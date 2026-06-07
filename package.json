@@ -1,0 +1,12 @@
+{
+  "name": "generator-testu",
+  "version": "1.0.0",
+  "description": "Generátor testů pro učitele – build systém",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
