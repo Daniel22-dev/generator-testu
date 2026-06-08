@@ -2296,10 +2296,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11',
+  version: '6.11.1',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA TEXTU WELCOME MODALU (6.11.1): PS přeformulováno — odstraněno slovo zbytečný, nový text: Až tě za nějakou dobu začne štvát, napiš adminovi — lze ho pro tebe vypnout. Jméno admina odstraněno. Ověřeno node --check.',
     'UVÍTACÍ MODAL (6.11): po úspěšném přihlášení se zobrazí personalizované uvítací okno (showWelcomeModal). Oslovení je ve vokativu — funkce czechVocative() skloňuje křestní jméno z displayName (40+ jmen v lookup table + automatická pravidla pro zbytek). Modal má gradientové záhlaví sladěné se stylem generátoru, popis nástroje, odkaz na Poradce a admina Daniela, PS o onboarding průvodci. Tlačítko Toto uvítání příště nezobrazovat uloží příznak do localStorage — modal se pak přeskočí. Onboarding gate se zobrazí 700 ms po welcome (ne 60 ms) aby nedošlo k překrytí. Admin dostane welcome modal stejně jako trainedTeacher. Ověřeno node --check.',
     'PORADCE: DOPLNĚNÍ CHYBĚJÍCÍCH KB ZÁZNAMŮ (6.10.1) — přidáno 9 záznamů: banked cloze, table-completion, bezpečnostní incident (klíč unikl), access-manifest.json, role admin vs trainedTeacher, logo školy, přiřazení skupin, anonymizace v diferenciaci. Celkem nyní 101 KB záznamů. Ověřeno node --check.',
     'PORADCE: VELKÉ ROZŠÍŘENÍ KB (6.10) — přidáno 30 nových záznamů ve 14 kategoriích. A) Typy cvičení: přehled typů, ordering vs word order, multi-select vs multiple choice, highlight-evidence, error-tagging, categorisation-board, počet položek. B) Hybrid: co to je, hlášky, ruční editace. C) Výsledky: answers.txt, bezpečnostní signály, bodování nesedí, odevzdal dvakrát, chybějící výsledek. D) Workflow: postup před nasazením, sdílení bez GitHubu. E) GitHub Pages: hosting, aktualizace, chyby. F) Bezpečnost: přísný vs procvičovací, ztráta připojení, PIN. G) Modely: Flash vs Lite. H) Správa: kolega, více variant, část látky. I) Šablony a historie. J) Archivace. K) Student: zobrazuje jinak. L) Přílohy a URL. M) Maturita a procvičovací test. N) Editor: úpravy, alternativy, smazání. Celkem nyní 93 KB záznamů. Ověřeno node --check.',
@@ -2309,9 +2310,8 @@ const RELEASE = Object.freeze({
     'OPRAVA ORDERING KLIKÁNÍ (6.08.5): RESP[id]=oOrder.slice() v renderQ inicializovalo RESP na [0,1,2,3] — ordCurPicks to vrátilo jako nakliknuté pořadí a clickOrd při prvním kliknutí odebíral místo přidával. Opraveno: RESP[id] se neinicializuje, ordBadgeHtml dostane prázdné picks[]. ordCurPicks nyní kontroluje jen Array.isArray, ne délku. Ověřeno node --check.',
     'ROZŠÍŘENÍ 503 HLÁŠKY O DENNÍ LIMIT (6.08.4): chyba 503 může mít dvě příčiny — přetížené servery NEBO vyčerpaný denní limit RPD (Free tier = 20/den, Google po vyčerpání vrací 503 místo 429). Hláška nyní obě možnosti vysvětluje a odkazuje na aistudio.google.com/rate-limit. Akce: zkontroluj RPD, počkej do půlnoci UTC nebo přejdi na Pay-as-you-go. Ověřeno node --check.',
     'OPRAVA TEXTU 503 HLÁŠKY (6.08.3): geminiAttemptsText vždy přidávala větu o 429/kvótě i u 503 chyby — nesedilo to. Funkce rozšířena o parametr errorType; při 503 zobrazí Generátor požadavek zkusil N×, ale Gemini servery stále neodpovídaly. Ověřeno node --check.',
-    'PŘÍVĚTIVĚJŠÍ CHYBOVÁ HLÁŠKA PRO 503 (6.08.2): chyba UNAVAILABLE (přetížené servery Gemini) nyní říká srozumitelně: servery jsou přetížené, trvá to pár minut, test ani klíč nejsou poškozené. Akce: počkej 2-3 minuty nebo přepni na Lite model. Ostatní 5xx chyby zůstaly beze změny. Ověřeno node --check.',
   ]
-});;;;;;;;;;;;;;;;;;;;
+});;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -13552,7 +13552,7 @@ function showWelcomeModal(profile) {
       adminNote +
       '<p>Pokud budeš mít jakékoliv dotazy, obrať se nejprve na <strong>Poradce ke generátoru</strong> — ikona <span style="font-size:15px">💬</span> vpravo nahoře. Pokud si ani tam neporadíš, napiš správci aplikace <strong>Danielovi</strong>.</p>' +
       '<p>Hodně štěstí při generování! 🚀</p>' +
-      '<div class="welcome-tip">💡 <strong>PS:</strong> Po tomto okně se zobrazí stručný průvodce prací s ostrým testem. Pokud ti přijde zbytečný, dej vědět Danielovi — lze ho pro tebe vypnout. Průvodce si pak přečteš kdykoliv kliknutím na ikonu <span style="font-size:13px">📋</span> vpravo nahoře.</div>' +
+      '<div class="welcome-tip">💡 <strong>PS:</strong> Po tomto okně se zobrazí stručný průvodce prací s ostrým testem. Až tě za nějakou dobu začne štvát, napiš adminovi — lze ho pro tebe vypnout. Kdykoliv si ho přečteš kliknutím na ikonu <span style="font-size:13px">📋</span> vpravo nahoře.</div>' +
     '</div>' +
     '<div class="welcome-actions">' +
       '<button type="button" class="welcome-ok-btn" id="welcomeOkBtn">Pojďme na to!</button>' +
