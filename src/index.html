@@ -2210,10 +2210,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.08',
+  version: '6.08.1',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA PROMPTU PRO ORDERING (6.08.1): validátor hlásil počet položek je 1, očekáváno 5 — Gemini chápal EXACTLY 5 items jako 5 vnitřních prvků jednoho bloku, ne jako 5 samostatných ordering otázek. Přidán orderingNote do specLines: každý items[] objekt je SAMOSTATNÁ ordering otázka se svým question/items[]/correct_order. Přidáno i do statických pravidel promptu. Ověřeno node --check.',
     'ORDERING: NOVÝ UX (klikací číslování) + EDITOR HIGHLIGHT-EVIDENCE (6.08). (1) Ordering: šipky ▲▼ nahrazeny klikacím číslováním — student kliká na položky v pořadí (1, 2, 3…), číslo se zobrazí v kruhovém badge, klik znovu číslo zruší. Funguje na mobilu i PC, přístupné přes klávesnici (Enter/Space). Změněno ve všech třech cestách: secure renderQ, instant buildQuestionHtml, a teacher verifier renderQ. Hint text aktualizován. Test Lab check upraven na clickOrdInst. (2) Editor: highlight-evidence chyběl jako větev v edItemHtml — propadal do generického else, kde se nezobrazilo zadání ani odpovědi. Přidán edEvidenceBlock: seznam vět s radio výběrem správné, přidávání/odebírání vět. Ověřeno node --check.',
     'PŘEPIS RETRY HLÁŠKY (6.07.6): geminiWaitBeforeRetry zobrazovala Gemini dočasně selhalo (poškozený JSON). Další pokus 3/4 za 15 s — pro učitele matoucí, vypadalo to jako chyba i když retry normálně probíhal. Změněno na Gemini vrátilo neúplný výstup — opakuji (pokus 3/4, za 15 s). Ověřeno node --check.',
     'OPRAVA TEXTU BANNERU (6.07.5): veta Generátor je vygeneruje byla gramaticky chybná. Opraveno na složitá se vygenerují každé zvlášť, jednoduchá najednou. Ověřeno node --check.',
@@ -2223,9 +2224,8 @@ const RELEASE = Object.freeze({
     'OPRAVA HYBRID BANNERU (6.07.1): (1) Badge deduplication: seen{} nyní porovnává raw ex.typ místo normalizeType(ex.typ) — počet složitých cvičení v textu a počet badge jsou teď vždy identické (dříve: ordering chyběl v badge, přestože byl počítán). (2) Reaktivita banneru: renderHybridBanner() přidáno do updateExField() → banner se okamžitě aktualizuje při změně typu v selectu bez nutnosti opustit sekci a vrátit se. Ověřeno node --check.',
     'AUTOMATICKÝ HYBRID: složitá cvičení každé zvlášť, jednoduchá najednou. Funkce runHybridGeneration() automaticky detekuje složitá cvičení (MANUAL_SUPPORTED_TYPES) v konfiguraci a generuje je každé vlastním API callem (split); jednoduchá cvičení jdou v jednom batch callu; výsledky se složí v původním pořadí. Funguje v OBOU módech (základní i pokročilý) bez přepínačů. Informativní banner (#hybridBanner) se automaticky zobrazí pod konfigurací cvičení, jakmile se v detailním nastavení vyskytne složitý typ — obsahuje jméno a počet složitých cvičení a upozornění na fallback (ruční editace). Banner se skryje, když detail vypnout nebo žádný složitý typ nechybí. Pokud hybrid selže na konkrétním cvičení i po 2 pokusech, zobrazí se chybová zpráva s návodem na ruční editaci; zbytek testu se sestaví normálně. Ověřeno node --check.',
     'OPRAVA normalizeLoadedState + TEST LAB. (1) normalizeLoadedState({}) nevracelo splitGenerate=false ani manualMode=false — defaulty byly omylem jen v setAppMode, ne ve funkci samotné. Test Lab catBoard lock + nová pole proto stále hlásil SELHALO. Opraveno: defaulty přesunuty do normalizeLoadedState. (2) Tlačítko „Ověřit aktuální výstup\" odstraněno z Test Lab UI (button, help karta i event listener). Ověřeno node --check.',
-    'EDITOR OTÁZEK A ODPOVĚDÍ — FULLSCREEN. Editor (openTestEditor) a panel „Rozšířit přijatelné odpovědi" nyní zabírají celou stránku: .editor-overlay padding snížen na 0, .editor-shell width=100%, border-radius=0, box-shadow odstraněn. Editor tak lépe využije prostor na širokých monitorech i při velkém počtu položek. Vizuální změna pouze v editoru, žádný dopad na generování, bodování ani export. Ověřeno node --check.',
   ]
-});;;;;;;;;
+});;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -10629,7 +10629,10 @@ function buildContentPrompt(st,apiSourceNotes=[]){
     const multiSelectNote=(s.type==='multi-select')
       ? ' MULTI-SELECT RULES: "correct" MUST be a JSON array of 0-based indices (e.g. [0,2]), NEVER a single integer. Write [0] not 0.'
       : '';
-        return `${i+1}. Exercise type "${s.type}": EXACTLY ${s.count} items, EXACTLY ${s.pts} total points. App item points: [${makeItemPoints(s.pts,s.count).join(',')}]. Required item fields: ${apiRequiredFieldsHint(s.type)}.${styleNote}${rcNote}${catBoardNote}${multiSelectNote}`;
+    const orderingNote=(s.type==='ordering')
+      ? ` ORDERING RULES: Generate EXACTLY ${s.count} separate ordering question(s) as items[]. Each item is one ordering question with its own "question", "items" array (the phrases/steps to sort, typically 3-6 entries), and "correct_order" (permutation of 0-based indices). Do NOT put all phrases into one item — every item[] entry is a SEPARATE ordering question block.`
+      : '';
+        return `${i+1}. Exercise type "${s.type}": EXACTLY ${s.count} items, EXACTLY ${s.pts} total points. App item points: [${makeItemPoints(s.pts,s.count).join(',')}]. Required item fields: ${apiRequiredFieldsHint(s.type)}.${styleNote}${rcNote}${catBoardNote}${multiSelectNote}${orderingNote}`;
   }).join('\n');
   const spanishArticleRules = isSpanishLike(jazyk) ? `\nSPANISH VOCABULARY ARTICLE RULES - MANDATORY:
 - If an isolated Spanish noun or noun phrase appears as a vocabulary item, option, matching left item, translation answer, correct answer, or displayed lexical item, include the definite article: el/la/los/las.
@@ -10647,6 +10650,7 @@ function buildContentPrompt(st,apiSourceNotes=[]){
 - For transformation-chain, scoring is deterministic only: every acceptable form must be listed in answer or alt_answers; do NOT assume AI/paraphrase evaluation.
 - For highlight-evidence, do NOT ask for free mouse highlighting; provide sentences[2+] and correct as the 0-based index of the evidence sentence.
 - For categorisation-board, every item is ONE complete sorting board: generate 6-10 entries per board (never fewer than 6). Every entry must be {text, category} with a real word/phrase; category EXACTLY matches one string in "categories"; entries in MIXED order.
+- For ordering, each item in items[] is ONE complete ordering question with its own "question", "items"[] (the phrases to sort) and "correct_order"[]. EXACTLY N separate ordering questions means N objects in items[] — do NOT collapse all phrases into one item.
 - For multi-select, "correct" must always be a JSON array of 0-based integer indices (e.g. [0,2]), never a single integer, even when only one option is correct.
 - correct is the 0-based integer index into the options array (first option = 0, second = 1, …). Never exceed options.length − 1.\n- For listening comprehension, use an attached audio/video file, a provided audio/video URL, or a transcript/exercise document as TEACHER/SOURCE material. Audio is for the teacher only: the student test must not contain an audio player, URL, transcript, or source text; it should only say that the teacher will play the listening. Include transcript/audio script/source note only in teacher data.\n- Use attached images/PDFs/DOCX/audio/video text as source material when present.\n${spanishArticleRules}- Include exact answer keys and concise explanations.\n- Return ONLY valid JSON, no markdown.${variantSchema}`;
 }
