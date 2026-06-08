@@ -2210,10 +2210,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.08.6',
+  version: '6.09',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'PORADCE: 9 NOVÝCH KB ZÁZNAMŮ PRO CHYBOVÉ HLÁŠKY (6.09). Přidány záznamy pokrývající všechny hlavní chyby generátoru: 503/UNAVAILABLE (přetížení vs. RPD limit), 429/RESOURCE_EXHAUSTED (kvóta), 400/INVALID_ARGUMENT (neplatný klíč), 401-403/PERMISSION_DENIED, 504/DEADLINE_EXCEEDED (timeout), poškozený JSON, data mimo zadání (validace), síťová chyba a model nenalezen. Každý záznam má simple i detailed verzi + evidence. Přidány chipy: chyba 503/429/400/poškozený JSON/data mimo zadání/model nenalezen/síťová chyba. Ověřeno node --check.',
+    'OPRAVA TEST LAB ORDERING (6.08.7): Test Lab hledal clickOrdInst v secure skriptu, ale secure cesta používá clickOrd — instant cesta má clickOrdInst. Check opraven na function clickOrd(. Ověřeno node --check.',
     'PŘEJMENOVÁNÍ SPLIT-GEN TLAČÍTKA (6.08.6): toggle Po cvičeních přejmenován na Každé cvičení zvlášť s podtitulkem Včetně jednoduchých — hybrid to dělá automaticky jen pro složitá. Tooltip upřesněn. Tlačítko zůstává jen v pokročilém módu. Ověřeno node --check.',
     'OPRAVA ORDERING KLIKÁNÍ (6.08.5): RESP[id]=oOrder.slice() v renderQ inicializovalo RESP na [0,1,2,3] — ordCurPicks to vrátilo jako nakliknuté pořadí a clickOrd při prvním kliknutí odebíral místo přidával. Opraveno: RESP[id] se neinicializuje, ordBadgeHtml dostane prázdné picks[]. ordCurPicks nyní kontroluje jen Array.isArray, ne délku. Ověřeno node --check.',
     'ROZŠÍŘENÍ 503 HLÁŠKY O DENNÍ LIMIT (6.08.4): chyba 503 může mít dvě příčiny — přetížené servery NEBO vyčerpaný denní limit RPD (Free tier = 20/den, Google po vyčerpání vrací 503 místo 429). Hláška nyní obě možnosti vysvětluje a odkazuje na aistudio.google.com/rate-limit. Akce: zkontroluj RPD, počkej do půlnoci UTC nebo přejdi na Pay-as-you-go. Ověřeno node --check.',
@@ -2222,10 +2224,8 @@ const RELEASE = Object.freeze({
     'OPRAVA PROMPTU PRO ORDERING (6.08.1): validátor hlásil počet položek je 1, očekáváno 5 — Gemini chápal EXACTLY 5 items jako 5 vnitřních prvků jednoho bloku, ne jako 5 samostatných ordering otázek. Přidán orderingNote do specLines: každý items[] objekt je SAMOSTATNÁ ordering otázka se svým question/items[]/correct_order. Přidáno i do statických pravidel promptu. Ověřeno node --check.',
     'ORDERING: NOVÝ UX (klikací číslování) + EDITOR HIGHLIGHT-EVIDENCE (6.08). (1) Ordering: šipky ▲▼ nahrazeny klikacím číslováním — student kliká na položky v pořadí (1, 2, 3…), číslo se zobrazí v kruhovém badge, klik znovu číslo zruší. Funguje na mobilu i PC, přístupné přes klávesnici (Enter/Space). Změněno ve všech třech cestách: secure renderQ, instant buildQuestionHtml, a teacher verifier renderQ. Hint text aktualizován. Test Lab check upraven na clickOrdInst. (2) Editor: highlight-evidence chyběl jako větev v edItemHtml — propadal do generického else, kde se nezobrazilo zadání ani odpovědi. Přidán edEvidenceBlock: seznam vět s radio výběrem správné, přidávání/odebírání vět. Ověřeno node --check.',
     'PŘEPIS RETRY HLÁŠKY (6.07.6): geminiWaitBeforeRetry zobrazovala Gemini dočasně selhalo (poškozený JSON). Další pokus 3/4 za 15 s — pro učitele matoucí, vypadalo to jako chyba i když retry normálně probíhal. Změněno na Gemini vrátilo neúplný výstup — opakuji (pokus 3/4, za 15 s). Ověřeno node --check.',
-    'OPRAVA TEXTU BANNERU (6.07.5): veta Generátor je vygeneruje byla gramaticky chybná. Opraveno na složitá se vygenerují každé zvlášť, jednoduchá najednou. Ověřeno node --check.',
-    'OPRAVA TOGGLE 🤖/✏️ PŘI ZMĚNĚ TYPU (6.07.4): toggle div byl renderován podmíněně (isManualSupported ? div : nic) — při přepnutí z jednoduchého na složitý typ element v DOM neexistoval, takže updateExField ho nemohl zobrazit. Opraveno: toggle div se vždy renderuje do DOM, viditelnost řídí inline style=display:none pro jednoduché typy. updateExField ho spolehlivě najde a zobrazí/skryje. Ověřeno node --check.',
   ]
-});;;;;;;;;;;;;;;
+});;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -2767,11 +2767,66 @@ const GENERATOR_ASSISTANT_KB = [
   keywords:['spanelstina','prizvuk','akcent','accent','tilde','spanelsky','diakritika spanelstina'],
   simple:'U španělštiny se za chybějící/špatný přízvuk u jinak správné odpovědi odečítá 0,5 bodu (nikdy ne pod 0). Ñ se bere jako samostatné písmeno.',
   detailed:'getCompactSpanishRules() přidává španělská pravidla: vyžaduje člen u izolovaných substantiv, nezrazuje rod členem před mezerou a u přízvuků odečítá 0,5 bodu za chybějící/špatný přízvuk. Hodnoticí engine (textScore v SHARED_SCORING_JS) dává za odpověď lišící se jen přízvukem poloviční kredit.',
-  evidence:['getCompactSpanishRules()','textScore() v SHARED_SCORING_JS','0,5 bodu za přízvuk','ñ = samostatné písmeno']}
+  evidence:['getCompactSpanishRules()','textScore() v SHARED_SCORING_JS','0,5 bodu za přízvuk','ñ = samostatné písmeno']},
+
+ {id:'chyba-503',title:'Chyba 503 / UNAVAILABLE při generování',status:'reseno',
+  keywords:['503','unavailable','service unavailable','pretizeny','přetížený','pretizene','přetížené servery','high demand','server nedostupny','server nedostupný','generovani selhalo','generování selhalo','zkus znovu'],
+  simple:'Chyba 503 má dvě možné příčiny: přetížené servery Gemini (trvá pár minut) nebo vyčerpaný denní limit requestů (Free tier = 20/den). Zkontroluj na aistudio.google.com → Rate Limit, jestli máš RPD na 20/20.',
+  detailed:'HTTP 503 UNAVAILABLE znamená buď (1) přetížení serverů Gemini — stává se ve špičkách, zpravidla odezní za 2–5 minut, nebo (2) vyčerpaný denní limit RPD — Google na Free tier povoluje 20 requestů denně a po dosažení vrací 503 místo 429. Jak poznat: jdi na aistudio.google.com → Rate Limit, podívej se na sloupec RPD u modelu gemini-2.5-flash. Pokud je 20/20, limit je vyčerpaný a resetuje se o půlnoci UTC (cca 1–2 hod. v noci CZ). Řešení: Pay-as-you-go (přidej kartu v AI Studiu) zvyšuje limit na 1000/den. Alternativa: Gemini 2.5 Flash Lite má oddělený limit (také 20/den, ale zpravidla méně vytížený).',
+  evidence:['geminiApiErrorMessage()','HTTP 503','UNAVAILABLE','RPD','Rate Limit','aistudio.google.com']},
+
+ {id:'chyba-429',title:'Chyba 429 / RESOURCE_EXHAUSTED / překročen limit',status:'reseno',
+  keywords:['429','resource exhausted','resource_exhausted','prekrocen limit','překročen limit','kvota','kvóta','quota','too many requests','denni limit','denní limit','rpm','rpd','rate limit'],
+  simple:'Byl překročen limit požadavků nebo kvóta API klíče. Generátor tlačítko dočasně zablokuje. Počkej alespoň minutu a zkus znovu, nebo ověř limity v AI Studiu.',
+  detailed:'HTTP 429 RESOURCE_EXHAUSTED znamená překročení limitu — buď RPM (requests per minute, Free tier = 5/min) nebo RPD (requests per day, Free tier = 20/den). Generátor na 429 automaticky čeká a zobrazí cooldown timer. Neklikej opakovaně — každý zbytečný request pálí denní kvótu. Na aistudio.google.com → Rate Limit uvidíš aktuální vytížení. Pokud je RPM překročen, stačí počkat minutu. Pokud je RPD 20/20, limit se resetuje o půlnoci UTC.',
+  evidence:['geminiCooldownRemainingMs()','geminiUpdateCooldownUI()','GEMINI_COOLDOWN_MS','HTTP 429','RESOURCE_EXHAUSTED']},
+
+ {id:'chyba-400',title:'Chyba 400 / INVALID_ARGUMENT při generování',status:'reseno',
+  keywords:['400','invalid argument','invalid_argument','neplatny klic','neplatný klíč','api key not valid','spatny klic','špatný klíč','klic nefunguje','klíč nefunguje','neplatny pozadavek','neplatný požadavek'],
+  simple:'Chyba 400 nejčastěji znamená neplatný API klíč. Zkontroluj klíč ve žluté sekci — zkopíruj ho znovu z aistudio.google.com → API Keys.',
+  detailed:'HTTP 400 INVALID_ARGUMENT nastane když: (1) API klíč je neplatný, expiroval nebo byl zrušen — nejčastější příčina, (2) zvolený model neexistuje nebo není dostupný pro tento endpoint, (3) kombinace příloh nebo URL není pro API podporovaná. Řešení pro případ (1): jdi na aistudio.google.com → API Keys, regeneruj klíč nebo vytvoř nový, vlož ho znovu do generátoru. Pro případ (2): přepni model na gemini-2.5-flash ve žluté sekci. Klíče na Free tier jsou občas automaticky zrušeny po dlouhé nečinnosti.',
+  evidence:['geminiApiErrorMessage()','HTTP 400','INVALID_ARGUMENT','getGeminiInputKey()','useGeminiKeyForSession()']},
+
+ {id:'chyba-401-403',title:'Chyba 401 / 403 / PERMISSION_DENIED při generování',status:'reseno',
+  keywords:['401','403','permission denied','permission_denied','unauthenticated','nemam opravneni','nemám oprávnění','pristup odepren','přístup odepřen','klic nema opravneni','klíč nemá oprávnění'],
+  simple:'Chyba 401/403 znamená, že API klíč nemá oprávnění. Zkontroluj klíč nebo vytvoř nový s správným projektem v AI Studiu.',
+  detailed:'HTTP 401 nebo 403 PERMISSION_DENIED nastane když API klíč není oprávněn pro daný model nebo projekt. Může to být: (1) klíč patří jinému projektu, (2) projekt nemá povolenou Gemini API, (3) klíč byl omezen nebo odvolán. Řešení: jdi na aistudio.google.com → API Keys, zkontroluj ke kterému projektu klíč patří, případně vytvoř nový klíč ve správném projektu.',
+  evidence:['geminiApiErrorMessage()','HTTP 401','HTTP 403','PERMISSION_DENIED','UNAUTHENTICATED']},
+
+ {id:'chyba-504',title:'Chyba 504 / DEADLINE_EXCEEDED — timeout',status:'reseno',
+  keywords:['504','deadline exceeded','deadline_exceeded','timeout','vyprselo','vypršelo','cas vyprsel','čas vypršel','prilis dlouhy test','příliš dlouhý','nestihlo','nestihlo se vygenerovat'],
+  simple:'Chyba 504 znamená, že Gemini nestihlo vygenerovat odpověď v časovém limitu. Zkus zmenšit test — méně cvičení nebo méně položek.',
+  detailed:'HTTP 504 DEADLINE_EXCEEDED nastane když generování trvá déle než interní limit Google API (obvykle 180 s). Typické příčiny: příliš mnoho cvičení najednou, příliš velký vstupní soubor (PDF/obrázek), nebo náročná kombinace typů. Řešení: (1) zmenši počet cvičení nebo položek, (2) použij hybridní generování (složitá cvičení zvlášť), (3) odstraň velké přílohy nebo zkracej URL obsah, (4) přepni na silnější model gemini-2.5-flash pokud používáš Lite.',
+  evidence:['geminiApiErrorMessage()','HTTP 504','DEADLINE_EXCEEDED','GEMINI_TIMEOUT_MS','hybridní generování']},
+
+ {id:'chyba-poskozeny-json',title:'Poškozený JSON — generátor nemůže sestavit test',status:'reseno',
+  keywords:['poskozeny json','poškozený json','spatny json','špatný json','nepodařilo opravit','nepodarilo opravit','json selhal','test negeneruje','generátor nemůže','blbý výstup','divný výstup','nesmyslný výstup'],
+  simple:'Gemini vrátilo neúplný nebo chybně naformátovaný výstup. Generátor se pokusí opravit automaticky. Pokud selže, zkus generovat znovu nebo použij hybridní generování.',
+  detailed:'Poškozený JSON nastane když model vrátí text, který nejde naparsovat jako validní JSON — typicky useknutý výstup (příliš dlouhý test), model vložil text mimo JSON strukturu, nebo nesprávně escapoval znaky. Generátor automaticky zkusí opravit (repairGeminiJson) a při selhání zobrazí chybu. Řešení: (1) zkus generovat znovu — modely jsou nedeterministické, druhý pokus bývá lepší, (2) zmenši test (méně cvičení/položek), (3) zapni hybridní generování — složitá cvičení zvlášť produkují menší JSON, (4) pokud selháváš opakovaně u jednoho typu, nastav ho na ruční editaci (✏️ v pokročilém módu).',
+  evidence:['repairGeminiJson()','lastGeminiJsonRepaired','lastGeminiRawResponse','hybridní generování','runHybridGeneration()']},
+
+ {id:'chyba-data-mimo-zadani',title:'Chyba: data mimo zadání — generátor negeneruje test',status:'reseno',
+  keywords:['data mimo zadani','data mimo zadání','pocet polozek','počet položek','ocekavano','očekáváno','spatny pocet','špatný počet','validator','validátor','negeneruje','test negeneruje','chyba validace'],
+  simple:'Gemini vygenerovalo správný JSON, ale s jiným počtem položek nebo špatným typem cvičení než bylo zadáno. Generátor to odmítne a zobrazí co konkrétně nesedí. Zkus generovat znovu.',
+  detailed:'Validátor striktně kontroluje: počet cvičení, typy cvičení, počet položek v každém cvičení a povinná pole. Chyba data mimo zadání nastane když Gemini nedodrží přesné zadání — například u ordering vygeneruje 1 otázku místo 5. Generátor automaticky zkusí jednu opravu (pošle AI seznam chyb). Pokud ani oprava neprojde, zobrazí se detail chyby. Řešení: (1) zkus generovat znovu, (2) pokud se chyba opakuje u konkrétního typu, zkus hybridní generování, (3) složité typy (ordering, categorisation-board) nastav na ruční editaci.',
+  evidence:['validateExerciseSetStrict()','buildExerciseSpecs()','isExerciseValidation','validationDetails','opravný pokyn']},
+
+ {id:'chyba-sit',title:'Chyba sítě / fetch selhal / offline',status:'reseno',
+  keywords:['sit','síť','network','fetch','offline','neni internet','není internet','odpojeni','odpojení','selhala sit','selhala síť','cors','proxy'],
+  simple:'Generátor nemůže dosáhnout Gemini API kvůli síťovému problému. Zkontroluj připojení k internetu a zkus znovu.',
+  detailed:'Síťová chyba nastane když fetch() požadavek selže ještě před tím, než API odpověď dorazí — typicky kvůli výpadku internetu, firemnímu proxy nebo firewallu blokujícímu api.generativelanguage.googleapis.com. Školní sítě občas blokují přímé API volání. Řešení: (1) zkontroluj připojení k internetu, (2) zkus na mobilních datech jestli to funguje, (3) pokud blokuje školní síť, generuj z domova nebo použij mobilní hotspot.',
+  evidence:['callGeminiJSON()','geminiNetworkErrorMessage()','fetch selhal','TypeError']},
+
+ {id:'chyba-model-nenalezen',title:'Chyba: model nenalezen / není podporován',status:'reseno',
+  keywords:['model nenalezen','model nenalezeny','model not found','not found','not supported','unsupported','404','model nefunguje','spatny model','špatný model','neexistujici model','neexistující model'],
+  simple:'Název modelu ve žluté sekci neexistuje nebo již není dostupný. Přepni na gemini-2.5-flash přes tlačítko Výchozí nebo ⚡ Silný.',
+  detailed:'HTTP 404 nebo odpověď obsahující not found nastane když zadaný název modelu Google nezná. Modely jsou občas zrušeny nebo přejmenovány. Generátor má dvě záchranná tlačítka: ⚡ Silný nastaví gemini-2.5-flash (doporučený), 🪶 Lite nastaví gemini-2.5-flash-lite. Tlačítko Výchozí obnoví výchozí model. Aktuální seznam modelů najdeš na ai.google.dev/gemini-api/docs/models.',
+  evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']}
+
 ];
 
 const GA_NOT_ADDRESSED = 'Tento jev není v generátoru nijak výslovně řešen.';
-const GA_CHIPS = ['tisk / PDF','co dát studentům','answers.txt','hromadné vyhodnocení','zpětná vazba','diferenciace','anonymizace','split screen','API klíč','self-test','teacher verifier','fullscreen','export'];
+const GA_CHIPS = ['tisk / PDF','co dát studentům','answers.txt','hromadné vyhodnocení','zpětná vazba','diferenciace','anonymizace','split screen','API klíč','self-test','teacher verifier','fullscreen','export','chyba 503','chyba 429','chyba 400','poškozený JSON','data mimo zadání','model nenalezen','síťová chyba'];
 let gaState = { ai:null, mode:'simple', loading:false, query:'' };
 
 function gaStatusMeta(status){
@@ -8989,7 +9044,7 @@ function tlChecks(){
       try { ss = secureStudentScript(); } catch(e) { return tlFail('Ordering bodování', 'secureStudentScript() skončil výjimkou.', e && e.message ? e.message : String(e)); }
       var miss = [];
       if (ss.indexOf("type==='ordering'") < 0) miss.push('render (renderQ)');
-      if (ss.indexOf('function clickOrdInst') < 0) miss.push('sběr odpovědí (clickOrdInst)');
+      if (ss.indexOf('function clickOrd(') < 0) miss.push('sběr odpovědí (clickOrd)');
       var ts = (typeof secureTeacherScript==='function') ? String(secureTeacherScript()) : '';
       if (ts.indexOf("t==='ordering'") < 0 || ts.indexOf('orderingScore(val,it.correct_order,pts)') < 0) miss.push('bodování (scoreItemSecure → orderingScore)');
       if (ts.indexOf('orderingScore') < 0) miss.push('sdílené orderingScore v secure');
