@@ -1,0 +1,18 @@
+{
+  "manifestVersion": 1,
+  "policyVersion": 1,
+  "issuedAt": "2026-06-08",
+  "entries": [
+    {
+      "userId": "BALAZ",
+      "displayName": "Daniel Baláž",
+      "role": "admin",
+      "status": "active",
+      "accessCodeHash": "pbkdf2-v1$yeYMLdvhsnuoXQ2Rpj2i_qmyUfQc7PQV652ssgeLV7E",
+      "salt": "9BCdvYJy-Aam6rfusGYkWQ",
+      "issuedAt": "2026-05-30",
+      "revokedAt": null,
+      "note": "Správce aplikace"
+    }
+  ]
+}
