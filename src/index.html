@@ -979,6 +979,92 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .ga-ai { border-color: var(--ok-b); color: var(--ok); }
 .ga-foot { padding: 4px 15px 14px; color: var(--t4); font-size: 11px; line-height: 1.45; }
 @media(max-width:480px){ .ga-controls { flex-direction: column; align-items: stretch; } .ga-find { width: 100%; } .ga-actions { flex-direction: column-reverse; } .ga-act { width: 100%; } .ga-result { max-height: 40vh; } }
+/* ── Uvítací modal (welcome) ─────────────────────────────────────────────── */
+.welcome-gate { z-index: 30040; }
+.welcome-box {
+  width: min(500px, 96vw);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.45);
+}
+.welcome-hero {
+  background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+  padding: 28px 24px 22px;
+  text-align: center;
+  position: relative;
+}
+body.light .welcome-hero {
+  background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+}
+.welcome-hero-emoji { font-size: 44px; line-height: 1; margin-bottom: 8px; }
+.welcome-hero-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .2px;
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+.welcome-hero-sub {
+  font-size: 13.5px;
+  color: rgba(255,255,255,.82);
+  margin-top: 5px;
+  font-weight: 500;
+}
+.welcome-body {
+  padding: 20px 22px 10px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--card);
+}
+.welcome-body p { margin: 0 0 10px; }
+.welcome-body p:last-child { margin-bottom: 0; }
+.welcome-body strong { color: var(--accent); }
+.welcome-tip {
+  background: var(--card2);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 12px;
+  line-height: 1.5;
+}
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px 20px;
+  background: var(--card);
+}
+.welcome-ok-btn {
+  min-width: 200px;
+  padding: 10px 24px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .3px;
+  transition: opacity .15s;
+}
+.welcome-ok-btn:hover { opacity: .88; }
+.welcome-skip-link {
+  font-size: 11.5px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+}
+.welcome-skip-link:hover { color: var(--text); }
+
 /* Povinné úvodní okno (onboarding gate) */
 .onboarding-gate { z-index: 30050; }
 .onboarding-box { width: min(560px, 100%); }
@@ -2210,10 +2296,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.10.1',
+  version: '6.11',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'UVÍTACÍ MODAL (6.11): po úspěšném přihlášení se zobrazí personalizované uvítací okno (showWelcomeModal). Oslovení je ve vokativu — funkce czechVocative() skloňuje křestní jméno z displayName (40+ jmen v lookup table + automatická pravidla pro zbytek). Modal má gradientové záhlaví sladěné se stylem generátoru, popis nástroje, odkaz na Poradce a admina Daniela, PS o onboarding průvodci. Tlačítko Toto uvítání příště nezobrazovat uloží příznak do localStorage — modal se pak přeskočí. Onboarding gate se zobrazí 700 ms po welcome (ne 60 ms) aby nedošlo k překrytí. Admin dostane welcome modal stejně jako trainedTeacher. Ověřeno node --check.',
     'PORADCE: DOPLNĚNÍ CHYBĚJÍCÍCH KB ZÁZNAMŮ (6.10.1) — přidáno 9 záznamů: banked cloze, table-completion, bezpečnostní incident (klíč unikl), access-manifest.json, role admin vs trainedTeacher, logo školy, přiřazení skupin, anonymizace v diferenciaci. Celkem nyní 101 KB záznamů. Ověřeno node --check.',
     'PORADCE: VELKÉ ROZŠÍŘENÍ KB (6.10) — přidáno 30 nových záznamů ve 14 kategoriích. A) Typy cvičení: přehled typů, ordering vs word order, multi-select vs multiple choice, highlight-evidence, error-tagging, categorisation-board, počet položek. B) Hybrid: co to je, hlášky, ruční editace. C) Výsledky: answers.txt, bezpečnostní signály, bodování nesedí, odevzdal dvakrát, chybějící výsledek. D) Workflow: postup před nasazením, sdílení bez GitHubu. E) GitHub Pages: hosting, aktualizace, chyby. F) Bezpečnost: přísný vs procvičovací, ztráta připojení, PIN. G) Modely: Flash vs Lite. H) Správa: kolega, více variant, část látky. I) Šablony a historie. J) Archivace. K) Student: zobrazuje jinak. L) Přílohy a URL. M) Maturita a procvičovací test. N) Editor: úpravy, alternativy, smazání. Celkem nyní 93 KB záznamů. Ověřeno node --check.',
     'PORADCE: 9 NOVÝCH KB ZÁZNAMŮ PRO CHYBOVÉ HLÁŠKY (6.09). Přidány záznamy pokrývající všechny hlavní chyby generátoru: 503/UNAVAILABLE (přetížení vs. RPD limit), 429/RESOURCE_EXHAUSTED (kvóta), 400/INVALID_ARGUMENT (neplatný klíč), 401-403/PERMISSION_DENIED, 504/DEADLINE_EXCEEDED (timeout), poškozený JSON, data mimo zadání (validace), síťová chyba a model nenalezen. Každý záznam má simple i detailed verzi + evidence. Přidány chipy: chyba 503/429/400/poškozený JSON/data mimo zadání/model nenalezen/síťová chyba. Ověřeno node --check.',
@@ -2223,9 +2310,8 @@ const RELEASE = Object.freeze({
     'ROZŠÍŘENÍ 503 HLÁŠKY O DENNÍ LIMIT (6.08.4): chyba 503 může mít dvě příčiny — přetížené servery NEBO vyčerpaný denní limit RPD (Free tier = 20/den, Google po vyčerpání vrací 503 místo 429). Hláška nyní obě možnosti vysvětluje a odkazuje na aistudio.google.com/rate-limit. Akce: zkontroluj RPD, počkej do půlnoci UTC nebo přejdi na Pay-as-you-go. Ověřeno node --check.',
     'OPRAVA TEXTU 503 HLÁŠKY (6.08.3): geminiAttemptsText vždy přidávala větu o 429/kvótě i u 503 chyby — nesedilo to. Funkce rozšířena o parametr errorType; při 503 zobrazí Generátor požadavek zkusil N×, ale Gemini servery stále neodpovídaly. Ověřeno node --check.',
     'PŘÍVĚTIVĚJŠÍ CHYBOVÁ HLÁŠKA PRO 503 (6.08.2): chyba UNAVAILABLE (přetížené servery Gemini) nyní říká srozumitelně: servery jsou přetížené, trvá to pár minut, test ani klíč nejsou poškozené. Akce: počkej 2-3 minuty nebo přepni na Lite model. Ostatní 5xx chyby zůstaly beze změny. Ověřeno node --check.',
-    'OPRAVA PROMPTU PRO ORDERING (6.08.1): validátor hlásil počet položek je 1, očekáváno 5 — Gemini chápal EXACTLY 5 items jako 5 vnitřních prvků jednoho bloku, ne jako 5 samostatných ordering otázek. Přidán orderingNote do specLines: každý items[] objekt je SAMOSTATNÁ ordering otázka se svým question/items[]/correct_order. Přidáno i do statických pravidel promptu. Ověřeno node --check.',
   ]
-});;;;;;;;;;;;;;;;;;;
+});;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -13321,6 +13407,182 @@ function showUsageGuide(){
 // Povinné úvodní okno: vyskočí při každém otevření generátoru a blokuje tvorbu testu,
 // dokud uživatel nepotvrdí „ROZUMÍM". Záměrně NEjde zavřít klikem mimo okno ani Esc —
 // jediná cesta dál je tlačítko. Stejný text jako návod 📋 v záhlaví (jeden zdroj).
+
+// ── Uvítací modal ─────────────────────────────────────────────────────────
+const WELCOME_SKIP_KEY = 'genWelcomeSkipped_v1';
+
+function czechVocative(displayName) {
+  // Vezme první slovo jako křestní jméno a skloní do vokativu
+  var first = (displayName || '').trim().split(/\s+/)[0] || '';
+  if (!first) return '';
+  var n = first;
+  var lc = n.toLowerCase();
+
+  // Výjimky / speciální tvary (rozšiřuj podle potřeby)
+  var exceptions = {
+    'daniel':   'Danieli',
+    'jan':      'Jane',
+    'jakub':    'Jakube',
+    'ondrej':   'Ondřeji',
+    'ondřej':   'Ondřeji',
+    'tomas':    'Tomáši',
+    'tomáš':    'Tomáši',
+    'martin':   'Martine',
+    'david':    'Davide',
+    'michal':   'Michale',
+    'lukas':    'Lukáši',
+    'lukáš':    'Lukáši',
+    'petr':     'Petře',
+    'pavel':    'Pavle',
+    'marek':    'Marku',
+    'adam':     'Adame',
+    'filip':    'Filipe',
+    'roman':    'Romane',
+    'jiri':     'Jiří',
+    'jiří':     'Jiří',
+    'radek':    'Radku',
+    'vojtech':  'Vojtěchu',
+    'vojtěch':  'Vojtěchu',
+    'frantisek':'Františku',
+    'františek':'Františku',
+    'zdenek':   'Zdeňku',
+    'zdeněk':   'Zdeňku',
+    'milan':    'Milane',
+    'stanislav':'Stanislave',
+    'jaroslav': 'Jaroslavu',
+    'miroslav': 'Miroslavu',
+    // Ženská jména
+    'jana':     'Jano',
+    'marie':    'Marie',
+    'tereza':   'Terezo',
+    'katerina': 'Kateřino',
+    'kateřina': 'Kateřino',
+    'eva':      'Evo',
+    'petra':    'Petro',
+    'lenka':    'Lenko',
+    'martina':  'Martino',
+    'lucie':    'Lucie',
+    'monika':   'Moniko',
+    'helena':   'Heleno',
+    'alena':    'Aleno',
+    'anna':     'Anno',
+    'hana':     'Hano',
+    'veronika': 'Veroniko',
+    'michaela': 'Michaelo',
+    'marketa':  'Markéto',
+    'markéta':  'Markéto',
+    'barbora':  'Barbaro',
+    'kristyna': 'Kristýno',
+    'kristýna': 'Kristýno',
+    'simona':   'Simono',
+    'zuzana':   'Zuzano',
+    'ivana':    'Ivano',
+    'dagmar':   'Dagmar',
+    'renata':   'Renato',
+    'andrea':   'Andreo',
+    'klara':    'Kláro',
+    'klára':    'Kláro',
+    'radka':    'Radko',
+    'libuse':   'Libuše',
+    'libuše':   'Libuše',
+    'olga':     'Olgo',
+    'vera':     'Věro',
+    'věra':     'Věro',
+    'sarka':    'Šárko',
+    'šárka':    'Šárko',
+    'blanka':   'Blanko',
+    'denisa':   'Deniso',
+    'nikola':   'Nikolo',
+    'silvie':   'Silvie',
+    'romana':   'Romano',
+    'vladimira':'Vladimíro',
+    'vladimíra':'Vladimíro'
+  };
+
+  if (exceptions[lc]) return exceptions[lc];
+
+  // Automatická pravidla (záložní)
+  var last = lc[lc.length - 1];
+  var last2 = lc.slice(-2);
+
+  // Ženská jména končící na -a
+  if (last === 'a' && lc.length > 2) {
+    return n.slice(0, -1) + 'o';
+  }
+  // Mužská jména končící na souhlásku (typická česká)
+  var consonants = 'bcdfghjklmnpqrstvwxz';
+  if (consonants.includes(last)) {
+    if (last === 'k') return n + 'u';
+    if (last === 'h') return n.slice(0,-1) + 'chu';
+    if (last === 'r') return n + 'e';
+    if (last === 'l') return n + 'e';
+    if (last === 'n') return n + 'e';
+    if (last === 'd') return n + 'e';
+    if (last === 't') return n + 'e';
+    if (last === 's') return n + 'e';
+    return n + 'e';
+  }
+  // Jména končící na -e nebo -í ponecháme
+  return n;
+}
+
+function showWelcomeModal(profile) {
+  // Pokud si uživatel nastavil skip, nezobrazovat
+  try { if (localStorage.getItem(WELCOME_SKIP_KEY) === '1') return; } catch(_){}
+  if (document.getElementById('welcomeGate')) return;
+
+  var p = profile || {};
+  var displayName = p.displayName || p.userId || '';
+  var vocative = czechVocative(displayName); // např. "Terezo", "Danieli"
+  var greeting = vocative ? ('Vítá tě, ' + vocative + '!') : 'Vítej!';
+  var isAdmin = (p.role === 'admin');
+
+  var adminNote = isAdmin
+    ? '<p>Jako <strong>administrátor</strong> máš plný přístup ke všem funkcím, včetně správy přístupů ostatních uživatelů.</p>'
+    : '';
+
+  var html =
+    '<div class="welcome-hero">' +
+      '<div class="welcome-hero-emoji">🎓</div>' +
+      '<div class="welcome-hero-title">' + esc(greeting) + '</div>' +
+      '<div class="welcome-hero-sub">Generátor interaktivních testů</div>' +
+    '</div>' +
+    '<div class="welcome-body">' +
+      '<p>Právě jsi spustil/a <strong>sofistikovanou aplikaci pro tvorbu interaktivních testů</strong> s podporou umělé inteligence. Pomůže ti snadno vygenerovat, přizpůsobit a distribuovat testy pro studenty.</p>' +
+      adminNote +
+      '<p>Pokud budeš mít jakékoliv dotazy, obrať se nejprve na <strong>Poradce ke generátoru</strong> — ikona <span style="font-size:15px">💬</span> vpravo nahoře. Pokud si ani tam neporadíš, napiš správci aplikace <strong>Danielovi</strong>.</p>' +
+      '<p>Hodně štěstí při generování! 🚀</p>' +
+      '<div class="welcome-tip">💡 <strong>PS:</strong> Po tomto okně se zobrazí stručný průvodce prací s ostrým testem. Pokud ti přijde zbytečný, dej vědět Danielovi — lze ho pro tebe vypnout. Průvodce si pak přečteš kdykoliv kliknutím na ikonu <span style="font-size:13px">📋</span> vpravo nahoře.</div>' +
+    '</div>' +
+    '<div class="welcome-actions">' +
+      '<button type="button" class="welcome-ok-btn" id="welcomeOkBtn">Pojďme na to!</button>' +
+      '<button type="button" class="welcome-skip-link" id="welcomeSkipBtn">Toto uvítání příště nezobrazovat</button>' +
+    '</div>';
+
+  var backdrop = document.createElement('div');
+  backdrop.id = 'welcomeGate';
+  backdrop.className = 'ui-modal-backdrop welcome-gate';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'welcomeGateHead');
+  backdrop.innerHTML = '<div class="ui-modal-box welcome-box" id="welcomeGateHead">' + html + '</div>';
+  document.body.appendChild(backdrop);
+  document.body.classList.add('onboarding-locked');
+
+  function closeWelcome() {
+    document.body.classList.remove('onboarding-locked');
+    backdrop.remove();
+  }
+
+  backdrop.querySelector('#welcomeOkBtn').addEventListener('click', closeWelcome);
+  backdrop.querySelector('#welcomeSkipBtn').addEventListener('click', function() {
+    try { localStorage.setItem(WELCOME_SKIP_KEY, '1'); } catch(_){}
+    closeWelcome();
+  });
+  // Klik mimo box nezavírá (je to uvítací modal, ne blokující alert)
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) e.stopPropagation(); });
+}
+
 function showOnboardingGate(){
   // kdyby tu z nějakého důvodu už okno bylo, neduplikuj
   if (document.getElementById('onboardingGate')) return;
@@ -13939,7 +14201,11 @@ function accOnGranted(){
   updateAccessEnvBanner();
   // Ponecháme stávající úvodní průvodce „jak používat ostře“.
   // Admin zná nástroj — přeskočit onboarding bránu (průvodce je vždy dostupný přes 📋).
-  if (p.role !== 'admin' && typeof showOnboardingGate === 'function'){ setTimeout(showOnboardingGate, 60); }
+  // Uvítací modal — pro všechny uživatele, dokud si ho nevypnou
+  if (typeof showWelcomeModal === 'function') { setTimeout(function(){ showWelcomeModal(p); }, 80); }
+  // Ponecháme stávající úvodní průvodce „jak používat ostře".
+  // Admin zná nástroj — přeskočit onboarding bránu (průvodce je vždy dostupný přes 📋).
+  if (p.role !== 'admin' && typeof showOnboardingGate === 'function'){ setTimeout(showOnboardingGate, 700); }
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
