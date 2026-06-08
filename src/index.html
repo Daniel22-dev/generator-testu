@@ -2187,10 +2187,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.05',
+  version: '6.06',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA: setAppMode — ReferenceError: s is not defined. Při přepnutí do pokročilého režimu používala funkce s.splitGenerate a s.exerciseConfig místo state.splitGenerate a state.exerciseConfig. Způsobovalo ReferenceError a nefunkční přepínač Pokročilý režim. Opraveno na state.*. Ověřeno node --check.',
     'EDITOR OTÁZEK A ODPOVĚDÍ — FULLSCREEN. Editor (openTestEditor) a panel „Rozšířit přijatelné odpovědi" nyní zabírají celou stránku: .editor-overlay padding snížen na 0, .editor-shell width=100%, border-radius=0, box-shadow odstraněn. Editor tak lépe využije prostor na širokých monitorech i při velkém počtu položek. Vizuální změna pouze v editoru, žádný dopad na generování, bodování ani export. Ověřeno node --check.',
     'OPRAVA DVOU REGRESÍ V TEST LAB. (1) normalizeLoadedState: přidané defaults splitGenerate a manualMode používaly state (globální proměnná) místo s (parametr funkce) — modifikovalo se globální state, ne předaný objekt, takže normalizeLoadedState({}).splitGenerate bylo undefined. Opraveno: s.splitGenerate a s.exerciseConfig. (2) Test Banked cloze + Multiple matching alias: EXERCISE_PEDAGOGY mapuje na pedagogickou kategorii string, ne objekt se .score. Test čísl neexistující .score property. Opraveno: test nyní používá scoringTypeFor() která vrací správný scoring alias. Ověřeno node --check.',
     'TAB TLAČÍTKA: tab buttons zobrazují jen Exercise 1/2/3 (bez typu) dle přání. Typ zůstává pouze v hlavičce panelu po rozkliknutí: Exercise 1: Multiple choice. Ověřeno node --check.',
@@ -3021,8 +3022,8 @@ function setAppMode(mode){
     state.workPreset = 'advanced';
     if (!state.testMode) state.testMode = 'bezny';
     if (!state.resultMode) state.resultMode = 'instant';
-  if (s.splitGenerate === undefined) s.splitGenerate = false;
-  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+  if (state.splitGenerate === undefined) state.splitGenerate = false;
+  if (Array.isArray(state.exerciseConfig)) state.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
     if (!state.layout) state.layout = 'tabs';
     if (!state.odevzdavani) state.odevzdavani = 'B';
   } else {
