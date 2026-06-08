@@ -2210,10 +2210,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.09',
+  version: '6.10.1',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'PORADCE: DOPLNĚNÍ CHYBĚJÍCÍCH KB ZÁZNAMŮ (6.10.1) — přidáno 9 záznamů: banked cloze, table-completion, bezpečnostní incident (klíč unikl), access-manifest.json, role admin vs trainedTeacher, logo školy, přiřazení skupin, anonymizace v diferenciaci. Celkem nyní 101 KB záznamů. Ověřeno node --check.',
+    'PORADCE: VELKÉ ROZŠÍŘENÍ KB (6.10) — přidáno 30 nových záznamů ve 14 kategoriích. A) Typy cvičení: přehled typů, ordering vs word order, multi-select vs multiple choice, highlight-evidence, error-tagging, categorisation-board, počet položek. B) Hybrid: co to je, hlášky, ruční editace. C) Výsledky: answers.txt, bezpečnostní signály, bodování nesedí, odevzdal dvakrát, chybějící výsledek. D) Workflow: postup před nasazením, sdílení bez GitHubu. E) GitHub Pages: hosting, aktualizace, chyby. F) Bezpečnost: přísný vs procvičovací, ztráta připojení, PIN. G) Modely: Flash vs Lite. H) Správa: kolega, více variant, část látky. I) Šablony a historie. J) Archivace. K) Student: zobrazuje jinak. L) Přílohy a URL. M) Maturita a procvičovací test. N) Editor: úpravy, alternativy, smazání. Celkem nyní 93 KB záznamů. Ověřeno node --check.',
     'PORADCE: 9 NOVÝCH KB ZÁZNAMŮ PRO CHYBOVÉ HLÁŠKY (6.09). Přidány záznamy pokrývající všechny hlavní chyby generátoru: 503/UNAVAILABLE (přetížení vs. RPD limit), 429/RESOURCE_EXHAUSTED (kvóta), 400/INVALID_ARGUMENT (neplatný klíč), 401-403/PERMISSION_DENIED, 504/DEADLINE_EXCEEDED (timeout), poškozený JSON, data mimo zadání (validace), síťová chyba a model nenalezen. Každý záznam má simple i detailed verzi + evidence. Přidány chipy: chyba 503/429/400/poškozený JSON/data mimo zadání/model nenalezen/síťová chyba. Ověřeno node --check.',
     'OPRAVA TEST LAB ORDERING (6.08.7): Test Lab hledal clickOrdInst v secure skriptu, ale secure cesta používá clickOrd — instant cesta má clickOrdInst. Check opraven na function clickOrd(. Ověřeno node --check.',
     'PŘEJMENOVÁNÍ SPLIT-GEN TLAČÍTKA (6.08.6): toggle Po cvičeních přejmenován na Každé cvičení zvlášť s podtitulkem Včetně jednoduchých — hybrid to dělá automaticky jen pro složitá. Tooltip upřesněn. Tlačítko zůstává jen v pokročilém módu. Ověřeno node --check.',
@@ -2222,10 +2224,8 @@ const RELEASE = Object.freeze({
     'OPRAVA TEXTU 503 HLÁŠKY (6.08.3): geminiAttemptsText vždy přidávala větu o 429/kvótě i u 503 chyby — nesedilo to. Funkce rozšířena o parametr errorType; při 503 zobrazí Generátor požadavek zkusil N×, ale Gemini servery stále neodpovídaly. Ověřeno node --check.',
     'PŘÍVĚTIVĚJŠÍ CHYBOVÁ HLÁŠKA PRO 503 (6.08.2): chyba UNAVAILABLE (přetížené servery Gemini) nyní říká srozumitelně: servery jsou přetížené, trvá to pár minut, test ani klíč nejsou poškozené. Akce: počkej 2-3 minuty nebo přepni na Lite model. Ostatní 5xx chyby zůstaly beze změny. Ověřeno node --check.',
     'OPRAVA PROMPTU PRO ORDERING (6.08.1): validátor hlásil počet položek je 1, očekáváno 5 — Gemini chápal EXACTLY 5 items jako 5 vnitřních prvků jednoho bloku, ne jako 5 samostatných ordering otázek. Přidán orderingNote do specLines: každý items[] objekt je SAMOSTATNÁ ordering otázka se svým question/items[]/correct_order. Přidáno i do statických pravidel promptu. Ověřeno node --check.',
-    'ORDERING: NOVÝ UX (klikací číslování) + EDITOR HIGHLIGHT-EVIDENCE (6.08). (1) Ordering: šipky ▲▼ nahrazeny klikacím číslováním — student kliká na položky v pořadí (1, 2, 3…), číslo se zobrazí v kruhovém badge, klik znovu číslo zruší. Funguje na mobilu i PC, přístupné přes klávesnici (Enter/Space). Změněno ve všech třech cestách: secure renderQ, instant buildQuestionHtml, a teacher verifier renderQ. Hint text aktualizován. Test Lab check upraven na clickOrdInst. (2) Editor: highlight-evidence chyběl jako větev v edItemHtml — propadal do generického else, kde se nezobrazilo zadání ani odpovědi. Přidán edEvidenceBlock: seznam vět s radio výběrem správné, přidávání/odebírání vět. Ověřeno node --check.',
-    'PŘEPIS RETRY HLÁŠKY (6.07.6): geminiWaitBeforeRetry zobrazovala Gemini dočasně selhalo (poškozený JSON). Další pokus 3/4 za 15 s — pro učitele matoucí, vypadalo to jako chyba i když retry normálně probíhal. Změněno na Gemini vrátilo neúplný výstup — opakuji (pokus 3/4, za 15 s). Ověřeno node --check.',
   ]
-});;;;;;;;;;;;;;;;;
+});;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -2821,12 +2821,304 @@ const GENERATOR_ASSISTANT_KB = [
   keywords:['model nenalezen','model nenalezeny','model not found','not found','not supported','unsupported','404','model nefunguje','spatny model','špatný model','neexistujici model','neexistující model'],
   simple:'Název modelu ve žluté sekci neexistuje nebo již není dostupný. Přepni na gemini-2.5-flash přes tlačítko Výchozí nebo ⚡ Silný.',
   detailed:'HTTP 404 nebo odpověď obsahující not found nastane když zadaný název modelu Google nezná. Modely jsou občas zrušeny nebo přejmenovány. Generátor má dvě záchranná tlačítka: ⚡ Silný nastaví gemini-2.5-flash (doporučený), 🪶 Lite nastaví gemini-2.5-flash-lite. Tlačítko Výchozí obnoví výchozí model. Aktuální seznam modelů najdeš na ai.google.dev/gemini-api/docs/models.',
-  evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']}
+  evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']},
 
+ {id:'typy-cviceni-prehled',title:'Přehled typů cvičení — co který typ dělá',status:'reseno',
+  keywords:['typy cviceni','typy cvičení','co je ordering','co je matching','co je cloze','co je highlight','co je error tagging','co je transformation','co je categorisation','jaké typy','seznam typů','přehled typů','co umí'],
+  simple:'Generátor nabízí přes 20 typů cvičení: od klasických (multiple choice, true/false, fill-in-the-blank) přes složitější (ordering, categorisation-board, highlight-evidence, error-tagging) až po produktivní (translation, transformation-chain). Každý typ testuje jiné jazykové dovednosti.',
+  detailed:'Základní typy: multiple choice (výběr z možností), true/false (pravda/nepravda), fill-in-the-blank (doplňování), matching (párování), word order (sestavení věty). Složitější: ordering (seřazení vět/kroků), multi-select (více správných odpovědí), highlight-evidence (označení důkazní věty v textu), error-tagging (označení chyby ve větě a její oprava), banked cloze (doplňování ze zásoby slov), multiple matching (přiřazení více položek). Produktivní: translation (překlad), transformation-chain (transformace věty), error correction (oprava chyby). Specifické: categorisation-board (třídění do kategorií), table-completion (doplňování tabulky), reading comprehension (čtení s porozuměním), listening comprehension (poslech). V generátoru je ke každému typu pedagogická funkce (BOD 5).',
+  evidence:['EXERCISE_TYPES','normalizeType()','MANUAL_SUPPORTED_TYPES','isManualSupported()','pedagogická mapa typů']},
+
+ {id:'typy-ordering-vs-wordorder',title:'Ordering vs. word order — jaký je rozdíl',status:'reseno',
+  keywords:['ordering','word order','rozdil ordering','rozdíl ordering','serazeni','seřazení','slozeni vety','složení věty','poradi slov','pořadí slov','kdy ordering','kdy word order'],
+  simple:'Word order = student skládá větu z jednotlivých slov (drag & drop nebo klikání). Ordering = student řadí celé fráze nebo kroky do správného pořadí (1., 2., 3…). Word order je na úrovni věty, ordering na úrovni celků.',
+  detailed:'Word order testuje syntaxi — student dostane zamíchaná slova a sestaví z nich správnou větu. Hodí se na procvičení slovosledu, pomocných sloves, negace. Ordering testuje logické pořadí — student dostane celé fráze nebo kroky a seřadí je. Hodí se na procvičení podmínkových vět, kroků procesu, časové posloupnosti. Ordering generuje N samostatných bloků (každý je jedna otázka se svými frázemi), zatímco word order generuje jednu větu na otázku.',
+  evidence:['ordering','word-order','ordBadgeHtml()','clickOrd()']},
+
+ {id:'typy-multiselect-vs-multiplechoice',title:'Multi-select vs. multiple choice — jaký je rozdíl',status:'reseno',
+  keywords:['multi select','multiselect','multiple choice','vice spravnych','více správných','jedna spravna','jedna správná','checkbox','radio','kdy multi select'],
+  simple:'Multiple choice = právě jedna správná odpověď (radio button). Multi-select = může být více správných najednou (checkboxy). Multi-select je náročnější — student musí zaškrtnout přesně ty správné.',
+  detailed:'Multiple choice má vždy právě jednu správnou odpověď — student vybere jednu z nabídnutých možností. Multi-select může mít 1–N správných odpovědí; student zaškrtne všechny správné. Bodování multi-select je přísnější: za každou nesprávně zaškrtnutou nebo nezaškrtnutou možnost se odečítá část bodu. Správný klíč u multi-select je pole indexů (např. [0,2]), ne jedno číslo.',
+  evidence:['multi-select','multiple choice','multiSelectScore()','correct[]','MULTI-SELECT RULES']},
+
+ {id:'typy-highlight-evidence',title:'Highlight-evidence — označení důkazní věty',status:'reseno',
+  keywords:['highlight evidence','highlight-evidence','zvyrazneni','zvýraznění','dukaz','důkaz','oznacit vetu','označit větu','ukazat dukaz','ukázat důkaz','evidence','podtrhnout'],
+  simple:'Student dostane odstavec textu a musí kliknout na větu, která nejlépe podporuje dané tvrzení (důkazní věta). Testuje porozumění textu a schopnost najít relevantní informaci.',
+  detailed:'Highlight-evidence zobrazí text rozdělený do vět. Student klikne na větu, která je správnou odpovědí. Správný klíč je index věty (0, 1, 2…) v poli sentences[]. Bodování: kliknutí na správnou větu = plný počet bodů, jiná věta = 0. Tento typ vyžaduje kvalitní zdrojový text; generátor ho vytvoří automaticky nebo použij vlastní text ve vstupním poli.',
+  evidence:['highlight-evidence','sentences[]','correct (index)','edEvidenceBlock()']},
+
+ {id:'typy-error-tagging',title:'Error-tagging — označení a oprava chyby',status:'reseno',
+  keywords:['error tagging','error-tagging','oznaceni chyby','označení chyby','oprava chyby','chyba ve vete','chyba ve větě','najdi chybu','podtrhni chybu','grammar error'],
+  simple:'Student dostane větu s chybou, klikne na chybné slovo a napíše opravenou verzi. Testuje gramatické povědomí a schopnost identifikovat a opravit chybu.',
+  detailed:'Error-tagging zobrazí větu jako klikatelná slova (tokeny). Student klikne na slovo kde je chyba — vybraný token se zvýrazní — a pak napíše opravenou verzi do textového pole. Klíč obsahuje: token (chybné slovo), etype (typ chyby), corr (správná oprava). Bodování: správný token + správná oprava = plný počet bodů; jen token nebo jen oprava = částečný kredit.',
+  evidence:['error-tagging','token','etype','corr','errorTagScore()']},
+
+ {id:'typy-categorisation-board',title:'Categorisation-board — třídění do kategorií',status:'reseno',
+  keywords:['categorisation board','categorisation-board','trideni','třídění','kategorie','kategorizace','sorting','rozdelit do skupin','rozdělit do skupin','drag drop kategorie'],
+  simple:'Student třídí slova nebo fráze do správných kategorií přetažením nebo klikáním. Každá položka patří do právě jedné kategorie. Testuje třídění slovní zásoby nebo gramatických jevů.',
+  detailed:'Categorisation-board zobrazí N kategorií jako sloupce a zamíchané položky. Student přiřadí každou položku do správné kategorie. Každá kategorie (entries s {text, category}) má přesně jeden správný sloupec. Generátor generuje 6–10 položek na jeden board. Bodování je částečné: 4/4 = plný počet, 3/4 = 75 % atd. Typ je označen jako složitý (MANUAL_SUPPORTED_TYPES) — generuje se zvlášť v hybrid módu.',
+  evidence:['categorisation-board','entries[{text,category}]','categories[]','catBoardScore()','MANUAL_SUPPORTED_TYPES']},
+
+ {id:'pocet-polozek-doporuceni',title:'Kolik položek dát do každého cvičení',status:'reseno',
+  keywords:['kolik polozek','kolik položek','kolik otazek','kolik otázek','doporuceny pocet','doporučený počet','optimalni pocet','optimální počet','prilis mnoho','příliš mnoho','prilis malo','příliš málo'],
+  simple:'Doporučení: 5–10 položek na cvičení. Méně než 3 je pedagogicky slabé, více než 15 zvyšuje riziko chyb generování a pomalého tisku.',
+  detailed:'Optimální počet závisí na typu: multiple choice 5–8, true/false 8–12, fill-in-the-blank 6–10, matching 5–8 párů, ordering 3–6 bloků, categorisation-board 6–10 položek, multi-select 4–6, transformation-chain 4–6, error-tagging 4–6. U složitých typů (ordering, categorisation-board) drž se raději spodní hranice — model má obtížnější strukturovaný výstup a více položek zvyšuje riziko poškodeného JSONu nebo timeoutu.',
+  evidence:['pocetOtazek','validateExerciseSetStrict()','MIN_ITEMS','MAX_ITEMS']},
+
+ {id:'hybrid-generovani',title:'Hybridní generování — co to je a proč existuje',status:'reseno',
+  keywords:['hybrid','hybridni','hybridní','proc se generuje po cvicenich','proč se generuje po cvičeních','automaticky zvlast','automaticky zvlášť','slozita cviceni','složitá cvičení','proc trva dele','proč trvá déle','jak funguje generovani'],
+  simple:'Hybridní generování automaticky rozpozná složitá cvičení (ordering, categorisation-board atd.) a vygeneruje je každé vlastním API požadavkem. Jednoduchá cvičení jdou najednou. Žádná akce není potřeba — funguje automaticky.',
+  detailed:'Složitá cvičení (MANUAL_SUPPORTED_TYPES: ordering, categorisation-board, multi-select, highlight-evidence, transformation-chain, error-tagging, banked cloze, multiple matching, table-completion) mají komplexní JSON strukturu, kterou model při generování více cvičení najednou občas pokazí. Hybridní generování řeší tím, že tato cvičení generuje každé zvlášť (split), jednoduchá jdou v jednom batchi. Výsledky se složí ve správném pořadí. Pokud složité cvičení selže i po 2 pokusech, test se sestaví bez něj a zobrazí se doporučení pro ruční editaci. Tlačítko Každé cvičení zvlášť je manuální alternativa — generuje zvlášť i jednoduchá cvičení.',
+  evidence:['runHybridGeneration()','MANUAL_SUPPORTED_TYPES','isManualSupported()','complexIdxs','simpleIdxs','hybridBanner']},
+
+ {id:'hybrid-hlasky',title:'Hlášky při hybridním generování — co znamenají',status:'reseno',
+  keywords:['hybrid hlaska','hybrid hláška','generuje zvlast','generuje zvlášť','pokus 1 2','co znamena hybrid','co znamená hybrid','zlute hlasky','žluté hlášky','jak dlouho trva','jak dlouho trvá'],
+  simple:'Hlášky "⚡ Hybrid: složité cvičení 1/2…" jsou normální — informují o průběhu. Číslo X/Y znamená kolikáté složité cvičení se právě generuje z celkového počtu.',
+  detailed:'Při hybridním generování se zobrazují průběžné hlášky: "⚡ Hybrid: složité cvičení X/Y (typ)…" = generuje se X-té složité cvičení z Y celkových složitých. "⚡ Hybrid: generuji N jednoduchých cvičení najednou…" = batch jednoduchých. "Gemini vrátilo neúplný výstup — opakuji (pokus X/Y, za N s)…" = model vrátil špatná data, generátor to zkouší znovu automaticky (normální). "⚡ Hybrid: sestavuji test a validuji…" = vše vygenerováno, probíhá validace. Pokud se zobrazí ⚠️ s doporučením ruční editace, jedno ze složitých cvičení se nepodařilo automaticky.',
+  evidence:['runHybridGeneration()','setGenMsg()','geminiWaitBeforeRetry()','MAX_SINGLE=2']},
+
+ {id:'rucni-editace-cviceni',title:'Ruční editace složitých cvičení (✏️)',status:'reseno',
+  keywords:['rucni editace','ruční editace','rucne zadat','ručně zadat','ceruzka','tužka','pencil','manual mode','manualni','manuální','slozite cviceni rucne','složité cvičení ručně','editovat cviceni','editovat cvičení'],
+  simple:'Pro složitá cvičení lze v pokročilém módu zapnout ruční zadání (✏️). Místo generování AI vyplníš otázky a odpovědi sám přes formulář v editoru.',
+  detailed:'V pokročilém módu je u každého složitého cvičení (MANUAL_SUPPORTED_TYPES) přepínač 🤖/✏️. Přepnutí na ✏️ (manualMode=true) způsobí, že toto cvičení AI negeneruje — místo toho se otevře editor otázek a odpovědí kde zadáš obsah ručně. Ostatní cvičení se generují normálně (hybridně). Ruční editace je záchranná síť pro případy kdy AI opakovaně selhává u konkrétního složitého typu.',
+  evidence:['manualMode','isManualSupported()','MANUAL_SUPPORTED_TYPES','ex-manual-toggle','generateTestWithManual()']},
+
+ {id:'answers-txt-format',title:'Co je answers.txt a jak ho číst',status:'reseno',
+  keywords:['answers txt','answers.txt','vysledkovy soubor','výsledkový soubor','jak cist vysledky','jak číst výsledky','odevzdany soubor','odevzdaný soubor','co je v souboru','studentsky soubor','studentský soubor','co odevzdava student','co odevzdává student'],
+  simple:'answers.txt je soubor který student odevzdá po dokončení testu. Obsahuje jeho odpovědi, výsledky, skóre a bezpečnostní záznamy. Nahraješ ho do hromadného vyhodnocení.',
+  detailed:'answers.txt je JSON soubor se strukturou: studentInfo (jméno, skupina, PIN), answers (odpovědi na každou otázku), scoring (skóre za každou otázku), summary (celkové skóre, procenta, čas), security (bezpečnostní záznamy — blur, split screen, fullscreen opuštění). Soubor je čitelný i v textovém editoru — je to čitelný JSON. Pro hromadné vyhodnocení ho nahraj přes rozhraní hromadného vyhodnocení; generátor ho zpracuje a zobrazí výsledkovou tabulku.',
+  evidence:['answers.txt','buildStudentPackage()','STUDENT_ANSWERS_SCHEMA','hromadné vyhodnocení']},
+
+ {id:'bezpecnostni-signaly-vyznam',title:'Bezpečnostní signály ve výsledku — co znamenají a kolik je normální',status:'reseno',
+  keywords:['bezpecnostni signal','bezpečnostní signál','blur','split screen signal','opusteni testu','opuštění testu','podvadeni','podvádění','bezpecnostni zaznam','bezpečnostní záznam','jak cist bezpecnostni','jak číst bezpečnostní','kolik signalu je normal','kolik signálů je normální'],
+  simple:'Bezpečnostní signály jsou indicie, ne důkazy. Blur = student přepnul okno/aplikaci. Split-screen = test běžel v malém okně. Fullscreen exit = opustil fullscreen. Každý student je jiný — 1–3 signály mohou být náhodné.',
+  detailed:'Typy signálů: blur-count (kolikrát student přepnul z okna testu — 1–2 může být náhodné, 10+ je podezřelé), blur-total-ms (celkový čas mimo okno), split-window (podíl času s malým oknem — typické pro rozdělenou obrazovku), fullscreen-exit (kolikrát opustil povinný fullscreen). Signály jsou vodítko pro učitele, ne automatické hodnocení. Kontext je důležitý: student s dyslexií mohl mít zapnutou čtečku v druhém okně; student na slabém PC mohl mít pomalé překreslování. Signály vidíš v teacher verifieru v záložce Bezpečnostní záznam.',
+  evidence:['startBlurMonitor()','startSplitMonitor()','recordSplitSummary()','security{}','SPLIT_RATIO','BLUR_THRESHOLD']},
+
+ {id:'bodovani-nesedi',title:'Bodování nesedí — co dělat',status:'reseno',
+  keywords:['bodovani nesedi','bodování nesedí','spatne body','špatné body','chybne body','chybné body','dostal 0','dostala 0','spatny vysledek','špatný výsledek','chybny vysledek','chybný výsledek','student ma 0','špatně ohodnoceno','chybne ohodnoceno'],
+  simple:'Pokud bodování nesedí: (1) zkontroluj klíč správných odpovědí v teacher verifieru, (2) spusť ověření klíče, (3) oprav klíč v editoru a přegeneruj výsledky.',
+  detailed:'Nejčastější příčiny chybného bodování: (1) AI vygenerovala špatnou správnou odpověď — zkontroluj klíč v teacher verifieru, oprav v editoru, (2) alt_answers chybí — student napsal synonymum nebo jiný tvar, přidej ho jako přijatelnou alternativu, (3) mezery nebo velikost písmen — bodovací engine ignoruje velikost a okrajové mezery, ale ne vnitřní, (4) u překladu/transformace je bodování AI-based — může se lišit od tvého očekávání, (5) u multi-select zkontroluj jestli klíč je pole indexů [0,2] a ne jedno číslo. Spusť self-test pro ověření bodování všech typů.',
+  evidence:['textScore()','SHARED_SCORING_JS','alt_answers[]','runScoringSelfTest()','aiVerifyKey()']},
+
+ {id:'student-odevzdal-dvakrat',title:'Student odevzdal test dvakrát — co dělat',status:'reseno',
+  keywords:['odevzdal dvakrat','odevzdal dvakrát','odevzdala dvakrat','odevzdala dvakrát','duplicitni odpovedi','duplicitní odpovědi','dva soubory','dvakrat odevzdal','dvakrát odevzdal','submitted twice'],
+  simple:'Generátor nebrání odevzdání dvakrát — student může po odevzdání obnovit stránku a odevzdat znovu. Máš-li dva soubory od stejného studenta, použij ten starší (první odevzdání).',
+  detailed:'Studentský test nemá serverovou autentizaci — odevzdání je lokální akce (stažení souboru). Student může stránku obnovit a odevzdat znovu s jinými odpověďmi. Pokud máš duplicitní answers.txt od stejného studenta (stejné jméno, podobný čas), zpravidla platí první odevzdání jako oficielní. V hromadném vyhodnocení se soubory zpracovávají individuálně — duplicity musíš vyřešit ručně výběrem správného souboru.',
+  evidence:['doSubmit()','buildStudentPackage()','hromadné vyhodnocení']},
+
+ {id:'workflow-pred-nasazenim',title:'Správný postup před ostrým nasazením testu',status:'reseno',
+  keywords:['postup','workflow','jak pripravit test','jak připravit test','co udelat pred','co udělat před','checklist','kontrolni seznam','kontrolní seznam','pred nasazenim','před nasazením','jak spravne','jak správně','co zkontrolovat'],
+  simple:'Doporučený postup: vygeneruj test → zkontroluj v náhledu → spusť self-test → spusť ověření klíče → oprav chyby v editoru → stáhni studentský soubor → dej studentům. Nikdy nedávej test studentům bez self-testu.',
+  detailed:'Krok 1: Vygeneruj test. Krok 2: Zkontroluj v náhledu (mobilní i plná šířka) — překontroluj otázky, odpovědi a vizuální vzhled. Krok 3: Self-test — automaticky ověří bodování pro všechny typy cvičení. Pokud projde s varováním (položky bez klíče), rozhodni jestli je budeš opravovat ručně nebo přijmout. Krok 4: Ověření klíče (AI druhý průchod) — AI projde uzavřené otázky a zkontroluje správnost klíče. Krok 5: Oprav případné chyby v editoru (✏️). Krok 6: Stáhni studentský soubor (nikoliv teacher verifier). Krok 7: Otestuj soubor sám jako student — otevři, vyplň, odevzdej. Krok 8: Dej soubor studentům.',
+  evidence:['runScoringSelfTest()','aiVerifyKey()','openTestEditor()','btnDownloadStudent','nahled-pred-stazenim']},
+
+ {id:'sdileni-bez-github',title:'Jak nasdílet test bez GitHub Pages',status:'reseno',
+  keywords:['bez github','bez GitHub','sdileni souboru','sdílení souboru','poslat soubor','poslat test','email','email soubor','usb','uloziste','úložiště','google drive','onedrive','jak dat studentum','jak dát studentům','lokalni sit','lokální síť','classroom'],
+  simple:'Studentský soubor (HTML) lze nasdílet přes Google Classroom, email, USB, Google Drive nebo OneDrive. Student ho otevře v prohlížeči. Offline verze funguje i bez internetu.',
+  detailed:'Možnosti distribuce: (1) Google Classroom — přilož HTML soubor jako přílohu nebo sdílej link ze Google Drive, (2) Email — přilož HTML soubor, student stáhne a otevře v prohlížeči, (3) USB/flash disk — zkopíruj soubor, student otevře lokálně (funguje offline), (4) Školní síť — ulož na sdílené úložiště školy, (5) GitHub Pages — vytvoří veřejný link, vhodné pro opakované použití. Pozor: test otevřený přes file:// (lokálně bez serveru) může mít omezení v některých prohlížečích (Chrome blokuje LocalStorage). GitHub Pages nebo jakýkoliv HTTP server toto řeší.',
+  evidence:['offline balíček','buildStudentPackage()','GitHub Pages','file:// vs https://']},
+
+ {id:'github-pages-hosting',title:'Jak nahrát test na GitHub Pages',status:'reseno',
+  keywords:['github pages','github','nahrát na web','nahrát na github','jak dát na web','hosting','web','link pro studenty','odkaz pro studenty','github io','github.io','repository','repozitář','jak aktualizovat','pencil tlacitko','pencil tlačítko'],
+  simple:'Jdi na github.com → tvůj repozitář → složka kde jsou testy → Add file nebo nahraj soubor. Po nahrání bude test dostupný na adrese username.github.io/repo/soubor.html. Editace probíhá přes tlačítko ✏️ (pencil) u souboru.',
+  detailed:'Postup pro nový test: (1) Přihlas se na github.com, (2) jdi do svého repozitáře (např. interaktivni-testy), (3) naviguj do správné složky, (4) klikni Add file → Upload files, (5) nahraj HTML soubor, (6) potvrď commit. URL bude username.github.io/repozitář/soubor.html. Pro editaci existujícího souboru: klikni na soubor → ikona tužky (pencil) → edituj → potvrď commit. Změny se projeví za 1–2 minuty. Generátor (src/index.html) edituj přes pencil ve složce src.',
+  evidence:['GitHub Pages','daniel22-dev.github.io','interaktivni-testy','src/index.html']},
+
+ {id:'github-test-nenacte',title:'Test na GitHubu se nenačte nebo zobrazuje chybu',status:'reseno',
+  keywords:['nefunguje link','nefunguje odkaz','nenacte se','nenačte se','github chyba','404 github','test nejde otevrit','test nejde otevřít','bily ekran','bílý ekrán','prazdna stranka','prázdná stránka','cors','mixed content'],
+  simple:'Nejčastější příčiny: (1) překlep v URL, (2) soubor ještě nebyl nahrán nebo commit ještě neproběhl (počkej 1–2 min), (3) GitHub Pages není zapnuto v nastavení repozitáře.',
+  detailed:'Kontrolní seznam: (1) Zkontroluj URL — github.io (ne github.com), správné jméno repozitáře a souboru, (2) Počkej 2–3 minuty po nahrání — GitHub Pages má zpoždění při nasazení, (3) Zkontroluj že GitHub Pages je zapnuto: Settings → Pages → Source = main/root nebo /docs, (4) Zkontroluj že soubor je v správné složce a má příponu .html, (5) Vymaž cache prohlížeče (Ctrl+Shift+R). Pokud vidíš bílý ekrán: otevři DevTools (F12) → Console a podívej se na chybové hlášky. CORS chyba znamená že zdroj blokuje přístup — pro HTML testy to zpravidla nenastane.',
+  evidence:['GitHub Pages','Settings → Pages','github.io','deploy']},
+
+ {id:'prisny-vs-procvicovaci-student',title:'Přísný vs. procvičovací režim — co vidí student',status:'reseno',
+  keywords:['co vidi student','co vidí student','prisny rezim student','přísný režim student','procvicovaci student','procvičovací student','po odevzdani','po odevzdání','spravne odpovedi po odevzdani','správné odpovědi po odevzdání','muzou studenti videt vysledek','můžou studenti vidět výsledek'],
+  simple:'Přísný režim: student po odevzdání vidí jen celkové skóre a zprávu. Žádné správné odpovědi. Procvičovací: student vidí hned u každé otázky zda odpověděl správně a jaká je správná odpověď.',
+  detailed:'Přísný (bezpečný offline) režim: po odevzdání student dostane výsledkovou obrazovku se jménem, skóre, procentem, známkou a časem. Správné odpovědi ani vysvětlení se nezobrazí — tím se minimalizuje riziko úniku klíče. Výsledkový soubor (answers.txt) obsahuje bodování ale ne klíč. Procvičovací (instant) režim: po odevzdání student vidí detailní přehled každé otázky — zda odpověděl správně, jaká je správná odpověď a případné vysvětlení. Vhodné pro procvičování, ne pro klasifikaci.',
+  evidence:['secure mode','instant mode','doSubmit()','showResultCard()','zpetna-vazba']},
+
+ {id:'student-ztratil-pripojeni',title:'Student ztratil připojení během testu — co se stane',status:'reseno',
+  keywords:['ztratil pripojeni','ztratil připojení','vypadl internet','výpadek internetu','offline student','student offline','test se zavrel','test se zavřel','ztratil test','odpovedi se ztratily','odpovědi se ztratily','autosave','autoukládání'],
+  simple:'Offline balíček funguje i bez internetu — test se neztratí. Odpovědi se průběžně ukládají lokálně. Pokud student obnoví stránku, může pokračovat od místa kde skončil (v přísném režimu).',
+  detailed:'Studentský test je kompletní offline HTML — nepotřebuje internet ke svému chodu. Odpovědi se průběžně ukládají do sessionStorage nebo localStorage (podle režimu). Při neúmyslném obnovení stránky (F5, výpadek) se test znovu otevře s uloženými odpověďmi. Časovač pokračuje od uloženého stavu. Pokud student zavře kartu záměrně a chce se vrátit, záleží na nastavení — v přísném režimu to může být zablokováno. Bezpečnostní záznamy (blur, split) se resetují při obnově stránky.',
+  evidence:['sessionStorage','localStorage','autosave','restoreAnswers()','timerVal']},
+
+ {id:'zmena-pinu-hesla',title:'Jak změnit PIN nebo heslo k testu',status:'reseno',
+  keywords:['zmenit pin','změnit pin','zmenit heslo','změnit heslo','zapomenuty pin','zapomenutý pin','novy pin','nový pin','pristupovy kod','přístupový kód','pin nefunguje','student nezna pin','student nezná pin'],
+  simple:'PIN a hesla jsou součástí vygenerovaného testu — nelze je změnit bez přegenerování. Chceš-li jiný PIN, uprav ho v nastavení skupin a vygeneruj test znovu.',
+  detailed:'Přístupové kódy (PINy a hesla skupin) jsou zapsány přímo do HTML souboru při generování. Nejde je změnit bez vytvoření nového souboru. Postup pro změnu: (1) v generátoru uprav PINy ve správě skupin, (2) vygeneruj test znovu (obsah zůstane stejný, jen kódy se změní), (3) nahraď studentský soubor novým. Pokud student zapomněl PIN, sdělíš mu ho — PIN je viditelný v generátoru v nastavení skupin nebo v teacher verifieru.',
+  evidence:['accessGroups[]','group.pin','group.password','buildAccessManifest()','pristy-kodove']},
+
+ {id:'flash-vs-lite',title:'Gemini Flash vs. Flash Lite — jaký je rozdíl',status:'reseno',
+  keywords:['flash vs lite','flash lite','ktery model','který model','lepsi model','lepší model','horsi model','horší model','kdy pouzit lite','kdy použít lite','rychlejsi model','rychlejší model','kvalita modelu','model doporuceni','model doporučení'],
+  simple:'Flash (gemini-2.5-flash) je výkonnější — lepší kvalita cvičení, ale pomalejší a s nižším denním limitem spotřebovaným rychleji. Lite (gemini-2.5-flash-lite) je rychlejší a levnější, vhodný pro jednoduché typy a když Flash vrací chyby 503/kvóta.',
+  detailed:'Gemini 2.5 Flash: doporučený model pro generování testů. Lepší porozumění kontextu, přesnější dodržení struktury JSON, vhodnější pro složité typy (ordering, categorisation-board, transformation-chain). Pomalejší (30–60 s na cvičení), Free tier: 20 req/den, 5 req/min. Gemini 2.5 Flash Lite: rychlejší (10–20 s), stejné denní limity (20 req/den) ale jiný pool. Vhodný pro jednoduché typy (multiple choice, true/false, fill-in-the-blank) nebo když Flash je přetížen. U složitých typů občas vrátí neúplný JSON. Přepnutí: ve žluté sekci klikni na tlačítko 🪶 Lite nebo ⚡ Silný.',
+  evidence:['GEMINI_MODEL_DEFAULT','gemini-2.5-flash','gemini-2.5-flash-lite','quickModel()','RPD','RPM']},
+
+ {id:'pristup-kolega',title:'Jak přidat kolegu jako uživatele generátoru',status:'reseno',
+  keywords:['pridat kolegu','přidat kolegu','kolega','sdileni generatoru','sdílení generátoru','vice uzivatelu','více uživatelů','jak dat kolegovi','jak dát kolegovi','pristup kolegy','přístup kolegy','kdo muze pouzivat','kdo může používat'],
+  simple:'Generátor je jeden HTML soubor — sdílení probíhá sdílením souboru nebo odkazu na GitHub Pages. Každý kolega potřebuje vlastní Gemini API klíč.',
+  detailed:'Generátor nemá uživatelské účty — je to standalone HTML soubor. Sdílení: (1) pošli kolegovi link na GitHub Pages (nebo přímo soubor), (2) kolega si vytvoří vlastní Gemini API klíč na aistudio.google.com a zadá ho do žluté sekce. API klíče jsou osobní — každý učitel by měl mít svůj (Free tier zdarma). Přístup k testu samotného mají studenti přes PINy/hesla skupin — to nastavuješ v generátoru.',
+  evidence:['GitHub Pages','getGeminiInputKey()','useGeminiKeyForSession()','saveGeminiKeyPermanent()']},
+
+ {id:'vice-variant-testu',title:'Jak vytvořit více variant testu',status:'reseno',
+  keywords:['vice variant','více variant','varianta a b','varianta A B','ruzne verze','různé verze','a b testing','zamichane otazky','zamíchané otázky','nahodne poradi','náhodné pořadí','opisovani','opisování','jak zamichat','jak zamíchat'],
+  simple:'Vygeneruj test vícekrát — každé generování produkuje jiné otázky (model je nedeterministický). Nebo použij jiné klíčové slovo pro téma. Generátor nemá automatické míchání variant.',
+  detailed:'Nejjednodušší způsob více variant: spusť generování dvakrát se stejným nastavením — Gemini vždy vygeneruje trochu jiné otázky. Alternativy: (1) změň trochu téma (npr. "First conditional — věty o cestování" vs. "First conditional — věty o práci"), (2) změň vstupní text (jiný článek nebo ukázka), (3) změň kombinaci typů cvičení. Generátor nemá vestavěné míchání pořadí otázek ani automatické varianty A/B — každá varianta je samostatný soubor.',
+  evidence:['buildContentPrompt()','generateTest()','GEMINI_TEMPERATURE']},
+
+ {id:'test-pro-cast-latky',title:'Jak udělat test jen pro část látky nebo konkrétní text',status:'reseno',
+  keywords:['cast latky','část látky','konkretni text','konkrétní text','urcita latka','určitá látka','jen z textu','jen z tohoto','vlastni text','vlastní text','nahrat text','nahrát text','vstupni text','vstupní text','omezit obsah','omezit téma'],
+  simple:'Vlož svůj text do vstupního pole (nebo nahraj soubor) a generátor vytvoří otázky výhradně z tohoto obsahu. Čím konkrétnější vstup, tím přesnější výstup.',
+  detailed:'Způsoby omezení obsahu: (1) Vstupní text — vlož přímo text, ze kterého mají být otázky (článek, ukázka, slovní zásoba). Generátor ho přijme jako primární zdroj. (2) Příloha — nahraj PDF, DOCX nebo obrázek; generátor ho zpracuje jako vstup. (3) URL — vlož odkaz na webovou stránku. (4) Téma + kontext — v poli tématu buď velmi konkrétní: místo "conditional sentences" napiš "second conditional — nereálné podmínky, věty o cestování, úroveň B1". Čím konkrétnější zadání, tím méně se generátor odchyluje od tvého záměru.',
+  evidence:['buildContentPrompt()','filePartsForGemini()','urlContext','state.tema','state.kontext']},
+
+ {id:'sablony-ulozeni',title:'Jak uložit nastavení jako šablonu a znovu ho použít',status:'reseno',
+  keywords:['sablona','šablona','ulozit nastaveni','uložit nastavení','znovupouzit','znovu použít','preset','ulozit preset','uložit preset','oblibene nastaveni','oblíbené nastavení','jak ulozit','jak uložit','template'],
+  simple:'Po konfiguraci testu klikni na Uložit jako šablonu (v sekci šablon). Šablona uloží celé nastavení — typy cvičení, počty, body, skupiny. Při příštím použití klikni na název šablony a nastavení se načte.',
+  detailed:'Šablony ukládají kompletní stav generátoru: počet cvičení, typy a jejich detailní nastavení (počty otázek, body, b/ot), skupiny, jazykovou úroveň, jazyk pokynů a časový limit. Uložení: klikni na ikonu 💾 nebo tlačítko Uložit jako šablonu, zadej název. Načtení: klikni na název šablony v přehledu. Šablony jsou uloženy v localStorage — jsou dostupné jen v tom prohlížeči kde byly vytvořeny. Pro přenos na jiné zařízení použij export šablony (pokud je dostupný).',
+  evidence:['state.templates','saveTemplate()','loadTemplate()','deleteTemplate()','localStorage']},
+
+ {id:'historie-snapshoty',title:'Historie a jak se vrátit k předchozímu nastavení',status:'reseno',
+  keywords:['historie','history','snapshot','vraceni','vracení','zpet','zpět','undo','predchozi nastaveni','předchozí nastavení','jak se vratit','jak se vrátit','smazal jsem','smazala jsem','omylem smazal'],
+  simple:'Generátor průběžně ukládá snapshoty (historii) nastavení. V sekci Historie najdeš předchozí stavy — kliknutím se vrátíš k libovolnému bodu.',
+  detailed:'Snapshot se vytvoří automaticky při každé změně nastavení (přidání cvičení, změna počtu, uložení šablony). Historie zobrazuje chronologický seznam snapshotů s časovou značkou. Kliknutím na snapshot obnovíš celý stav generátoru na ten okamžik. Snapshoty jsou uloženy v sessionStorage — dostupné jen v aktuální relaci prohlížeče; po zavření prohlížeče se smažou. Pro dlouhodobé uchování nastavení použij šablony.',
+  evidence:['saveSnapshot()','loadSnapshot()','historyStack','sessionStorage','renderHistory()']},
+
+ {id:'archivace-vysledku',title:'Jak archivovat výsledky testů',status:'reseno',
+  keywords:['archivace','archivovat','ulozit vysledky','uložit výsledky','archiv testu','archiv testů','uchovat vysledky','uchovati výsledky','dlouhodobe ulozeni','dlouhodobé uložení','csv export','export vysledku','export výsledků'],
+  simple:'Po hromadném vyhodnocení stáhni CSV soubor s výsledky — ten lze otevřít v Excelu nebo Google Sheets. Samotné answers.txt soubory si ulož do složky pro daný test.',
+  detailed:'Doporučená archivace: (1) answers.txt soubory od studentů ulož do pojmenované složky (např. "Třída_4A_Test_Kondicionály_2026-06"). (2) Po hromadném vyhodnocení stáhni CSV — obsahuje jméno, skupinu, skóre, procenta, čas a výsledky po cvičeních. (3) Ulož i původní studentský HTML soubor a teacher verifier — bez nich nelze výsledky zpětně ověřit. (4) Vygenerovaný test si zálouj — lze ho znovu použít příští rok nebo upravit. Generátor sám výsledky neukládá na server — vše je lokální.',
+  evidence:['hromadné vyhodnocení','buildCsvExport()','downloadCsv()','teacher verifier']},
+
+ {id:'student-nema-vysledek',title:'Student odevzdal ale nemám výsledek — co dělat',status:'reseno',
+  keywords:['nemas vysledek','nemáš výsledek','student neodevzdal','student neodevzdala','chybi soubor','chybí soubor','neposla soubor','neposlala soubor','kde je soubor','ztraceny soubor','ztracený soubor','student tvrdi ze odevzdal','student tvrdí že odevzdal'],
+  simple:'Student musí po dokončení testu stáhnout a odevzdat soubor answers.txt. Pokud ho nemáš, buď ho neposlal/nestáhl, nebo ho poslal do špatné složky. Požádej studenta o opětovné stažení — pokud neobnovil stránku, soubor stále lze stáhnout.',
+  detailed:'Příčiny chybějícího souboru: (1) Student nedokončil test nebo zavřel okno před odevzdáním, (2) student stáhl soubor ale neposlal ho, (3) soubor byl zablokován antivirem nebo školním firewallem, (4) student odevzdal jiný soubor (HTML místo .txt). Řešení: (1) požádej studenta ať znovu otevře test v prohlížeči — pokud ho nezavřel a neobnovil, může stáhnout soubor znovu, (2) pokud stránku obnovil nebo zavřel, soubor je ztracen — student musí test opakovat, (3) zkontroluj emailovou schránku nebo odevzdávárnu třídy.',
+  evidence:['doSubmit()','downloadAnswers()','buildStudentPackage()','answers.txt']},
+
+ {id:'test-se-zobrazuje-jinak',title:'Test se studentovi zobrazuje jinak než v náhledu',status:'reseno',
+  keywords:['zobrazuje jinak','vypadá jinak','jiny vzhled','jiný vzhled','student vidi jine','student vidí jiné','rozliseni','rozlišení','mobil pc','mobil pocitac','mobil počítač','jiny prohlizec','jiný prohlížeč','safari chrome'],
+  simple:'Test je responzivní — na mobilu vypadá jinak než na PC. To je záměr. Pokud jsou rozdíly závažné (prvky se překrývají, texty se nevejdou), zkontroluj náhled v mobilním zobrazení.',
+  detailed:'Rozdíly mezi zařízeními jsou normální a žádoucí — test se přizpůsobuje šířce obrazovky. Problémy nastávají když: (1) student používá velmi starý prohlížeč (IE, starý Safari) — test je otestován pro Chrome, Firefox, Edge, moderní Safari, (2) student má zapnutý čtečkový/accessibility mód který mění layout, (3) na iOS Safari může být jiné chování fullscreenu a drag&drop. Pokud student hlásí nefunkčnost: požádej ho aby otevřel test v Chrome. Vizuální rozdíly (barvy, fonty) mohou způsobit tmavý režim operačního systému.',
+  evidence:['responsive CSS','viewport','@media','prefers-color-scheme']},
+
+ {id:'prilohy-typy-a-limity',title:'Jaké přílohy lze nahrát a jak velké',status:'reseno',
+  keywords:['prilohy','přílohy','jake soubory','jaké soubory','pdf priloha','pdf příloha','docx priloha','obrazek priloha','obrázek příloha','audio priloha','video priloha','jak velky soubor','jak velký soubor','limit prilohy','limit přílohy','nahrat soubor','nahrát soubor'],
+  simple:'Lze nahrát: PDF, DOCX, obrázky (JPG, PNG, GIF, WebP), audio (MP3, WAV, M4A) a video (MP4). Doporučený limit: do 10 MB. Větší soubory mohou způsobit timeout.',
+  detailed:'Podporované typy: dokumenty (PDF, DOCX, TXT), obrázky (JPEG, PNG, GIF, WebP — Gemini Vision), audio (MP3, WAV, OGG, M4A, FLAC), video (MP4, MOV, AVI, MKV). Praktické limity: Gemini API má limit 20 MB na soubor, ale větší soubory vedou k timeoutu (504) nebo pomalejšímu generování. Doporučení: PDF do 5 MB, obrázky do 2 MB, audio do 10 MB, video do 15 MB. Přílohy se konvertují na base64 a posílají přímo do Gemini API — nenahrávají se na žádný server.',
+  evidence:['filePartsForGemini()','readFileAsBase64()','MIME types','MAX_FILE_SIZE']},
+
+ {id:'url-kontext',title:'Použití URL jako vstupního kontextu',status:'reseno',
+  keywords:['url','odkaz','link','webova stranka','webová stránka','z internetu','z webu','pridat url','přidat url','url kontext','url context','vlozit odkaz','vložit odkaz','nacist z webu','načíst z webu'],
+  simple:'Do pole URL kontextu vlož odkaz na webovou stránku a generátor vytvoří otázky z jejího obsahu. Funguje pro veřejně dostupné stránky. Stránky za přihlášením nebo s blokem robotů nefungují.',
+  detailed:'URL kontext pošle odkaz přímo do Gemini API — model načte obsah stránky a použije ho jako zdroj pro otázky. Funguje pro: veřejné články, Wikipedie, vzdělávací weby, online texty. Nefunguje pro: stránky za přihlášením (Google Docs, školní systémy), stránky blokující crawlery (robots.txt), PDF přímo v URL (lepší je stáhnout a nahrát jako přílohu). Tip: pokud URL nefunguje, zkopíruj text stránky do vstupního textového pole.',
+  evidence:['urlContext','state.urlContext','useUrlContext','filePartsForGemini()']},
+
+ {id:'procvicovaci-test-bez-hodnoceni',title:'Procvičovací test bez hodnocení nebo klasifikace',status:'reseno',
+  keywords:['procvicovaci test','procvičovací test','bez hodnoceni','bez hodnocení','bez znamky','bez známky','jen procvicovani','jen procvičování','nehodnotit','nehodnotím','formativni','formativní','neznamkovany','neznámkovaný'],
+  simple:'Použij procvičovací (instant) režim — student vidí hned správné odpovědi a vysvětlení. Nenastavuj časový limit nebo nastav velkorysý. Takový test slouží jako procvičování, ne klasifikace.',
+  detailed:'Pro formativní (nehodnotící) použití: (1) zvol instant (okamžitá známka) režim — student dostane zpětnou vazbu ihned, (2) nastav velkorysý časový limit nebo nulový (bez limitu), (3) nastav procvičovací přístupový kód (nebo žádný), (4) v nastavení skupin lze zapnout "zobrazit správné odpovědi". V procvičovacím režimu student vidí u každé otázky zda odpověděl správně a jaká je správná odpověď. Tento režim není vhodný pro klasifikaci — správné odpovědi jsou viditelné.',
+  evidence:['instant mode','procvičovací režim','showCorrect','group.showFeedback','okamžitá-znamka']},
+
+ {id:'maturita-pouziti',title:'Jak generátor použít pro maturitní přípravu',status:'reseno',
+  keywords:['maturita','maturitni','maturitní','priprava na maturitu','příprava na maturitu','maturitni test','maturitní test','statnice','státnice','maturitni cviceni','maturitní cvičení'],
+  simple:'Generátor je vhodný pro maturitní přípravu — lze generovat testy zaměřené na konkrétní jazykové jevy, úroveň CEFR a typy úloh podobné maturitním. Pro ostré maturitní zkoušení doporučuji přísný offline režim.',
+  detailed:'Doporučená nastavení pro maturitní přípravu: (1) jazyková úroveň B1/B2 nebo C1/C2 dle třídy, (2) typy cvičení podobné maturitě — reading comprehension, error correction, transformation-chain, fill-in-the-blank, multiple choice, (3) zadání v cílovém jazyce (instrJazyk = target), (4) přísný offline režim pro ostrá přezkoušení, procvičovací pro opakování. Vstupní text: lze vložit autentický text z maturitních zadání nebo podobné texty. Generátor vytvoří otázky přesně zaměřené na daný text.',
+  evidence:['instrJazyk','jazykova-uroven','CEFR','reading comprehension','transformation-chain']},
+
+ {id:'co-kdyz-kolega-zapomnel-pin',title:'Kolega zapomněl PIN nebo přístup — co dělat',status:'reseno',
+  keywords:['zapomenuty pin','zapomenutý pin','zapomnel pristup','zapomněl přístup','nema pristup','nemá přístup','obnovit pristup','obnovit přístup','jak zjistit pin','jak zjistit přístup','admin pin','admin přístup'],
+  simple:'PIN a přístupy jsou viditelné v generátoru v nastavení skupin nebo v teacher verifieru. Sdělíš kolegovi PIN přímo — nebo mu pošleš nový soubor s novým PINem.',
+  detailed:'PINy a přístupy nejsou nikde šifrovány — jsou viditelné v generátoru (nastavení skupin → PIN skupiny) a v teacher verifieru (sekce přístupy). Pokud kolega ztratil přístup k teacher verifieru: otevři generátor, načti příslušnou šablonu nebo nastavení, zkontroluj PINy skupin. Pokud chceš PIN změnit: uprav ho v generátoru, vygeneruj test znovu, předej kolegovi nový soubor. Admin heslo (pokud je nastaveno) je viditelné v nastavení skupin — není šifrováno.',
+  evidence:['group.pin','group.password','buildAccessManifest()','admin-sprava']},
+
+ {id:'anonymizace-gdpr-detail',title:'Anonymizace a GDPR — jak chránit data studentů',status:'reseno',
+  keywords:['anonymizace','gdpr','ochrana dat','osobni udaje','osobní údaje','jmeno studenta','jméno studenta','skryt jmena','skrýt jména','anonymni','anonymní','pravni','právní'],
+  simple:'Generátor ukládá data pouze lokálně (v prohlížeči studenta a v answers.txt). Žádná data se neodesílají na server. Pro GDPR: anonymizuj jména v hromadném vyhodnocení nebo použij přezdívky/čísla.',
+  detailed:'Tok dat: studentova data (jméno, odpovědi, výsledky) zůstávají výhradně na jeho zařízení a v souboru answers.txt který odevzdá učiteli. Nic se neodesílá na external server — generátor je offline tool. Gemini API dostává pouze obsah testu při generování (ne studentská data). Pro GDPR compliance: (1) použij čísla nebo přezdívky místo jmen, (2) v hromadném vyhodnocení lze anonymizovat zobrazená jména, (3) answers.txt soubory uchovávej zabezpečeně (ne v emailu bez šifrování). Generátor nabízí anonymizaci v sekci diferenciace.',
+  evidence:['anonymizace','buildLocalTeacherMap()','Student A1','GDPR','localStorage']},
+
+ {id:'vice-testu-na-jednom-webu',title:'Jak mít více testů na jednom GitHub Pages webu',status:'reseno',
+  keywords:['vice testu','více testů','vice souboru','více souborů','seznam testu','seznam testů','rozcestnik','rozcestník','index stranka','index stránka','jak organizovat','jak organizovat testy','repo struktura'],
+  simple:'Nahraj každý test jako samostatný HTML soubor do repozitáře. Studentovi dáš přímý odkaz na konkrétní soubor. Volitelně vytvoř index.html jako rozcestník.',
+  detailed:'Doporučená struktura repozitáře: /testy/trida-4a-kondicionaly.html, /testy/trida-3b-pasivum.html atd. Každý test má vlastní URL: username.github.io/repo/testy/soubor.html. Pro rozcestník: vytvoř index.html se seznamem odkazů (nebo použi GitHub Pages automatickou navigaci). Generátor (src/index.html) je oddělen od studentských testů — drž ho ve složce src/, studentské testy v /testy/ nebo přímo v root.',
+  evidence:['GitHub Pages','interaktivni-testy','repository structure','index.html']},
+
+ {id:'uprava-po-generovani',title:'Jak upravit otázky a odpovědi po vygenerování',status:'reseno',
+  keywords:['upravit otazky','upravit otázky','upravit odpovedi','upravit odpovědi','zmenit otazku','změnit otázku','zmenit odpoved','změnit odpověď','editor','editovat test','editovat','opravit test','opravit chybu','ai vygenerovala spatne','AI vygenerovala špatně'],
+  simple:'Po vygenerování klikni na ikonu ✏️ (editor) u konkrétního cvičení nebo otevři plný editor otázek. Lze měnit zadání, správné odpovědi, přijatelné alternativy i vysvětlení.',
+  detailed:'Editor otázek a odpovědí (openTestEditor) umožňuje: (1) upravit text otázky/zadání, (2) změnit správnou odpověď, (3) přidat přijatelné alternativy (alt_answers) pro synonyma nebo jiné tvary, (4) přidat nebo smazat položky cvičení, (5) přidat vysvětlení správné odpovědi (zobrazí se v procvičovacím režimu). Po editaci klikni na Uložit a přestavit — test se sestaví znovu s opravenými daty. Pro složité typy (highlight-evidence, ordering) je editor plně funkční.',
+  evidence:['openTestEditor()','edItemHtml()','saveEditorChanges()','alt_answers[]','Uložit a přestavit']},
+
+ {id:'pridat-alternativni-odpovedi',title:'Jak přidat přijatelné alternativy ke správné odpovědi',status:'reseno',
+  keywords:['alternativy','alternativa','alt odpoved','alt odpověď','synonymum','synonyma','jiny tvar','jiný tvar','student ma pravdu','student má pravdu','spravna ale jina','správná ale jiná','alt answers','uznane odpovedi','uznané odpovědi'],
+  simple:'V editoru otázek klikni na + Alternativa pod správnou odpovědí. Alternativy jsou uznány jako správné při hodnocení (oranžová barva v editoru). Vhodné pro synonyma, různé tvary nebo různé správné překlady.',
+  detailed:'Přijatelné alternativy (alt_answers[]) jsou další odpovědi, které se hodnotí jako plně správné — například u překladu může být správných více variant. Přidání: otevři editor (✏️), u otázky klikni na + Alternativa, napiš alternativní odpověď. Alternativy jsou viditelné v teacher verifieru (oranžová barva) a v hromadném vyhodnocení. Bodovací engine porovnává studentovu odpověď nejdříve se správnou odpovědí, pak s alternativami — pokud sedí cokoliv z toho, dostane plný počet bodů.',
+  evidence:['alt_answers[]','edAltAnswers','textScore()','alternativy']},
+
+ {id:'smazat-cviceni',title:'Jak smazat nebo přeskládat cvičení po vygenerování',status:'reseno',
+  keywords:['smazat cviceni','smazat cvičení','odstranit cviceni','odstranit cvičení','preskladat','přeskládat','zmenit poradi','změnit pořadí','presunout cviceni','přesunout cvičení','mazani cviceni','mazání cvičení'],
+  simple:'V editoru otázek lze mazat jednotlivé položky uvnitř cvičení. Celé cvičení smazat nebo přeskládat nelze přímo v editoru — nejjednodušší je upravit nastavení a vygenerovat znovu.',
+  detailed:'Co lze v editoru: mazat jednotlivé otázky/položky uvnitř cvičení (tlačítko ✕ u položky), přidat novou položku (+ Přidat položku), měnit obsah. Co nelze přímo: smazat celé cvičení nebo změnit pořadí cvičení. Workaround: (1) pokud chceš cvičení smazat, v editoru smaž všechny jeho položky — cvičení zůstane prázdné, ale při přestavení se přeskočí, nebo (2) uprav konfiguraci v generátoru a vygeneruj znovu. Přeskládání pořadí cvičení: zatím nepodporováno — plánovaná funkce.',
+  evidence:['edDelItem()','edAddItem()','openTestEditor()','saveEditorChanges()']},
+
+ {id:'ai-klic-nespravny',title:'AI vygenerovala špatnou správnou odpověď — jak opravit',status:'reseno',
+  keywords:['spatna odpoved','špatná odpověď','spatny klic','špatný klíč','ai se spleta','ai se splete','chybna odpoved','chybná odpověď','generátor spletl','nesouhlas s klicem','nesouhlas s klíčem','opravit klic','opravit klíč'],
+  simple:'Otevři editor (✏️), najdi otázku s chybnou odpovědí a přepiš ji. Pak klikni Uložit a přestavit. Spusť ověření klíče pro kontrolu ostatních otázek.',
+  detailed:'Postup opravy: (1) klikni na ✏️ (editor) u cvičení s chybou, (2) najdi konkrétní otázku, (3) přepiš pole Odpověď na správnou hodnotu, (4) volitelně přidej vysvětlení proč je tato odpověď správná, (5) klikni Uložit a přestavit. Pro prevenci: před nasazením spusť Ověření klíče — AI projde všechny uzavřené otázky a upozorní na podezřelé odpovědi. Pokud se chybné odpovědi opakují u určitého typu, zkus přesnější zadání tématu nebo konkrétnější vstupní text.',
+  evidence:['openTestEditor()','edAnswer','saveEditorChanges()','aiVerifyKey()','keyDiffsAcknowledged']},
+ {id:'typy-banked-cloze',title:'Banked cloze — doplňování ze zásoby slov',status:'reseno',
+  keywords:['banked cloze','cloze','banka slov','zásoba slov','word bank','doplnit ze seznamu','doplnit ze zásoby','vyber ze slov','vyber ze seznamu','cloze test','mezerovy test','mezerový test'],
+  simple:'Student dostane text s mezerami a seznam slov (banku). Vybírá správné slovo ze zásoby pro každou mezeru. Testuje slovní zásobu a gramatiku v kontextu.',
+  detailed:'Banked cloze zobrazí text s mezerami a pod ním nabídku slov (word bank). Student přiřadí každé slovo do správné mezery — buď přetažením nebo výběrem z dropdown menu. Každé slovo lze použít jen jednou. Klíč obsahuje pole správných odpovědí (answers[]) odpovídající pořadí mezer. Bodování: každá správná mezera = poměrná část bodů. Typ je označen jako složitý (MANUAL_SUPPORTED_TYPES) a v hybrid módu se generuje zvlášť.',
+  evidence:['banked cloze','banked-cloze','answers[]','word bank','MANUAL_SUPPORTED_TYPES','clozeScore()']},
+
+ {id:'typy-table-completion',title:'Table-completion — doplňování tabulky',status:'reseno',
+  keywords:['table completion','table-completion','tabulka','doplnit tabulku','doplňování tabulky','doplnit do tabulky','gramaticka tabulka','gramatická tabulka','sklonovani','skloňování','casovani','časování','paradigma'],
+  simple:'Student doplňuje chybějící buňky v tabulce. Vhodné pro paradigmata (časování sloves, skloňování, nepravidelné tvary). Testuje systematické gramatické znalosti.',
+  detailed:'Table-completion zobrazí tabulku s předvyplněnými záhlavími a části buněk. Student doplní prázdné buňky. Struktura: rows[] kde každý řádek má label a cells[] (buňky — část je prefilled, část je prázdná pro student). Bodování: každá správně doplněná buňka = poměrná část bodů. Typ je označen jako složitý a v hybrid módu se generuje zvlášť. Vhodné například pro: časování sloves (I go/he goes/they go), stupňování přídavných jmen, nepravidelná minulá příčestí.',
+  evidence:['table-completion','rows[]','cells[]','tableScore()','MANUAL_SUPPORTED_TYPES']},
+
+ {id:'bezpecnostni-incident',title:'Bezpečnostní incident — klíč unikl, co dělat',status:'reseno',
+  keywords:['klic unikl','klíč unikl','studenti maji klic','studenti mají klíč','podvod','opisovani','opisování','bezpecnostni incident','bezpečnostní incident','zneplatnit test','zneplatnit','odvolat test','test unikl','fotka testu','foto testu','sdilel test','sdílel test'],
+  simple:'Pokud klíč nebo test unikl: (1) okamžitě smaž soubor z GitHub Pages nebo přestaň ho distribuovat, (2) vygeneruj nový test s jiným obsahem, (3) změň PINy skupin. Starý soubor nelze vzdáleně zneplatnit.',
+  detailed:'Generátor nemá serverovou kontrolu — jakmile student má soubor, nelze ho vzdáleně deaktivovat. Možnosti při incidentu: (1) Pokud test ještě nepsal: přestaň distribuovat odkaz, nahraj na GitHub Pages nový soubor (jiný název nebo přepiš původní), vygeneruj test s jiným obsahem a novými PINy. (2) Pokud test právě probíhá: není technická možnost zastavit — pouze organizačně (svolat studenty, přerušit). (3) Po incidentu: vygeneruj novou variantu testu, použij jiný vstupní text, změň typy cvičení. Prevence: distribuuj odkaz/soubor těsně před testem, ne dny předem.',
+  evidence:['GitHub Pages','buildStudentPackage()','accessGroups[]','group.pin','offline balíček']},
+
+ {id:'access-manifest',title:'Co je access-manifest.json a jak funguje',status:'reseno',
+  keywords:['access manifest','access-manifest','manifest','pristupovy manifest','přístupový manifest','json manifest','sprava pristupu','správa přístupů','jak funguje pristup','jak funguje přístup','kdo ma pristup','kdo má přístup'],
+  simple:'Access-manifest.json je soubor který definuje kdo má přístup ke generátoru — seznam učitelů s jejich rolemi. Generuje se při nastavení přístupů a je součástí hostovaného generátoru.',
+  detailed:'Access-manifest.json obsahuje seznam autorizovaných uživatelů: každý záznam má email (nebo identifikátor), roli (admin/trainedTeacher) a volitelně jméno. Generátor při spuštění manifest načte a ověří přihlášeného uživatele. Bez manifestu nebo pro neznámého uživatele se generátor nespustí (ochrana před neoprávněným použitím). Manifest se edituje v sekci Admin správa přístupů. Role admin: plný přístup včetně správy přístupů. Role trainedTeacher: přístup ke generování testů bez správy přístupů. Soubor je hostován spolu s generátorem na GitHub Pages.',
+  evidence:['access-manifest.json','buildAccessManifest()','admin-sprava','trainedTeacher','OFFICIAL_ORIGINS']},
+
+ {id:'role-admin-teacher',title:'Role admin vs. trainedTeacher — jaký je rozdíl',status:'reseno',
+  keywords:['admin','administrator','trained teacher','trainedTeacher','role','opravneni','oprávnění','co muze admin','co může admin','rozdil roli','rozdíl rolí','kdo je admin','kdo muze','kdo může','pristupova uroven','přístupová úroveň'],
+  simple:'Admin má plný přístup — včetně správy přístupů, přidávání kolegů a změny nastavení generátoru. TrainedTeacher má přístup ke generování testů, ale nemůže spravovat přístupy ostatních.',
+  detailed:'Role admin: může generovat testy, spravovat access-manifest (přidávat/odebírat uživatele, měnit role), měnit nastavení generátoru, přistupovat ke všem funkcím. Role trainedTeacher: může generovat testy, používat všechny funkce generátoru (editor, šablony, historii, hromadné vyhodnocení), ale nemá přístup ke správě přístupů a nevidí sekci Admin. Prakticky: admin = osoba zodpovědná za nástroj (ty), trainedTeacher = kolegové kteří prošli školením a smějí nástroj používat. Doporučení: nastav sebe jako admin, kolegy jako trainedTeacher.',
+  evidence:['admin role','trainedTeacher','access-manifest.json','admin-sprava','buildAccessManifest()']},
+
+ {id:'logo-skola',title:'Jak přidat logo školy nebo název školy do generátoru',status:'reseno',
+  keywords:['logo','logo skoly','logo školy','nazev skoly','název školy','skola','škola','branding','vlastni logo','vlastní logo','pridat logo','přidat logo','upravit generátor','vzhled generátoru'],
+  simple:'Název školy a základní branding lze nastavit v konfiguraci generátoru. Logo jako obrázek vyžaduje úpravu HTML — to je nad rámec běžného nastavení.',
+  detailed:'Generátor má proměnnou pro název školy (SCHOOL_NAME nebo podobnou konstantu) která se zobrazuje v záhlaví a v exportovaných testech. Změna: otevři src/index.html v editoru, najdi konstantu SCHOOL_NAME (nebo podobnou) a uprav. Pro přidání loga: vlož <img> tag do záhlaví generátoru v HTML. Tato změna vyžaduje přímou editaci HTML souboru — není dostupná přes UI. Po změně nahraj soubor na GitHub Pages.',
+  evidence:['SCHOOL_NAME','src/index.html','GitHub Pages','pencil tlačítko']},
+
+ {id:'prirazeni-skupin',title:'Jak přiřadit studenty do skupin',status:'reseno',
+  keywords:['prirazeni skupin','přiřazení skupin','skupiny','skupina','student ve skupine','student ve skupině','jak vytvorit skupiny','jak vytvořit skupiny','kdo je v jake skupine','kdo je v jaké skupině','trida','třída','rozdelit studenty','rozdělit studenty','skupinovy pin','skupinový pin'],
+  simple:'Skupiny se nastavují v generátoru — každá má svůj název, PIN a případně podpůrná opatření. Student si sám vybere skupinu při zahájení testu zadáním správného PINu.',
+  detailed:'Skupiny v generátoru fungují jako přístupové brány: každá skupina má PIN (nebo heslo) a nastavení (podpůrná opatření, čas, anonymizace). Student zadá PIN své skupiny při zahájení testu — tím se identifikuje jako člen dané skupiny a aktivují se jeho nastavení. Přiřazení: není automatické — student musí znát PIN své skupiny. Ty jako učitel určíš PINy skupin, zapíšeš je na tabuli nebo pošleš studentům. Doporučení: pojmenuj skupiny po třídách nebo úrovních (4A, 4B, skupina-B1, skupina-B2).',
+  evidence:['accessGroups[]','group.pin','group.name','group.a11y','buildAccessManifest()','diferenciace-skupiny']},
+
+ {id:'anonymizace-v-diferenciaci',title:'Jak funguje anonymizace v diferenciovaném testu',status:'reseno',
+  keywords:['anonymizace diferenciace','anonymizace skupiny','anonymni skupina','anonymní skupina','skryt skupinu','skrýt skupinu','nevidet skupinu','nevidět skupinu','anonymni trida','anonymní třída','diferenciace anonymizace'],
+  simple:'V diferenciovaném testu lze pro každou skupinu nastavit anonymizaci zvlášť. Anonymizace v teacher verifieru nahradí jméno studenta generovaným kódem — učitel vidí výsledky, ale ne kdo je kdo.',
+  detailed:'Anonymizace funguje na dvou úrovních: (1) Globální — všichni studenti jsou anonymizováni stejně, jména se nahradí kódy (Student A1, Student A2…). (2) Skupinová — lze nastavit per-skupina, například skupina "SVP" je anonymizována zatímco ostatní ne. V teacher verifieru se anonymizovaní studenti zobrazí pod kódem; lokální mapa (uložená v localStorage) umožňuje učiteli rozklíčovat kód na jméno — ale tato mapa zůstane jen v jeho prohlížeči. Anonymizace chrání před nechtěným prozrazením jmen při sdílení obrazovky.',
+  evidence:['anonymizace','buildLocalTeacherMap()','Student A1','group.anonymize','diferenciace-skupiny','anonymizace-gdpr']}
 ];
 
 const GA_NOT_ADDRESSED = 'Tento jev není v generátoru nijak výslovně řešen.';
-const GA_CHIPS = ['tisk / PDF','co dát studentům','answers.txt','hromadné vyhodnocení','zpětná vazba','diferenciace','anonymizace','split screen','API klíč','self-test','teacher verifier','fullscreen','export','chyba 503','chyba 429','chyba 400','poškozený JSON','data mimo zadání','model nenalezen','síťová chyba'];
+const GA_CHIPS = ['tisk / PDF','co dát studentům','answers.txt','hromadné vyhodnocení','zpětná vazba','diferenciace','anonymizace','split screen','API klíč','self-test','teacher verifier','fullscreen','export','chyba 503','chyba 429','chyba 400','poškozený JSON','data mimo zadání','model nenalezen','síťová chyba','hybridní generování','ordering','categorisation-board','highlight-evidence','Flash vs Lite','GitHub Pages','šablony','archivace','GDPR','maturita','editor','alternativy'];
 let gaState = { ai:null, mode:'simple', loading:false, query:'' };
 
 function gaStatusMeta(status){
