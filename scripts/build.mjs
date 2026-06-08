@@ -3,6 +3,8 @@ import path from "node:path";
 
 const SRC  = path.resolve("src/index.html");
 const DIST = path.resolve("dist/index.html");
+const MANIFEST_SRC  = path.resolve("src/access-manifest.json");
+const MANIFEST_DIST = path.resolve("dist/access-manifest.json");
 
 fs.mkdirSync(path.dirname(DIST), { recursive: true });
 
@@ -20,6 +22,11 @@ const output = source.replace(
 );
 
 fs.writeFileSync(DIST, output, "utf8");
+
+if (fs.existsSync(MANIFEST_SRC)) {
+  fs.copyFileSync(MANIFEST_SRC, MANIFEST_DIST);
+  console.log("✅  access-manifest.json zkopírován do dist/");
+}
 
 const srcKB  = (fs.statSync(SRC).size  / 1024).toFixed(1);
 const distKB = (fs.statSync(DIST).size / 1024).toFixed(1);
