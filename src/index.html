@@ -983,22 +983,27 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .welcome-gate { z-index: 30040; }
 .welcome-box {
   width: min(500px, 96vw);
+  max-height: 92dvh;
+  max-height: 92vh;
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,.45);
+  display: flex;
+  flex-direction: column;
 }
 .welcome-hero {
   background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
-  padding: 28px 24px 22px;
+  padding: 22px 24px 18px;
   text-align: center;
   position: relative;
+  flex-shrink: 0;
 }
 body.light .welcome-hero {
   background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
 }
-.welcome-hero-emoji { font-size: 44px; line-height: 1; margin-bottom: 8px; }
+.welcome-hero-emoji { font-size: 38px; line-height: 1; margin-bottom: 6px; }
 .welcome-hero-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #fff;
   letter-spacing: .2px;
@@ -1006,38 +1011,43 @@ body.light .welcome-hero {
   text-shadow: 0 1px 4px rgba(0,0,0,.3);
 }
 .welcome-hero-sub {
-  font-size: 13.5px;
+  font-size: 13px;
   color: rgba(255,255,255,.82);
-  margin-top: 5px;
+  margin-top: 4px;
   font-weight: 500;
 }
 .welcome-body {
-  padding: 20px 22px 10px;
+  padding: 16px 20px 10px;
   font-size: 13.5px;
-  line-height: 1.65;
+  line-height: 1.62;
   color: var(--text);
   background: var(--card);
+  overflow-y: auto;
+  flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch;
 }
-.welcome-body p { margin: 0 0 10px; }
+.welcome-body p { margin: 0 0 9px; }
 .welcome-body p:last-child { margin-bottom: 0; }
 .welcome-body strong { color: var(--accent); }
 .welcome-tip {
   background: var(--card2);
   border-left: 3px solid var(--accent);
   border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12.5px;
+  padding: 7px 11px;
+  font-size: 12px;
   color: var(--muted);
-  margin-top: 12px;
+  margin-top: 10px;
   line-height: 1.5;
 }
 .welcome-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 14px 22px 20px;
+  gap: 7px;
+  padding: 12px 20px 16px;
   background: var(--card);
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
 }
 .welcome-ok-btn {
   min-width: 200px;
@@ -2296,10 +2306,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.1',
+  version: '6.11.2',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA WELCOME MODALU NA MOBILU (6.11.2): box má max-height 92vh + flex-direction:column — hero a akce jsou flex-shrink:0 (vždy viditelné), tělo má overflow-y:auto a flex:1 (scrollovatelné). Tlačítko Pojďme na to již není skryté pod viewport. Zmenšeny padding a font-size hero sekce pro úsporu místa. Ověřeno node --check.',
     'OPRAVA TEXTU WELCOME MODALU (6.11.1): PS přeformulováno — odstraněno slovo zbytečný, nový text: Až tě za nějakou dobu začne štvát, napiš adminovi — lze ho pro tebe vypnout. Jméno admina odstraněno. Ověřeno node --check.',
     'UVÍTACÍ MODAL (6.11): po úspěšném přihlášení se zobrazí personalizované uvítací okno (showWelcomeModal). Oslovení je ve vokativu — funkce czechVocative() skloňuje křestní jméno z displayName (40+ jmen v lookup table + automatická pravidla pro zbytek). Modal má gradientové záhlaví sladěné se stylem generátoru, popis nástroje, odkaz na Poradce a admina Daniela, PS o onboarding průvodci. Tlačítko Toto uvítání příště nezobrazovat uloží příznak do localStorage — modal se pak přeskočí. Onboarding gate se zobrazí 700 ms po welcome (ne 60 ms) aby nedošlo k překrytí. Admin dostane welcome modal stejně jako trainedTeacher. Ověřeno node --check.',
     'PORADCE: DOPLNĚNÍ CHYBĚJÍCÍCH KB ZÁZNAMŮ (6.10.1) — přidáno 9 záznamů: banked cloze, table-completion, bezpečnostní incident (klíč unikl), access-manifest.json, role admin vs trainedTeacher, logo školy, přiřazení skupin, anonymizace v diferenciaci. Celkem nyní 101 KB záznamů. Ověřeno node --check.',
@@ -2309,9 +2320,8 @@ const RELEASE = Object.freeze({
     'PŘEJMENOVÁNÍ SPLIT-GEN TLAČÍTKA (6.08.6): toggle Po cvičeních přejmenován na Každé cvičení zvlášť s podtitulkem Včetně jednoduchých — hybrid to dělá automaticky jen pro složitá. Tooltip upřesněn. Tlačítko zůstává jen v pokročilém módu. Ověřeno node --check.',
     'OPRAVA ORDERING KLIKÁNÍ (6.08.5): RESP[id]=oOrder.slice() v renderQ inicializovalo RESP na [0,1,2,3] — ordCurPicks to vrátilo jako nakliknuté pořadí a clickOrd při prvním kliknutí odebíral místo přidával. Opraveno: RESP[id] se neinicializuje, ordBadgeHtml dostane prázdné picks[]. ordCurPicks nyní kontroluje jen Array.isArray, ne délku. Ověřeno node --check.',
     'ROZŠÍŘENÍ 503 HLÁŠKY O DENNÍ LIMIT (6.08.4): chyba 503 může mít dvě příčiny — přetížené servery NEBO vyčerpaný denní limit RPD (Free tier = 20/den, Google po vyčerpání vrací 503 místo 429). Hláška nyní obě možnosti vysvětluje a odkazuje na aistudio.google.com/rate-limit. Akce: zkontroluj RPD, počkej do půlnoci UTC nebo přejdi na Pay-as-you-go. Ověřeno node --check.',
-    'OPRAVA TEXTU 503 HLÁŠKY (6.08.3): geminiAttemptsText vždy přidávala větu o 429/kvótě i u 503 chyby — nesedilo to. Funkce rozšířena o parametr errorType; při 503 zobrazí Generátor požadavek zkusil N×, ale Gemini servery stále neodpovídaly. Ověřeno node --check.',
   ]
-});;;;;;;;;;;;;;;;;;;;;
+});;;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
