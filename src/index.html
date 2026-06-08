@@ -2210,10 +2210,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.07',
+  version: '6.07.1',
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA HYBRID BANNERU (6.07.1): (1) Badge deduplication: seen{} nyní porovnává raw ex.typ místo normalizeType(ex.typ) — počet složitých cvičení v textu a počet badge jsou teď vždy identické (dříve: ordering chyběl v badge, přestože byl počítán). (2) Reaktivita banneru: renderHybridBanner() přidáno do updateExField() → banner se okamžitě aktualizuje při změně typu v selectu bez nutnosti opustit sekci a vrátit se. Ověřeno node --check.',
     'AUTOMATICKÝ HYBRID: složitá cvičení každé zvlášť, jednoduchá najednou. Funkce runHybridGeneration() automaticky detekuje složitá cvičení (MANUAL_SUPPORTED_TYPES) v konfiguraci a generuje je každé vlastním API callem (split); jednoduchá cvičení jdou v jednom batch callu; výsledky se složí v původním pořadí. Funguje v OBOU módech (základní i pokročilý) bez přepínačů. Informativní banner (#hybridBanner) se automaticky zobrazí pod konfigurací cvičení, jakmile se v detailním nastavení vyskytne složitý typ — obsahuje jméno a počet složitých cvičení a upozornění na fallback (ruční editace). Banner se skryje, když detail vypnout nebo žádný složitý typ nechybí. Pokud hybrid selže na konkrétním cvičení i po 2 pokusech, zobrazí se chybová zpráva s návodem na ruční editaci; zbytek testu se sestaví normálně. Ověřeno node --check.',
     'OPRAVA normalizeLoadedState + TEST LAB. (1) normalizeLoadedState({}) nevracelo splitGenerate=false ani manualMode=false — defaulty byly omylem jen v setAppMode, ne ve funkci samotné. Test Lab catBoard lock + nová pole proto stále hlásil SELHALO. Opraveno: defaulty přesunuty do normalizeLoadedState. (2) Tlačítko „Ověřit aktuální výstup\" odstraněno z Test Lab UI (button, help karta i event listener). Ověřeno node --check.',
     'EDITOR OTÁZEK A ODPOVĚDÍ — FULLSCREEN. Editor (openTestEditor) a panel „Rozšířit přijatelné odpovědi" nyní zabírají celou stránku: .editor-overlay padding snížen na 0, .editor-shell width=100%, border-radius=0, box-shadow odstraněn. Editor tak lépe využije prostor na širokých monitorech i při velkém počtu položek. Vizuální změna pouze v editoru, žádný dopad na generování, bodování ani export. Ověřeno node --check.',
@@ -2223,9 +2224,8 @@ const RELEASE = Object.freeze({
     'AKV DIFF POLOŽKY: přidán checkbox Přijmout AI odpověď jako alternativu na uzavřené položky (k revizi). Dříve byl checkbox jen pro otevřené typy (překlady, transformace). Nyní i fill-in-the-blank a jiné diff položky nabídnou možnost přijmout AI odpověď jako alt_answer — klíč zůstává hlavní. Diff záznamy se přidají do akvWeakRows s indexy od 1000, zobrazují se ve žluté barvě (akv-pick-diff). Ověřeno node --check.',
     'SELF-TEST BODOVÁNÍ: AUTOFILL SPRÁVNÉ/ŠPATNÉ ODPOVĚDI PRO 8 NOVÝCH TYPŮ. stCorrectValue a stWrongValue neuměly generovat simulované odpovědi pro multi-select, highlight-evidence, ordering, categorisation-board, transformation-chain, error-tagging, banked cloze, multiple matching — tyto položky vedly k gap=null a skóre 0 v scenáři vše-správně. Přidáno: multi-select→it.correct[], highlight-evidence→Number(it.correct), ordering→it.correct_order[], catBoard→entries.map(e→e.category), transformation-chain→transformations.map(tr→tr.answer), error-tagging→{token,etype,corr}, banked cloze→it.answers[], multiple matching→items.map(s→s.correct). Špatné odpovědi pro monotonie test analogicky. Ověřeno node --check.',
     'TEST LAB: 4 NOVÉ TESTY + GEMINI API PING. (1) Banked cloze + Multiple matching alias: ověří EXERCISE_PEDAGOGY aliasy (banked->cloze text, multiple matching->matching) a přítomnost typů v MANUAL_SUPPORTED_TYPES. (2) quickModel + Model fallback: ověří quickModel(strong/lite) přes mock setGeminiModel, GEMINI_MODEL_DEFAULT=gemini-2.5-flash, pickGeminiFallbackModel vrací odlišný model. (3) Manuální editor (funkce + typy): ověří existenci showManualExerciseForm, generateTestWithManual, isManualSupported pro všech 9 složitých typů (false pro jednoduché). (4) catBoard lock + nová pole (regrese): normalizeLoadedState přidá splitGenerate=false a manualMode=false; buildExerciseSpecs vrátí count=1 pro catBoard bez ohledu na pocetOtazek. (5) Nové tlačítko Ping API: volá Gemini API s minimálním promptem, měří latenci, zobrazí výsledek samostatně (VOLÁ API — neni v Spustit vše). Overeno node --check.',
-    'STRIP manualMode Z GENEROVANÉHO TESTU + OPRAVA SYNTAX ERROR V CHANGELOGU. manualMode je interní pole generátoru a nesmí se dostat do studentského testu. Strip na dvou místech: normalizeGeneratedExercises a generateTestWithManual. NAVÍC: changelog v RELEASE.changes měl BOOL_FIELDS=[ manualMode ] s neoescapovanými apostrofy uvnitř JS stringu — způsobovalo Unexpected identifier manualMode napříč celou aplikací (smoke test, node --check). Opraveno odstraněním apostrofů z textu changelogu. Ověřeno node --check.',
   ]
-});;
+});;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -5171,6 +5171,7 @@ function updateExField(i, field, value) {
     }
   }
   renderExTotals();
+  renderHybridBanner();
   validate();
   saveSnapshot();
 }
@@ -5229,12 +5230,13 @@ function renderHybridBanner() {
   }
   const listEl = $('hybridComplexList');
   if (listEl) {
+    // Deduplicate by raw typ string so badge count always matches the number shown
     const seen = {};
     const badges = complexExs.map(function(ex) {
-      const t = normalizeType(ex.typ || '');
-      if (seen[t]) return '';
-      seen[t] = true;
-      return '<span class="hybrid-badge">' + esc(ex.typ || t) + '</span>';
+      const raw = (ex.typ || '').trim();
+      if (seen[raw]) return '';
+      seen[raw] = true;
+      return '<span class="hybrid-badge">' + esc(raw) + '</span>';
     }).filter(Boolean).join('');
     listEl.innerHTML = badges;
   }
