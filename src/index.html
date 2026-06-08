@@ -802,9 +802,9 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .preview-frame.full { width:100%; border-radius:8px; }
 .btn-edit { width:100%; padding:12px; border-radius:10px; border:1.5px solid var(--bdr); background:transparent; color:var(--t2); font-size:14px; font-weight:700; cursor:pointer; font-family:Georgia,serif; min-height:46px; margin:0 0 8px; }
 .btn-edit:hover { border-color:var(--acc-b); color:var(--acc); }
-.editor-overlay { position:fixed; inset:0; background:rgba(4,6,12,.86); z-index:10000; display:flex; align-items:stretch; justify-content:center; padding:14px; }
+.editor-overlay { position:fixed; inset:0; background:rgba(4,6,12,.86); z-index:10000; display:flex; align-items:stretch; justify-content:center; padding:0; }
 .editor-overlay.hidden { display:none; }
-.editor-shell { width:min(900px,100%); height:100%; display:flex; flex-direction:column; background:var(--bg2); border:1px solid var(--bdr); border-radius:14px; overflow:hidden; box-shadow:0 24px 80px rgba(0,0,0,.6); }
+.editor-shell { width:100%; height:100%; display:flex; flex-direction:column; background:var(--bg2); border:none; border-radius:0; overflow:hidden; box-shadow:none; }
 .editor-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 13px; background:var(--bg3); border-bottom:1px solid var(--bdr); flex-wrap:wrap; }
 .editor-bar-title { font-size:14px; font-weight:700; color:var(--t1); }
 .editor-bar-actions { display:flex; gap:7px; flex-wrap:wrap; }
@@ -2188,10 +2188,10 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
   version: '6.05',
-  date:    '2026-06-05',
+  date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
-    'FIX REGRESE: splitGenerate a manualMode defaults byly chybně v setAppMode místo v normalizeLoadedState. Přesunuty před return s; v normalizeLoadedState. Ověřeno node --check + ověřena přítomnost v normalizeLoadedState.',
+    'EDITOR OTÁZEK A ODPOVĚDÍ — FULLSCREEN. Editor (openTestEditor) a panel „Rozšířit přijatelné odpovědi" nyní zabírají celou stránku: .editor-overlay padding snížen na 0, .editor-shell width=100%, border-radius=0, box-shadow odstraněn. Editor tak lépe využije prostor na širokých monitorech i při velkém počtu položek. Vizuální změna pouze v editoru, žádný dopad na generování, bodování ani export. Ověřeno node --check.',
     'OPRAVA DVOU REGRESÍ V TEST LAB. (1) normalizeLoadedState: přidané defaults splitGenerate a manualMode používaly state (globální proměnná) místo s (parametr funkce) — modifikovalo se globální state, ne předaný objekt, takže normalizeLoadedState({}).splitGenerate bylo undefined. Opraveno: s.splitGenerate a s.exerciseConfig. (2) Test Banked cloze + Multiple matching alias: EXERCISE_PEDAGOGY mapuje na pedagogickou kategorii string, ne objekt se .score. Test čísl neexistující .score property. Opraveno: test nyní používá scoringTypeFor() která vrací správný scoring alias. Ověřeno node --check.',
     'TAB TLAČÍTKA: tab buttons zobrazují jen Exercise 1/2/3 (bez typu) dle přání. Typ zůstává pouze v hlavičce panelu po rozkliknutí: Exercise 1: Multiple choice. Ověřeno node --check.',
     'TAB LABELY CVIČENÍ: (1) normalizeGeneratedExercises ignoruje AI-generovaný title (AI vrací nesmysly jako test/complete the test) a vždy použije typ cvičení. (2) Tab tlačítka nyní zobrazují typ: Exercise 1: Multiple choice, Exercise 2: Fill in the blank apod. Přidána funkce exTypeLabel() s mapou názvů pro všech 24 typů. Ověřeno node --check.',
@@ -3021,7 +3021,8 @@ function setAppMode(mode){
     state.workPreset = 'advanced';
     if (!state.testMode) state.testMode = 'bezny';
     if (!state.resultMode) state.resultMode = 'instant';
-
+  if (s.splitGenerate === undefined) s.splitGenerate = false;
+  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
     if (!state.layout) state.layout = 'tabs';
     if (!state.odevzdavani) state.odevzdavani = 'B';
   } else {
@@ -3077,9 +3078,6 @@ function normalizeLoadedState(s) {
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   if (s.exercisePedagogyMap === undefined) s.exercisePedagogyMap = null;
   if (s.didacticReview === undefined) s.didacticReview = null;
-  // Nová pole: splitGenerate a manualMode na cvičeních
-  if (s.splitGenerate === undefined) s.splitGenerate = false;
-  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
   return s;
 }
 
