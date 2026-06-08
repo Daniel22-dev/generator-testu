@@ -2191,7 +2191,7 @@ const RELEASE = Object.freeze({
   date:    '2026-06-08',
   status:  'approved-for-school-use',
   changes: [
-    'OPRAVA: setAppMode — ReferenceError: s is not defined. Při přepnutí do pokročilého režimu používala funkce s.splitGenerate a s.exerciseConfig místo state.splitGenerate a state.exerciseConfig. Způsobovalo ReferenceError a nefunkční přepínač Pokročilý režim. Opraveno na state.*. Ověřeno node --check.',
+    'OPRAVA normalizeLoadedState + TEST LAB. (1) normalizeLoadedState({}) nevracelo splitGenerate=false ani manualMode=false — defaulty byly omylem jen v setAppMode, ne ve funkci samotné. Test Lab catBoard lock + nová pole proto stále hlásil SELHALO. Opraveno: defaulty přesunuty do normalizeLoadedState. (2) Tlačítko „Ověřit aktuální výstup\" odstraněno z Test Lab UI (button, help karta i event listener). Ověřeno node --check.',
     'EDITOR OTÁZEK A ODPOVĚDÍ — FULLSCREEN. Editor (openTestEditor) a panel „Rozšířit přijatelné odpovědi" nyní zabírají celou stránku: .editor-overlay padding snížen na 0, .editor-shell width=100%, border-radius=0, box-shadow odstraněn. Editor tak lépe využije prostor na širokých monitorech i při velkém počtu položek. Vizuální změna pouze v editoru, žádný dopad na generování, bodování ani export. Ověřeno node --check.',
     'OPRAVA DVOU REGRESÍ V TEST LAB. (1) normalizeLoadedState: přidané defaults splitGenerate a manualMode používaly state (globální proměnná) místo s (parametr funkce) — modifikovalo se globální state, ne předaný objekt, takže normalizeLoadedState({}).splitGenerate bylo undefined. Opraveno: s.splitGenerate a s.exerciseConfig. (2) Test Banked cloze + Multiple matching alias: EXERCISE_PEDAGOGY mapuje na pedagogickou kategorii string, ne objekt se .score. Test čísl neexistující .score property. Opraveno: test nyní používá scoringTypeFor() která vrací správný scoring alias. Ověřeno node --check.',
     'TAB TLAČÍTKA: tab buttons zobrazují jen Exercise 1/2/3 (bez typu) dle přání. Typ zůstává pouze v hlavičce panelu po rozkliknutí: Exercise 1: Multiple choice. Ověřeno node --check.',
@@ -3022,8 +3022,8 @@ function setAppMode(mode){
     state.workPreset = 'advanced';
     if (!state.testMode) state.testMode = 'bezny';
     if (!state.resultMode) state.resultMode = 'instant';
-  if (state.splitGenerate === undefined) state.splitGenerate = false;
-  if (Array.isArray(state.exerciseConfig)) state.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+  if (s.splitGenerate === undefined) s.splitGenerate = false;
+  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
     if (!state.layout) state.layout = 'tabs';
     if (!state.odevzdavani) state.odevzdavani = 'B';
   } else {
@@ -3079,6 +3079,9 @@ function normalizeLoadedState(s) {
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   if (s.exercisePedagogyMap === undefined) s.exercisePedagogyMap = null;
   if (s.didacticReview === undefined) s.didacticReview = null;
+  if (s.splitGenerate === undefined) s.splitGenerate = false;
+  if (s.manualMode === undefined) s.manualMode = false;
+  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
   return s;
 }
 
@@ -9147,13 +9150,11 @@ function openTestLab(){
     +   '<div class="testlab-intro">Admin kontrola generátoru a právě vytvořených testů. Běží lokálně, nevolá Gemini a nic nestahuje. Slouží jako rychlá pojistka před vydáním nové verze nebo před sdílením konkrétního testu.</div>'
     +   '<div class="testlab-actions">'
     +     '<button type="button" class="acc-btn primary" id="testLabRunAll" title="Kontrola generátoru jako aplikace: bezpečnostní pojistky, export, UI modaly, self-testy, verifier a základní technická diagnostika.">Spustit vše</button>'
-    +     '<button type="button" class="acc-btn" id="testLabRunCurrent" title="Kontrola posledního vygenerovaného testu. Použij až po generování, před stažením nebo sdílením konkrétního výstupu.">Ověřit aktuální výstup</button>'
     +     '<button type="button" class="acc-btn" id="testLabPingGemini" title="Rychlý ping Gemini API s aktuálním klíčem a modelem. VOLÁ GEMINI — spotřebuje 1 API request.">🌐 Ping API</button>'
     +     '<button type="button" class="acc-btn" id="testLabClear" title="Smaže jen diagnostické hlášky v Test Labu. Nemění test ani nastavení generátoru.">Vyčistit výstup</button>'
     +   '</div>'
     +   '<div class="testlab-admin-help">'
     +     '<div class="testlab-admin-help-card"><b>Spustit vše</b><strong>Kontroluje generátor.</strong> Použij po úpravě kódu nebo před vydáním nové verze.</div>'
-    +     '<div class="testlab-admin-help-card"><b>Ověřit aktuální výstup</b><strong>Kontroluje poslední vygenerovaný test.</strong> Použij po vygenerování testu před stažením / sdílením.</div>'
     +     '<div class="testlab-admin-help-card"><b>Vyčistit výstup</b><strong>Jen uklidí Test Lab.</strong> Smaže hlášky z diagnostiky, ne rozpracovaný test.</div>'
     +   '</div>'
     +   '<div class="testlab-note"><b>Rozsah:</b> admin gate, release metadata, UI modaly, SecretScanner, export guard, smoke validátor HTML, offline guard (negativní), answer-key guard, self-test bodování (vč. reálného spuštění proti vygenerovanému testu), secure/verifier funkce, normalizace typů, pedagogická mapa, datový model a prompt builder. <b>Neověřuje:</b> reálné klikání v prohlížeči, stahování souborů, mobilní Safari ani celý uživatelský průchod. Pro první vrstvu reálného prohlížeče použij nově tlačítko „Stáhnout E2E starter”.</div>'
@@ -9164,7 +9165,6 @@ function openTestLab(){
   document.getElementById('testLabX').addEventListener('click', function(){ bd.remove(); });
   document.getElementById('testLabClose').addEventListener('click', function(){ bd.remove(); });
   document.getElementById('testLabRunAll').addEventListener('click', testLabRunAll);
-  document.getElementById('testLabRunCurrent').addEventListener('click', testLabRunCurrentOutput);
   document.getElementById('testLabPingGemini').addEventListener('click', testLabPingGemini);
   document.getElementById('testLabDownloadE2E').addEventListener('click', downloadE2EStarter);
   document.getElementById('testLabClear').addEventListener('click', function(){ var el=document.getElementById('testLabResults'); if(el) el.innerHTML=''; });
