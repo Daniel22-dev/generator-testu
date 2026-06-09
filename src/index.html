@@ -760,6 +760,8 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .gemini-note code { font-family:monospace; font-size:12px; background:var(--bg2); border:1px solid var(--bdr); border-radius:4px; padding:0 4px; color:var(--t2); }
 .key-restrict-info { font-size:12.5px; color:var(--acc); background:var(--acc-d); border:1px solid var(--acc-b); border-radius:8px; padding:7px 10px; margin-bottom:8px; line-height:1.5; }
 .key-restrict-info a { color:var(--acc); font-weight:600; text-decoration:underline; text-underline-offset:2px; }
+.key-restrict-info button.inline-guide-btn { background:none; border:none; padding:0; font:inherit; font-size:inherit; font-weight:600; color:var(--acc); text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+.gemini-note button.inline-guide-btn { background:none; border:none; padding:0; font:inherit; font-size:inherit; color:var(--acc); text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
 .gemini-model-row { margin-top:9px; padding-top:9px; border-top:1px dashed var(--bdr); }
 .gemini-model-label { display:block; font-size:12.5px; color:var(--t3); margin-bottom:4px; font-family:Georgia,serif; }
 .gemini-model-status { color:var(--t4); font-style:italic; margin-left:4px; }
@@ -923,6 +925,7 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .ui-modal-backdrop { position: fixed; inset: 0; z-index: 30010; background: rgba(4,6,12,.78); display: flex; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .ui-modal-backdrop.hidden { display: none; }
 .ui-modal-box { width: min(440px, 100%); max-height: calc(100vh - 32px); margin: auto; display: flex; flex-direction: column; background: var(--bg2); border: 1px solid var(--bdr); border-radius: 14px; box-shadow: 0 24px 80px rgba(0,0,0,.55); overflow: hidden; }
+@media(min-width:600px){ .changelog-box { width: min(880px, 100%); } }
 .ui-modal-head { flex: 0 0 auto; }
 .ui-modal-actions { flex: 0 0 auto; }
 .ui-modal-head { padding: 13px 15px 8px; color: var(--t1); font-weight: 800; font-size: 14px; }
@@ -1022,22 +1025,22 @@ body.light .welcome-hero {
   padding: 16px 20px 10px;
   font-size: 13.5px;
   line-height: 1.62;
-  color: var(--text);
-  background: var(--card);
+  color: var(--t2);
+  background: var(--bg2);
   overflow-y: auto;
   flex: 1 1 auto;
   -webkit-overflow-scrolling: touch;
 }
 .welcome-body p { margin: 0 0 9px; }
 .welcome-body p:last-child { margin-bottom: 0; }
-.welcome-body strong { color: var(--accent); }
+.welcome-body strong { color: var(--acc); }
 .welcome-tip {
-  background: var(--card2);
-  border-left: 3px solid var(--accent);
+  background: var(--bg3);
+  border-left: 3px solid var(--acc);
   border-radius: 6px;
   padding: 7px 11px;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--t3);
   margin-top: 10px;
   line-height: 1.5;
 }
@@ -1047,15 +1050,15 @@ body.light .welcome-hero {
   align-items: center;
   gap: 7px;
   padding: 12px 20px 16px;
-  background: var(--card);
+  background: var(--bg2);
   flex-shrink: 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--bdr2);
 }
 .welcome-ok-btn {
   min-width: 200px;
   padding: 10px 24px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--acc);
+  color: #0a0c14;
   border: none;
   border-radius: 10px;
   font-size: 14px;
@@ -1067,7 +1070,7 @@ body.light .welcome-hero {
 .welcome-ok-btn:hover { opacity: .88; }
 .welcome-skip-link {
   font-size: 11.5px;
-  color: var(--muted);
+  color: var(--t3);
   background: none;
   border: none;
   cursor: pointer;
@@ -1075,8 +1078,96 @@ body.light .welcome-hero {
   text-underline-offset: 2px;
   padding: 0;
 }
-.welcome-skip-link:hover { color: var(--text); }
+.welcome-skip-link:hover { color: var(--t1); }
 
+/* ── Return welcome modal (2.+ spuštění) ────────────────────────────────── */
+.welcome-return-box {
+  width: min(420px, 96vw);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 12px 50px rgba(0,0,0,.55);
+  display: flex;
+  flex-direction: column;
+}
+.welcome-return-hero {
+  background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+  padding: 32px 28px 26px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.welcome-return-emoji { font-size: 46px; line-height: 1; margin-bottom: 10px; }
+.welcome-return-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .1px;
+  text-shadow: 0 1px 6px rgba(0,0,0,.3);
+  margin-bottom: 6px;
+}
+.welcome-return-phrase {
+  font-size: 14px;
+  color: rgba(255,255,255,.85);
+  font-style: italic;
+  line-height: 1.4;
+}
+.welcome-return-actions {
+  padding: 20px 28px 24px;
+  background: var(--bg2);
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.welcome-return-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 13px 24px;
+  background: var(--acc);
+  color: #0a0c14;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: .3px;
+  transition: opacity .15s;
+  font-family: Georgia, serif;
+}
+.welcome-return-btn:hover { opacity: .88; }
+@media(max-width:480px){
+  .welcome-return-hero { padding: 26px 20px 20px; }
+  .welcome-return-emoji { font-size: 38px; }
+  .welcome-return-name { font-size: 19px; }
+  .welcome-return-actions { padding: 16px 20px 20px; }
+}
+/* ── First-run onboarding checkbox ─────────────────────────────────────── */
+.onb-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border: 1.5px solid var(--bdr);
+  border-radius: 9px;
+  cursor: pointer;
+}
+.onb-check-row input[type=checkbox] {
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--acc);
+  cursor: pointer;
+}
+.onb-check-label { font-size: 13px; color: var(--t2); line-height: 1.5; cursor: pointer; }
+.onb-finish-note {
+  font-size: 12.5px;
+  color: var(--t3);
+  text-align: center;
+  line-height: 1.55;
+  padding: 14px 22px 4px;
+  background: var(--bg2);
+}
+.onb-finish-note strong { color: var(--t1); }
 /* ── Security guide modal ────────────────────────────────────────────────── */
 .sec-guide-gate { z-index: 30045; }
 .sec-guide-box {
@@ -1131,11 +1222,11 @@ body.light .sec-guide-hero {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
-  letter-spacing: .08em;
+  letter-spacing: .04em;
   text-transform: uppercase;
-  color: var(--t4);
+  color: var(--acc);
   margin-bottom: 7px;
 }
 .sec-guide-section-title .sg-ico { font-size: 15px; flex-shrink: 0; }
@@ -2219,7 +2310,7 @@ body.acc-locked { overflow:hidden; }
           <span class="gemini-ptitle">⚡ Přímé generování testu</span>
           <span class="gemini-status" id="geminiStatus">Klíč není nastaven</span>
         </div>
-        <div class="key-restrict-info">⚠️ Klíč musí být omezený na <strong>Gemini API</strong> (od 19. 6. 2026 Google blokuje neomezené klíče). <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noreferrer">Jak omezit klíč →</a></div>
+        <div class="key-restrict-info">⚠️ Klíč musí být omezený na <strong>Gemini API</strong> (od 19. 6. 2026 Google blokuje neomezené klíče). <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">Jak omezit klíč →</button></div>
         <div class="gemini-key-row">
           <input type="password" id="geminiKeyInput" placeholder="Gemini API klíč (AIza…)" autocomplete="off" autocorrect="off">
         </div>
@@ -2234,7 +2325,7 @@ body.acc-locked { overflow:hidden; }
             <span class="key-advanced-hint">⚠️ Jen na vlastním zařízení — klíč zůstane v prohlížeči i po restartu. Na sdíleném počítači použij relaci.</span>
           </div>
         </details>
-        <div class="gemini-note" id="geminiNote"><strong>Relace</strong> = klíč se po zavření prohlížeče sám zapomene; nejbezpečnější volba, doporučená na sdílených i školních zařízeních. <strong>Trvalé uložení</strong> = klíč zůstane v prohlížeči i po restartu — jen na vlastním zařízení. Klíč musí být omezený na Gemini API — <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noreferrer">návod</a>. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com</a> → Get API key.</div>
+        <div class="gemini-note" id="geminiNote"><strong>Relace</strong> = klíč se po zavření prohlížeče sám zapomene; nejbezpečnější volba, doporučená na sdílených i školních zařízeních. <strong>Trvalé uložení</strong> = klíč zůstane v prohlížeči i po restartu — jen na vlastním zařízení. Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">návod</button>. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com</a> → Get API key.</div>
         <div class="gemini-model-row">
           <label class="gemini-model-label" for="geminiModelInput">Model <span class="gemini-model-status" id="geminiModelStatus">výchozí</span></label>
           <div class="gemini-model-inputwrap">
@@ -2404,20 +2495,24 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.4',
+  version: '6.11.11',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'ITEM ANALYSIS ROZŠÍŘENÍ (6.11.11): v položkové analýze teacher verifieru přidány: (1) sloupec Časté chyby — top-3 nejčastější špatné odpovědi per položka (min. 2 výskyty), s doporučením zvaž alternativu pokud tvoří ≥20 % odpovědí. (2) Signál podezřele snadné položky (p>90 %, oranžové zvýraznění). (3) iaDiffLabel rozšířen o práh >90 %. Ověřeno node --check.',
+    'GDPR ROZŠÍŘENÍ BEZPEČNOSTNÍHO PRŮVODCE (6.11.10): přidány 4 sekce do 🔒 průvodce — přístup k CSV a sdílení výsledků, sdílení obrazovky, interpretace bezpečnostních signálů v answers.txt. Ověřeno node --check.',
+    'NOVÝ ONBOARDING FLOW (6.11.9): (1) První spuštění: 4kroký průvodce — uvítání s info o aktivačním kódu → průvodce ostrý test (checkbox) → průvodce bezpečný provoz (checkbox) → závěrečná slide. Příznak genOnboardingDone_v1 v localStorage. (2) Opakované spuštění: krátké velké uvítací okno s vokativem a 5 rotujícími frázemi, tlačítko Jdeme na to!, vždy bez vypnutí. Funguje na mobilu. Ověřeno node --check.',
+    'VĚTŠÍ CHANGELOG MODAL (6.11.8) + OPRAVA POKROČILÉHO REŽIMU (6.11.7). Ověřeno node --check.',
+    'REDESIGN NÁVODU A OPRAVY MODALŮ (6.11.6): (1) Návod „Jak používat ostře" předělán z prostého textu na HTML sekce ve stylu bezpečnostního průvodce (buildUsageGuideHtml) — zelené záhlaví, 8 sekcí s ikonami a barevnými boxy. Použit v 📋 tlačítku i onboardingovém gate. (2) Opraveny CSS proměnné welcome modalu (--text/--muted/--card/--accent → --t2/--t3/--bg2/--acc) — text „Toto uvítání příště nezobrazovat" nyní viditelný i v denním módu. (3) Tlačítko v API key guide přejmenováno z „Rozumím" na „← Zpět". Ověřeno node --check.',
+    'NÁVOD NA API KLÍČ (6.11.5): přidána funkce showApiKeyGuide() — český 5krokový návod „Jak získat a omezit Gemini API klíč" v samostatném modalu. Volají ho všechna tři místa, kde byl dříve odkaz na anglickou dokumentaci (key-restrict-info box, geminiNote, security guide modal). Odkazy nahrazeny tlačítky inline-guide-btn. Ověřeno node --check.',
     'BEZPEČNOSTNÍ PRŮVODCE (6.11.4): přidáno tlačítko 🔒 do záhlaví — otevírá modal „Bezpečný provoz ve škole" se 6 sekcemi: kdy použít který režim, co nikdy neposlat studentům, kam ukládat answers.txt, jak anonymizovat studenty, pravidla pro API klíč, co dělat při úniku verifieru/klíče. Vlastní CSS (sec-guide-*), scrollovatelné tělo, funguje na mobilu. Klik mimo modal nebo Escape zavírá. Ověřeno node --check.',
     'BEZPEČNOST API KLÍČE (6.11.3): přidán info box ve žluté sekci — upozornění, že klíč musí být omezený na Gemini API (Google blokuje neomezené klíče od 19. 6. 2026) + odkaz na návod. Varování u trvalého uložení zpřísněno. Chybová hláška 401/403 rozšířena o konkrétní zmínku požadavku na omezení klíče. Ověřeno node --check.',
     'OPRAVA WELCOME MODALU NA MOBILU (6.11.2): box má max-height 92vh + flex-direction:column — hero a akce jsou flex-shrink:0 (vždy viditelné), tělo má overflow-y:auto a flex:1 (scrollovatelné). Tlačítko Pojďme na to již není skryté pod viewport. Zmenšeny padding a font-size hero sekce pro úsporu místa. Ověřeno node --check.',
     'OPRAVA TEXTU WELCOME MODALU (6.11.1): PS přeformulováno — odstraněno slovo zbytečný, nový text: Až tě za nějakou dobu začne štvát, napiš adminovi — lze ho pro tebe vypnout. Jméno admina odstraněno. Ověřeno node --check.',
     'UVÍTACÍ MODAL (6.11): po úspěšném přihlášení se zobrazí personalizované uvítací okno (showWelcomeModal). Oslovení je ve vokativu — funkce czechVocative() skloňuje křestní jméno z displayName (40+ jmen v lookup table + automatická pravidla pro zbytek). Modal má gradientové záhlaví sladěné se stylem generátoru, popis nástroje, odkaz na Poradce a admina Daniela, PS o onboarding průvodci. Tlačítko Toto uvítání příště nezobrazovat uloží příznak do localStorage — modal se pak přeskočí. Onboarding gate se zobrazí 700 ms po welcome (ne 60 ms) aby nedošlo k překrytí. Admin dostane welcome modal stejně jako trainedTeacher. Ověřeno node --check.',
     'PORADCE: DOPLNĚNÍ CHYBĚJÍCÍCH KB ZÁZNAMŮ (6.10.1) — přidáno 9 záznamů: banked cloze, table-completion, bezpečnostní incident (klíč unikl), access-manifest.json, role admin vs trainedTeacher, logo školy, přiřazení skupin, anonymizace v diferenciaci. Celkem nyní 101 KB záznamů. Ověřeno node --check.',
-    'PORADCE: VELKÉ ROZŠÍŘENÍ KB (6.10) — přidáno 30 nových záznamů ve 14 kategoriích. A) Typy cvičení: přehled typů, ordering vs word order, multi-select vs multiple choice, highlight-evidence, error-tagging, categorisation-board, počet položek. B) Hybrid: co to je, hlášky, ruční editace. C) Výsledky: answers.txt, bezpečnostní signály, bodování nesedí, odevzdal dvakrát, chybějící výsledek. D) Workflow: postup před nasazením, sdílení bez GitHubu. E) GitHub Pages: hosting, aktualizace, chyby. F) Bezpečnost: přísný vs procvičovací, ztráta připojení, PIN. G) Modely: Flash vs Lite. H) Správa: kolega, více variant, část látky. I) Šablony a historie. J) Archivace. K) Student: zobrazuje jinak. L) Přílohy a URL. M) Maturita a procvičovací test. N) Editor: úpravy, alternativy, smazání. Celkem nyní 93 KB záznamů. Ověřeno node --check.',
-    'PORADCE: 9 NOVÝCH KB ZÁZNAMŮ PRO CHYBOVÉ HLÁŠKY (6.09). Přidány záznamy pokrývající všechny hlavní chyby generátoru: 503/UNAVAILABLE (přetížení vs. RPD limit), 429/RESOURCE_EXHAUSTED (kvóta), 400/INVALID_ARGUMENT (neplatný klíč), 401-403/PERMISSION_DENIED, 504/DEADLINE_EXCEEDED (timeout), poškozený JSON, data mimo zadání (validace), síťová chyba a model nenalezen. Každý záznam má simple i detailed verzi + evidence. Přidány chipy: chyba 503/429/400/poškozený JSON/data mimo zadání/model nenalezen/síťová chyba. Ověřeno node --check.',
-    'OPRAVA TEST LAB ORDERING (6.08.7): Test Lab hledal clickOrdInst v secure skriptu, ale secure cesta používá clickOrd — instant cesta má clickOrdInst. Check opraven na function clickOrd(. Ověřeno node --check.',
-    'PŘEJMENOVÁNÍ SPLIT-GEN TLAČÍTKA (6.08.6): toggle Po cvičeních přejmenován na Každé cvičení zvlášť s podtitulkem Včetně jednoduchých — hybrid to dělá automaticky jen pro složitá. Tooltip upřesněn. Tlačítko zůstává jen v pokročilém módu. Ověřeno node --check.',
+    'PORADCE: VELKÉ ROZŠÍŘENÍ KB (6.10) — přidáno 30 nových záznamů ve 14 kategoriích. Ověřeno node --check.',
+    'PORADCE: 9 NOVÝCH KB ZÁZNAMŮ PRO CHYBOVÉ HLÁŠKY (6.09). Ověřeno node --check.',
   ]
 });;;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -2689,8 +2784,8 @@ function uiModal({title='Potvrzení', message='', input=false, defaultValue='', 
     setTimeout(() => { if (inputEl) { inputEl.focus(); inputEl.select(); } else okBtn.focus(); }, 0);
   });
 }
-function uiAlert(message, title='Upozornění'){
-  return uiModal({title, message, okText:'Rozumím'});
+function uiAlert(message, title='Upozornění', boxClass=''){
+  return uiModal({title, message, okText:'Rozumím', boxClass});
 }
 function uiConfirm(message, title='Potvrzení', danger=false){
   return uiModal({title, message, okText:'Ano, pokračovat', cancelText:'Zrušit', danger}).then(Boolean);
@@ -3535,8 +3630,8 @@ function setAppMode(mode){
     state.workPreset = 'advanced';
     if (!state.testMode) state.testMode = 'bezny';
     if (!state.resultMode) state.resultMode = 'instant';
-  if (s.splitGenerate === undefined) s.splitGenerate = false;
-  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+    if (state.splitGenerate === undefined) state.splitGenerate = false;
+    if (Array.isArray(state.exerciseConfig)) state.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
     if (!state.layout) state.layout = 'tabs';
     if (!state.odevzdavani) state.odevzdavani = 'B';
   } else {
@@ -3592,9 +3687,9 @@ function normalizeLoadedState(s) {
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   if (s.exercisePedagogyMap === undefined) s.exercisePedagogyMap = null;
   if (s.didacticReview === undefined) s.didacticReview = null;
-  if (s.splitGenerate === undefined) s.splitGenerate = false;
+    if (state.splitGenerate === undefined) state.splitGenerate = false;
   if (s.manualMode === undefined) s.manualMode = false;
-  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+    if (Array.isArray(state.exerciseConfig)) state.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
   return s;
 }
 
@@ -12367,10 +12462,34 @@ function iaMedian(arr){if(!arr.length)return 0;var a=arr.slice().sort(function(p
 function iaSum(arr){return arr.reduce(function(a,b){return a+b;},0);}
 function iaGradeCmp(a,b){var na=parseFloat(String(a).replace(',','.')),nb=parseFloat(String(b).replace(',','.'));if(!isNaN(na)&&!isNaN(nb))return na-nb;return String(a).localeCompare(String(b),'cs');}
 function distributionStats(){var ok=RESULTS.filter(function(r){return r.status==='OK';});var pcts=ok.map(function(r){return r.pct;});var grades={};ok.forEach(function(r){var g=String(r.grade);grades[g]=(grades[g]||0)+1;});return {n:ok.length,pcts:pcts,grades:grades,mean:pcts.length?Math.round(iaSum(pcts)/pcts.length):0,median:pcts.length?Math.round(iaMedian(pcts)):0,min:pcts.length?Math.min.apply(null,pcts):0,max:pcts.length?Math.max.apply(null,pcts):0};}
-function itemAnalysisRows(){var ok=RESULTS.filter(function(r){return r.status==='OK';});var groups={};ok.forEach(function(r){var k=r.groupKey||'__default';(groups[k]||(groups[k]=[])).push(r);});var rows=[];Object.keys(groups).forEach(function(gk){var studs=groups[gk];var totals=studs.map(function(r){return r.earned;});var items={};studs.forEach(function(r,si){(r.details||[]).forEach(function(d){var key=d.ex+'|'+d.q;var it=items[key]||(items[key]={ex:d.ex,q:d.q,prompt:d.prompt,type:d.type,scores:[],oks:[],totals:[]});var frac=(d.total>0)?(d.pts/d.total):0;it.scores.push(frac);it.oks.push(d.ok?1:0);it.totals.push(totals[si]);});});Object.keys(items).forEach(function(key){var it=items[key];var n=it.scores.length;var p=n?iaSum(it.scores)/n:0;var full=n?iaSum(it.oks)/n:0;var D=iaPearson(it.scores,it.totals);rows.push({groupKey:gk,ex:it.ex,q:it.q,prompt:it.prompt,type:it.type,n:n,p:p,full:full,D:D});});});rows.sort(function(a,b){var da=(a.D==null)?99:a.D,db=(b.D==null)?99:b.D;return da-db||b.p-a.p;});return rows;}
-function iaDiffLabel(p){if(p<0.3)return 'těžká';if(p>0.85)return 'snadná';return 'střední';}
+function itemAnalysisRows(){var ok=RESULTS.filter(function(r){return r.status==='OK';});var groups={};ok.forEach(function(r){var k=r.groupKey||'__default';(groups[k]||(groups[k]=[])).push(r);});var rows=[];Object.keys(groups).forEach(function(gk){var studs=groups[gk];var totals=studs.map(function(r){return r.earned;});var items={};studs.forEach(function(r,si){(r.details||[]).forEach(function(d){var key=d.ex+'|'+d.q;var it=items[key]||(items[key]={ex:d.ex,q:d.q,prompt:d.prompt,type:d.type,scores:[],oks:[],totals:[],wrongAnswers:[]});var frac=(d.total>0)?(d.pts/d.total):0;it.scores.push(frac);it.oks.push(d.ok?1:0);it.totals.push(totals[si]);if(!d.ok && d.student != null && String(d.student).trim()) it.wrongAnswers.push(String(d.student).trim());});});Object.keys(items).forEach(function(key){var it=items[key];var n=it.scores.length;var p=n?iaSum(it.scores)/n:0;var full=n?iaSum(it.oks)/n:0;var D=iaPearson(it.scores,it.totals);var topWrong=iaTopWrongAnswers(it.wrongAnswers,3);rows.push({groupKey:gk,ex:it.ex,q:it.q,prompt:it.prompt,type:it.type,n:n,p:p,full:full,D:D,topWrong:topWrong,wrongTotal:it.wrongAnswers.length});});});rows.sort(function(a,b){var da=(a.D==null)?99:a.D,db=(b.D==null)?99:b.D;return da-db||b.p-a.p;});return rows;}
+function iaDiffLabel(p){if(p<0.3)return 'těžká';if(p>0.9)return 'podezřele snadná';if(p>0.85)return 'snadná';return 'střední';}
 function iaDiscVerdict(row){if(row.n<3)return {txt:'málo dat',bad:false};if(row.D==null)return {txt:'—',bad:false};if(row.D<0)return {txt:'⚠ záporná — zkontroluj klíč',bad:true};if(row.D<0.15)return {txt:'⚠ slabě rozlišuje',bad:true};if(row.D<0.3)return {txt:'hraniční',bad:false};return {txt:'OK',bad:false};}
-function analysisHtml(forExport){var ok=RESULTS.filter(function(r){return r.status==='OK';});if(!ok.length)return '<div class="muted">Zatím nejsou načtené žádné opravené výsledky.</div>';var s=distributionStats();var html='';html+='<div class="archive-note"><b>Souhrn třídy:</b> '+s.n+' studentů · průměr <b>'+s.mean+' %</b> · medián '+s.median+' % · rozsah '+s.min+'–'+s.max+' %</div>';var gkeys=Object.keys(s.grades).sort(iaGradeCmp);var maxc=0;gkeys.forEach(function(g){if(s.grades[g]>maxc)maxc=s.grades[g];});html+='<div style="margin:10px 0">';gkeys.forEach(function(g){var c=s.grades[g];var w=maxc?Math.round(c/maxc*100):0;html+='<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:64px;font-weight:800">Známka '+esc(g)+'</div><div style="flex:1;background:#eef2ff;border-radius:6px;overflow:hidden"><div style="width:'+w+'%;min-width:2px;background:#1d4ed8;color:#fff;padding:2px 6px;font-size:12px;font-weight:800;border-radius:6px;text-align:right">'+c+'</div></div></div>';});html+='</div>';var rows=itemAnalysisRows();var multi=Object.keys(s.grades).length>-1;var hasGroups=false;var seen={};ok.forEach(function(r){seen[r.groupKey||'__default']=1;});hasGroups=Object.keys(seen).length>1;html+='<div class="archive-note" style="margin-top:14px"><b>Položková analýza.</b> Obtížnost p = průměrná úspěšnost (0–100 %). Diskriminace = korelace položky s celkovým skóre: vysoká = dobří studenti ji řeší lépe; nízká nebo záporná = položka pravděpodobně chybná, dvojznačná nebo špatně oklíčovaná, ne jen těžká.</div>';html+='<div style="overflow:auto"><table class="tbl"><tr>'+(hasGroups?'<th>Skupina</th>':'')+'<th>Položka</th><th>Typ</th><th>n</th><th>Obtížnost p</th><th>Diskriminace</th><th>Hodnocení</th><th>Zadání</th></tr>';rows.forEach(function(row){var v=iaDiscVerdict(row);var dtxt=(row.D==null||row.n<3)?'—':(Math.round(row.D*100)/100).toFixed(2);html+='<tr'+(v.bad?' class="problem-high"':'')+'>'+(hasGroups?'<td>'+esc(row.groupKey==='__default'?'základní':row.groupKey)+'</td>':'')+'<td>Cv. '+esc(row.ex)+', ot. '+esc(row.q)+'</td><td class="small">'+esc(row.type||'')+'</td><td>'+row.n+'</td><td><b>'+Math.round(row.p*100)+' %</b> <span class="small muted">('+iaDiffLabel(row.p)+')</span></td><td>'+dtxt+'</td><td'+(v.bad?' style="font-weight:800;color:#991b1b"':'')+'>'+esc(v.txt)+'</td><td class="small">'+esc((row.prompt||'').slice(0,90))+'</td></tr>';});html+='</table></div>';return html;}
+function iaTopWrongAnswers(wrongAnswers, n){
+  // Agreguje nejčastější špatné odpovědi, vrátí top-n s počtem výskytů
+  var counts = {};
+  wrongAnswers.forEach(function(a){ var k = String(a||'').trim(); if(k) counts[k] = (counts[k]||0)+1; });
+  return Object.keys(counts)
+    .filter(function(k){ return counts[k] >= 2; })
+    .sort(function(a,b){ return counts[b]-counts[a]; })
+    .slice(0, n)
+    .map(function(k){ return {answer:k, count:counts[k]}; });
+}
+function analysisHtml(forExport){var ok=RESULTS.filter(function(r){return r.status==='OK';});if(!ok.length)return '<div class="muted">Zatím nejsou načtené žádné opravené výsledky.</div>';var s=distributionStats();var html='';html+='<div class="archive-note"><b>Souhrn třídy:</b> '+s.n+' studentů · průměr <b>'+s.mean+' %</b> · medián '+s.median+' % · rozsah '+s.min+'–'+s.max+' %</div>';var gkeys=Object.keys(s.grades).sort(iaGradeCmp);var maxc=0;gkeys.forEach(function(g){if(s.grades[g]>maxc)maxc=s.grades[g];});html+='<div style="margin:10px 0">';gkeys.forEach(function(g){var c=s.grades[g];var w=maxc?Math.round(c/maxc*100):0;html+='<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:64px;font-weight:800">Známka '+esc(g)+'</div><div style="flex:1;background:#eef2ff;border-radius:6px;overflow:hidden"><div style="width:'+w+'%;min-width:2px;background:#1d4ed8;color:#fff;padding:2px 6px;font-size:12px;font-weight:800;border-radius:6px;text-align:right">'+c+'</div></div></div>';});html+='</div>';var rows=itemAnalysisRows();var hasGroups=false;var seen={};ok.forEach(function(r){seen[r.groupKey||'__default']=1;});hasGroups=Object.keys(seen).length>1;html+='<div class="archive-note" style="margin-top:14px"><b>Položková analýza.</b> Obtížnost p = průměrná úspěšnost (0–100 %). Diskriminace = korelace položky s celkovým skóre: vysoká = dobří studenti ji řeší lépe; nízká nebo záporná = položka pravděpodobně chybná, dvojznačná nebo špatně oklíčovaná, ne jen těžká. Sloupec <b>Časté chyby</b> ukazuje nejčastější špatné odpovědi — pokud se opakuje stejná, zvaž uznání alternativy.</div>';html+='<div style="overflow:auto"><table class="tbl"><tr>'+(hasGroups?'<th>Skupina</th>':'')+'<th>Položka</th><th>Typ</th><th>n</th><th>Obtížnost p</th><th>Diskriminace</th><th>Hodnocení</th><th>Časté chyby / doporučení</th></tr>';rows.forEach(function(row){var v=iaDiscVerdict(row);var dtxt=(row.D==null||row.n<3)?'—':(Math.round(row.D*100)/100).toFixed(2);
+  // Signál vysoké úspěšnosti
+  var diffCls=''; var diffTxt='<b>'+Math.round(row.p*100)+' %</b> <span class="small muted">('+iaDiffLabel(row.p)+')</span>';
+  if(row.p>0.9&&row.n>=3) diffTxt='<b style="color:#b45309">'+Math.round(row.p*100)+' %</b> <span class="small" style="color:#b45309">⚠ podezřele snadná</span>';
+  // Špatné odpovědi a doporučení
+  var wrongHtml='—';
+  if(row.topWrong&&row.topWrong.length){
+    var parts=row.topWrong.map(function(w){
+      var pct=row.n?Math.round(w.count/row.n*100):0;
+      var rec=(pct>=20)?' <span style="color:#1d4ed8;font-weight:700">→ zvaž alternativu</span>':'';
+      return '<span class="small">„'+esc(w.answer)+'" ('+w.count+'×'+' / '+pct+'%)'+rec+'</span>';
+    });
+    wrongHtml=parts.join('<br>');
+  }
+  html+='<tr'+(v.bad?' class="problem-high"':'')+'>'+(hasGroups?'<td>'+esc(row.groupKey==='__default'?'základní':row.groupKey)+'</td>':'')+'<td>Cv. '+esc(row.ex)+', ot. '+esc(row.q)+'</td><td class="small">'+esc(row.type||'')+'</td><td>'+row.n+'</td><td>'+diffTxt+'</td><td>'+dtxt+'</td><td'+(v.bad?' style="font-weight:800;color:#991b1b"':'')+'>'+esc(v.txt)+'</td><td class="small">'+wrongHtml+'</td></tr>';});html+='</table></div>';return html;}
 function renderItemAnalysis(){var box=$('itemAnalysis');if(box)box.innerHTML=analysisHtml(false);}
 function archiveMeta(){const info=duplicateInfo();return {testId:CONFIG.testId,manifestHash:CONFIG.manifestHash,studentHtmlSha256:CONFIG.studentHtmlSha256||'',nazev:CONFIG.nazev,proKoho:CONFIG.proKoho||'',creatorId:CONFIG.creatorId||'',creatorName:CONFIG.creatorName||'',creatorRole:CONFIG.creatorRole||'',generatorVersion:CONFIG.generatorVersion||'',buildHash:CONFIG.buildHash||'',releaseDate:CONFIG.releaseDate||'',releaseStatus:CONFIG.releaseStatus||'',generatedAt:CONFIG.generatedAt||'',resultMode:CONFIG.resultMode||'secureOffline',createdAt:new Date().toISOString(),resultCount:RESULTS.length,okCount:RESULTS.filter(r=>r.status==='OK').length,duplicateStudentCount:info.dupStudentKeys.length,duplicateAttemptCount:info.dupAttemptKeys.length};}
 function safeFileName(s){return String(s||'test').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,80)||'test';}
@@ -13471,45 +13590,105 @@ function showReleaseInfo(){
   })[Access && Access.envKind] || 'neurčeno';
   const envLine = 'Prostředí: '+envLabel;
   const msg='vydáno '+RELEASE.date+' · build '+BUILD_HASH+'\n'+envLine+'\n\n'+statusLine+'\n\nCo se v této verzi změnilo:\n'+items+windowNote;
-  uiAlert(msg,'Generátor testů v'+RELEASE.version);
+  uiAlert(msg,'Generátor testů v'+RELEASE.version, 'changelog-box');
 }
 
 // Vestavěný provozní návod „Jak používat ostře" — pro kolegy, kteří nástroj nestavěli.
 // Žije přímo v souboru, takže se nedá oddělit ani zastarat. U bodů, kde to nástroj
 // vynucuje sám, je to označené, ať kolega ví, že ho to jistí.
 // Jediný zdroj provozního návodu — používá ho tlačítko 📋 v záhlaví i povinné
-// úvodní okno při otevření. Čísla kroků drž v souvislé řadě 1–8.
-const USAGE_GUIDE_TEXT =
-'Krátký postup pro ostrý (známkovaný) test.\n\n'+
-'1) Pro známkovaný test zvol režim „Bezpečný offline + verifier".\n'+
-'   → Vznikne student_test.html (bez odpovědí) a učitelský verifier.\n\n'+
-'2) Studentům posílej jen HTTPS ODKAZ na student_test.html\n'+
-'   (např. GitHub Pages / Netlify / Tiiny.host), ne HTML jako přílohu.\n\n'+
-'3) NIKDY nesdílej učitelský verifier.\n'+
-'   → Stahuje se pod názvem DO_NOT_SEND_TEACHER_VERIFIER… a nástroj\n'+
-'     blokuje, kdyby ses ho pokusil dát mezi studentský/veřejný export.\n\n'+
-'4) Před stažením otevři NÁHLED a zkontroluj zadání.\n\n'+
-'5) Spusť SELF-TEST bodování.\n'+
-'   → U bezpečného režimu je POVINNÝ — bez úspěšného self-testu\n'+
-'     nepustí stažení (chrání před tichou chybnou známkou). Kromě\n'+
-'     krajních případů ověří i monotonii a rozsah 0–100 % na náhodných\n'+
-'     odpovědích (odhalí nelineární chyby v součtu/zaokrouhlení bodů).\n\n'+
-'6) Volitelně: OVĚŘ KLÍČ druhým průchodem (AI). Self-test ověří, že\n'+
-'   stroj počítá podle klíče správně; tohle navíc nechá AI nezávisle\n'+
-'   vyřešit úlohy a označí, kde se liší od klíče — místa k ruční kontrole\n'+
-'   (jestli je sám klíč obsahově správný). Neblokuje stažení.\n\n'+
-'7) U studentů používej jména/kódy podle pokynů (diferencované skupiny).\n\n'+
-'8) Výsledky ukládej jen do zabezpečeného školního úložiště.\n\n'+
-'Co hlídá nástroj sám: povinný self-test u známkování, kontrola finálního\n'+
-'souboru před stažením (učitelská data / klíče / tokeny), výrazný název\n'+
-'učitelského souboru, potvrzení u rizikových akcí, sjednocené bodování\n'+
-'instant i verifier. I tak platí: nástroj je připravenější než člověk,\n'+
-'který ho použije — proto tenhle postup.';
+// úvodní okno při otevření.
+function buildUsageGuideHtml() {
+  return '<div class="sec-guide-hero" style="background:linear-gradient(135deg,#1a3a1a 0%,#0d2b0d 100%)">' +
+      '<div class="sec-guide-hero-emoji">📋</div>' +
+      '<div class="sec-guide-hero-title">Jak používat generátor ostře</div>' +
+      '<div class="sec-guide-hero-sub">Postup pro ostrý (známkovaný) test</div>' +
+    '</div>' +
+    '<div class="sec-guide-body">' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">1️⃣</span> Zvol správný režim</div>' +
+        '<p class="sec-guide-p">Pro ostrý (známkovaný) test vždy zvol <strong>Bezpečný offline + verifier</strong>.</p>' +
+        '<div class="sec-guide-ok">✓ Vzniknou dva soubory: <strong>student_test.html</strong> (bez správných odpovědí) a <strong>učitelský verifier</strong> (s klíčem a hodnoticí logikou).</div>' +
+        '<p class="sec-guide-p">Procvičování a domácí úkoly nevyžadují bezpečný režim — stačí jednoduchý (instant) mód.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">2️⃣</span> Pošli studentům pouze odkaz</div>' +
+        '<p class="sec-guide-p">Studentům posílej jen <strong>HTTPS odkaz</strong> na <code>student_test.html</code> (např. GitHub Pages, Netlify nebo Tiiny.host).</p>' +
+        '<div class="sec-guide-warn">⚠️ Nikdy neposílej soubor jako přílohu e-mailu — studenti by mohli vidět zdrojový kód a zjistit strukturu testu.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">3️⃣</span> Nikdy nesdílej verifier</div>' +
+        '<p class="sec-guide-p">Učitelský verifier obsahuje <strong>správné odpovědi a privátní dešifrovací klíč</strong>. Patří jen tobě.</p>' +
+        '<div class="sec-guide-ok">✓ Generátor ho pojmenuje <strong>DO_NOT_SEND_TEACHER_VERIFIER_…</strong> a blokuje jeho zahrnutí do studentského exportu.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">4️⃣</span> Zkontroluj náhled</div>' +
+        '<p class="sec-guide-p">Před stažením otevři <strong>Náhled</strong> a zkontroluj zadání, otázky i odpovědi — v mobilní i plné šířce.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">5️⃣</span> Spusť self-test bodování</div>' +
+        '<p class="sec-guide-p">Klikni na <strong>Self-test</strong> a nechej generátor ověřit, že bodování počítá správně.</p>' +
+        '<div class="sec-guide-ok">✓ U bezpečného režimu je self-test <strong>povinný</strong> — bez úspěšného testu nepůjde stáhnout klasifikovaný test. Chrání před tichou chybnou známkou.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">6️⃣</span> Volitelně: ověř klíč druhým průchodem</div>' +
+        '<p class="sec-guide-p">Funkce <strong>Ověřit klíč (AI)</strong> nechá AI nezávisle vyřešit úlohy a označí místa, kde se liší od uloženého klíče — tam nejspíš je obsahová chyba v klíči.</p>' +
+        '<p class="sec-guide-p">Doplňuje self-test: self-test ověří, že <em>stroj</em> počítá správně; tohle ověří, zda je sám <em>klíč</em> obsahově správný. Neblokuje stažení.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">7️⃣</span> Jména a výsledky</div>' +
+        '<p class="sec-guide-p">U diferencovaných skupin používej <strong>anonymizaci</strong> — generátor nahradí jména kódy v promptu odesílaném do AI.</p>' +
+        '<p class="sec-guide-p">Výsledky ukládej jen do <strong>zabezpečeného školního úložiště</strong> (ne sdílený cloud s veřejným přístupem).</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🛡️</span> Co hlídá nástroj sám</div>' +
+        '<p class="sec-guide-p">Povinný self-test před stažením klasifikovaného testu · bezpečnostní skener blokující únik učitelských dat · výrazný název verifieru · potvrzení u rizikových akcí · sjednocené bodování pro instant i verifier režim.</p>' +
+        '<div class="sec-guide-warn">⚠️ Nástroj je připravenější než člověk, který ho použije — proto tenhle postup.</div>' +
+      '</div>' +
+
+    '</div>';
+}
 
 function showUsageGuide(){
-  // Stejné široké okno jako úvodní onboarding (560px + větší řádkování), aby se
-  // odsazené řádky návodu nezalamovaly a nerozjížděly jako v užším obecném okně.
-  uiModal({title:'📋 Jak používat ostře', message:USAGE_GUIDE_TEXT, okText:'Rozumím', boxClass:'onboarding-box'});
+  if (document.getElementById('usageGuideGate')) return;
+
+  var isLight = document.body.classList.contains('light');
+  var themeIcon = isLight ? '🌙' : '☀️';
+
+  var backdrop = document.createElement('div');
+  backdrop.id = 'usageGuideGate';
+  backdrop.className = 'ui-modal-backdrop sec-guide-gate';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'usageGuideHead');
+  backdrop.innerHTML =
+    '<div class="ui-modal-box sec-guide-box" id="usageGuideHead">' +
+      buildUsageGuideHtml() +
+      '<div class="sec-guide-actions" style="justify-content:space-between">' +
+        '<button type="button" class="hdr-btn" id="usageGuideThemeBtn" title="Světlý/tmavý režim">' + themeIcon + '</button>' +
+        '<button type="button" class="ui-modal-btn primary" id="usageGuideOkBtn">Rozumím</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(backdrop);
+
+  function closeGuide() { backdrop.remove(); }
+  var okBtn = backdrop.querySelector('#usageGuideOkBtn');
+  var themeBtn = backdrop.querySelector('#usageGuideThemeBtn');
+  okBtn.addEventListener('click', closeGuide);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeGuide(); });
+  backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeGuide(); });
+  themeBtn.addEventListener('click', function(){
+    toggleMode();
+    themeBtn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
 }
 
 function showSecurityGuide(){
@@ -13551,16 +13730,37 @@ function showSecurityGuide(){
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Gemini API klíč</div>' +
-        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong> (výchozí volba) — po zavření prohlížeče se sám zapomene. Trvalé uložení používejte výhradně na vlastním, nepřepůjčovaném zařízení.</p>' +
-        '<p class="sec-guide-p">Každý učitel by měl mít <strong>vlastní klíč</strong> z Google AI Studio (zdarma). Klíč musí být omezený na Gemini API — <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noreferrer" style="color:var(--acc)">návod zde</a>.</p>' +
+        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong> (výchozí volba) — po zavření prohlížeče se sám zapomene. Trvalé uložení používejte výhradně na vlastním zařízení, které nikomu nepůjčujete.</p>' +
+        '<p class="sec-guide-p">Každý učitel by měl mít <strong>vlastní klíč</strong> z Google AI Studio (zdarma). Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()" style="color:var(--acc)">návod zde</button>.</p>' +
         '<div class="sec-guide-warn">⚠️ Na sdíleném počítači (sborovna, počítačová učebna) nikdy neukládejte klíč trvale — mohl by ho získat jiný uživatel.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🚨</span> Co dělat při úniku</div>' +
-        '<p class="sec-guide-p"><strong>Unikl verifier nebo answers.txt:</strong> Informujte vedení školy, zneplatnění testu zvažte individuálně. Soubor okamžitě odstraňte ze všech sdílených umístění.</p>' +
+        '<p class="sec-guide-p"><strong>Unikl verifier nebo answers.txt:</strong> Informujte admina aplikace, zneplatnění testu zvažte individuálně. Soubor okamžitě odstraňte ze všech sdílených umístění.</p>' +
         '<p class="sec-guide-p"><strong>Unikl API klíč:</strong> Přihlaste se na <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style="color:var(--acc)">aistudio.google.com</a>, starý klíč smažte a vytvořte nový. Zkontrolujte historii požadavků — zda klíč někdo nezneužil.</p>' +
         '<div class="sec-guide-ok">✓ Rychlá akce (smazání klíče) zabrání dalšímu zneužití i tehdy, když k úniku skutečně došlo.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">📊</span> Přístup k CSV a sdílení výsledků</div>' +
+        '<p class="sec-guide-p">CSV s výsledky obsahuje jména (nebo kódy), skupiny, body a časy — jde o osobní údaje. Soubor sdílejte <strong>pouze s osobami, které mají oprávnění výsledky zpracovávat</strong> (třídní učitel, výchovný poradce, vedení školy v rámci klasifikace).</p>' +
+        '<p class="sec-guide-p">Výsledky neposílejte e-mailem bez šifrování, nesdílejte přes veřejné cloudy (Google Disk „pro kohokoliv s odkazem", Dropbox bez hesla). Používejte školní systémy s přihlášením.</p>' +
+        '<div class="sec-guide-ok">✓ Pravidlo: CSV putuje jen tam, kam by putoval papírový výpis z třídní knihy.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🖥️</span> Sdílení obrazovky</div>' +
+        '<p class="sec-guide-p">Při sdílení obrazovky (online hodina, projekce ve třídě) nikdy nezobrazujte teacher verifier ani otevřený answers.txt. Zavřete záložky s výsledky před tím, než spustíte sdílení.</p>' +
+        '<p class="sec-guide-p">Pokud potřebujete studentům ukázat výsledky, použijte anonymizovaný přehled — bez jmen, pouze s kódy nebo skupinami.</p>' +
+        '<div class="sec-guide-warn">⚠️ Správné odpovědi zobrazené při sdílení obrazovky nelze vzít zpět — studenti je mohou zachytit screenshotem.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">⚠️</span> Bezpečnostní signály v answers.txt</div>' +
+        '<p class="sec-guide-p">Každý answers.txt obsahuje záznamy o bezpečnostních událostech: opuštění okna, přepnutí záložky, ztráta fokusu, zamčení testu. Nejde o důkaz podvádění — jde o <strong>podněty k rozhovoru se studentem</strong>.</p>' +
+        '<p class="sec-guide-p"><strong>Jedno opuštění okna</strong> — může být náhodné (notifikace, přepnutý kurzor). <strong>Opakované události těsně za sebou</strong> — stojí za zmínku při opravě. <strong>Zamčení testu</strong> (jen přísný režim) — student musel zadat odemykací heslo; záznam obsahuje čas a důvod.</p>' +
+        '<div class="sec-guide-ok">✓ Signály jsou kontextuální pomůcka, ne automatický verdikt. Výsledek vždy posuzujte jako celek.</div>' +
       '</div>' +
 
     '</div>' +
@@ -13583,6 +13783,71 @@ function showSecurityGuide(){
   backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSecGuide(); });
 }
 
+function showApiKeyGuide(){
+  if (document.getElementById('apiKeyGuideGate')) return;
+
+  var html =
+    '<div class="sec-guide-hero">' +
+      '<div class="sec-guide-hero-emoji">🔑</div>' +
+      '<div class="sec-guide-hero-title">Jak získat a omezit Gemini API klíč</div>' +
+      '<div class="sec-guide-hero-sub">Postup krok za krokem — zdarma, trvá asi 3 minuty</div>' +
+    '</div>' +
+    '<div class="sec-guide-body">' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">1️⃣</span> Přihlaste se do Google AI Studio</div>' +
+        '<p class="sec-guide-p">Otevřete v prohlížeči adresu <strong>aistudio.google.com</strong> a přihlaste se svým Google účtem (stejným, který běžně používáte).</p>' +
+        '<p class="sec-guide-p">Pokud se zobrazí uvítací obrazovka, klikněte na <strong>„Continue"</strong>.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">2️⃣</span> Otevřete správu API klíčů</div>' +
+        '<p class="sec-guide-p">V levém menu klikněte na <strong>„Get API key"</strong> (nebo přejděte přímo na <strong>aistudio.google.com/apikey</strong>).</p>' +
+        '<p class="sec-guide-p">Zobrazí se přehled vašich klíčů. Pokud žádný nemáte, klikněte na <strong>„Create API key"</strong> a vyberte existující projekt nebo nechte vytvořit nový.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">3️⃣</span> Otevřete nastavení klíče v Google Cloud</div>' +
+        '<p class="sec-guide-p">U vašeho klíče klikněte na ikonu tužky ✏️ nebo na název klíče. Tím se dostanete do <strong>Google Cloud Console</strong> — to je správná stránka pro omezení.</p>' +
+        '<p class="sec-guide-p">Pokud vás to přesměruje na <strong>console.cloud.google.com</strong>, jste na správném místě.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">4️⃣</span> Omezte klíč na Gemini API</div>' +
+        '<p class="sec-guide-p">Na stránce úprav klíče najděte sekci <strong>„APIs that can be accessed using this key"</strong>.</p>' +
+        '<p class="sec-guide-p">Klikněte na rozbalovací nabídku <strong>„Select API restrictions"</strong> a vyberte <strong>„Restrict key"</strong>.</p>' +
+        '<p class="sec-guide-p">Ze seznamu vyberte <strong>„Generative Language API"</strong> (to je Gemini API). Ostatní API nechte nezaškrtnuté.</p>' +
+        '<div class="sec-guide-ok">✓ Pod výběrem se zobrazí: <strong>Selected APIs: Gemini API</strong> — to je správný stav.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">5️⃣</span> Uložte a zkopírujte klíč</div>' +
+        '<p class="sec-guide-p">Klikněte na tlačítko <strong>„Save"</strong> dole na stránce.</p>' +
+        '<p class="sec-guide-p">Vraťte se zpět na <strong>aistudio.google.com/apikey</strong>, klikněte na <strong>„Show key"</strong> a klíč zkopírujte.</p>' +
+        '<p class="sec-guide-p">Vložte ho do pole <strong>„Gemini API klíč (AIza…)"</strong> ve žluté sekci generátoru a klikněte <strong>„Použít jen pro relaci"</strong>.</p>' +
+        '<div class="sec-guide-warn">⚠️ Klíč začíná vždy písmeny <strong>AIza</strong>. Pokud začíná jinak, není to Gemini API klíč.</div>' +
+      '</div>' +
+
+    '</div>' +
+    '<div class="sec-guide-actions">' +
+      '<button type="button" class="ui-modal-btn primary" id="apiKeyGuideOkBtn">← Zpět</button>' +
+    '</div>';
+
+  var backdrop = document.createElement('div');
+  backdrop.id = 'apiKeyGuideGate';
+  backdrop.className = 'ui-modal-backdrop sec-guide-gate';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'apiKeyGuideHead');
+  backdrop.innerHTML = '<div class="ui-modal-box sec-guide-box" id="apiKeyGuideHead">' + html + '</div>';
+  document.body.appendChild(backdrop);
+
+  function closeGuide() { backdrop.remove(); }
+  backdrop.querySelector('#apiKeyGuideOkBtn').addEventListener('click', closeGuide);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeGuide(); });
+  backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeGuide(); });
+}
+
 // Povinné úvodní okno: vyskočí při každém otevření generátoru a blokuje tvorbu testu,
 // dokud uživatel nepotvrdí „ROZUMÍM". Záměrně NEjde zavřít klikem mimo okno ani Esc —
 // jediná cesta dál je tlačítko. Stejný text jako návod 📋 v záhlaví (jeden zdroj).
@@ -13599,7 +13864,7 @@ function czechVocative(displayName) {
 
   // Výjimky / speciální tvary (rozšiřuj podle potřeby)
   var exceptions = {
-    'daniel':   'Danieli',
+    'daniel':   'Dane',
     'jan':      'Jane',
     'jakub':    'Jakube',
     'ondrej':   'Ondřeji',
@@ -13705,110 +13970,237 @@ function czechVocative(displayName) {
   return n;
 }
 
-function showWelcomeModal(profile) {
-  // Pokud si uživatel nastavil skip, nezobrazovat
-  try { if (localStorage.getItem(WELCOME_SKIP_KEY) === '1') return; } catch(_){}
-  if (document.getElementById('welcomeGate')) return;
+const ONBOARDING_DONE_KEY = 'genOnboardingDone_v1';
 
+// 5 rotujících frází pro opakované spuštění (točí se podle dne v týdnu)
+var RETURN_PHRASES = [
+  'Dnes to zase rozjedeme. Studenti neví, co je čeká. 😄',
+  'Káva v ruce, test v hlavě — jdeme na to!',
+  'Připraven/a tvořit? Gemini čeká na pokyny.',
+  'Každý dobrý test začíná tady.',
+  'Nový den, nový test. Jsi na správném místě.'
+];
+
+// ── Opakované spuštění (2.+): krátké velké uvítání ───────────────────────
+function showReturnWelcome(profile) {
+  if (document.getElementById('returnWelcomeGate')) return;
   var p = profile || {};
-  var displayName = p.displayName || p.userId || '';
-  var vocative = czechVocative(displayName); // např. "Terezo", "Danieli"
-  var greeting = vocative ? ('Vítá tě, ' + vocative + '!') : 'Vítej!';
-  var isAdmin = (p.role === 'admin');
-
-  var adminNote = isAdmin
-    ? '<p>Jako <strong>administrátor</strong> máš plný přístup ke všem funkcím, včetně správy přístupů ostatních uživatelů.</p>'
-    : '';
-
-  var html =
-    '<div class="welcome-hero">' +
-      '<div class="welcome-hero-emoji">🎓</div>' +
-      '<div class="welcome-hero-title">' + esc(greeting) + '</div>' +
-      '<div class="welcome-hero-sub">Generátor interaktivních testů</div>' +
-    '</div>' +
-    '<div class="welcome-body">' +
-      '<p>Právě jsi spustil/a <strong>sofistikovanou aplikaci pro tvorbu interaktivních testů</strong> s podporou umělé inteligence. Pomůže ti snadno vygenerovat, přizpůsobit a distribuovat testy pro studenty.</p>' +
-      adminNote +
-      '<p>Pokud budeš mít jakékoliv dotazy, obrať se nejprve na <strong>Poradce ke generátoru</strong> — ikona <span style="font-size:15px">💬</span> vpravo nahoře. Pokud si ani tam neporadíš, napiš správci aplikace <strong>Danielovi</strong>.</p>' +
-      '<p>Hodně štěstí při generování! 🚀</p>' +
-      '<div class="welcome-tip">💡 <strong>PS:</strong> Po tomto okně se zobrazí stručný průvodce prací s ostrým testem. Až tě za nějakou dobu začne štvát, napiš adminovi — lze ho pro tebe vypnout. Kdykoliv si ho přečteš kliknutím na ikonu <span style="font-size:13px">📋</span> vpravo nahoře.</div>' +
-    '</div>' +
-    '<div class="welcome-actions">' +
-      '<button type="button" class="welcome-ok-btn" id="welcomeOkBtn">Pojďme na to!</button>' +
-      '<button type="button" class="welcome-skip-link" id="welcomeSkipBtn">Toto uvítání příště nezobrazovat</button>' +
-    '</div>';
+  var vocative = czechVocative(p.displayName || p.userId || '');
+  var greeting = vocative ? ('Vítej zpátky, ' + vocative + '!') : 'Vítej zpátky!';
+  var phrase = RETURN_PHRASES[new Date().getDay() % RETURN_PHRASES.length];
 
   var backdrop = document.createElement('div');
-  backdrop.id = 'welcomeGate';
+  backdrop.id = 'returnWelcomeGate';
   backdrop.className = 'ui-modal-backdrop welcome-gate';
   backdrop.setAttribute('role', 'dialog');
   backdrop.setAttribute('aria-modal', 'true');
-  backdrop.setAttribute('aria-labelledby', 'welcomeGateHead');
-  backdrop.innerHTML = '<div class="ui-modal-box welcome-box" id="welcomeGateHead">' + html + '</div>';
+  backdrop.innerHTML =
+    '<div class="ui-modal-box welcome-return-box">' +
+      '<div class="welcome-return-hero">' +
+        '<div class="welcome-return-emoji">👋</div>' +
+        '<div class="welcome-return-name">' + esc(greeting) + '</div>' +
+        '<div class="welcome-return-phrase">' + esc(phrase) + '</div>' +
+      '</div>' +
+      '<div class="welcome-return-actions">' +
+        '<button type="button" class="welcome-return-btn" id="returnWelcomeOkBtn">Jdeme na to!</button>' +
+      '</div>' +
+    '</div>';
   document.body.appendChild(backdrop);
   document.body.classList.add('onboarding-locked');
+  function close() { document.body.classList.remove('onboarding-locked'); backdrop.remove(); }
+  backdrop.querySelector('#returnWelcomeOkBtn').addEventListener('click', close);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) e.stopPropagation(); });
+  setTimeout(function(){ var b = backdrop.querySelector('#returnWelcomeOkBtn'); if(b) b.focus(); }, 80);
+}
 
-  function closeWelcome() {
-    document.body.classList.remove('onboarding-locked');
-    backdrop.remove();
+// ── První spuštění: 4 kroky ───────────────────────────────────────────────
+function showFirstRunFlow(profile) {
+  if (document.getElementById('firstRunGate')) return;
+  var p = profile || {};
+  var vocative = czechVocative(p.displayName || p.userId || '');
+  var greeting = vocative ? ('Vítej, ' + vocative + '!') : 'Vítej!';
+  var isAdmin = (p.role === 'admin');
+
+  function mkBackdrop(cls) {
+    var bd = document.createElement('div');
+    bd.id = 'firstRunGate';
+    bd.className = 'ui-modal-backdrop ' + cls;
+    bd.setAttribute('role', 'dialog');
+    bd.setAttribute('aria-modal', 'true');
+    bd.addEventListener('click', function(e){ if (e.target === bd) e.stopPropagation(); });
+    document.body.appendChild(bd);
+    document.body.classList.add('onboarding-locked');
+    return bd;
+  }
+  function removeBackdrop(bd) { bd.remove(); }
+
+  // Krok 1: uvítání
+  function step1() {
+    var bd = mkBackdrop('welcome-gate');
+    bd.innerHTML =
+      '<div class="ui-modal-box welcome-box">' +
+        '<div class="welcome-hero">' +
+          '<div class="welcome-hero-emoji">🎓</div>' +
+          '<div class="welcome-hero-title">' + esc(greeting) + '</div>' +
+          '<div class="welcome-hero-sub">Generátor interaktivních testů</div>' +
+        '</div>' +
+        '<div class="welcome-body">' +
+          '<p>Právě spouštíš <strong>aplikaci pro tvorbu interaktivních testů</strong> s podporou umělé inteligence. Pomůže ti snadno vygenerovat, přizpůsobit a distribuovat testy pro studenty.</p>' +
+          (isAdmin ? '<p>Jako <strong>administrátor</strong> máš plný přístup ke všem funkcím, včetně správy přístupů ostatních uživatelů.</p>' : '') +
+          (isAdmin ? '' : '<p>Pokud budeš mít dotazy, obrať se na <strong>Poradce ke generátoru</strong> — ikona <span style="font-size:15px">💬</span> vpravo nahoře. Pokud si ani tam neporadíš, napiš správci aplikace.</p>') +
+          '<p>Každý učitel obdržel <strong>unikátní aktivační kód</strong> — pečlivě si ho uchovej pro případ, že budeš potřebovat obnovit přístup na novém zařízení.</p>' +
+          '<p>Hodně štěstí při generování! 🚀</p>' +
+        '</div>' +
+        '<div class="welcome-actions">' +
+          '<button type="button" class="welcome-ok-btn" id="frStep1Btn">Spustit průvodce →</button>' +
+        '</div>' +
+      '</div>';
+    bd.querySelector('#frStep1Btn').addEventListener('click', function(){ removeBackdrop(bd); step2(); });
   }
 
-  backdrop.querySelector('#welcomeOkBtn').addEventListener('click', closeWelcome);
-  backdrop.querySelector('#welcomeSkipBtn').addEventListener('click', function() {
-    try { localStorage.setItem(WELCOME_SKIP_KEY, '1'); } catch(_){}
-    closeWelcome();
-  });
-  // Klik mimo box nezavírá (je to uvítací modal, ne blokující alert)
-  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) e.stopPropagation(); });
+  // Krok 2: průvodce ostrý test
+  function step2() {
+    var bd = mkBackdrop('onboarding-gate');
+    bd.innerHTML =
+      '<div class="ui-modal-box sec-guide-box">' +
+        buildUsageGuideHtml() +
+        '<div class="sec-guide-actions" style="flex-direction:column;gap:10px;align-items:stretch">' +
+          '<label class="onb-check-row">' +
+            '<input type="checkbox" id="frCheck1">' +
+            '<span class="onb-check-label">Přečetl/a jsem si postup a rozumím, jak správně používat ostrý test.</span>' +
+          '</label>' +
+          '<button type="button" class="ui-modal-btn primary" id="frStep2Btn" disabled style="opacity:.45">Pokračovat →</button>' +
+        '</div>' +
+      '</div>';
+    var cb = bd.querySelector('#frCheck1'), btn = bd.querySelector('#frStep2Btn');
+    cb.addEventListener('change', function(){ btn.disabled = !cb.checked; btn.style.opacity = cb.checked ? '1' : '.45'; });
+    btn.addEventListener('click', function(){ if (!cb.checked) return; removeBackdrop(bd); step3(); });
+  }
+
+  // Krok 3: průvodce bezpečný provoz
+  function step3() {
+    var bd = mkBackdrop('onboarding-gate');
+    bd.innerHTML =
+      '<div class="ui-modal-box sec-guide-box">' +
+        buildSecurityGuideBodyHtml() +
+        '<div class="sec-guide-actions" style="flex-direction:column;gap:10px;align-items:stretch">' +
+          '<label class="onb-check-row">' +
+            '<input type="checkbox" id="frCheck2">' +
+            '<span class="onb-check-label">Přečetl/a jsem si pravidla bezpečného provozu a budu se jimi řídit.</span>' +
+          '</label>' +
+          '<button type="button" class="ui-modal-btn primary" id="frStep3Btn" disabled style="opacity:.45">Dokončit průvodce →</button>' +
+        '</div>' +
+      '</div>';
+    var cb = bd.querySelector('#frCheck2'), btn = bd.querySelector('#frStep3Btn');
+    cb.addEventListener('change', function(){ btn.disabled = !cb.checked; btn.style.opacity = cb.checked ? '1' : '.45'; });
+    btn.addEventListener('click', function(){ if (!cb.checked) return; removeBackdrop(bd); step4(); });
+  }
+
+  // Krok 4: závěr
+  function step4() {
+    var bd = mkBackdrop('welcome-gate');
+    bd.innerHTML =
+      '<div class="ui-modal-box welcome-return-box">' +
+        '<div class="welcome-return-hero" style="padding:28px 28px 22px">' +
+          '<div class="welcome-return-emoji">✅</div>' +
+          '<div class="welcome-return-name">Průvodce dokončen!</div>' +
+          '<div class="welcome-return-phrase">Jsi připraven/a generovat testy.</div>' +
+        '</div>' +
+        '<p class="onb-finish-note">Kdykoli se můžeš vrátit k oběma průvodcům — jsou dostupné přes ikony <strong>📋</strong> a <strong>🔒</strong> vpravo nahoře.</p>' +
+        '<div class="welcome-return-actions" style="padding-top:12px">' +
+          '<button type="button" class="welcome-return-btn" id="frFinishBtn">Jdeme na to!</button>' +
+        '</div>' +
+      '</div>';
+    bd.querySelector('#frFinishBtn').addEventListener('click', function(){
+      try { localStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch(_){}
+      document.body.classList.remove('onboarding-locked');
+      bd.remove();
+    });
+  }
+
+  step1();
+}
+
+// ── Hlavní vstupní bod ────────────────────────────────────────────────────
+function showWelcomeModal(profile) {
+  var done = false;
+  try { done = localStorage.getItem(ONBOARDING_DONE_KEY) === '1'; } catch(_){}
+  if (!done) showFirstRunFlow(profile);
+  else showReturnWelcome(profile);
+}
+
+// ── HTML pro bezpečnostní průvodce (sdílené mezi onboardingem a 🔒 tlačítkem) ──
+function buildSecurityGuideBodyHtml() {
+  return '<div class="sec-guide-hero">' +
+      '<div class="sec-guide-hero-emoji">🔒</div>' +
+      '<div class="sec-guide-hero-title">Bezpečný provoz ve škole</div>' +
+      '<div class="sec-guide-hero-sub">Praktická pravidla pro každodenní použití</div>' +
+    '</div>' +
+    '<div class="sec-guide-body">' +
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">📁</span> Kdy použít který režim</div>' +
+        '<p class="sec-guide-p"><strong>Procvičování a domácí úkoly</strong> — stačí jednoduchý (instant) režim.</p>' +
+        '<p class="sec-guide-p"><strong>Ostrý (známkovaný) test</strong> — vždy <strong>Bezpečný offline + verifier</strong>.</p>' +
+      '</div>' +
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🚫</span> Co nikdy neposlat studentům</div>' +
+        '<div class="sec-guide-warn">⚠️ Soubor <strong>DO_NOT_SEND_TEACHER_VERIFIER_…</strong> obsahuje správné odpovědi. Nikdy ho neposílejte studentům.</div>' +
+        '<p class="sec-guide-p">Studentům patří <strong>výhradně</strong> odkaz na <code>student_test.html</code>.</p>' +
+      '</div>' +
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">📂</span> Kam ukládat výsledky</div>' +
+        '<p class="sec-guide-p">Soubory <code>answers.txt</code> a verifier ukládejte pouze do <strong>zabezpečeného školního úložiště</strong>. Výsledky uchovávejte po dobu danou školním řádem, pak je smažte.</p>' +
+      '</div>' +
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">👤</span> Anonymizace studentů</div>' +
+        '<p class="sec-guide-p">Zapněte <strong>anonymizaci</strong> v sekci skupin — generátor nahradí jména kódy v promptu odesílaném do AI.</p>' +
+      '</div>' +
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Gemini API klíč</div>' +
+        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong>. Každý učitel má vlastní klíč — musí být omezený na Gemini API.</p>' +
+        '<div class="sec-guide-warn">⚠️ Na sdíleném počítači nikdy neukládejte klíč trvale.</div>' +
+      '</div>' +
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🚨</span> Co dělat při úniku</div>' +
+        '<p class="sec-guide-p"><strong>Unikl verifier:</strong> Informujte admina aplikace, soubor okamžitě odstraňte ze sdílených umístění.</p>' +
+        '<p class="sec-guide-p"><strong>Unikl API klíč:</strong> Přihlaste se na <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style="color:var(--acc)">aistudio.google.com</a>, starý klíč smažte a vytvořte nový.</p>' +
+      '</div>' +
+    '</div>';
 }
 
 function showOnboardingGate(){
-  // kdyby tu z nějakého důvodu už okno bylo, neduplikuj
+  // Zachováno pro zpětnou kompatibilitu; nový flow jde přes showWelcomeModal.
   if (document.getElementById('onboardingGate')) return;
-  const isLight = document.body.classList.contains('light');
-  const themeIcon = isLight ? '🌙' : '☀️'; // stejná konvence jako tlačítko v záhlaví
-  const backdrop = document.createElement('div');
+  if (document.getElementById('firstRunGate')) return;
+  var isLight = document.body.classList.contains('light');
+  var themeIcon = isLight ? '🌙' : '☀️';
+  var backdrop = document.createElement('div');
   backdrop.id = 'onboardingGate';
   backdrop.className = 'ui-modal-backdrop onboarding-gate';
   backdrop.setAttribute('role', 'dialog');
   backdrop.setAttribute('aria-modal', 'true');
   backdrop.setAttribute('aria-labelledby', 'onboardingGateHead');
   backdrop.innerHTML =
-    '<div class="ui-modal-box onboarding-box">'
-    + '<div class="onboarding-head-row">'
-    +   '<div class="ui-modal-head" id="onboardingGateHead">📋 Než začneš: jak používat generátor ostře</div>'
-    +   '<button type="button" class="hdr-btn onboarding-theme-btn" id="onboardingThemeBtn" title="Světlý/tmavý režim" aria-label="Přepnout světlý nebo tmavý režim">' + themeIcon + '</button>'
-    + '</div>'
-    + '<div class="ui-modal-body">' + esc(USAGE_GUIDE_TEXT) + '</div>'
-    + '<div class="ui-modal-actions">'
-    + '<button type="button" class="ui-modal-btn primary" id="onboardingOkBtn">ROZUMÍM</button>'
-    + '</div>'
-    + '</div>';
+    '<div class="ui-modal-box sec-guide-box" id="onboardingGateHead">' +
+      buildUsageGuideHtml() +
+      '<div class="sec-guide-actions" style="justify-content:space-between">' +
+        '<button type="button" class="hdr-btn" id="onboardingThemeBtn" title="Světlý/tmavý režim">' + themeIcon + '</button>' +
+        '<button type="button" class="ui-modal-btn primary" id="onboardingOkBtn">ROZUMÍM</button>' +
+      '</div>' +
+    '</div>';
   document.body.appendChild(backdrop);
-  // zabraň rolování pozadí, ať je jasné, že okno je modální
   document.body.classList.add('onboarding-locked');
-  const okBtn = backdrop.querySelector('#onboardingOkBtn');
-  const themeBtn = backdrop.querySelector('#onboardingThemeBtn');
-  // přepínač režimu: použij stejný toggleMode jako v záhlaví (jeden zdroj),
-  // pak jen srovnej ikonu tlačítka v okně podle aktuálního stavu.
-  themeBtn.addEventListener('click', function(){
-    toggleMode();
-    themeBtn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
-  });
-  // blokuj zavření klikem mimo okno (necháme jen probublání uvnitř boxu)
+  var okBtn = backdrop.querySelector('#onboardingOkBtn');
+  var themeBtn = backdrop.querySelector('#onboardingThemeBtn');
+  themeBtn.addEventListener('click', function(){ toggleMode(); themeBtn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️'; });
   backdrop.addEventListener('click', function(e){ if (e.target === backdrop) e.stopPropagation(); });
-  // blokuj Esc, dokud se nepotvrdí
-  const escBlock = function(e){ if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); } };
+  var escBlock = function(e){ if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); } };
   document.addEventListener('keydown', escBlock, true);
-  const close = function(){
-    document.removeEventListener('keydown', escBlock, true);
-    document.body.classList.remove('onboarding-locked');
-    backdrop.remove();
-  };
+  var close = function(){ document.removeEventListener('keydown', escBlock, true); document.body.classList.remove('onboarding-locked'); backdrop.remove(); };
   okBtn.addEventListener('click', close);
-  // fokus na tlačítko kvůli klávesnici/čtečce
   setTimeout(function(){ okBtn.focus(); }, 0);
 }
+
 
 // ===== INSERTED: ACCESS + AUDIT MODULE (start) =====
 // ═══════════════════════════════════════════════════════════════════════════
@@ -14378,13 +14770,9 @@ function accOnGranted(){
     else tlChip.classList.add('hidden');
   }
   updateAccessEnvBanner();
-  // Ponecháme stávající úvodní průvodce „jak používat ostře“.
-  // Admin zná nástroj — přeskočit onboarding bránu (průvodce je vždy dostupný přes 📋).
-  // Uvítací modal — pro všechny uživatele, dokud si ho nevypnou
+  // showWelcomeModal rozhodne podle ONBOARDING_DONE_KEY:
+  // první spuštění → celý průvodce (4 kroky), opakované → krátké uvítání
   if (typeof showWelcomeModal === 'function') { setTimeout(function(){ showWelcomeModal(p); }, 80); }
-  // Ponecháme stávající úvodní průvodce „jak používat ostře".
-  // Admin zná nástroj — přeskočit onboarding bránu (průvodce je vždy dostupný přes 📋).
-  if (p.role !== 'admin' && typeof showOnboardingGate === 'function'){ setTimeout(showOnboardingGate, 700); }
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
