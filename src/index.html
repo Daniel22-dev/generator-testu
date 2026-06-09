@@ -758,6 +758,8 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .gemini-note { font-size:12.5px; color:var(--t4); margin-top:6px; line-height:1.5; }
 .gemini-note a { color:var(--acc); text-decoration:none; }
 .gemini-note code { font-family:monospace; font-size:12px; background:var(--bg2); border:1px solid var(--bdr); border-radius:4px; padding:0 4px; color:var(--t2); }
+.key-restrict-info { font-size:12.5px; color:var(--acc); background:var(--acc-d); border:1px solid var(--acc-b); border-radius:8px; padding:7px 10px; margin-bottom:8px; line-height:1.5; }
+.key-restrict-info a { color:var(--acc); font-weight:600; text-decoration:underline; text-underline-offset:2px; }
 .gemini-model-row { margin-top:9px; padding-top:9px; border-top:1px dashed var(--bdr); }
 .gemini-model-label { display:block; font-size:12.5px; color:var(--t3); margin-bottom:4px; font-family:Georgia,serif; }
 .gemini-model-status { color:var(--t4); font-style:italic; margin-left:4px; }
@@ -1075,6 +1077,100 @@ body.light .welcome-hero {
 }
 .welcome-skip-link:hover { color: var(--text); }
 
+/* ── Security guide modal ────────────────────────────────────────────────── */
+.sec-guide-gate { z-index: 30045; }
+.sec-guide-box {
+  width: min(540px, 96vw);
+  max-height: 92dvh;
+  max-height: 92vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+  display: flex;
+  flex-direction: column;
+}
+.sec-guide-hero {
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%);
+  padding: 20px 22px 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+body.light .sec-guide-hero {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+}
+.sec-guide-hero-emoji { font-size: 34px; line-height: 1; margin-bottom: 5px; }
+.sec-guide-hero-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .1px;
+  text-shadow: 0 1px 4px rgba(0,0,0,.35);
+}
+.sec-guide-hero-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.75);
+  margin-top: 3px;
+}
+.sec-guide-body {
+  padding: 14px 18px 12px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--t2);
+  background: var(--bg2);
+  overflow-y: auto;
+  flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch;
+}
+.sec-guide-section {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--bdr2);
+}
+.sec-guide-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.sec-guide-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--t4);
+  margin-bottom: 7px;
+}
+.sec-guide-section-title .sg-ico { font-size: 15px; flex-shrink: 0; }
+.sec-guide-p { margin: 0 0 6px; color: var(--t2); }
+.sec-guide-p:last-child { margin-bottom: 0; }
+.sec-guide-p strong { color: var(--t1); font-weight: 700; }
+.sec-guide-ok {
+  background: var(--ok-d);
+  border: 1px solid var(--ok-b);
+  border-radius: 7px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: var(--ok);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.sec-guide-warn {
+  background: var(--acc-d);
+  border: 1px solid var(--acc-b);
+  border-radius: 7px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: var(--acc);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.sec-guide-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px 15px;
+  background: var(--bg2);
+  flex-shrink: 0;
+  border-top: 1px solid var(--bdr2);
+}
 /* Povinné úvodní okno (onboarding gate) */
 .onboarding-gate { z-index: 30050; }
 .onboarding-box { width: min(560px, 100%); }
@@ -1411,6 +1507,7 @@ body.acc-locked { overflow:hidden; }
     </div>
     <div class="hdr-btns">
       <button class="hdr-btn" id="btnGuide" onclick="showUsageGuide()" title="Jak používat ostře (návod pro kolegy)">📋</button>
+      <button class="hdr-btn" id="btnSecGuide" onclick="showSecurityGuide()" title="Bezpečný provoz ve škole">🔒</button>
       <button class="hdr-btn" id="btnMode" onclick="toggleMode()" title="Světlý/tmavý režim">☀️</button>
       <button class="hdr-btn" id="btnAssistant" onclick="openGeneratorAssistant()" title="Zeptat se na funkce, bezpečnost a ovládání generátoru">💬</button>
       <button class="hdr-btn" id="btnFs" onclick="toggleFullscreen()" title="Celá obrazovka"><span class="fs-ico-hdr" aria-hidden="true"></span></button>
@@ -2122,6 +2219,7 @@ body.acc-locked { overflow:hidden; }
           <span class="gemini-ptitle">⚡ Přímé generování testu</span>
           <span class="gemini-status" id="geminiStatus">Klíč není nastaven</span>
         </div>
+        <div class="key-restrict-info">⚠️ Klíč musí být omezený na <strong>Gemini API</strong> (od 19. 6. 2026 Google blokuje neomezené klíče). <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noreferrer">Jak omezit klíč →</a></div>
         <div class="gemini-key-row">
           <input type="password" id="geminiKeyInput" placeholder="Gemini API klíč (AIza…)" autocomplete="off" autocorrect="off">
         </div>
@@ -2133,10 +2231,10 @@ body.acc-locked { overflow:hidden; }
           <summary>Pokročilé · trvalé uložení klíče</summary>
           <div class="key-advanced-body gemini-key-actions">
             <button type="button" id="btnSaveKeyPermanent" onclick="saveGeminiKeyPermanent()" title="Klíč se zapíše do localStorage tohoto prohlížeče a zůstane tam i po restartu. Používej JEN na vlastním zařízení — na sdíleném by ho mohl vytáhnout jiný uživatel.">Uložit trvale (jen osobní zařízení)</button>
-            <span class="key-advanced-hint">Jen na vlastním zařízení. Vyžaduje opsání potvrzovací věty.</span>
+            <span class="key-advanced-hint">⚠️ Jen na vlastním zařízení — klíč zůstane v prohlížeči i po restartu. Na sdíleném počítači použij relaci.</span>
           </div>
         </details>
-        <div class="gemini-note" id="geminiNote"><strong>Relace</strong> = klíč se po zavření prohlížeče sám zapomene; nejbezpečnější volba, doporučená na sdílených i školních zařízeních. <strong>Trvalé uložení</strong> zapisuje klíč do localStorage tohoto prohlížeče (zůstane i po restartu) — používej jen na vlastním zařízení. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com</a> → Get API key.</div>
+        <div class="gemini-note" id="geminiNote"><strong>Relace</strong> = klíč se po zavření prohlížeče sám zapomene; nejbezpečnější volba, doporučená na sdílených i školních zařízeních. <strong>Trvalé uložení</strong> = klíč zůstane v prohlížeči i po restartu — jen na vlastním zařízení. Klíč musí být omezený na Gemini API — <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noreferrer">návod</a>. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com</a> → Get API key.</div>
         <div class="gemini-model-row">
           <label class="gemini-model-label" for="geminiModelInput">Model <span class="gemini-model-status" id="geminiModelStatus">výchozí</span></label>
           <div class="gemini-model-inputwrap">
@@ -2306,10 +2404,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.2',
-  date:    '2026-06-08',
+  version: '6.11.4',
+  date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'BEZPEČNOSTNÍ PRŮVODCE (6.11.4): přidáno tlačítko 🔒 do záhlaví — otevírá modal „Bezpečný provoz ve škole" se 6 sekcemi: kdy použít který režim, co nikdy neposlat studentům, kam ukládat answers.txt, jak anonymizovat studenty, pravidla pro API klíč, co dělat při úniku verifieru/klíče. Vlastní CSS (sec-guide-*), scrollovatelné tělo, funguje na mobilu. Klik mimo modal nebo Escape zavírá. Ověřeno node --check.',
+    'BEZPEČNOST API KLÍČE (6.11.3): přidán info box ve žluté sekci — upozornění, že klíč musí být omezený na Gemini API (Google blokuje neomezené klíče od 19. 6. 2026) + odkaz na návod. Varování u trvalého uložení zpřísněno. Chybová hláška 401/403 rozšířena o konkrétní zmínku požadavku na omezení klíče. Ověřeno node --check.',
     'OPRAVA WELCOME MODALU NA MOBILU (6.11.2): box má max-height 92vh + flex-direction:column — hero a akce jsou flex-shrink:0 (vždy viditelné), tělo má overflow-y:auto a flex:1 (scrollovatelné). Tlačítko Pojďme na to již není skryté pod viewport. Zmenšeny padding a font-size hero sekce pro úsporu místa. Ověřeno node --check.',
     'OPRAVA TEXTU WELCOME MODALU (6.11.1): PS přeformulováno — odstraněno slovo zbytečný, nový text: Až tě za nějakou dobu začne štvát, napiš adminovi — lze ho pro tebe vypnout. Jméno admina odstraněno. Ověřeno node --check.',
     'UVÍTACÍ MODAL (6.11): po úspěšném přihlášení se zobrazí personalizované uvítací okno (showWelcomeModal). Oslovení je ve vokativu — funkce czechVocative() skloňuje křestní jméno z displayName (40+ jmen v lookup table + automatická pravidla pro zbytek). Modal má gradientové záhlaví sladěné se stylem generátoru, popis nástroje, odkaz na Poradce a admina Daniela, PS o onboarding průvodci. Tlačítko Toto uvítání příště nezobrazovat uloží příznak do localStorage — modal se pak přeskočí. Onboarding gate se zobrazí 700 ms po welcome (ne 60 ms) aby nedošlo k překrytí. Admin dostane welcome modal stejně jako trainedTeacher. Ověřeno node --check.',
@@ -2318,8 +2418,6 @@ const RELEASE = Object.freeze({
     'PORADCE: 9 NOVÝCH KB ZÁZNAMŮ PRO CHYBOVÉ HLÁŠKY (6.09). Přidány záznamy pokrývající všechny hlavní chyby generátoru: 503/UNAVAILABLE (přetížení vs. RPD limit), 429/RESOURCE_EXHAUSTED (kvóta), 400/INVALID_ARGUMENT (neplatný klíč), 401-403/PERMISSION_DENIED, 504/DEADLINE_EXCEEDED (timeout), poškozený JSON, data mimo zadání (validace), síťová chyba a model nenalezen. Každý záznam má simple i detailed verzi + evidence. Přidány chipy: chyba 503/429/400/poškozený JSON/data mimo zadání/model nenalezen/síťová chyba. Ověřeno node --check.',
     'OPRAVA TEST LAB ORDERING (6.08.7): Test Lab hledal clickOrdInst v secure skriptu, ale secure cesta používá clickOrd — instant cesta má clickOrdInst. Check opraven na function clickOrd(. Ověřeno node --check.',
     'PŘEJMENOVÁNÍ SPLIT-GEN TLAČÍTKA (6.08.6): toggle Po cvičeních přejmenován na Každé cvičení zvlášť s podtitulkem Včetně jednoduchých — hybrid to dělá automaticky jen pro složitá. Tooltip upřesněn. Tlačítko zůstává jen v pokročilém módu. Ověřeno node --check.',
-    'OPRAVA ORDERING KLIKÁNÍ (6.08.5): RESP[id]=oOrder.slice() v renderQ inicializovalo RESP na [0,1,2,3] — ordCurPicks to vrátilo jako nakliknuté pořadí a clickOrd při prvním kliknutí odebíral místo přidával. Opraveno: RESP[id] se neinicializuje, ordBadgeHtml dostane prázdné picks[]. ordCurPicks nyní kontroluje jen Array.isArray, ne délku. Ověřeno node --check.',
-    'ROZŠÍŘENÍ 503 HLÁŠKY O DENNÍ LIMIT (6.08.4): chyba 503 může mít dvě příčiny — přetížené servery NEBO vyčerpaný denní limit RPD (Free tier = 20/den, Google po vyčerpání vrací 503 místo 429). Hláška nyní obě možnosti vysvětluje a odkazuje na aistudio.google.com/rate-limit. Akce: zkontroluj RPD, počkej do půlnoci UTC nebo přejdi na Pay-as-you-go. Ověřeno node --check.',
   ]
 });;;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -7154,8 +7252,8 @@ function geminiApiErrorMessage(res, data, model, attempts, retryMs=0){
     why = 'Požadavek má pro API neplatný tvar nebo obsahuje nepodporovanou kombinaci parametrů/modelu/příloh.';
     action = 'Zkontroluj zvolený model, URL/přílohy a zkus jednodušší zadání.';
   } else if(res.status === 401 || res.status === 403 || /PERMISSION_DENIED|UNAUTHENTICATED/i.test(apiStatus)){
-    why = 'API klíč není platný, nemá oprávnění, nebo je pro tento model/projekt omezený.';
-    action = 'Zkontroluj Gemini API klíč ve žluté sekci, případně vytvoř nový klíč nebo ověř oprávnění projektu.';
+    why = 'API klíč není platný, nemá oprávnění, nebo není omezený na Gemini API.';
+    action = 'Zkontroluj Gemini API klíč ve žluté sekci. Od 19. 6. 2026 Google vyžaduje, aby byl klíč omezený na Gemini API — neomezené klíče vrací chybu 403. Zkontroluj nastavení klíče na aistudio.google.com → API Keys nebo vytvoř nový omezený klíč.';
   } else if(modelGone){
     why = `Zvolený model „${model}" pravděpodobně není dostupný nebo není podporovaný pro tento endpoint.`;
     action = `Změň název modelu v poli „Model" ve žluté sekci, např. na ${GEMINI_MODEL_DEFAULT} nebo gemini-flash-latest.`;
@@ -13412,6 +13510,77 @@ function showUsageGuide(){
   // Stejné široké okno jako úvodní onboarding (560px + větší řádkování), aby se
   // odsazené řádky návodu nezalamovaly a nerozjížděly jako v užším obecném okně.
   uiModal({title:'📋 Jak používat ostře', message:USAGE_GUIDE_TEXT, okText:'Rozumím', boxClass:'onboarding-box'});
+}
+
+function showSecurityGuide(){
+  if (document.getElementById('secGuideGate')) return;
+
+  var html =
+    '<div class="sec-guide-hero">' +
+      '<div class="sec-guide-hero-emoji">🔒</div>' +
+      '<div class="sec-guide-hero-title">Bezpečný provoz ve škole</div>' +
+      '<div class="sec-guide-hero-sub">Praktická pravidla pro každodenní použití</div>' +
+    '</div>' +
+    '<div class="sec-guide-body">' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">📁</span> Kdy použít který režim</div>' +
+        '<p class="sec-guide-p"><strong>Procvičování a domácí úkoly</strong> — stačí jednoduchý (instant) režim. Výsledek vidí student okamžitě, klíč odpovědí je v souboru — to je v pořádku, protože oprava není tajná.</p>' +
+        '<p class="sec-guide-p"><strong>Ostrý (známkovaný) test</strong> — vždy zvolte <strong>Bezpečný offline + verifier</strong>. Studentský soubor neobsahuje správné odpovědi ani hodnoticí logiku; vše řeší učitelský verifier samostatně.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🚫</span> Co nikdy neposlat studentům</div>' +
+        '<div class="sec-guide-warn">⚠️ Soubor <strong>DO_NOT_SEND_TEACHER_VERIFIER_…</strong> obsahuje správné odpovědi a privátní dešifrovací klíč. Nikdy ho neposílejte e-mailem, nenahrávejte na sdílené úložiště ani nevkládejte do skupinového chatu.</div>' +
+        '<p class="sec-guide-p">Studentům patří <strong>výhradně</strong> odkaz na <code>student_test.html</code> (ideálně přes GitHub Pages nebo Tiiny.host — ne jako příloha e-mailu).</p>' +
+        '<p class="sec-guide-p">Generátor sám blokuje export verifieru do studentského balíčku, ale technická pojistka nenahrazuje pozornost učitele.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">📂</span> Kam ukládat answers.txt a výsledky</div>' +
+        '<p class="sec-guide-p">Soubory <code>answers.txt</code> od studentů a učitelský verifier ukládejte <strong>pouze do zabezpečeného školního úložiště</strong> (šifrovaný disk, školní cloud s přihlášením — ne Google Disk se sdílením „kdokoliv s odkazem").</p>' +
+        '<div class="sec-guide-ok">✓ Doporučeno: složka s přístupem jen pro daného učitele, pojmenovaná třídou a datem testu.</div>' +
+        '<p class="sec-guide-p">Výsledky uchovávejte <strong>po dobu, kterou vyžaduje školní řád</strong> (obvykle do konce školního roku nebo do uzavření klasifikace). Pak soubory smažte.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">👤</span> Jak anonymizovat studenty</div>' +
+        '<p class="sec-guide-p">Zapněte <strong>anonymizaci</strong> v sekci skupin — generátor nahradí jména kódy (Student A1, A2…) v promptu odesílaném do AI. Reálná jména tak neopustí prohlížeč.</p>' +
+        '<p class="sec-guide-p">Mapování kódů na skutečná jména zůstává jen ve vašem prohlížeči (lokální klíč skupiny) a nikdy se neodesílá do AI ani do exportovaných souborů.</p>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Gemini API klíč</div>' +
+        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong> (výchozí volba) — po zavření prohlížeče se sám zapomene. Trvalé uložení používejte výhradně na vlastním, nepřepůjčovaném zařízení.</p>' +
+        '<p class="sec-guide-p">Každý učitel by měl mít <strong>vlastní klíč</strong> z Google AI Studio (zdarma). Klíč musí být omezený na Gemini API — <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noreferrer" style="color:var(--acc)">návod zde</a>.</p>' +
+        '<div class="sec-guide-warn">⚠️ Na sdíleném počítači (sborovna, počítačová učebna) nikdy neukládejte klíč trvale — mohl by ho získat jiný uživatel.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🚨</span> Co dělat při úniku</div>' +
+        '<p class="sec-guide-p"><strong>Unikl verifier nebo answers.txt:</strong> Informujte vedení školy, zneplatnění testu zvažte individuálně. Soubor okamžitě odstraňte ze všech sdílených umístění.</p>' +
+        '<p class="sec-guide-p"><strong>Unikl API klíč:</strong> Přihlaste se na <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style="color:var(--acc)">aistudio.google.com</a>, starý klíč smažte a vytvořte nový. Zkontrolujte historii požadavků — zda klíč někdo nezneužil.</p>' +
+        '<div class="sec-guide-ok">✓ Rychlá akce (smazání klíče) zabrání dalšímu zneužití i tehdy, když k úniku skutečně došlo.</div>' +
+      '</div>' +
+
+    '</div>' +
+    '<div class="sec-guide-actions">' +
+      '<button type="button" class="ui-modal-btn primary" id="secGuideOkBtn">Rozumím</button>' +
+    '</div>';
+
+  var backdrop = document.createElement('div');
+  backdrop.id = 'secGuideGate';
+  backdrop.className = 'ui-modal-backdrop sec-guide-gate';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'secGuideHead');
+  backdrop.innerHTML = '<div class="ui-modal-box sec-guide-box" id="secGuideHead">' + html + '</div>';
+  document.body.appendChild(backdrop);
+
+  function closeSecGuide() { backdrop.remove(); }
+  backdrop.querySelector('#secGuideOkBtn').addEventListener('click', closeSecGuide);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeSecGuide(); });
+  backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSecGuide(); });
 }
 
 // Povinné úvodní okno: vyskočí při každém otevření generátoru a blokuje tvorbu testu,
