@@ -997,7 +997,7 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
   flex-direction: column;
 }
 .welcome-hero {
-  background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--acc) 0%, #7c3aed 100%);
   padding: 22px 24px 18px;
   text-align: center;
   position: relative;
@@ -1350,7 +1350,7 @@ body.onboarding-locked { overflow: hidden; }
 .akv-pick-row input[type=checkbox] { width: 16px; height: 16px; margin-top: 1px; flex-shrink: 0; accent-color: var(--ok); cursor: pointer; }
 .akv-pick-row b { color: var(--ok); font-weight: 700; }
 .akv-pick-row.done { opacity: .6; border-style: solid; }
-.akv-pick-row.akv-pick-diff { border-color: var(--warn-b); background: var(--warn-d); }
+.akv-pick-row.akv-pick-diff { border-color: var(--acc-b); background: var(--acc-d); }
 .akv-pick-row.akv-pick-diff b { color: var(--warn); }
 .akv-pick-row.done span::after { content: ' ✓ přidáno'; color: var(--ok); font-weight: 700; }
 .akv-apply-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
@@ -2495,10 +2495,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.14',
+  version: '6.11.15',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA CSS PROMĚNNÝCH (6.11.15): --accent→--acc v .welcome-hero gradientu, --warn-b/--warn-d→--acc-b/--acc-d v .akv-pick-row. Odstraněny reference na nedefinované CSS proměnné. Ověřeno node --check.',
     'OPRAVA TEST LAB REGRESE (6.11.14): normalizeLoadedState() používal state.splitGenerate a state.exerciseConfig místo s.splitGenerate a s.exerciseConfig — test catBoard lock + nová pole hlásil SELHALO. Opraveno. Ověřeno node --check.',
     'KONTRAST TEXTU (6.11.13): dark mód: --t3 #8b93b5→#a8b0d0, --t4 #4a5178→#6e7899 — šedé popisné texty čitelné na tmavém pozadí (kontrast ≥4.5:1). Light mód: --t4 #565d80→#444b6e, --t5 #7c84a6→#5c6482 — šedé texty čitelné na šedém pozadí (kontrast ≥4.1:1). Týká se všech popisků, neaktivních tlačítek, počtů cvičení, typů cvičení atd. Ověřeno node --check.',
     'REDESIGN CHANGELOGU (6.11.12): showReleaseInfo předělán z prostého textu na HTML modal ve stylu sec-guide — fialové záhlaví s verzí a buildem, každá změna jako sekce s názvem a číslem verze, zelený/oranžový status box. Odstraněn přepínač módu z showUsageGuide (zbytečný, přepínač je v záhlaví). Rozšířena sekce anonymizace v bezpečnostním průvodci o vysvětlení jak funguje ve vztahu k verifieru. Ověřeno node --check.',
