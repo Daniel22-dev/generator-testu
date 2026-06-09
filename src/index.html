@@ -183,6 +183,8 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .flag-de { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3'%3E%3Crect width='5' height='3' y='0' fill='%23000'/%3E%3Crect width='5' height='2' y='1' fill='%23D00'/%3E%3Crect width='5' height='1' y='2' fill='%23FFCE00'/%3E%3C/svg%3E"); }
 .flag-es { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 4'%3E%3Crect width='6' height='4' fill='%23AA151B'/%3E%3Crect width='6' height='2' y='1' fill='%23F1BF00'/%3E%3C/svg%3E"); }
 .flag-cz { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 4'%3E%3Crect width='6' height='2' fill='%23fff'/%3E%3Crect width='6' height='2' y='2' fill='%23D7141A'/%3E%3Cpath d='M0 0l3 2-3 2z' fill='%2311457E'/%3E%3C/svg%3E"); }
+.flag-fr { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Crect width='1' height='2' fill='%23002395'/%3E%3Crect width='1' height='2' x='1' fill='%23fff'/%3E%3Crect width='1' height='2' x='2' fill='%23ED2939'/%3E%3C/svg%3E"); }
+.flag-va { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'%3E%3Crect width='1' height='2' fill='%23FFE000'/%3E%3Crect width='1' height='2' x='1' fill='%23fff'/%3E%3C/svg%3E"); }
 .tag-btn:disabled:hover { border-color: var(--bdr); color: var(--t4); }
 .tag-btn.active:disabled { border-color: var(--acc-b); background: var(--acc-d); color: var(--acc); opacity: .72; }
 /* BOD 5 — pedagogické rozdělení typů cvičení */
@@ -1677,6 +1679,8 @@ body.acc-locked { overflow:hidden; }
           <button class="tag-btn lang-btn" data-val="němčina" onclick="pickJazyk('němčina')"><span class="choice-card-title"><span class="flag flag-de" aria-hidden="true"></span><span>Němčina</span></span><span class="choice-card-desc">Deutsch / DE</span></button>
           <button class="tag-btn lang-btn" data-val="španělština" onclick="pickJazyk('španělština')"><span class="choice-card-title"><span class="flag flag-es" aria-hidden="true"></span><span>Španělština</span></span><span class="choice-card-desc">Español / ES</span></button>
           <button class="tag-btn lang-btn" data-val="čeština" onclick="pickJazyk('čeština')"><span class="choice-card-title"><span class="flag flag-cz" aria-hidden="true"></span><span>Čeština</span></span><span class="choice-card-desc">Čeština / CZ</span></button>
+          <button class="tag-btn lang-btn" data-val="francouzština" onclick="pickJazyk('francouzština')"><span class="choice-card-title"><span class="flag flag-fr" aria-hidden="true"></span><span>Francouzština</span></span><span class="choice-card-desc">Français / FR</span></button>
+          <button class="tag-btn lang-btn" data-val="latina" onclick="pickJazyk('latina')"><span class="choice-card-title"><span class="flag flag-va" aria-hidden="true"></span><span>Latina</span></span><span class="choice-card-desc">Lingua Latina</span></button>
         </div>
       </div>
       <div class="field">
@@ -2495,10 +2499,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.15',
+  version: '6.11.16',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'NOVÉ JAZYKY (6.11.16): přidána francouzština (🇫🇷 flag-fr) a latina (🇻🇦 flag-va / Vatikán). Každý jazyk má CSS SVG vlajku a tlačítko v sekci Jazyk testu. Gemini zpracuje oba jazyky nativně. Ověřeno node --check.',
     'OPRAVA CSS PROMĚNNÝCH (6.11.15): --accent→--acc v .welcome-hero gradientu, --warn-b/--warn-d→--acc-b/--acc-d v .akv-pick-row. Odstraněny reference na nedefinované CSS proměnné. Ověřeno node --check.',
     'OPRAVA TEST LAB REGRESE (6.11.14): normalizeLoadedState() používal state.splitGenerate a state.exerciseConfig místo s.splitGenerate a s.exerciseConfig — test catBoard lock + nová pole hlásil SELHALO. Opraveno. Ověřeno node --check.',
     'KONTRAST TEXTU (6.11.13): dark mód: --t3 #8b93b5→#a8b0d0, --t4 #4a5178→#6e7899 — šedé popisné texty čitelné na tmavém pozadí (kontrast ≥4.5:1). Light mód: --t4 #565d80→#444b6e, --t5 #7c84a6→#5c6482 — šedé texty čitelné na šedém pozadí (kontrast ≥4.1:1). Týká se všech popisků, neaktivních tlačítek, počtů cvičení, typů cvičení atd. Ověřeno node --check.',
