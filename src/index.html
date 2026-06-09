@@ -2495,10 +2495,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.11',
+  version: '6.11.12',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'REDESIGN CHANGELOGU (6.11.12): showReleaseInfo předělán z prostého textu na HTML modal ve stylu sec-guide — fialové záhlaví s verzí a buildem, každá změna jako sekce s názvem a číslem verze, zelený/oranžový status box. Odstraněn přepínač módu z showUsageGuide (zbytečný, přepínač je v záhlaví). Rozšířena sekce anonymizace v bezpečnostním průvodci o vysvětlení jak funguje ve vztahu k verifieru. Ověřeno node --check.',
     'ITEM ANALYSIS ROZŠÍŘENÍ (6.11.11): v položkové analýze teacher verifieru přidány: (1) sloupec Časté chyby — top-3 nejčastější špatné odpovědi per položka (min. 2 výskyty), s doporučením zvaž alternativu pokud tvoří ≥20 % odpovědí. (2) Signál podezřele snadné položky (p>90 %, oranžové zvýraznění). (3) iaDiffLabel rozšířen o práh >90 %. Ověřeno node --check.',
     'GDPR ROZŠÍŘENÍ BEZPEČNOSTNÍHO PRŮVODCE (6.11.10): přidány 4 sekce do 🔒 průvodce — přístup k CSV a sdílení výsledků, sdílení obrazovky, interpretace bezpečnostních signálů v answers.txt. Ověřeno node --check.',
     'NOVÝ ONBOARDING FLOW (6.11.9): (1) První spuštění: 4kroký průvodce — uvítání s info o aktivačním kódu → průvodce ostrý test (checkbox) → průvodce bezpečný provoz (checkbox) → závěrečná slide. Příznak genOnboardingDone_v1 v localStorage. (2) Opakované spuštění: krátké velké uvítací okno s vokativem a 5 rotujícími frázemi, tlačítko Jdeme na to!, vždy bez vypnutí. Funguje na mobilu. Ověřeno node --check.',
@@ -13569,28 +13570,67 @@ function applyReleaseBadge(){
 // Modal s changelogem této verze — pro učitele a kolegy, ať vidí, co se v této verzi
 // změnilo a podle čeho se rozhodnout, jestli ji použít pro ostrý test.
 function showReleaseInfo(){
-  const approved=RELEASE.status==='approved-for-school-use';
-  const statusLine=approved
-    ? '✅ Schváleno pro školní použití — verze prošla self-testem bodování a integračními testy.'
-    : '⚠ DRAFT — nepoužívat pro ostré klasifikované testy.';
-  // Zobrazujeme jen posledních 10 záznamů (rolling okno). Při častých denních
-  // update by úplná historie rychle narostla; starší se neukazují.
-  const MAX_CHANGES=10;
-  const shown=RELEASE.changes.slice(0,MAX_CHANGES);
-  const items=shown.map(c=>'  • '+c).join('\n');
-  const windowNote = RELEASE.changes.length>=MAX_CHANGES
-    ? '\n\n(Zobrazeno posledních '+MAX_CHANGES+' změn; starší se průběžně odmazávají.)'
-    : '';
-  const envLabel = ({
+  if (document.getElementById('changelogGate')) return;
+  var approved = RELEASE.status === 'approved-for-school-use';
+  var statusHtml = approved
+    ? '<div class="sec-guide-ok" style="margin:0 0 4px">✅ Schváleno pro školní použití — verze prošla self-testem bodování a integračními testy.</div>'
+    : '<div class="sec-guide-warn" style="margin:0 0 4px">⚠️ DRAFT — nepoužívat pro ostré klasifikované testy.</div>';
+  var envLabel = ({
     official:'oficiální adresa',
     unofficialCopy:'⚠ NEOFICIÁLNÍ kopie — generování blokováno',
     local:'lokální soubor (file://)',
     unverified:'web (oficiální adresa zatím nenastavena)',
     unknown:'neurčeno'
   })[Access && Access.envKind] || 'neurčeno';
-  const envLine = 'Prostředí: '+envLabel;
-  const msg='vydáno '+RELEASE.date+' · build '+BUILD_HASH+'\n'+envLine+'\n\n'+statusLine+'\n\nCo se v této verzi změnilo:\n'+items+windowNote;
-  uiAlert(msg,'Generátor testů v'+RELEASE.version, 'changelog-box');
+
+  var MAX_CHANGES = 10;
+  var shown = RELEASE.changes.slice(0, MAX_CHANGES);
+  var windowNote = RELEASE.changes.length >= MAX_CHANGES
+    ? '<p class="sec-guide-p" style="color:var(--t4);font-style:italic">Zobrazeno posledních '+MAX_CHANGES+' změn; starší se průběžně odmazávají.</p>'
+    : '';
+
+  // Každý záznam parsujeme: "NÁZEV (6.x.y): text" → záhlaví + tělo
+  var itemsHtml = shown.map(function(c){
+    var m = c.match(/^([^(]+)\(([^)]+)\):\s*([\s\S]*)$/);
+    var title, version, body;
+    if(m){ title = m[1].trim(); version = m[2].trim(); body = m[3].trim(); }
+    else { title = ''; version = ''; body = c; }
+    return '<div class="sec-guide-section">' +
+      (title ? '<div class="sec-guide-section-title" style="font-size:12px;gap:6px">' +
+        '<span style="font-size:13px">📝</span> ' + esc(title) +
+        (version ? ' <span style="font-weight:400;color:var(--t4);font-size:11px;text-transform:none;letter-spacing:0">v'+esc(version)+'</span>' : '') +
+      '</div>' : '') +
+      '<p class="sec-guide-p" style="font-size:12.5px;color:var(--t3)">' + esc(body) + '</p>' +
+    '</div>';
+  }).join('');
+
+  var html =
+    '<div class="sec-guide-hero" style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);padding:18px 22px 14px">' +
+      '<div class="sec-guide-hero-emoji" style="font-size:28px;margin-bottom:4px">📋</div>' +
+      '<div class="sec-guide-hero-title" style="font-size:15px">Generátor testů v' + esc(RELEASE.version) + '</div>' +
+      '<div class="sec-guide-hero-sub">vydáno ' + esc(RELEASE.date) + ' · build ' + esc(BUILD_HASH) + ' · ' + esc(envLabel) + '</div>' +
+    '</div>' +
+    '<div class="sec-guide-body" style="padding:12px 16px 8px">' +
+      statusHtml +
+      '<div style="margin-top:10px">' + itemsHtml + '</div>' +
+      windowNote +
+    '</div>' +
+    '<div class="sec-guide-actions">' +
+      '<button type="button" class="ui-modal-btn primary" id="changelogOkBtn">Zavřít</button>' +
+    '</div>';
+
+  var backdrop = document.createElement('div');
+  backdrop.id = 'changelogGate';
+  backdrop.className = 'ui-modal-backdrop sec-guide-gate';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.innerHTML = '<div class="ui-modal-box sec-guide-box changelog-box">' + html + '</div>';
+  document.body.appendChild(backdrop);
+
+  function close(){ backdrop.remove(); }
+  backdrop.querySelector('#changelogOkBtn').addEventListener('click', close);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) close(); });
+  backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
 }
 
 // Vestavěný provozní návod „Jak používat ostře" — pro kolegy, kteří nástroj nestavěli.
@@ -13660,9 +13700,6 @@ function buildUsageGuideHtml() {
 function showUsageGuide(){
   if (document.getElementById('usageGuideGate')) return;
 
-  var isLight = document.body.classList.contains('light');
-  var themeIcon = isLight ? '🌙' : '☀️';
-
   var backdrop = document.createElement('div');
   backdrop.id = 'usageGuideGate';
   backdrop.className = 'ui-modal-backdrop sec-guide-gate';
@@ -13672,23 +13709,16 @@ function showUsageGuide(){
   backdrop.innerHTML =
     '<div class="ui-modal-box sec-guide-box" id="usageGuideHead">' +
       buildUsageGuideHtml() +
-      '<div class="sec-guide-actions" style="justify-content:space-between">' +
-        '<button type="button" class="hdr-btn" id="usageGuideThemeBtn" title="Světlý/tmavý režim">' + themeIcon + '</button>' +
+      '<div class="sec-guide-actions">' +
         '<button type="button" class="ui-modal-btn primary" id="usageGuideOkBtn">Rozumím</button>' +
       '</div>' +
     '</div>';
   document.body.appendChild(backdrop);
 
   function closeGuide() { backdrop.remove(); }
-  var okBtn = backdrop.querySelector('#usageGuideOkBtn');
-  var themeBtn = backdrop.querySelector('#usageGuideThemeBtn');
-  okBtn.addEventListener('click', closeGuide);
+  backdrop.querySelector('#usageGuideOkBtn').addEventListener('click', closeGuide);
   backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeGuide(); });
   backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeGuide(); });
-  themeBtn.addEventListener('click', function(){
-    toggleMode();
-    themeBtn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
-  });
 }
 
 function showSecurityGuide(){
@@ -13725,7 +13755,9 @@ function showSecurityGuide(){
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">👤</span> Jak anonymizovat studenty</div>' +
         '<p class="sec-guide-p">Zapněte <strong>anonymizaci</strong> v sekci skupin — generátor nahradí jména kódy (Student A1, A2…) v promptu odesílaném do AI. Reálná jména tak neopustí prohlížeč.</p>' +
-        '<p class="sec-guide-p">Mapování kódů na skutečná jména zůstává jen ve vašem prohlížeči (lokální klíč skupiny) a nikdy se neodesílá do AI ani do exportovaných souborů.</p>' +
+        '<p class="sec-guide-p">Studenti přesto píší své skutečné jméno do testu — anonymizace se týká pouze komunikace s AI při generování, ne samotného testu. Ve <strong>teacher verifieru jsou výsledky pod skutečnými jmény</strong>, takže jako učitel vidíte vše normálně.</p>' +
+        '<p class="sec-guide-p">Mapování kódů na skutečná jména (Student A1 = Jan Novák…) zůstává jen ve vašem prohlížeči v sekci „Lokální mapování pro učitele" — nikam se neodesílá.</p>' +
+        '<div class="sec-guide-ok">✓ Shrnutí: anonymizace chrání jména před AI, ale vás jako učitele nijak neomezuje.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
