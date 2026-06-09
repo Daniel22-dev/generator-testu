@@ -2499,10 +2499,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.16',
+  version: '6.11.17',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA UVÍTACÍHO OKNA PŘI RELOADU (6.11.17): showWelcomeModal() nyní kontroluje sessionStorage příznak genWelcomeShown_session — uvítání se zobrazí jen jednou za relaci, ne opakovaně po každém Sestavit nový test. Ověřeno node --check.',
     'NOVÉ JAZYKY (6.11.16): přidána francouzština (🇫🇷 flag-fr) a latina (🇻🇦 flag-va / Vatikán). Každý jazyk má CSS SVG vlajku a tlačítko v sekci Jazyk testu. Gemini zpracuje oba jazyky nativně. Ověřeno node --check.',
     'OPRAVA CSS PROMĚNNÝCH (6.11.15): --accent→--acc v .welcome-hero gradientu, --warn-b/--warn-d→--acc-b/--acc-d v .akv-pick-row. Odstraněny reference na nedefinované CSS proměnné. Ověřeno node --check.',
     'OPRAVA TEST LAB REGRESE (6.11.14): normalizeLoadedState() používal state.splitGenerate a state.exerciseConfig místo s.splitGenerate a s.exerciseConfig — test catBoard lock + nová pole hlásil SELHALO. Opraveno. Ověřeno node --check.',
@@ -14011,6 +14012,7 @@ function czechVocative(displayName) {
 }
 
 const ONBOARDING_DONE_KEY = 'genOnboardingDone_v1';
+const WELCOME_SESSION_KEY = 'genWelcomeShown_session';
 
 // 5 rotujících frází pro opakované spuštění (točí se podle dne v týdnu)
 var RETURN_PHRASES = [
@@ -14163,6 +14165,10 @@ function showFirstRunFlow(profile) {
 
 // ── Hlavní vstupní bod ────────────────────────────────────────────────────
 function showWelcomeModal(profile) {
+  // Zobrazit jen jednou za relaci (ne při každém reloadu po "Sestavit nový test")
+  try { if (sessionStorage.getItem(WELCOME_SESSION_KEY) === '1') return; } catch(_){}
+  try { sessionStorage.setItem(WELCOME_SESSION_KEY, '1'); } catch(_){}
+
   var done = false;
   try { done = localStorage.getItem(ONBOARDING_DONE_KEY) === '1'; } catch(_){}
   if (!done) showFirstRunFlow(profile);
