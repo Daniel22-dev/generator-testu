@@ -9,7 +9,7 @@
 :root {
   --bg:    #080a14; --bg2:   #0f1120; --bg3:   #0c0e1a;
   --bdr:   #2d3148; --bdr2:  #1e2238;
-  --t1:    #f0f2ff; --t2:    #c8cde8; --t3:    #8b93b5; --t4:    #4a5178; --t5: #3d4462;
+  --t1:    #f0f2ff; --t2:    #c8cde8; --t3:    #a8b0d0; --t4:    #6e7899; --t5: #3d4462;
   --acc:   #f59e0b; --acc-d: #f59e0b18; --acc-b: #f59e0b55; --acc-btn: #fbbf24;
   --ok:    #10b981; --ok-d:  #0d2417; --ok-b:  #10b98155;
   --err:   #ef4444;
@@ -19,7 +19,7 @@
 body.light {
   --bg: #f0f2fa; --bg2: #ffffff; --bg3: #e8eaf6;
   --bdr: #c5cae9; --bdr2: #dde0f5;
-  --t1: #14162a; --t2: #232842; --t3: #3a4163; --t4: #565d80; --t5: #7c84a6;
+  --t1: #14162a; --t2: #232842; --t3: #3a4163; --t4: #444b6e; --t5: #5c6482;
   --acc: #a85d00; --acc-d: #fff4d6; --acc-b: #a85d0066; --acc-btn: #f59e0b;
   --ok: #047857; --ok-d: #e8f8f1; --ok-b: #04785766;
   --err: #c41e1e;
@@ -2495,10 +2495,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.12',
+  version: '6.11.13',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'KONTRAST TEXTU (6.11.13): dark mód: --t3 #8b93b5→#a8b0d0, --t4 #4a5178→#6e7899 — šedé popisné texty čitelné na tmavém pozadí (kontrast ≥4.5:1). Light mód: --t4 #565d80→#444b6e, --t5 #7c84a6→#5c6482 — šedé texty čitelné na šedém pozadí (kontrast ≥4.1:1). Týká se všech popisků, neaktivních tlačítek, počtů cvičení, typů cvičení atd. Ověřeno node --check.',
     'REDESIGN CHANGELOGU (6.11.12): showReleaseInfo předělán z prostého textu na HTML modal ve stylu sec-guide — fialové záhlaví s verzí a buildem, každá změna jako sekce s názvem a číslem verze, zelený/oranžový status box. Odstraněn přepínač módu z showUsageGuide (zbytečný, přepínač je v záhlaví). Rozšířena sekce anonymizace v bezpečnostním průvodci o vysvětlení jak funguje ve vztahu k verifieru. Ověřeno node --check.',
     'ITEM ANALYSIS ROZŠÍŘENÍ (6.11.11): v položkové analýze teacher verifieru přidány: (1) sloupec Časté chyby — top-3 nejčastější špatné odpovědi per položka (min. 2 výskyty), s doporučením zvaž alternativu pokud tvoří ≥20 % odpovědí. (2) Signál podezřele snadné položky (p>90 %, oranžové zvýraznění). (3) iaDiffLabel rozšířen o práh >90 %. Ověřeno node --check.',
     'GDPR ROZŠÍŘENÍ BEZPEČNOSTNÍHO PRŮVODCE (6.11.10): přidány 4 sekce do 🔒 průvodce — přístup k CSV a sdílení výsledků, sdílení obrazovky, interpretace bezpečnostních signálů v answers.txt. Ověřeno node --check.',
