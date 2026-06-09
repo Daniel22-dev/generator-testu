@@ -2495,10 +2495,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.13',
+  version: '6.11.14',
   date:    '2026-06-09',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA TEST LAB REGRESE (6.11.14): normalizeLoadedState() používal state.splitGenerate a state.exerciseConfig místo s.splitGenerate a s.exerciseConfig — test catBoard lock + nová pole hlásil SELHALO. Opraveno. Ověřeno node --check.',
     'KONTRAST TEXTU (6.11.13): dark mód: --t3 #8b93b5→#a8b0d0, --t4 #4a5178→#6e7899 — šedé popisné texty čitelné na tmavém pozadí (kontrast ≥4.5:1). Light mód: --t4 #565d80→#444b6e, --t5 #7c84a6→#5c6482 — šedé texty čitelné na šedém pozadí (kontrast ≥4.1:1). Týká se všech popisků, neaktivních tlačítek, počtů cvičení, typů cvičení atd. Ověřeno node --check.',
     'REDESIGN CHANGELOGU (6.11.12): showReleaseInfo předělán z prostého textu na HTML modal ve stylu sec-guide — fialové záhlaví s verzí a buildem, každá změna jako sekce s názvem a číslem verze, zelený/oranžový status box. Odstraněn přepínač módu z showUsageGuide (zbytečný, přepínač je v záhlaví). Rozšířena sekce anonymizace v bezpečnostním průvodci o vysvětlení jak funguje ve vztahu k verifieru. Ověřeno node --check.',
     'ITEM ANALYSIS ROZŠÍŘENÍ (6.11.11): v položkové analýze teacher verifieru přidány: (1) sloupec Časté chyby — top-3 nejčastější špatné odpovědi per položka (min. 2 výskyty), s doporučením zvaž alternativu pokud tvoří ≥20 % odpovědí. (2) Signál podezřele snadné položky (p>90 %, oranžové zvýraznění). (3) iaDiffLabel rozšířen o práh >90 %. Ověřeno node --check.',
@@ -3689,9 +3690,9 @@ function normalizeLoadedState(s) {
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   if (s.exercisePedagogyMap === undefined) s.exercisePedagogyMap = null;
   if (s.didacticReview === undefined) s.didacticReview = null;
-    if (state.splitGenerate === undefined) state.splitGenerate = false;
+  if (s.splitGenerate === undefined) s.splitGenerate = false;
   if (s.manualMode === undefined) s.manualMode = false;
-    if (Array.isArray(state.exerciseConfig)) state.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+  if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
   return s;
 }
 
