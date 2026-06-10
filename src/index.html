@@ -1600,7 +1600,8 @@ body.acc-locked { overflow:hidden; }
     </div>
     <div class="hdr-btns">
       <button class="hdr-btn" id="btnGuide" onclick="showUsageGuide()" title="Jak používat ostře (návod pro kolegy)">📋</button>
-      <button class="hdr-btn" id="btnSecGuide" onclick="showSecurityGuide()" title="Bezpečný provoz ve škole">🔒</button>
+      <button class="hdr-btn" id="btnSecGuide" onclick="showSecurityGuide()" title="Bezpečný provoz ve škole">🏫</button>
+      <button class="hdr-btn" id="btnStrict" onclick="showStrictSituations()" title="Co čekat od přísného testu — situace a meze">🔒</button>
       <button class="hdr-btn" id="btnMode" onclick="toggleMode()" title="Světlý/tmavý režim">☀️</button>
       <button class="hdr-btn" id="btnAssistant" onclick="openGeneratorAssistant()" title="Zeptat se na funkce, bezpečnost a ovládání generátoru">💬</button>
       <button class="hdr-btn" id="btnFs" onclick="toggleFullscreen()" title="Celá obrazovka"><span class="fs-ico-hdr" aria-hidden="true"></span></button>
@@ -2499,10 +2500,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.17',
-  date:    '2026-06-09',
+  version: '6.11.18',
+  date:    '2026-06-10',
   status:  'approved-for-school-use',
   changes: [
+    'PRŮVODCE SITUACE V PŘÍSNÉM TESTU (6.11.18): nové tlačítko 🔒 v záhlaví otevírá modal showStrictSituations() — co od přísného testu čekat a co musí pohlídat dozor: 3 souhrnné boxy (spolehlivé / pomáhá / neřeší) + tabulka 10 situací se stavem a doporučením. Stávající průvodce „Bezpečný provoz ve škole" přesunut z ikony 🔒 na 🏫. Vlastní obsah ve stylu sec-guide, scrollovatelný, funguje na mobilu, Escape i klik mimo zavírá. Ověřeno node --check.',
     'OPRAVA UVÍTACÍHO OKNA PŘI RELOADU (6.11.17): showWelcomeModal() nyní kontroluje sessionStorage příznak genWelcomeShown_session — uvítání se zobrazí jen jednou za relaci, ne opakovaně po každém Sestavit nový test. Ověřeno node --check.',
     'NOVÉ JAZYKY (6.11.16): přidána francouzština (🇫🇷 flag-fr) a latina (🇻🇦 flag-va / Vatikán). Každý jazyk má CSS SVG vlajku a tlačítko v sekci Jazyk testu. Gemini zpracuje oba jazyky nativně. Ověřeno node --check.',
     'OPRAVA CSS PROMĚNNÝCH (6.11.15): --accent→--acc v .welcome-hero gradientu, --warn-b/--warn-d→--acc-b/--acc-d v .akv-pick-row. Odstraněny reference na nedefinované CSS proměnné. Ověřeno node --check.',
@@ -3196,7 +3198,7 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'bodovani-nesedi',title:'Bodování nesedí — co dělat',status:'reseno',
   keywords:['bodovani nesedi','bodování nesedí','spatne body','špatné body','chybne body','chybné body','dostal 0','dostala 0','spatny vysledek','špatný výsledek','chybny vysledek','chybný výsledek','student ma 0','špatně ohodnoceno','chybne ohodnoceno'],
-  simple:'Pokud bodování nesedí: (1) zkontroluj klíč správných odpovědí v teacher verifieru, (2) spusť ověření klíče, (3) oprav klíč v editoru a přegeneruj výsledky.',
+  simple:'Pokud bodování nesedí: (1) zkontroluj klíč správných odpovědí v teacher verifieru, (2) spusť ověření klíče, (3) oprav klíč v editoru a výsledky vygeneruj znovu.',
   detailed:'Nejčastější příčiny chybného bodování: (1) AI vygenerovala špatnou správnou odpověď — zkontroluj klíč v teacher verifieru, oprav v editoru, (2) alt_answers chybí — student napsal synonymum nebo jiný tvar, přidej ho jako přijatelnou alternativu, (3) mezery nebo velikost písmen — bodovací engine ignoruje velikost a okrajové mezery, ale ne vnitřní, (4) u překladu/transformace je bodování AI-based — může se lišit od tvého očekávání, (5) u multi-select zkontroluj jestli klíč je pole indexů [0,2] a ne jedno číslo. Spusť self-test pro ověření bodování všech typů.',
   evidence:['textScore()','SHARED_SCORING_JS','alt_answers[]','runScoringSelfTest()','aiVerifyKey()']},
 
@@ -13822,6 +13824,87 @@ function showSecurityGuide(){
   backdrop.querySelector('#secGuideOkBtn').addEventListener('click', closeSecGuide);
   backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeSecGuide(); });
   backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSecGuide(); });
+}
+
+function showStrictSituations(){
+  if (document.getElementById('strictSitGate')) return;
+
+  var pill = 'display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap;margin-bottom:4px';
+  var pOk   = pill + ';background:var(--ok-d);border:1px solid var(--ok-b);color:var(--ok)';
+  var pMid  = pill + ';background:var(--acc-d);border:1px solid var(--acc-b);color:var(--acc)';
+  var pNo   = pill + ';background:transparent;border:1px solid var(--err);color:var(--err)';
+
+  function row(badgeStyle, badgeText, situace, akce){
+    return '<tr style="border-bottom:1px solid var(--bdr)">' +
+      '<td style="padding:8px 8px 8px 0;vertical-align:top;width:46%">' +
+        '<span style="' + badgeStyle + '">' + badgeText + '</span><br>' +
+        '<strong style="color:var(--t1)">' + situace + '</strong>' +
+      '</td>' +
+      '<td style="padding:8px 0;vertical-align:top;color:var(--t2)">' + akce + '</td>' +
+    '</tr>';
+  }
+
+  var html =
+    '<div class="sec-guide-hero" style="background:linear-gradient(135deg,#3a1a3a 0%,#241024 100%)">' +
+      '<div class="sec-guide-hero-emoji">🔒</div>' +
+      '<div class="sec-guide-hero-title">Situace v přísném testu</div>' +
+      '<div class="sec-guide-hero-sub">Co od něj čekat — a co musí pohlídat dozor</div>' +
+    '</div>' +
+    '<div class="sec-guide-body">' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🎯</span> Co přísný režim umí a co ne</div>' +
+        '<p class="sec-guide-p">Přísný režim podvádění výrazně ztěžuje a spolehlivě chrání známku a správné odpovědi. Není to ale dozor a není 100% neprůstřelný — počítej s tím, na co se dá spolehnout, a zbytek pohlídej v učebně.</p>' +
+        '<div class="sec-guide-ok"><strong>Spolehni se:</strong> student nemá ve svém souboru správné odpovědi ani klíč a známku nelze nafouknout — verifier ji počítá znovu z odevzdaných odpovědí, ne z toho, co student tvrdí.</div>' +
+        '<div class="sec-guide-warn"><strong>Pomáhá, ale ne na 100 %:</strong> promíchání otázek, zámek po opuštění testu a bezpečnostní signály. Jsou to překážky a vodítka, ne tvrdé brány a ne důkazy.</div>' +
+        '<div style="background:transparent;border:1px solid var(--err);border-radius:7px;padding:6px 10px;font-size:12.5px;color:var(--err);line-height:1.5;margin-bottom:6px"><strong>Tohle nezařídí soubor:</strong> telefon, papír, druhé zařízení, soused, kdo test reálně píše a kdy se odkaz dostane ke studentům. To řeší jedině dozor a organizace.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">📋</span> Situace a co s nimi</div>' +
+        '<p class="sec-guide-p" style="font-size:12px">Stav: ' +
+          '<span style="' + pOk + '">Spolehlivé</span> ' +
+          '<span style="' + pMid + '">Pomáhá</span> ' +
+          '<span style="' + pNo + '">Neřeší</span></p>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5">' +
+          '<tbody>' +
+            row(pOk, 'Spolehlivé', 'Student chce v souboru najít správné odpovědi', 'Nejsou tam — klíč má jen učitelský verifier. Nedělej nic.') +
+            row(pOk, 'Spolehlivé', 'Student chce nahlásit lepší známku, než dosáhl', 'Verifier známku přepočítá sám. Student ji neovlivní.') +
+            row(pNo, 'Neřeší', 'Přečtení otázek z odkazu předem', 'Odkaz pošli nebo zveřejni až na začátku testu. Stejné zadání nedávej opakovaně víc skupinám.') +
+            row(pMid, 'Pomáhá', 'Opisování od souseda', 'Zapni promíchání otázek. Pro ostrý test ideálně pro každou skupinu jiné zadání.') +
+            row(pNo, 'Neřeší', 'Telefon, tahák, druhé zařízení, šeptání', 'Fyzický dozor. Software druhé zařízení ani odposlech nevidí.') +
+            row(pMid, 'Pomáhá', 'Student přepne okno nebo aplikaci během testu', 'Test se zamkne, signál uvidíš ve verifieru. Ber jako vodítko, ne důkaz.') +
+            row(pMid, 'Pomáhá', 'Obejití zámku novým nebo anonymním oknem', 'Zámek je odrazení a záznam, ne tvrdá brána. V dozorované učebně je restart vidět.') +
+            row(pNo, 'Neřeší', 'Test píše za studenta někdo jiný', 'Ověř totožnost u dozoru. Odkaz a PIN samy o sobě osobu neváží.') +
+            row(pNo, 'Neřeší', 'Student si test nechá nebo nafotí na příště', 'Publikované offline HTML si kdokoli nechá. Pro další skupinu vytvoř nový test.') +
+            row(pNo, 'Neřeší', 'Posun času nebo pauza timeru', 'Reálný čas drží dozor. Klientský timer je orientační.') +
+          '</tbody>' +
+        '</table>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🛡️</span> Shrnutí</div>' +
+        '<div class="sec-guide-ok">Přísný režim chrání známku a správné odpovědi spolehlivě a podvádění ztěžuje. Zabránit fyzickému podvádění, záměně identity a úniku zadání ale musí dozor a organizace, ne soubor.</div>' +
+      '</div>' +
+
+    '</div>' +
+    '<div class="sec-guide-actions">' +
+      '<button type="button" class="ui-modal-btn primary" id="strictSitOkBtn">Rozumím</button>' +
+    '</div>';
+
+  var backdrop = document.createElement('div');
+  backdrop.id = 'strictSitGate';
+  backdrop.className = 'ui-modal-backdrop sec-guide-gate';
+  backdrop.setAttribute('role', 'dialog');
+  backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'strictSitHead');
+  backdrop.innerHTML = '<div class="ui-modal-box sec-guide-box" id="strictSitHead">' + html + '</div>';
+  document.body.appendChild(backdrop);
+
+  function closeStrictSit() { backdrop.remove(); }
+  backdrop.querySelector('#strictSitOkBtn').addEventListener('click', closeStrictSit);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeStrictSit(); });
+  backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeStrictSit(); });
 }
 
 function showApiKeyGuide(){
