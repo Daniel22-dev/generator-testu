@@ -672,6 +672,47 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .preset-modal-warning { margin-top:10px; padding:10px 12px; border-radius:9px; border:1px solid var(--acc-b); background:var(--acc-d); color:var(--acc); font-size:13.5px; line-height:1.5; }
 .preset-modal-warning strong { color:var(--t1); }
 @media(max-width:480px){ .preset-modal-grid { grid-template-columns:1fr; gap:3px; } .preset-modal-icon { font-size:30px; } }
+/* ── 2× ZVĚTŠENÉ MODALY PRESETŮ (detail šablony) — čitelnější ─────────────── */
+.preset-modal-box { width:min(1040px,100%); }
+.preset-modal-box .ui-modal-head { font-size:24px; padding:22px 26px 13px; }
+.preset-modal-box .ui-modal-body { font-size:21px; line-height:1.6; padding:0 26px 20px; }
+.preset-modal-box .preset-modal-icon { font-size:58px; }
+.preset-modal-box .preset-modal-title { font-size:27px; margin-bottom:6px; }
+.preset-modal-box .preset-modal-sub { font-size:21px; line-height:1.5; }
+.preset-modal-box .preset-modal-grid { grid-template-columns:240px 1fr; gap:12px 20px; padding:18px 22px; margin:18px 0; }
+.preset-modal-box .preset-modal-grid .pm-label { font-size:20px; }
+.preset-modal-box .preset-modal-grid .pm-val { font-size:21px; line-height:1.5; }
+.preset-modal-box .preset-modal-why { font-size:21px; line-height:1.6; padding:16px 20px; margin-top:18px; }
+.preset-modal-box .preset-modal-why strong { font-size:21px; }
+.preset-modal-box .preset-modal-hint { font-size:19px; line-height:1.5; margin-top:18px; }
+.preset-modal-box .preset-modal-warning { font-size:21px; line-height:1.55; padding:16px 20px; margin-top:18px; }
+.preset-modal-box .ui-modal-actions { padding:18px 26px 24px; gap:12px; }
+.preset-modal-box .ui-modal-btn { font-size:20px; min-height:54px; padding:14px 22px; }
+@media(max-width:640px){
+  .preset-modal-box .ui-modal-head { font-size:20px; padding:18px 18px 10px; }
+  .preset-modal-box .ui-modal-body { font-size:17px; padding:0 18px 16px; }
+  .preset-modal-box .preset-modal-icon { font-size:46px; }
+  .preset-modal-box .preset-modal-title { font-size:21px; }
+  .preset-modal-box .preset-modal-sub { font-size:17px; }
+  .preset-modal-box .preset-modal-grid { grid-template-columns:1fr; gap:5px; padding:14px 16px; }
+  .preset-modal-box .preset-modal-grid .pm-label { font-size:16px; }
+  .preset-modal-box .preset-modal-grid .pm-val { font-size:17px; }
+  .preset-modal-box .preset-modal-why,
+  .preset-modal-box .preset-modal-warning { font-size:17px; padding:13px 15px; }
+  .preset-modal-box .preset-modal-hint { font-size:15.5px; }
+  .preset-modal-box .ui-modal-btn { font-size:17px; min-height:48px; padding:12px 16px; }
+}
+/* ── 2× ZVĚTŠENÉ PRVNÍ OKNO PRESETU („Použít preset?") ───────────────────── */
+.preset-confirm-box { width:min(820px,100%); }
+.preset-confirm-box .ui-modal-head { font-size:24px; padding:22px 26px 12px; }
+.preset-confirm-box .ui-modal-body { font-size:21px; line-height:1.6; padding:0 26px 18px; }
+.preset-confirm-box .ui-modal-actions { padding:18px 26px 24px; gap:12px; }
+.preset-confirm-box .ui-modal-btn { font-size:20px; min-height:54px; padding:14px 22px; }
+@media(max-width:640px){
+  .preset-confirm-box .ui-modal-head { font-size:20px; padding:18px 18px 10px; }
+  .preset-confirm-box .ui-modal-body { font-size:17px; padding:0 18px 14px; }
+  .preset-confirm-box .ui-modal-btn { font-size:17px; min-height:48px; padding:12px 16px; }
+}
 .simple-mode .advanced-only { display: none !important; }
 .simple-helper { background: var(--bg3); border: 1px solid var(--bdr2); border-radius: 10px; padding: 10px 12px; margin: 10px 0; color: var(--t3); font-size: 13.5px; line-height: 1.55; }
 .simple-helper b { color: var(--acc); }
@@ -2572,10 +2613,13 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.35',
+  version: '6.11.38',
   date:    '2026-06-11',
   status:  'approved-for-school-use',
   changes: [
+    'ZPŘESNĚNÍ SITUACÍ V PŘÍSNÉM REŽIMU (6.11.38): dva řádky tabulky upraveny podle skutečného chování. (1) „Obejití zámku“ → nyní jasně, že zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde — submittedLocked() to potvrzuje hláškou použij jiné zařízení/prohlížeč. (2) Řádek o posunu času/pauze timeru (vyžadoval konzoli, kterou výchozí předpoklad bez přístupu k HTML vylučuje) nahrazen reálně dostupnou variantou protahuje čas prací mimo okno — klientský timer (startTimer/timerVal) běží jen v aktivní kartě. Ověřeno node --check.',
+    'SITUACE V PŘÍSNÉM REŽIMU + JEDNORÁZOVÉ KÓDY (6.11.37): záložka aktualizována o režim jednorázových kódů. (1) Úvod nyní pojmenovává výchozí předpoklad — student dostane jen odkaz, k HTML se nedostane. (2) Nová sekce Jak fungují jednorázové kódy (3 karty: kódy jen ve verifieru ne ve studentském testu / pokaždé nové / kód váže záznam, ne osobu). (3) Tabulka situací rozšířena: zelená pokrývá signál kód není v seznamu (rosterHasCode) a nemožnost vyčíst cizí kódy z testu; oranžová duplicitní pokus (duplicateInfo); červená nově výměna kódů mezi studenty. Ověřeno node --check.',
+    'OPRAVY MODULŮ (6.11.36): (1) oba modaly presetu (potvrzení „Použít preset?" i detail šablony) zvětšeny ~2× — větší šířka, písmo, ikona i mřížka detailů, vlastní mobilní breakpoint. (2) Opravena chyba, kdy po přepnutí z modulu Český jazyk do cizího jazyka zůstávaly v podrobném nastavení cvičení dva české typy (Vyber pravopisně správnou variantu, Doplň přesný pravopisný tvar): záloha/obnova generického stavu nově pokrývá exerciseConfig/exerciseDetail/pocet/body/cas + pojistka csStripCzechExerciseRows při odchodu z ČJ i při startu (čistí i staré uložené snapshoty). Ověřeno node --check.',
     'REALISTICKÁ RIZIKA (6.11.35): výrazné tmavě červené pozadí panelu (#2d0a0a dark / #fef2f2 light), světlý text na kartičkách v dark módu (#1a0505 bg, #fca5a5 text). Ověřeno node --check.',
     'REALISTICKÁ RIZIKA (6.11.34): panel redesignován – výrazné červené pozadí/border přes --err generátoru (#ef444412 dark / #c41e1e0e light), karty s ikonami v gridu, bílý text na dark pozadí karet. Ověřeno node --check.',
     'REALISTICKÁ RIZIKA (6.11.33): panel schovaný mimo přísný režim; redesign checklistu na grid karet s ikonou + textem, CSS proměnné --bg2/--bdr/--t2 pro kompatibilitu denní i noční téma. Ověřeno node --check.',
@@ -2583,9 +2627,6 @@ const RELEASE = Object.freeze({
     'OPRAVA VLAJKY MODULU ČJ (6.11.31): místo emoji 🇨🇿 (na Windows renderováno jako text CZ) se v titulcích listů 1/3, 2/3, 3/3, záhlaví entry modalu a záložce changelogu používá CSS třída flag-cz — stejná SVG vlajka jako u tlačítka výběru jazyka. Ověřeno node --check.',
     'JEDNOTNÝ ESCAPE PRO MODALY (6.11.28): nový globální keydown listener na document zavírá klávesou Escape nejvrchnější otevřený informační modal (changelog, oba průvodci, strict situace, API key návod, Test Lab, detail presetu, admin panel). Dříve Escape fungoval jen s fokusem uvnitř modalu. Whitelist záměrně NEobsahuje povinné brány (aktivace, onboarding), uiModal (čeká na promise) a welcome okno (design vyžaduje tlačítko). Řeší i modal nad modalem (poslední v DOM = nahoře). Ověřeno node --check.',
     'OČISTA MRTVÉHO KÓDU (6.11.28): odstraněno 21 nereferencovaných funkcí (~153 řádků) nalezených auditem — pozůstatky starších refaktorů z obou vývojových větví: editor (addRow/getRows/removeRow, getEffectiveWorkPreset, isPracticePreset, presetModeActionHtml, applyWorkPreset, showOnboardingGate — nahrazen showFirstRunFlow, testLabRunCurrentOutput, csHasText), šablony generovaných testů (activateJoker, useJoker, selectMC, updateOpen, updateErr, variantByGroupKey, sha256Client, recommendedBrowser, exTypeLabel, optionLabel — zmenšuje i generované soubory), modul ČJ (csGoalCards). Ověřeno: žádní noví sirotci, kaskádové závislosti (shortHashClient, applyRecommendedModeForCurrentPreset) zůstávají živé. Ověřeno node --check.',
-    'OPRAVA TEST LABU (6.11.27): openTestLab() věšel listener na tlačítko testLabDownloadE2E, které v HTML modalu neexistovalo → TypeError při každém otevření Test Labu a mrtvé tlačítko „Vyčistit výstup" (jeho listener se už nenavěsil). Chyba byla předexistující v obou vývojových větvích, audit ji odhalil. Oprava: doplněno tlačítko „⬇ Stáhnout E2E starter" do řady akcí (funkce downloadE2EStarter a celý Playwright export existovaly, jen byly nedosažitelné) + listener nově guardovaný. Ověřeno node --check.',
-    'SAMOSTATNÝ CHANGELOG MODULU ČJ (6.11.26): changelog modal (tlačítko „co je nového") má nově přepínač Generátor / 🇨🇿 Modul ČJ. Modul má vlastní data RELEASE_CS (nezávislé verzování V16…, vlastní hero v české barevnosti). Přepnutí překresluje obsah bez zavření okna; Escape i klik mimo zavírá jako dřív. Ověřeno node --check.',
-    'SLOUČENÍ MODULU ČESKÝ JAZYK (6.11.25): do bezpečnostní větve (6.11.24) naroubován samostatný modul Český jazyk (3krokový průvodce učivo/úloha/hodnocení, cs* funkce, openModule, csEnsureItemFeedback, strukturovaná zpětná vazba csFeedback). Integrační háčky: csScoringPolicy + csFeedbackPolicy + isCzech protaženy cfg → studentský CFG → verifier CONFIG i do hashe; normForScore/textScore/indexNorm respektují českou přesnost (diakritika/interpunkce/velká písmena), pro češtinu se vypíná fuzzy i CEFR. Zachovány VŠECHNY funkce cizích jazyků a celé zabezpečení 6.11.19–24 (roster jednorázových kódů, identityMode, code v payloadu, displayStudent, varianta pro skupinu, detail paste eventů, kontroly rosteru). Ověřeno node --check obou skriptových bloků.',
   ]
 });;;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -4813,9 +4854,11 @@ async function choosePreset(id){
   if (!p){ return; }
   if (state.pedagogicalPreset === id){ openPresetDetailModal(id); return; }
   if (presetHasManualWork() && state.pedagogicalPreset !== id){
-    const ok = await uiConfirm(
-      'Preset „' + p.label + '" nastaví režim testu, zpětvazbu, hodnocení a diferenciaci. Typy cvičení, počet ani čas se nemění — to zůstává na tobě. Doporučené typy uvidíš v detailu. Pokračovat?',
-      'Použít preset?');
+    const ok = await uiModal({
+      title:'Použít preset?',
+      message:'Preset „' + p.label + '" nastaví režim testu, zpětvazbu, hodnocení a diferenciaci. Typy cvičení, počet ani čas se nemění — to zůstává na tobě. Doporučené typy uvidíš v detailu. Pokračovat?',
+      okText:'Ano, pokračovat', cancelText:'Zrušit', boxClass:'preset-confirm-box'
+    }).then(Boolean);
     if (!ok){ applyVisualState(); return; }
   }
   applyPreset(id);
@@ -14096,10 +14139,18 @@ function showStrictSituations(){
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🎯</span> Co přísný režim umí a co ne</div>' +
-        '<p class="sec-guide-p">Přísný režim podvádění výrazně ztěžuje a spolehlivě chrání známku a správné odpovědi. Není to ale dozor a není 100% neprůstřelný — počítej s tím, na co se dá spolehnout, a zbytek pohlídej v učebně.</p>' +
-        '<div class="sec-guide-ok"><strong>Spolehni se:</strong> student nemá ve svém souboru správné odpovědi ani klíč a známku nelze nafouknout — verifier ji počítá znovu z odevzdaných odpovědí, ne z toho, co student tvrdí.</div>' +
-        '<div class="sec-guide-warn"><strong>Pomáhá, ale ne na 100 %:</strong> promíchání otázek, zámek po opuštění testu a bezpečnostní signály. Jsou to překážky a vodítka, ne tvrdé brány a ne důkazy.</div>' +
-        '<div style="background:transparent;border:1px solid var(--err);border-radius:7px;padding:6px 10px;font-size:12.5px;color:var(--err);line-height:1.5;margin-bottom:6px"><strong>Tohle nezařídí soubor:</strong> telefon, papír, druhé zařízení, soused, kdo test reálně píše a kdy se odkaz dostane ke studentům. To řeší jedině dozor a organizace.</div>' +
+        '<p class="sec-guide-p">Vycházíme z toho, že student dostane jen webový odkaz na test a k samotnému HTML souboru se nedostane. Tím odpadá čtení správných odpovědí ze zdrojáku i přepisování výsledku v prohlížeči. Přísný režim pak podvádění výrazně ztěžuje a spolehlivě chrání známku i klíč. Není to ale dozor a není 100% neprůstřelný — počítej s tím, na co se dá spolehnout, a zbytek pohlídej v učebně.</p>' +
+        '<div class="sec-guide-ok"><strong>Spolehni se:</strong> studentský test neobsahuje správné odpovědi ani klíč a známku nelze nafouknout — verifier ji počítá znovu z odevzdaných odpovědí, ne z toho, co student tvrdí. U ostrého testu navíc nedrží jména: student zadá jen jednorázový kód a dvojici kód → student zná pouze učitelský verifier.</div>' +
+        '<div class="sec-guide-warn"><strong>Pomáhá, ale ne na 100 %:</strong> jednorázové kódy, promíchání otázek, zámek po opuštění testu a bezpečnostní signály (opuštění okna, krátký čas, duplicitní pokus, kód mimo seznam). Jsou to překážky a vodítka pro tvou kontrolu, ne tvrdé brány a ne důkazy.</div>' +
+        '<div style="background:transparent;border:1px solid var(--err);border-radius:7px;padding:6px 10px;font-size:12.5px;color:var(--err);line-height:1.5;margin-bottom:6px"><strong>Tohle nezařídí soubor:</strong> telefon, papír, druhé zařízení, soused, sdílení kódu mezi studenty, kdo test reálně píše a kdy se odkaz dostane ke studentům. To řeší jedině dozor a organizace.</div>' +
+      '</div>' +
+
+      '<div class="sec-guide-section">' +
+        '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Jak fungují jednorázové kódy</div>' +
+        '<p class="sec-guide-p">Pro ostrý test zvol režim <strong>Jednorázový kód</strong>: vlepíš e-maily skupiny, vygeneruješ kódy a pak test. Co je důležité vědět:</p>' +
+        '<div class="sec-guide-ok"><strong>Do studentského testu se kódy nezapékají.</strong> Student vidí jen políčko „zadej svůj kód“ — žádný seznam, takže z testu cizí kódy nevyčte. Dvojici kód → student a e-maily zná jen učitel (verifier + stažené CSV).</div>' +
+        '<div class="sec-guide-ok"><strong>Kódy jsou pokaždé nové.</strong> Generují se náhodně pro každý test (co student, to jiný kód), nejsou to stálé celoroční kódy. Když roster změníš, vygeneruj test znovu.</div>' +
+        '<div class="sec-guide-warn"><strong>Kód váže záznam, ne osobu.</strong> Kód je jen jednorázový token. Pokud si dva studenti kódy vymění, verifier to sám nepozná — proto fyzicky ověř, že kód u zařízení sedí na přítomného studenta.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
@@ -14110,23 +14161,27 @@ function showStrictSituations(){
           '<span style="' + pNo + '">Neřeší</span></p>' +
         '<table style="width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5">' +
           '<tbody>' +
-            row(pOk, 'Spolehlivé', 'Student chce v souboru najít správné odpovědi', 'Nejsou tam — klíč má jen učitelský verifier. Nedělej nic.') +
-            row(pOk, 'Spolehlivé', 'Student chce nahlásit lepší známku, než dosáhl', 'Verifier známku přepočítá sám. Student ji neovlivní.') +
-            row(pNo, 'Neřeší', 'Přečtení otázek z odkazu předem', 'Odkaz pošli nebo zveřejni až na začátku testu. Stejné zadání nedávej opakovaně víc skupinám.') +
+            row(pOk, 'Spolehlivé', 'Student chce najít správné odpovědi', 'Ve studentském testu nejsou — klíč má jen učitelský verifier. A k HTML se student stejně nedostane. Nedělej nic.') +
+            row(pOk, 'Spolehlivé', 'Student chce nahlásit lepší známku, než dosáhl', 'Verifier známku přepočítá sám z odevzdaných odpovědí. Student ji neovlivní.') +
+            row(pOk, 'Spolehlivé', 'Student zadá vymyšlený nebo cizí kód', 'Verifier u kódu mimo roster zobrazí tvrdý signál „kód není v seznamu“. Hned vidíš, že něco nesedí.') +
+            row(pOk, 'Spolehlivé', 'Z testu zjistit cizí kódy spolužáků', 'Nejde — kódy jsou jen ve verifieru, ne ve studentském souboru. Student vidí jen své prázdné políčko.') +
+            row(pMid, 'Pomáhá', 'Student test otevře a odevzdá vícekrát', 'Verifier označí duplicitní kód i duplicitní ID pokusu oranžově. Rozhodnutí, který pokus platí, je na tobě.') +
             row(pMid, 'Pomáhá', 'Opisování od souseda', 'Zapni promíchání otázek. Pro ostrý test ideálně pro každou skupinu jiné zadání.') +
+            row(pMid, 'Pomáhá', 'Student přepne okno nebo aplikaci během testu', 'Test se zamkne, signál uvidíš ve verifieru. Ber jako vodítko, ne důkaz — na mobilu spustí blur i notifikace.') +
+            row(pMid, 'Pomáhá', 'Obejití zámku jiným prohlížečem nebo anonymním oknem', 'Zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde. Je to odrazení a záznam, ne tvrdá brána — v učebně hlídej, kdo začíná test znovu.') +
+            row(pNo, 'Neřeší', 'Dva studenti si vymění kódy', 'Verifier vidí kód v seznamu a použitý jednou — záměnu sám nepozná. Ověř u zařízení, že kód sedí na přítomného studenta.') +
+            row(pNo, 'Neřeší', 'Test píše za studenta někdo jiný', 'Kód ani odkaz osobu neváží. Totožnost musí ověřit dozor.') +
             row(pNo, 'Neřeší', 'Telefon, tahák, druhé zařízení, šeptání', 'Fyzický dozor. Software druhé zařízení ani odposlech nevidí.') +
-            row(pMid, 'Pomáhá', 'Student přepne okno nebo aplikaci během testu', 'Test se zamkne, signál uvidíš ve verifieru. Ber jako vodítko, ne důkaz.') +
-            row(pMid, 'Pomáhá', 'Obejití zámku novým nebo anonymním oknem', 'Zámek je odrazení a záznam, ne tvrdá brána. V dozorované učebně je restart vidět.') +
-            row(pNo, 'Neřeší', 'Test píše za studenta někdo jiný', 'Ověř totožnost u dozoru. Odkaz a PIN samy o sobě osobu neváží.') +
-            row(pNo, 'Neřeší', 'Student si test nechá nebo nafotí na příště', 'Publikované offline HTML si kdokoli nechá. Pro další skupinu vytvoř nový test.') +
-            row(pNo, 'Neřeší', 'Posun času nebo pauza timeru', 'Reálný čas drží dozor. Klientský timer je orientační.') +
+            row(pNo, 'Neřeší', 'Přečtení otázek z odkazu předem', 'Odkaz pošli nebo zveřejni až na začátku testu. Stejné zadání nedávej opakovaně víc skupinám.') +
+            row(pNo, 'Neřeší', 'Student si obsah testu zapamatuje na příště', 'Co student jednou viděl, může předat dál. Pro další skupinu vytvoř variantu nebo nový test.') +
+            row(pNo, 'Neřeší', 'Student protahuje čas prací mimo okno', 'Klientský timer odpočítává jen v běžící kartě a sám čas neohlídá. Reálný čas drží dozor; čas odevzdání a opuštění okna vidíš ve verifieru.') +
           '</tbody>' +
         '</table>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🛡️</span> Shrnutí</div>' +
-        '<div class="sec-guide-ok">Přísný režim chrání známku a správné odpovědi spolehlivě a podvádění ztěžuje. Zabránit fyzickému podvádění, záměně identity a úniku zadání ale musí dozor a organizace, ne soubor.</div>' +
+        '<div class="sec-guide-ok">Přísný režim + jednorázové kódy chrání známku a klíč spolehlivě, ohlídá použití cizího kódu i opakovaný pokus a podvádění ztěžuje. Zabránit fyzickému podvádění, záměně identity (kdo pod kódem reálně sedí) a úniku zadání ale musí dozor a organizace, ne soubor.</div>' +
       '</div>' +
 
     '</div>' +
@@ -16145,8 +16200,10 @@ document.addEventListener('keydown', function(e){
     document.addEventListener('keydown', onKey);
     setTimeout(function(){ if(open) open.focus(); }, 0);
   }
-  function csBackupGenericBeforeEntering(){ if (!state.__csGenericBackup) { const latkaEl=document.getElementById('latka'); state.__csGenericBackup = {instrJazyk:state.instrJazyk, uroven:csClone(state.uroven||[]), kombinovat:state.kombinovat, typyCviceni:csClone(state.typyCviceni||[]), ageGroup:state.ageGroup, ageGroupCustom:state.ageGroupCustom, testPurpose:state.testPurpose, latkaValue: latkaEl ? latkaEl.value : ''}; } }
-  function csRestoreGenericAfterLeaving(){ const b=state.__csGenericBackup; if (!b) return; ['instrJazyk','uroven','kombinovat','typyCviceni','ageGroup','ageGroupCustom','testPurpose'].forEach(k => { state[k]=csClone(b[k]); }); const latkaEl=document.getElementById('latka'); if (latkaEl && Object.prototype.hasOwnProperty.call(b,'latkaValue')) latkaEl.value = b.latkaValue || ''; delete state.__csGenericBackup; }
+  function csBackupGenericBeforeEntering(){ if (!state.__csGenericBackup) { const latkaEl=document.getElementById('latka'); state.__csGenericBackup = {instrJazyk:state.instrJazyk, uroven:csClone(state.uroven||[]), kombinovat:state.kombinovat, typyCviceni:csClone(state.typyCviceni||[]), ageGroup:state.ageGroup, ageGroupCustom:state.ageGroupCustom, testPurpose:state.testPurpose, latkaValue: latkaEl ? latkaEl.value : '', exerciseConfig:csClone(state.exerciseConfig||[]), exerciseDetail:!!state.exerciseDetail, pocet:state.pocet, body:state.body, cas:state.cas}; } }
+  function csRestoreGenericAfterLeaving(){ const b=state.__csGenericBackup; if (b){ ['instrJazyk','uroven','kombinovat','typyCviceni','ageGroup','ageGroupCustom','testPurpose'].forEach(k => { state[k]=csClone(b[k]); }); if (Object.prototype.hasOwnProperty.call(b,'exerciseConfig')) state.exerciseConfig = csClone(b.exerciseConfig||[]); if (Object.prototype.hasOwnProperty.call(b,'exerciseDetail')) state.exerciseDetail = !!b.exerciseDetail; if (Object.prototype.hasOwnProperty.call(b,'pocet')) state.pocet = b.pocet; if (Object.prototype.hasOwnProperty.call(b,'body')) state.body = b.body; if (Object.prototype.hasOwnProperty.call(b,'cas')) state.cas = b.cas; const latkaEl=document.getElementById('latka'); if (latkaEl && Object.prototype.hasOwnProperty.call(b,'latkaValue')) latkaEl.value = b.latkaValue || ''; delete state.__csGenericBackup; } csStripCzechExerciseRows(); try { if (typeof renderExerciseConfig === 'function') renderExerciseConfig(); } catch(_) {} }
+  // Pojistka: v cizím jazyce nesmí zůstat řádky cvičení patřící do modulu ČJ (csLabel/csExerciseKey).
+  function csStripCzechExerciseRows(){ if (csIsActive()) return; if (Array.isArray(state.exerciseConfig) && state.exerciseConfig.some(function(ex){return ex && (ex.csLabel || ex.csExerciseKey);})) { state.exerciseConfig = state.exerciseConfig.filter(function(ex){return ex && !ex.csLabel && !ex.csExerciseKey;}); if (!state.exerciseConfig.length) state.exerciseDetail = false; } }
   function csSelectedExerciseText(m){ return csExerciseList(m).map(k => { const e=CS_EXERCISES[k]; return '- '+e.label+' -> typ v ČJ: '+csTechPromptLabel(e.tech)+'; režim: '+csReviewLabel(e.review)+'; poznámka: '+e.desc; }).join('\n'); }
   function csDerivedGoal(st){
     st = st || state;
@@ -16248,7 +16305,7 @@ POVINNÉ FORMÁTY PRO BEZPEČNÉ HODNOCENÍ ČJ:\n- Pravopis/interpunkci testuj 
     });
   }
   function csBoot(){
-    try { csMountPanels(); csPatchFunctions(); csInstallCzechButtonFallback(); csEnsureState(state); if (csIsActive()) csApplyCoreState(); csRenderPanels(); csApplyVisualState(); try{ if(typeof validate==='function') validate(); }catch(_){} } catch(e) { console.error('Modul Český jazyk se nepodařilo inicializovat:', e); }
+    try { csMountPanels(); csPatchFunctions(); csInstallCzechButtonFallback(); csEnsureState(state); if (csIsActive()) csApplyCoreState(); else csStripCzechExerciseRows(); csRenderPanels(); csApplyVisualState(); try{ if(typeof validate==='function') validate(); }catch(_){} } catch(e) { console.error('Modul Český jazyk se nepodařilo inicializovat:', e); }
   }
 
   window.csEnterCzechFromButton = function(ev){
