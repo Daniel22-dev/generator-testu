@@ -393,7 +393,8 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
   .ex-num { width:24px; height:24px; border-radius:50%; background:var(--acc);
     color:#0a0c14; font-size:12.5px; font-weight:700; display:flex; align-items:center;
     justify-content:center; flex-shrink:0; }
-  .ex-row select { background:var(--bg2); border:1.5px solid var(--bdr); border-radius:6px;
+  .ex-cs-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--t2);background:var(--bg3);border:1.5px solid var(--bdr);border-radius:8px;padding:7px 10px;}
+.ex-row select { background:var(--bg2); border:1.5px solid var(--bdr); border-radius:6px;
     padding:6px 7px; color:var(--t2); font-size:13.5px; font-family:Georgia,serif;
     outline:none; cursor:pointer; width:100%; transition:border-color 0.15s; }
   .ex-row select:focus { border-color:var(--acc-b); }
@@ -1595,6 +1596,22 @@ body.acc-locked { overflow:hidden; }
   }
 }
 
+.strict-risk-panel { background: #2d0a0a; border: 1.5px solid #ef4444aa; border-radius: 11px; padding: 13px 15px; }
+body.light .strict-risk-panel { background: #fef2f2; border-color: #c41e1e88; }
+.strict-risk-header { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.strict-risk-icon { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.strict-risk-title { font-size: 13px; font-weight: 800; color: #fc8181; text-transform: uppercase; letter-spacing: .04em; }
+body.light .strict-risk-title { color: var(--err); }
+.strict-risk-body { font-size: 13px; color: #fca5a5; line-height: 1.55; margin-bottom: 11px; }
+body.light .strict-risk-body { color: var(--t2); }
+.strict-risk-body strong { color: #fecaca; }
+body.light .strict-risk-body strong { color: var(--err); }
+.strict-risk-sublabel { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #f87171; margin-bottom: 8px; }
+body.light .strict-risk-sublabel { color: var(--err); }
+.strict-risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 6px; }
+.strict-risk-card { background: #1a0505; border: 1px solid #ef444455; border-radius: 8px; padding: 8px 11px; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #fca5a5; line-height: 1.45; }
+body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; color: var(--t2); }
+.sri { flex-shrink: 0; font-size: 15px; line-height: 1.35; }
 </style>
 </head>
 <body>
@@ -1965,22 +1982,26 @@ body.acc-locked { overflow:hidden; }
       </div>
 
 
-      <div class="field" id="strictRiskField">
-        <div class="field-label">🎯 Ostrý test: realistická rizika</div>
-        <div class="secure-mode-box" style="border-left:3px solid var(--err)">
-          <strong>Přísný režim chrání hlavně proti opuštění testu na stejném zařízení.</strong> Neumí spolehlivě poznat druhý mobil, chytré hodinky, papírový tahák ani komunikaci mimo test. Pro ostrý test doporučujeme dohled a telefony mimo lavici.
+      <div class="field hidden" id="strictRiskField">
+        <div class="strict-risk-panel">
+          <div class="strict-risk-header">
+            <span class="strict-risk-icon">⚠️</span>
+            <span class="strict-risk-title">Realistická rizika přísného testu</span>
+          </div>
+          <div class="strict-risk-body">
+            <strong>Přísný režim chrání hlavně proti opuštění testu na tomto zařízení.</strong> Druhý mobil, hodinky ani papírový tahák neodhalí — to je na dozoru.
+          </div>
+          <div class="strict-risk-sublabel">Před testem zkontroluj</div>
+          <div class="strict-risk-grid">
+            <div class="strict-risk-card"><span class="sri">📵</span><span>Telefony mimo lavici nebo školní zařízení pod dohledem</span></div>
+            <div class="strict-risk-card"><span class="sri">🔒</span><span>Teacher verifier u sebe — nikdy na GitHub</span></div>
+            <div class="strict-risk-card"><span class="sri">🔗</span><span>Studentům jen odkaz na GitHub Pages</span></div>
+            <div class="strict-risk-card"><span class="sri">💾</span><span>Bezpečný offline režim</span></div>
+            <div class="strict-risk-card"><span class="sri">🪪</span><span>Kódy nebo jasná identita studentů</span></div>
+            <div class="strict-risk-card"><span class="sri">⏱️</span><span>Odkaz rozeslat těsně před testem</span></div>
+            <div class="strict-risk-card"><span class="sri">🔀</span><span>Pro každou skupinu jiná varianta</span></div>
+          </div>
         </div>
-        <div class="small-muted" style="margin-top:8px;font-weight:700">Checklist před ostrým testem:</div>
-        <ul style="list-style:none;padding-left:0;margin:6px 0 0;font-size:13px;color:var(--t3);line-height:1.7">
-          <li>✓ telefony mimo lavici, pod dohledem nebo školní zařízení</li>
-          <li>✓ teacher verifier držet u sebe — nikdy na GitHub</li>
-          <li>✓ studentům posílat jen odkaz na GitHub Pages</li>
-          <li>✓ bezpečný offline režim</li>
-          <li>✓ přísný režim (zámek)</li>
-          <li>✓ kódy nebo jasná identita studentů</li>
-          <li>✓ odkaz rozeslat až těsně před testem</li>
-          <li>✓ pro každou skupinu jiná varianta testu</li>
-        </ul>
       </div>
 
       <div class="field">
@@ -2551,20 +2572,20 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.31',
+  version: '6.11.35',
   date:    '2026-06-11',
   status:  'approved-for-school-use',
   changes: [
+    'REALISTICKÁ RIZIKA (6.11.35): výrazné tmavě červené pozadí panelu (#2d0a0a dark / #fef2f2 light), světlý text na kartičkách v dark módu (#1a0505 bg, #fca5a5 text). Ověřeno node --check.',
+    'REALISTICKÁ RIZIKA (6.11.34): panel redesignován – výrazné červené pozadí/border přes --err generátoru (#ef444412 dark / #c41e1e0e light), karty s ikonami v gridu, bílý text na dark pozadí karet. Ověřeno node --check.',
+    'REALISTICKÁ RIZIKA (6.11.33): panel schovaný mimo přísný režim; redesign checklistu na grid karet s ikonou + textem, CSS proměnné --bg2/--bdr/--t2 pro kompatibilitu denní i noční téma. Ověřeno node --check.',
+    'REALISTICKÁ RIZIKA (6.11.32): panel se zobrazuje jen při volbě přísný test (jinak skrytý); redesign checklistu — karty s emoji místo holého seznamu. Ověřeno node --check.',
     'OPRAVA VLAJKY MODULU ČJ (6.11.31): místo emoji 🇨🇿 (na Windows renderováno jako text CZ) se v titulcích listů 1/3, 2/3, 3/3, záhlaví entry modalu a záložce changelogu používá CSS třída flag-cz — stejná SVG vlajka jako u tlačítka výběru jazyka. Ověřeno node --check.',
     'JEDNOTNÝ ESCAPE PRO MODALY (6.11.28): nový globální keydown listener na document zavírá klávesou Escape nejvrchnější otevřený informační modal (changelog, oba průvodci, strict situace, API key návod, Test Lab, detail presetu, admin panel). Dříve Escape fungoval jen s fokusem uvnitř modalu. Whitelist záměrně NEobsahuje povinné brány (aktivace, onboarding), uiModal (čeká na promise) a welcome okno (design vyžaduje tlačítko). Řeší i modal nad modalem (poslední v DOM = nahoře). Ověřeno node --check.',
     'OČISTA MRTVÉHO KÓDU (6.11.28): odstraněno 21 nereferencovaných funkcí (~153 řádků) nalezených auditem — pozůstatky starších refaktorů z obou vývojových větví: editor (addRow/getRows/removeRow, getEffectiveWorkPreset, isPracticePreset, presetModeActionHtml, applyWorkPreset, showOnboardingGate — nahrazen showFirstRunFlow, testLabRunCurrentOutput, csHasText), šablony generovaných testů (activateJoker, useJoker, selectMC, updateOpen, updateErr, variantByGroupKey, sha256Client, recommendedBrowser, exTypeLabel, optionLabel — zmenšuje i generované soubory), modul ČJ (csGoalCards). Ověřeno: žádní noví sirotci, kaskádové závislosti (shortHashClient, applyRecommendedModeForCurrentPreset) zůstávají živé. Ověřeno node --check.',
     'OPRAVA TEST LABU (6.11.27): openTestLab() věšel listener na tlačítko testLabDownloadE2E, které v HTML modalu neexistovalo → TypeError při každém otevření Test Labu a mrtvé tlačítko „Vyčistit výstup" (jeho listener se už nenavěsil). Chyba byla předexistující v obou vývojových větvích, audit ji odhalil. Oprava: doplněno tlačítko „⬇ Stáhnout E2E starter" do řady akcí (funkce downloadE2EStarter a celý Playwright export existovaly, jen byly nedosažitelné) + listener nově guardovaný. Ověřeno node --check.',
     'SAMOSTATNÝ CHANGELOG MODULU ČJ (6.11.26): changelog modal (tlačítko „co je nového") má nově přepínač Generátor / 🇨🇿 Modul ČJ. Modul má vlastní data RELEASE_CS (nezávislé verzování V16…, vlastní hero v české barevnosti). Přepnutí překresluje obsah bez zavření okna; Escape i klik mimo zavírá jako dřív. Ověřeno node --check.',
     'SLOUČENÍ MODULU ČESKÝ JAZYK (6.11.25): do bezpečnostní větve (6.11.24) naroubován samostatný modul Český jazyk (3krokový průvodce učivo/úloha/hodnocení, cs* funkce, openModule, csEnsureItemFeedback, strukturovaná zpětná vazba csFeedback). Integrační háčky: csScoringPolicy + csFeedbackPolicy + isCzech protaženy cfg → studentský CFG → verifier CONFIG i do hashe; normForScore/textScore/indexNorm respektují českou přesnost (diakritika/interpunkce/velká písmena), pro češtinu se vypíná fuzzy i CEFR. Zachovány VŠECHNY funkce cizích jazyků a celé zabezpečení 6.11.19–24 (roster jednorázových kódů, identityMode, code v payloadu, displayStudent, varianta pro skupinu, detail paste eventů, kontroly rosteru). Ověřeno node --check obou skriptových bloků.',
-    'KONTROLY ROSTERU VE VERIFIERU (6.11.24, krok 7/7): verifier u režimu jednorázového kódu používá zapečený CONFIG.roster. scorePayload nese do záznamu i code. Nový tvrdý signál „kód není v seznamu (roster)" u odevzdání s kódem mimo roster (pedagogický jazyk, ne obvinění). Kód → označení studenta se zobrazuje v hlavní tabulce, v panelu signálů, ve výběru studenta i v hlavičce zpětné vazby (label + kód; u neznámého „kód … — není v seznamu"). Opakovaný kód řeší stávající detekce duplicit (jméno/kód). Ověřeno node --check.',
-    'ROSTER JEDNORÁZOVÝCH KÓDŮ (6.11.23, krok 6/7): v nastavení přibyla sekce „🔑 Kódy studentů (roster)" — vlepíš e-maily skupiny (formát prijmeni@domena), tlačítko vygeneruje každému jedinečný 6znakový kód (crypto, bez záměnných znaků 0/O/1/I/L), zobrazí tabulku označení/kód/e-mail a umí stáhnout CSV (email,student,code) pro hromadnou korespondenci. Při vygenerování testu v režimu jednorázového kódu se roster (jen kód → označení, BEZ e-mailů) zapeče do teacher verifieru (CONFIG.roster); do studentského testu se nedostane. Kontroly proti rosteru přijdou v kroku 7. Ověřeno node --check.',
-    'REŽIM IDENTITY STUDENTA (6.11.22, krok 5/7): v nastavení přibyl výběr „🪪 Identita studenta" — jméno / jednorázový kód (identityMode). U jednorázového kódu student při startu zadá místo jména kód (popisek i placeholder se přizpůsobí). Kód se ukládá do šifrovaného payloadu (pole code + identityMode) vedle stávajícího student; identityMode protažen do studentského CFG i do teacher verifieru. Roster a kontroly přijdou v krocích 6 a 7. Ověřeno node --check.',
-    'NOVÁ VARIANTA PRO DALŠÍ SKUPINU (6.11.21): v sekci stažení přibylo tlačítko „🔀 Nová varianta pro další skupinu" (makeVariantForNextGroup). Přesestaví test z týchž dat (assembleTestHtml + lastGenData) — stejná látka i body, ale nové Test ID, zapnutá randomizace (jiné pořadí) a nový název souboru (outputSlug doplní skupina-b/c…). Bez nového volání AI. Po přesestavení se vyžádá nový self-test. Poznámka připomíná posílat správné odpovědi až po všech skupinách. Ověřeno node --check.',
   ]
 });;;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -2585,9 +2606,11 @@ const RELEASE_LABEL = RELEASE.version+' · '+RELEASE.date+' · '+BUILD_HASH;
 // „Modul ČJ" vedle hlavního changelogu generátoru.
 const RELEASE_CS = Object.freeze({
   module:  'Modul Český jazyk',
-  version: 'V16',
+  version: 'V18',
   date:    '2026-06-11',
   changes: [
+    'SKRYTÍ NASTAVENÍ CVIČENÍ V CS REŽIMU (V18): tlačítko Nastavit cvičení podrobně a celá sekce s typy cvičení jsou v CS režimu skryté — typy i počet určuje modul ČJ, ruční zásah nedává smysl. Ověřeno node --check.',
+    'DUPLIKÁT ODSTRANĚN ZE SKLADBY (V17): jev \'základní skladební dvojice\' odstraněn ze seznamu jevů kategorie Skladba — didakticky totožný s \'podmět a přísudek\', AI generovala překrývající se úlohy. Ověřeno node --check.',
     'SLOUČENÍ DO GENERÁTORU (V16): modul naroubován do bezpečnostní větve generátoru (v6.11.25). Integrační háčky protaženy přes cfg → studentský CFG → verifier CONFIG i do hashe (csScoringPolicy, csFeedbackPolicy, isCzech). Vše české je zahrazené na jazyk=čeština; cizí jazyky (EN/ES/FR/LA) běží beze změny. Ověřeno node --check.',
     'STRUKTUROVANÁ ZPĚTNÁ VAZBA (V16): objekt csFeedback (jev, pravidlo, proč správně/špatně, co zopakovat, typ chyby) se generuje u českých položek, zobrazuje studentovi v učícím režimu, učiteli v náhledu i ve verifieru a propisuje se do exportů feedbacku.',
     'ČESKÉ HODNOCENÍ ODPOVĚDÍ (V16): normForScore respektuje zvolenou přesnost — diakritika, interpunkce a velká písmena se hodnotí podle zadání. U češtiny se vypíná fuzzy tolerance překlepů (pravopis musí sedět přesně).',
@@ -4358,6 +4381,8 @@ function applyVisualState() {
   if (secureResultBtn) {
     secureResultBtn.title = state.testMode === 'prisny' ? 'V přísném testu je bezpečný offline verifier povinný.' : '';
   }
+  const strictRiskField = $('strictRiskField');
+  if (strictRiskField) strictRiskField.classList.toggle('hidden', state.testMode !== 'prisny');
   if (state.diferencovany === 'ANO') renderGroups();
   renderTeacherMapping();
   renderSourceMeters();
@@ -5875,14 +5900,21 @@ function renderExerciseConfig() {
   // Normalizace: catBoard má vždy 1 položku — opravíme i uložený stav, ne jen displej.
   state.exerciseConfig.forEach(function(ex){ if(normalizeType(ex.typ||'')==='categorisation-board' && ex.pocetOtazek!==1) ex.pocetOtazek=1; });
   const rowsHtml = state.exerciseConfig.map((ex, i) => {
-    const opts = getExerciseTypeOptions().map(t =>
-      `<option value="${esc(t)}" ${ex.typ === t ? 'selected' : ''}>${esc(t)}</option>`
-    ).join('');
+    const isCsRow = !!ex.csLabel;
+    let typCell;
+    if (isCsRow) {
+      typCell = `<div class="ex-cs-label" title="${esc(ex.csLabel)}">${esc(ex.csLabel)}</div>`;
+    } else {
+      const opts = getExerciseTypeOptions().map(t =>
+        `<option value="${esc(t)}" ${ex.typ === t ? 'selected' : ''}>${esc(t)}</option>`
+      ).join('');
+      typCell = `<select onchange="updateExField(${i},'typ',this.value)">${opts}</select>`;
+    }
     const bpp = ex.body > 0 && ex.pocetOtazek > 0
       ? (ex.body / ex.pocetOtazek).toFixed(1) : '—';
     return `<div class="ex-row">
       <div class="ex-num">${i + 1}</div>
-      <select onchange="updateExField(${i},'typ',this.value)">${opts}</select>
+      ${typCell}
       ${normalizeType(ex.typ||'')=='categorisation-board'
         ? '<div class="ex-catlock" title="Categorisation-board: vždy 1 tabule. Počet slov/vět (6–10) generuje model automaticky.">1 🔒</div>'
         : '<input type="number" min="1" max="30" value="'+ex.pocetOtazek+'" oninput="updateExField('+i+',\'pocetOtazek\',this.value)">'}
@@ -15615,7 +15647,7 @@ document.addEventListener('keydown', function(e){
   const CS_DOMAINS = {
     pravopis:{label:'Pravopis', icon:'✍️', hint:'i/y, s/z/vz, mě/mně, bě/pě/vě, velká písmena, shoda', phenomena:['i/y po obojetných souhláskách','koncovky podstatných a přídavných jmen','shoda přísudku s podmětem','s/z/vz','mě/mně','bě/pě/vě/mě','velká písmena','pravopis přejatých slov','kombinovaný pravopis']},
     tvaroslovi:{label:'Tvarosloví', icon:'🧩', hint:'slovní druhy, pády, vzory, mluvnické kategorie, tvary slov', phenomena:['slovní druhy','pády','vzory podstatných jmen','mluvnické kategorie jmen','mluvnické kategorie sloves','stupňování přídavných jmen a příslovcí','zájmena a číslovky','správné tvary slov']},
-    skladba:{label:'Skladba', icon:'🏗️', hint:'větné členy, druhy vět vedlejších, souvětí, interpunkce', phenomena:['podmět a přísudek','větné členy','základní skladební dvojice','druhy vedlejších vět','poměry mezi větami hlavními','souvětí souřadné a podřadné','interpunkce v souvětí','přístavek, oslovení, vsuvka']},
+    skladba:{label:'Skladba', icon:'🏗️', hint:'větné členy, druhy vět vedlejších, souvětí, interpunkce', phenomena:['podmět a přísudek','větné členy','druhy vedlejších vět','poměry mezi větami hlavními','souvětí souřadné a podřadné','interpunkce v souvětí','přístavek, oslovení, vsuvka']},
     text:{label:'Práce s textem', icon:'📖', hint:'porozumění, hlavní myšlenka, informace, význam slov v kontextu', phenomena:['hlavní myšlenka textu','vyhledání informace','pravda/nepravda podle textu','význam slova v kontextu','vhodný nadpis','seřazení informací','autorův záměr','jazykové prostředky v textu']},
     slovni_zasoba:{label:'Slovní zásoba a význam slov', icon:'🗣️', hint:'synonyma, antonyma, mnohoznačnost, odborné výrazy, frazémy', phenomena:['synonyma','antonyma','slova mnohoznačná','význam slova v kontextu','odborné výrazy a termíny','frazémy a ustálená slovní spojení','slova citově zabarvená','slova nadřazená, podřazená a souřadná','archaismy, historismy, neologismy','slovní zásoba v publicistickém nebo odborném textu']},
     stylistika:{label:'Stylistika', icon:'🎭', hint:'vhodnost vyjádření, stylové vrstvy, úprava formulace', phenomena:['formální a neformální styl','vhodnost formulace','nahrazení hovorového výrazu','úprava nevhodné věty','komunikační záměr','slohové útvary jako uzavřené rozpoznávání','koherence a návaznost textu']},
@@ -15984,6 +16016,11 @@ document.addEventListener('keydown', function(e){
     csSetHidden(latkaField, active);
     csSetHidden(countField, active && page !== 1);
     csSetHidden(sourceField, active && page !== 1);
+    const btnExDetail = document.getElementById('btnExDetail');
+    const exConfigList = document.getElementById('exConfigList');
+    const exTotals = document.getElementById('exTotals');
+    csSetHidden(btnExDetail, active);
+    if (active) { csSetHidden(exConfigList, true); csSetHidden(exTotals, true); }
     csSetHidden(listeningField, active);
     csSetHidden(readingField, active);
     const step1Back = document.querySelector('#step1 .nav .btn-back');
