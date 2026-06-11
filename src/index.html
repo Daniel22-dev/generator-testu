@@ -2613,10 +2613,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.38',
+  version: '6.11.40',
   date:    '2026-06-11',
   status:  'approved-for-school-use',
   changes: [
+    'DROBNÁ JAZYKOVÁ ÚPRAVA (6.11.40): v záložce 🔒 nahrazeno uměle zvýšit slovem vylepšit (známku nelze vylepšit). Bez změny obsahu a barev. Ověřeno node --check.',
+    'JAZYKOVÉ OPRAVY ZÁLOŽKY PŘÍSNÉHO REŽIMU (6.11.39): vyčištěny hovorové a kostrbaté tvary v textu záložky 🔒: zdrojáku → zdrojového kódu; několik dalších úprav (několik formulací přepsáno do spisovné češtiny, odstraněn slang a anglicismy: nafouknout/vlepíš/zapékají/token/blur/tvrdé brány). Bez změny obsahu a barev. Ověřeno node --check.',
     'ZPŘESNĚNÍ SITUACÍ V PŘÍSNÉM REŽIMU (6.11.38): dva řádky tabulky upraveny podle skutečného chování. (1) „Obejití zámku“ → nyní jasně, že zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde — submittedLocked() to potvrzuje hláškou použij jiné zařízení/prohlížeč. (2) Řádek o posunu času/pauze timeru (vyžadoval konzoli, kterou výchozí předpoklad bez přístupu k HTML vylučuje) nahrazen reálně dostupnou variantou protahuje čas prací mimo okno — klientský timer (startTimer/timerVal) běží jen v aktivní kartě. Ověřeno node --check.',
     'SITUACE V PŘÍSNÉM REŽIMU + JEDNORÁZOVÉ KÓDY (6.11.37): záložka aktualizována o režim jednorázových kódů. (1) Úvod nyní pojmenovává výchozí předpoklad — student dostane jen odkaz, k HTML se nedostane. (2) Nová sekce Jak fungují jednorázové kódy (3 karty: kódy jen ve verifieru ne ve studentském testu / pokaždé nové / kód váže záznam, ne osobu). (3) Tabulka situací rozšířena: zelená pokrývá signál kód není v seznamu (rosterHasCode) a nemožnost vyčíst cizí kódy z testu; oranžová duplicitní pokus (duplicateInfo); červená nově výměna kódů mezi studenty. Ověřeno node --check.',
     'OPRAVY MODULŮ (6.11.36): (1) oba modaly presetu (potvrzení „Použít preset?" i detail šablony) zvětšeny ~2× — větší šířka, písmo, ikona i mřížka detailů, vlastní mobilní breakpoint. (2) Opravena chyba, kdy po přepnutí z modulu Český jazyk do cizího jazyka zůstávaly v podrobném nastavení cvičení dva české typy (Vyber pravopisně správnou variantu, Doplň přesný pravopisný tvar): záloha/obnova generického stavu nově pokrývá exerciseConfig/exerciseDetail/pocet/body/cas + pojistka csStripCzechExerciseRows při odchodu z ČJ i při startu (čistí i staré uložené snapshoty). Ověřeno node --check.',
@@ -2625,8 +2627,6 @@ const RELEASE = Object.freeze({
     'REALISTICKÁ RIZIKA (6.11.33): panel schovaný mimo přísný režim; redesign checklistu na grid karet s ikonou + textem, CSS proměnné --bg2/--bdr/--t2 pro kompatibilitu denní i noční téma. Ověřeno node --check.',
     'REALISTICKÁ RIZIKA (6.11.32): panel se zobrazuje jen při volbě přísný test (jinak skrytý); redesign checklistu — karty s emoji místo holého seznamu. Ověřeno node --check.',
     'OPRAVA VLAJKY MODULU ČJ (6.11.31): místo emoji 🇨🇿 (na Windows renderováno jako text CZ) se v titulcích listů 1/3, 2/3, 3/3, záhlaví entry modalu a záložce changelogu používá CSS třída flag-cz — stejná SVG vlajka jako u tlačítka výběru jazyka. Ověřeno node --check.',
-    'JEDNOTNÝ ESCAPE PRO MODALY (6.11.28): nový globální keydown listener na document zavírá klávesou Escape nejvrchnější otevřený informační modal (changelog, oba průvodci, strict situace, API key návod, Test Lab, detail presetu, admin panel). Dříve Escape fungoval jen s fokusem uvnitř modalu. Whitelist záměrně NEobsahuje povinné brány (aktivace, onboarding), uiModal (čeká na promise) a welcome okno (design vyžaduje tlačítko). Řeší i modal nad modalem (poslední v DOM = nahoře). Ověřeno node --check.',
-    'OČISTA MRTVÉHO KÓDU (6.11.28): odstraněno 21 nereferencovaných funkcí (~153 řádků) nalezených auditem — pozůstatky starších refaktorů z obou vývojových větví: editor (addRow/getRows/removeRow, getEffectiveWorkPreset, isPracticePreset, presetModeActionHtml, applyWorkPreset, showOnboardingGate — nahrazen showFirstRunFlow, testLabRunCurrentOutput, csHasText), šablony generovaných testů (activateJoker, useJoker, selectMC, updateOpen, updateErr, variantByGroupKey, sha256Client, recommendedBrowser, exTypeLabel, optionLabel — zmenšuje i generované soubory), modul ČJ (csGoalCards). Ověřeno: žádní noví sirotci, kaskádové závislosti (shortHashClient, applyRecommendedModeForCurrentPreset) zůstávají živé. Ověřeno node --check.',
   ]
 });;;;;;;;;;;;;;;;;;;;;;
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -14139,18 +14139,18 @@ function showStrictSituations(){
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🎯</span> Co přísný režim umí a co ne</div>' +
-        '<p class="sec-guide-p">Vycházíme z toho, že student dostane jen webový odkaz na test a k samotnému HTML souboru se nedostane. Tím odpadá čtení správných odpovědí ze zdrojáku i přepisování výsledku v prohlížeči. Přísný režim pak podvádění výrazně ztěžuje a spolehlivě chrání známku i klíč. Není to ale dozor a není 100% neprůstřelný — počítej s tím, na co se dá spolehnout, a zbytek pohlídej v učebně.</p>' +
-        '<div class="sec-guide-ok"><strong>Spolehni se:</strong> studentský test neobsahuje správné odpovědi ani klíč a známku nelze nafouknout — verifier ji počítá znovu z odevzdaných odpovědí, ne z toho, co student tvrdí. U ostrého testu navíc nedrží jména: student zadá jen jednorázový kód a dvojici kód → student zná pouze učitelský verifier.</div>' +
-        '<div class="sec-guide-warn"><strong>Pomáhá, ale ne na 100 %:</strong> jednorázové kódy, promíchání otázek, zámek po opuštění testu a bezpečnostní signály (opuštění okna, krátký čas, duplicitní pokus, kód mimo seznam). Jsou to překážky a vodítka pro tvou kontrolu, ne tvrdé brány a ne důkazy.</div>' +
+        '<p class="sec-guide-p">Vycházíme z toho, že student dostane jen webový odkaz na test a k samotnému HTML souboru se nedostane. Tím odpadá čtení správných odpovědí ze zdrojového kódu i přepisování výsledku v prohlížeči. Přísný režim pak podvádění výrazně ztěžuje a spolehlivě chrání známku i klíč. Není to ale dozor a není 100% neprůstřelný — počítej s tím, na co se dá spolehnout, a zbytek pohlídej v učebně.</p>' +
+        '<div class="sec-guide-ok"><strong>Spolehni se:</strong> studentský test neobsahuje správné odpovědi ani klíč a známku nelze vylepšit — verifier ji počítá znovu z odevzdaných odpovědí, ne z toho, co student tvrdí. U ostrého testu navíc nedrží jména: student zadává jen jednorázový kód a to, kterému studentovi kód patří, ví pouze učitelský verifier.</div>' +
+        '<div class="sec-guide-warn"><strong>Pomáhá, ale ne na 100 %:</strong> jednorázové kódy, promíchání otázek, zámek po opuštění testu a bezpečnostní signály (opuštění okna, krátký čas, duplicitní pokus, kód mimo seznam). Jsou to překážky a vodítka pro tvou kontrolu, ne neprůstřelné zábrany a ne důkazy.</div>' +
         '<div style="background:transparent;border:1px solid var(--err);border-radius:7px;padding:6px 10px;font-size:12.5px;color:var(--err);line-height:1.5;margin-bottom:6px"><strong>Tohle nezařídí soubor:</strong> telefon, papír, druhé zařízení, soused, sdílení kódu mezi studenty, kdo test reálně píše a kdy se odkaz dostane ke studentům. To řeší jedině dozor a organizace.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Jak fungují jednorázové kódy</div>' +
-        '<p class="sec-guide-p">Pro ostrý test zvol režim <strong>Jednorázový kód</strong>: vlepíš e-maily skupiny, vygeneruješ kódy a pak test. Co je důležité vědět:</p>' +
-        '<div class="sec-guide-ok"><strong>Do studentského testu se kódy nezapékají.</strong> Student vidí jen políčko „zadej svůj kód“ — žádný seznam, takže z testu cizí kódy nevyčte. Dvojici kód → student a e-maily zná jen učitel (verifier + stažené CSV).</div>' +
+        '<p class="sec-guide-p">Pro ostrý test zvol režim <strong>Jednorázový kód</strong>: vložíš e-maily skupiny, vygeneruješ kódy a pak test. Co je důležité vědět:</p>' +
+        '<div class="sec-guide-ok"><strong>Do studentského testu se kódy nevkládají.</strong> Student vidí jen políčko „zadej svůj kód“ — žádný seznam, takže z testu cizí kódy nevyčte. To, kterému studentovi kód patří, i e-maily zná jen učitel (verifier + stažené CSV).</div>' +
         '<div class="sec-guide-ok"><strong>Kódy jsou pokaždé nové.</strong> Generují se náhodně pro každý test (co student, to jiný kód), nejsou to stálé celoroční kódy. Když roster změníš, vygeneruj test znovu.</div>' +
-        '<div class="sec-guide-warn"><strong>Kód váže záznam, ne osobu.</strong> Kód je jen jednorázový token. Pokud si dva studenti kódy vymění, verifier to sám nepozná — proto fyzicky ověř, že kód u zařízení sedí na přítomného studenta.</div>' +
+        '<div class="sec-guide-warn"><strong>Kód váže záznam, ne osobu.</strong> Kód označuje odevzdaný test, ne konkrétního studenta. Pokud si dva studenti kódy vymění, verifier to sám nepozná — proto fyzicky ověř, že kód u zařízení sedí na přítomného studenta.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
@@ -14167,10 +14167,10 @@ function showStrictSituations(){
             row(pOk, 'Spolehlivé', 'Z testu zjistit cizí kódy spolužáků', 'Nejde — kódy jsou jen ve verifieru, ne ve studentském souboru. Student vidí jen své prázdné políčko.') +
             row(pMid, 'Pomáhá', 'Student test otevře a odevzdá vícekrát', 'Verifier označí duplicitní kód i duplicitní ID pokusu oranžově. Rozhodnutí, který pokus platí, je na tobě.') +
             row(pMid, 'Pomáhá', 'Opisování od souseda', 'Zapni promíchání otázek. Pro ostrý test ideálně pro každou skupinu jiné zadání.') +
-            row(pMid, 'Pomáhá', 'Student přepne okno nebo aplikaci během testu', 'Test se zamkne, signál uvidíš ve verifieru. Ber jako vodítko, ne důkaz — na mobilu spustí blur i notifikace.') +
-            row(pMid, 'Pomáhá', 'Obejití zámku jiným prohlížečem nebo anonymním oknem', 'Zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde. Je to odrazení a záznam, ne tvrdá brána — v učebně hlídej, kdo začíná test znovu.') +
+            row(pMid, 'Pomáhá', 'Student přepne okno nebo aplikaci během testu', 'Test se zamkne, signál uvidíš ve verifieru. Ber to jako vodítko, ne důkaz — na mobilu ho vyvolá i běžné oznámení nebo příchozí hovor.') +
+            row(pMid, 'Pomáhá', 'Obejití zámku jiným prohlížečem nebo anonymním oknem', 'Zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde. Je to odrazení a záznam, ne nepřekonatelná překážka — v učebně hlídej, kdo začíná test znovu.') +
             row(pNo, 'Neřeší', 'Dva studenti si vymění kódy', 'Verifier vidí kód v seznamu a použitý jednou — záměnu sám nepozná. Ověř u zařízení, že kód sedí na přítomného studenta.') +
-            row(pNo, 'Neřeší', 'Test píše za studenta někdo jiný', 'Kód ani odkaz osobu neváží. Totožnost musí ověřit dozor.') +
+            row(pNo, 'Neřeší', 'Test píše za studenta někdo jiný', 'Kód ani odkaz neověří, kdo u zařízení skutečně sedí. Totožnost musí potvrdit dozor.') +
             row(pNo, 'Neřeší', 'Telefon, tahák, druhé zařízení, šeptání', 'Fyzický dozor. Software druhé zařízení ani odposlech nevidí.') +
             row(pNo, 'Neřeší', 'Přečtení otázek z odkazu předem', 'Odkaz pošli nebo zveřejni až na začátku testu. Stejné zadání nedávej opakovaně víc skupinám.') +
             row(pNo, 'Neřeší', 'Student si obsah testu zapamatuje na příště', 'Co student jednou viděl, může předat dál. Pro další skupinu vytvoř variantu nebo nový test.') +
