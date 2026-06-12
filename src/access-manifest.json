@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "policyVersion": 1,
-  "issuedAt": "2026-06-08",
+  "issuedAt": "2026-06-12",
   "entries": [
     {
       "userId": "BALAZ",
@@ -13,6 +13,17 @@
       "issuedAt": "2026-05-30",
       "revokedAt": null,
       "note": "Správce aplikace"
+    },
+    {
+      "userId": "STILLEROVA",
+      "displayName": "Adéla Stillerová",
+      "role": "trainedTeacher",
+      "status": "active",
+      "accessCodeHash": "pbkdf2-v1$Bw7R1D5M2JivVTQukxOxN6O46MIGWyag4kXz2HLbUOM",
+      "salt": "UlKnrD8iWcmW2TStDdWu9g",
+      "issuedAt": "2026-06-12T07:09:30.060Z",
+      "revokedAt": null,
+      "note": ""
     }
   ]
 }
