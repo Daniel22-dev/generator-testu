@@ -2623,10 +2623,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.44',
+  version: '6.11.45',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'AUTOMATICKÝ FALLBACK PŘI 503 (6.11.45): callGeminiJSON — automatický přepad na záložní model (Lite) nově i při 503/UNAVAILABLE, ne jen při 429. Při přetížení primárního modelu se request místo druhého marného retry na stejný (zahlcený) model přesměruje JEDNOU na méně vytížený záložní model, který má vlastní per-model RPD kvótu — šetří denní limit primárního modelu a zvyšuje šanci na úspěch. Spouští se jen jednou (_fellBack), lze vypnout přes opts.noFallback, s viditelnou hláškou přes setGenMsg. Když i záložní model hlásí 503, _fellBack brání další rekurzi a spadne to do běžného capovaného retry. Ověřeno node --check.',
     'AUDIT LOGIKY NASTAVENÍ (6.11.44): (1) Šablony modulu ČJ nově procházejí enforceModeConstraints() — nemohla by tak vzniknout zakázaná kombinace procvičovací režim + bezpečný offline verifier; šablona navíc toastem shrne, co přepsala na kartách 1 a 3. (2) Čeština vynucuje pokročilý mód — applySimpleDefaults() už nepřepisuje exerciseConfig modulu ČJ (počty položek dle obtížnosti, rozdělení bodů se tak skutečně použijí v buildExerciseSpecs). (3) Identita „jednorázový kód\": pole rosteru se zobrazuje jen v tomto režimu, je advanced-only a validate() blokuje generování s prázdným rosterem (verifier by jinak tiše ztratil kontrolu kódů); v jednoduchém režimu se identita drží na „jméno\". (4) Varování o známkovaném testu s poloautomatickými položkami čte csDerivedGoal (skutečný režim) místo goal ze šablony. (5) Interpunkční checkbox je u interpunkčního jevu viditelně povinný (disabled) místo tichého snap-backu mimo UI. (6) Tlačítka počtu cvičení se v ČJ skrývají úplně (počet = vybrané typy úloh; klik dřív nic nedělal). (7) splitGenerate vynucený režimem semi/manual se po návratu na auto i po odchodu z ČJ vrací zpět. (8) Tichý přepad procvičovací→běžný při volbě secureOffline hlásí toast. (9) Export checklist má u ČJ semi/manual povinnou položku o schválení alternativ. (10) Úklid: artefakt ;;; za RELEASE, mrtvý zápis instrJazyk, inertní manualMode u ČJ cvičení. Ověřeno node --check + headless smoke testy.',
     'COMPREHENSION BLOKY — OPRAVA ZOBRAZENÍ + UPOZORNĚNÍ (6.11.43): (1) Mimo ČJ modul se bloky listening/reading comprehension už nezobrazují automaticky. csApplyVisualState() dříve volal csSetHidden(block, active) — při active=false (cizí jazyky) blok natvrdo odkryl bez ohledu na výběr typu. Nyní: active || !usesListening/ReadingComprehension(), takže se řídí skutečným výběrem. (2) Po zaškrtnutí comprehension typu se učitel upozorní, že blok vyžaduje doladění: v každém bloku je nově výrazná výzva (.comp-needs-setup) a toggleType() po novém výběru doroluje na blok + krátce ho zvýrazní (flashCompBlock). Ověřeno node --check.',
     'STABILNĚJŠÍ SELF-TEST BODOVÁNÍ (6.11.42): odstraněna příčina falešného selhání „Studentský test neexponuje encryptPayloadForTeacher“. stMakeHiddenFrame() dříve čekal na inicializaci emitovaného skriptu pevných 80 ms — na zaneprázdněném stroji (běžící AI volání apod.) skript nestihl vystavit funkce a kontrola selhala. Nyní aktivně čeká (polling po 25 ms až 4 s) na konkrétní funkce ve window předané přes readyCheck — verifier (scorePayload/decryptPayload/parseTxt/correctIndex), student (encryptPayloadForTeacher) i instant (calcScore…). V dobrém případě se vrací dříve, při reálné chybě selže se stejnou konkrétní hláškou. Celková pojistka 8 s. Ověřeno node --check.',
@@ -2636,7 +2637,6 @@ const RELEASE = Object.freeze({
     'ZPŘESNĚNÍ SITUACÍ V PŘÍSNÉM REŽIMU (6.11.38): dva řádky tabulky upraveny podle skutečného chování. (1) „Obejití zámku“ → nyní jasně, že zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde — submittedLocked() to potvrzuje hláškou použij jiné zařízení/prohlížeč. (2) Řádek o posunu času/pauze timeru (vyžadoval konzoli, kterou výchozí předpoklad bez přístupu k HTML vylučuje) nahrazen reálně dostupnou variantou protahuje čas prací mimo okno — klientský timer (startTimer/timerVal) běží jen v aktivní kartě. Ověřeno node --check.',
     'SITUACE V PŘÍSNÉM REŽIMU + JEDNORÁZOVÉ KÓDY (6.11.37): záložka aktualizována o režim jednorázových kódů. (1) Úvod nyní pojmenovává výchozí předpoklad — student dostane jen odkaz, k HTML se nedostane. (2) Nová sekce Jak fungují jednorázové kódy (3 karty: kódy jen ve verifieru ne ve studentském testu / pokaždé nové / kód váže záznam, ne osobu). (3) Tabulka situací rozšířena: zelená pokrývá signál kód není v seznamu (rosterHasCode) a nemožnost vyčíst cizí kódy z testu; oranžová duplicitní pokus (duplicateInfo); červená nově výměna kódů mezi studenty. Ověřeno node --check.',
     'OPRAVY MODULŮ (6.11.36): (1) oba modaly presetu (potvrzení „Použít preset?" i detail šablony) zvětšeny ~2× — větší šířka, písmo, ikona i mřížka detailů, vlastní mobilní breakpoint. (2) Opravena chyba, kdy po přepnutí z modulu Český jazyk do cizího jazyka zůstávaly v podrobném nastavení cvičení dva české typy (Vyber pravopisně správnou variantu, Doplň přesný pravopisný tvar): záloha/obnova generického stavu nově pokrývá exerciseConfig/exerciseDetail/pocet/body/cas + pojistka csStripCzechExerciseRows při odchodu z ČJ i při startu (čistí i staré uložené snapshoty). Ověřeno node --check.',
-    'REALISTICKÁ RIZIKA (6.11.35): výrazné tmavě červené pozadí panelu (#2d0a0a dark / #fef2f2 light), světlý text na kartičkách v dark módu (#1a0505 bg, #fca5a5 text). Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -7666,6 +7666,17 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
         }
         geminiStartCooldown(retryMs || GEMINI_QUOTA_DEFAULT_COOLDOWN_MS);
         throw lastErr;
+      }
+      // 503/UNAVAILABLE = přetížený sdílený pool primárního modelu. Než spálíme druhý
+      // request na stejný (zahlcený) model, zkus JEDNOU záložní model — sedí v jiném,
+      // typicky méně vytíženém segmentu a má vlastní per-model RPD kvótu.
+      const isOverload = res.status === 503 || /UNAVAILABLE/i.test(apiStatus);
+      if(isOverload && !(opts && opts.noFallback) && !(opts && opts._fellBack)){
+        const fb = pickGeminiFallbackModel(model);
+        if(fb){
+          try{ if(typeof setGenMsg === 'function') setGenMsg('Model „' + model + '" je přetížený (503). Zkouším záložní model „' + fb + '"…'); }catch(_){ }
+          return await callGeminiJSON(prompt, extraParts, Object.assign({}, opts, { modelOverride: fb, _fellBack: true }));
+        }
       }
       // 503 = Google overload: omezíme retry na 2 pokusy celkem, abychom nespálili denní kvótu prázdnými requesty.
       const maxForThisErr = (res && res.status === 503) ? GEMINI_MAX_ATTEMPTS_503 : maxAttempts;
