@@ -150,6 +150,12 @@ body.light .hybrid-fallback { color: #6b7280; border-color: #7c3aed33; }
 .field { margin-bottom: 18px; position: relative; }
 .field-label { font-size: 12.5px; font-weight: 700; color: var(--acc); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
 .field-hint { font-size: 13.5px; color: var(--t4); margin-bottom: 7px; }
+.comp-needs-setup { display:flex; gap:8px; align-items:flex-start; margin-bottom:10px; padding:9px 12px; border:1.5px solid var(--acc-b); border-radius:9px; background:var(--acc-d); color:var(--acc); font-size:13px; font-weight:700; line-height:1.45; }
+.comp-needs-setup .cns-ico { flex:0 0 auto; font-size:15px; line-height:1.3; }
+@keyframes compHighlight { 0%{ box-shadow:0 0 0 0 var(--acc-b); } 30%{ box-shadow:0 0 0 4px var(--acc-b); } 100%{ box-shadow:0 0 0 0 transparent; } }
+.comp-flash { animation: compHighlight 1.4s ease-out 2; border-radius:10px; }
+.type-needs-setup { position:relative; }
+.type-needs-setup::after { content:"⚠"; position:absolute; top:3px; right:5px; font-size:11px; color:var(--acc); }
 
 input[type=text], input[type=password], input[type=number], input[type=url], textarea {
   width: 100%; background: var(--bg3); border: 1.5px solid var(--bdr);
@@ -672,46 +678,48 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .preset-modal-warning { margin-top:10px; padding:10px 12px; border-radius:9px; border:1px solid var(--acc-b); background:var(--acc-d); color:var(--acc); font-size:13.5px; line-height:1.5; }
 .preset-modal-warning strong { color:var(--t1); }
 @media(max-width:480px){ .preset-modal-grid { grid-template-columns:1fr; gap:3px; } .preset-modal-icon { font-size:30px; } }
-/* ── 2× ZVĚTŠENÉ MODALY PRESETŮ (detail šablony) — čitelnější ─────────────── */
-.preset-modal-box { width:min(1040px,100%); }
-.preset-modal-box .ui-modal-head { font-size:24px; padding:22px 26px 13px; }
-.preset-modal-box .ui-modal-body { font-size:21px; line-height:1.6; padding:0 26px 20px; }
-.preset-modal-box .preset-modal-icon { font-size:58px; }
-.preset-modal-box .preset-modal-title { font-size:27px; margin-bottom:6px; }
-.preset-modal-box .preset-modal-sub { font-size:21px; line-height:1.5; }
-.preset-modal-box .preset-modal-grid { grid-template-columns:240px 1fr; gap:12px 20px; padding:18px 22px; margin:18px 0; }
-.preset-modal-box .preset-modal-grid .pm-label { font-size:20px; }
-.preset-modal-box .preset-modal-grid .pm-val { font-size:21px; line-height:1.5; }
-.preset-modal-box .preset-modal-why { font-size:21px; line-height:1.6; padding:16px 20px; margin-top:18px; }
-.preset-modal-box .preset-modal-why strong { font-size:21px; }
-.preset-modal-box .preset-modal-hint { font-size:19px; line-height:1.5; margin-top:18px; }
-.preset-modal-box .preset-modal-warning { font-size:21px; line-height:1.55; padding:16px 20px; margin-top:18px; }
-.preset-modal-box .ui-modal-actions { padding:18px 26px 24px; gap:12px; }
-.preset-modal-box .ui-modal-btn { font-size:20px; min-height:54px; padding:14px 22px; }
-@media(max-width:640px){
-  .preset-modal-box .ui-modal-head { font-size:20px; padding:18px 18px 10px; }
-  .preset-modal-box .ui-modal-body { font-size:17px; padding:0 18px 16px; }
-  .preset-modal-box .preset-modal-icon { font-size:46px; }
-  .preset-modal-box .preset-modal-title { font-size:21px; }
-  .preset-modal-box .preset-modal-sub { font-size:17px; }
-  .preset-modal-box .preset-modal-grid { grid-template-columns:1fr; gap:5px; padding:14px 16px; }
-  .preset-modal-box .preset-modal-grid .pm-label { font-size:16px; }
-  .preset-modal-box .preset-modal-grid .pm-val { font-size:17px; }
+/* ── ZVĚTŠENÉ MODALY PRESETŮ (detail šablony) — čitelné, bez přetékání ────── */
+.preset-modal-box { width:min(680px,100%); }
+.preset-modal-box .ui-modal-head { font-size:17px; padding:16px 20px 9px; }
+.preset-modal-box .ui-modal-body { font-size:14.5px; line-height:1.55; padding:0 20px 16px; }
+.preset-modal-box .preset-modal-icon { font-size:38px; }
+.preset-modal-box .preset-modal-title { font-size:18.5px; margin-bottom:4px; }
+.preset-modal-box .preset-modal-sub { font-size:14px; line-height:1.5; }
+.preset-modal-box .preset-modal-grid { grid-template-columns:160px minmax(0,1fr); gap:8px 16px; padding:14px 16px; margin:14px 0; }
+.preset-modal-box .preset-modal-grid .pm-label { font-size:13.5px; }
+.preset-modal-box .preset-modal-grid .pm-val { font-size:14px; line-height:1.5; min-width:0; overflow-wrap:anywhere; }
+.preset-modal-box .preset-modal-why { font-size:14px; line-height:1.55; padding:12px 15px; margin-top:14px; }
+.preset-modal-box .preset-modal-why strong { font-size:14px; }
+.preset-modal-box .preset-modal-hint { font-size:13px; line-height:1.5; margin-top:14px; }
+.preset-modal-box .preset-modal-warning { font-size:14px; line-height:1.5; padding:12px 15px; margin-top:14px; }
+.preset-modal-box .ui-modal-actions { padding:14px 20px 18px; gap:10px; }
+.preset-modal-box .ui-modal-btn { font-size:14.5px; min-height:44px; padding:11px 18px; }
+@media(max-width:560px){
+  .preset-modal-box { width:min(460px,100%); }
+  .preset-modal-box .ui-modal-head { font-size:16px; padding:14px 15px 8px; }
+  .preset-modal-box .ui-modal-body { font-size:13.5px; padding:0 15px 14px; }
+  .preset-modal-box .preset-modal-icon { font-size:32px; }
+  .preset-modal-box .preset-modal-title { font-size:16.5px; }
+  .preset-modal-box .preset-modal-sub { font-size:13.5px; }
+  .preset-modal-box .preset-modal-grid { grid-template-columns:1fr; gap:4px; padding:12px 14px; }
+  .preset-modal-box .preset-modal-grid .pm-label { font-size:13px; }
+  .preset-modal-box .preset-modal-grid .pm-val { font-size:13.5px; }
   .preset-modal-box .preset-modal-why,
-  .preset-modal-box .preset-modal-warning { font-size:17px; padding:13px 15px; }
-  .preset-modal-box .preset-modal-hint { font-size:15.5px; }
-  .preset-modal-box .ui-modal-btn { font-size:17px; min-height:48px; padding:12px 16px; }
+  .preset-modal-box .preset-modal-warning { font-size:13.5px; padding:11px 13px; }
+  .preset-modal-box .preset-modal-hint { font-size:12.5px; }
+  .preset-modal-box .ui-modal-btn { font-size:13.5px; min-height:42px; padding:10px 14px; }
 }
-/* ── 2× ZVĚTŠENÉ PRVNÍ OKNO PRESETU („Použít preset?") ───────────────────── */
-.preset-confirm-box { width:min(820px,100%); }
-.preset-confirm-box .ui-modal-head { font-size:24px; padding:22px 26px 12px; }
-.preset-confirm-box .ui-modal-body { font-size:21px; line-height:1.6; padding:0 26px 18px; }
-.preset-confirm-box .ui-modal-actions { padding:18px 26px 24px; gap:12px; }
-.preset-confirm-box .ui-modal-btn { font-size:20px; min-height:54px; padding:14px 22px; }
-@media(max-width:640px){
-  .preset-confirm-box .ui-modal-head { font-size:20px; padding:18px 18px 10px; }
-  .preset-confirm-box .ui-modal-body { font-size:17px; padding:0 18px 14px; }
-  .preset-confirm-box .ui-modal-btn { font-size:17px; min-height:48px; padding:12px 16px; }
+/* ── ZVĚTŠENÉ PRVNÍ OKNO PRESETU („Použít preset?") ─────────────────────── */
+.preset-confirm-box { width:min(560px,100%); }
+.preset-confirm-box .ui-modal-head { font-size:17px; padding:16px 20px 9px; }
+.preset-confirm-box .ui-modal-body { font-size:14.5px; line-height:1.55; padding:0 20px 16px; }
+.preset-confirm-box .ui-modal-actions { padding:14px 20px 18px; gap:10px; }
+.preset-confirm-box .ui-modal-btn { font-size:14.5px; min-height:44px; padding:11px 18px; }
+@media(max-width:560px){
+  .preset-confirm-box { width:min(460px,100%); }
+  .preset-confirm-box .ui-modal-head { font-size:16px; padding:14px 15px 8px; }
+  .preset-confirm-box .ui-modal-body { font-size:13.5px; padding:0 15px 14px; }
+  .preset-confirm-box .ui-modal-btn { font-size:13.5px; min-height:42px; padding:10px 14px; }
 }
 .simple-mode .advanced-only { display: none !important; }
 .simple-helper { background: var(--bg3); border: 1px solid var(--bdr2); border-radius: 10px; padding: 10px 12px; margin: 10px 0; color: var(--t3); font-size: 13.5px; line-height: 1.55; }
@@ -1961,6 +1969,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 
       <div class="field hidden" id="listeningBlock">
         <div class="field-label">🎧 Listening comprehension — doplňující zadání <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ listening comprehension. Slouží k doplnění zaměření otázek, transkriptu nebo vlastních hotových otázek bez ohledu na to, zda jako hlavní zdroj používáš text, soubor nebo odkaz.">?</button></div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>listening comprehension</strong> — tento typ vyžaduje doladění níže: nahraj audio/video nebo vlož transkript a urči, na co se mají otázky ptát. Bez zdroje k poslechu nebude mít test z čeho čerpat.</span></div>
         <div class="field-hint">Audio/video je zdroj pro Gemini a učitele. Ve studentském testu se audio nepřehrává; poslech pouští učitel.</div>
         <div class="tip-box" style="margin-bottom:10px">
           <div class="tip-title">Shrnutí funkčnosti</div>
@@ -1973,6 +1982,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 
       <div class="field hidden" id="readingBlock">
         <div class="field-label">📖 Reading comprehension — délka textu <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ reading comprehension. Určuje přibližnou délku souvislého textu, ke kterému se váží otázky. Jeden text na cvičení, otázky pod ním. Delší text = náročnější čtení a víc prostoru pro detailní otázky.">?</button></div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>reading comprehension</strong> — tady doleď délku souvislého textu, ke kterému se otázky vážou. Delší text = náročnější čtení; doporučujeme spárovat s vyšším počtem otázek.</span></div>
         <div class="field-hint">Jeden souvislý text na cvičení; otázky se vážou na něj (text se neopakuje u každé otázky).</div>
         <div class="btn-row" id="rcLenBtns">
           <button class="tag-btn" data-val="short" onclick="pickRcLength('short')">Krátký (~60–100 slov)</button>
@@ -2613,22 +2623,22 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.40',
-  date:    '2026-06-11',
+  version: '6.11.44',
+  date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'AUDIT LOGIKY NASTAVENÍ (6.11.44): (1) Šablony modulu ČJ nově procházejí enforceModeConstraints() — nemohla by tak vzniknout zakázaná kombinace procvičovací režim + bezpečný offline verifier; šablona navíc toastem shrne, co přepsala na kartách 1 a 3. (2) Čeština vynucuje pokročilý mód — applySimpleDefaults() už nepřepisuje exerciseConfig modulu ČJ (počty položek dle obtížnosti, rozdělení bodů se tak skutečně použijí v buildExerciseSpecs). (3) Identita „jednorázový kód\": pole rosteru se zobrazuje jen v tomto režimu, je advanced-only a validate() blokuje generování s prázdným rosterem (verifier by jinak tiše ztratil kontrolu kódů); v jednoduchém režimu se identita drží na „jméno\". (4) Varování o známkovaném testu s poloautomatickými položkami čte csDerivedGoal (skutečný režim) místo goal ze šablony. (5) Interpunkční checkbox je u interpunkčního jevu viditelně povinný (disabled) místo tichého snap-backu mimo UI. (6) Tlačítka počtu cvičení se v ČJ skrývají úplně (počet = vybrané typy úloh; klik dřív nic nedělal). (7) splitGenerate vynucený režimem semi/manual se po návratu na auto i po odchodu z ČJ vrací zpět. (8) Tichý přepad procvičovací→běžný při volbě secureOffline hlásí toast. (9) Export checklist má u ČJ semi/manual povinnou položku o schválení alternativ. (10) Úklid: artefakt ;;; za RELEASE, mrtvý zápis instrJazyk, inertní manualMode u ČJ cvičení. Ověřeno node --check + headless smoke testy.',
+    'COMPREHENSION BLOKY — OPRAVA ZOBRAZENÍ + UPOZORNĚNÍ (6.11.43): (1) Mimo ČJ modul se bloky listening/reading comprehension už nezobrazují automaticky. csApplyVisualState() dříve volal csSetHidden(block, active) — při active=false (cizí jazyky) blok natvrdo odkryl bez ohledu na výběr typu. Nyní: active || !usesListening/ReadingComprehension(), takže se řídí skutečným výběrem. (2) Po zaškrtnutí comprehension typu se učitel upozorní, že blok vyžaduje doladění: v každém bloku je nově výrazná výzva (.comp-needs-setup) a toggleType() po novém výběru doroluje na blok + krátce ho zvýrazní (flashCompBlock). Ověřeno node --check.',
+    'STABILNĚJŠÍ SELF-TEST BODOVÁNÍ (6.11.42): odstraněna příčina falešného selhání „Studentský test neexponuje encryptPayloadForTeacher“. stMakeHiddenFrame() dříve čekal na inicializaci emitovaného skriptu pevných 80 ms — na zaneprázdněném stroji (běžící AI volání apod.) skript nestihl vystavit funkce a kontrola selhala. Nyní aktivně čeká (polling po 25 ms až 4 s) na konkrétní funkce ve window předané přes readyCheck — verifier (scorePayload/decryptPayload/parseTxt/correctIndex), student (encryptPayloadForTeacher) i instant (calcScore…). V dobrém případě se vrací dříve, při reálné chybě selže se stejnou konkrétní hláškou. Celková pojistka 8 s. Ověřeno node --check.',
+    'ZMENŠENÍ MODALŮ PRESETU (6.11.41): modaly Detail doporučené šablony i Použít preset? byly předtím zvětšené ~2× (písmo 21–27px), což způsobovalo obří text a vodorovný posuvník (přetékání obsahu). Sníženo na vyvážené velikosti (head 17px, body 14.5px, title 18.5px), box zúžen (680/560px), první sloupec mřížky 240→160px + minmax(0,1fr) a overflow-wrap na hodnotách — dlouhé hodnoty se nyní zalamují místo roztahování. Breakpoint sjednocen na 560px. Ověřeno node --check.',
     'DROBNÁ JAZYKOVÁ ÚPRAVA (6.11.40): v záložce 🔒 nahrazeno uměle zvýšit slovem vylepšit (známku nelze vylepšit). Bez změny obsahu a barev. Ověřeno node --check.',
     'JAZYKOVÉ OPRAVY ZÁLOŽKY PŘÍSNÉHO REŽIMU (6.11.39): vyčištěny hovorové a kostrbaté tvary v textu záložky 🔒: zdrojáku → zdrojového kódu; několik dalších úprav (několik formulací přepsáno do spisovné češtiny, odstraněn slang a anglicismy: nafouknout/vlepíš/zapékají/token/blur/tvrdé brány). Bez změny obsahu a barev. Ověřeno node --check.',
     'ZPŘESNĚNÍ SITUACÍ V PŘÍSNÉM REŽIMU (6.11.38): dva řádky tabulky upraveny podle skutečného chování. (1) „Obejití zámku“ → nyní jasně, že zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde — submittedLocked() to potvrzuje hláškou použij jiné zařízení/prohlížeč. (2) Řádek o posunu času/pauze timeru (vyžadoval konzoli, kterou výchozí předpoklad bez přístupu k HTML vylučuje) nahrazen reálně dostupnou variantou protahuje čas prací mimo okno — klientský timer (startTimer/timerVal) běží jen v aktivní kartě. Ověřeno node --check.',
     'SITUACE V PŘÍSNÉM REŽIMU + JEDNORÁZOVÉ KÓDY (6.11.37): záložka aktualizována o režim jednorázových kódů. (1) Úvod nyní pojmenovává výchozí předpoklad — student dostane jen odkaz, k HTML se nedostane. (2) Nová sekce Jak fungují jednorázové kódy (3 karty: kódy jen ve verifieru ne ve studentském testu / pokaždé nové / kód váže záznam, ne osobu). (3) Tabulka situací rozšířena: zelená pokrývá signál kód není v seznamu (rosterHasCode) a nemožnost vyčíst cizí kódy z testu; oranžová duplicitní pokus (duplicateInfo); červená nově výměna kódů mezi studenty. Ověřeno node --check.',
     'OPRAVY MODULŮ (6.11.36): (1) oba modaly presetu (potvrzení „Použít preset?" i detail šablony) zvětšeny ~2× — větší šířka, písmo, ikona i mřížka detailů, vlastní mobilní breakpoint. (2) Opravena chyba, kdy po přepnutí z modulu Český jazyk do cizího jazyka zůstávaly v podrobném nastavení cvičení dva české typy (Vyber pravopisně správnou variantu, Doplň přesný pravopisný tvar): záloha/obnova generického stavu nově pokrývá exerciseConfig/exerciseDetail/pocet/body/cas + pojistka csStripCzechExerciseRows při odchodu z ČJ i při startu (čistí i staré uložené snapshoty). Ověřeno node --check.',
     'REALISTICKÁ RIZIKA (6.11.35): výrazné tmavě červené pozadí panelu (#2d0a0a dark / #fef2f2 light), světlý text na kartičkách v dark módu (#1a0505 bg, #fca5a5 text). Ověřeno node --check.',
-    'REALISTICKÁ RIZIKA (6.11.34): panel redesignován – výrazné červené pozadí/border přes --err generátoru (#ef444412 dark / #c41e1e0e light), karty s ikonami v gridu, bílý text na dark pozadí karet. Ověřeno node --check.',
-    'REALISTICKÁ RIZIKA (6.11.33): panel schovaný mimo přísný režim; redesign checklistu na grid karet s ikonou + textem, CSS proměnné --bg2/--bdr/--t2 pro kompatibilitu denní i noční téma. Ověřeno node --check.',
-    'REALISTICKÁ RIZIKA (6.11.32): panel se zobrazuje jen při volbě přísný test (jinak skrytý); redesign checklistu — karty s emoji místo holého seznamu. Ověřeno node --check.',
-    'OPRAVA VLAJKY MODULU ČJ (6.11.31): místo emoji 🇨🇿 (na Windows renderováno jako text CZ) se v titulcích listů 1/3, 2/3, 3/3, záhlaví entry modalu a záložce changelogu používá CSS třída flag-cz — stejná SVG vlajka jako u tlačítka výběru jazyka. Ověřeno node --check.',
   ]
-});;;;;;;;;;;;;;;;;;;;;;
+});
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
 // soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
@@ -2647,9 +2657,10 @@ const RELEASE_LABEL = RELEASE.version+' · '+RELEASE.date+' · '+BUILD_HASH;
 // „Modul ČJ" vedle hlavního changelogu generátoru.
 const RELEASE_CS = Object.freeze({
   module:  'Modul Český jazyk',
-  version: 'V18',
-  date:    '2026-06-11',
+  version: 'V19',
+  date:    '2026-06-12',
   changes: [
+    'BEZPEČNOSTNÍ AUDIT VAZEB (V19): šablony procházejí enforceModeConstraints (konec zakázané kombinace procvičovací + secureOffline) a toastem hlásí, co přepsaly na ostatních kartách. Varování pro známkovaný test čte skutečný režim (csDerivedGoal), ne jen goal ze šablony. Interpunkční checkbox je u interpunkčního jevu povinný a viditelně zamčený. Tlačítka počtu cvičení v ČJ skryta (počet = vybrané typy). Čeština vynucuje pokročilý mód, takže exerciseConfig modulu se skutečně propíše do generování. splitGenerate se po semi/manual umí vrátit. Ověřeno node --check + headless testy.',
     'SKRYTÍ NASTAVENÍ CVIČENÍ V CS REŽIMU (V18): tlačítko Nastavit cvičení podrobně a celá sekce s typy cvičení jsou v CS režimu skryté — typy i počet určuje modul ČJ, ruční zásah nedává smysl. Ověřeno node --check.',
     'DUPLIKÁT ODSTRANĚN ZE SKLADBY (V17): jev \'základní skladební dvojice\' odstraněn ze seznamu jevů kategorie Skladba — didakticky totožný s \'podmět a přísudek\', AI generovala překrývající se úlohy. Ověřeno node --check.',
     'SLOUČENÍ DO GENERÁTORU (V16): modul naroubován do bezpečnostní větve generátoru (v6.11.25). Integrační háčky protaženy přes cfg → studentský CFG → verifier CONFIG i do hashe (csScoringPolicy, csFeedbackPolicy, isCzech). Vše české je zahrazené na jazyk=čeština; cizí jazyky (EN/ES/FR/LA) běží beze změny. Ověřeno node --check.',
@@ -3754,6 +3765,7 @@ function applySimpleDefaults(){
   state.diferencovany = 'NE';
   state.anonymizace = 'ANO';
   state.overeni = 'NE';
+  state.identityMode = 'name';
   state.fuzzyTolerance = 'off';
   if (!state.body || state.body <= 0) { state.body = 30; setVal('bodyCustom', 30); }
 }
@@ -3813,6 +3825,11 @@ function normalizeLoadedState(s) {
 function enforceModeConstraints() {
   // Ověřovací panel odebrán z UI; vždy NE.
   state.overeni = 'NE';
+  // Modul ČJ řídí exerciseConfig, bodování i typy — vyžaduje pokročilý mód,
+  // jinak applySimpleDefaults() jeho nastavení při každé validaci přepisuje.
+  if (String(state.jazyk || '').toLowerCase() === 'čeština' && isSimpleMode()) {
+    state.appMode = 'advanced'; state.workPreset = 'advanced';
+  }
   // Přísný test → bezpečný offline verifier je povinný.
   if (state.testMode === 'prisny') {
     state.resultMode = 'secureOffline';
@@ -3883,7 +3900,8 @@ function updateWorkPresetUI(){
   if (panel) panel.classList.add('hidden');
 }
 function markAdvancedSections(){
-  const ids = ['instrJazykBtns','testModeBtns','layoutBtns','resultModeBtns','randomBtns','gradeSkola','themeGrid','zolicekBtns','diffBtns','diffLevelBtns','fuzzyBtns','feedbackModeBtns'];
+  const ids = ['instrJazykBtns','testModeBtns','layoutBtns','resultModeBtns','randomBtns','gradeSkola','themeGrid','zolicekBtns','diffBtns','diffLevelBtns','fuzzyBtns','feedbackModeBtns','identityModeBtns'];
+  const rosterF = $('rosterField'); if (rosterF) rosterF.classList.add('advanced-only');
   ids.forEach(id => { const el = $(id); const f = el && el.closest ? el.closest('.field') : null; if (f) f.classList.add('advanced-only'); });
   const varA = $('varA'); const subField = varA && varA.closest ? varA.closest('.field') : null; if (subField) subField.classList.add('advanced-only');
   const btnEx = $('btnExDetail'); if (btnEx) btnEx.classList.add('advanced-only');
@@ -4424,6 +4442,9 @@ function applyVisualState() {
   }
   const strictRiskField = $('strictRiskField');
   if (strictRiskField) strictRiskField.classList.toggle('hidden', state.testMode !== 'prisny');
+  // Roster jednorázových kódů má smysl jen v režimu identity „jednorázový kód".
+  const rosterField = $('rosterField');
+  if (rosterField) rosterField.classList.toggle('hidden', (state.identityMode || 'name') !== 'oneTimeCode');
   if (state.diferencovany === 'ANO') renderGroups();
   renderTeacherMapping();
   renderSourceMeters();
@@ -4525,6 +4546,7 @@ function pick(key, value) {
   // Speciální případ: procvičovací + bezpečný offline jsou neslučitelné.
   if (key === 'resultMode' && value === 'secureOffline' && state.testMode === 'procviceci') {
     state.testMode = 'bezny';
+    try { uiToast('Bezpečný offline verifier se s procvičovacím režimem neslučuje — režim testu přepnut na běžný.', 'warn', 5200); } catch(_){}
   }
   enforceModeConstraints();
   warnIfPresetModeMismatch(key);
@@ -4987,6 +5009,7 @@ function renderSourceMeters(){
 function pickSourceSlice(v){ state.sourceSliceMode=(v==='end')?'end':'start'; renderSourceMeters(); saveSnapshot(); }
 
 function toggleType(t) {
+  const wasSelected = state.typyCviceni.includes(t);
   state.typyCviceni = state.typyCviceni.includes(t)
     ? state.typyCviceni.filter(x=>x!==t)
     : [...state.typyCviceni, t];
@@ -5002,6 +5025,23 @@ function toggleType(t) {
     renderSmartTimeTip();
   }
   applyVisualState(); renderSmartTimeTip(); validate(); saveSnapshot();
+  // Comprehension typy vyžadují další nastavení — když je učitel nově zaškrtne,
+  // upozorni: doroluj na blok a krátce ho zvýrazni, ať si doladění nikdo nepřehlédne.
+  if (!wasSelected && (t === 'listening comprehension' || t === 'reading comprehension')) {
+    flashCompBlock(t === 'listening comprehension' ? 'listeningBlock' : 'readingBlock');
+  }
+}
+
+function flashCompBlock(id){
+  const el = document.getElementById(id);
+  if (!el || el.classList.contains('hidden')) return;
+  setTimeout(() => {
+    el.scrollIntoView({ behavior:'smooth', block:'center' });
+    el.classList.remove('comp-flash');
+    void el.offsetWidth; // restart animace
+    el.classList.add('comp-flash');
+    setTimeout(() => el.classList.remove('comp-flash'), 3000);
+  }, 60);
 }
 
 function pickVariant(v) {
@@ -5646,8 +5686,13 @@ function validate() {
   const hesloStrongOk = !hesloVal || (hesloVal.length >= 12 && !isWeakSecret(hesloVal));
   const secretOk = baseSecretOk && securityCodeOk && pinStrongOk && hesloStrongOk;
   const groupsOk = state.diferencovany==='NE' || (state.skupiny.length>0 && state.skupiny.every(g => plainText(g.nazev).length > 0 && plainText(g.podminky).length > 0 && Array.isArray(g.studenti) && g.studenti.length > 0));
-  $('next3').disabled = !(secretOk && groupsOk);
+  // Jednorázové kódy bez vygenerovaného rosteru = verifier nemá seznam a kontrola
+  // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
+  const rosterOk = (state.identityMode || 'name') !== 'oneTimeCode'
+    || (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries) && rosterEntries.length > 0);
+  $('next3').disabled = !(secretOk && groupsOk && rosterOk);
   const msg = [];
+  if (!rosterOk) msg.push('Identita „jednorázový kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
   if (!trim('heslo') || !trim('ucitelPin')) msg.push('Doplň odemykací heslo i samostatný učitelský PIN.');
   if (trim('heslo') && trim('ucitelPin') && trim('heslo') === trim('ucitelPin')) msg.push('Odemykací heslo a učitelský PIN musí být jiné.');
   if (pinVal && pinVal.length < 8) msg.push('Učitelský PIN musí mít aspoň 8 znaků (slabý PIN jde offline uhádnout).');
@@ -6698,6 +6743,9 @@ function exportChecklistItems(){
     ['scale','Zkontroloval/a jsem stupnici hodnocení (kdy je 1, kdy 5).', secure],
     ...(secure ? [
       ['aikey','Spustil/a jsem 🔑 AI ověření klíče (druhý nezávislý průchod) — doporučeno hlavně u prvního ostrého nasazení. Najde-li rozdíl u uzavřených úloh, vyřeším ho nebo vědomě potvrdím.', false]
+    ] : []),
+    ...((state.jazyk === 'čeština' && state.csModule && (state.csModule.correctionMode === 'semi' || state.csModule.correctionMode === 'manual' || state.csModule.domain === 'stylistika' || state.csModule.domain === 'literatura')) ? [
+      ['csReview','ČJ: test obsahuje položky se schválením učitele (poloautomatické nebo ruční hodnocení). Prošel/a jsem navržené alternativy, schválil/a jsem, co se uznává, a vím, které položky hodnotím ručně.', secure]
     ] : []),
     ...((state.fuzzyTolerance==='mild'||state.fuzzyTolerance==='strict') ? [
       ['fuzzy', 'VĚDOMĚ jsem zapnul/a toleranci překlepů ('+(state.fuzzyTolerance==='mild'?'Mírná — překlep = 0,85 b':'Přísná — překlep = 0,5 b')+') a vím, že u psaných odpovědí se za drobný překlep přidávají body. U testu, kde hodnotím pravopis, má být Vypnuto.', secure]
@@ -8553,18 +8601,31 @@ const ST_EPS = 1e-6;
 const ST_CHOICE_TYPES = ['multiple choice','reading comprehension','listening comprehension'];
 function stPointOf(ex,i){return Array.isArray(ex.item_points)&&ex.item_points[i]!=null?(Number(ex.item_points[i])||0):(Number(ex.points_each)||1);}
 
-function stMakeHiddenFrame(html){
+function stMakeHiddenFrame(html, readyCheck){
+  // readyCheck(win) → true, jakmile je emitovaný skript inicializovaný (funkce ve window).
+  // Místo slepé pevné prodlevy aktivně čekáme, takže na zaneprázdněném stroji nevznikne
+  // falešné „neexponuje X" a v běžném případě se vrátí dřív (jakmile je funkce k dispozici).
   return new Promise((resolve,reject)=>{
     const f=document.createElement('iframe');
     f.setAttribute('sandbox','allow-scripts allow-same-origin');
     f.style.cssText='position:fixed;left:-99999px;top:0;width:480px;height:640px;border:0;visibility:hidden';
-    let settled=false;
-    const done=(fn,arg)=>{ if(settled)return; settled=true; fn(arg); };
-    f.onload=()=>setTimeout(()=>done(resolve,f),80); // tick pro setTimeout(...,0) init verifieru
+    let settled=false, pollId=null, hardCap=null;
+    const done=(fn,arg)=>{ if(settled)return; settled=true; if(pollId)clearInterval(pollId); if(hardCap)clearTimeout(hardCap); fn(arg); };
+    const isReady=()=>{ try{ return readyCheck ? !!readyCheck(f.contentWindow) : true; }catch(_){ return false; } };
+    const startWait=()=>{
+      if(!readyCheck){ setTimeout(()=>done(resolve,f),80); return; } // zpětná kompatibilita
+      if(isReady()){ done(resolve,f); return; }
+      const deadline=Date.now()+4000; // max aktivní čekání na readiness po onload
+      pollId=setInterval(()=>{
+        if(isReady()) done(resolve,f);
+        else if(Date.now()>deadline) done(resolve,f); // vrátíme i tak — kontrola výš selže s konkrétní hláškou
+      },25);
+    };
+    f.onload=()=>setTimeout(startWait,0); // tick pro setTimeout(...,0) init skriptu
     f.onerror=()=>done(reject,new Error('Skrytý iframe se nepodařilo načíst.'));
     document.body.appendChild(f);
     f.srcdoc=html;
-    setTimeout(()=>done(resolve,f),5000); // pojistka
+    hardCap=setTimeout(()=>done(resolve,f),8000); // celková pojistka
   });
 }
 
@@ -8723,8 +8784,8 @@ async function stRunSecure(report){
   if(!asm||!asm.variants||!asm.cfg) throw new Error('Chybí strukturovaná data testu. Spusť self-test hned po vygenerování testu (ne po načtení z historie).');
   let teacherFrame=null, studentFrame=null;
   try{
-    teacherFrame=await stMakeHiddenFrame(pkg.teacherHtml);
-    studentFrame=await stMakeHiddenFrame(pkg.studentHtml);
+    teacherFrame=await stMakeHiddenFrame(pkg.teacherHtml, w=>['scorePayload','decryptPayload','parseTxt','correctIndex'].every(n=>typeof w[n]==='function'));
+    studentFrame=await stMakeHiddenFrame(pkg.studentHtml, w=>typeof w.encryptPayloadForTeacher==='function');
     const tw=teacherFrame.contentWindow, sw=studentFrame.contentWindow;
     ['scorePayload','decryptPayload','parseTxt','correctIndex'].forEach(n=>{ if(typeof tw[n]!=='function') throw new Error('Verifier neexponuje funkci '+n+' — pravděpodobně chyba v emitovaném skriptu.'); });
     if(typeof sw.encryptPayloadForTeacher!=='function') throw new Error('Studentský test neexponuje encryptPayloadForTeacher.');
@@ -8781,7 +8842,7 @@ async function stRunInstant(report){
   if(!asm||!asm.variants) throw new Error('Chybí strukturovaná data testu. Spusť self-test hned po vygenerování testu (ne po načtení z historie).');
   let frame=null;
   try{
-    frame=await stMakeHiddenFrame(generatedTestHtml);
+    frame=await stMakeHiddenFrame(generatedTestHtml, w=>['calcScore','calcScoreFromAnswers','scoreItem','correctIndex'].every(n=>typeof w[n]==='function'));
     const iw=frame.contentWindow;
     ['calcScore','calcScoreFromAnswers','scoreItem','correctIndex'].forEach(n=>{ if(typeof iw[n]!=='function') throw new Error('Instant test neexponuje funkci '+n+' — pravděpodobně chyba v emitovaném skriptu.'); });
     const variants=asm.variants, keys=Object.keys(variants).length?Object.keys(variants):['__default'];
@@ -15910,7 +15971,9 @@ document.addEventListener('keydown', function(e){
     state.csDifficulty = m.difficulty || 'standardni';
     state.csDifficultyLabel = csDifficultyLabel(m);
     state.fuzzyTolerance = 'off';
-    if (m.correctionMode !== 'auto') state.splitGenerate = true;
+    if (typeof isSimpleMode === 'function' && isSimpleMode()) { state.appMode = 'advanced'; state.workPreset = 'advanced'; }
+    if (m.correctionMode !== 'auto') { state.splitGenerate = true; state.__csSplitForced = true; }
+    else if (state.__csSplitForced) { state.splitGenerate = false; delete state.__csSplitForced; }
     state.typyCviceni = csTechTypes(m);
     state.pocet = Math.max(1, csExerciseList(m).length || state.pocet || 3);
     if (!state.body || state.body <= 0) state.body = 20;
@@ -15920,7 +15983,7 @@ document.addEventListener('keydown', function(e){
     const totalPts = Math.max(exKeys.length, parseInt(state.body,10) || exKeys.length * 8);
     const basePts = Math.floor(totalPts / Math.max(exKeys.length,1));
     const remPts = totalPts - basePts * Math.max(exKeys.length,1);
-    state.exerciseConfig = exKeys.map(function(k,i){ const e=CS_EXERCISES[k]; const baseCount = e.tech==='reading comprehension' ? 5 : (e.tech==='matching' ? 8 : (e.tech==='ordering' ? 6 : 8)); const count = Math.max(3, baseCount + csDifficultyItemAdjust(m)); return { typ:e.tech, pocetOtazek:count, body:basePts + (i < remPts ? 1 : 0), csExerciseKey:k, csReview:e.review, csLabel:e.label, manualMode:e.review==='manual' }; });
+    state.exerciseConfig = exKeys.map(function(k,i){ const e=CS_EXERCISES[k]; const baseCount = e.tech==='reading comprehension' ? 5 : (e.tech==='matching' ? 8 : (e.tech==='ordering' ? 6 : 8)); const count = Math.max(3, baseCount + csDifficultyItemAdjust(m)); return { typ:e.tech, pocetOtazek:count, body:basePts + (i < remPts ? 1 : 0), csExerciseKey:k, csReview:e.review, csLabel:e.label, manualMode:false }; });
     state.pocet = state.exerciseConfig.length || Math.max(1,state.pocet||3);
     state.body = state.exerciseConfig.reduce(function(s,e){return s+(Number(e.body)||0);},0) || state.body;
     if (typeof setVal === 'function') { setVal('bodyCustom', state.body); setVal('casCustom', state.cas); }
@@ -15967,7 +16030,7 @@ document.addEventListener('keydown', function(e){
       const cards = Object.keys(CS_EXERCISES).filter(k => CS_EXERCISES[k].review===g && (CS_EXERCISES[k].domains.includes(domain) || domain==='kombinovane')).map(k => { const e=CS_EXERCISES[k]; const title = e.desc + ' Typ úlohy v ČJ: ' + csTechUiLabel(e.tech) + '. Režim: ' + (g==='auto'?'opraví generátor':g==='semi'?'AI pomůže, učitel schválí':'opravuje učitel ručně') + '.'; return '<button type="button" class="cs-card '+(selected.has(k)?'active':'')+'" title="'+csEsc(title)+'" aria-label="'+csEsc(e.label+' - '+title)+'" onclick="csToggleExercise(\''+k+'\')"><span class="cs-card-title">'+csEsc(e.label)+'</span><span class="cs-card-desc">'+csEsc(e.desc)+'</span><span class="cs-review-pill '+g+'">'+csEsc(g==='auto'?'opraví generátor':g==='semi'?'učitel zkontroluje':'ručně')+'</span></button>'; }).join('');
       return cards ? '<div class="cs-exercise-group '+g+'"><div class="cs-section-title">'+csEsc(groups[g])+'</div><div class="cs-grid three">'+cards+'</div></div>' : '';
     }).join(''); return '<div class="cs-exercise-groups">'+html+'</div>'; }
-  function csCheck(key,label){ const m = csModule(); const tip = CS_CHECK_TIPS[key] || ''; return '<label class="cs-check" title="'+csEsc(tip)+'"><input type="checkbox" '+(m.checks && m.checks[key]?'checked':'')+' onchange="csToggleCheck(\''+key+'\',this.checked)"><span>'+csEsc(label)+'</span>'+csTip(tip)+'</label>'; }
+  function csCheck(key,label){ const m = csModule(); let tip = CS_CHECK_TIPS[key] || ''; const forced = (key === 'punctuation' && csNeedsPunctuationCheck(m)); if (forced) tip = 'U interpunkčního jevu nebo interpunkčních úloh je kontrola čárek povinná — nelze ji vypnout. ' + tip; return '<label class="cs-check" title="'+csEsc(tip)+'"'+(forced?' style="opacity:.65;cursor:not-allowed"':'')+'><input type="checkbox" '+((m.checks && m.checks[key]) || forced ?'checked':'')+(forced?' disabled':'')+' onchange="csToggleCheck(\''+key+'\',this.checked)"><span>'+csEsc(label)+(forced?' (povinné)':'')+'</span>'+csTip(tip)+'</label>'; }
   function csClampPage(v){ return Math.max(0, Math.min(2, parseInt(v || 0, 10) || 0)); }
   function csPageTitle(page){ return ['Učivo','Úlohy a podklady','Opravování a kontrola'][csClampPage(page)] || 'Modul ČJ'; }
   function csPageSubnav(page){
@@ -15992,7 +16055,7 @@ document.addEventListener('keydown', function(e){
   function csRunScoringTests(){ const out=document.getElementById('csDevTestReport'); const lines=[]; let pass=0,fail=0; function assert(name,got,exp){ const ok=Object.is(got,exp); if(ok)pass++; else fail++; lines.push((ok?'✓':'✗')+' '+name+' → '+got+' (čekáno '+exp+')'); } try{ if(typeof SHARED_SCORING_JS!=='string') throw new Error('SHARED_SCORING_JS není dostupný.'); const boot='function __isSpanish(){return false;}function __fuzzyMode(){return "mild";}function __isCzech(){return true;}function __csScoringPolicy(){return {enabled:true,diacritics:true,punctuation:true,capitalization:true,exactShape:true};}'; const api=(new Function(boot+'\n'+SHARED_SCORING_JS+'\nreturn {textScore:textScore,correctIndex:correctIndex};'))(); assert('diakritika: byt ≠ být', api.textScore('byt','být',[],'fill-in-the-blank'), 0); assert('velká písmena: praha ≠ Praha', api.textScore('praha','Praha',[],'fill-in-the-blank'), 0); assert('interpunkce: Ano ≠ Ano.', api.textScore('Ano','Ano.',[],'fill-in-the-blank'), 0); assert('fuzzy tolerance je u ČJ vypnutá i při mild', api.textScore('zkouska','zkouška',[],'fill-in-the-blank'), 0); assert('MC správně rozliší Praha/praha podle kapitalizace', api.correctIndex({options:['praha','Praha'],correct:'Praha'}), 1); assert('MC správně rozliší Ano/Ano. podle interpunkce', api.correctIndex({options:['Ano','Ano.'],correct:'Ano.'}), 1); const boot2='function __isSpanish(){return false;}function __fuzzyMode(){return "off";}function __isCzech(){return true;}function __csScoringPolicy(){return {enabled:true,diacritics:true,punctuation:false,capitalization:false,exactShape:true};}'; const api2=(new Function(boot2+'\n'+SHARED_SCORING_JS+'\nreturn {textScore:textScore,correctIndex:correctIndex};'))(); assert('při vypnuté kapitalizaci se praha/Praha uzná', api2.textScore('praha','Praha',[],'fill-in-the-blank'), 1); assert('při vypnuté interpunkci se Ano/Ano. uzná', api2.textScore('Ano','Ano.',[],'fill-in-the-blank'), 1); const boot3='function __isSpanish(){return false;}function __fuzzyMode(){return "off";}function __isCzech(){return true;}function __csScoringPolicy(){return {enabled:true,diacritics:false,punctuation:false,capitalization:false,exactShape:true};}'; const api3=(new Function(boot3+'\n'+SHARED_SCORING_JS+'\nreturn {textScore:textScore,correctIndex:correctIndex};'))(); assert('při vypnuté diakritice se byt/být uzná', api3.textScore('byt','být',[],'fill-in-the-blank'), 1); }catch(e){ fail++; lines.push('✗ Test se nepodařilo spustit: '+(e&&e.message?e.message:String(e))); } if(out){ out.classList.remove('hidden','ok','warn'); out.classList.add(fail?'warn':'ok'); out.textContent='České bodování: '+pass+' testů prošlo, '+fail+' selhalo.\n\n'+lines.join('\n'); } try{ if(fail) uiToast('České bodování má problém — viz panel v modulu ČJ.','warn',5200); else uiToast('České bodování prošlo lokálními kontrolami.','ok'); }catch(_){} return {pass:pass,fail:fail,lines:lines}; }
   function csBuildIntro(){ return '<div id="'+CS_INTRO_ID+'" class="cs-module-intro hidden"><b>Čeština má vlastní nastavení.</b> Na tomto listu jen dokonči základní informace. Podrobný modul Český jazyk se otevře až na dalším listu po kliknutí na Pokračovat.</div>'; }
   function csBuildStep0(){ const m = csModule(); return '<div id="'+CS_STEP0_ID+'" class="cs-module-panel hidden"><div class="cs-module-head"><div><div class="cs-module-title"><span class="flag flag-cz" aria-hidden="true"></span> Modul Český jazyk '+csTip(CS_SECTION_TIPS.intro)+'</div><div class="cs-module-sub">První část řeší pouze učivo: ročník, oblast češtiny a konkrétní jazykový jev.</div></div><span class="cs-module-badge">1/3 · učivo</span></div>'+csPageSubnav(0)+'<div class="cs-section">'+csTitle('Ročník / cílová skupina', CS_SECTION_TIPS.stage)+'<div class="cs-grid four" id="csStageBtns">'+csStageCards()+'</div><input id="csStageCustom" class="cs-input '+(m.stage==='custom'?'':'hidden')+'" style="margin-top:8px" placeholder="např. 2. ročník, septima, slabší skupina…" value="'+csEsc(m.stageCustom||'')+'" oninput="csInput(\'stageCustom\',this.value)"></div><div class="cs-section">'+csTitle('Didaktická obtížnost', CS_SECTION_TIPS.difficulty)+'<div class="cs-note">Ročník určuje cílovou skupinu. Obtížnost určuje, jak náročné mají být položky v rámci vybraného ročníku.</div><div class="cs-grid three" id="csDifficultyBtns">'+csDifficultyCards()+'</div></div><div class="cs-section">'+csTitle('Co se bude procvičovat?', CS_SECTION_TIPS.domain)+'<div class="cs-note">Vyber oblast učiva. Tady ještě neurčuješ podobu otázky ani způsob hodnocení.</div><div class="cs-grid three" id="csDomainBtns">'+csDomainCards()+'</div></div><div class="cs-section">'+csTitle('Jaký konkrétní jev?', CS_SECTION_TIPS.phenomenon)+'<div class="cs-field-row"><select id="csPhenomenonSelect" class="cs-select" title="Vyber konkrétní jazykový jev v aktuální oblasti učiva." onchange="csPick(\'phenomenon\',this.value)">'+csPhenomenonOptions()+'</select><input id="csPhenomenonCustom" class="cs-input '+(m.phenomenon==='__custom__'?'':'hidden')+'" title="Sem napiš vlastní konkrétní jev, pokud není v seznamu." placeholder="Upřesni vlastní jev…" value="'+csEsc(m.phenomenonCustom||'')+'" oninput="csInput(\'phenomenonCustom\',this.value)"></div><div class="cs-note">Příklad: oblast = skladba, konkrétní jev = druhy vedlejších vět. Oblast = pravopis, konkrétní jev = shoda přísudku s podmětem.</div></div></div>'; }
-  function csBuildStep1(){ return '<div id="'+CS_STEP1_ID+'" class="cs-module-panel hidden"><div class="cs-module-head"><div><div class="cs-module-title"><span class="flag flag-cz" aria-hidden="true"></span> ČJ - úlohy a podklady '+csTip(CS_SECTION_TIPS.exerciseForm)+'</div><div class="cs-module-sub">Druhá část řeší podobu testu: šablonu, typy úloh, počet cvičení a případný textový podklad.</div></div><span class="cs-module-badge">2/3 · úlohy</span></div>'+csPageSubnav(1)+'<div class="cs-section">'+csTitle('Rychlé šablony', CS_SECTION_TIPS.presets)+'<div class="cs-note"><strong>Šablona není povinná.</strong> Karta Vlastní test nechá ruční nastavení. Ostatní šablony jsou jen zkratky: nastaví oblast, typy úloh, počet, čas a doporučený režim. Po výběru je můžeš ručně upravit.</div><div class="cs-grid three" id="csPresetBtns">'+csPresetCards()+'</div></div><div class="cs-section cs-exercise-section">'+csTitle('Co má žák v úlohách dělat?', CS_SECTION_TIPS.exerciseForm)+'<div id="csExerciseBtns">'+csExerciseCards()+'</div><div class="cs-note"><strong>Rozdíl oproti první části:</strong> tam se vybírá učivo, tady forma otázky. Např. učivo = velká písmena; forma úlohy = vyber správnou variantu / doplň přesný tvar / oprav chybu.</div><div class="cs-warning" id="csSafetySummary">'+csEsc(csSafetySummary())+'</div></div><div class="cs-section"><div class="cs-note"><strong>Počet cvičení</strong> a případný <strong>vlastní text, soubor nebo odkaz</strong> nastavíš hned pod tímto českým blokem. Patří sem, protože určují skutečnou podobu výsledného testu.</div></div></div>'; }
+  function csBuildStep1(){ return '<div id="'+CS_STEP1_ID+'" class="cs-module-panel hidden"><div class="cs-module-head"><div><div class="cs-module-title"><span class="flag flag-cz" aria-hidden="true"></span> ČJ - úlohy a podklady '+csTip(CS_SECTION_TIPS.exerciseForm)+'</div><div class="cs-module-sub">Druhá část řeší podobu testu: šablonu, typy úloh, počet cvičení a případný textový podklad.</div></div><span class="cs-module-badge">2/3 · úlohy</span></div>'+csPageSubnav(1)+'<div class="cs-section">'+csTitle('Rychlé šablony', CS_SECTION_TIPS.presets)+'<div class="cs-note"><strong>Šablona není povinná.</strong> Karta Vlastní test nechá ruční nastavení. Ostatní šablony jsou jen zkratky: nastaví oblast, typy úloh, počet, čas a doporučený režim. Po výběru je můžeš ručně upravit.</div><div class="cs-grid three" id="csPresetBtns">'+csPresetCards()+'</div></div><div class="cs-section cs-exercise-section">'+csTitle('Co má žák v úlohách dělat?', CS_SECTION_TIPS.exerciseForm)+'<div id="csExerciseBtns">'+csExerciseCards()+'</div><div class="cs-note"><strong>Rozdíl oproti první části:</strong> tam se vybírá učivo, tady forma otázky. Např. učivo = velká písmena; forma úlohy = vyber správnou variantu / doplň přesný tvar / oprav chybu.</div><div class="cs-warning" id="csSafetySummary">'+csEsc(csSafetySummary())+'</div></div><div class="cs-section"><div class="cs-note"><strong>Počet cvičení</strong> odpovídá počtu vybraných typů úloh výše — každý vybraný typ = jedno cvičení. Případný <strong>vlastní text, soubor nebo odkaz</strong> (podklad pro úlohy) nastavíš hned pod tímto českým blokem.</div></div></div>'; }
   function csBuildStep2(){ const m = csModule(); return '<div id="'+CS_STEP2_ID+'" class="cs-module-panel hidden"><div class="cs-module-head"><div><div class="cs-module-title"><span class="flag flag-cz" aria-hidden="true"></span> ČJ - opravování a kontrola '+csTip(CS_SECTION_TIPS.correction)+'</div><div class="cs-module-sub">Třetí část uzavírá český modul: kdo má poslední slovo u opravování a co se má počítat jako chyba.</div></div><span class="cs-module-badge">3/3 · hodnocení</span></div>'+csPageSubnav(2)+'<div class="cs-section">'+csTitle('Kdo má odpovědi opravovat?', CS_SECTION_TIPS.correction)+'<div class="cs-note">Generátor doporučí bezpečný režim podle vybraných typů úloh. U jednoznačných uzavřených úloh může opravovat automaticky. U spornějších položek AI připraví návrh a klíč musí potvrdit učitel. Otevřené stylistické nebo interpretační odpovědi hodnotí učitel ručně.</div><div class="cs-grid three" id="csCorrectionBtns">'+csCorrectionCards()+'</div><div class="cs-warning" id="csCorrectionRecommendation">'+csEsc(csCorrectionRecommendationText(m))+'</div></div><div class="cs-section">'+csTitle('Co se má při opravování počítat jako chyba?', CS_SECTION_TIPS.checks)+'<div class="cs-checks">'+csCheck('diacritics','háčky a čárky ve slovech')+csCheck('punctuation','čárky a další interpunkce')+csCheck('capitalization','velká a malá písmena')+csCheck('exactShape','přesný tvar odpovědi')+'</div><div class="cs-warning" id="csRiskNote"></div></div><div class="cs-section">'+csTitle('Povinné zásady pro ČJ', CS_SECTION_TIPS.principles)+'<ul class="cs-summary-list"><li>Diakritika se u pravopisných a tvarových úloh standardně hodnotí.</li><li>Interpunkce má tři režimy: výběr správné varianty = automaticky po kontrole klíče; doplnění čárek do očíslovaných míst = učitel schválí klíč; oprava interpunkce v textu = ruční hodnocení.</li><li>Sloh a literární interpretace nesmí být čistě automaticky známkované.</li><li>Každá položka má mít správnou odpověď, krátké zdůvodnění a označený jazykový jev.</li></ul></div><div class="cs-section">'+csTitle('Ověření a dotazy pro češtináře', CS_SECTION_TIPS.verification)+'<div class="cs-note">Volitelné pracovní pojistky před ostrým použitím: lokální self-test českého bodování a otázky pro češtináře ke sporným oblastem.</div><div class="cs-dev-actions"><button type="button" class="btn-mini" title="Spustí lokální kontrolu českého porovnávání odpovědí: diakritika, velká písmena, interpunkce a multiple choice." onclick="csRunScoringTests()">🧪 Ověřit české bodování</button><button type="button" class="btn-mini" title="Zkopíruje srozumitelné otázky pro kolegu češtináře, hlavně ke sporným oblastem hodnocení." onclick="csCopyTeacherQuestions()">📋 Zkopírovat otázky pro kolegu</button></div><div id="csDevTestReport" class="cs-dev-report hidden"></div><ul class="cs-question-list">'+csTeacherQuestionsHtml()+'</ul></div></div>'; }
   function csMountPanels(){
     csInstallStyle();
@@ -16069,15 +16132,17 @@ document.addEventListener('keydown', function(e){
     const readingField = document.getElementById('readingBlock');
     const latkaField = document.getElementById('latka') && document.getElementById('latka').closest('.field');
     csSetHidden(latkaField, active);
-    csSetHidden(countField, active && page !== 1);
+    csSetHidden(countField, active); // v ČJ počet cvičení určuje výběr typů úloh, tlačítka by nefungovala
     csSetHidden(sourceField, active && page !== 1);
     const btnExDetail = document.getElementById('btnExDetail');
     const exConfigList = document.getElementById('exConfigList');
     const exTotals = document.getElementById('exTotals');
     csSetHidden(btnExDetail, active);
     if (active) { csSetHidden(exConfigList, true); csSetHidden(exTotals, true); }
-    csSetHidden(listeningField, active);
-    csSetHidden(readingField, active);
+    // V ČJ modulu bloky vždy skryj. Mimo ČJ je neukazuj natvrdo — řiď se tím,
+    // zda učitel daný typ skutečně vybral (jinak se zobrazí matoucí prázdné nastavení).
+    csSetHidden(listeningField, active || !usesListeningComprehension());
+    csSetHidden(readingField, active || !usesReadingComprehension());
     const step1Back = document.querySelector('#step1 .nav .btn-back');
     const step1Next = document.getElementById('next1');
     if (step1Back) {
@@ -16102,7 +16167,7 @@ document.addEventListener('keydown', function(e){
     if ((m.domain === 'stylistika' || m.domain === 'literatura') && m.correctionMode === 'auto') warnings.push('Stylistika a literatura nejsou vhodné pro čisté automatické známkování bez kontroly. Doporučený režim je AI návrh + učitelské schválení, případně ruční hodnocení.');
     if (m.domain === 'slovni_zasoba' && csExerciseList(m).some(function(k){ return (CS_EXERCISES[k] && CS_EXERCISES[k].review !== 'auto'); })) warnings.push('Slovní zásoba je vhodná pro automatické hodnocení hlavně u výběru, přiřazování a uzavřeného významu v kontextu. Otevřené odpovědi vyžadují schválení alternativ.');
     if ((m.phenomenon || '').toLowerCase().includes('interpunk') && !m.checks.punctuation) warnings.push('Vybraný jev souvisí s interpunkcí, ale kontrola interpunkce není zapnutá.');
-    if (m.goal === 'graded' && m.correctionMode !== 'auto') warnings.push('Známkovaný test s poloautomatickými položkami vyžaduje schválení alternativ a ověření klíče před použitím; ruční položky musí hodnotit učitel.');
+    if (csDerivedGoal(state) === 'graded' && m.correctionMode !== 'auto') warnings.push('Známkovaný test s poloautomatickými položkami vyžaduje schválení alternativ a ověření klíče před použitím; ruční položky musí hodnotit učitel.');
     box.textContent = warnings.length ? warnings.join(' ') : csSafetySummary(m); const ss=document.getElementById('csSafetySummary'); if(ss) ss.textContent=csSafetySummary(m); const cr=document.getElementById('csCorrectionRecommendation'); if(cr) cr.textContent=csCorrectionRecommendationText(m);
   }
   function csGoPage(page){
@@ -16131,7 +16196,7 @@ document.addEventListener('keydown', function(e){
     try { if (typeof saveSnapshot === 'function') saveSnapshot(); } catch(_) {}
   }
   function csInput(key,value){ const m=csModule(); m[key]=value; csApplyCoreState(); csUpdateRiskNote(); try{ if(typeof validate==='function') validate(); }catch(_){} try{ if(typeof saveSnapshot==='function') saveSnapshot(); }catch(_){} }
-  function csToggleCheck(key,checked){ const m=csModule(); m.checks[key]=!!checked; csApplyCoreState(); csUpdateRiskNote(); try{ if(typeof saveSnapshot==='function') saveSnapshot(); }catch(_){} }
+  function csToggleCheck(key,checked){ const m=csModule(); m.checks[key]=!!checked; csApplyCoreState(); if (m.checks[key] !== !!checked) { csRenderPanels(); try{ uiToast('Tuto kontrolu nelze pro vybraný jev vypnout.', 'warn', 4200); }catch(_){} } csUpdateRiskNote(); try{ if(typeof saveSnapshot==='function') saveSnapshot(); }catch(_){} }
   function csUseCustomPreset(){
     const m = csModule();
     m.preset = '';
@@ -16149,6 +16214,16 @@ document.addEventListener('keydown', function(e){
     const m = csModule();
     m.preset=k; m.domain=p.domain; m.phenomenon=p.phenomenon; m.goal=p.goal; m.correctionMode=p.correctionMode; m.difficulty=p.difficulty || m.difficulty || 'standardni'; m.exerciseTypes=csClone(p.exercises); if (p.stage) m.stage=p.stage; csSyncCorrectionMode(m);
     state.pocet=p.pocet; state.body=p.body; state.cas=p.cas; state.resultMode=p.resultMode; state.feedbackMode=p.feedbackMode;
+    // Šablona zapisuje resultMode/feedbackMode mimo pick() — křížová pravidla se musí
+    // vynutit ručně, jinak vznikne např. zakázané procvičovací + secureOffline.
+    // Záměr šablony má přednost: secureOffline šablona při procvičovacím režimu přepne na běžný test
+    // (stejně jako ruční volba secureOffline), jinak by enforceModeConstraints verifier zase vrátil na instant.
+    if (p.resultMode === 'secureOffline' && state.testMode === 'procviceci') {
+      state.testMode = 'bezny';
+      try { uiToast('Šablona používá bezpečný offline verifier — režim testu přepnut z procvičovacího na běžný.', 'warn', 5200); } catch(_) {}
+    }
+    try { if (typeof enforceModeConstraints === 'function') enforceModeConstraints(); } catch(_) {}
+    try { uiToast('Šablona nastavila: ' + (CS_STAGE[m.stage] ? CS_STAGE[m.stage].label : m.stage) + ' · ' + ((CS_DOMAINS[m.domain]||{}).label || m.domain) + ' · ' + csPhenomenonLabel(m) + ' · ' + (CS_DIFFICULTY[m.difficulty]||{}).label + ' · ' + (state.resultMode === 'secureOffline' ? 'bezpečný offline verifier' : 'okamžitá známka') + '. Volby na kartách 1 a 3 se tomu přizpůsobily.', 'ok', 6500); } catch(_) {}
     if (typeof setVal === 'function') { setVal('bodyCustom', state.body); setVal('casCustom', state.cas); }
     csApplyCoreState(); csRenderPanels(); csApplyVisualState();
     try { if (typeof applyVisualState === 'function') applyVisualState(); } catch(_) {}
@@ -16200,8 +16275,8 @@ document.addEventListener('keydown', function(e){
     document.addEventListener('keydown', onKey);
     setTimeout(function(){ if(open) open.focus(); }, 0);
   }
-  function csBackupGenericBeforeEntering(){ if (!state.__csGenericBackup) { const latkaEl=document.getElementById('latka'); state.__csGenericBackup = {instrJazyk:state.instrJazyk, uroven:csClone(state.uroven||[]), kombinovat:state.kombinovat, typyCviceni:csClone(state.typyCviceni||[]), ageGroup:state.ageGroup, ageGroupCustom:state.ageGroupCustom, testPurpose:state.testPurpose, latkaValue: latkaEl ? latkaEl.value : '', exerciseConfig:csClone(state.exerciseConfig||[]), exerciseDetail:!!state.exerciseDetail, pocet:state.pocet, body:state.body, cas:state.cas}; } }
-  function csRestoreGenericAfterLeaving(){ const b=state.__csGenericBackup; if (b){ ['instrJazyk','uroven','kombinovat','typyCviceni','ageGroup','ageGroupCustom','testPurpose'].forEach(k => { state[k]=csClone(b[k]); }); if (Object.prototype.hasOwnProperty.call(b,'exerciseConfig')) state.exerciseConfig = csClone(b.exerciseConfig||[]); if (Object.prototype.hasOwnProperty.call(b,'exerciseDetail')) state.exerciseDetail = !!b.exerciseDetail; if (Object.prototype.hasOwnProperty.call(b,'pocet')) state.pocet = b.pocet; if (Object.prototype.hasOwnProperty.call(b,'body')) state.body = b.body; if (Object.prototype.hasOwnProperty.call(b,'cas')) state.cas = b.cas; const latkaEl=document.getElementById('latka'); if (latkaEl && Object.prototype.hasOwnProperty.call(b,'latkaValue')) latkaEl.value = b.latkaValue || ''; delete state.__csGenericBackup; } csStripCzechExerciseRows(); try { if (typeof renderExerciseConfig === 'function') renderExerciseConfig(); } catch(_) {} }
+  function csBackupGenericBeforeEntering(){ if (!state.__csGenericBackup) { const latkaEl=document.getElementById('latka'); state.__csGenericBackup = {instrJazyk:state.instrJazyk, uroven:csClone(state.uroven||[]), kombinovat:state.kombinovat, typyCviceni:csClone(state.typyCviceni||[]), ageGroup:state.ageGroup, ageGroupCustom:state.ageGroupCustom, testPurpose:state.testPurpose, latkaValue: latkaEl ? latkaEl.value : '', exerciseConfig:csClone(state.exerciseConfig||[]), exerciseDetail:!!state.exerciseDetail, pocet:state.pocet, body:state.body, cas:state.cas, splitGenerate:!!state.splitGenerate}; } }
+  function csRestoreGenericAfterLeaving(){ const b=state.__csGenericBackup; if (b){ ['instrJazyk','uroven','kombinovat','typyCviceni','ageGroup','ageGroupCustom','testPurpose'].forEach(k => { state[k]=csClone(b[k]); }); if (Object.prototype.hasOwnProperty.call(b,'exerciseConfig')) state.exerciseConfig = csClone(b.exerciseConfig||[]); if (Object.prototype.hasOwnProperty.call(b,'exerciseDetail')) state.exerciseDetail = !!b.exerciseDetail; if (Object.prototype.hasOwnProperty.call(b,'pocet')) state.pocet = b.pocet; if (Object.prototype.hasOwnProperty.call(b,'body')) state.body = b.body; if (Object.prototype.hasOwnProperty.call(b,'cas')) state.cas = b.cas; if (Object.prototype.hasOwnProperty.call(b,'splitGenerate')) { state.splitGenerate = !!b.splitGenerate; delete state.__csSplitForced; } const latkaEl=document.getElementById('latka'); if (latkaEl && Object.prototype.hasOwnProperty.call(b,'latkaValue')) latkaEl.value = b.latkaValue || ''; delete state.__csGenericBackup; } csStripCzechExerciseRows(); try { if (typeof renderExerciseConfig === 'function') renderExerciseConfig(); } catch(_) {} }
   // Pojistka: v cizím jazyce nesmí zůstat řádky cvičení patřící do modulu ČJ (csLabel/csExerciseKey).
   function csStripCzechExerciseRows(){ if (csIsActive()) return; if (Array.isArray(state.exerciseConfig) && state.exerciseConfig.some(function(ex){return ex && (ex.csLabel || ex.csExerciseKey);})) { state.exerciseConfig = state.exerciseConfig.filter(function(ex){return ex && !ex.csLabel && !ex.csExerciseKey;}); if (!state.exerciseConfig.length) state.exerciseDetail = false; } }
   function csSelectedExerciseText(m){ return csExerciseList(m).map(k => { const e=CS_EXERCISES[k]; return '- '+e.label+' -> typ v ČJ: '+csTechPromptLabel(e.tech)+'; režim: '+csReviewLabel(e.review)+'; poznámka: '+e.desc; }).join('\n'); }
@@ -16319,7 +16394,6 @@ POVINNÉ FORMÁTY PRO BEZPEČNÉ HODNOCENÍ ČJ:\n- Pravopis/interpunkci testuj 
       csEnsureState(state);
       if (prev !== 'čeština') csBackupGenericBeforeEntering();
       state.jazyk = 'čeština';
-      if (!state.instrJazyk || state.instrJazyk === 'cs') state.instrJazyk = 'target';
       csEnsureState(state).csPage = 0;
       csApplyCoreState();
       try { if (typeof applyVisualState === 'function') applyVisualState(); } catch(_) {}
