@@ -186,6 +186,8 @@ body.light .hybrid-fallback { color: #6b7280; border-color: #7c3aed33; }
 .share-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--acc-b); border-radius:9px; background:#fff; color:var(--acc); font-size:13px; font-weight:700; cursor:pointer; line-height:1.2; }
 .share-btn:hover { background:var(--acc); color:#fff; }
 .share-note { font-size:11.5px; color:var(--ink2,#374151); line-height:1.45; }
+.share-gen { margin-top:10px; padding:11px 14px; border:1px solid var(--acc-b); border-radius:12px; background:var(--acc-d); }
+.share-gen .share-btn { background:#fff; margin-bottom:7px; }
 
 input[type=text], input[type=password], input[type=number], input[type=url], textarea {
   width: 100%; background: var(--bg3); border: 1.5px solid var(--bdr);
@@ -1748,8 +1750,8 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
     <div class="tpl-list" id="tplList"></div>
   </div>
 
-  <!-- Přenos zadání mezi kolegy (export / import konfigurace) -->
-  <details class="share-strip" id="shareZadani">
+  <!-- Přenos zadání mezi kolegy (export / import konfigurace) — jen admin (přepíná accOnGranted) -->
+  <details class="share-strip hidden" id="shareZadani">
     <summary class="share-head">🤝 Zadání pro kolegy <span class="share-sub">přenes nastavení testu mezi generátory (export / import)</span></summary>
     <div class="share-body">
       <div class="share-actions">
@@ -2515,6 +2517,10 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
       <!-- GENERATE BUTTON -->
       <button class="btn-generate" id="btnGenerate" onclick="generateTest()">✨ Vytvořit test přímo</button>
       <div class="req-note">Spotřebuje AI požadavky z denní kvóty (RPD) — jeden test = obvykle 3–6 požadavků. Bez AI klíče se místo toho jen připraví prompt ke zkopírování (offline).</div>
+      <div class="share-gen hidden" id="exportZadaniGen">
+        <button type="button" class="share-btn" onclick="exportZadani()">📤 Exportovat zadání pro správce</button>
+        <div class="share-note">Nemáš dnes volné AI požadavky? Ulož zadání do souboru a pošli ho správci — vytvoří test za tebe na svém klíči. Hesla ani nahrané soubory (audio/PDF/obrázky) se nepřenášejí, ty pošli zvlášť.</div>
+      </div>
       <div class="split-gen-row">
         <label class="split-gen-label" title="Každé cvičení se generuje samostatným API requestem — včetně jednoduchých typů. Složitá cvičení generátor odděluje automaticky (hybrid). Tuto volbu použij, pokud chceš rozdělit opravdu každé cvičení zvlášť.">
           <input type="checkbox" id="chkSplitGen" onchange="state.splitGenerate=this.checked;saveSnapshot();">
@@ -2675,10 +2681,13 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.50',
+  version: '6.11.53',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'AUTOMATICKÉ DOPLNĚNÍ TÝMOVÉHO KÓDU NA VLASTNÍM ZAŘÍZENÍ (6.11.53): pokud je týmový bezpečnostní kód lokálně uložen (SCHOOL_SECURITY_CODE_KEY), nově se do pole doplní sám — po přihlášení i po importu zadání — bez klikání na „Načíst". Uložení kódu je vědomé označení zařízení za vlastní/důvěryhodné (ukládání před sdíleným počítačem varuje), takže auto-doplnění je bezpečné; nepřepisuje už vyplněné pole a na zařízení bez uloženého kódu (sdílené počítače) se nic neděje. Hesla a učitelský PIN se i nadále nedoplňují automaticky (jsou per-test). Hláška po importu upravena. Ověřeno node --check.',
+    'IMPORT ZADÁNÍ — UPOZORNĚNÍ NA HESLA/PIN/KÓD (6.11.52): po načtení zadání od kolegy hláška nově výslovně připomíná, že hesla, učitelský PIN ani bezpečnostní kód se z bezpečnostních důvodů nepřenášejí a je nutné je před generováním nastavit (týmový kód přes „Načíst"). Doplňuje to záměrné chování: SENSITIVE_FIELD_IDS (heslo/ucitelPin/bezpKod) se do exportu nikdy nedostanou a import je vyprázdní — tajné údaje tak nikdy necestují v souboru. Pouze textová úprava hlášky. Ověřeno node --check.',
+    'PŘENOS ZADÁNÍ DLE ROLE — ADMIN NAHOŘE, KOLEGA POD GENEROVÁNÍM (6.11.51): viditelnost panelu „Zadání pro kolegy" se nově řídí rolí (accOnGranted). (1) ADMIN: plný panel (export + import) nahoře pod šablonami — odtud načítá zadání od kolegů a generuje. (2) NEADMIN (kolega): horní panel skrytý; místo něj má pod tlačítkem „Vytvořit test přímo" tlačítko „📤 Exportovat zadání pro správce" s vysvětlením — přesně ve chvíli, kdy narazí na vyčerpané AI požadavky. Stejný admin mechanismus jako u týmového kódu (default hidden, accOnGranted odkrývá podle role). Bez změny logiky exportu/importu. Ověřeno node --check.',
     'PŘENOS ZADÁNÍ MEZI KOLEGY — EXPORT/IMPORT KONFIGURACE (6.11.50): nahoře (pod šablonami) je nová rozbalovací sekce „🤝 Zadání pro kolegy". „📤 Exportovat zadání" uloží celé nastavení formuláře (látka, typy cvičení, čas, body, pedagogika, poslech i čtení vč. tématu a navrženého textu) do .json souboru; „📥 Načíst zadání od kolegy" ho v jiném generátoru načte a předvyplní formulář. Účel: kolega bez volných AI požadavků (RPD) vyplní zadání, exportuje a pošle ho kolegovi s placeným tierem, který test vytvoří na svém klíči. Bezpečně se NEpřenášejí hesla/PINy ani nahrané soubory (audio/PDF/obrázky — binárky se neukládají; po importu se přiloží ručně). Validace formátu (__type), potvrzení před přepsáním, žádná změna logiky generování. Ověřeno node --check.',
     'VIDITELNÉ OZNAČENÍ AKCÍ, KTERÉ STOJÍ AI POŽADAVEK (6.11.49): u všech tlačítek, která volají Gemini a čerpají z denní kvóty (RPD), je nově viditelný odznak „spotřebuje AI požadavek" / poznámka, aby bylo jasné, že nejde o offline funkci generátoru. Označeno: Vytvořit test přímo (s poznámkou, že jeden test = obvykle 3–6 požadavků), AI návrh otázek k poslechu, AI návrh textu+otázek ke čtení (vč. upozornění, že každé „Jiný návrh" = další požadavek), Rozšířit přijatelné odpovědi, Ověřit klíč druhým průchodem (AI), Přečíst stupnici pomocí AI a AI poradce. Pouze vizuální/textová vrstva, žádná změna logiky. Ověřeno node --check.',
     'AI POMOCNÍCI PRO POSLECH A ČTENÍ + TÉMA ČTENÍ DLE CEFR (6.11.48): comprehension bloky už negenerují „naslepo". (1) Listening: tlačítko „✨ Nechat AI navrhnout otázky" — z transkriptu/zaměření/učiva (a multimodálně z nahraného audia/videa, pokud je v Konkrétní zadání) navrhne otázky, ukáže náhled a po vložení je necháš v editovatelném poli upravit. (2) Reading: nový výběr TÉMATU/oboru textu, jehož nabídka se mění podle zvolené úrovně CEFR (A1–A2 konkrétní → B1–B2 šířeji → C1–C2 abstraktně) + pole pro vlastní téma. Tlačítko „✨ Navrhnout text a otázky" vygeneruje souvislý text + otázky, ukáže náhled ke schválení (✅ Použít / 🔄 Navrhnout jiný); schválený text se použije jako PEVNÝ zdroj — otázky čerpají jen z něj, AI nepřidává alternativy. Ruční offline varianta zůstává: text i otázky lze napsat přímo. (3) Reading nově předává do promptu i téma a pevný text/otázky přes buildReadingUserBlock() (dřív se k AI dostávala jen délka). Vše bez CDN, přes stávající callGeminiJSON. Ověřeno node --check.',
@@ -2686,9 +2695,6 @@ const RELEASE = Object.freeze({
     'SPRÁVA TÝMOVÉHO BEZPEČNOSTNÍHO KÓDU (6.11.46): (1) Generovat nový týmový kód smí jen správce (admin) — tlačítka „Vygenerovat" a „Kopírovat pro kolegy" jsou skrytá pro neadminy (default hidden, accOnGranted je odkrývá jen adminovi) + pojistka v generateSchoolSecurityCode(). Kolegům zůstává vložit/uložit/načíst/zapomenout kód. (2) U klasifikovaného (secureOffline) testu je týmový kód pro neadminy povinný (validate) — verifier tak nemůže tiše spadnout na náhodný per-test secret a tým drží jeden sdílený kód. (3) UI vyčištěno: odstraněna vysvětlující sec-note i rozbalovací <details>; zůstává jediný tooltip popisující účel a důležitost kódu. Ověřeno node --check.',
     'AUTOMATICKÝ FALLBACK PŘI 503 (6.11.45): callGeminiJSON — automatický přepad na záložní model (Lite) nově i při 503/UNAVAILABLE, ne jen při 429. Při přetížení primárního modelu se request místo druhého marného retry na stejný (zahlcený) model přesměruje JEDNOU na méně vytížený záložní model, který má vlastní per-model RPD kvótu — šetří denní limit primárního modelu a zvyšuje šanci na úspěch. Spouští se jen jednou (_fellBack), lze vypnout přes opts.noFallback, s viditelnou hláškou přes setGenMsg. Když i záložní model hlásí 503, _fellBack brání další rekurzi a spadne to do běžného capovaného retry. Ověřeno node --check.',
     'AUDIT LOGIKY NASTAVENÍ (6.11.44): (1) Šablony modulu ČJ nově procházejí enforceModeConstraints() — nemohla by tak vzniknout zakázaná kombinace procvičovací režim + bezpečný offline verifier; šablona navíc toastem shrne, co přepsala na kartách 1 a 3. (2) Čeština vynucuje pokročilý mód — applySimpleDefaults() už nepřepisuje exerciseConfig modulu ČJ (počty položek dle obtížnosti, rozdělení bodů se tak skutečně použijí v buildExerciseSpecs). (3) Identita „jednorázový kód\": pole rosteru se zobrazuje jen v tomto režimu, je advanced-only a validate() blokuje generování s prázdným rosterem (verifier by jinak tiše ztratil kontrolu kódů); v jednoduchém režimu se identita drží na „jméno\". (4) Varování o známkovaném testu s poloautomatickými položkami čte csDerivedGoal (skutečný režim) místo goal ze šablony. (5) Interpunkční checkbox je u interpunkčního jevu viditelně povinný (disabled) místo tichého snap-backu mimo UI. (6) Tlačítka počtu cvičení se v ČJ skrývají úplně (počet = vybrané typy úloh; klik dřív nic nedělal). (7) splitGenerate vynucený režimem semi/manual se po návratu na auto i po odchodu z ČJ vrací zpět. (8) Tichý přepad procvičovací→běžný při volbě secureOffline hlásí toast. (9) Export checklist má u ČJ semi/manual povinnou položku o schválení alternativ. (10) Úklid: artefakt ;;; za RELEASE, mrtvý zápis instrJazyk, inertní manualMode u ČJ cvičení. Ověřeno node --check + headless smoke testy.',
-    'COMPREHENSION BLOKY — OPRAVA ZOBRAZENÍ + UPOZORNĚNÍ (6.11.43): (1) Mimo ČJ modul se bloky listening/reading comprehension už nezobrazují automaticky. csApplyVisualState() dříve volal csSetHidden(block, active) — při active=false (cizí jazyky) blok natvrdo odkryl bez ohledu na výběr typu. Nyní: active || !usesListening/ReadingComprehension(), takže se řídí skutečným výběrem. (2) Po zaškrtnutí comprehension typu se učitel upozorní, že blok vyžaduje doladění: v každém bloku je nově výrazná výzva (.comp-needs-setup) a toggleType() po novém výběru doroluje na blok + krátce ho zvýrazní (flashCompBlock). Ověřeno node --check.',
-    'STABILNĚJŠÍ SELF-TEST BODOVÁNÍ (6.11.42): odstraněna příčina falešného selhání „Studentský test neexponuje encryptPayloadForTeacher“. stMakeHiddenFrame() dříve čekal na inicializaci emitovaného skriptu pevných 80 ms — na zaneprázdněném stroji (běžící AI volání apod.) skript nestihl vystavit funkce a kontrola selhala. Nyní aktivně čeká (polling po 25 ms až 4 s) na konkrétní funkce ve window předané přes readyCheck — verifier (scorePayload/decryptPayload/parseTxt/correctIndex), student (encryptPayloadForTeacher) i instant (calcScore…). V dobrém případě se vrací dříve, při reálné chybě selže se stejnou konkrétní hláškou. Celková pojistka 8 s. Ověřeno node --check.',
-    'ZMENŠENÍ MODALŮ PRESETU (6.11.41): modaly Detail doporučené šablony i Použít preset? byly předtím zvětšené ~2× (písmo 21–27px), což způsobovalo obří text a vodorovný posuvník (přetékání obsahu). Sníženo na vyvážené velikosti (head 17px, body 14.5px, title 18.5px), box zúžen (680/560px), první sloupec mřížky 240→160px + minmax(0,1fr) a overflow-wrap na hodnotách — dlouhé hodnoty se nyní zalamují místo roztahování. Breakpoint sjednocen na 560px. Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -4047,6 +4053,19 @@ async function forgetSecurityCodeLocal(){
   try { localStorage.removeItem(SCHOOL_SECURITY_CODE_KEY); uiToast('Lokálně uložený bezpečnostní kód byl z tohoto zařízení smazán. Samotný týmový kód v bezpečném školním úložišti tím smazán není.', 'warn', 5200); }
   catch(_) { await uiAlert('Lokální kód se nepodařilo smazat.'); }
 }
+// Na vlastním (důvěryhodném) zařízení: pokud je týmový bezpečnostní kód lokálně uložen,
+// doplň ho do pole automaticky a tiše. Uložení kódu = vědomé označení zařízení za vlastní
+// (ukládání i varuje před sdíleným počítačem), takže auto-doplnění je bezpečné. Nepřepisuje
+// už vyplněné pole. Voláno po startu (accOnGranted) i po importu zadání.
+function autoApplyStoredSecurityCode(){
+  try {
+    if (trim('bezpKod')) return;
+    const code = localStorage.getItem(SCHOOL_SECURITY_CODE_KEY) || '';
+    if (!code) return;
+    setVal('bezpKod', code);
+    if (typeof validate === 'function') validate();
+  } catch(_){}
+}
 function anonymizeGroupsForStorage(groups){
   return (Array.isArray(groups) ? groups : []).map((g, gi) => ({
     ...g,
@@ -4325,7 +4344,7 @@ async function importZadaniFile(inp){
     const ok = await uiConfirm('Načíst zadání ze souboru? Přepíše tvoje aktuální rozpracované nastavení formuláře.', 'Načíst zadání od kolegy?', true);
     if (!ok) return;
     applyImportedZadani(data);
-    uiToast('Zadání načteno' + (data.appVersion ? ' (vytvořeno ve verzi ' + esc(String(data.appVersion)) + ')' : '') + '. Pokud zadání používalo nahrané soubory, přilož je teď ručně v Konkrétní zadání → Soubory.', 'ok', 7000);
+    uiToast('Zadání načteno' + (data.appVersion ? ' (verze ' + esc(String(data.appVersion)) + ')' : '') + '. Hesla a učitelský PIN se nepřenášejí — nastav je před generováním. Týmový bezpečnostní kód se na tomto zařízení doplnil sám, pokud ho tu máš uložený (jinak ho vlož / načti). Nahrané soubory případně přilož ručně.', 'ok', 8000);
   }catch(err){
     uiToast('Soubor se nepodařilo načíst: ' + (err && err.message ? err.message : err), 'warn', 6000);
   }finally{
@@ -4348,6 +4367,7 @@ function applyImportedZadani(data){
   enforceModeConstraints();
   Object.entries(data.dom || {}).forEach(([k,v]) => setVal(k, v));
   SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
+  autoApplyStoredSecurityCode();   // na vlastním zařízení vrať uložený týmový kód
   if (typeof showFileError === 'function') showFileError('');
   maxStep = 0;
   goTo(0);
@@ -15586,6 +15606,13 @@ function accOnGranted(){
     var b = document.getElementById(id);
     if (b){ if (isAdminNow) b.classList.remove('hidden'); else b.classList.add('hidden'); }
   });
+  // Přenos zadání: horní panel (export+import) jen admin; tlačítko exportu pod generováním jen neadmin (kolega).
+  var shareTop = document.getElementById('shareZadani');
+  if (shareTop){ if (isAdminNow) shareTop.classList.remove('hidden'); else shareTop.classList.add('hidden'); }
+  var shareGen = document.getElementById('exportZadaniGen');
+  if (shareGen){ if (isAdminNow) shareGen.classList.add('hidden'); else shareGen.classList.remove('hidden'); }
+  // Na vlastním zařízení doplň uložený týmový bezpečnostní kód rovnou (bez klikání na „Načíst").
+  if (typeof autoApplyStoredSecurityCode === 'function') autoApplyStoredSecurityCode();
   updateAccessEnvBanner();
   // showWelcomeModal rozhodne podle ONBOARDING_DONE_KEY:
   // první spuštění → celý průvodce (4 kroky), opakované → krátké uvítání
