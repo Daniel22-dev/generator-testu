@@ -177,6 +177,15 @@ body.light .hybrid-fallback { color: #6b7280; border-color: #7c3aed33; }
 .req-badge::before { content:"🌐"; }
 .req-note { display:flex; align-items:center; gap:5px; font-size:11.5px; color:#b45309; font-weight:600; margin-top:7px; }
 .req-note::before { content:"🌐"; }
+/* ── Panel: přenos zadání mezi kolegy (export/import konfigurace) ── */
+.share-strip { margin:0 0 12px; padding:0; border:1px solid var(--acc-b); border-radius:12px; background:var(--acc-d); overflow:hidden; }
+.share-head { cursor:pointer; padding:11px 14px; font-size:13px; font-weight:800; color:var(--acc); text-transform:uppercase; letter-spacing:.03em; }
+.share-sub { font-size:11.5px; font-weight:500; color:var(--ink3,#6b7280); text-transform:none; letter-spacing:0; }
+.share-body { padding:0 14px 12px; }
+.share-actions { display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 9px; }
+.share-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--acc-b); border-radius:9px; background:#fff; color:var(--acc); font-size:13px; font-weight:700; cursor:pointer; line-height:1.2; }
+.share-btn:hover { background:var(--acc); color:#fff; }
+.share-note { font-size:11.5px; color:var(--ink2,#374151); line-height:1.45; }
 
 input[type=text], input[type=password], input[type=number], input[type=url], textarea {
   width: 100%; background: var(--bg3); border: 1.5px solid var(--bdr);
@@ -1739,6 +1748,20 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
     <div class="tpl-list" id="tplList"></div>
   </div>
 
+  <!-- Přenos zadání mezi kolegy (export / import konfigurace) -->
+  <details class="share-strip" id="shareZadani">
+    <summary class="share-head">🤝 Zadání pro kolegy <span class="share-sub">přenes nastavení testu mezi generátory (export / import)</span></summary>
+    <div class="share-body">
+      <div class="share-actions">
+        <button type="button" class="share-btn" onclick="exportZadani()">📤 Exportovat zadání do souboru</button>
+        <label class="share-btn" title="Načte zadání z .json souboru od kolegy a přepíše tvoje aktuální nastavení.">📥 Načíst zadání od kolegy
+          <input type="file" id="zadaniImportFile" accept="application/json,.json" style="display:none" onchange="importZadaniFile(this)">
+        </label>
+      </div>
+      <div class="share-note">Přenese všechna nastavení a texty (látku, typy cvičení, čas, body, poslech i čtení včetně tématu a navrženého textu) — <b>kromě hesel/PINů a nahraných souborů</b>. Audio, PDF a obrázky se do souboru nevejdou; ty pošli kolegovi zvlášť a po načtení je znovu přilož. Smysl: kolega bez volných AI požadavků vyplní zadání, exportuje ho a pošle tobě — ty ho načteš a test vytvoříš na svém klíči.</div>
+    </div>
+  </details>
+
   <!-- Progress -->
   <div id="progressArea">
     <div class="progress-bar" id="progressBar">
@@ -2652,10 +2675,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.49',
+  version: '6.11.50',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'PŘENOS ZADÁNÍ MEZI KOLEGY — EXPORT/IMPORT KONFIGURACE (6.11.50): nahoře (pod šablonami) je nová rozbalovací sekce „🤝 Zadání pro kolegy". „📤 Exportovat zadání" uloží celé nastavení formuláře (látka, typy cvičení, čas, body, pedagogika, poslech i čtení vč. tématu a navrženého textu) do .json souboru; „📥 Načíst zadání od kolegy" ho v jiném generátoru načte a předvyplní formulář. Účel: kolega bez volných AI požadavků (RPD) vyplní zadání, exportuje a pošle ho kolegovi s placeným tierem, který test vytvoří na svém klíči. Bezpečně se NEpřenášejí hesla/PINy ani nahrané soubory (audio/PDF/obrázky — binárky se neukládají; po importu se přiloží ručně). Validace formátu (__type), potvrzení před přepsáním, žádná změna logiky generování. Ověřeno node --check.',
     'VIDITELNÉ OZNAČENÍ AKCÍ, KTERÉ STOJÍ AI POŽADAVEK (6.11.49): u všech tlačítek, která volají Gemini a čerpají z denní kvóty (RPD), je nově viditelný odznak „spotřebuje AI požadavek" / poznámka, aby bylo jasné, že nejde o offline funkci generátoru. Označeno: Vytvořit test přímo (s poznámkou, že jeden test = obvykle 3–6 požadavků), AI návrh otázek k poslechu, AI návrh textu+otázek ke čtení (vč. upozornění, že každé „Jiný návrh" = další požadavek), Rozšířit přijatelné odpovědi, Ověřit klíč druhým průchodem (AI), Přečíst stupnici pomocí AI a AI poradce. Pouze vizuální/textová vrstva, žádná změna logiky. Ověřeno node --check.',
     'AI POMOCNÍCI PRO POSLECH A ČTENÍ + TÉMA ČTENÍ DLE CEFR (6.11.48): comprehension bloky už negenerují „naslepo". (1) Listening: tlačítko „✨ Nechat AI navrhnout otázky" — z transkriptu/zaměření/učiva (a multimodálně z nahraného audia/videa, pokud je v Konkrétní zadání) navrhne otázky, ukáže náhled a po vložení je necháš v editovatelném poli upravit. (2) Reading: nový výběr TÉMATU/oboru textu, jehož nabídka se mění podle zvolené úrovně CEFR (A1–A2 konkrétní → B1–B2 šířeji → C1–C2 abstraktně) + pole pro vlastní téma. Tlačítko „✨ Navrhnout text a otázky" vygeneruje souvislý text + otázky, ukáže náhled ke schválení (✅ Použít / 🔄 Navrhnout jiný); schválený text se použije jako PEVNÝ zdroj — otázky čerpají jen z něj, AI nepřidává alternativy. Ruční offline varianta zůstává: text i otázky lze napsat přímo. (3) Reading nově předává do promptu i téma a pevný text/otázky přes buildReadingUserBlock() (dřív se k AI dostávala jen délka). Vše bez CDN, přes stávající callGeminiJSON. Ověřeno node --check.',
     'POČET CVIČENÍ + SROZUMITELNOST POSLECHU A ŽOLÍKA (6.11.47): (1) Počet cvičení se nově slaďuje s typy v OBOU směrech. Dřív se počet při ubrání typu nesnížil (zůstalo staré vyšší číslo) — nyní toggleType() pozná, zda počet „seděl na podlaze" (počet == počtu typů); pokud ano, drží ho na podlaze i při odebrání typu (4 typy→ubereš→3). Když měl uživatel záměrně víc cvičení než typů (ruční volba přes tlačítka), počet se jen hlídá zespodu a nesnižuje se. (2) Žolík: tooltip rozšířen o praktický účel (omezený počet žolíků za pololetí = omluvený pokus, report označí ŽOLÍK POUŽIT, volba nevratná na začátku), aby kolegové chápali, k čemu sekce slouží. (3) Listening comprehension: blok i výzva nově jasně říkají, že audio/video/odkaz se nahrává NAHOŘE v sekci Konkrétní zadání → Soubory/Odkazy, a dole se jen ladí zaměření otázek/transkript — odstraněn zmatek, kam vlastně nahrávku dát. Ověřeno node --check.',
@@ -2665,7 +2689,6 @@ const RELEASE = Object.freeze({
     'COMPREHENSION BLOKY — OPRAVA ZOBRAZENÍ + UPOZORNĚNÍ (6.11.43): (1) Mimo ČJ modul se bloky listening/reading comprehension už nezobrazují automaticky. csApplyVisualState() dříve volal csSetHidden(block, active) — při active=false (cizí jazyky) blok natvrdo odkryl bez ohledu na výběr typu. Nyní: active || !usesListening/ReadingComprehension(), takže se řídí skutečným výběrem. (2) Po zaškrtnutí comprehension typu se učitel upozorní, že blok vyžaduje doladění: v každém bloku je nově výrazná výzva (.comp-needs-setup) a toggleType() po novém výběru doroluje na blok + krátce ho zvýrazní (flashCompBlock). Ověřeno node --check.',
     'STABILNĚJŠÍ SELF-TEST BODOVÁNÍ (6.11.42): odstraněna příčina falešného selhání „Studentský test neexponuje encryptPayloadForTeacher“. stMakeHiddenFrame() dříve čekal na inicializaci emitovaného skriptu pevných 80 ms — na zaneprázdněném stroji (běžící AI volání apod.) skript nestihl vystavit funkce a kontrola selhala. Nyní aktivně čeká (polling po 25 ms až 4 s) na konkrétní funkce ve window předané přes readyCheck — verifier (scorePayload/decryptPayload/parseTxt/correctIndex), student (encryptPayloadForTeacher) i instant (calcScore…). V dobrém případě se vrací dříve, při reálné chybě selže se stejnou konkrétní hláškou. Celková pojistka 8 s. Ověřeno node --check.',
     'ZMENŠENÍ MODALŮ PRESETU (6.11.41): modaly Detail doporučené šablony i Použít preset? byly předtím zvětšené ~2× (písmo 21–27px), což způsobovalo obří text a vodorovný posuvník (přetékání obsahu). Sníženo na vyvážené velikosti (head 17px, body 14.5px, title 18.5px), box zúžen (680/560px), první sloupec mřížky 240→160px + minmax(0,1fr) a overflow-wrap na hodnotách — dlouhé hodnoty se nyní zalamují místo roztahování. Breakpoint sjednocen na 560px. Ověřeno node --check.',
-    'DROBNÁ JAZYKOVÁ ÚPRAVA (6.11.40): v záložce 🔒 nahrazeno uměle zvýšit slovem vylepšit (známku nelze vylepšit). Bez změny obsahu a barev. Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -4256,6 +4279,83 @@ function loadTemplate(id) {
     applyVisualState();
     validate();
   }
+}
+
+// ═══ PŘENOS ZADÁNÍ MEZI KOLEGY ════════════════════════════════════════════════
+// Export/import celé konfigurace formuláře do .json souboru. Stejný tvar jako snapshot
+// (dom + state), bez hesel/PINů (nejsou v DOM_FIELDS) a bez nahraných souborů (binárky
+// se neukládají). Použití: kolega bez volných AI requestů vyplní zadání, exportuje ho a
+// pošle, druhý učitel ho načte a vygeneruje test na svém klíči/kvótě.
+function buildZadaniExport(){
+  const dom = {};
+  DOM_FIELDS.forEach(id => { dom[id] = val(id); });
+  return {
+    __type: 'generator-testu-zadani',
+    formatVersion: 1,
+    appVersion: RELEASE.version,
+    exportedAt: new Date().toISOString(),
+    dom,
+    state: getStoredState()
+  };
+}
+function exportZadani(){
+  try{
+    const data = buildZadaniExport();
+    const slug = (trim('nazev') || 'zadani').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'zadani';
+    const ts = new Date().toISOString().slice(0,10);
+    downloadText(JSON.stringify(data, null, 2), 'zadani_' + slug + '_' + ts + '.json', 'application/json;charset=utf-8');
+    const hasFiles = Array.isArray(state.fileNames) && state.fileNames.length > 0;
+    uiToast(hasFiles
+      ? 'Zadání exportováno. POZOR: nahrané soubory (audio/PDF/obrázky) se do souboru nepřenášejí — pošli je kolegovi zvlášť.'
+      : 'Zadání exportováno do souboru. Pošli ho kolegovi (e-mailem / Teams), který má volné AI požadavky.', hasFiles ? 'warn' : 'ok', 6500);
+  }catch(err){
+    uiToast('Export zadání selhal: ' + (err && err.message ? err.message : err), 'warn');
+  }
+}
+async function importZadaniFile(inp){
+  const f = inp && inp.files && inp.files[0];
+  if (!f){ return; }
+  try{
+    const raw = await readBlobAsText(f);
+    const data = JSON.parse(raw);
+    if (!data || data.__type !== 'generator-testu-zadani' || !data.state){
+      uiToast('Tento soubor není exportované zadání generátoru (.json). Zkontroluj, že posíláš správný soubor.', 'warn', 6000);
+      return;
+    }
+    const ok = await uiConfirm('Načíst zadání ze souboru? Přepíše tvoje aktuální rozpracované nastavení formuláře.', 'Načíst zadání od kolegy?', true);
+    if (!ok) return;
+    applyImportedZadani(data);
+    uiToast('Zadání načteno' + (data.appVersion ? ' (vytvořeno ve verzi ' + esc(String(data.appVersion)) + ')' : '') + '. Pokud zadání používalo nahrané soubory, přilož je teď ručně v Konkrétní zadání → Soubory.', 'ok', 7000);
+  }catch(err){
+    uiToast('Soubor se nepodařilo načíst: ' + (err && err.message ? err.message : err), 'warn', 6000);
+  }finally{
+    if (inp) inp.value = '';
+  }
+}
+function applyImportedZadani(data){
+  Object.assign(state, data.state || {});
+  if (!state.urls || !state.urls.length) state.urls = [''];
+  fileObjects = [];
+  fileReadPromises = [];
+  state.fileNames = [];
+  if (state.zadaniTab === 'file') state.zadaniTab = 'text';  // nahrané soubory se nepřenášejí
+  if (!state.exerciseConfig) state.exerciseConfig = [];
+  if (typeof state.exerciseDetail !== 'boolean') state.exerciseDetail = false;
+  if (!state.tema) state.tema = 'modern';
+  if (!state.resultMode) state.resultMode = 'instant';
+  if (!state.layout) state.layout = 'tabs';
+  normalizeLoadedState(state);
+  enforceModeConstraints();
+  Object.entries(data.dom || {}).forEach(([k,v]) => setVal(k, v));
+  SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
+  if (typeof showFileError === 'function') showFileError('');
+  maxStep = 0;
+  goTo(0);
+  applyVisualState();
+  if (typeof renderGroups === 'function') renderGroups();
+  if (typeof renderTeacherMapping === 'function') renderTeacherMapping();
+  validate();
+  saveSnapshot();
 }
 
 async function deleteTemplate(id) {
