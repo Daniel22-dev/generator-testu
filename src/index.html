@@ -172,6 +172,11 @@ body.light .hybrid-fallback { color: #6b7280; border-color: #7c3aed33; }
 .ai-prev-loading { font-size:13px; color:var(--ink3,#6b7280); }
 .ai-prev-err { font-size:13px; color:#b91c1c; font-weight:600; }
 .rc-sub-label { font-size:12.5px; font-weight:700; color:var(--ink2,#374151); margin:12px 0 6px; }
+/* ── Odznak „spotřebuje AI požadavek z denní kvóty" ── */
+.req-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border:1px solid #f59e0b; border-radius:999px; background:#fff7ed; color:#b45309; font-size:11px; font-weight:700; line-height:1.5; white-space:nowrap; vertical-align:middle; cursor:help; }
+.req-badge::before { content:"🌐"; }
+.req-note { display:flex; align-items:center; gap:5px; font-size:11.5px; color:#b45309; font-weight:600; margin-top:7px; }
+.req-note::before { content:"🌐"; }
 
 input[type=text], input[type=password], input[type=number], input[type=url], textarea {
   width: 100%; background: var(--bg3); border: 1.5px solid var(--bdr);
@@ -1994,6 +1999,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
         <textarea id="listeningFocus" rows="3" placeholder="Na co se má poslech ptát? Např. hlavní myšlenka, konkrétní údaje, postoje mluvčích, důvody rozhodnutí, pořadí událostí..." oninput="onInput()"></textarea>
         <div class="ai-suggest-row">
           <button type="button" class="ai-suggest-btn" id="liAiBtn" onclick="aiSuggestListeningQuestions()">✨ Nechat AI navrhnout otázky</button>
+          <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru. Každé kliknutí (i „Jiný návrh“) = 1 požadavek.">spotřebuje AI požadavek</span>
           <span class="ai-suggest-hint">Návrh uvidíš v náhledu, po vložení ho můžeš upravit. Funguje z transkriptu, zaměření i z nahraného audia.</span>
         </div>
         <div class="ai-prev hidden" id="liAiPreview"></div>
@@ -2019,6 +2025,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
         <div class="rc-sub-label">Text a otázky <button class="tt-icon" data-tip="Buď napiš vlastní text a otázky ručně (offline), nebo nech AI navrhnout text + otázky, prohlédni si náhled a schval. Schválený text se použije jako pevný zdroj — otázky čerpají jen z něj.">?</button></div>
         <div class="ai-suggest-row">
           <button type="button" class="ai-suggest-btn" id="rcAiBtn" onclick="aiSuggestReading()">✨ Navrhnout text a otázky</button>
+          <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru. Každé kliknutí (i „Navrhnout jiný“) = 1 požadavek.">spotřebuje AI požadavek</span>
           <span class="ai-suggest-hint">Podle úrovně, tématu a délky. Náhled si přečteš a schválíš (nebo necháš navrhnout jiný).</span>
         </div>
         <div class="ai-prev hidden" id="rcAiPreview"></div>
@@ -2209,6 +2216,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
             <div class="hidden" id="vlastniSkalaErr" style="margin-top:8px;font-size:13px;line-height:1.45;color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.35);border-radius:8px;padding:8px 10px"></div>
             <div class="hidden" id="aiScaleWrap" style="margin-top:10px" onclick="event.stopPropagation()">
               <button type="button" id="aiScaleBtn" class="ghost" style="width:100%" onclick="aiReadScale()">📖 Přečíst stupnici pomocí AI</button>
+              <div class="req-note">Spotřebuje 1 AI požadavek z denní kvóty (volá Gemini, není to offline).</div>
               <div class="go-desc" style="margin-top:6px">Stupnici můžeš napsat i slovně (věty, fajfky, body). AI ji převede a ukáže ti, jak ji pochopila — pak ji potvrdíš. Vyžaduje zadaný Gemini klíč ve žluté sekci.</div>
               <div class="hidden" id="aiScalePreview" style="margin-top:10px;font-size:13px;line-height:1.5;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.4);border-radius:10px;padding:10px 12px"></div>
             </div>
@@ -2483,6 +2491,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 
       <!-- GENERATE BUTTON -->
       <button class="btn-generate" id="btnGenerate" onclick="generateTest()">✨ Vytvořit test přímo</button>
+      <div class="req-note">Spotřebuje AI požadavky z denní kvóty (RPD) — jeden test = obvykle 3–6 požadavků. Bez AI klíče se místo toho jen připraví prompt ke zkopírování (offline).</div>
       <div class="split-gen-row">
         <label class="split-gen-label" title="Každé cvičení se generuje samostatným API requestem — včetně jednoduchých typů. Složitá cvičení generátor odděluje automaticky (hybrid). Tuto volbu použij, pokud chceš rozdělit opravdu každé cvičení zvlášť.">
           <input type="checkbox" id="chkSplitGen" onchange="state.splitGenerate=this.checked;saveSnapshot();">
@@ -2508,6 +2517,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
         <button class="btn-edit" id="btnEdit" onclick="openTestEditor()">✏️ Upravit otázky a odpovědi</button>
         <div class="enrich-row">
           <button class="btn-edit" id="btnEnrich" onclick="enrichAltAnswers()">✨ Rozšířit přijatelné odpovědi</button>
+          <span class="req-badge" title="Tato akce znovu volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
           <button type="button" class="tt-icon enrich-help" data-tip="Funkce znovu požádá Gemini, aby u textově opravovaných úloh doplnilo další uznatelné varianty odpovědí: synonyma, běžné pravopisné varianty, alternativní formulace nebo odpovědi bez zbytečně přísného slovosledu. Nemění zadání ani body; rozšiřuje pouze seznam odpovědí, které má test/verifier uznat jako správné. Po použití je dobré výsledek rychle zkontrolovat v editoru.">?</button>
         </div>
         <details class="quality-panel hidden" id="qualityPanel"></details>
@@ -2520,6 +2530,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
         <div id="selfTestReport" class="hidden"></div>
         <div class="enrich-row">
           <button class="btn-edit" id="btnKeyCheck" onclick="aiVerifyKey()" title="Druhý nezávislý klíč: požádá AI, aby sama vyřešila úlohy tohoto testu (NEgeneruje nový test), a porovná její odpovědi s uloženým klíčem. Položky, kde se AI a klíč liší, označí jako podezřelé — levný signál, kde nejspíš je chyba v klíči. Není to důkaz chyby; je to seznam míst k ruční kontrole. Vyžaduje Gemini klíč ve žluté sekci.">🔑 Ověřit klíč druhým průchodem (AI)</button>
+          <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
           <button type="button" class="tt-icon enrich-help" data-tip="Self-test ověří, že STROJ počítá body podle klíče správně. Neumí ale poznat, jestli je sám KLÍČ obsahově správný (AI může vyrobit hezkou otázku se špatně označenou správnou odpovědí). Tahle funkce proto nechá AI nezávisle odpovědět na stejné otázky a ukáže položky, kde se její odpověď liší od uloženého klíče — přesně tam je nejvyšší šance na chybu v klíči. Funguje u uzavřených a krátkých typů (výběr, true/false, doplňování, slovotvorba…); u otevřených překladů/transformací je signál slabší a bere se jen jako upozornění.">?</button>
         </div>
         <div id="keyCheckReport" class="hidden"></div>
@@ -2641,10 +2652,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.48',
+  version: '6.11.49',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'VIDITELNÉ OZNAČENÍ AKCÍ, KTERÉ STOJÍ AI POŽADAVEK (6.11.49): u všech tlačítek, která volají Gemini a čerpají z denní kvóty (RPD), je nově viditelný odznak „spotřebuje AI požadavek" / poznámka, aby bylo jasné, že nejde o offline funkci generátoru. Označeno: Vytvořit test přímo (s poznámkou, že jeden test = obvykle 3–6 požadavků), AI návrh otázek k poslechu, AI návrh textu+otázek ke čtení (vč. upozornění, že každé „Jiný návrh" = další požadavek), Rozšířit přijatelné odpovědi, Ověřit klíč druhým průchodem (AI), Přečíst stupnici pomocí AI a AI poradce. Pouze vizuální/textová vrstva, žádná změna logiky. Ověřeno node --check.',
     'AI POMOCNÍCI PRO POSLECH A ČTENÍ + TÉMA ČTENÍ DLE CEFR (6.11.48): comprehension bloky už negenerují „naslepo". (1) Listening: tlačítko „✨ Nechat AI navrhnout otázky" — z transkriptu/zaměření/učiva (a multimodálně z nahraného audia/videa, pokud je v Konkrétní zadání) navrhne otázky, ukáže náhled a po vložení je necháš v editovatelném poli upravit. (2) Reading: nový výběr TÉMATU/oboru textu, jehož nabídka se mění podle zvolené úrovně CEFR (A1–A2 konkrétní → B1–B2 šířeji → C1–C2 abstraktně) + pole pro vlastní téma. Tlačítko „✨ Navrhnout text a otázky" vygeneruje souvislý text + otázky, ukáže náhled ke schválení (✅ Použít / 🔄 Navrhnout jiný); schválený text se použije jako PEVNÝ zdroj — otázky čerpají jen z něj, AI nepřidává alternativy. Ruční offline varianta zůstává: text i otázky lze napsat přímo. (3) Reading nově předává do promptu i téma a pevný text/otázky přes buildReadingUserBlock() (dřív se k AI dostávala jen délka). Vše bez CDN, přes stávající callGeminiJSON. Ověřeno node --check.',
     'POČET CVIČENÍ + SROZUMITELNOST POSLECHU A ŽOLÍKA (6.11.47): (1) Počet cvičení se nově slaďuje s typy v OBOU směrech. Dřív se počet při ubrání typu nesnížil (zůstalo staré vyšší číslo) — nyní toggleType() pozná, zda počet „seděl na podlaze" (počet == počtu typů); pokud ano, drží ho na podlaze i při odebrání typu (4 typy→ubereš→3). Když měl uživatel záměrně víc cvičení než typů (ruční volba přes tlačítka), počet se jen hlídá zespodu a nesnižuje se. (2) Žolík: tooltip rozšířen o praktický účel (omezený počet žolíků za pololetí = omluvený pokus, report označí ŽOLÍK POUŽIT, volba nevratná na začátku), aby kolegové chápali, k čemu sekce slouží. (3) Listening comprehension: blok i výzva nově jasně říkají, že audio/video/odkaz se nahrává NAHOŘE v sekci Konkrétní zadání → Soubory/Odkazy, a dole se jen ladí zaměření otázek/transkript — odstraněn zmatek, kam vlastně nahrávku dát. Ověřeno node --check.',
     'SPRÁVA TÝMOVÉHO BEZPEČNOSTNÍHO KÓDU (6.11.46): (1) Generovat nový týmový kód smí jen správce (admin) — tlačítka „Vygenerovat" a „Kopírovat pro kolegy" jsou skrytá pro neadminy (default hidden, accOnGranted je odkrývá jen adminovi) + pojistka v generateSchoolSecurityCode(). Kolegům zůstává vložit/uložit/načíst/zapomenout kód. (2) U klasifikovaného (secureOffline) testu je týmový kód pro neadminy povinný (validate) — verifier tak nemůže tiše spadnout na náhodný per-test secret a tým drží jeden sdílený kód. (3) UI vyčištěno: odstraněna vysvětlující sec-note i rozbalovací <details>; zůstává jediný tooltip popisující účel a důležitost kódu. Ověřeno node --check.',
@@ -2654,7 +2666,6 @@ const RELEASE = Object.freeze({
     'STABILNĚJŠÍ SELF-TEST BODOVÁNÍ (6.11.42): odstraněna příčina falešného selhání „Studentský test neexponuje encryptPayloadForTeacher“. stMakeHiddenFrame() dříve čekal na inicializaci emitovaného skriptu pevných 80 ms — na zaneprázdněném stroji (běžící AI volání apod.) skript nestihl vystavit funkce a kontrola selhala. Nyní aktivně čeká (polling po 25 ms až 4 s) na konkrétní funkce ve window předané přes readyCheck — verifier (scorePayload/decryptPayload/parseTxt/correctIndex), student (encryptPayloadForTeacher) i instant (calcScore…). V dobrém případě se vrací dříve, při reálné chybě selže se stejnou konkrétní hláškou. Celková pojistka 8 s. Ověřeno node --check.',
     'ZMENŠENÍ MODALŮ PRESETU (6.11.41): modaly Detail doporučené šablony i Použít preset? byly předtím zvětšené ~2× (písmo 21–27px), což způsobovalo obří text a vodorovný posuvník (přetékání obsahu). Sníženo na vyvážené velikosti (head 17px, body 14.5px, title 18.5px), box zúžen (680/560px), první sloupec mřížky 240→160px + minmax(0,1fr) a overflow-wrap na hodnotách — dlouhé hodnoty se nyní zalamují místo roztahování. Breakpoint sjednocen na 560px. Ověřeno node --check.',
     'DROBNÁ JAZYKOVÁ ÚPRAVA (6.11.40): v záložce 🔒 nahrazeno uměle zvýšit slovem vylepšit (známku nelze vylepšit). Bez změny obsahu a barev. Ověřeno node --check.',
-    'JAZYKOVÉ OPRAVY ZÁLOŽKY PŘÍSNÉHO REŽIMU (6.11.39): vyčištěny hovorové a kostrbaté tvary v textu záložky 🔒: zdrojáku → zdrojového kódu; několik dalších úprav (několik formulací přepsáno do spisovné češtiny, odstraněn slang a anglicismy: nafouknout/vlepíš/zapékají/token/blur/tvrdé brány). Bez změny obsahu a barev. Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -3715,6 +3726,7 @@ function openGeneratorAssistant(){
       + '<button type="button" class="ga-mode-btn'+(gaState.mode==='simple'?' active':'')+'" data-mode="simple">Jednoduše</button>'
       + '<button type="button" class="ga-mode-btn'+(gaState.mode==='detailed'?' active':'')+'" data-mode="detailed">Podrobně</button></div>'
       + '<button type="button" class="ga-find" id="gaFind">🔎 Najít odpověď</button></div>'
+    + '<div class="req-note">Poradce odpovídá přes AI — každý dotaz = 1 požadavek z denní kvóty (RPD).</div>'
     + '<div class="ga-chips" id="gaChips">'+chips+'</div>'
     + '<div class="ga-result" id="gaResult" aria-live="polite"><p class="ga-hint">Napiš dotaz a klikni na „Najít odpověď".</p></div>'
     + '<div class="ga-actions">'
@@ -4710,7 +4722,8 @@ function renderLiAiPreview(s){
     '<div class="ai-prev-actions">' +
     '<button type="button" class="btn-modal-ok" onclick="liAiInsert()">✅ Vložit do otázek</button>' +
     '<button type="button" class="ghost" onclick="aiSuggestListeningQuestions()">🔄 Jiný návrh</button>' +
-    '<button type="button" class="ghost" onclick="liAiDismiss()">Zavřít</button></div>';
+    '<button type="button" class="ghost" onclick="liAiDismiss()">Zavřít</button></div>' +
+    '<div class="req-note">Každé „Jiný návrh“ = další 1 AI požadavek z denní kvóty.</div>';
 }
 function liAiInsert(){
   if (!_liAiDraft || !_liAiDraft.length) return;
@@ -4778,7 +4791,8 @@ function renderRcAiPreview(s){
     '<div class="ai-prev-actions">' +
     '<button type="button" class="btn-modal-ok" onclick="rcAiInsert()">✅ Použít tento text</button>' +
     '<button type="button" class="ghost" onclick="aiSuggestReading()">🔄 Navrhnout jiný</button>' +
-    '<button type="button" class="ghost" onclick="rcAiDismiss()">Zavřít</button></div>';
+    '<button type="button" class="ghost" onclick="rcAiDismiss()">Zavřít</button></div>' +
+    '<div class="req-note">Každé „Navrhnout jiný“ = další 1 AI požadavek z denní kvóty.</div>';
 }
 function rcAiInsert(){
   if (!_rcAiDraft) return;
