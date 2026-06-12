@@ -156,6 +156,22 @@ body.light .hybrid-fallback { color: #6b7280; border-color: #7c3aed33; }
 .comp-flash { animation: compHighlight 1.4s ease-out 2; border-radius:10px; }
 .type-needs-setup { position:relative; }
 .type-needs-setup::after { content:"⚠"; position:absolute; top:3px; right:5px; font-size:11px; color:var(--acc); }
+/* ── AI pomocníci v comprehension blocích (návrh + náhled) ── */
+.ai-suggest-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0; }
+.ai-suggest-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--acc-b); border-radius:9px; background:var(--acc-d); color:var(--acc); font-size:13px; font-weight:700; cursor:pointer; line-height:1.2; }
+.ai-suggest-btn:hover:not(:disabled) { background:var(--acc); color:#fff; }
+.ai-suggest-btn:disabled { opacity:.6; cursor:default; }
+.ai-suggest-hint { font-size:12px; color:var(--ink3,#6b7280); }
+.ai-prev { margin:8px 0 4px; padding:11px 13px; border:1.5px solid var(--acc-b); border-radius:10px; background:#fff; }
+.ai-prev-head { font-size:12.5px; font-weight:700; color:var(--acc); margin-bottom:7px; }
+.ai-prev-passage { font-size:13.5px; line-height:1.5; white-space:pre-wrap; padding:9px 11px; border:1px solid var(--acc-b); border-radius:8px; background:var(--acc-d); margin-bottom:9px; max-height:230px; overflow:auto; }
+.ai-prev-list { margin:0 0 9px; padding-left:20px; font-size:13.5px; line-height:1.5; }
+.ai-prev-list li { margin-bottom:4px; }
+.ai-prev-a { color:var(--ok,#15803d); font-weight:600; }
+.ai-prev-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.ai-prev-loading { font-size:13px; color:var(--ink3,#6b7280); }
+.ai-prev-err { font-size:13px; color:#b91c1c; font-weight:600; }
+.rc-sub-label { font-size:12.5px; font-weight:700; color:var(--ink2,#374151); margin:12px 0 6px; }
 
 input[type=text], input[type=password], input[type=number], input[type=url], textarea {
   width: 100%; background: var(--bg3); border: 1.5px solid var(--bdr);
@@ -1969,20 +1985,25 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 
       <div class="field hidden" id="listeningBlock">
         <div class="field-label">🎧 Listening comprehension — doplňující zadání <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ listening comprehension. Slouží k doplnění zaměření otázek, transkriptu nebo vlastních hotových otázek bez ohledu na to, zda jako hlavní zdroj používáš text, soubor nebo odkaz.">?</button></div>
-        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>listening comprehension</strong> — tento typ vyžaduje doladění níže: nahraj audio/video nebo vlož transkript a urči, na co se mají otázky ptát. Bez zdroje k poslechu nebude mít test z čeho čerpat.</span></div>
-        <div class="field-hint">Audio/video je zdroj pro Gemini a učitele. Ve studentském testu se audio nepřehrává; poslech pouští učitel.</div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>listening comprehension</strong> — audio/video nebo odkaz na nahrávku nahraj <strong>nahoře v sekci Konkrétní zadání → Soubory / Odkazy</strong>; tady dole pak jen urči, na co se mají otázky ptát (případně vlož transkript nebo vlastní hotové otázky). Bez zdroje k poslechu nebude mít test z čeho čerpat.</span></div>
+        <div class="field-hint">📎 Samotnou nahrávku (audio/video) nebo odkaz na ni dej <strong>výše do „Konkrétní zadání → Soubory / Odkazy"</strong> — listening formáty jsou tam mezi podporovanými. Tento blok slouží jen k doladění zaměření otázek, transkriptu nebo vlastních hotových otázek. Ve studentském testu se audio nepřehrává; poslech pouští učitel.</div>
         <div class="tip-box" style="margin-bottom:10px">
           <div class="tip-title">Shrnutí funkčnosti</div>
           <div class="tip-body">Můžeš současně nahrát audio/video nebo vložit URL a tady určit, na co se mají otázky ptát. Pokud máš vlastní otázky, transkript nebo hotové cvičení, vlož je sem — generátor je pošle do Gemini společně s aktivním zdrojem. Teacher verifier dostane transkript/audio script a správné odpovědi; student uvidí jen informaci, že poslech pustí učitel.</div>
         </div>
         <textarea id="listeningFocus" rows="3" placeholder="Na co se má poslech ptát? Např. hlavní myšlenka, konkrétní údaje, postoje mluvčích, důvody rozhodnutí, pořadí událostí..." oninput="onInput()"></textarea>
+        <div class="ai-suggest-row">
+          <button type="button" class="ai-suggest-btn" id="liAiBtn" onclick="aiSuggestListeningQuestions()">✨ Nechat AI navrhnout otázky</button>
+          <span class="ai-suggest-hint">Návrh uvidíš v náhledu, po vložení ho můžeš upravit. Funguje z transkriptu, zaměření i z nahraného audia.</span>
+        </div>
+        <div class="ai-prev hidden" id="liAiPreview"></div>
         <textarea id="listeningQuestions" rows="4" placeholder="Moje hotové otázky / vlastní cvičení k poslechu (nepovinné). Pokud je vložíš, Gemini je má převést do interaktivního testu a nepřepisovat zbytečně." style="margin-top:8px" oninput="onInput()"></textarea>
         <textarea id="listeningTranscript" rows="3" placeholder="Transkript / audio script / poznámka k poslechovému zdroji (nepovinné). Studentům se nezobrazí, patří do učitelského verifieru." style="margin-top:8px" oninput="onInput()"></textarea>
       </div>
 
       <div class="field hidden" id="readingBlock">
-        <div class="field-label">📖 Reading comprehension — délka textu <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ reading comprehension. Určuje přibližnou délku souvislého textu, ke kterému se váží otázky. Jeden text na cvičení, otázky pod ním. Delší text = náročnější čtení a víc prostoru pro detailní otázky.">?</button></div>
-        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>reading comprehension</strong> — tady doleď délku souvislého textu, ke kterému se otázky vážou. Delší text = náročnější čtení; doporučujeme spárovat s vyšším počtem otázek.</span></div>
+        <div class="field-label">📖 Reading comprehension — délka, téma, text <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ reading comprehension. Nastav délku a téma textu (téma se mění podle CEFR). Text i otázky můžeš napsat ručně, nebo je nechat navrhnout AI a schválit. Jeden text na cvičení, otázky pod ním.">?</button></div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>reading comprehension</strong> — dole zvol délku a téma textu. Buď napiš vlastní text a otázky ručně, nebo nech <strong>AI navrhnout text + otázky</strong>, prohlédni si náhled a schval. Bez tématu/textu vybere obsah AI sama podle úrovně.</span></div>
         <div class="field-hint">Jeden souvislý text na cvičení; otázky se vážou na něj (text se neopakuje u každé otázky).</div>
         <div class="btn-row" id="rcLenBtns">
           <button class="tag-btn" data-val="short" onclick="pickRcLength('short')">Krátký (~60–100 slov)</button>
@@ -1990,6 +2011,19 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
           <button class="tag-btn" data-val="long" onclick="pickRcLength('long')">Delší (~240–340 slov)</button>
         </div>
         <div class="small-muted" style="margin-top:8px">Delší text doporučujeme spárovat s vyšším počtem otázek (4–6), aby se čtení vyplatilo. Skutečná délka se může mírně lišit podle tématu a úrovně CEFR.</div>
+
+        <div class="rc-sub-label">Téma / obor textu <button class="tt-icon" data-tip="Vyber téma textu. Nabídka se přizpůsobuje zvolené úrovni CEFR — s vyšší úrovní jsou témata abstraktnější. Můžeš zadat i vlastní téma. Téma se předá AI při generování i návrhu textu.">?</button></div>
+        <div class="btn-row" id="rcTopicBtns"></div>
+        <input type="text" id="readingTopicCustom" placeholder="…nebo zadej vlastní téma textu (např. cestování po Andalusii, historie Ostravy)" style="margin-top:8px" oninput="onReadingTopicCustomInput()">
+
+        <div class="rc-sub-label">Text a otázky <button class="tt-icon" data-tip="Buď napiš vlastní text a otázky ručně (offline), nebo nech AI navrhnout text + otázky, prohlédni si náhled a schval. Schválený text se použije jako pevný zdroj — otázky čerpají jen z něj.">?</button></div>
+        <div class="ai-suggest-row">
+          <button type="button" class="ai-suggest-btn" id="rcAiBtn" onclick="aiSuggestReading()">✨ Navrhnout text a otázky</button>
+          <span class="ai-suggest-hint">Podle úrovně, tématu a délky. Náhled si přečteš a schválíš (nebo necháš navrhnout jiný).</span>
+        </div>
+        <div class="ai-prev hidden" id="rcAiPreview"></div>
+        <textarea id="readingText" rows="5" placeholder="Souvislý text k přečtení (nepovinné). Můžeš ho napsat ručně, nebo sem vložit návrh AI. Pokud ho vyplníš, použije se přesně tento text." oninput="onInput()"></textarea>
+        <textarea id="readingQuestions" rows="4" placeholder="Otázky k textu (nepovinné). Ručně nebo z návrhu AI. Pokud je vyplníš, použijí se přesně tyto otázky bez přidávání dalších." style="margin-top:8px" oninput="onInput()"></textarea>
       </div>
 
       <div class="nav">
@@ -2355,7 +2389,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
       </div>
       <!-- overeni bylo odstraněno z UI; state.overeni=NE vynucuje normalizeLoadedState() -->
       <div class="field">
-        <div class="field-label">🃏 Žolík <button class="tt-icon" data-tip="Žolík je nevratná volba na začátku testu. Student zůstává v testovém prostředí, úlohy normálně vyplňuje a body se počítají. Report viditelně ukáže ŽOLÍK POUŽIT, bude obsahovat watermark a kontrolní kód reportu; TXT se u žolíka nevyžaduje.">?</button></div>
+        <div class="field-label">🃏 Žolík <button class="tt-icon" data-tip="K čemu slouží: dáváš studentům omezený počet žolíků za pololetí (typicky jednoho). Když student není na test připravený, může si na úvodní obrazovce „vzít žolíka". Test pak normálně napíše a body se spočítají, ale report viditelně označí ŽOLÍK POUŽIT (+ watermark a kontrolní kód reportu) — díky tomu poznáš, že jde o omluvený pokus, který se nemá počítat do klasifikace. Volba je nevratná hned na začátku, takže ji student nemůže použít až poté, co zjistí, že mu test nevyšel. U žolíka se nevyžaduje ověřovací .txt; stačí screenshot s kontrolním kódem reportu.">?</button></div>
         <div class="btn-row choice-card-grid two-col centered-cards" id="zolicekBtns">
           <button class="tag-btn active" data-val="NE" onclick="pick('zolicek','NE')"><span class="choice-card-title">NE — bez žolíka</span><span class="choice-card-desc">Všichni studenti píší test standardně bez této speciální volby.</span></button>
           <button class="tag-btn" data-val="ANO" onclick="pick('zolicek','ANO')"><span class="choice-card-title">ANO — student si může vzít žolíka</span><span class="choice-card-desc">Na začátku testu se může rozhodnout využít žolíka a report to jasně označí.</span></button>
@@ -2607,10 +2641,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.46',
+  version: '6.11.48',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'AI POMOCNÍCI PRO POSLECH A ČTENÍ + TÉMA ČTENÍ DLE CEFR (6.11.48): comprehension bloky už negenerují „naslepo". (1) Listening: tlačítko „✨ Nechat AI navrhnout otázky" — z transkriptu/zaměření/učiva (a multimodálně z nahraného audia/videa, pokud je v Konkrétní zadání) navrhne otázky, ukáže náhled a po vložení je necháš v editovatelném poli upravit. (2) Reading: nový výběr TÉMATU/oboru textu, jehož nabídka se mění podle zvolené úrovně CEFR (A1–A2 konkrétní → B1–B2 šířeji → C1–C2 abstraktně) + pole pro vlastní téma. Tlačítko „✨ Navrhnout text a otázky" vygeneruje souvislý text + otázky, ukáže náhled ke schválení (✅ Použít / 🔄 Navrhnout jiný); schválený text se použije jako PEVNÝ zdroj — otázky čerpají jen z něj, AI nepřidává alternativy. Ruční offline varianta zůstává: text i otázky lze napsat přímo. (3) Reading nově předává do promptu i téma a pevný text/otázky přes buildReadingUserBlock() (dřív se k AI dostávala jen délka). Vše bez CDN, přes stávající callGeminiJSON. Ověřeno node --check.',
+    'POČET CVIČENÍ + SROZUMITELNOST POSLECHU A ŽOLÍKA (6.11.47): (1) Počet cvičení se nově slaďuje s typy v OBOU směrech. Dřív se počet při ubrání typu nesnížil (zůstalo staré vyšší číslo) — nyní toggleType() pozná, zda počet „seděl na podlaze" (počet == počtu typů); pokud ano, drží ho na podlaze i při odebrání typu (4 typy→ubereš→3). Když měl uživatel záměrně víc cvičení než typů (ruční volba přes tlačítka), počet se jen hlídá zespodu a nesnižuje se. (2) Žolík: tooltip rozšířen o praktický účel (omezený počet žolíků za pololetí = omluvený pokus, report označí ŽOLÍK POUŽIT, volba nevratná na začátku), aby kolegové chápali, k čemu sekce slouží. (3) Listening comprehension: blok i výzva nově jasně říkají, že audio/video/odkaz se nahrává NAHOŘE v sekci Konkrétní zadání → Soubory/Odkazy, a dole se jen ladí zaměření otázek/transkript — odstraněn zmatek, kam vlastně nahrávku dát. Ověřeno node --check.',
     'SPRÁVA TÝMOVÉHO BEZPEČNOSTNÍHO KÓDU (6.11.46): (1) Generovat nový týmový kód smí jen správce (admin) — tlačítka „Vygenerovat" a „Kopírovat pro kolegy" jsou skrytá pro neadminy (default hidden, accOnGranted je odkrývá jen adminovi) + pojistka v generateSchoolSecurityCode(). Kolegům zůstává vložit/uložit/načíst/zapomenout kód. (2) U klasifikovaného (secureOffline) testu je týmový kód pro neadminy povinný (validate) — verifier tak nemůže tiše spadnout na náhodný per-test secret a tým drží jeden sdílený kód. (3) UI vyčištěno: odstraněna vysvětlující sec-note i rozbalovací <details>; zůstává jediný tooltip popisující účel a důležitost kódu. Ověřeno node --check.',
     'AUTOMATICKÝ FALLBACK PŘI 503 (6.11.45): callGeminiJSON — automatický přepad na záložní model (Lite) nově i při 503/UNAVAILABLE, ne jen při 429. Při přetížení primárního modelu se request místo druhého marného retry na stejný (zahlcený) model přesměruje JEDNOU na méně vytížený záložní model, který má vlastní per-model RPD kvótu — šetří denní limit primárního modelu a zvyšuje šanci na úspěch. Spouští se jen jednou (_fellBack), lze vypnout přes opts.noFallback, s viditelnou hláškou přes setGenMsg. Když i záložní model hlásí 503, _fellBack brání další rekurzi a spadne to do běžného capovaného retry. Ověřeno node --check.',
     'AUDIT LOGIKY NASTAVENÍ (6.11.44): (1) Šablony modulu ČJ nově procházejí enforceModeConstraints() — nemohla by tak vzniknout zakázaná kombinace procvičovací režim + bezpečný offline verifier; šablona navíc toastem shrne, co přepsala na kartách 1 a 3. (2) Čeština vynucuje pokročilý mód — applySimpleDefaults() už nepřepisuje exerciseConfig modulu ČJ (počty položek dle obtížnosti, rozdělení bodů se tak skutečně použijí v buildExerciseSpecs). (3) Identita „jednorázový kód\": pole rosteru se zobrazuje jen v tomto režimu, je advanced-only a validate() blokuje generování s prázdným rosterem (verifier by jinak tiše ztratil kontrolu kódů); v jednoduchém režimu se identita drží na „jméno\". (4) Varování o známkovaném testu s poloautomatickými položkami čte csDerivedGoal (skutečný režim) místo goal ze šablony. (5) Interpunkční checkbox je u interpunkčního jevu viditelně povinný (disabled) místo tichého snap-backu mimo UI. (6) Tlačítka počtu cvičení se v ČJ skrývají úplně (počet = vybrané typy úloh; klik dřív nic nedělal). (7) splitGenerate vynucený režimem semi/manual se po návratu na auto i po odchodu z ČJ vrací zpět. (8) Tichý přepad procvičovací→běžný při volbě secureOffline hlásí toast. (9) Export checklist má u ČJ semi/manual povinnou položku o schválení alternativ. (10) Úklid: artefakt ;;; za RELEASE, mrtvý zápis instrJazyk, inertní manualMode u ČJ cvičení. Ověřeno node --check + headless smoke testy.',
@@ -2619,8 +2655,6 @@ const RELEASE = Object.freeze({
     'ZMENŠENÍ MODALŮ PRESETU (6.11.41): modaly Detail doporučené šablony i Použít preset? byly předtím zvětšené ~2× (písmo 21–27px), což způsobovalo obří text a vodorovný posuvník (přetékání obsahu). Sníženo na vyvážené velikosti (head 17px, body 14.5px, title 18.5px), box zúžen (680/560px), první sloupec mřížky 240→160px + minmax(0,1fr) a overflow-wrap na hodnotách — dlouhé hodnoty se nyní zalamují místo roztahování. Breakpoint sjednocen na 560px. Ověřeno node --check.',
     'DROBNÁ JAZYKOVÁ ÚPRAVA (6.11.40): v záložce 🔒 nahrazeno uměle zvýšit slovem vylepšit (známku nelze vylepšit). Bez změny obsahu a barev. Ověřeno node --check.',
     'JAZYKOVÉ OPRAVY ZÁLOŽKY PŘÍSNÉHO REŽIMU (6.11.39): vyčištěny hovorové a kostrbaté tvary v textu záložky 🔒: zdrojáku → zdrojového kódu; několik dalších úprav (několik formulací přepsáno do spisovné češtiny, odstraněn slang a anglicismy: nafouknout/vlepíš/zapékají/token/blur/tvrdé brány). Bez změny obsahu a barev. Ověřeno node --check.',
-    'ZPŘESNĚNÍ SITUACÍ V PŘÍSNÉM REŽIMU (6.11.38): dva řádky tabulky upraveny podle skutečného chování. (1) „Obejití zámku“ → nyní jasně, že zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde — submittedLocked() to potvrzuje hláškou použij jiné zařízení/prohlížeč. (2) Řádek o posunu času/pauze timeru (vyžadoval konzoli, kterou výchozí předpoklad bez přístupu k HTML vylučuje) nahrazen reálně dostupnou variantou protahuje čas prací mimo okno — klientský timer (startTimer/timerVal) běží jen v aktivní kartě. Ověřeno node --check.',
-    'SITUACE V PŘÍSNÉM REŽIMU + JEDNORÁZOVÉ KÓDY (6.11.37): záložka aktualizována o režim jednorázových kódů. (1) Úvod nyní pojmenovává výchozí předpoklad — student dostane jen odkaz, k HTML se nedostane. (2) Nová sekce Jak fungují jednorázové kódy (3 karty: kódy jen ve verifieru ne ve studentském testu / pokaždé nové / kód váže záznam, ne osobu). (3) Tabulka situací rozšířena: zelená pokrývá signál kód není v seznamu (rosterHasCode) a nemožnost vyčíst cizí kódy z testu; oranžová duplicitní pokus (duplicateInfo); červená nově výměna kódů mezi studenty. Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -2778,7 +2812,7 @@ const THEME_SPECS = {
 };
 
 const DOM_FIELDS = ['nazev','proKoho','latka','vlastniTyp','zadaniText',
-  'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
+  'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
 const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin','bezpKod'];
 const SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
 const MAX_FILES = 12;
@@ -2796,7 +2830,7 @@ const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','
 const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
-  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', sourceSliceMode:'start',
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', sourceSliceMode:'start',
   cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
   body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfig:[],
   fuzzyTolerance:'off',
@@ -4474,6 +4508,7 @@ function applyVisualState() {
   const rb = $('readingBlock');
   if (rb) rb.classList.toggle('hidden', !usesReadingComprehension());
   document.querySelectorAll('#rcLenBtns .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === (state.rcLength || 'medium')));
+  renderRcTopics();
 }
 
 // ═══ Navigation ═══════════════════════════════════════════════════════════════
@@ -4560,6 +4595,202 @@ function pickJazyk(v) {
 
 function pickTheme(t) { state.tema=t; applyVisualState(); saveSnapshot(); }
 function pickRcLength(v){ state.rcLength = v; applyVisualState(); saveSnapshot(); }
+
+// ═══ READING COMPREHENSION — téma dle CEFR + AI návrh ══════════════════════════
+// Témata se škálují podle nejvyšší zvolené úrovně CEFR: konkrétní → šířeji → abstraktně.
+const RC_TOPIC_TIERS = {
+  beginner: ['Rodina a domov','Jídlo a nákupy','Škola a volný čas','Počasí a roční období','Zvířata a příroda','Cestování a dovolená','Zdraví a tělo','Život ve městě'],
+  intermediate: ['Technologie a sociální sítě','Životní prostředí','Kultura a tradice','Práce a kariéra','Média a zprávy','Sport a zdravý životní styl','Historie a osobnosti','Věda v běžném životě'],
+  advanced: ['Globalizace a ekonomika','Etika a společenská dilemata','Umělá inteligence a budoucnost práce','Politika a lidská práva','Psychologie a chování','Vědecký výzkum','Klimatická změna','Literatura a umění']
+};
+function rcTier(){
+  const order = ['A1','A2','B1','B2','C1','C2'];
+  let max = -1;
+  (state.uroven || []).forEach(l => { const i = order.indexOf(l); if (i > max) max = i; });
+  if (max < 0) return 'intermediate';   // úroveň nezvolena → střední pásmo
+  if (max <= 1) return 'beginner';      // A1–A2
+  if (max <= 3) return 'intermediate';  // B1–B2
+  return 'advanced';                    // C1–C2
+}
+function renderRcTopics(){
+  const host = document.getElementById('rcTopicBtns');
+  if (!host) return;
+  const topics = RC_TOPIC_TIERS[rcTier()] || RC_TOPIC_TIERS.intermediate;
+  const sel = state.rcTopic || '';
+  host.innerHTML = topics.map(tp =>
+    '<button type="button" class="tag-btn' + (sel === tp ? ' active' : '') + '" data-val="' + esc(tp) + '">' + esc(tp) + '</button>'
+  ).join('');
+  host.querySelectorAll('.tag-btn').forEach(b => b.addEventListener('click', () => pickRcTopic(b.dataset.val)));
+}
+function pickRcTopic(tp){
+  state.rcTopic = (state.rcTopic === tp) ? '' : tp;
+  if (state.rcTopic){ const c = document.getElementById('readingTopicCustom'); if (c) c.value = ''; }
+  renderRcTopics(); validate(); saveSnapshot();
+}
+function onReadingTopicCustomInput(){
+  const c = document.getElementById('readingTopicCustom');
+  if (c && c.value.trim() && state.rcTopic){ state.rcTopic = ''; renderRcTopics(); }
+  onInput();
+}
+function rcEffectiveTopic(){ const custom = trim('readingTopicCustom'); return custom || state.rcTopic || ''; }
+function rcLenWords(){ return ({short:'60–100', medium:'130–190', long:'240–340'})[state.rcLength] || '130–190'; }
+function compCefrForPrompt(){ return (state.uroven && state.uroven.length) ? cefrLabel() : 'B1'; }
+
+// Doplňující blok pro READING do promptu: téma, délka a (pokud učitel dodal) pevný text/otázky.
+function buildReadingUserBlock(){
+  if (!usesReadingComprehension()) return '';
+  const topic = rcEffectiveTopic();
+  const passage = trim('readingText');
+  const questions = trim('readingQuestions');
+  const lines = [
+    'READING COMPREHENSION — DOPLŇUJÍCÍ POKYNY OD UČITELE:',
+    '• Jeden souvislý text na cvičení; otázky se vážou na tento text (text se u každé otázky neopakuje).',
+    '• Přibližná délka textu: ' + rcLenWords() + ' slov.'
+  ];
+  if (topic) lines.push('• Téma / obor textu: ' + topic + '. Drž se tohoto tématu.');
+  if (passage) lines.push('• POUŽIJ PŘESNĚ TENTO TEXT (neměň ho, nepřepisuj, nepřekládej; jen z něj udělej čtecí pasáž):\n' + passage);
+  if (questions) lines.push('• POUŽIJ PŘESNĚ TYTO OTÁZKY a nepřidávej žádné další ani jejich alternativní znění — jen je převeď do interaktivní podoby a doplň správné odpovědi podle textu:\n' + questions);
+  if (!passage && !topic) lines.push('• Učitel nedodal vlastní text ani téma; vyber přiměřené téma podle úrovně a věkové skupiny.');
+  return lines.join('\n');
+}
+
+// ── AI návrh otázek k POSLECHU (vkládá se do editovatelného pole) ──
+let _liAiDraft = null;
+async function aiSuggestListeningQuestions(){
+  const btn = document.getElementById('liAiBtn');
+  if (!(typeof geminiApiKey !== 'undefined' && geminiApiKey)){
+    renderLiAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho ve žluté sekci a zkus to znovu.' });
+    return;
+  }
+  const focus = trim('listeningFocus');
+  const transcript = trim('listeningTranscript');
+  const latka = trim('latka');
+  const jazyk = state.jazyk || 'angličtina';
+  const lvl = compCefrForPrompt();
+  let fileParts = [];
+  try { const fp = await buildGeminiFilePartsForApi(); fileParts = (fp && fp.parts) || []; } catch(_){ fileParts = []; }
+  const old = btn ? btn.textContent : '';
+  if (btn){ btn.disabled = true; btn.textContent = '⏳ Generuji…'; }
+  renderLiAiPreview({ loading:true });
+  const n = 5;
+  const prompt =
+    'Jsi pomocník učitele jazyků. Navrhni ' + n + ' otázek k poslechu s porozuměním pro školní test.\n' +
+    'Jazyk otázek: ' + jazyk + '. Úroveň CEFR: ' + lvl + '.\n' +
+    (transcript ? 'Transkript / zdroj poslechu:\n' + transcript + '\n' : '') +
+    (focus ? 'Zaměření otázek od učitele: ' + focus + '\n' : '') +
+    (latka ? 'Probírané učivo / téma: ' + latka + '\n' : '') +
+    (fileParts.length ? 'Poslechová nahrávka je přiložena jako soubor — vycházej z jejího skutečného obsahu.\n' : '') +
+    'Otázky musí být auto-opravitelné (krátká, jednoznačná odpověď), přiměřené úrovni a vhodné pro školu. Piš je v jazyce ' + jazyk + '.\n' +
+    'Vrať POUZE JSON: {"questions":[{"q":"...","a":"..."}]} bez dalšího textu.';
+  try {
+    const out = await callGeminiJSON(prompt, fileParts);
+    const qs = (out && Array.isArray(out.questions))
+      ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)
+      : [];
+    if (!qs.length) throw new Error('AI nevrátila použitelné otázky.');
+    _liAiDraft = qs;
+    renderLiAiPreview({ questions:qs });
+  } catch(err){
+    _liAiDraft = null;
+    renderLiAiPreview({ err:'AI se nepodařilo zavolat: ' + (err && err.message ? err.message : err) });
+  } finally {
+    if (btn){ btn.disabled = false; btn.textContent = old; }
+  }
+}
+function renderLiAiPreview(s){
+  const box = document.getElementById('liAiPreview');
+  if (!box) return;
+  box.classList.remove('hidden');
+  if (s.loading){ box.innerHTML = '<div class="ai-prev-loading">⏳ AI připravuje návrh otázek…</div>'; return; }
+  if (s.err){ box.innerHTML = '<div class="ai-prev-err">⚠ ' + esc(s.err) + '</div>'; return; }
+  const qs = s.questions || [];
+  box.innerHTML =
+    '<div class="ai-prev-head">Návrh AI — přečti, po vložení můžeš upravit:</div>' +
+    '<ol class="ai-prev-list">' + qs.map(x => '<li><b>' + esc(x.q) + '</b>' + (x.a ? '<span class="ai-prev-a"> → ' + esc(x.a) + '</span>' : '') + '</li>').join('') + '</ol>' +
+    '<div class="ai-prev-actions">' +
+    '<button type="button" class="btn-modal-ok" onclick="liAiInsert()">✅ Vložit do otázek</button>' +
+    '<button type="button" class="ghost" onclick="aiSuggestListeningQuestions()">🔄 Jiný návrh</button>' +
+    '<button type="button" class="ghost" onclick="liAiDismiss()">Zavřít</button></div>';
+}
+function liAiInsert(){
+  if (!_liAiDraft || !_liAiDraft.length) return;
+  const txt = _liAiDraft.map((x,i) => (i+1) + '. ' + x.q + (x.a ? '  [' + x.a + ']' : '')).join('\n');
+  const ta = document.getElementById('listeningQuestions');
+  if (ta) ta.value = txt;
+  onInput();
+  liAiDismiss();
+  uiToast('Otázky vloženy. Můžeš je upravit.','ok');
+}
+function liAiDismiss(){ const b = document.getElementById('liAiPreview'); if (b){ b.classList.add('hidden'); b.innerHTML = ''; } }
+
+// ── AI návrh TEXTU + otázek k ČTENÍ (náhled ke schválení, pevný zdroj) ──
+let _rcAiDraft = null;
+async function aiSuggestReading(){
+  const btn = document.getElementById('rcAiBtn');
+  if (!(typeof geminiApiKey !== 'undefined' && geminiApiKey)){
+    renderRcAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho ve žluté sekci a zkus to znovu.' });
+    return;
+  }
+  const topic = rcEffectiveTopic();
+  const jazyk = state.jazyk || 'angličtina';
+  const lvl = compCefrForPrompt();
+  const words = rcLenWords();
+  const nQ = state.rcLength === 'short' ? 3 : state.rcLength === 'long' ? 5 : 4;
+  const latka = trim('latka');
+  const old = btn ? btn.textContent : '';
+  if (btn){ btn.disabled = true; btn.textContent = '⏳ Generuji…'; }
+  renderRcAiPreview({ loading:true });
+  const prompt =
+    'Jsi pomocník učitele jazyků. Napiš souvislý čtecí text (reading comprehension) a otázky k němu pro školní test.\n' +
+    'Jazyk textu i otázek: ' + jazyk + '. Úroveň CEFR: ' + lvl + '.\n' +
+    'Délka textu přibližně ' + words + ' slov.\n' +
+    (topic ? 'Téma / obor textu: ' + topic + '.\n' : 'Téma zvol přiměřené úrovni a věku.\n') +
+    (latka ? 'Zohledni probírané učivo: ' + latka + '.\n' : '') +
+    'Napiš ' + nQ + ' otázek s porozuměním, auto-opravitelných (krátká, jednoznačná odpověď).\n' +
+    'Text musí být originální, přiměřený úrovni a vhodný pro školu (žádná nevhodná témata).\n' +
+    'Vrať POUZE JSON: {"passage":"...","questions":[{"q":"...","a":"..."}]} bez dalšího textu.';
+  try {
+    const out = await callGeminiJSON(prompt);
+    const passage = String(out && out.passage || '').trim();
+    const qs = (out && Array.isArray(out.questions))
+      ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)
+      : [];
+    if (!passage || !qs.length) throw new Error('AI nevrátila text nebo otázky.');
+    _rcAiDraft = { passage, questions:qs };
+    renderRcAiPreview({ passage, questions:qs });
+  } catch(err){
+    _rcAiDraft = null;
+    renderRcAiPreview({ err:'AI se nepodařilo zavolat: ' + (err && err.message ? err.message : err) });
+  } finally {
+    if (btn){ btn.disabled = false; btn.textContent = old; }
+  }
+}
+function renderRcAiPreview(s){
+  const box = document.getElementById('rcAiPreview');
+  if (!box) return;
+  box.classList.remove('hidden');
+  if (s.loading){ box.innerHTML = '<div class="ai-prev-loading">⏳ AI připravuje text a otázky…</div>'; return; }
+  if (s.err){ box.innerHTML = '<div class="ai-prev-err">⚠ ' + esc(s.err) + '</div>'; return; }
+  box.innerHTML =
+    '<div class="ai-prev-head">Návrh AI — přečti a schval, nebo nech navrhnout jiný:</div>' +
+    '<div class="ai-prev-passage">' + esc(s.passage) + '</div>' +
+    '<ol class="ai-prev-list">' + s.questions.map(x => '<li><b>' + esc(x.q) + '</b>' + (x.a ? '<span class="ai-prev-a"> → ' + esc(x.a) + '</span>' : '') + '</li>').join('') + '</ol>' +
+    '<div class="ai-prev-actions">' +
+    '<button type="button" class="btn-modal-ok" onclick="rcAiInsert()">✅ Použít tento text</button>' +
+    '<button type="button" class="ghost" onclick="aiSuggestReading()">🔄 Navrhnout jiný</button>' +
+    '<button type="button" class="ghost" onclick="rcAiDismiss()">Zavřít</button></div>';
+}
+function rcAiInsert(){
+  if (!_rcAiDraft) return;
+  const t = document.getElementById('readingText');
+  if (t) t.value = _rcAiDraft.passage;
+  const q = document.getElementById('readingQuestions');
+  if (q) q.value = _rcAiDraft.questions.map((x,i) => (i+1) + '. ' + x.q + (x.a ? '  [' + x.a + ']' : '')).join('\n');
+  onInput();
+  rcAiDismiss();
+  uiToast('Text a otázky vloženy jako pevný zdroj.','ok');
+}
+function rcAiDismiss(){ const b = document.getElementById('rcAiPreview'); if (b){ b.classList.add('hidden'); b.innerHTML = ''; } }
 
 // ── BOD 15: Věková skupina / ročník ──────────────────────────────────────────
 const AGE_GROUPS = {
@@ -4997,18 +5228,28 @@ function renderSourceMeters(){
 function pickSourceSlice(v){ state.sourceSliceMode=(v==='end')?'end':'start'; renderSourceMeters(); saveSnapshot(); }
 
 function toggleType(t) {
+  const custom = trim('vlastniTyp');
+  // Stav PŘED změnou: kolik různých typů a zda počet cvičení „seděl na podlaze"
+  // (počet == počtu typů → počet byl řízený výběrem typů, ne ručně nastavený výš).
+  const prevDistinct = new Set(sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])])).size;
+  const wasFloorBound = (state.pocet||0) === prevDistinct;
+
   const wasSelected = state.typyCviceni.includes(t);
-  state.typyCviceni = state.typyCviceni.includes(t)
+  state.typyCviceni = wasSelected
     ? state.typyCviceni.filter(x=>x!==t)
     : [...state.typyCviceni, t];
-  // Slaď počet cvičení s počtem vybraných typů: když je vybráno víc typů než cvičení,
-  // automaticky zvedni počet, aby se každý typ dostal aspoň do jednoho cvičení (jinak by
-  // se „přebytečné" typy potichu zahodily při přechodu do podrobného nastavení). Počet
-  // nikdy nesnižujeme (uživatel může chtít víc cvičení než typů) a držíme strop 10.
-  const custom = trim('vlastniTyp');
+  // Počet cvičení musí být aspoň počet vybraných typů (každý typ se dostane do cvičení).
+  // Když počet sledoval výběr typů (byl na podlaze), drž ho na nové podlaze v OBOU směrech —
+  // po odebrání typu se tak počet sníží (dřív v něm zůstávalo staré vyšší číslo). Když měl
+  // uživatel záměrně víc cvičení než typů (ruční volba tlačítkem), počet jen hlídáme zespodu
+  // a nesnižujeme ho. Strop 10, minimum 1.
   const distinctTypes = new Set(sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])])).size;
-  if (distinctTypes > (state.pocet||0)) {
-    state.pocet = Math.min(10, distinctTypes);
+  let newPocet = state.pocet || 0;
+  if (wasFloorBound) newPocet = distinctTypes;
+  else if (distinctTypes > newPocet) newPocet = distinctTypes;
+  newPocet = Math.min(10, Math.max(1, newPocet));
+  if (newPocet !== (state.pocet||0)) {
+    state.pocet = newPocet;
     syncExerciseConfig();
     renderSmartTimeTip();
   }
@@ -6489,6 +6730,7 @@ function buildPrompt() {
     getCompactSpanishRules(jazyk),
     getCompactListeningRules(),
     buildListeningUserBlock(),
+    buildReadingUserBlock(),
     diffText,
     jokerText
   ].filter(Boolean).join('\n\n');
@@ -11441,6 +11683,8 @@ function buildContentPrompt(st,apiSourceNotes=[]){
   }
   const listeningBlock = buildListeningUserBlock();
   if (listeningBlock) src += '\n\n' + listeningBlock;
+  const readingBlock = buildReadingUserBlock();
+  if (readingBlock) src += '\n\n' + readingBlock;
   const instrLang=st.instrJazyk==='target'?jazyk:st.instrJazyk==='mixed'?`Czech UI, task instructions in ${jazyk}`:'Czech UI and Czech task instructions';
   const exJSON=specs.map(s=>apiExerciseExampleJson(s.type)).join(',\n    ');
   const rcWords = ({short:'60–100', medium:'130–190', long:'240–340'})[st.rcLength] || '130–190';
