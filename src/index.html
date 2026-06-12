@@ -2340,34 +2340,18 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
         <div class="small-muted">Použij jiné heslo než učitelský PIN.</div>
       </div>
       <div class="field">
-        <div class="field-label">🛡️ Bezpečnostní kód výsledků <span style="font-weight:400;color:var(--t4);text-transform:none;letter-spacing:0;font-size:10px">(volitelné)</span> <button class="tt-icon" data-tip="Volitelný týmový kód pro učitele. Používá se pro kontrolní kód reportu a žolíka. Pro běžný rychlý test ani bezpečný offline verifier ho není nutné vyplňovat. Kód není PIN ani odemykací heslo a nikdy se neposílá studentům.">?</button></div>
+        <div class="field-label">🛡️ Bezpečnostní kód výsledků <button class="tt-icon" data-tip="Týmový bezpečnostní kód učitelů. Z něj se odvozuje pečeť (kontrolní kód) reportu, takže celý tým musí používat STEJNÝ kód — jen tak jdou výsledky napříč týmem konzistentně ověřit a nelze podvrhnout cizí report. Kód generuje a bezpečně rozesílá správce; ty ho jen vlož. U klasifikovaného (bezpečného offline) testu je povinný. Není to učitelský PIN ani odemykací heslo a studentům se nikdy neposílá.">?</button></div>
         <div class="input-wrap">
-          <input type="password" id="bezpKod" placeholder="Vlož týmový bezpečnostní kód nebo vygeneruj nový..." autocomplete="new-password" oninput="onInput()">
+          <input type="password" id="bezpKod" placeholder="Vlož týmový bezpečnostní kód od správce..." autocomplete="new-password" oninput="onInput()">
           <button type="button" class="btn-eye" onclick="toggleSecret('bezpKod', this)" aria-label="Zobrazit nebo skrýt bezpečnostní kód">👁</button>
         </div>
         <div class="ex-action" style="margin-top:7px">
-          <button type="button" class="btn-mini" onclick="generateSchoolSecurityCode()">🎲 Vygenerovat nový týmový kód</button>
-          <button type="button" class="btn-mini" onclick="copySecurityCode()">📋 Kopírovat pro kolegy</button>
+          <button type="button" class="btn-mini hidden" id="btnGenSecCode" onclick="generateSchoolSecurityCode()">🎲 Vygenerovat nový týmový kód</button>
+          <button type="button" class="btn-mini hidden" id="btnCopySecCode" onclick="copySecurityCode()">📋 Kopírovat pro kolegy</button>
           <button type="button" class="btn-mini" onclick="saveSecurityCodeLocal()">💾 Uložit lokálně na tomto zařízení</button>
           <button type="button" class="btn-mini" onclick="loadSecurityCodeLocal()">↩ Načíst uložený kód</button>
           <button type="button" class="btn-mini" onclick="forgetSecurityCodeLocal()">🧹 Zapomenout z tohoto zařízení</button>
         </div>
-        <div class="sec-note">
-          <strong>Jak to má pochopit kolega:</strong> tento kód je volitelný společný učitelský kód pro kontrolní kód reportu a žolíka. Pro běžný rychlý test ani bezpečný offline verifier ho není nutné vyplňovat. Pokud ho tým používá, jeden člen ho uloží do školního správce hesel nebo zabezpečeného interního dokumentu a bezpečně ho předá oprávněným kolegům.
-        </div>
-        <details class="step4-details" style="margin-top:9px">
-          <summary>ℹ️ Vysvětlení pro kolegy: kdy generovat, kdy vložit a kdy měnit kód</summary>
-          <div class="tip-box" style="margin-top:8px">
-            <div class="tip-title">Základní pravidlo</div>
-            <div class="tip-body">Generátor je jen nástroj. Bezpečnostní kód je samostatné tajemství. Pokud má celý tým používat stejný kód, jeden učitel ho vygeneruje a ostatní kolegové ho sem ručně vloží. Tlačítko „Vygenerovat nový týmový kód“ u každého kolegy vytvoří jiný nový kód.</div>
-          </div>
-          <div class="mode-help">
-            <div class="mode-card"><b>1. První nastavení</b><span>Jeden učitel klikne na „Vygenerovat nový týmový kód“, zkopíruje ho a uloží do bezpečného školního úložiště. Ten konkrétní kód se potom předá kolegům.</span></div>
-            <div class="mode-card"><b>2. Použití kolegy</b><span>Kolega kód vloží do pole „Bezpečnostní kód výsledků“. Na vlastním učitelském počítači může kliknout na „Uložit lokálně“. Na sdíleném počítači neukládat.</span></div>
-            <div class="mode-card"><b>3. Podezření na prozrazení</b><span>Vygenerujte nový týmový kód, bezpečně ho rozešlete kolegům a starý kód přestaňte používat pro nové testy. Staré testy a archivy ponechte uložené.</span></div>
-          </div>
-          <div class="small-muted">Bezpečnostní kód výsledků není učitelský PIN a není heslo pro odemčení zamčeného testu. PIN a odemykací heslo si může každý učitel nastavit zvlášť pro konkrétní test. Tento týmový kód je volitelná pomůcka pro konzistentní kontrolní kód reportu napříč týmem.</div>
-        </details>
       </div>
       <!-- overeni bylo odstraněno z UI; state.overeni=NE vynucuje normalizeLoadedState() -->
       <div class="field">
@@ -2623,10 +2607,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.45',
+  version: '6.11.46',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'SPRÁVA TÝMOVÉHO BEZPEČNOSTNÍHO KÓDU (6.11.46): (1) Generovat nový týmový kód smí jen správce (admin) — tlačítka „Vygenerovat" a „Kopírovat pro kolegy" jsou skrytá pro neadminy (default hidden, accOnGranted je odkrývá jen adminovi) + pojistka v generateSchoolSecurityCode(). Kolegům zůstává vložit/uložit/načíst/zapomenout kód. (2) U klasifikovaného (secureOffline) testu je týmový kód pro neadminy povinný (validate) — verifier tak nemůže tiše spadnout na náhodný per-test secret a tým drží jeden sdílený kód. (3) UI vyčištěno: odstraněna vysvětlující sec-note i rozbalovací <details>; zůstává jediný tooltip popisující účel a důležitost kódu. Ověřeno node --check.',
     'AUTOMATICKÝ FALLBACK PŘI 503 (6.11.45): callGeminiJSON — automatický přepad na záložní model (Lite) nově i při 503/UNAVAILABLE, ne jen při 429. Při přetížení primárního modelu se request místo druhého marného retry na stejný (zahlcený) model přesměruje JEDNOU na méně vytížený záložní model, který má vlastní per-model RPD kvótu — šetří denní limit primárního modelu a zvyšuje šanci na úspěch. Spouští se jen jednou (_fellBack), lze vypnout přes opts.noFallback, s viditelnou hláškou přes setGenMsg. Když i záložní model hlásí 503, _fellBack brání další rekurzi a spadne to do běžného capovaného retry. Ověřeno node --check.',
     'AUDIT LOGIKY NASTAVENÍ (6.11.44): (1) Šablony modulu ČJ nově procházejí enforceModeConstraints() — nemohla by tak vzniknout zakázaná kombinace procvičovací režim + bezpečný offline verifier; šablona navíc toastem shrne, co přepsala na kartách 1 a 3. (2) Čeština vynucuje pokročilý mód — applySimpleDefaults() už nepřepisuje exerciseConfig modulu ČJ (počty položek dle obtížnosti, rozdělení bodů se tak skutečně použijí v buildExerciseSpecs). (3) Identita „jednorázový kód\": pole rosteru se zobrazuje jen v tomto režimu, je advanced-only a validate() blokuje generování s prázdným rosterem (verifier by jinak tiše ztratil kontrolu kódů); v jednoduchém režimu se identita drží na „jméno\". (4) Varování o známkovaném testu s poloautomatickými položkami čte csDerivedGoal (skutečný režim) místo goal ze šablony. (5) Interpunkční checkbox je u interpunkčního jevu viditelně povinný (disabled) místo tichého snap-backu mimo UI. (6) Tlačítka počtu cvičení se v ČJ skrývají úplně (počet = vybrané typy úloh; klik dřív nic nedělal). (7) splitGenerate vynucený režimem semi/manual se po návratu na auto i po odchodu z ČJ vrací zpět. (8) Tichý přepad procvičovací→běžný při volbě secureOffline hlásí toast. (9) Export checklist má u ČJ semi/manual povinnou položku o schválení alternativ. (10) Úklid: artefakt ;;; za RELEASE, mrtvý zápis instrJazyk, inertní manualMode u ČJ cvičení. Ověřeno node --check + headless smoke testy.',
     'COMPREHENSION BLOKY — OPRAVA ZOBRAZENÍ + UPOZORNĚNÍ (6.11.43): (1) Mimo ČJ modul se bloky listening/reading comprehension už nezobrazují automaticky. csApplyVisualState() dříve volal csSetHidden(block, active) — při active=false (cizí jazyky) blok natvrdo odkryl bez ohledu na výběr typu. Nyní: active || !usesListening/ReadingComprehension(), takže se řídí skutečným výběrem. (2) Po zaškrtnutí comprehension typu se učitel upozorní, že blok vyžaduje doladění: v každém bloku je nově výrazná výzva (.comp-needs-setup) a toggleType() po novém výběru doroluje na blok + krátce ho zvýrazní (flashCompBlock). Ověřeno node --check.',
@@ -2636,7 +2621,6 @@ const RELEASE = Object.freeze({
     'JAZYKOVÉ OPRAVY ZÁLOŽKY PŘÍSNÉHO REŽIMU (6.11.39): vyčištěny hovorové a kostrbaté tvary v textu záložky 🔒: zdrojáku → zdrojového kódu; několik dalších úprav (několik formulací přepsáno do spisovné češtiny, odstraněn slang a anglicismy: nafouknout/vlepíš/zapékají/token/blur/tvrdé brány). Bez změny obsahu a barev. Ověřeno node --check.',
     'ZPŘESNĚNÍ SITUACÍ V PŘÍSNÉM REŽIMU (6.11.38): dva řádky tabulky upraveny podle skutečného chování. (1) „Obejití zámku“ → nyní jasně, že zámek i blok opětovného odevzdání se drží v úložišti prohlížeče, takže incognito nebo jiný prohlížeč je obejde — submittedLocked() to potvrzuje hláškou použij jiné zařízení/prohlížeč. (2) Řádek o posunu času/pauze timeru (vyžadoval konzoli, kterou výchozí předpoklad bez přístupu k HTML vylučuje) nahrazen reálně dostupnou variantou protahuje čas prací mimo okno — klientský timer (startTimer/timerVal) běží jen v aktivní kartě. Ověřeno node --check.',
     'SITUACE V PŘÍSNÉM REŽIMU + JEDNORÁZOVÉ KÓDY (6.11.37): záložka aktualizována o režim jednorázových kódů. (1) Úvod nyní pojmenovává výchozí předpoklad — student dostane jen odkaz, k HTML se nedostane. (2) Nová sekce Jak fungují jednorázové kódy (3 karty: kódy jen ve verifieru ne ve studentském testu / pokaždé nové / kód váže záznam, ne osobu). (3) Tabulka situací rozšířena: zelená pokrývá signál kód není v seznamu (rosterHasCode) a nemožnost vyčíst cizí kódy z testu; oranžová duplicitní pokus (duplicateInfo); červená nově výměna kódů mezi studenty. Ověřeno node --check.',
-    'OPRAVY MODULŮ (6.11.36): (1) oba modaly presetu (potvrzení „Použít preset?" i detail šablony) zvětšeny ~2× — větší šířka, písmo, ikona i mřížka detailů, vlastní mobilní breakpoint. (2) Opravena chyba, kdy po přepnutí z modulu Český jazyk do cizího jazyka zůstávaly v podrobném nastavení cvičení dva české typy (Vyber pravopisně správnou variantu, Doplň přesný pravopisný tvar): záloha/obnova generického stavu nově pokrývá exerciseConfig/exerciseDetail/pocet/body/cas + pojistka csStripCzechExerciseRows při odchodu z ČJ i při startu (čistí i staré uložené snapshoty). Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -3953,6 +3937,10 @@ function setSecurityCodeAndRefresh(code){
   saveSnapshot();
 }
 async function generateSchoolSecurityCode(){
+  if (typeof accIsAdmin === 'function' && !accIsAdmin()) {
+    await uiAlert('Nový týmový bezpečnostní kód může vygenerovat jen správce. Vlož kód, který ti správce předal bezpečnou cestou.', 'Vyhrazeno správci');
+    return;
+  }
   if (trim('bezpKod')) {
     const replace = await uiConfirm('Pole už obsahuje bezpečnostní kód. Nahradit ho novým?', 'Nahradit bezpečnostní kód?', true);
     if (!replace) return;
@@ -5676,7 +5664,7 @@ function validate() {
   }
 
   const baseSecretOk = trim('heslo') && trim('ucitelJmeno') && trim('ucitelPin') && trim('heslo') !== trim('ucitelPin');
-  const needsSecurityCode = state.zolicek === 'ANO';
+  const needsSecurityCode = state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline');
   const securityCode = trim('bezpKod');
   const securityCodeOk = !needsSecurityCode || (securityCode.length >= 16 && securityCode !== trim('ucitelPin') && securityCode !== trim('heslo'));
   // Minimální síla tajemství. Důvod: hash chrání jen částečně — slabý PIN jde offline
@@ -5699,7 +5687,7 @@ function validate() {
   else if (pinVal && isWeakSecret(pinVal)) msg.push('Učitelský PIN je příliš běžný (např. 12345678, heslo, jméno) — zvol méně odhadnutelný.');
   if (hesloVal && hesloVal.length < 12) msg.push('Odemykací heslo musí mít aspoň 12 znaků.');
   else if (hesloVal && isWeakSecret(hesloVal)) msg.push('Odemykací heslo je příliš běžné — zvol méně odhadnutelné.');
-  if (needsSecurityCode && securityCode.length < 16) msg.push('Doplň bezpečnostní kód výsledků alespoň o 16 znacích; u žolíka slouží pro kontrolní kód reportu.');
+  if (needsSecurityCode && securityCode.length < 16) msg.push((typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline') ? 'Bezpečnostní kód výsledků je u klasifikovaného (bezpečného offline) testu povinný — vlož týmový kód od správce (alespoň 16 znaků).' : 'Doplň bezpečnostní kód výsledků alespoň o 16 znacích; u žolíka slouží pro kontrolní kód reportu.');
   if (securityCode && (securityCode === trim('ucitelPin') || securityCode === trim('heslo'))) msg.push('Bezpečnostní kód výsledků musí být jiný než PIN i odemykací heslo.');
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
   $('validHint3').textContent = msg.join(' ');
@@ -15235,6 +15223,11 @@ function accOnGranted(){
     if (p.role === 'admin') tlChip.classList.remove('hidden');
     else tlChip.classList.add('hidden');
   }
+  var isAdminNow = (p.role === 'admin');
+  ['btnGenSecCode','btnCopySecCode'].forEach(function(id){
+    var b = document.getElementById(id);
+    if (b){ if (isAdminNow) b.classList.remove('hidden'); else b.classList.add('hidden'); }
+  });
   updateAccessEnvBanner();
   // showWelcomeModal rozhodne podle ONBOARDING_DONE_KEY:
   // první spuštění → celý průvodce (4 kroky), opakované → krátké uvítání
