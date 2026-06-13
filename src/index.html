@@ -161,31 +161,31 @@ body.light .hybrid-fallback { color: #6b7280; border-color: #7c3aed33; }
 .ai-suggest-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--acc-b); border-radius:9px; background:var(--acc-d); color:var(--acc); font-size:13px; font-weight:700; cursor:pointer; line-height:1.2; }
 .ai-suggest-btn:hover:not(:disabled) { background:var(--acc); color:#fff; }
 .ai-suggest-btn:disabled { opacity:.6; cursor:default; }
-.ai-suggest-hint { font-size:12px; color:var(--ink3,#6b7280); }
-.ai-prev { margin:8px 0 4px; padding:11px 13px; border:1.5px solid var(--acc-b); border-radius:10px; background:#fff; }
-.ai-prev-head { font-size:12.5px; font-weight:700; color:var(--acc); margin-bottom:7px; }
-.ai-prev-passage { font-size:13.5px; line-height:1.5; white-space:pre-wrap; padding:9px 11px; border:1px solid var(--acc-b); border-radius:8px; background:var(--acc-d); margin-bottom:9px; max-height:230px; overflow:auto; }
-.ai-prev-list { margin:0 0 9px; padding-left:20px; font-size:13.5px; line-height:1.5; }
+.ai-suggest-hint { font-size:12.5px; color:var(--t3); line-height:1.45; }
+.ai-prev { margin:8px 0 4px; padding:11px 13px; border:1.5px solid var(--acc-b); border-radius:10px; background:#fff; color:#1f2433; }
+.ai-prev-head { font-size:13px; font-weight:700; color:#92560a; margin-bottom:7px; }
+.ai-prev-passage { font-size:13.5px; line-height:1.5; white-space:pre-wrap; color:#1f2433; padding:9px 11px; border:1px solid #f1d9ad; border-radius:8px; background:#fff8ec; margin-bottom:9px; max-height:230px; overflow:auto; }
+.ai-prev-list { margin:0 0 9px; padding-left:20px; font-size:13.5px; line-height:1.5; color:#1f2433; }
 .ai-prev-list li { margin-bottom:4px; }
-.ai-prev-a { color:var(--ok,#15803d); font-weight:600; }
+.ai-prev-a { color:#047857; font-weight:600; }
 .ai-prev-actions { display:flex; flex-wrap:wrap; gap:8px; }
-.ai-prev-loading { font-size:13px; color:var(--ink3,#6b7280); }
+.ai-prev-loading { font-size:13px; color:#5b6478; }
 .ai-prev-err { font-size:13px; color:#b91c1c; font-weight:600; }
-.rc-sub-label { font-size:12.5px; font-weight:700; color:var(--ink2,#374151); margin:12px 0 6px; }
+.rc-sub-label { font-size:13px; font-weight:700; color:var(--t2); margin:12px 0 6px; }
 /* ── Odznak „spotřebuje AI požadavek z denní kvóty" ── */
-.req-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border:1px solid #f59e0b; border-radius:999px; background:#fff7ed; color:#b45309; font-size:11px; font-weight:700; line-height:1.5; white-space:nowrap; vertical-align:middle; cursor:help; }
+.req-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border:1px solid #f59e0b; border-radius:999px; background:#fff7ed; color:#92560a; font-size:11.5px; font-weight:700; line-height:1.5; white-space:nowrap; vertical-align:middle; cursor:help; }
 .req-badge::before { content:"🌐"; }
-.req-note { display:flex; align-items:center; gap:5px; font-size:11.5px; color:#b45309; font-weight:600; margin-top:7px; }
+.req-note { display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--acc); font-weight:600; line-height:1.45; margin-top:7px; }
 .req-note::before { content:"🌐"; }
 /* ── Panel: přenos zadání mezi kolegy (export/import konfigurace) ── */
 .share-strip { margin:0 0 12px; padding:0; border:1px solid var(--acc-b); border-radius:12px; background:var(--acc-d); overflow:hidden; }
-.share-head { cursor:pointer; padding:11px 14px; font-size:13px; font-weight:800; color:var(--acc); text-transform:uppercase; letter-spacing:.03em; }
-.share-sub { font-size:11.5px; font-weight:500; color:var(--ink3,#6b7280); text-transform:none; letter-spacing:0; }
+.share-head { cursor:pointer; padding:11px 14px; font-size:13.5px; font-weight:800; color:var(--acc); text-transform:uppercase; letter-spacing:.03em; }
+.share-sub { font-size:12.5px; font-weight:500; color:var(--t3); text-transform:none; letter-spacing:0; }
 .share-body { padding:0 14px 12px; }
 .share-actions { display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 9px; }
-.share-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--acc-b); border-radius:9px; background:#fff; color:var(--acc); font-size:13px; font-weight:700; cursor:pointer; line-height:1.2; }
+.share-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--acc-b); border-radius:9px; background:#fff; color:#92560a; font-size:13px; font-weight:700; cursor:pointer; line-height:1.2; }
 .share-btn:hover { background:var(--acc); color:#fff; }
-.share-note { font-size:11.5px; color:var(--ink2,#374151); line-height:1.45; }
+.share-note { font-size:13px; color:var(--t2); line-height:1.5; }
 .share-gen { margin-top:10px; padding:11px 14px; border:1px solid var(--acc-b); border-radius:12px; background:var(--acc-d); }
 .share-gen .share-btn { background:#fff; margin-bottom:7px; }
 
@@ -1897,6 +1897,10 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
               <button class="tag-btn" data-val="odd one out" onclick="toggleType('odd one out')">odd one out</button>
               <button class="tag-btn" data-val="matching" onclick="toggleType('matching')">matching</button>
               <button class="tag-btn" data-val="categorisation-board" onclick="toggleType('categorisation-board')">categorisation-board</button>
+              <button class="tag-btn" data-val="synonym choice" onclick="toggleType('synonym choice')">synonym choice</button>
+              <button class="tag-btn" data-val="antonym choice" onclick="toggleType('antonym choice')">antonym choice</button>
+              <button class="tag-btn" data-val="choose the correct response" onclick="toggleType('choose the correct response')">choose the correct response</button>
+              <button class="tag-btn" data-val="match word to definition" onclick="toggleType('match word to definition')">match word to definition</button>
             </div>
           </div>
           <div class="type-group" data-fn="controlled">
@@ -1912,6 +1916,10 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
               <button class="tag-btn" data-val="transformation-chain" onclick="toggleType('transformation-chain')">transformation-chain</button>
               <button class="tag-btn" data-val="error correction" onclick="toggleType('error correction')">error correction</button>
               <button class="tag-btn" data-val="error-tagging" onclick="toggleType('error-tagging')">error-tagging</button>
+              <button class="tag-btn" data-val="verb form" onclick="toggleType('verb form')">verb form</button>
+              <button class="tag-btn" data-val="preposition gap-fill" onclick="toggleType('preposition gap-fill')">preposition gap-fill</button>
+              <button class="tag-btn" data-val="question formation" onclick="toggleType('question formation')">question formation</button>
+              <button class="tag-btn" data-val="word family" onclick="toggleType('word family')">word family</button>
             </div>
           </div>
           <div class="type-group" data-fn="freer">
@@ -1919,6 +1927,8 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
             <div class="type-group-desc">Žák musí sám formulovat jazyk. Vyšší náročnost, větší potřeba kontroly alternativ.</div>
             <div class="btn-row">
               <button class="tag-btn" data-val="translation" onclick="toggleType('translation')">translation</button>
+              <button class="tag-btn" data-val="short answer" onclick="toggleType('short answer')">short answer</button>
+              <button class="tag-btn" data-val="paraphrase the sentence" onclick="toggleType('paraphrase the sentence')">paraphrase the sentence</button>
             </div>
           </div>
           <div class="type-group" data-fn="comprehension">
@@ -1934,6 +1944,9 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
               <button class="tag-btn" data-val="categorization" onclick="toggleType('categorization')">categorization</button>
               <button class="tag-btn" data-val="ordering" onclick="toggleType('ordering')">ordering</button>
               <button class="tag-btn" data-val="highlight-evidence" onclick="toggleType('highlight-evidence')">highlight-evidence</button>
+              <button class="tag-btn" data-val="heading matching" onclick="toggleType('heading matching')">heading matching</button>
+              <button class="tag-btn" data-val="gist question" onclick="toggleType('gist question')">gist question</button>
+              <button class="tag-btn" data-val="summary cloze" onclick="toggleType('summary cloze')">summary cloze</button>
             </div>
           </div>
         </div>
@@ -2681,10 +2694,13 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.53',
+  version: '6.11.56',
   date:    '2026-06-12',
   status:  'approved-for-school-use',
   changes: [
+    'PRŮVODCE TYPŮ — SJEDNOCENÍ BAREVNÝCH SKUPIN (6.11.56): v rozbalovacím panelu „Co který typ cvičení umí" se nové typy (6.11.55) přidávaly na konec, takže se barevné kategorie (rozpoznávání / řízená produkce / porozumění) objevovaly dvakrát. buildTypeGuide() nově karty před vykreslením stabilně seřadí podle kategorie (r → c → p), takže každá barva tvoří jeden souvislý blok a budoucí přidané typy se zařadí samy. Pouze pořadí zobrazení, beze změny obsahu. Ověřeno node --check + kontrola souvislosti skupin.',
+    '13 NOVÝCH TYPŮ CVIČENÍ (6.11.55): rozšířena nabídka typů, každý se boduje/renderuje jako existující kanonický typ (žádná nová bodovací větev) — přes osvědčený mechanismus SPECIAL_STYLES (styl + recept „Emit type X"). Rozpoznání: synonym choice, antonym choice, choose the correct response (→ multiple choice), match word to definition (→ matching). Řízená produkce: verb form, preposition gap-fill (→ fill-in-the-blank), question formation (→ sentence transformation), word family (→ word formation). Volnější produkce: short answer (→ fill-in-the-blank; zároveň odblokován z DISABLED — odebrán alias short answer→open answer), paraphrase the sentence (→ sentence transformation). Porozumění: heading matching (→ matching), gist question (→ multiple choice), summary cloze (→ cloze text). Každý typ doplněn do UI čipů (správná pedagogická skupina), ALL_TYPES, EXERCISE_PEDAGOGY, TYPE_MIN, defaultItemCount i průvodce „Co který typ umí". Ověřeno node --check + logická kontrola zapojení všech 13 typů.',
+    'OPRAVA ČITELNOSTI POPISKŮ V NOČNÍM REŽIMU (6.11.54): popisky u nedávno přidaných sekcí (panel „Zadání pro kolegy", poznámky o AI požadavcích, nápovědy a podtitulky AI pomocníků, náhledy) byly napsané neexistujícími proměnnými --ink2/--ink3, které padaly na natvrdo zadanou tmavě šedou (#374151/#6b7280) — na tmavém pozadí téměř nečitelné. Nahrazeno správnými téma-aware proměnnými aplikace (--t2/--t3), zvětšeno písmo (11,5→13 px u hlavních popisků) a sjednoceny řádkování i odsazení. Bílé karty (tlačítka, náhled AI) mají nově vynucený tmavý text (jantarová #92560a / #1f2433), aby byly čitelné v obou motivech. Čitelné, ale ne křiklavé; funguje v nočním i světlém režimu. Pouze CSS, ověřeno node --check + vizuální render.',
     'AUTOMATICKÉ DOPLNĚNÍ TÝMOVÉHO KÓDU NA VLASTNÍM ZAŘÍZENÍ (6.11.53): pokud je týmový bezpečnostní kód lokálně uložen (SCHOOL_SECURITY_CODE_KEY), nově se do pole doplní sám — po přihlášení i po importu zadání — bez klikání na „Načíst". Uložení kódu je vědomé označení zařízení za vlastní/důvěryhodné (ukládání před sdíleným počítačem varuje), takže auto-doplnění je bezpečné; nepřepisuje už vyplněné pole a na zařízení bez uloženého kódu (sdílené počítače) se nic neděje. Hesla a učitelský PIN se i nadále nedoplňují automaticky (jsou per-test). Hláška po importu upravena. Ověřeno node --check.',
     'IMPORT ZADÁNÍ — UPOZORNĚNÍ NA HESLA/PIN/KÓD (6.11.52): po načtení zadání od kolegy hláška nově výslovně připomíná, že hesla, učitelský PIN ani bezpečnostní kód se z bezpečnostních důvodů nepřenášejí a je nutné je před generováním nastavit (týmový kód přes „Načíst"). Doplňuje to záměrné chování: SENSITIVE_FIELD_IDS (heslo/ucitelPin/bezpKod) se do exportu nikdy nedostanou a import je vyprázdní — tajné údaje tak nikdy necestují v souboru. Pouze textová úprava hlášky. Ověřeno node --check.',
     'PŘENOS ZADÁNÍ DLE ROLE — ADMIN NAHOŘE, KOLEGA POD GENEROVÁNÍM (6.11.51): viditelnost panelu „Zadání pro kolegy" se nově řídí rolí (accOnGranted). (1) ADMIN: plný panel (export + import) nahoře pod šablonami — odtud načítá zadání od kolegů a generuje. (2) NEADMIN (kolega): horní panel skrytý; místo něj má pod tlačítkem „Vytvořit test přímo" tlačítko „📤 Exportovat zadání pro správce" s vysvětlením — přesně ve chvíli, kdy narazí na vyčerpané AI požadavky. Stejný admin mechanismus jako u týmového kódu (default hidden, accOnGranted odkrývá podle role). Bez změny logiky exportu/importu. Ověřeno node --check.',
@@ -2692,9 +2708,6 @@ const RELEASE = Object.freeze({
     'VIDITELNÉ OZNAČENÍ AKCÍ, KTERÉ STOJÍ AI POŽADAVEK (6.11.49): u všech tlačítek, která volají Gemini a čerpají z denní kvóty (RPD), je nově viditelný odznak „spotřebuje AI požadavek" / poznámka, aby bylo jasné, že nejde o offline funkci generátoru. Označeno: Vytvořit test přímo (s poznámkou, že jeden test = obvykle 3–6 požadavků), AI návrh otázek k poslechu, AI návrh textu+otázek ke čtení (vč. upozornění, že každé „Jiný návrh" = další požadavek), Rozšířit přijatelné odpovědi, Ověřit klíč druhým průchodem (AI), Přečíst stupnici pomocí AI a AI poradce. Pouze vizuální/textová vrstva, žádná změna logiky. Ověřeno node --check.',
     'AI POMOCNÍCI PRO POSLECH A ČTENÍ + TÉMA ČTENÍ DLE CEFR (6.11.48): comprehension bloky už negenerují „naslepo". (1) Listening: tlačítko „✨ Nechat AI navrhnout otázky" — z transkriptu/zaměření/učiva (a multimodálně z nahraného audia/videa, pokud je v Konkrétní zadání) navrhne otázky, ukáže náhled a po vložení je necháš v editovatelném poli upravit. (2) Reading: nový výběr TÉMATU/oboru textu, jehož nabídka se mění podle zvolené úrovně CEFR (A1–A2 konkrétní → B1–B2 šířeji → C1–C2 abstraktně) + pole pro vlastní téma. Tlačítko „✨ Navrhnout text a otázky" vygeneruje souvislý text + otázky, ukáže náhled ke schválení (✅ Použít / 🔄 Navrhnout jiný); schválený text se použije jako PEVNÝ zdroj — otázky čerpají jen z něj, AI nepřidává alternativy. Ruční offline varianta zůstává: text i otázky lze napsat přímo. (3) Reading nově předává do promptu i téma a pevný text/otázky přes buildReadingUserBlock() (dřív se k AI dostávala jen délka). Vše bez CDN, přes stávající callGeminiJSON. Ověřeno node --check.',
     'POČET CVIČENÍ + SROZUMITELNOST POSLECHU A ŽOLÍKA (6.11.47): (1) Počet cvičení se nově slaďuje s typy v OBOU směrech. Dřív se počet při ubrání typu nesnížil (zůstalo staré vyšší číslo) — nyní toggleType() pozná, zda počet „seděl na podlaze" (počet == počtu typů); pokud ano, drží ho na podlaze i při odebrání typu (4 typy→ubereš→3). Když měl uživatel záměrně víc cvičení než typů (ruční volba přes tlačítka), počet se jen hlídá zespodu a nesnižuje se. (2) Žolík: tooltip rozšířen o praktický účel (omezený počet žolíků za pololetí = omluvený pokus, report označí ŽOLÍK POUŽIT, volba nevratná na začátku), aby kolegové chápali, k čemu sekce slouží. (3) Listening comprehension: blok i výzva nově jasně říkají, že audio/video/odkaz se nahrává NAHOŘE v sekci Konkrétní zadání → Soubory/Odkazy, a dole se jen ladí zaměření otázek/transkript — odstraněn zmatek, kam vlastně nahrávku dát. Ověřeno node --check.',
-    'SPRÁVA TÝMOVÉHO BEZPEČNOSTNÍHO KÓDU (6.11.46): (1) Generovat nový týmový kód smí jen správce (admin) — tlačítka „Vygenerovat" a „Kopírovat pro kolegy" jsou skrytá pro neadminy (default hidden, accOnGranted je odkrývá jen adminovi) + pojistka v generateSchoolSecurityCode(). Kolegům zůstává vložit/uložit/načíst/zapomenout kód. (2) U klasifikovaného (secureOffline) testu je týmový kód pro neadminy povinný (validate) — verifier tak nemůže tiše spadnout na náhodný per-test secret a tým drží jeden sdílený kód. (3) UI vyčištěno: odstraněna vysvětlující sec-note i rozbalovací <details>; zůstává jediný tooltip popisující účel a důležitost kódu. Ověřeno node --check.',
-    'AUTOMATICKÝ FALLBACK PŘI 503 (6.11.45): callGeminiJSON — automatický přepad na záložní model (Lite) nově i při 503/UNAVAILABLE, ne jen při 429. Při přetížení primárního modelu se request místo druhého marného retry na stejný (zahlcený) model přesměruje JEDNOU na méně vytížený záložní model, který má vlastní per-model RPD kvótu — šetří denní limit primárního modelu a zvyšuje šanci na úspěch. Spouští se jen jednou (_fellBack), lze vypnout přes opts.noFallback, s viditelnou hláškou přes setGenMsg. Když i záložní model hlásí 503, _fellBack brání další rekurzi a spadne to do běžného capovaného retry. Ověřeno node --check.',
-    'AUDIT LOGIKY NASTAVENÍ (6.11.44): (1) Šablony modulu ČJ nově procházejí enforceModeConstraints() — nemohla by tak vzniknout zakázaná kombinace procvičovací režim + bezpečný offline verifier; šablona navíc toastem shrne, co přepsala na kartách 1 a 3. (2) Čeština vynucuje pokročilý mód — applySimpleDefaults() už nepřepisuje exerciseConfig modulu ČJ (počty položek dle obtížnosti, rozdělení bodů se tak skutečně použijí v buildExerciseSpecs). (3) Identita „jednorázový kód\": pole rosteru se zobrazuje jen v tomto režimu, je advanced-only a validate() blokuje generování s prázdným rosterem (verifier by jinak tiše ztratil kontrolu kódů); v jednoduchém režimu se identita drží na „jméno\". (4) Varování o známkovaném testu s poloautomatickými položkami čte csDerivedGoal (skutečný režim) místo goal ze šablony. (5) Interpunkční checkbox je u interpunkčního jevu viditelně povinný (disabled) místo tichého snap-backu mimo UI. (6) Tlačítka počtu cvičení se v ČJ skrývají úplně (počet = vybrané typy úloh; klik dřív nic nedělal). (7) splitGenerate vynucený režimem semi/manual se po návratu na auto i po odchodu z ČJ vrací zpět. (8) Tichý přepad procvičovací→běžný při volbě secureOffline hlásí toast. (9) Export checklist má u ČJ semi/manual povinnou položku o schválení alternativ. (10) Úklid: artefakt ;;; za RELEASE, mrtvý zápis instrJazyk, inertní manualMode u ČJ cvičení. Ověřeno node --check + headless smoke testy.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -2766,10 +2779,14 @@ const TYPE_MIN = {
   'table-completion':5,
   'transformation-chain':6,
   'highlight-evidence':4,
+  'synonym choice':4,'antonym choice':4,'choose the correct response':4,'match word to definition':4,
+  'verb form':5,'preposition gap-fill':5,'question formation':5,'word family':4,
+  'short answer':5,'paraphrase the sentence':6,
+  'heading matching':7,'gist question':5,'summary cloze':6,
 };
 
 const DISABLED_EXERCISE_TYPES = ['open answer','image description'];
-const DISABLED_TYPE_ALIASES = ['open','open question','short answer','free answer','image','picture description','picture','describe picture','image description'];
+const DISABLED_TYPE_ALIASES = ['open','open question','free answer','image','picture description','picture','describe picture','image description'];
 function isDisabledExerciseType(t) {
   const raw = String(t || '').trim().toLowerCase();
   return DISABLED_EXERCISE_TYPES.includes(raw) || DISABLED_TYPE_ALIASES.includes(raw);
@@ -4978,14 +4995,18 @@ function renderAgeGroupNote(){
 const EXERCISE_PEDAGOGY = {
   // Rozpoznání
   'multiple choice':'recognition', 'true/false':'recognition', 'odd one out':'recognition', 'matching':'recognition', 'multi-select':'recognition', 'categorisation-board':'recognition',
+  'synonym choice':'recognition', 'antonym choice':'recognition', 'choose the correct response':'recognition', 'match word to definition':'recognition',
   // Řízená produkce
   'fill-in-the-blank':'controlled', 'word formation':'controlled', 'sentence transformation':'controlled',
   'key word transformation':'controlled', 'word order':'controlled', 'table-completion':'controlled', 'transformation-chain':'controlled', 'error correction':'controlled', 'error-tagging':'controlled',
+  'verb form':'controlled', 'preposition gap-fill':'controlled', 'question formation':'controlled', 'word family':'controlled',
   // Volnější produkce
   'translation':'freer',
+  'short answer':'freer', 'paraphrase the sentence':'freer',
   // Porozumění
   'reading comprehension':'comprehension', 'listening comprehension':'comprehension', 'multiple matching':'comprehension',
-  'banked cloze':'comprehension', 'cloze text':'comprehension', 'dialogue completion':'comprehension', 'categorization':'comprehension', 'ordering':'comprehension', 'highlight-evidence':'comprehension'
+  'banked cloze':'comprehension', 'cloze text':'comprehension', 'dialogue completion':'comprehension', 'categorization':'comprehension', 'ordering':'comprehension', 'highlight-evidence':'comprehension',
+  'heading matching':'comprehension', 'gist question':'comprehension', 'summary cloze':'comprehension'
 };
 const PEDAGOGY_FN = {
   recognition:   { label:'Rozpoznání', desc:'žák vybírá nebo přiřazuje; rychlá kontrola porozumění, slabší pro aktivní použití jazyka' },
@@ -6156,7 +6177,11 @@ const ALL_TYPES = [
   'translation','true/false','error correction','error-tagging','cloze text','sentence transformation',
   'reading comprehension','dialogue completion','categorization','word formation',
   'listening comprehension',
-  'odd one out','multiple matching','banked cloze','key word transformation'
+  'odd one out','multiple matching','banked cloze','key word transformation',
+  'synonym choice','antonym choice','choose the correct response','match word to definition',
+  'verb form','preposition gap-fill','question formation','word family',
+  'short answer','paraphrase the sentence',
+  'heading matching','gist question','summary cloze'
 ];
 
 // Speciální typy cvičení = obsahový STYL, který se v testu boduje a renderuje jako
@@ -6171,7 +6196,39 @@ const SPECIAL_STYLES = {
   'banked cloze': { score:'cloze text',
     recipe:'Emit type "cloze text". Begin the "text" with a line "Word bank: w1, w2, …" listing every word the gaps need (optionally 1-2 extra distractors), then a blank line, then the passage using ___ for each gap. "answers" gives the correct word for each ___ in order. The visible bank guides the student, who types the words.' },
   'key word transformation': { score:'sentence transformation',
-    recipe:'Cambridge-style. Emit type "sentence transformation". Give an original sentence in "prompt", a fixed keyword in "keyword" that must be used unchanged, and the second (gapped) sentence; "answer"/"alt_answers" hold the full acceptable completion, typically 2-5 words and including the keyword.' }
+    recipe:'Cambridge-style. Emit type "sentence transformation". Give an original sentence in "prompt", a fixed keyword in "keyword" that must be used unchanged, and the second (gapped) sentence; "answer"/"alt_answers" hold the full acceptable completion, typically 2-5 words and including the keyword.' },
+
+  // ── Nové typy (každý se boduje/renderuje jako existující kanonický typ) ──
+  // Rozpoznání → multiple choice / matching
+  'synonym choice': { score:'multiple choice',
+    recipe:'Each item targets one word/phrase (in the question or a short carrier sentence) and asks for the CLOSEST SYNONYM; give 4 options of the same part of speech, exactly one a true synonym, the others plausible near-misses; correct = the synonym; explanation names the meaning. Emit type "multiple choice".' },
+  'antonym choice': { score:'multiple choice',
+    recipe:'Each item targets one word and asks for its OPPOSITE (antonym); give 4 options of the same part of speech, exactly one a true antonym, distractors may include a synonym or unrelated words; correct = the antonym. Emit type "multiple choice".' },
+  'choose the correct response': { score:'multiple choice',
+    recipe:'Each item gives a short prompt utterance (a question, request or remark in a dialogue) and asks which reply is appropriate and natural; give 4 candidate responses, exactly one pragmatically correct; distractors are grammatical but pragmatically wrong. Emit type "multiple choice".' },
+  'match word to definition': { score:'matching',
+    recipe:'Each item: left = a word/term, right = its short definition (one unique definition per word; the app builds the dropdown from all right values). Keep definitions concise and unambiguous so exactly one word fits each. Emit type "matching" with left and right on every item.' },
+  // Řízená produkce → fill-in-the-blank / sentence transformation / word formation
+  'verb form': { score:'fill-in-the-blank',
+    recipe:'Emit type "fill-in-the-blank". Each item is a sentence with ___ where a verb goes, with the base/infinitive in brackets, e.g. "She ___ (go) home yesterday."; "answers" = the correct conjugated form(s); include valid contracted/spelling variants in answers. One gap per item.' },
+  'preposition gap-fill': { score:'fill-in-the-blank',
+    recipe:'Emit type "fill-in-the-blank". Each sentence has one ___ where a PREPOSITION belongs; "answers" = the correct preposition, adding accepted alternatives only when truly interchangeable. One gap per item.' },
+  'question formation': { score:'sentence transformation',
+    recipe:'Emit type "sentence transformation". In "prompt" give a statement or an answer (optionally with the required question word) and ask the student to FORM the matching question; "answer"/"alt_answers" hold the correct question and its acceptable phrasings (word-order/punctuation variants).' },
+  'word family': { score:'word formation',
+    recipe:'Emit type "word formation". Give a sentence with ___ and a base word in brackets; the student writes the correct DERIVED form (noun/adjective/adverb/verb) that fits, e.g. "Her ___ (decide) was final." -> decision; "answer" = the derived word, with valid variants in "alt_answers".' },
+  // Volnější produkce → fill-in-the-blank / sentence transformation (jen s uzavřenou množinou odpovědí)
+  'short answer': { score:'fill-in-the-blank',
+    recipe:'Emit type "fill-in-the-blank". Each item is a question with a SHORT expected answer (1-5 words); put the question in "sentence"/"prompt"; "answers" = all acceptable short answers including reasonable wording/spelling variants. Use only questions with a small, closed set of correct answers (avoid open-ended ones).' },
+  'paraphrase the sentence': { score:'sentence transformation',
+    recipe:'Emit type "sentence transformation". Give an original sentence in "prompt" and ask the student to rewrite it keeping the meaning (optionally starting with a given word); "answer"/"alt_answers" list the acceptable paraphrases — be generous with valid rewordings since several can be correct.' },
+  // Porozumění → matching / multiple choice / cloze text
+  'heading matching': { score:'matching',
+    recipe:'Each item: left = a short paragraph or text segment (from the source), right = its best HEADING/title (one unique heading per item; the app builds the dropdown from all right values). Headings must be short and clearly distinguishable. Emit type "matching" with left and right on every item.' },
+  'gist question': { score:'multiple choice',
+    recipe:'Each item asks for the MAIN IDEA / overall point of the source text or a paragraph, not a detail; give 4 options, exactly one captures the gist, distractors are true-but-minor details or plausible misreadings; correct = the gist. Emit type "multiple choice".' },
+  'summary cloze': { score:'cloze text',
+    recipe:'Emit type "cloze text". "text" is a short SUMMARY of the source reading/listening with ___ for each gap (meaning-bearing content words); "answers" gives the correct word for each ___ in order. The summary must stay faithful to the source.' }
 };
 // Vrátí klíč SPECIAL_STYLES pro daný (surový) typ, nebo '' když jde o běžný typ.
 function specialStyleKey(t){ const r=String(t||'').trim().toLowerCase(); return SPECIAL_STYLES[r]?r:''; }
@@ -7362,10 +7419,27 @@ function buildTypeGuide(){
     ['cloze text','p','Souvot\u00e1n\u00ed text s v\u00edce mezery k dopln\u011bn\u00ed.','She ___(1) to school every ___(2). \u2192 goes, day'],
     ['banked cloze','p','Text s mezerami + z\u00e1sobn\u00edk slov, student vybere spr\u00e1vn\u00e1 slova.','Z\u00e1sobn\u00edk: however/although/because \u2192 ___ it was late, she stayed.'],
     ['ordering','p','Se\u0159azen\u00ed v\u011bt, krok\u016f nebo ud\u00e1lost\u00ed do spr\u00e1vn\u00e9ho po\u0159ad\u00ed tla\u010d\u00edtky.','Se\u0159a\u010f kroky receptu: p\u0159idej vejce \u2192 ml\u00e9ko \u2192 upec \u2192 pod\u00e1vej'],
-    ['multiple matching','p','P\u0159i\u0159azen\u00ed nadpis\u016f nebo tvrzen\u00ed k odstavc\u016fm (MCM form\u00e1t).','P\u0159i\u0159a\u010f nadpisy 1\u20135 k odstavc\u016fm A\u2013E v \u010dl\u00e1nku']
+    ['multiple matching','p','P\u0159i\u0159azen\u00ed nadpis\u016f nebo tvrzen\u00ed k odstavc\u016fm (MCM form\u00e1t).','P\u0159i\u0159a\u010f nadpisy 1\u20135 k odstavc\u016fm A\u2013E v \u010dl\u00e1nku'],
+    ['synonym choice','r','Vyber nejbli\u017e\u0161\u00ed synonymum. Boduje se jako multiple choice.','happy \u2192 glad / sad / tired / fast \u2192 glad \u2713'],
+    ['antonym choice','r','Vyber opak (antonymum). Boduje se jako multiple choice.','big \u2192 small / huge / wide / tall \u2192 small \u2713'],
+    ['choose the correct response','r','Vyber vhodnou reakci v dialogu. Boduje se jako multiple choice.','"Thanks a lot!" \u2192 You\u2019re welcome \u2713 / Yes, I do'],
+    ['match word to definition','r','P\u0159i\u0159a\u010f slovo k jeho definici. Boduje se jako matching.','generous \u2192 ochotn\u00fd d\u00e1vat \u00b7 brave \u2192 nebojácn\u00fd'],
+    ['verb form','c','Dopl\u0148 spr\u00e1vn\u00fd tvar slovesa do mezery. Boduje se jako fill-in-the-blank.','She ___ (go) home yesterday. \u2192 went \u2713'],
+    ['preposition gap-fill','c','Dopl\u0148 spr\u00e1vnou p\u0159edlo\u017eku. Boduje se jako fill-in-the-blank.','I\u2019m good ___ math. \u2192 at \u2713'],
+    ['question formation','c','Vytvo\u0159 ot\u00e1zku k zadan\u00e9 v\u011bt\u011b/odpov\u011bdi. Boduje se jako sentence transformation.','Odpov\u011b\u010f: To London. \u2192 Where did she go? \u2713'],
+    ['word family','c','Vytvo\u0159 odvozen\u00fd tvar slova (podst./p\u0159\u00edd./p\u0159\u00edsl.). Boduje se jako word formation.','Her ___ (decide) was final. \u2192 decision \u2713'],
+    ['short answer','c','Kr\u00e1tk\u00e1 odpov\u011b\u010f (1\u20135 slov) s uzav\u0159enou mno\u017einou \u0159e\u0161en\u00ed. Boduje se jako fill-in-the-blank.','What is the capital of France? \u2192 Paris \u2713'],
+    ['paraphrase the sentence','c','P\u0159eformuluj v\u011btu se zachov\u00e1n\u00edm smyslu. Boduje se jako sentence transformation (v\u00edce alternativ).','It\u2019s very cold. \u2192 It isn\u2019t warm at all.'],
+    ['heading matching','p','P\u0159i\u0159a\u010f nadpis k odstavci textu. Boduje se jako matching.','Odstavec o po\u010das\u00ed \u2192 nadpis "Climate" \u2713'],
+    ['gist question','p','Ot\u00e1zka na hlavn\u00ed my\u0161lenku textu (ne detail). Boduje se jako multiple choice.','What is the text mainly about? \u2192 A) Recycling \u2713'],
+    ['summary cloze','p','Dopl\u0148 mezery v souhrnu textu. Boduje se jako cloze text.','The author argues that ___(1) helps the ___(2). \u2192 reading, brain']
   ];
   var CAT={r:'rozpozn\u00e1v\u00e1n\u00ed',c:'\u0159\u00edzen\u00e1 produkce',p:'porozum\u011bn\u00ed'};
   var CLS={r:'tc-recog',c:'tc-ctrl',p:'tc-comp'};
+  // Seskup karty podle kategorie (r -> c -> p), aby barevné skupiny šly za sebou.
+  // Stabilní řazení zachová původní pořadí uvnitř každé skupiny.
+  var ORD={r:0,c:1,p:2};
+  D=D.slice().sort(function(a,b){return (ORD[a[1]]==null?9:ORD[a[1]])-(ORD[b[1]]==null?9:ORD[b[1]]);});
   return D.map(function(d){
     return '<div class="type-card" onclick="toggleTypeCard(this)">'
       +'<div class="type-card-name">'+d[0]+'</div>'
@@ -11382,7 +11456,7 @@ function normalizeType(t) {
     'image':'image description', 'picture description':'image description',
     'error-correction':'error correction', 'correction':'error correction',
     'error tagging':'error-tagging', 'error-tagging':'error-tagging', 'find and classify mistake':'error-tagging', 'find and classify the mistake':'error-tagging', 'mistake tagging':'error-tagging', 'error classification':'error-tagging',
-    'open':'open answer', 'open question':'open answer', 'short answer':'open answer',
+    'open':'open answer', 'open question':'open answer',
     'multi select':'multi-select', 'multiselect':'multi-select', 'multiple select':'multi-select', 'multiple-select':'multi-select', 'multiple answer':'multi-select', 'multiple answers':'multi-select', 'multiple-answer':'multi-select', 'select all':'multi-select', 'select all that apply':'multi-select', 'multiple response':'multi-select', 'výběr více možností':'multi-select', 'vyber vice moznosti':'multi-select',
     'table completion':'table-completion', 'table-complete':'table-completion', 'complete table':'table-completion', 'complete the table':'table-completion', 'complete-the-table':'table-completion', 'table fill':'table-completion', 'table-fill':'table-completion', 'tabulka':'table-completion', 'dopln tabulku':'table-completion', 'doplneni tabulky':'table-completion', 'doplnění tabulky':'table-completion',
     'transformation chain':'transformation-chain', 'sentence chain':'transformation-chain', 'transform sentence chain':'transformation-chain', 'chain transformations':'transformation-chain', 'transformace v řetězci':'transformation-chain', 'retezcova transformace':'transformation-chain', 'řetězová transformace':'transformation-chain',
@@ -11397,6 +11471,9 @@ function defaultItemCount(type) {
   if (style === 'multiple matching') return 5;
   if (style === 'banked cloze') return 6;
   if (style === 'key word transformation') return 5;
+  if (style === 'summary cloze') return 1;            // jeden souhrnný text s více mezerami
+  if (style === 'match word to definition' || style === 'heading matching') return 5;
+  if (style === 'verb form' || style === 'preposition gap-fill' || style === 'word family' || style === 'short answer') return 6;
   type = normalizeType(type);
   if (type === 'reading comprehension' || type === 'listening comprehension') return 4;
   if (type === 'cloze text') return 2;
