@@ -1710,6 +1710,26 @@ body.light .strict-risk-sublabel { color: var(--err); }
 .strict-risk-card { background: #1a0505; border: 1px solid #ef444455; border-radius: 8px; padding: 8px 11px; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #fca5a5; line-height: 1.45; }
 body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; color: var(--t2); }
 .sri { flex-shrink: 0; font-size: 15px; line-height: 1.35; }
+
+/* ── Vlastnické označení aplikace ────────────────────────────────────────── */
+.app-owner-footer {
+  max-width: 660px;
+  margin: 22px auto 0;
+  padding: 14px 12px 4px;
+  text-align: center;
+  color: var(--t4);
+  font-size: 12px;
+  line-height: 1.55;
+  font-family: Georgia, serif;
+}
+.app-owner-footer div:first-child {
+  color: var(--t3);
+  font-weight: 700;
+}
+@media (min-width: 1000px) {
+  .app-owner-footer { max-width: 1080px; }
+}
+
 </style>
 </head>
 <body>
@@ -2654,6 +2674,11 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
   </div><!-- /card -->
 </div><!-- /wrap -->
 
+<footer class="app-owner-footer" aria-label="Vlastnictví aplikace">
+  <div>Vlastník aplikace: Daniel Baláž · Gymnázium, Ostrava-Hrabůvka</div>
+  <div>© 2026 Daniel Baláž. Všechna práva vyhrazena.</div>
+</footer>
+
 <div class="preview-overlay hidden" id="previewModal" role="dialog" aria-modal="true" aria-label="Náhled testu" onclick="previewBackdrop(event)">
   <div class="preview-shell">
     <div class="preview-bar">
@@ -2711,10 +2736,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.57',
-  date:    '2026-06-12',
+  version: '6.11.59',
+  date:    '2026-06-16',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA FALEŠNÉHO BLOKOVÁNÍ EXPORTU — „inline přihlašovací údaj" (6.11.59): bezpečnostní skener (SecretScanner, pravidlo inline-credential) blokoval i běžné testy, pokud zdrojový text (např. vložený DOCX se čtecím textem) obsahoval slovo password/secret/token/apiKey následované dvojtečkou nebo rovnítkem a delším textem v uvozovkách — typicky obyčejná věta z textu. Pravidlo nově vyžaduje, aby hodnota v uvozovkách vypadala jako skutečný údaj: bez mezer a s aspoň jednou číslicí. Skutečné klíče (AIza…, sk-…, ghp_…) i nadále blokují vlastní samostatná pravidla, běžný text už ne. Přidán regresní test (věta „secret: …" s mezerami musí projít, reálný inline klíč musí spadnout). Ověřeno node --check + runScannerTests().',
+    'VLASTNICKÉ OZNAČENÍ APLIKACE (6.11.58): do spodní části aplikace bylo doplněno vlastnické označení „Vlastník aplikace: Daniel Baláž · Gymnázium, Ostrava-Hrabůvka“ a copyright „© 2026 Daniel Baláž. Všechna práva vyhrazena.“ Změna je jen textová/identifikační, bez zásahu do generování testů, bodování, bezpečnostních režimů nebo exportů. Ověřeno node --check.',
     'LOGO ŠKOLY I NA MOBILU (6.11.57): logo školy se nově zobrazuje i v mobilní/tabletové verzi (pod 1000px) — malé, decentní, jako v Korespondenčním asistentovi: oblý štítek vlevo nahoře v hlavičce (logo ~32px). Aby se nepřekrývalo s tlačítky vpravo, je titulek na mobilu posunut pod horní řádek (padding-top hlavičky jen pod 1000px). Na PC (≥1000px) zůstává původní velký box vlevo nahoře beze změny. Pouze CSS, ověřeno node --check + vizuální render hlavičky.',
     'PRŮVODCE TYPŮ — SJEDNOCENÍ BAREVNÝCH SKUPIN (6.11.56): v rozbalovacím panelu „Co který typ cvičení umí" se nové typy (6.11.55) přidávaly na konec, takže se barevné kategorie (rozpoznávání / řízená produkce / porozumění) objevovaly dvakrát. buildTypeGuide() nově karty před vykreslením stabilně seřadí podle kategorie (r → c → p), takže každá barva tvoří jeden souvislý blok a budoucí přidané typy se zařadí samy. Pouze pořadí zobrazení, beze změny obsahu. Ověřeno node --check + kontrola souvislosti skupin.',
     '13 NOVÝCH TYPŮ CVIČENÍ (6.11.55): rozšířena nabídka typů, každý se boduje/renderuje jako existující kanonický typ (žádná nová bodovací větev) — přes osvědčený mechanismus SPECIAL_STYLES (styl + recept „Emit type X"). Rozpoznání: synonym choice, antonym choice, choose the correct response (→ multiple choice), match word to definition (→ matching). Řízená produkce: verb form, preposition gap-fill (→ fill-in-the-blank), question formation (→ sentence transformation), word family (→ word formation). Volnější produkce: short answer (→ fill-in-the-blank; zároveň odblokován z DISABLED — odebrán alias short answer→open answer), paraphrase the sentence (→ sentence transformation). Porozumění: heading matching (→ matching), gist question (→ multiple choice), summary cloze (→ cloze text). Každý typ doplněn do UI čipů (správná pedagogická skupina), ALL_TYPES, EXERCISE_PEDAGOGY, TYPE_MIN, defaultItemCount i průvodce „Co který typ umí". Ověřeno node --check + logická kontrola zapojení všech 13 typů.',
@@ -2723,8 +2750,6 @@ const RELEASE = Object.freeze({
     'IMPORT ZADÁNÍ — UPOZORNĚNÍ NA HESLA/PIN/KÓD (6.11.52): po načtení zadání od kolegy hláška nově výslovně připomíná, že hesla, učitelský PIN ani bezpečnostní kód se z bezpečnostních důvodů nepřenášejí a je nutné je před generováním nastavit (týmový kód přes „Načíst"). Doplňuje to záměrné chování: SENSITIVE_FIELD_IDS (heslo/ucitelPin/bezpKod) se do exportu nikdy nedostanou a import je vyprázdní — tajné údaje tak nikdy necestují v souboru. Pouze textová úprava hlášky. Ověřeno node --check.',
     'PŘENOS ZADÁNÍ DLE ROLE — ADMIN NAHOŘE, KOLEGA POD GENEROVÁNÍM (6.11.51): viditelnost panelu „Zadání pro kolegy" se nově řídí rolí (accOnGranted). (1) ADMIN: plný panel (export + import) nahoře pod šablonami — odtud načítá zadání od kolegů a generuje. (2) NEADMIN (kolega): horní panel skrytý; místo něj má pod tlačítkem „Vytvořit test přímo" tlačítko „📤 Exportovat zadání pro správce" s vysvětlením — přesně ve chvíli, kdy narazí na vyčerpané AI požadavky. Stejný admin mechanismus jako u týmového kódu (default hidden, accOnGranted odkrývá podle role). Bez změny logiky exportu/importu. Ověřeno node --check.',
     'PŘENOS ZADÁNÍ MEZI KOLEGY — EXPORT/IMPORT KONFIGURACE (6.11.50): nahoře (pod šablonami) je nová rozbalovací sekce „🤝 Zadání pro kolegy". „📤 Exportovat zadání" uloží celé nastavení formuláře (látka, typy cvičení, čas, body, pedagogika, poslech i čtení vč. tématu a navrženého textu) do .json souboru; „📥 Načíst zadání od kolegy" ho v jiném generátoru načte a předvyplní formulář. Účel: kolega bez volných AI požadavků (RPD) vyplní zadání, exportuje a pošle ho kolegovi s placeným tierem, který test vytvoří na svém klíči. Bezpečně se NEpřenášejí hesla/PINy ani nahrané soubory (audio/PDF/obrázky — binárky se neukládají; po importu se přiloží ručně). Validace formátu (__type), potvrzení před přepsáním, žádná změna logiky generování. Ověřeno node --check.',
-    'VIDITELNÉ OZNAČENÍ AKCÍ, KTERÉ STOJÍ AI POŽADAVEK (6.11.49): u všech tlačítek, která volají Gemini a čerpají z denní kvóty (RPD), je nově viditelný odznak „spotřebuje AI požadavek" / poznámka, aby bylo jasné, že nejde o offline funkci generátoru. Označeno: Vytvořit test přímo (s poznámkou, že jeden test = obvykle 3–6 požadavků), AI návrh otázek k poslechu, AI návrh textu+otázek ke čtení (vč. upozornění, že každé „Jiný návrh" = další požadavek), Rozšířit přijatelné odpovědi, Ověřit klíč druhým průchodem (AI), Přečíst stupnici pomocí AI a AI poradce. Pouze vizuální/textová vrstva, žádná změna logiky. Ověřeno node --check.',
-    'AI POMOCNÍCI PRO POSLECH A ČTENÍ + TÉMA ČTENÍ DLE CEFR (6.11.48): comprehension bloky už negenerují „naslepo". (1) Listening: tlačítko „✨ Nechat AI navrhnout otázky" — z transkriptu/zaměření/učiva (a multimodálně z nahraného audia/videa, pokud je v Konkrétní zadání) navrhne otázky, ukáže náhled a po vložení je necháš v editovatelném poli upravit. (2) Reading: nový výběr TÉMATU/oboru textu, jehož nabídka se mění podle zvolené úrovně CEFR (A1–A2 konkrétní → B1–B2 šířeji → C1–C2 abstraktně) + pole pro vlastní téma. Tlačítko „✨ Navrhnout text a otázky" vygeneruje souvislý text + otázky, ukáže náhled ke schválení (✅ Použít / 🔄 Navrhnout jiný); schválený text se použije jako PEVNÝ zdroj — otázky čerpají jen z něj, AI nepřidává alternativy. Ruční offline varianta zůstává: text i otázky lze napsat přímo. (3) Reading nově předává do promptu i téma a pevný text/otázky přes buildReadingUserBlock() (dřív se k AI dostávala jen délka). Vše bez CDN, přes stávající callGeminiJSON. Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -9887,7 +9912,7 @@ const SecretScanner = (function(){
     {rule:'github-token', re:/gh[pousr]_[A-Za-z0-9_]{30,}/, msg:'GitHub token'},
     {rule:'github-pat', re:/github_pat_[A-Za-z0-9_]{20,}/, msg:'GitHub personal access token'},
     {rule:'openai-key', re:/sk-[A-Za-z0-9_-]{20,}/, msg:'API klíč (sk-…)'},
-    {rule:'inline-credential', re:/(apiKey|api_key|token|secret|password)\s*[:=]\s*["'][^"']{12,}["']/i, msg:'inline přihlašovací údaj'}
+    {rule:'inline-credential', re:/(apiKey|api_key|token|secret|password)\s*[:=]\s*["'](?=[^"']*\d)[^"'\s]{12,}["']/i, msg:'inline přihlašovací údaj'}
   ];
 
   function finding(severity, rule, message, needle){ return {severity, rule, message, needle}; }
@@ -9991,6 +10016,8 @@ const SecretScanner = (function(){
       {n:'R6: student-instant nesmí mít PRIVATE_KEY',target:'student-instant',fn:'instant.html',c:'const PRIVATE_KEY={"kty":"RSA","d":"secret"};',expect:false},
       {n:'R7: teacher smí mít PEM klíč (záměrná výjimka na řádku s target===teacher)',target:'teacher',fn:'teacher_verifier.html',c:'-----BEGIN RSA PRIVATE KEY-----\nabc\n-----END RSA PRIVATE KEY-----',expect:true},
       {n:'R8: GitHub token blokuje ve studentském souboru',target:'student',fn:'student_test.html',c:'const t="ghp_AbCdEfGhIjKlMnOpQrStUvWxYz012345";',expect:false},
+      {n:'R9: běžná věta z textu (secret: s mezerami) studentský soubor NEblokuje',target:'student',fn:'student_test.html',c:'<div class="src">The agent revealed the secret: "the meeting is tonight" and left.</div>',expect:true},
+      {n:'R10: reálný inline klíč (apiKey bez mezer, s číslicí) blokuje',target:'student',fn:'student_test.html',c:'const cfg={apiKey:"AIzaSyFakeTestKey12345678901234"};',expect:false},
     ];
     var pass=0, fail=0;
     var results = cases.map(function(tc){
