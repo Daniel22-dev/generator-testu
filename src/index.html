@@ -2736,10 +2736,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.59',
+  version: '6.11.60',
   date:    '2026-06-16',
   status:  'approved-for-school-use',
   changes: [
+    'OPRAVA — VYSVĚTLENÍ SE NEZOBRAZOVALA STUDENTOVI (6.11.60): hlavní příčina nalezena — feedbackMode (none/brief/learning) se vůbec nepropisoval z formuláře do konfigurace generovaného testu (chyběl v configForHash i v cfg). Klientský kód testu četl CFG.feedbackMode, který byl undefined, takže VŽDY spadl na výchozí \'brief\' — učící zpětná vazba s vysvětlením se tedy nezobrazila NIKDY, ať uživatel zvolil cokoli. Nově se feedbackMode přenáší až do studentského HTML. Druhá oprava: vysvětlení/nápověda u otázky během testu (practiceNote) bylo svázané jen s procvičovacím režimem (testMode=procviceci); nově se ukáže i u BĚŽNÉHO testu, pokud je zapnutá učící zpětná vazba (feedbackMode=learning), při zachování okamžité známky. Přísný test ani bezpečný offline režim vysvětlení během testu dál neukazují (ochrana klíče). Ověřeno node --check.',
     'OPRAVA FALEŠNÉHO BLOKOVÁNÍ EXPORTU — „inline přihlašovací údaj" (6.11.59): bezpečnostní skener (SecretScanner, pravidlo inline-credential) blokoval i běžné testy, pokud zdrojový text (např. vložený DOCX se čtecím textem) obsahoval slovo password/secret/token/apiKey následované dvojtečkou nebo rovnítkem a delším textem v uvozovkách — typicky obyčejná věta z textu. Pravidlo nově vyžaduje, aby hodnota v uvozovkách vypadala jako skutečný údaj: bez mezer a s aspoň jednou číslicí. Skutečné klíče (AIza…, sk-…, ghp_…) i nadále blokují vlastní samostatná pravidla, běžný text už ne. Přidán regresní test (věta „secret: …" s mezerami musí projít, reálný inline klíč musí spadnout). Ověřeno node --check + runScannerTests().',
     'VLASTNICKÉ OZNAČENÍ APLIKACE (6.11.58): do spodní části aplikace bylo doplněno vlastnické označení „Vlastník aplikace: Daniel Baláž · Gymnázium, Ostrava-Hrabůvka“ a copyright „© 2026 Daniel Baláž. Všechna práva vyhrazena.“ Změna je jen textová/identifikační, bez zásahu do generování testů, bodování, bezpečnostních režimů nebo exportů. Ověřeno node --check.',
     'LOGO ŠKOLY I NA MOBILU (6.11.57): logo školy se nově zobrazuje i v mobilní/tabletové verzi (pod 1000px) — malé, decentní, jako v Korespondenčním asistentovi: oblý štítek vlevo nahoře v hlavičce (logo ~32px). Aby se nepřekrývalo s tlačítky vpravo, je titulek na mobilu posunut pod horní řádek (padding-top hlavičky jen pod 1000px). Na PC (≥1000px) zůstává původní velký box vlevo nahoře beze změny. Pouze CSS, ověřeno node --check + vizuální render hlavičky.',
@@ -2749,7 +2750,6 @@ const RELEASE = Object.freeze({
     'AUTOMATICKÉ DOPLNĚNÍ TÝMOVÉHO KÓDU NA VLASTNÍM ZAŘÍZENÍ (6.11.53): pokud je týmový bezpečnostní kód lokálně uložen (SCHOOL_SECURITY_CODE_KEY), nově se do pole doplní sám — po přihlášení i po importu zadání — bez klikání na „Načíst". Uložení kódu je vědomé označení zařízení za vlastní/důvěryhodné (ukládání před sdíleným počítačem varuje), takže auto-doplnění je bezpečné; nepřepisuje už vyplněné pole a na zařízení bez uloženého kódu (sdílené počítače) se nic neděje. Hesla a učitelský PIN se i nadále nedoplňují automaticky (jsou per-test). Hláška po importu upravena. Ověřeno node --check.',
     'IMPORT ZADÁNÍ — UPOZORNĚNÍ NA HESLA/PIN/KÓD (6.11.52): po načtení zadání od kolegy hláška nově výslovně připomíná, že hesla, učitelský PIN ani bezpečnostní kód se z bezpečnostních důvodů nepřenášejí a je nutné je před generováním nastavit (týmový kód přes „Načíst"). Doplňuje to záměrné chování: SENSITIVE_FIELD_IDS (heslo/ucitelPin/bezpKod) se do exportu nikdy nedostanou a import je vyprázdní — tajné údaje tak nikdy necestují v souboru. Pouze textová úprava hlášky. Ověřeno node --check.',
     'PŘENOS ZADÁNÍ DLE ROLE — ADMIN NAHOŘE, KOLEGA POD GENEROVÁNÍM (6.11.51): viditelnost panelu „Zadání pro kolegy" se nově řídí rolí (accOnGranted). (1) ADMIN: plný panel (export + import) nahoře pod šablonami — odtud načítá zadání od kolegů a generuje. (2) NEADMIN (kolega): horní panel skrytý; místo něj má pod tlačítkem „Vytvořit test přímo" tlačítko „📤 Exportovat zadání pro správce" s vysvětlením — přesně ve chvíli, kdy narazí na vyčerpané AI požadavky. Stejný admin mechanismus jako u týmového kódu (default hidden, accOnGranted odkrývá podle role). Bez změny logiky exportu/importu. Ověřeno node --check.',
-    'PŘENOS ZADÁNÍ MEZI KOLEGY — EXPORT/IMPORT KONFIGURACE (6.11.50): nahoře (pod šablonami) je nová rozbalovací sekce „🤝 Zadání pro kolegy". „📤 Exportovat zadání" uloží celé nastavení formuláře (látka, typy cvičení, čas, body, pedagogika, poslech i čtení vč. tématu a navrženého textu) do .json souboru; „📥 Načíst zadání od kolegy" ho v jiném generátoru načte a předvyplní formulář. Účel: kolega bez volných AI požadavků (RPD) vyplní zadání, exportuje a pošle ho kolegovi s placeným tierem, který test vytvoří na svém klíči. Bezpečně se NEpřenášejí hesla/PINy ani nahrané soubory (audio/PDF/obrázky — binárky se neukládají; po importu se přiloží ručně). Validace formátu (__type), potvrzení před přepsáním, žádná změna logiky generování. Ověřeno node --check.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -13296,6 +13296,7 @@ async function assembleTestHtml(st, genData) {
     zolicek: st.zolicek==='ANO', layout: st.layout||'tabs', odevzdavani: st.odevzdavani||'B', resultMode: st.resultMode || 'instant',
     gradeTyp: st.gradeTyp||'skola', gradeScaleRaw: customScaleRaw,
     fuzzyTolerance: (st.fuzzyTolerance==='mild'||st.fuzzyTolerance==='strict')?st.fuzzyTolerance:'off',
+    feedbackMode: (['none','brief','learning'].indexOf(st.feedbackMode)!==-1)?st.feedbackMode:'brief',
     isCzech: String(jazyk||'').toLowerCase()==='čeština',
     csScoringPolicy: (function(){ const cm=(st&&st.csModule)||{}; const ch=(cm&&cm.checks)||{}; return { enabled:String(jazyk||'').toLowerCase()==='čeština', domain:cm.domain||'', phenomenon:cm.phenomenon||'', correctionMode:cm.correctionMode||'', difficulty:cm.difficulty||'', diacritics:ch.diacritics!==false, punctuation:!!ch.punctuation, capitalization:!!ch.capitalization, exactShape:ch.exactShape!==false, requireTeacherReview: cm.correctionMode==='semi'||cm.correctionMode==='manual'||cm.domain==='stylistika'||cm.domain==='literatura' }; })(),
     csFeedbackPolicy: (function(){ const cm=(st&&st.csModule)||{}; return { enabled:String(jazyk||'').toLowerCase()==='čeština', structured:true, domain:cm.domain||'', phenomenon:cm.phenomenon||'', difficulty:cm.difficulty||'', studentLabels:{phenomenon:'Jev',rule:'Pravidlo',why:'Proč',repeat:'Co zopakovat'} }; })(),
@@ -13344,6 +13345,7 @@ async function assembleTestHtml(st, genData) {
     resultMode: configForHash.resultMode,
     gradeTyp: configForHash.gradeTyp,
     fuzzyTolerance: configForHash.fuzzyTolerance,
+    feedbackMode: configForHash.feedbackMode,
     gradeScale: st.gradeTyp==='vlastni'?((st.aiGradeScale&&st.aiGradeScale.length&&st.aiGradeRaw===customScaleRaw)?st.aiGradeScale.slice():parseCustomGradeScale(customScaleRaw, summary.totalBody)):[],
     gradeScaleRaw: customScaleRaw,
     generatorVersion,
@@ -13557,7 +13559,14 @@ function buildQuestionHtml(item, qi, ei, type, pts, cfg, rcSkip) {
   const qnum = qi + 1;
   const hdr  = '<div class="q-hdr"><span class="q-num">' + qnum + '</span><span class="q-pts">' + pts + '&nbsp;b</span></div>';
   const joker = '';
-  const practiceNote = cfg.testMode === 'procviceci' ? (cfg.isCzech ? csFeedbackBlockForBuild(item,'practice') : ((item.explanation || item.model_answer) ? '<div class="practice-note"><strong>Vysvětlení / nápověda:</strong> ' + H(item.explanation || item.model_answer) + '</div>' : '')) : '';
+  // Vysvětlení/nápovědu u otázky během testu ukazujeme, když to dává pedagogický smysl:
+  // procvičovací režim, NEBO běžný test s učící zpětnou vazbou (feedbackMode=learning).
+  // Přísný test ji nikdy neukazuje (riziko úniku klíče) a v bezpečném offline režimu
+  // student stejně známku/klíč hned nevidí, proto tam taky ne.
+  const inlineHelp = cfg.testMode !== 'prisny'
+    && (cfg.resultMode || 'instant') !== 'secureOffline'
+    && (cfg.testMode === 'procviceci' || (cfg.feedbackMode || 'brief') === 'learning');
+  const practiceNote = inlineHelp ? (cfg.isCzech ? csFeedbackBlockForBuild(item,'practice') : ((item.explanation || item.model_answer) ? '<div class="practice-note"><strong>Vysvětlení / nápověda:</strong> ' + H(item.explanation || item.model_answer) + '</div>' : '')) : '';
 
   if (type === 'multiple choice') {
     return '<div class="question" id="q_' + qid + '">' + hdr + '<div class="q-text">' + H(item.question||'') + '</div>' + buildChoiceHtml(qid, item.options||[]) + joker + practiceNote + '</div>';
