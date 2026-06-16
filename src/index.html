@@ -2740,7 +2740,7 @@ const RELEASE = Object.freeze({
   date:    '2026-06-16',
   status:  'approved-for-school-use',
   changes: [
-    'OPRAVA — VYSVĚTLENÍ SE NEZOBRAZOVALA STUDENTOVI (6.11.60): hlavní příčina nalezena — feedbackMode (none/brief/learning) se vůbec nepropisoval z formuláře do konfigurace generovaného testu (chyběl v configForHash i v cfg). Klientský kód testu četl CFG.feedbackMode, který byl undefined, takže VŽDY spadl na výchozí \'brief\' — učící zpětná vazba s vysvětlením se tedy nezobrazila NIKDY, ať uživatel zvolil cokoli. Nově se feedbackMode přenáší až do studentského HTML. Druhá oprava: vysvětlení/nápověda u otázky během testu (practiceNote) bylo svázané jen s procvičovacím režimem (testMode=procviceci); nově se ukáže i u BĚŽNÉHO testu, pokud je zapnutá učící zpětná vazba (feedbackMode=learning), při zachování okamžité známky. Přísný test ani bezpečný offline režim vysvětlení během testu dál neukazují (ochrana klíče). Ověřeno node --check.',
+    'OPRAVA UČÍCÍ ZPĚTNÉ VAZBY — VYSVĚTLENÍ SE NEZOBRAZOVALA, PAK SE ZOBRAZOVALA PŘEDČASNĚ (6.11.60): (1) Hlavní příčina: volba feedbackMode (none/brief/learning) se vůbec nepropisovala z formuláře do konfigurace generovaného testu (chyběla v configForHash i v cfg). Klientský kód testu četl CFG.feedbackMode = undefined, takže VŽDY spadl na výchozí \'brief\' — učící zpětná vazba s vysvětlením se nezobrazila nikdy, ať uživatel zvolil cokoli. Nově se feedbackMode přenáší až do studentského HTML. (2) Správné umístění vysvětlení podle režimu: vysvětlení PŘÍMO U OTÁZKY (před odevzdáním) zůstává jen pro procvičovací režim, kde nejde o známku. U BĚŽNÉHO známkovaného testu by inline vysvětlení prozradilo správnou odpověď ještě před výběrem (regrese odhalená při testu — u MC otázky se pod možnostmi rovnou ukázalo řešení), proto se učící zpětná vazba u běžného testu zobrazuje až ve výsledcích PO odevzdání (rozbalovací „Zobrazit moje odpovědi“ → ✓/✕, body a vysvětlení u každé otázky). Přísný a bezpečný offline režim vysvětlení během testu dál neukazují. Ověřeno node --check.',
     'OPRAVA FALEŠNÉHO BLOKOVÁNÍ EXPORTU — „inline přihlašovací údaj" (6.11.59): bezpečnostní skener (SecretScanner, pravidlo inline-credential) blokoval i běžné testy, pokud zdrojový text (např. vložený DOCX se čtecím textem) obsahoval slovo password/secret/token/apiKey následované dvojtečkou nebo rovnítkem a delším textem v uvozovkách — typicky obyčejná věta z textu. Pravidlo nově vyžaduje, aby hodnota v uvozovkách vypadala jako skutečný údaj: bez mezer a s aspoň jednou číslicí. Skutečné klíče (AIza…, sk-…, ghp_…) i nadále blokují vlastní samostatná pravidla, běžný text už ne. Přidán regresní test (věta „secret: …" s mezerami musí projít, reálný inline klíč musí spadnout). Ověřeno node --check + runScannerTests().',
     'VLASTNICKÉ OZNAČENÍ APLIKACE (6.11.58): do spodní části aplikace bylo doplněno vlastnické označení „Vlastník aplikace: Daniel Baláž · Gymnázium, Ostrava-Hrabůvka“ a copyright „© 2026 Daniel Baláž. Všechna práva vyhrazena.“ Změna je jen textová/identifikační, bez zásahu do generování testů, bodování, bezpečnostních režimů nebo exportů. Ověřeno node --check.',
     'LOGO ŠKOLY I NA MOBILU (6.11.57): logo školy se nově zobrazuje i v mobilní/tabletové verzi (pod 1000px) — malé, decentní, jako v Korespondenčním asistentovi: oblý štítek vlevo nahoře v hlavičce (logo ~32px). Aby se nepřekrývalo s tlačítky vpravo, je titulek na mobilu posunut pod horní řádek (padding-top hlavičky jen pod 1000px). Na PC (≥1000px) zůstává původní velký box vlevo nahoře beze změny. Pouze CSS, ověřeno node --check + vizuální render hlavičky.',
@@ -13559,13 +13559,12 @@ function buildQuestionHtml(item, qi, ei, type, pts, cfg, rcSkip) {
   const qnum = qi + 1;
   const hdr  = '<div class="q-hdr"><span class="q-num">' + qnum + '</span><span class="q-pts">' + pts + '&nbsp;b</span></div>';
   const joker = '';
-  // Vysvětlení/nápovědu u otázky během testu ukazujeme, když to dává pedagogický smysl:
-  // procvičovací režim, NEBO běžný test s učící zpětnou vazbou (feedbackMode=learning).
-  // Přísný test ji nikdy neukazuje (riziko úniku klíče) a v bezpečném offline režimu
-  // student stejně známku/klíč hned nevidí, proto tam taky ne.
-  const inlineHelp = cfg.testMode !== 'prisny'
-    && (cfg.resultMode || 'instant') !== 'secureOffline'
-    && (cfg.testMode === 'procviceci' || (cfg.feedbackMode || 'brief') === 'learning');
+  // Vysvětlení/nápovědu PŘÍMO U OTÁZKY (před odevzdáním) ukazujeme jen v procvičovacím
+  // režimu — tam nejde o známku a cílem je učení za pochodu. U běžného známkovaného testu
+  // by inline vysvětlení prozradilo správnou odpověď ještě před výběrem, proto se učící
+  // zpětná vazba (feedbackMode=learning) zobrazuje až ve výsledcích PO odevzdání.
+  const inlineHelp = cfg.testMode === 'procviceci'
+    && (cfg.resultMode || 'instant') !== 'secureOffline';
   const practiceNote = inlineHelp ? (cfg.isCzech ? csFeedbackBlockForBuild(item,'practice') : ((item.explanation || item.model_answer) ? '<div class="practice-note"><strong>Vysvětlení / nápověda:</strong> ' + H(item.explanation || item.model_answer) + '</div>' : '')) : '';
 
   if (type === 'multiple choice') {
