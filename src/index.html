@@ -1876,28 +1876,10 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 
     <!-- ═══════════════════════════ STEP 1 ═══════════════════════════ -->
     <div id="step1" class="hidden">
-      <div class="field simple-only" id="simpleTemplateField">
-        <div class="field-label">Šablona testu <button class="tt-icon" data-tip="Vyber, k čemu test je. Šablona za tebe nastaví režim testu, zpětnou vazbu a hodnocení — tyhle volby pak nemusíš řešit. Doplníš jen látku, typy cvičení a počet. Klikni na šablonu znovu pro detail, co přesně zapíná.">?</button></div>
-        <div class="field-hint">Vyber podle cíle. Šablona nastaví režim a hodnocení; ty doplníš látku, typy a počet. Klikni znovu na vybranou šablonu pro detail.</div>
+      <div class="field" id="simpleTemplateField">
+        <div class="field-label">Šablona testu <button class="tt-icon" data-tip="Vyber, k čemu test je. Šablona nastaví režim testu, zpětnou vazbu a hodnocení podle cíle. V jednoduchém režimu tyto volby skryje (nemusíš je řešit), v pokročilém je předvyplní a nechá viditelné k doladění. Látku, typy a počet doplňuješ vždy sám. Klikni na šablonu znovu pro detail.">?</button></div>
+        <div class="field-hint" id="simpleTemplateHint">Vyber podle cíle. Šablona nastaví režim a hodnocení; ty doplníš látku, typy a počet. Klikni znovu na vybranou šablonu pro detail.</div>
         <div class="btn-row preset-card-grid" id="simpleTemplateBtns"></div>
-      </div>
-
-      <div class="field advanced-only" id="pedPresetField">
-        <div class="field-label">Doporučená šablona podle cíle testu <button class="tt-icon" data-tip="Systémové pedagogické presety. Nastaví rozumné výchozí typy, počet cvičení, čas, přísnost hodnocení a režim zpětné vazby podle cíle testu. Po použití můžeš vše ručně doladit.">?</button></div>
-        <div class="field-hint">Volitelné. Vyber cíl testu a preset přednastaví zbytek — pak můžeš cokoli ručně upravit.</div>
-        <div class="btn-row preset-card-grid" id="pedPresetBtns">
-          <button class="tag-btn preset-card" data-val="quick_vocab" onclick="choosePreset('quick_vocab')" title="Procvičení: okamžitá známka a učící zpětná vazba."><span class="preset-card-top"><span class="preset-card-emoji">⚡</span><span class="preset-card-text"><span class="preset-card-title">Rychlé procvičení slovíček</span><span class="preset-card-desc">Krátké procvičení s okamžitou známkou a učící zpětnou vazbou.</span></span></span><span class="preset-card-mode instant">Doporučeno: okamžitá známka</span></button>
-          <button class="tag-btn preset-card" data-val="home_practice" onclick="choosePreset('home_practice')" title="Domácí procvičení: okamžitá známka, měkčí tolerance, učící zpětná vazba."><span class="preset-card-top"><span class="preset-card-emoji">🏠</span><span class="preset-card-text"><span class="preset-card-title">Domácí procvičení</span><span class="preset-card-desc">Měkčí procvičovací varianta pro domácí práci nebo samostatný trénink.</span></span></span><span class="preset-card-mode instant">Doporučeno: okamžitá známka</span></button>
-          <button class="tag-btn preset-card" data-val="formative" onclick="choosePreset('formative')" title="Orientační test: může být okamžitá známka, případně bezpečný offline režim."><span class="preset-card-top"><span class="preset-card-emoji">🔎</span><span class="preset-card-text"><span class="preset-card-title">Krátký orientační test</span><span class="preset-card-desc">Rychlá kontrola porozumění nebo průběžného zvládnutí látky.</span></span></span><span class="preset-card-mode flex">Doporučeno: okamžitá známka / offline</span></button>
-          <button class="tag-btn preset-card" data-val="vocab_graded" onclick="choosePreset('vocab_graded')" title="Klasifikace slovní zásoby: bezpečný offline verifier."><span class="preset-card-top"><span class="preset-card-emoji">🧾</span><span class="preset-card-text"><span class="preset-card-title">Klasifikovaný test ze slovíček</span><span class="preset-card-desc">Krátký známkovaný test zaměřený hlavně na slovní zásobu.</span></span></span><span class="preset-card-mode secure">Doporučeno: bezpečný offline verifier</span></button>
-          <button class="tag-btn preset-card" data-val="strict_supervised" onclick="choosePreset('strict_supervised')" title="Ostrý test pod dohledem: přísný režim + verifier."><span class="preset-card-top"><span class="preset-card-emoji">🔒</span><span class="preset-card-text"><span class="preset-card-title">Ostrý test pod dohledem</span><span class="preset-card-desc">Přísný režim pro klasifikaci, kontrolované psaní a bezpečné vyhodnocení.</span></span></span><span class="preset-card-mode strict">Doporučeno: přísný režim + verifier</span></button>
-          <button class="tag-btn preset-card" data-val="grammar_graded" onclick="choosePreset('grammar_graded')" title="Klasifikace gramatiky: bezpečný offline verifier."><span class="preset-card-top"><span class="preset-card-emoji">📝</span><span class="preset-card-text"><span class="preset-card-title">Gramatický test na známku</span><span class="preset-card-desc">Známkovaný test s důrazem na vybraný gramatický jev nebo kombinaci jevů.</span></span></span><span class="preset-card-mode secure">Doporučeno: bezpečný offline verifier</span></button>
-          <button class="tag-btn preset-card" data-val="maturita_prep" onclick="choosePreset('maturita_prep')" title="Zkouškový trénink: bezpečný offline verifier."><span class="preset-card-top"><span class="preset-card-emoji">🎓</span><span class="preset-card-text"><span class="preset-card-title">Maturitní / zkouškový trénink</span><span class="preset-card-desc">Tréninková varianta pro vyšší náročnost, časový tlak a zkouškové typy úloh.</span></span></span><span class="preset-card-mode secure">Doporučeno: bezpečný offline verifier</span></button>
-          <button class="tag-btn preset-card" data-val="weaker_group" onclick="choosePreset('weaker_group')"><span class="preset-card-top"><span class="preset-card-emoji">🤝</span><span class="preset-card-text"><span class="preset-card-title">Slabší skupina</span><span class="preset-card-desc">Lehčí tempo, opora v zadáních a přístupnější obtížnost.</span></span></span><span class="preset-card-mode flex">Doporučeno: podle cíle hodiny</span></button>
-          <button class="tag-btn preset-card" data-val="stronger_group" onclick="choosePreset('stronger_group')"><span class="preset-card-top"><span class="preset-card-emoji">🚀</span><span class="preset-card-text"><span class="preset-card-title">Silnější skupina</span><span class="preset-card-desc">Vyšší náročnost, větší samostatnost a menší míra opory.</span></span></span><span class="preset-card-mode flex">Doporučeno: podle cíle hodiny</span></button>
-          <button class="tag-btn preset-card clear-card" data-val="" onclick="clearPreset()"><span class="preset-card-top"><span class="preset-card-text"><span class="preset-card-title">✖ Bez šablony</span><span class="preset-card-desc">Zruší označení presetu, ale tvoje ruční nastavení ponechá.</span></span></span></button>
-        </div>
-        <div class="preset-result-note hidden" id="pedPresetNote"></div>
       </div>
 
       <div class="field">
@@ -2187,6 +2169,15 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
             <div class="strict-risk-card"><span class="sri">⏱️</span><span>Odkaz rozeslat těsně před testem</span></div>
             <div class="strict-risk-card"><span class="sri">🔀</span><span>Pro každou skupinu jiná varianta</span></div>
           </div>
+        </div>
+      </div>
+
+      <div class="field advanced-only" id="screenGuardField">
+        <div class="field-label">🛡️ Hlídání obrazovky <button class="tt-icon" data-tip="Nezávisle na režimu testu zapne zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí). Po porušení student vidí 🔒 a pokračuje až po zadání odemykacího hesla učitelem. Vhodné i pro méně důležité testy. Přísný režim toto má vždy zapnuté. Vyžaduje odemykací heslo — pokud žádné nezadáš, vygeneruje se automaticky a najdeš ho v pokynech pro učitele.">?</button></div>
+        <div class="field-hint">Zámek při opuštění testu — funguje u běžného i procvičovacího režimu. Porušení vyhodnocuje učitel.</div>
+        <div class="btn-row choice-card-grid two-col" id="screenGuardBtns">
+          <button class="tag-btn active" data-val="off" onclick="setScreenGuard(false)"><span class="choice-card-title">Vypnuto</span><span class="choice-card-desc">Opuštění testu se jen zaznamená (běžný režim), nebo ignoruje (procvičování).</span></button>
+          <button class="tag-btn" data-val="on" onclick="setScreenGuard(true)"><span class="choice-card-title">🛡️ Zapnuto</span><span class="choice-card-desc">Opuštění testu uzamkne pokus; odemkne ho jen učitel heslem.</span></button>
         </div>
       </div>
 
@@ -2755,10 +2746,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.63',
+  version: '6.11.65',
   date:    '2026-06-16',
   status:  'approved-for-school-use',
   changes: [
+    'HLÍDÁNÍ OBRAZOVKY ODPOJENO OD REŽIMU TESTU + ZAPNUTO U ZNÁMKOVACÍCH ŠABLON (6.11.65): zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí) byl dosud vázán JEN na přísný režim. Nově je samostatný přepínač „Hlídání obrazovky“ (state.screenGuard) nezávislý na režimu testu — lze ho zapnout i u běžného a procvičovacího testu. Při porušení student vidí 🔒 a pokračuje až po zadání odemykacího hesla učitelem; porušení vyhodnocuje učitel (nedopatření vs. úmysl). V generovaném testu řídí zamykání nový odvozený příznak CFG.lockOnLeave = (přísný režim NEBO screenGuard); přepsány obě varianty lock logiky (handleLeave, lockTest, setupLockDetection, onBeforeUnload). Tři známkovací šablony cizích jazyků/češtiny (Test na známku screenshot, Test na známku verifier, Jazykový test na známku) mají guard nově ZAPNUTÝ ve výchozím stavu — i méně důležité testy tak hlídají přepínání obrazovky. Přísné šablony mají zámek z podstaty (beze změny). Guard vyžaduje odemykací heslo: pokud není zadané, vygeneruje se automaticky (LOCK-…) a objeví se v pokynech pro učitele. V pokročilém režimu je ruční přepínač v sekci Čas & forma; v přísném režimu je skrytý (zámek tam platí vždy). Detail šablony guard vypisuje. Ověřeno node --check + headless E2E (fl_graded_quick vygeneroval HTML s lockOnLeave:true a lock detekcí, auto-heslo, ruční přepínač, divergence šablony, žádné JS chyby).',
+    'SJEDNOCENÍ ŠABLON NAPŘÍČ JEDNODUCHÝM I POKROČILÝM REŽIMEM (6.11.64): odstraněna dvojkolejnost. Dřívějších 9 samostatných systémových presetů v pokročilém režimu nahrazeno jednou sdílenou sadou šablon (5 cizojazyčných + 4 české) — stejné názvy, ikony i význam v obou režimech. Šablona nastavuje JEN režim testu, režim výsledků, zpětnou vazbu, toleranci a hodnocení; typy cvičení, počet, čas a body zůstávají vždy na učiteli (i v pokročilém — sjednocená filozofie). Chování podle režimu: v JEDNODUCHÉM se volby šablony skryjí (učitel je nevidí ani nerozladí), v POKROČILÉM se předvyplní, ale zůstanou viditelné a plně editovatelné (odrazový můstek). Aktivní šablona se zachová i při přepnutí mezi režimy. Když uživatel v pokročilém ručně změní režimovou volbu mimo šablonu, šablona se odznačí (byla jen startem). Detail karty i potvrzení jsou kontextové podle režimu. Odstraněn mrtvý kód (PEDAGOGICAL_PRESETS objekt, choosePreset/applyPreset detail modaly, warnIfPresetModeMismatch) — staré API zachováno jako tenké wrappery kvůli kompatibilitě. Český modul zobrazuje šablony společně se svým průvodcem (ortogonální vrstvy). Ověřeno node --check + headless test obou režimů (výběr, skrytí/zobrazení polí, divergence, přepnutí jazyka, žádné JS chyby).',
     'PÁTÁ FL ŠABLONA — TEST NA ZNÁMKU JEN SE SCREENSHOTEM (6.11.63): k jednoduchým šablonám cizích jazyků přidána varianta „Test na známku (jen screenshot)“ pro učitele, kteří nechtějí řešit verifier. Nastaví běžný test + okamžitou známku + stručnou zpětnou vazbu (správně/špatně + skóre, BEZ vysvětlení) + přesnou shodu (pravopis se počítá), bez offline souboru a bez verifieru — jednodušší, ale méně bezpečné. Stávající offline varianta přejmenována na „Test na známku (bezpečný verifier)“ a obě jsou v UI i v detailu jasně rozlišené (🧾 screenshot vs 🛡️ verifier), aby bylo zřejmé, čím se liší (rychlost vs bezpečnost). Logika ověřena: bezny/instant/brief projde enforce beze změny, brief u běžného testu neodhalí klíč během testu (vysvětlení se ukazuje jen u procvičovacího režimu). Ověřeno node --check + headless test (5 FL karet, výběr nastaví bezny/instant/brief, detail modal, žádné JS chyby).',
     'JEDNODUCHÉ ŠABLONY V SIMPLE MÓDU — VÝBĚR ZAPNE A SKRYJE VOLBY (6.11.62): nově lze v jednoduchém režimu vybrat šablonu podle cíle testu; šablona nastaví režim testu, režim výsledků, zpětnou vazbu, toleranci překlepů a hodnocení — a TYTO VOLBY SE SKRYJÍ (učitel je nevidí ani omylem nerozladí). Doplní jen látku, typy, počet, čas/body (u cizích jazyků i CEFR). Oddělené sady podle modulu: cizí jazyky (⚡ Procvičení, 🏠 Domácí procvičení, 🧾 Test na známku, 🔒 Ostrý test pod dohledem) a čeština (✍️ Procvičení pravopisu/mluvnice, 📖 Práce s textem, 🧾 Jazykový test na známku, 🔒 Ostrý test pod dohledem). Každá karta má rozbalovací detail „Co šablona zapne“ s úplným výčtem zamčených i doplňovaných voleb. Druhý klik na vybranou šablonu = detail. Klíčové, aby se neopakovalo, co potkalo kolegyni: žádná šablona neobsahuje vnitřně neslučitelnou kombinaci (ověřeno simulací enforce přes všechny šablony). Čeština nově smí zůstat v jednoduchém módu, pokud je aktivní šablona (jinak dál vyžaduje pokročilý kvůli modulu ČJ). Přepnutí do pokročilého šablonu „rozbalí“ (hodnoty zůstanou, zámek se sundá); přepnutí jazyka mezi cs/cizí zruší šablonu z druhé sady. Staré systémové presety (doporučení) přesunuty do pokročilého režimu. Ověřeno node --check + headless test v prohlížeči (render karet FL/CS, výběr šablony nastaví bezny/secureOffline/none dle locks, detail modal, žádné JS chyby).',
     'AUDIT KOMBINACÍ REŽIMŮ + ODSTRANĚNÍ MATOUCÍCH VOLEB (6.11.61): systematická prověrka všech kombinací (režim testu × režim výsledků × zpětná vazba × šablony). Tvrdá pravidla testMode×resultMode jsou v pořádku — dosažitelné jsou jen 4 logické stavy (bezny/instant, bezny/offline, prisny/offline, procviceci/instant), žádná nesmyslná kombinace (např. prisny/instant nebo procviceci/offline) neprojde. Opraveny ale tři matoucí věci: (1) V procvičovacím režimu se inline vysvětlení u otázky ukazovalo i při „Bez okamžité ZV“ — nově respektuje feedbackMode (none = bez vysvětlení). (2) Volba „Režim zpětné vazby“ neměla v bezpečném offline režimu žádný efekt (student hned nevidí nic, řídí to verifier), ale vypadala funkčně — typický zdroj omylu („zvolím Učící, ale studentovi se nic neukáže“). Nově se v offline režimu pole zašedne (disabled) a popisek jasně říká, že o zpětné vazbě rozhoduje učitel až při opravě ve verifieru. (3) Čtyři šablony (Maturitní/zkouškový trénink + české Mluvnice, Skladba, Maturitní opakování) měly u offline testu mrtvou volbu feedbackMode=brief — sjednoceno na none, aby šablona neměla vnitřní rozpor. Ověřeno node --check + simulace enforce přes všechny kombinace a šablony.',
@@ -2767,8 +2760,6 @@ const RELEASE = Object.freeze({
     'VLASTNICKÉ OZNAČENÍ APLIKACE (6.11.58): do spodní části aplikace bylo doplněno vlastnické označení „Vlastník aplikace: Daniel Baláž · Gymnázium, Ostrava-Hrabůvka“ a copyright „© 2026 Daniel Baláž. Všechna práva vyhrazena.“ Změna je jen textová/identifikační, bez zásahu do generování testů, bodování, bezpečnostních režimů nebo exportů. Ověřeno node --check.',
     'LOGO ŠKOLY I NA MOBILU (6.11.57): logo školy se nově zobrazuje i v mobilní/tabletové verzi (pod 1000px) — malé, decentní, jako v Korespondenčním asistentovi: oblý štítek vlevo nahoře v hlavičce (logo ~32px). Aby se nepřekrývalo s tlačítky vpravo, je titulek na mobilu posunut pod horní řádek (padding-top hlavičky jen pod 1000px). Na PC (≥1000px) zůstává původní velký box vlevo nahoře beze změny. Pouze CSS, ověřeno node --check + vizuální render hlavičky.',
     'PRŮVODCE TYPŮ — SJEDNOCENÍ BAREVNÝCH SKUPIN (6.11.56): v rozbalovacím panelu „Co který typ cvičení umí" se nové typy (6.11.55) přidávaly na konec, takže se barevné kategorie (rozpoznávání / řízená produkce / porozumění) objevovaly dvakrát. buildTypeGuide() nově karty před vykreslením stabilně seřadí podle kategorie (r → c → p), takže každá barva tvoří jeden souvislý blok a budoucí přidané typy se zařadí samy. Pouze pořadí zobrazení, beze změny obsahu. Ověřeno node --check + kontrola souvislosti skupin.',
-    '13 NOVÝCH TYPŮ CVIČENÍ (6.11.55): rozšířena nabídka typů, každý se boduje/renderuje jako existující kanonický typ (žádná nová bodovací větev) — přes osvědčený mechanismus SPECIAL_STYLES (styl + recept „Emit type X"). Rozpoznání: synonym choice, antonym choice, choose the correct response (→ multiple choice), match word to definition (→ matching). Řízená produkce: verb form, preposition gap-fill (→ fill-in-the-blank), question formation (→ sentence transformation), word family (→ word formation). Volnější produkce: short answer (→ fill-in-the-blank; zároveň odblokován z DISABLED — odebrán alias short answer→open answer), paraphrase the sentence (→ sentence transformation). Porozumění: heading matching (→ matching), gist question (→ multiple choice), summary cloze (→ cloze text). Každý typ doplněn do UI čipů (správná pedagogická skupina), ALL_TYPES, EXERCISE_PEDAGOGY, TYPE_MIN, defaultItemCount i průvodce „Co který typ umí". Ověřeno node --check + logická kontrola zapojení všech 13 typů.',
-    'OPRAVA ČITELNOSTI POPISKŮ V NOČNÍM REŽIMU (6.11.54): popisky u nedávno přidaných sekcí (panel „Zadání pro kolegy", poznámky o AI požadavcích, nápovědy a podtitulky AI pomocníků, náhledy) byly napsané neexistujícími proměnnými --ink2/--ink3, které padaly na natvrdo zadanou tmavě šedou (#374151/#6b7280) — na tmavém pozadí téměř nečitelné. Nahrazeno správnými téma-aware proměnnými aplikace (--t2/--t3), zvětšeno písmo (11,5→13 px u hlavních popisků) a sjednoceny řádkování i odsazení. Bílé karty (tlačítka, náhled AI) mají nově vynucený tmavý text (jantarová #92560a / #1f2433), aby byly čitelné v obou motivech. Čitelné, ale ne křiklavé; funguje v nočním i světlém režimu. Pouze CSS, ověřeno node --check + vizuální render.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -2961,6 +2952,7 @@ const DEFAULT = {
   testPurpose:'',                            // pedagogický účel testu (label presetu)
   pedagogicalPreset:'',                      // BOD 6 — zvolený systémový preset
   simpleTemplate:'',                         // jednoduchá šablona (simple mode) — zamyká a skrývá volby
+  screenGuard:false,                         // hlídání obrazovky (zámek při opuštění) nezávisle na testMode
   feedbackMode:'brief',                      // BOD 8 — none | brief | learning
   differentiationLevel:'standard',           // BOD 7 — basic | standard | challenge (celý test)
   exercisePedagogyMap:null,                  // BOD 5 — typ → pedagogická funkce (cache)
@@ -3907,6 +3899,7 @@ function applySimpleDefaults(){
   state.overeni = 'NE';
   state.identityMode = 'name';
   state.fuzzyTolerance = 'off';
+  state.screenGuard = false;
   if (!state.body || state.body <= 0) { state.body = 30; setVal('bodyCustom', 30); }
   // Aktivní jednoduchá šablona přebíjí tvrdé defaulty svými zamčenými hodnotami.
   // Tím může i v jednoduchém módu vzniknout např. offline/přísný test — volby jsou
@@ -3918,19 +3911,42 @@ function applySimpleDefaults(){
 // buď jako volající (applySimpleDefaults je z něj volán), nebo navazuje samostatně;
 // zavolání zde by způsobilo nekonečnou rekurzi.
 function applySimpleTemplateLocks(){
+  // Drží zamčené hodnoty šablony — voláno opakovaně z applySimpleDefaults.
+  // Účinné jen v jednoduchém módu (v pokročilém se hodnoty nedrží, jsou volné).
   if (!isSimpleMode()) return;
-  const t = simpleTemplateById(state.simpleTemplate || '');
+  applyTemplateValues(state.simpleTemplate || '');
+}
+// Jednorázově zapíše hodnoty šablony do state. Funguje v OBOU režimech.
+// V jednoduchém se pak volby skryjí, v pokročilém zůstanou viditelné a editovatelné.
+function applyTemplateValues(id){
+  const t = simpleTemplateById(id || '');
   if (!t) return;
   const L = t.locks || {};
+  // screenGuard je „opt-in" prvek šablony. Před aplikací ho vynulujeme, aby
+  // nezůstal viset z předchozí šablony — pokud ho nová šablona chce, locks ho zapne.
+  state.screenGuard = false;
   for (const k in L){ if (Object.prototype.hasOwnProperty.call(L,k)) state[k] = L[k]; }
+  ensureUnlockPasswordForGuard();
+}
+// Hlídání obrazovky potřebuje odemykací heslo učitele — bez něj by se zámek
+// neaktivoval (jen by se zaznamenalo varování). Když je guard zapnutý a heslo
+// prázdné, vygenerujeme čitelné heslo automaticky, ať guard funguje i v jednoduchém
+// režimu bez nutnosti cokoli zadávat. Heslo se objeví v pokynech pro učitele.
+function ensureUnlockPasswordForGuard(){
+  if (!state.screenGuard) return;
+  try {
+    if (!trim('heslo')) {
+      setVal('heslo', 'LOCK-' + randomChunk(8) + '-' + randomChunk(4));
+    }
+  } catch(_){}
 }
 function setAppMode(mode){
   if (mode === 'advanced') {
     state.appMode = 'advanced';
     state.workPreset = 'advanced';
-    // Přechod do pokročilého: hodnoty z jednoduché šablony zůstanou ve state, ale
-    // příznak zrušíme — učitel je teď vidí a může je volně měnit (šablona se „rozbalí").
-    state.simpleTemplate = '';
+    // Šablony jsou sjednocené napříč režimy — aktivní šablona zůstává i v pokročilém,
+    // kde slouží jako odrazový můstek (předvyplní režim/hodnocení, ale volby jsou
+    // viditelné a editovatelné). Nemažeme ji.
     if (!state.testMode) state.testMode = 'bezny';
     if (!state.resultMode) state.resultMode = 'instant';
     if (state.splitGenerate === undefined) state.splitGenerate = false;
@@ -3967,11 +3983,10 @@ function normalizeLoadedState(s) {
   if (typeof s.ageGroupCustom !== 'string') s.ageGroupCustom = '';
   if (typeof s.testPurpose !== 'string') s.testPurpose = '';
   if (typeof s.pedagogicalPreset !== 'string') s.pedagogicalPreset = '';
-  // Jednoduchá šablona: musí být platné ID a smysl má jen v jednoduchém módu.
-  // V pokročilém módu ji vyčistíme (tam se „rozbalí" do volných voleb).
+  // Sjednocená šablona: platí v obou režimech. Musí být platné ID.
   if (typeof s.simpleTemplate !== 'string') s.simpleTemplate = '';
   if (s.simpleTemplate && !(SIMPLE_TEMPLATES.fl[s.simpleTemplate] || SIMPLE_TEMPLATES.cs[s.simpleTemplate])) s.simpleTemplate = '';
-  if (s.appMode === 'advanced') s.simpleTemplate = '';
+  if (typeof s.screenGuard !== 'boolean') s.screenGuard = false;
   if (['none','brief','learning'].indexOf(s.feedbackMode) === -1) s.feedbackMode = 'brief';
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   if (s.exercisePedagogyMap === undefined) s.exercisePedagogyMap = null;
@@ -4666,8 +4681,7 @@ function applyVisualState() {
     b.classList.toggle('active', b.dataset.val === state.ageGroup));
   setVal('ageGroupCustom', state.ageGroupCustom || '');
   renderAgeGroupNote();
-  document.querySelectorAll('#pedPresetBtns .tag-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.val === (state.pedagogicalPreset || '')));
+  renderSimpleTemplates();
   renderPresetNote();
   // Filtr pedagogických funkcí je jen pokročilý; v jednoduchém režimu drž vše viditelné.
   if (isSimpleMode() && pedFilterActive !== 'all') filterPedagogy('all');
@@ -4723,6 +4737,12 @@ function applyVisualState() {
   });
   const strictRiskField = $('strictRiskField');
   if (strictRiskField) strictRiskField.classList.toggle('hidden', state.testMode !== 'prisny');
+  // Hlídání obrazovky: aktivní tlačítko + skrytí pole v přísném režimu (tam je zámek vždy).
+  document.querySelectorAll('#screenGuardBtns .tag-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.val === (state.screenGuard ? 'on' : 'off'));
+  });
+  const screenGuardField = $('screenGuardField');
+  if (screenGuardField) screenGuardField.classList.toggle('hidden', state.testMode === 'prisny');
   // Roster jednorázových kódů má smysl jen v režimu identity „jednorázový kód".
   const rosterField = $('rosterField');
   if (rosterField) rosterField.classList.toggle('hidden', (state.identityMode || 'name') !== 'oneTimeCode');
@@ -4831,8 +4851,37 @@ function pick(key, value) {
     try { uiToast('Bezpečný offline verifier se s procvičovacím režimem neslučuje — režim testu přepnut na běžný.', 'warn', 5200); } catch(_){}
   }
   enforceModeConstraints();
-  warnIfPresetModeMismatch(key);
+  unmarkTemplateIfDiverged(key);
   applyVisualState(); validate(); saveSnapshot();
+}
+
+// Když uživatel v pokročilém režimu ručně změní režimovou volbu tak, že už
+// neodpovídá aktivní šabloně, zrušíme zvýraznění šablony — byla jen startem a teď
+// si učitel jede po svém. V jednoduchém režimu k tomu nedojde (volby jsou skryté).
+// Ruční přepínač hlídání obrazovky (pokročilý režim). Funguje nezávisle na šabloně
+// i režimu testu. Při zapnutí zajistí odemykací heslo (jinak by se zámek neaktivoval).
+function setScreenGuard(on){
+  state.screenGuard = !!on;
+  if (on) ensureUnlockPasswordForGuard();
+  // Ruční změna guardu odznačí šablonu jen pokud guard přestane odpovídat její definici.
+  if (state.simpleTemplate){
+    const t = simpleTemplateById(state.simpleTemplate);
+    const want = !!(t && t.locks && t.locks.screenGuard);
+    if (want !== !!on) state.simpleTemplate = '';
+  }
+  enforceModeConstraints();
+  applyVisualState(); validate(); saveSnapshot();
+}
+function unmarkTemplateIfDiverged(key){
+  if (!state.simpleTemplate) return;
+  if (isSimpleMode()) return;
+  const t = simpleTemplateById(state.simpleTemplate);
+  if (!t || !t.locks) return;
+  if (!Object.prototype.hasOwnProperty.call(t.locks, key)) return;
+  if (state[key] !== t.locks[key]) {
+    state.simpleTemplate = '';
+    try { renderSimpleTemplates(); } catch(_){}
+  }
 }
 
 function pickNum(key, value) {
@@ -5174,132 +5223,65 @@ function pedagogySummaryForPrompt(){
     + '\nVyvažuj test podle těchto funkcí: rozpoznání ověřuje pasivní znalost, produkce ověřuje aktivní použití jazyka, porozumění ověřuje práci s obsahem.';
 }
 
-// ── BOD 6: Systémové pedagogické presety podle cíle testu ─────────────────────
-// Presety přednastaví rozumné výchozí hodnoty; po použití zůstává vše ručně editovatelné.
-const PEDAGOGICAL_PRESETS = {
-  quick_vocab: {
-    label:'Rychlé procvičení slovíček', purpose:'procvičení slovní zásoby', recommendedMode:'instant',
-    typy:['matching','multiple choice','fill-in-the-blank'],
-    pocet:3, cas:15, testMode:'procviceci', resultMode:'instant',
-    fuzzyTolerance:'mild', feedbackMode:'learning', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Krátké nízkostresové procvičení slovní zásoby na začátek/konec hodiny. Okamžitá zpětná vazba, měkčí hodnocení (tolerance drobných překlepů), žádná klasifikace.'
-  },
-  home_practice: {
-    label:'Domácí procvičení', purpose:'domácí procvičení', recommendedMode:'instant',
-    typy:['multiple choice','matching','fill-in-the-blank'],
-    pocet:3, cas:25, testMode:'procviceci', resultMode:'instant',
-    fuzzyTolerance:'mild', feedbackMode:'learning', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Domácí procvičení má žákovi dát rychlou zpětnou vazbu bez učitelského verifieru. Hodí se pro upevnění látky, ne pro ostrou klasifikaci.'
-  },
-  formative: {
-    label:'Krátký orientační test', purpose:'orientační zjištění slabých míst', recommendedMode:'flex',
-    typy:['multiple choice','fill-in-the-blank','sentence transformation'],
-    pocet:3, cas:20, testMode:'bezny', resultMode:'instant',
-    fuzzyTolerance:'mild', feedbackMode:'brief', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Krátký orientační test může být rychlý s okamžitou známkou, ale pokud má sloužit jako menší klasifikovaný výstup, lze ho přepnout na bezpečný offline verifier.'
-  },
-  vocab_graded: {
-    label:'Klasifikovaný test ze slovíček', purpose:'klasifikace slovní zásoby', recommendedMode:'secure',
-    typy:['fill-in-the-blank','translation','word formation','matching'],
-    pocet:4, cas:25, testMode:'bezny', resultMode:'secureOffline',
-    fuzzyTolerance:'off', feedbackMode:'none', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Známkovaný test ze slovní zásoby: bez okamžité zpětné vazby, přesná shoda a bezpečný offline verifier, aby studentský soubor neobsahoval klíč.'
-  },
-  strict_supervised: {
-    label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem', recommendedMode:'strict',
-    typy:['reading comprehension','fill-in-the-blank','sentence transformation','translation','multiple choice'],
-    pocet:5, cas:45, testMode:'prisny', resultMode:'secureOffline',
-    fuzzyTolerance:'off', feedbackMode:'none', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Nejpřísnější varianta pro ostrý test ve třídě: přísný režim, uzamčení při opuštění testu a oprava přes učitelský verifier.'
-  },
-  grammar_graded: {
-    label:'Gramatický test na známku', purpose:'klasifikace gramatiky', recommendedMode:'secure',
-    typy:['fill-in-the-blank','sentence transformation','error correction','translation'],
-    pocet:4, cas:30, testMode:'bezny', resultMode:'secureOffline',
-    fuzzyTolerance:'off', feedbackMode:'none', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Klasifikovaný gramatický test. Přísné bodování (přesná shoda, pravopis se hodnotí), jasná pravidla uznávání odpovědí, bez okamžité zpětné vazby; doporučen bezpečný offline verifier.'
-  },
-  maturita_prep: {
-    label:'Maturitní / zkouškový trénink', purpose:'příprava na zkoušku', recommendedMode:'secure',
-    typy:['reading comprehension','word formation','key word transformation','banked cloze','multiple matching'],
-    pocet:5, cas:45, testMode:'bezny', resultMode:'secureOffline',
-    fuzzyTolerance:'off', feedbackMode:'none', differentiationLevel:'standard', gradeTyp:'skola',
-    why:'Trénink na zkoušku/maturitu s typickými zkouškovými formáty, časovým limitem, vyšší náročností a přísnějším bodováním.'
-  },
-  weaker_group: {
-    label:'Slabší skupina', purpose:'procvičení (podpora)', recommendedMode:'instant',
-    typy:['matching','multiple choice','fill-in-the-blank'],
-    pocet:2, cas:30, testMode:'bezny', resultMode:'instant',
-    fuzzyTolerance:'mild', feedbackMode:'learning', differentiationLevel:'basic', gradeTyp:'skola',
-    why:'Verze se základní podporou: méně položek, jednodušší instrukce, méně distraktorů, více kontextu, delší čas, méně typů najednou. Cíl testu zůstává stejný — jen se odstraňují bariéry.'
-  },
-  stronger_group: {
-    label:'Silnější skupina', purpose:'procvičení / klasifikace', recommendedMode:'flex',
-    typy:['sentence transformation','translation','reading comprehension','key word transformation'],
-    pocet:5, cas:35, testMode:'bezny', resultMode:'instant',
-    fuzzyTolerance:'off', feedbackMode:'brief', differentiationLevel:'challenge', gradeTyp:'skola',
-    why:'Náročnější verze: vyšší podíl produkčních úloh (transformace, překlad), méně nápovědy, delší/komplexnější věty a náročnější distractory. Měřená látka zůstává stejná — náročnější je forma zpracování.'
-  }
-};
-// ═══ JEDNODUCHÉ ŠABLONY (simple mode) ═════════════════════════════════════════
-// Plochá, snadno auditovatelná struktura. Každá šablona nastaví hodnoty v `locks`
-// a TY SE V JEDNODUCHÉM MÓDU SKRYJÍ Z GENERÁTORU (učitel je nevidí ani nemění).
-// Co v `locks` NENÍ, učitel vyplní normálně (látka, typy, počet, čas, body, CEFR).
-// `lockLabels` = lidsky čitelný výčet do detailu karty (co přesně šablona zapne).
-// Oddělené sady podle modulu: FL = cizí jazyky (EN/ES/FR/LA), CS = čeština.
-// POZOR: hodnoty musí být vždy vzájemně kompatibilní (viz enforceModeConstraints).
+// ═══ SDÍLENÉ ŠABLONY TESTU (jednoduchý i pokročilý režim) ═════════════════════
+// Plochá, snadno auditovatelná struktura. Šablona nastaví hodnoty v `locks`:
+//  • V JEDNODUCHÉM režimu se tyto volby skryjí (učitel je nevidí ani nemění).
+//  • V POKROČILÉM režimu se předvyplní, ale zůstanou viditelné a editovatelné.
+// Co v `locks` NENÍ, učitel vyplní vždy sám (látka, typy, počet, čas, body, CEFR).
+// `purpose` = krátký pedagogický záměr do AI promptu. `desc` = popis do karty/detailu.
+// Oddělené sady: FL = cizí jazyky (EN/ES/FR/LA), CS = čeština.
+// POZOR: hodnoty musí být vzájemně kompatibilní (viz enforceModeConstraints).
 const SIMPLE_TEMPLATES = {
   fl: {
     fl_practice: {
-      icon:'⚡', label:'Procvičení (okamžitá známka)',
+      icon:'⚡', label:'Procvičení (okamžitá známka)', purpose:'procvičení a upevnění látky',
       desc:'Učení za pochodu. Student vidí známku i vysvětlení hned po odevzdání.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'mild', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     fl_homework: {
-      icon:'🏠', label:'Domácí procvičení',
+      icon:'🏠', label:'Domácí procvičení', purpose:'samostatné domácí procvičení',
       desc:'Samostatná práce doma. Měkčí tolerance překlepů, učící zpětná vazba.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'mild', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     fl_graded_quick: {
-      icon:'🧾', label:'Test na známku (jen screenshot)',
+      icon:'🧾', label:'Test na známku (jen screenshot)', purpose:'klasifikace (rychlá, bez verifieru)',
       desc:'Jednodušší klasifikace. Student dostane známku, skóre a screenshot hned — bez souboru a verifieru. Méně bezpečné, ale rychlé.',
-      locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
+      locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
     },
     fl_graded: {
-      icon:'🛡️', label:'Test na známku (bezpečný verifier)',
+      icon:'🛡️', label:'Test na známku (bezpečný verifier)', purpose:'klasifikace s ochranou proti opisování',
       desc:'Klasifikace s ochranou. Student neuvidí klíč — odevzdá soubor a opravíš ho ve verifieru.',
-      locks:{ testMode:'bezny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
+      locks:{ testMode:'bezny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
     },
     fl_strict: {
-      icon:'🔒', label:'Ostrý test pod dohledem',
+      icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
       desc:'Kontrolované psaní. Opuštění testu uzamkne pokus; odemkne jen učitel.',
       locks:{ testMode:'prisny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     }
   },
   cs: {
     cs_practice: {
-      icon:'✍️', label:'Procvičení pravopisu / mluvnice',
+      icon:'✍️', label:'Procvičení pravopisu / mluvnice', purpose:'procvičení pravopisu a mluvnice',
       desc:'Učení za pochodu. Automatické opravování, učící zpětná vazba s vysvětlením.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     cs_text: {
-      icon:'📖', label:'Práce s textem',
+      icon:'📖', label:'Práce s textem', purpose:'čtenářská gramotnost a porozumění textu',
       desc:'Čtenářská gramotnost a porozumění. Stručná zpětná vazba po odevzdání.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     cs_graded: {
-      icon:'🧾', label:'Jazykový test na známku',
+      icon:'🛡️', label:'Jazykový test na známku', purpose:'klasifikace jazykových znalostí s ochranou',
       desc:'Klasifikace. Student neuvidí klíč; opravíš ve verifieru a klíč schválíš.',
-      locks:{ testMode:'bezny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
+      locks:{ testMode:'bezny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
     },
     cs_strict: {
-      icon:'🔒', label:'Ostrý test pod dohledem',
+      icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
       desc:'Kontrolované psaní. Opuštění testu uzamkne pokus; odemkne jen učitel.',
       locks:{ testMode:'prisny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     }
   }
 };
-// Lidsky čitelné popisky zamčených hodnot — pro detail karty. Klíč musí sedět na hodnotu.
 const SIMPLE_LOCK_LABELS = {
   testMode:      { bezny:'Běžný test', prisny:'Přísný test (zámek při opuštění)', procviceci:'Procvičovací režim' },
   resultMode:    { instant:'Okamžitá známka', secureOffline:'Bezpečný offline verifier' },
@@ -5308,179 +5290,31 @@ const SIMPLE_LOCK_LABELS = {
   differentiationLevel:{ basic:'Základní podpora', standard:'Standardní obtížnost', challenge:'Challenge (náročnější)' },
   gradeTyp:      { skola:'Školní známkování 1–5', vlastni:'Vlastní stupnice' }
 };
-// Pořadí, v jakém se zamčené hodnoty vypisují v detailu (od nejdůležitějšího).
 const SIMPLE_LOCK_ORDER = ['testMode','resultMode','feedbackMode','fuzzyTolerance','differentiationLevel','gradeTyp'];
-// Vrátí sadu šablon podle aktuálního jazyka (čeština → cs, jinak fl).
 function simpleTemplateSet(){
   return (String(state.jazyk||'').toLowerCase()==='čeština') ? SIMPLE_TEMPLATES.cs : SIMPLE_TEMPLATES.fl;
 }
 function simpleTemplateById(id){
   return (SIMPLE_TEMPLATES.fl[id]) || (SIMPLE_TEMPLATES.cs[id]) || null;
 }
-const FEEDBACK_MODE_LABEL = { none:'bez okamžité zpětné vazby (klasifikace)', brief:'stručná zpětná vazba (správně/špatně, skóre)', learning:'učící zpětná vazba (vysvětlení + doporučení)' };
-const DIFF_LEVEL_LABEL = { basic:'základní podpora', standard:'standard', challenge:'challenge' };
-const FUZZY_LABEL = { off:'přesná shoda — pravopis se hodnotí (přísné)', mild:'mírná tolerance drobného překlepu', strict:'přísná tolerance (0,5 b za překlep)' };
-function resultModeShortLabel(rm){ return (rm === 'secureOffline') ? 'bezpečný offline verifier' : 'okamžitá známka'; }
-const PRESET_MODE_LABEL = {
-  instant:'okamžitá známka',
-  flex:'okamžitá známka nebo bezpečný offline verifier',
-  secure:'bezpečný offline verifier',
-  strict:'přísný režim + verifier'
-};
-const PRESET_ICON = {
-  quick_vocab:'⚡', home_practice:'🏠', formative:'🔎', vocab_graded:'🧾', strict_supervised:'🔒',
-  grammar_graded:'📝', maturita_prep:'🎓', weaker_group:'🤝', stronger_group:'🚀'
-};
-function presetIcon(id){ return PRESET_ICON[id] || '🎯'; }
-function currentModeShortLabel(){
-  if (state.testMode === 'prisny') return 'přísný režim + verifier';
-  return resultModeShortLabel(state.resultMode || 'instant');
-}
-function presetModeMismatchInfo(p){
-  if (!p) return null;
-  const mode = p.recommendedMode || 'flex';
-  const rm = state.resultMode || 'instant';
-  const tm = state.testMode || 'bezny';
-  if (mode === 'instant' && (rm === 'secureOffline' || tm === 'prisny')) {
-    return { title:'Procvičovací šablona je teď nastavená jako klasifikace/verifier.', detail:'Tato šablona je určená pro rychlé učení s okamžitou zpětnou vazbou. Pokud chceš známkovat, použij raději klasifikovanou šablonu; pokud jde jen o procvičení, vrať okamžitou známku.' };
-  }
-  if (mode === 'secure' && (rm !== 'secureOffline' || tm === 'procviceci')) {
-    return { title:'Klasifikovaná šablona je teď nastavená jako procvičení / okamžitý výsledek.', detail:'Pro známkování je bezpečnější offline verifier: studentský soubor neobsahuje klíč a oprava proběhne v teacher_verifier.html.' };
-  }
-  if (mode === 'strict' && (tm !== 'prisny' || rm !== 'secureOffline')) {
-    return { title:'Ostrý test pod dohledem má používat přísný režim + verifier.', detail:'Tato šablona počítá s uzamčením při opuštění testu a s opravou přes teacher_verifier.html. Okamžitá známka by šla proti logice ostrého testu.' };
-  }
-  return null;
-}
-function applyRecommendedModeForCurrentPreset(){
-  const p = PEDAGOGICAL_PRESETS[state.pedagogicalPreset];
-  if (!p) return;
-  if (p.recommendedMode === 'instant') {
-    state.testMode = p.testMode || 'procviceci'; state.resultMode = 'instant'; state.feedbackMode = p.feedbackMode || 'learning'; state.fuzzyTolerance = p.fuzzyTolerance || 'mild';
-  } else if (p.recommendedMode === 'secure') {
-    state.testMode = 'bezny'; state.resultMode = 'secureOffline'; state.feedbackMode = p.feedbackMode || 'none'; state.fuzzyTolerance = p.fuzzyTolerance || 'off';
-  } else if (p.recommendedMode === 'strict') {
-    state.testMode = 'prisny'; state.resultMode = 'secureOffline'; state.feedbackMode = 'none'; state.fuzzyTolerance = p.fuzzyTolerance || 'off';
-  }
-  enforceModeConstraints(); applyVisualState(); validate(); saveSnapshot();
-  uiToast('Použit doporučený režim pro šablonu: ' + p.label + '.', 'ok', 4200);
-}
-function warnIfPresetModeMismatch(key){
-  if (key !== 'testMode' && key !== 'resultMode') return;
-  const p = PEDAGOGICAL_PRESETS[state.pedagogicalPreset];
-  const info = presetModeMismatchInfo(p);
-  if (!p || !info) return;
-  uiToast(info.title + ' Doporučení šablony: ' + (PRESET_MODE_LABEL[p.recommendedMode] || 'bez doporučení') + '.', 'warn', 6500);
-}
-function closePresetDetailModal(){
-  const modal = document.getElementById('presetDetailModal');
-  if (modal) modal.remove();
-  document.removeEventListener('keydown', presetDetailKeyHandler);
-}
-function presetDetailKeyHandler(e){
-  if (e.key === 'Escape') closePresetDetailModal();
-}
-function presetDetailRowsHtml(p){
-  const recommended = PRESET_MODE_LABEL[p.recommendedMode] || 'bez zvláštního doporučení';
-  const rows = [
-    ['Cíl / účel', p.purpose],
-    ['Doporučený režim', recommended],
-    ['Aktuálně nastaveno', currentModeShortLabel()],
-    ['Hodnocení', resultModeShortLabel(p.resultMode) + ' · ' + (FUZZY_LABEL[p.fuzzyTolerance] || p.fuzzyTolerance)],
-    ['Zpětná vazba', FEEDBACK_MODE_LABEL[p.feedbackMode] || p.feedbackMode],
-    ['Diferenciace', DIFF_LEVEL_LABEL[p.differentiationLevel] || p.differentiationLevel]
-  ];
-  // Doporučené typy cvičení — jen pro inspiraci, nenastavují se automaticky.
-  const typyHtml = p.typy && p.typy.length
-    ? '<div class="pm-label pm-label-full">Doporučené typy cvičení</div><div class="pm-val pm-val-full" style="color:var(--t4);font-style:italic">' + esc((p.typy || []).join(', ')) + '<span style="font-size:11px;margin-left:6px">(jen doporučení — nastav si sám)</span></div>'
-    : '';
-  return rows.map(r => '<div class="pm-label">' + esc(r[0]) + '</div><div class="pm-val">' + esc(r[1]) + '</div>').join('') + typyHtml;
-}
-function openPresetDetailModal(id){
-  const p = PEDAGOGICAL_PRESETS[id || state.pedagogicalPreset];
-  if (!p) return;
-  closePresetDetailModal();
-  const mismatch = presetModeMismatchInfo(p);
-  const backdrop = document.createElement('div');
-  backdrop.id = 'presetDetailModal';
-  backdrop.className = 'ui-modal-backdrop';
-  backdrop.setAttribute('role', 'dialog');
-  backdrop.setAttribute('aria-modal', 'true');
-  const warnHtml = mismatch ? '<div class="preset-modal-warning"><strong>⚠️ Logický nesoulad:</strong><br>' + esc(mismatch.title) + '<br>' + esc(mismatch.detail) + '</div>' : '';
-  const actionHtml = mismatch ? (
-    '<button type="button" class="ui-modal-btn" data-preset-recommended>Použít doporučený režim</button>'
-    + (p.recommendedMode === 'instant' ? '<button type="button" class="ui-modal-btn" data-preset-convert>Převést na klasifikovaný test</button>' : '')
-  ) : '';
-  backdrop.innerHTML = '<div class="ui-modal-box preset-modal-box">'
-    + '<div class="ui-modal-head">Detail doporučené šablony</div>'
-    + '<div class="ui-modal-body preset-modal-body">'
-    +   '<div class="preset-modal-hero"><div class="preset-modal-icon">' + esc(presetIcon(id || state.pedagogicalPreset)) + '</div><div><div class="preset-modal-title">' + esc(p.label) + '</div><div class="preset-modal-sub">Tento detail patří k právě zvolené kartě. Preset nastaví mód, zpětnou vazbu, hodnocení a diferenciaci. Typy cvičení, počet ani čas se nemění — to zůstává na tobě.</div></div></div>'
-    +   '<div class="preset-modal-grid">' + presetDetailRowsHtml(p) + '</div>'
-    +   (p.why ? '<div class="preset-modal-why"><strong>Logika šablony:</strong> ' + esc(p.why) + '</div>' : '')
-    +   warnHtml
-    +   '<div class="preset-modal-hint">„Bez šablony” jen zruší označení presetu, hodnoty ponechá. Kliknutí na aktivní kartu znovu otevře tento detail bez přepisování ručních změn.</div>'
-    + '</div>'
-    + '<div class="ui-modal-actions">' + actionHtml + '<button type="button" class="ui-modal-btn primary" data-preset-close>Rozumím</button></div>'
-    + '</div>';
-  document.body.appendChild(backdrop);
-  const closeBtn = backdrop.querySelector('[data-preset-close]');
-  const recBtn = backdrop.querySelector('[data-preset-recommended]');
-  const convertBtn = backdrop.querySelector('[data-preset-convert]');
-  if (closeBtn) closeBtn.addEventListener('click', closePresetDetailModal);
-  if (recBtn) recBtn.addEventListener('click', () => { closePresetDetailModal(); applyRecommendedModeForCurrentPreset(); });
-  if (convertBtn) convertBtn.addEventListener('click', () => { closePresetDetailModal(); applyPreset('vocab_graded'); });
-  backdrop.addEventListener('click', e => { if (e.target === backdrop) closePresetDetailModal(); });
-  document.addEventListener('keydown', presetDetailKeyHandler);
-  setTimeout(() => { if (closeBtn) closeBtn.focus(); }, 0);
+// Vrátí definici aktivní šablony (sjednoceno pro oba režimy) nebo null.
+function activeTemplateDef(){
+  return simpleTemplateById(state.simpleTemplate || '');
 }
 
-function presetHasManualWork(){
-  return (state.typyCviceni && state.typyCviceni.length > 0)
-      || state.exerciseDetail
-      || (trim('vlastniTyp') !== '')
-      || (state.gradeTyp === 'vlastni');
-}
-async function choosePreset(id){
-  const p = PEDAGOGICAL_PRESETS[id];
-  if (!p){ return; }
-  if (state.pedagogicalPreset === id){ openPresetDetailModal(id); return; }
-  if (presetHasManualWork() && state.pedagogicalPreset !== id){
-    const ok = await uiModal({
-      title:'Použít preset?',
-      message:'Preset „' + p.label + '" nastaví režim testu, zpětvazbu, hodnocení a diferenciaci. Typy cvičení, počet ani čas se nemění — to zůstává na tobě. Doporučené typy uvidíš v detailu. Pokračovat?',
-      okText:'Ano, pokračovat', cancelText:'Zrušit', boxClass:'preset-confirm-box'
-    }).then(Boolean);
-    if (!ok){ applyVisualState(); return; }
-  }
-  applyPreset(id);
-}
-function applyPreset(id, opts){
-  const p = PEDAGOGICAL_PRESETS[id];
-  if (!p) return;
-  // Preset je vědomá konfigurace → odemkne pokročilý režim, ať nastavení (přísnost,
-  // bezpečnost, zpětná vazba) nepřebije applySimpleDefaults().
-  state.appMode = 'advanced'; state.workPreset = 'advanced';
-  state.pedagogicalPreset = id;
-  state.testPurpose = p.purpose || '';
-  // Typy, počet a čas záměrně NENASTAVUJEME — učitel si volí sám.
-  // Doporučené typy jsou vidět v detailním modalu jako informace.
-  if (p.testMode) state.testMode = p.testMode;
-  if (p.resultMode) state.resultMode = p.resultMode;
-  if (p.fuzzyTolerance) state.fuzzyTolerance = p.fuzzyTolerance;
-  if (p.feedbackMode) state.feedbackMode = p.feedbackMode;
-  if (p.differentiationLevel) state.differentiationLevel = p.differentiationLevel;
-  if (p.gradeTyp) state.gradeTyp = p.gradeTyp;
-  enforceModeConstraints();
-  applyVisualState(); validate(); saveSnapshot();
-  renderPresetNote();
-  const showDetail = !(opts && opts.showDetail === false);
-  if (showDetail) openPresetDetailModal(id);
-  else uiToast('Preset použit: ' + p.label + '. Doporučený režim: ' + (PRESET_MODE_LABEL[p.recommendedMode] || 'volitelný') + '. Vše můžeš dál ručně upravit.', 'ok', 5200);
-}
+// ── BOD 6: Šablony testu — sjednocené napříč jednoduchým i pokročilým režimem ──
+// Dřívější samostatné systémové presety (PEDAGOGICAL_PRESETS) byly nahrazeny jednou
+// sdílenou sadou SIMPLE_TEMPLATES (viz výše). Šablona nastavuje jen režim/hodnocení;
+// typy, počet a čas zůstávají vždy na učiteli. V jednoduchém režimu se volby šablony
+// skryjí, v pokročilém zůstanou viditelné a editovatelné. Funkce choosePreset/applyPreset/
+// clearPreset (staré API) jsou zachované jako tenké wrappery kvůli zpětné kompatibilitě.
+const PEDAGOGICAL_PRESETS = {};
+function choosePreset(id){ if (id) chooseSimpleTemplate(id); else clearPreset(); }
+function applyPreset(id){ if (id){ state.simpleTemplate = id; applyTemplateValues(id); enforceModeConstraints(); applyVisualState(); validate(); saveSnapshot(); renderSimpleTemplates(); } }
 function clearPreset(){
   state.pedagogicalPreset = '';
   state.testPurpose = '';
-  applyVisualState(); saveSnapshot();
+  clearSimpleTemplate();
 }
 // ═══ JEDNODUCHÉ ŠABLONY — výběr, zrušení, detail ══════════════════════════════
 // Výběr jednoduché šablony: zapne zamčené hodnoty, ostatní nechá na učiteli.
@@ -5491,16 +5325,20 @@ function chooseSimpleTemplate(id){
   if (!t) return;
   if (state.simpleTemplate === id){ openSimpleTemplateDetail(id); return; }
   state.simpleTemplate = id;
-  applySimpleTemplateLocks();
+  applyTemplateValues(id);          // zapíše hodnoty (funguje v obou režimech)
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
   renderSimpleTemplates();
-  uiToast('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň jen látku, typy a počet.', 'ok', 4200);
+  const msg = isSimpleMode()
+    ? ('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň jen látku, typy a počet.')
+    : ('Šablona: ' + t.label + '. Režim a hodnocení jsou předvyplněné — můžeš je dál upravit a doplnit typy, počet i ostatní volby.');
+  uiToast(msg, 'ok', 4200);
 }
 function clearSimpleTemplate(){
   state.simpleTemplate = '';
-  // Po zrušení šablony se vrátí běžné jednoduché defaulty (bezny/instant atd.).
-  applySimpleDefaults();
+  // V jednoduchém módu se vrátí výchozí nastavení (bezny/instant…). V pokročilém
+  // necháme aktuální hodnoty být — uživatel je vidí a může s nimi dál pracovat.
+  if (isSimpleMode()) applySimpleDefaults();
   applyVisualState(); validate(); saveSnapshot();
   renderSimpleTemplates();
 }
@@ -5514,6 +5352,9 @@ function simpleTemplateLockList(t){
     const lab = dict[L[k]]; if (!lab) return;
     out.push(lab);
   });
+  // Hlídání obrazovky (zámek při opuštění testu) — přidáme do výčtu, ať je viditelné.
+  if (L.screenGuard) out.push('Hlídání obrazovky: zámek při opuštění testu (odemyká učitel)');
+  // Přísný režim zamyká vždy ze své podstaty — u něj guard neuvádíme zvlášť.
   return out;
 }
 // Vykreslí karty jednoduchých šablon podle aktuálního jazyka. Volá se při změně
@@ -5533,32 +5374,39 @@ function renderSimpleTemplates(){
       + '<span class="preset-card-top"><span class="preset-card-emoji">' + t.icon + '</span>'
       + '<span class="preset-card-text"><span class="preset-card-title">' + esc(t.label) + '</span>'
       + '<span class="preset-card-desc">' + esc(t.desc) + '</span></span></span>'
-      + '<span class="simple-tpl-detaillink">' + (isActive ? 'Klikni znovu pro detail ▸' : 'Co šablona zapne ▸') + '</span>'
+      + '<span class="simple-tpl-detaillink">' + (isActive ? 'Klikni znovu pro detail ▸' : (isSimpleMode() ? 'Co šablona zapne ▸' : 'Detail ▸')) + '</span>'
       + '</button>';
   }
-  // Karta „bez šablony"
+  // Karta „bez šablony" — popis závisí na režimu
+  const clearDesc = isSimpleMode()
+    ? 'Nastav si režim i hodnocení ručně (přepne do pokročilého režimu).'
+    : 'Zruší označení šablony, tvoje ruční nastavení ale ponechá.';
   html += '<button type="button" class="tag-btn preset-card clear-card simple-tpl-card' + (active===''?' active':'') + '" '
     + 'data-val="" onclick="clearSimpleTemplate()">'
     + '<span class="preset-card-top"><span class="preset-card-text">'
     + '<span class="preset-card-title">✖ Bez šablony</span>'
-    + '<span class="preset-card-desc">Nastav si režim i hodnocení ručně (přepne do pokročilého režimu).</span>'
+    + '<span class="preset-card-desc">' + clearDesc + '</span>'
     + '</span></span></button>';
   wrap.innerHTML = html;
 }
 function openSimpleTemplateDetail(id){
   const t = simpleTemplateById(id);
   if (!t) return;
+  const simple = isSimpleMode();
   const locks = simpleTemplateLockList(t);
   let body = '<div class="stpl-detail">';
   body += '<p class="stpl-detail-desc">' + esc(t.desc) + '</p>';
-  body += '<div class="stpl-detail-h">Tato šablona automaticky nastaví:</div><ul class="stpl-detail-list">';
+  body += '<div class="stpl-detail-h">' + (simple ? 'Tato šablona automaticky nastaví:' : 'Tato šablona předvyplní (můžeš změnit):') + '</div><ul class="stpl-detail-list">';
   locks.forEach(function(l){ body += '<li>' + esc(l) + '</li>'; });
   body += '</ul>';
   body += '<div class="stpl-detail-h">Doplníš sám:</div><ul class="stpl-detail-list stpl-detail-open">'
     + '<li>Látku / téma testu</li><li>Typy cvičení</li><li>Počet otázek</li><li>Čas a body</li>'
     + (String(state.jazyk||'').toLowerCase()==='čeština' ? '' : '<li>Úroveň CEFR</li>')
     + '</ul>';
-  body += '<p class="stpl-detail-foot">Zamčené volby se v jednoduchém režimu neukazují, aby nešlo nic omylem rozladit. Chceš-li je měnit ručně, přepni nahoře na <strong>Pokročilý režim</strong>.</p>';
+  body += '<p class="stpl-detail-foot">' + (simple
+      ? 'Tyto volby se v jednoduchém režimu neukazují, aby nešlo nic omylem rozladit. Chceš-li je měnit ručně, přepni nahoře na <strong>Pokročilý režim</strong>.'
+      : 'V pokročilém režimu jsou všechny tyto volby níže viditelné a můžeš je libovolně doladit. Šablona je jen rychlý start.')
+    + '</p>';
   body += '</div>';
   uiModal({ title: t.icon + ' ' + t.label, message: body, html:true, okText:'Rozumím', cancelText:null }).then(function(){});
 }
@@ -6991,9 +6839,12 @@ function getCompactVerificationBlock() {
   return `Ověření výsledku je vypnuté. Student po odevzdání vidí výsledkovou kartu a pošle učiteli screenshot. Nepřidávej QR ani ověřovací .txt / OVR4 logiku.`;
 }
 function getCompactSecurityBlock() {
-  if (state.testMode === 'procviceci')
+  // Hlídání obrazovky (screenGuard) povyšuje běžný i procvičovací režim na zámkové
+  // chování jako přísný — zámek při opuštění testu, odemyká učitel heslem.
+  const guardOn = !!state.screenGuard && state.testMode !== 'prisny';
+  if (state.testMode === 'procviceci' && !guardOn)
     return `BEZPEČNOST — procvičovací režim: bez represivních zámků; opuštění stránky můžeš ignorovat nebo jen jemně zalogovat. LocalStorage ukládá průběh a odpovědi, nikdy PIN.`;
-  if (state.testMode === 'bezny')
+  if (state.testMode === 'bezny' && !guardOn)
     return `BEZPEČNOST — běžný režim: monitorování bez zámku.
   • Skutečné opuštění běžícího neodevzdaného testu (visibilitychange hidden, pagehide, reload, přepnutí aplikace/karty nebo otevření jiného okna) pouze zapiš do logs/securityEvents jako warning/security-warning. Nikdy kvůli tomu nenastavuj state.locked a nikdy nezobrazuj lock screen.
   • Student-facing texty formuluj jako zákaz opustit test; studentovi nepiš, že běžný režim nezamyká.
@@ -7209,11 +7060,11 @@ function buildPrompt() {
   const ageBlock = ageLbl
     ? `Cílová věková skupina: ${ageLbl}.\n${ageGroupHint() || 'Témata, délku vět, míru abstrakce, kulturní reference a styl pokynů přizpůsob této věkové skupině.'}\n• CEFR úroveň není totéž co věková přiměřenost: úroveň řídí jazykovou náročnost, věk řídí témata a formulace. Stejná CEFR úroveň pro mladší žáky a pro dospělé vyžaduje jiná témata.\n• Před výstupem si ověř: Odpovídá test věkové skupině? Neobsahuje zbytečně dospělácká témata pro mladší žáky? Neobsahuje příliš dětské formulace pro vyšší gymnázium / dospělé?`
     : '';
-  // BOD 6 — pedagogický preset / cíl testu
-  const presetDef = PEDAGOGICAL_PRESETS[state.pedagogicalPreset];
-  const presetLine = presetDef ? `\nCíl testu / preset: ${presetDef.label} (účel: ${presetDef.purpose})` : (state.testPurpose ? `\nÚčel testu: ${state.testPurpose}` : '');
+  // BOD 6 — pedagogický záměr ze šablony (sjednocené napříč režimy)
+  const presetDef = activeTemplateDef();
+  const presetLine = presetDef ? `\nCíl testu / šablona: ${presetDef.label} (účel: ${presetDef.purpose||''})` : (state.testPurpose ? `\nÚčel testu: ${state.testPurpose}` : '');
   const presetBlock = presetDef
-    ? `Učitel zvolil pedagogický preset „${presetDef.label}" (účel: ${presetDef.purpose}).\nProč: ${presetDef.why}\nVýchozí typy podle presetu: ${(presetDef.typy||[]).join(', ')}.\nRespektuj tento záměr při tvorbě obsahu, výběru témat, náročnosti i tónu úloh; konkrétní nastavení (typy, počet, čas, bodování, zpětná vazba) je řízeno samostatnými sekcemi níže.`
+    ? `Učitel zvolil šablonu „${presetDef.label}" (účel: ${presetDef.purpose||''}).\nRespektuj tento záměr při tvorbě obsahu, výběru témat, náročnosti i tónu úloh; konkrétní nastavení (typy, počet, čas, bodování, zpětná vazba) je řízeno samostatnými sekcemi níže.`
     : '';
   // BOD 8 — režim zpětné vazby a diagnostika
   const fm = state.feedbackMode || 'brief';
@@ -7372,7 +7223,7 @@ function analyzeDidactics(st, data){
   const productionPct = ratios.controlled + ratios.freer;
   const checks = [];
   const add = (level, text) => checks.push({ level, text });
-  const purpose = (PEDAGOGICAL_PRESETS[st.pedagogicalPreset] && PEDAGOGICAL_PRESETS[st.pedagogicalPreset].purpose) || st.testPurpose || '';
+  const purpose = (function(){ const t=simpleTemplateById(st.simpleTemplate||''); return (t&&t.purpose)||st.testPurpose||''; })();
   const isGraded = (st.resultMode || 'instant') === 'secureOffline';
 
   // Jednostrannost
@@ -7408,7 +7259,7 @@ function renderDidacticReview(){
   state.didacticReview = { ratios:d.ratios, totalPts:d.totalPts, totalItems:d.totalItems };
   panel.classList.remove('hidden');
   panel.removeAttribute('open');
-  const presetLbl = (PEDAGOGICAL_PRESETS[state.pedagogicalPreset] && PEDAGOGICAL_PRESETS[state.pedagogicalPreset].label) || 'bez presetu';
+  const presetLbl = (function(){ const t=activeTemplateDef(); return (t&&t.label)||'bez šablony'; })();
   const ageLbl = ageGroupLabel() || 'neurčena';
   const rOrder = ['recognition','controlled','freer','comprehension'];
   const ratioRow = rOrder.filter(k=>d.ratios[k]>0).map(k=>PEDAGOGY_FN[k].label+' '+d.ratios[k]+' %').join(' · ') || '—';
@@ -13059,10 +12910,10 @@ var LEFT_AT=0;
 var SOFT_AWAY_MS=8000; // odchod kratší než ~8 s bereme jako měkký (běžné mobilní vyrušení)
 function markLeftNow(){ LEFT_AT=Date.now(); }
 function awayMsSinceLeft(){ if(!LEFT_AT) return null; var d=Date.now()-LEFT_AT; LEFT_AT=0; return d>=0?d:null; }
-function handleLeave(kind,reason){if(!isTestRunning())return;var why=reason||t('lockedEvent','left window');if(CFG.testMode==='prisny'){lockTest(why);return;}recordSec(kind||'left-window',why);}
+function handleLeave(kind,reason){if(!isTestRunning())return;var why=reason||t('lockedEvent','left window');if(CFG.lockOnLeave){lockTest(why);return;}recordSec(kind||'left-window',why);}
 var LOCK_TAPS=0,LOCK_TAP_TIMER=null;
 function lockTap(){LOCK_TAPS++;clearTimeout(LOCK_TAP_TIMER);LOCK_TAP_TIMER=setTimeout(function(){LOCK_TAPS=0;},2000);if(LOCK_TAPS>=5){LOCK_TAPS=0;var rv=$('unlockReveal');if(rv)rv.classList.remove('hidden');var inp=$('unlockInp');if(inp){try{inp.focus();}catch(_){}}}}
-function lockTest(reason){if(!isTestRunning())return;if(CFG.testMode!=='prisny'){recordSec('left-window',reason||t('lockedEvent','left window'));return;}LOCKED=true;recordSec('locked',reason||t('lockedEvent','left window'));const r=$('lockReasonBox');if(r)r.textContent=(t('lockReason','Reason')+': '+(reason||t('lockedEvent','left window')));LOCK_TAPS=0;var rv=$('unlockReveal');if(rv)rv.classList.add('hidden');$('lockScreen').classList.remove('hidden');}
+function lockTest(reason){if(!isTestRunning())return;if(!CFG.lockOnLeave){recordSec('left-window',reason||t('lockedEvent','left window'));return;}LOCKED=true;recordSec('locked',reason||t('lockedEvent','left window'));const r=$('lockReasonBox');if(r)r.textContent=(t('lockReason','Reason')+': '+(reason||t('lockedEvent','left window')));LOCK_TAPS=0;var rv=$('unlockReveal');if(rv)rv.classList.add('hidden');$('lockScreen').classList.remove('hidden');}
 document.addEventListener('visibilitychange',()=>{
   if(!isTestRunning())return;
   if(document.visibilityState==='hidden'){ markLeftNow(); handleLeave('visibility-hidden',t('lockedEvent','left window')); }
@@ -13532,6 +13383,8 @@ async function assembleTestHtml(st, genData) {
     gradeTyp: st.gradeTyp||'skola', gradeScaleRaw: customScaleRaw,
     fuzzyTolerance: (st.fuzzyTolerance==='mild'||st.fuzzyTolerance==='strict')?st.fuzzyTolerance:'off',
     feedbackMode: (['none','brief','learning'].indexOf(st.feedbackMode)!==-1)?st.feedbackMode:'brief',
+    screenGuard: !!st.screenGuard,
+    lockOnLeave: (st.testMode==='prisny') || !!st.screenGuard,
     isCzech: String(jazyk||'').toLowerCase()==='čeština',
     csScoringPolicy: (function(){ const cm=(st&&st.csModule)||{}; const ch=(cm&&cm.checks)||{}; return { enabled:String(jazyk||'').toLowerCase()==='čeština', domain:cm.domain||'', phenomenon:cm.phenomenon||'', correctionMode:cm.correctionMode||'', difficulty:cm.difficulty||'', diacritics:ch.diacritics!==false, punctuation:!!ch.punctuation, capitalization:!!ch.capitalization, exactShape:ch.exactShape!==false, requireTeacherReview: cm.correctionMode==='semi'||cm.correctionMode==='manual'||cm.domain==='stylistika'||cm.domain==='literatura' }; })(),
     csFeedbackPolicy: (function(){ const cm=(st&&st.csModule)||{}; return { enabled:String(jazyk||'').toLowerCase()==='čeština', structured:true, domain:cm.domain||'', phenomenon:cm.phenomenon||'', difficulty:cm.difficulty||'', studentLabels:{phenomenon:'Jev',rule:'Pravidlo',why:'Proč',repeat:'Co zopakovat'} }; })(),
@@ -13581,6 +13434,8 @@ async function assembleTestHtml(st, genData) {
     gradeTyp: configForHash.gradeTyp,
     fuzzyTolerance: configForHash.fuzzyTolerance,
     feedbackMode: configForHash.feedbackMode,
+    screenGuard: configForHash.screenGuard,
+    lockOnLeave: configForHash.lockOnLeave,
     gradeScale: st.gradeTyp==='vlastni'?((st.aiGradeScale&&st.aiGradeScale.length&&st.aiGradeRaw===customScaleRaw)?st.aiGradeScale.slice():parseCustomGradeScale(customScaleRaw, summary.totalBody)):[],
     gradeScaleRaw: customScaleRaw,
     generatorVersion,
@@ -14082,7 +13937,7 @@ function startTest(){
   if(CFG.activeGroupKey){var note=(CFG.groupNotes||{})[CFG.activeGroupKey]||g.conditions||'';var hdr=document.querySelector('.t-header-title');if(hdr&&!document.querySelector('.group-pill')){hdr.insertAdjacentHTML('afterend','<span class="group-pill">'+esc(CFG.activeGroupName)+'</span>');}if(note){var area=I('exArea');if(area)area.insertAdjacentHTML('afterbegin','<div class="group-warning">'+esc(note)+'</div>');}}
   started=true;
   startTimer();
-  if(CFG.testMode==='prisny'||CFG.testMode==='bezny') setupLockDetection();
+  if(CFG.lockOnLeave||CFG.testMode==='prisny'||CFG.testMode==='bezny') setupLockDetection();
   var first=document.querySelector('.mc-opt,.he-sent,.et-token,.et-type,.et-corr,.fib-inp,.tf-btn,.match-sel,.err-inp,.open-inp,.tc-inp,.trch-inp');
   if(first)setTimeout(function(){first.focus();},120);
 }
@@ -14394,10 +14249,10 @@ function isEditable(el){return !!(el&&(el.tagName==='INPUT'||el.tagName==='TEXTA
 function recordSecurityEvent(type,detail){securityEvents.push({type:type,detail:detail||'',ts:new Date().toISOString()});warningCount=securityEvents.length;}
 function lockTest(reason){
   if(!started||submitted||locked)return;
-  if(CFG.testMode==='prisny'){
+  if(CFG.lockOnLeave){
     recordSecurityEvent('lock',reason);
     if(CFG.hasUnlock){locked=true;I('lockReason').textContent=reason+' ('+warningCount+')';LOCK_TAPS=0;hide('unlockReveal');show('lockScreen');}
-    else{recordSecurityEvent('warning','Přísný režim: zámek nemá nastavené odemykací heslo. '+reason);}
+    else{recordSecurityEvent('warning','Hlídání obrazovky: zámek nemá nastavené odemykací heslo. '+reason);}
     return;
   }
   if(CFG.testMode==='bezny'){recordSecurityEvent('warning',reason);return;}
@@ -14406,7 +14261,7 @@ function lockTest(reason){
 function guardedBlurCheck(){clearTimeout(blurTimer);blurTimer=setTimeout(function(){if(!started||submitted||locked)return;if(activeEditable||isEditable(document.activeElement)||isModalOpen())return;if(document.visibilityState==='visible'&&!document.hasFocus())lockTest('Stránka ztratila fokus.');},1000);}
 function onVisibility(){if(!started||submitted||locked)return;if(document.visibilityState==='hidden')lockTest('Student opustil okno nebo přepnul aplikaci.');}
 function onPageHide(){if(!started||submitted||locked)return;lockTest('Pokus o opuštění stránky.');}
-function onBeforeUnload(e){if(!started||submitted)return;recordSecurityEvent('warning','Pokus o reload nebo opuštění stránky.');if(CFG.testMode==='prisny'){e.preventDefault();e.returnValue='';return '';}}
+function onBeforeUnload(e){if(!started||submitted)return;recordSecurityEvent('warning','Pokus o reload nebo opuštění stránky.');if(CFG.lockOnLeave){e.preventDefault();e.returnValue='';return '';}}
 function setupLockDetection(){if(secInstalled)return;secInstalled=true;lastBeat=Date.now();document.addEventListener('visibilitychange',onVisibility);window.addEventListener('pagehide',onPageHide);window.addEventListener('blur',guardedBlurCheck);window.addEventListener('beforeunload',onBeforeUnload);document.addEventListener('focusin',function(e){activeEditable=isEditable(e.target);});document.addEventListener('focusout',function(){setTimeout(function(){activeEditable=isEditable(document.activeElement);},50);});setInterval(function(){if(started&&!submitted&&!locked){var now=Date.now();if(now-lastBeat>45000)lockTest('Podezřelá prodleva aktivity: '+String(now-lastBeat)+' ms.');lastBeat=now;}},15000);}
 function teardownLockDetection(){if(!secInstalled)return;secInstalled=false;document.removeEventListener('visibilitychange',onVisibility);window.removeEventListener('pagehide',onPageHide);window.removeEventListener('blur',guardedBlurCheck);window.removeEventListener('beforeunload',onBeforeUnload);}
 var LOCK_TAPS=0,LOCK_TAP_TIMER=null;
@@ -16439,7 +16294,7 @@ function openIncidentReport(){
 //     report s vlastní obsluhou Escape…) → neděláme NIC, aby Escape nezavřel
 //     modal schovaný POD blokujícím dialogem (uiModal si Escape řeší sám
 //     v uiModalKeyHandler jako cancel).
-const ESC_CLOSABLE_MODALS = ['changelogGate','secGuideGate','strictSitGate','usageGuideGate','apiKeyGuideGate','testLabModal','presetDetailModal','accAdminModal'];
+const ESC_CLOSABLE_MODALS = ['changelogGate','secGuideGate','strictSitGate','usageGuideGate','apiKeyGuideGate','testLabModal','accAdminModal'];
 document.addEventListener('keydown', function(e){
   if (e.key !== 'Escape') return;
   const kids = document.body.children;
@@ -16448,8 +16303,7 @@ document.addEventListener('keydown', function(e){
     if (!el || !el.classList || !el.classList.contains('ui-modal-backdrop')) continue;
     if (el.classList.contains('hidden')) continue; // perzistentní skryté backdropy ignoruj
     if (el.id && ESC_CLOSABLE_MODALS.indexOf(el.id) !== -1) {
-      if (el.id === 'presetDetailModal' && typeof closePresetDetailModal === 'function') closePresetDetailModal();
-      else el.remove();
+      el.remove();
       e.stopPropagation();
     }
     return; // první viditelný backdrop rozhodl — ať tak či tak končíme
@@ -16876,10 +16730,9 @@ document.addEventListener('keydown', function(e){
     const cefrField = document.getElementById('cefrBtns') && document.getElementById('cefrBtns').closest('.field');
     const instrField = document.getElementById('instrJazykBtns') && document.getElementById('instrJazykBtns').closest('.field');
     const ageField = document.getElementById('ageGroupBtns') && document.getElementById('ageGroupBtns').closest('.field');
-    const pedPresetField = document.getElementById('pedPresetField');
     const globalTypesField = document.getElementById('globalTypesField');
     const typeGuide = document.getElementById('typeGuidePanel');
-    csSetHidden(cefrField, active); csSetHidden(instrField, active); csSetHidden(ageField, active); csSetHidden(pedPresetField, active); csSetHidden(globalTypesField, active); csSetHidden(typeGuide, active);
+    csSetHidden(cefrField, active); csSetHidden(instrField, active); csSetHidden(ageField, active); csSetHidden(globalTypesField, active); csSetHidden(typeGuide, active);
     const countField = document.getElementById('pocetBtns') && document.getElementById('pocetBtns').closest('.field');
     const sourceField = document.getElementById('tabBtnText') && document.getElementById('tabBtnText').closest('.field');
     const listeningField = document.getElementById('listeningBlock');
