@@ -294,6 +294,12 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .grade-school-table { margin-top: 10px; border: 1px solid var(--bdr); border-radius: 8px; overflow: hidden; font-size: 13.5px; }
 .grade-opt:not(.active) .grade-school-table,
 .grade-opt:not(.active) .small-muted { display: none; }
+/* Šablona jako autorita: zamčené volby jsou viditelné, ale zašedlé a neklikatelné. */
+.tpl-locked { opacity: .5; pointer-events: none; filter: grayscale(.4); cursor: not-allowed; }
+.tpl-lock-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 12px; border: 1.5px solid var(--acc-b); border-radius: 9px; background: var(--acc-d); }
+.tpl-lock-banner-text { font-size: 12.5px; line-height: 1.5; color: var(--t3); flex: 1 1 240px; }
+.tpl-lock-detach-btn { border: 1.5px solid var(--acc); background: var(--bg3); color: var(--acc); border-radius: 8px; padding: 7px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.tpl-lock-detach-btn:hover { background: var(--acc-d); }
 .gst-row { display: flex; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--bdr2); color: var(--t3); }
 .gst-row:last-child { border-bottom: none; }
 .gst-grade { font-weight: 700; color: var(--acc); width: 24px; flex-shrink: 0; }
@@ -1877,9 +1883,13 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
     <!-- ═══════════════════════════ STEP 1 ═══════════════════════════ -->
     <div id="step1" class="hidden">
       <div class="field" id="simpleTemplateField">
-        <div class="field-label">Šablona testu <button class="tt-icon" data-tip="Vyber, k čemu test je. Šablona nastaví režim testu, zpětnou vazbu a hodnocení podle cíle. V jednoduchém režimu tyto volby skryje (nemusíš je řešit), v pokročilém je předvyplní a nechá viditelné k doladění. Látku, typy a počet doplňuješ vždy sám. Klikni na šablonu znovu pro detail.">?</button></div>
+        <div class="field-label">Šablona testu <button class="tt-icon" data-tip="Vyber, k čemu test je. Šablona nastaví režim testu, zpětnou vazbu a hodnocení podle cíle. V jednoduchém režimu tyto volby skryje (nemusíš je řešit), v pokročilém je nastaví a zamkne (viditelné, ale zašedlé — pro ruční úpravu šablonu odepni). Látku, typy a počet doplňuješ vždy sám. Klikni na šablonu znovu pro detail.">?</button></div>
         <div class="field-hint" id="simpleTemplateHint">Vyber podle cíle. Šablona nastaví režim a hodnocení; ty doplníš látku, typy a počet. Klikni znovu na vybranou šablonu pro detail.</div>
         <div class="btn-row preset-card-grid" id="simpleTemplateBtns"></div>
+        <div class="tpl-lock-banner hidden" id="tplLockBanner">
+          <span class="tpl-lock-banner-text">🔒 Režim testu a bezpečnost níže určuje šablona <strong id="tplLockBannerName"></strong> — volby jsou zamčené (zašedlé). Chceš-li je měnit ručně, odepni šablonu.</span>
+          <button type="button" class="tpl-lock-detach-btn" onclick="clearSimpleTemplate()">✏️ Upravit ručně (odepnout šablonu)</button>
+        </div>
       </div>
 
       <div class="field">
@@ -2281,7 +2291,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 
       <div class="field">
         <div class="field-label">📊 Stupnice hodnocení <button class="tt-icon" data-tip="Školní: standardní česká stupnice 1–5. Vlastní: napiš libovolné prahové hodnoty nebo systém (např. A/B/C/D/F, procentuální pásma, slovní hodnocení).">?</button></div>
-        <div class="grade-options">
+        <div class="grade-options" id="gradeOptions">
           <div class="grade-opt active" id="gradeSkola" onclick="pickGrade('skola')">
             <div class="go-title">🏫 Školní stupnice (CZ gymnázium)</div>
             <div class="go-desc">1–5, procenta se před známkováním zaokrouhlují matematicky na celá %</div>
@@ -2746,10 +2756,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '6.11.65',
-  date:    '2026-06-16',
+  version: '6.11.66',
+  date:    '2026-06-19',
   status:  'approved-for-school-use',
   changes: [
+    'ŠABLONA JAKO AUTORITA + SLOUČENÍ ZNÁMKOVACÍCH ŠABLON + OPRAVA PÁDU PROMPTU (6.11.66): (1) OPRAVA KRITICKÉ CHYBY: buildPrompt() padal na nedefinované konstantě FEEDBACK_MODE_LABEL (ReferenceError) — test se vůbec nevygeneroval a Test Lab hlásil červené FAIL „Prompt builder". Obě místa (feedbackBlock v promptu i hlavička didaktické kontroly) nově čtou existující mapu SIMPLE_LOCK_LABELS.feedbackMode. Tím se opraví jak generování testu (chyba u kolegyně), tak self-test. (2) SLOUČENÍ ŠABLON: samostatné šablony „Test na známku (bezpečný verifier)" (fl_graded) a „Jazykový test na známku" (cs_graded) odstraněny — byly po zapnutí hlídání obrazovky prakticky shodné s „Ostrý test pod dohledem". Klasifikace s offline verifierem teď probíhá přes „Ostrý test pod dohledem"; rychlou variantou zůstává „Test na známku (jen screenshot)". (3) ŠABLONA ZAMYKÁ VOLBY: dřívější „odrazový můstek" (volby šablony v pokročilém šly proklikat a šablona se tiše odznačila) nahrazen autoritativním modelem — když je v pokročilém aktivní šablona, všechny jí řízené volby (režim testu, režim výsledků, zpětná vazba, tolerance, diferenciace, stupnice, hlídání obrazovky) jsou viditelné, ale zamčené a zašedlé (.tpl-locked, pointer-events:none) a nejdou změnit. Pojistka i v pick()/setScreenGuard()/pickGrade() (toast vysvětlí, že volbu řídí šablona). Nad volbami je banner s tlačítkem „✏️ Upravit ručně (odepnout šablonu)" → clearSimpleTemplate() volby odemkne (aktuální hodnoty zůstanou). Tím padají všechny nesmyslné kombinace najednou (procvičení + hlídání obrazovky, ostrý → běžný, …). Texty detailu šablony, toastu i tooltipu sjednoceny s novým chováním. (4) POCTIVÝ POPISEK KARTY „BĚŽNÝ TEST"/„PROCVIČOVACÍ": při zapnutém hlídání obrazovky karta už neslibuje „bez zámku", ale uvádí, že opuštění testu uzamkne pokus (odznak „Zámek z hlídání obrazovky"). Ověřeno node --check + headless (jsdom): buildPrompt() vrací prompt bez chyby, šablony se vykreslí, výběr šablony v pokročilém zamkne ovládací prvky (.tpl-locked) i banner, odepnutí odemkne, žádné JS chyby.',
     'HLÍDÁNÍ OBRAZOVKY ODPOJENO OD REŽIMU TESTU + ZAPNUTO U ZNÁMKOVACÍCH ŠABLON (6.11.65): zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí) byl dosud vázán JEN na přísný režim. Nově je samostatný přepínač „Hlídání obrazovky“ (state.screenGuard) nezávislý na režimu testu — lze ho zapnout i u běžného a procvičovacího testu. Při porušení student vidí 🔒 a pokračuje až po zadání odemykacího hesla učitelem; porušení vyhodnocuje učitel (nedopatření vs. úmysl). V generovaném testu řídí zamykání nový odvozený příznak CFG.lockOnLeave = (přísný režim NEBO screenGuard); přepsány obě varianty lock logiky (handleLeave, lockTest, setupLockDetection, onBeforeUnload). Tři známkovací šablony cizích jazyků/češtiny (Test na známku screenshot, Test na známku verifier, Jazykový test na známku) mají guard nově ZAPNUTÝ ve výchozím stavu — i méně důležité testy tak hlídají přepínání obrazovky. Přísné šablony mají zámek z podstaty (beze změny). Guard vyžaduje odemykací heslo: pokud není zadané, vygeneruje se automaticky (LOCK-…) a objeví se v pokynech pro učitele. V pokročilém režimu je ruční přepínač v sekci Čas & forma; v přísném režimu je skrytý (zámek tam platí vždy). Detail šablony guard vypisuje. Ověřeno node --check + headless E2E (fl_graded_quick vygeneroval HTML s lockOnLeave:true a lock detekcí, auto-heslo, ruční přepínač, divergence šablony, žádné JS chyby).',
     'SJEDNOCENÍ ŠABLON NAPŘÍČ JEDNODUCHÝM I POKROČILÝM REŽIMEM (6.11.64): odstraněna dvojkolejnost. Dřívějších 9 samostatných systémových presetů v pokročilém režimu nahrazeno jednou sdílenou sadou šablon (5 cizojazyčných + 4 české) — stejné názvy, ikony i význam v obou režimech. Šablona nastavuje JEN režim testu, režim výsledků, zpětnou vazbu, toleranci a hodnocení; typy cvičení, počet, čas a body zůstávají vždy na učiteli (i v pokročilém — sjednocená filozofie). Chování podle režimu: v JEDNODUCHÉM se volby šablony skryjí (učitel je nevidí ani nerozladí), v POKROČILÉM se předvyplní, ale zůstanou viditelné a plně editovatelné (odrazový můstek). Aktivní šablona se zachová i při přepnutí mezi režimy. Když uživatel v pokročilém ručně změní režimovou volbu mimo šablonu, šablona se odznačí (byla jen startem). Detail karty i potvrzení jsou kontextové podle režimu. Odstraněn mrtvý kód (PEDAGOGICAL_PRESETS objekt, choosePreset/applyPreset detail modaly, warnIfPresetModeMismatch) — staré API zachováno jako tenké wrappery kvůli kompatibilitě. Český modul zobrazuje šablony společně se svým průvodcem (ortogonální vrstvy). Ověřeno node --check + headless test obou režimů (výběr, skrytí/zobrazení polí, divergence, přepnutí jazyka, žádné JS chyby).',
     'PÁTÁ FL ŠABLONA — TEST NA ZNÁMKU JEN SE SCREENSHOTEM (6.11.63): k jednoduchým šablonám cizích jazyků přidána varianta „Test na známku (jen screenshot)“ pro učitele, kteří nechtějí řešit verifier. Nastaví běžný test + okamžitou známku + stručnou zpětnou vazbu (správně/špatně + skóre, BEZ vysvětlení) + přesnou shodu (pravopis se počítá), bez offline souboru a bez verifieru — jednodušší, ale méně bezpečné. Stávající offline varianta přejmenována na „Test na známku (bezpečný verifier)“ a obě jsou v UI i v detailu jasně rozlišené (🧾 screenshot vs 🛡️ verifier), aby bylo zřejmé, čím se liší (rychlost vs bezpečnost). Logika ověřena: bezny/instant/brief projde enforce beze změny, brief u běžného testu neodhalí klíč během testu (vysvětlení se ukazuje jen u procvičovacího režimu). Ověřeno node --check + headless test (5 FL karet, výběr nastaví bezny/instant/brief, detail modal, žádné JS chyby).',
@@ -2759,7 +2770,6 @@ const RELEASE = Object.freeze({
     'OPRAVA FALEŠNÉHO BLOKOVÁNÍ EXPORTU — „inline přihlašovací údaj" (6.11.59): bezpečnostní skener (SecretScanner, pravidlo inline-credential) blokoval i běžné testy, pokud zdrojový text (např. vložený DOCX se čtecím textem) obsahoval slovo password/secret/token/apiKey následované dvojtečkou nebo rovnítkem a delším textem v uvozovkách — typicky obyčejná věta z textu. Pravidlo nově vyžaduje, aby hodnota v uvozovkách vypadala jako skutečný údaj: bez mezer a s aspoň jednou číslicí. Skutečné klíče (AIza…, sk-…, ghp_…) i nadále blokují vlastní samostatná pravidla, běžný text už ne. Přidán regresní test (věta „secret: …" s mezerami musí projít, reálný inline klíč musí spadnout). Ověřeno node --check + runScannerTests().',
     'VLASTNICKÉ OZNAČENÍ APLIKACE (6.11.58): do spodní části aplikace bylo doplněno vlastnické označení „Vlastník aplikace: Daniel Baláž · Gymnázium, Ostrava-Hrabůvka“ a copyright „© 2026 Daniel Baláž. Všechna práva vyhrazena.“ Změna je jen textová/identifikační, bez zásahu do generování testů, bodování, bezpečnostních režimů nebo exportů. Ověřeno node --check.',
     'LOGO ŠKOLY I NA MOBILU (6.11.57): logo školy se nově zobrazuje i v mobilní/tabletové verzi (pod 1000px) — malé, decentní, jako v Korespondenčním asistentovi: oblý štítek vlevo nahoře v hlavičce (logo ~32px). Aby se nepřekrývalo s tlačítky vpravo, je titulek na mobilu posunut pod horní řádek (padding-top hlavičky jen pod 1000px). Na PC (≥1000px) zůstává původní velký box vlevo nahoře beze změny. Pouze CSS, ověřeno node --check + vizuální render hlavičky.',
-    'PRŮVODCE TYPŮ — SJEDNOCENÍ BAREVNÝCH SKUPIN (6.11.56): v rozbalovacím panelu „Co který typ cvičení umí" se nové typy (6.11.55) přidávaly na konec, takže se barevné kategorie (rozpoznávání / řízená produkce / porozumění) objevovaly dvakrát. buildTypeGuide() nově karty před vykreslením stabilně seřadí podle kategorie (r → c → p), takže každá barva tvoří jeden souvislý blok a budoucí přidané typy se zařadí samy. Pouze pořadí zobrazení, beze změny obsahu. Ověřeno node --check + kontrola souvislosti skupin.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -4788,6 +4798,46 @@ function applyVisualState() {
   if (rb) rb.classList.toggle('hidden', !usesReadingComprehension());
   document.querySelectorAll('#rcLenBtns .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === (state.rcLength || 'medium')));
   renderRcTopics();
+
+  // ── Šablona jako autorita: zamkni (zašedni) volby, které šablona řídí ──────────
+  // V pokročilém režimu s aktivní šablonou jsou režim/bezpečnost/hodnocení zamčené
+  // a viditelně zašedlé; banner nabídne odepnutí. V jednoduchém režimu jsou tyto
+  // volby skryté jinou cestou, takže zde nic nezamykáme.
+  const tplLock = templateLockActive();
+  const tplDef = tplLock ? simpleTemplateById(state.simpleTemplate) : null;
+  Object.keys(TEMPLATE_LOCK_FIELD_MAP).forEach(function(key){
+    const el = $(TEMPLATE_LOCK_FIELD_MAP[key]);
+    if (el) el.classList.toggle('tpl-locked', tplLock);
+  });
+  const tplBanner = $('tplLockBanner');
+  if (tplBanner) {
+    tplBanner.classList.toggle('hidden', !tplLock);
+    const nm = $('tplLockBannerName');
+    if (nm && tplDef) nm.textContent = tplDef.label || '';
+  }
+
+  // ── Poctivý popisek karet „Běžný test"/„Procvičovací" podle hlídání obrazovky ──
+  // Hlídání obrazovky (screenGuard) povyšuje běžný i procvičovací režim na zámkové
+  // chování. Karta proto nesmí slibovat „bez zámku", když je guard zapnutý.
+  const guardOn = !!state.screenGuard && state.testMode !== 'prisny';
+  const setModeCardText = function(val, descOn, modeOn, modeClsOn, descOff, modeOff, modeClsOff){
+    const card = document.querySelector('#testModeBtns .preset-card[data-val="' + val + '"]');
+    if (!card) return;
+    const d = card.querySelector('.preset-card-desc');
+    const m = card.querySelector('.preset-card-mode');
+    if (d) d.textContent = guardOn ? descOn : descOff;
+    if (m){
+      m.textContent = guardOn ? modeOn : modeOff;
+      m.classList.remove('flex','strict','instant');
+      m.classList.add(guardOn ? modeClsOn : modeClsOff);
+    }
+  };
+  setModeCardText('bezny',
+    'Standardní známkovaný režim. 🛡️ Hlídání obrazovky je zapnuté: opuštění testu uzamkne pokus (odemyká učitel).', 'Zámek z hlídání obrazovky', 'strict',
+    'Standardní známkovaný režim. Opuštění testu se jen zapíše do bezpečnostního záznamu a do výsledku.', 'Bez zámku, se záznamem', 'flex');
+  setModeCardText('procviceci',
+    'Učící režim s měkčími pravidly a přívětivější zpětnou vazbou. 🛡️ Hlídání obrazovky je zapnuté: opuštění testu uzamkne pokus (odemyká učitel).', 'Zámek z hlídání obrazovky', 'strict',
+    'Učící režim s měkčími pravidly, přívětivější zpětnou vazbou a bez stresujících bezpečnostních zásahů.', 'Tréninkový režim', 'instant');
 }
 
 // ═══ Navigation ═══════════════════════════════════════════════════════════════
@@ -4844,6 +4894,14 @@ function updateProgress() {
 
 // ═══ Pickers ══════════════════════════════════════════════════════════════════
 function pick(key, value) {
+  // Aktivní šablona je v pokročilém režimu autoritativní: volby, které řídí (režim,
+  // bezpečnost, hodnocení), nejdou proklikat. Pro ruční úpravu musí učitel nejdřív
+  // odepnout šablonu. (Ovládací prvky jsou navíc zašedlé/neklikatelné — tohle je pojistka.)
+  if (templateLockActive() && TEMPLATE_GOVERNED_KEYS.indexOf(key) !== -1) {
+    const t = simpleTemplateById(state.simpleTemplate);
+    try { uiToast('Tuto volbu určuje šablona „' + ((t&&t.label)||'') + '". Pro ruční úpravu klikni na „✖ Bez šablony".', 'warn', 4200); } catch(_){}
+    return;
+  }
   state[key] = value;
   // Speciální případ: procvičovací + bezpečný offline jsou neslučitelné.
   if (key === 'resultMode' && value === 'secureOffline' && state.testMode === 'procviceci') {
@@ -4861,6 +4919,13 @@ function pick(key, value) {
 // Ruční přepínač hlídání obrazovky (pokročilý režim). Funguje nezávisle na šabloně
 // i režimu testu. Při zapnutí zajistí odemykací heslo (jinak by se zámek neaktivoval).
 function setScreenGuard(on){
+  // Šablona řídí i hlídání obrazovky — když je aktivní (pokročilý režim), guard nejde
+  // přepnout ručně (pro úpravu odepni šablonu). Pojistka k zašedlému ovládacímu prvku.
+  if (templateLockActive()) {
+    const t = simpleTemplateById(state.simpleTemplate);
+    try { uiToast('Hlídání obrazovky určuje šablona „' + ((t&&t.label)||'') + '". Pro ruční úpravu klikni na „✖ Bez šablony".', 'warn', 4200); } catch(_){}
+    return;
+  }
   state.screenGuard = !!on;
   if (on) ensureUnlockPasswordForGuard();
   // Ruční změna guardu odznačí šablonu jen pokud guard přestane odpovídat její definici.
@@ -5248,11 +5313,6 @@ const SIMPLE_TEMPLATES = {
       desc:'Jednodušší klasifikace. Student dostane známku, skóre a screenshot hned — bez souboru a verifieru. Méně bezpečné, ale rychlé.',
       locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
     },
-    fl_graded: {
-      icon:'🛡️', label:'Test na známku (bezpečný verifier)', purpose:'klasifikace s ochranou proti opisování',
-      desc:'Klasifikace s ochranou. Student neuvidí klíč — odevzdá soubor a opravíš ho ve verifieru.',
-      locks:{ testMode:'bezny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
-    },
     fl_strict: {
       icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
       desc:'Kontrolované psaní. Opuštění testu uzamkne pokus; odemkne jen učitel.',
@@ -5270,11 +5330,6 @@ const SIMPLE_TEMPLATES = {
       desc:'Čtenářská gramotnost a porozumění. Stručná zpětná vazba po odevzdání.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
-    cs_graded: {
-      icon:'🛡️', label:'Jazykový test na známku', purpose:'klasifikace jazykových znalostí s ochranou',
-      desc:'Klasifikace. Student neuvidí klíč; opravíš ve verifieru a klíč schválíš.',
-      locks:{ testMode:'bezny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
-    },
     cs_strict: {
       icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
       desc:'Kontrolované psaní. Opuštění testu uzamkne pokus; odemkne jen učitel.',
@@ -5291,6 +5346,18 @@ const SIMPLE_LOCK_LABELS = {
   gradeTyp:      { skola:'Školní známkování 1–5', vlastni:'Vlastní stupnice' }
 };
 const SIMPLE_LOCK_ORDER = ['testMode','resultMode','feedbackMode','fuzzyTolerance','differentiationLevel','gradeTyp'];
+// Volby, které ŠABLONA plně řídí. Když je v pokročilém režimu aktivní jakákoli
+// šablona, tyto volby jsou zamčené (zašedlé) a nejdou proklikat — bez ohledu na to,
+// zda je konkrétní hodnota uvedená v `locks` (např. screenGuard u procvičení je
+// implicitně OFF a stejně zamčený, aby nešlo zapnout hlídání u procvičovací šablony).
+// Pro ruční úpravu musí učitel šablonu nejdřív odepnout („✖ Bez šablony").
+const TEMPLATE_GOVERNED_KEYS = ['testMode','resultMode','feedbackMode','fuzzyTolerance','differentiationLevel','gradeTyp','screenGuard'];
+const TEMPLATE_LOCK_FIELD_MAP = {
+  testMode:'testModeBtns', resultMode:'resultModeBtns', feedbackMode:'feedbackModeBtns',
+  fuzzyTolerance:'fuzzyBtns', differentiationLevel:'diffLevelBtns', gradeTyp:'gradeOptions', screenGuard:'screenGuardBtns'
+};
+// True, když je v pokročilém režimu aktivní šablona (= režim a bezpečnost jsou zamčené).
+function templateLockActive(){ return !!state.simpleTemplate && !isSimpleMode(); }
 function simpleTemplateSet(){
   return (String(state.jazyk||'').toLowerCase()==='čeština') ? SIMPLE_TEMPLATES.cs : SIMPLE_TEMPLATES.fl;
 }
@@ -5331,7 +5398,7 @@ function chooseSimpleTemplate(id){
   renderSimpleTemplates();
   const msg = isSimpleMode()
     ? ('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň jen látku, typy a počet.')
-    : ('Šablona: ' + t.label + '. Režim a hodnocení jsou předvyplněné — můžeš je dál upravit a doplnit typy, počet i ostatní volby.');
+    : ('Šablona: ' + t.label + '. Režim a bezpečnost jsou nastavené a zamčené (zašedlé). Doplň látku, typy a počet; pro ruční úpravu šablonu odepni.');
   uiToast(msg, 'ok', 4200);
 }
 function clearSimpleTemplate(){
@@ -5396,7 +5463,7 @@ function openSimpleTemplateDetail(id){
   const locks = simpleTemplateLockList(t);
   let body = '<div class="stpl-detail">';
   body += '<p class="stpl-detail-desc">' + esc(t.desc) + '</p>';
-  body += '<div class="stpl-detail-h">' + (simple ? 'Tato šablona automaticky nastaví:' : 'Tato šablona předvyplní (můžeš změnit):') + '</div><ul class="stpl-detail-list">';
+  body += '<div class="stpl-detail-h">' + (simple ? 'Tato šablona automaticky nastaví:' : 'Tato šablona nastaví a zamkne (pro úpravu šablonu odepni):') + '</div><ul class="stpl-detail-list">';
   locks.forEach(function(l){ body += '<li>' + esc(l) + '</li>'; });
   body += '</ul>';
   body += '<div class="stpl-detail-h">Doplníš sám:</div><ul class="stpl-detail-list stpl-detail-open">'
@@ -5405,7 +5472,7 @@ function openSimpleTemplateDetail(id){
     + '</ul>';
   body += '<p class="stpl-detail-foot">' + (simple
       ? 'Tyto volby se v jednoduchém režimu neukazují, aby nešlo nic omylem rozladit. Chceš-li je měnit ručně, přepni nahoře na <strong>Pokročilý režim</strong>.'
-      : 'V pokročilém režimu jsou všechny tyto volby níže viditelné a můžeš je libovolně doladit. Šablona je jen rychlý start.')
+      : 'V pokročilém režimu jsou tyto volby viditelné, ale <strong>zamčené (zašedlé)</strong> — šablona je řídí. Chceš-li je měnit, klikni na <strong>„✖ Bez šablony"</strong>; tím šablonu odepneš a vše se odemkne (tvoje aktuální hodnoty zůstanou).')
     + '</p>';
   body += '</div>';
   uiModal({ title: t.icon + ' ' + t.label, message: body, html:true, okText:'Rozumím', cancelText:null }).then(function(){});
@@ -5560,7 +5627,14 @@ function pickVariant(v) {
   state.odevzdavani=v; applyVisualState(); validate(); saveSnapshot();
 }
 
-function pickGrade(v) { state.gradeTyp=v; applyVisualState(); validate(); saveSnapshot(); }
+function pickGrade(v) {
+  if (templateLockActive()) {
+    const t = simpleTemplateById(state.simpleTemplate);
+    try { uiToast('Typ stupnice určuje šablona „' + ((t&&t.label)||'') + '". Pro ruční úpravu klikni na „✖ Bez šablony".', 'warn', 4200); } catch(_){}
+    return;
+  }
+  state.gradeTyp=v; applyVisualState(); validate(); saveSnapshot();
+}
 
 async function pickDiff(v) {
   // Při vypnutí diferenciace, pokud máme studenty se jmény, zeptáme se a vymažeme.
@@ -7073,7 +7147,7 @@ function buildPrompt() {
     brief:'STRUČNÁ ZPĚTNÁ VAZBA: u každé položky ukaž jen správně/špatně a celkové skóre + známku. Žádné vysvětlování chyb.',
     learning:'UČÍCÍ ZPĚTNÁ VAZBA: u každé položky ukaž správně/špatně a u CHYBNÝCH odpovědí stručné vysvětlení a doporučení, co si zopakovat. U uzavřených úloh odvoď vysvětlení ze správné odpovědi a typu úlohy. U otevřených odpovědí buď opatrný: pokud nelze spolehlivě určit typ chyby, napiš neutrální doporučení (např. „Porovnej svou odpověď se vzorem a zkontroluj tvar a pravopis."), ne falešně jistou diagnózu. Na konci procvičovacího/formativního testu přidej krátké souhrnné doporučení pro žáka (např. „Doporučení: zopakuj si tvoření otázek v Present Perfect.").'
   }[fm];
-  const feedbackBlock = `Režim zpětné vazby: ${FEEDBACK_MODE_LABEL[fm] || fm}.\n${fmStudent}\n`
+  const feedbackBlock = `Režim zpětné vazby: ${SIMPLE_LOCK_LABELS.feedbackMode[fm] || fm}.\n${fmStudent}\n`
     + 'KLÍČOVÉ: studentský test je plně offline. Veškerá zpětná vazba se počítá lokálně z uloženého klíče. NEVOLEJ žádné AI/API a NEODESÍLEJ odpovědi studenta nikam (žádný fetch/XHR/WebSocket). Analýza typů chyb pomocí AI je povolená POUZE jako učitelská vrstva po testu (verifier), nikdy v klientském studentském testu.\n'
     + 'PER-ITEM METADATA (volitelně, jen pokud zapadne do stávající JSON struktury položky): u položek smíš přidat pole "feedback" (krátké vysvětlení), "hint" (nápověda) a "errorFocus" (typ chyby, kterou položka typicky odhalí). Pro češtinu navíc používej strukturovaný objekt "csFeedback" s phenomenon/rule/whyCorrect/whyIncorrect/reviewTip/errorFocus. Tato pole jsou zpětně kompatibilní — test bez nich musí fungovat dál. Povolené hodnoty errorFocus: gramatika, slovní zásoba, pravopis/spelling, slovosled, tvar slovesa, čas (tense), člen/předložka, porozumění zadání'
     + (isSpanishLike(jazyk) ? ', přízvuk/diakritika (ŠJ), člen (el/la/los/las).' : '.')
@@ -7266,7 +7340,7 @@ function renderDidacticReview(){
   const head = [
     ['Účel / preset', presetLbl + (d.purpose? ' (' + d.purpose + ')' : '')],
     ['Věková skupina', ageLbl],
-    ['Zpětná vazba', FEEDBACK_MODE_LABEL[state.feedbackMode||'brief'] || (state.feedbackMode||'brief')],
+    ['Zpětná vazba', SIMPLE_LOCK_LABELS.feedbackMode[state.feedbackMode||'brief'] || (state.feedbackMode||'brief')],
     ['Diferenciace', DIFF_LEVEL_LABEL[state.differentiationLevel||'standard'] || (state.differentiationLevel||'standard')],
     ['Poměr funkcí (podle bodů)', ratioRow]
   ];
