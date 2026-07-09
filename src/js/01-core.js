@@ -1,0 +1,1234 @@
+
+'use strict';
+
+// ═══ Constants ════════════════════════════════════════════════════════════════
+const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
+
+// ─── RELEASE ─────────────────────────────────────────────────────────────────
+// JEDEN zdroj pravdy pro verzi. Všechna ostatní místa (title, footer, balíčky,
+// archiv, feedback dokumenty) čtou odsud — netřeba synchronizovat. Při bumpu
+// edituj jen tento blok.
+//   version: SemVer-styl, "MAJOR.MINOR.PATCH[-tag]"
+//   date:    'YYYY-MM-DD' kdy byla verze sestavena
+//   status:  'approved-for-school-use' = prošlo self-testem a je schválené pro klasifikované použití
+//            'draft' = ve vývoji, NEpoužívat pro ostré testy
+//   changes: krátké body „co se v této verzi změnilo" (NEJNOVĚJŠÍ NAHOŘE).
+//   PRAVIDLO: udržuj jen POSLEDNÍCH 10 záznamů. Při bumpu přidej nový na začátek
+//   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
+//   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
+const RELEASE = Object.freeze({
+  version: '6.12.0',
+  date:    '2026-07-09',
+  status:  'approved-for-school-use',
+  changes: [
+    'MODULARIZACE ZDROJE — 18 MODULŮ, JEDEN VÝSTUP (6.12.0): zdrojový kód rozdělen z jednoho 1,6MB src/index.html do modulární struktury src/shell.html + src/styles.css + src/js/01-core…16-access + 50-cs-module + 60-pwa. Build (scripts/build.mjs v2) moduly čistě konkatenuje do jednoho offline dist/index.html — žádné ES moduly, žádné přejmenování, chování 1:1. Složený výstup ověřen BYTE-IDENTICKY proti původnímu souboru 6.11.70 (po odečtení BUILD komentáře) a headless kontrolou tools/headless-check.mjs (jsdom: boot bez chyb, Test Lab 25 pass / 0 fail, buildPrompt, exportZadani, všech 7 šablon, přepínání režimů). Původní jednosouborový zdroj archivován v archive/index-v6.11.70.html. Pořadí modulů je kontrakt (číselné prefixy): 50-cs-module monkey-patchuje funkce hlavního bloku a skládá se až po něm. package.json má nově skript npm test (headless kontrola nad dist). Přínos: do vlákna AI asistenta se nahrává jen dotčený modul (20–220 kB) místo celého souboru; verze a changelog žijí v src/js/01-core.js.',
+    'HLOUBKOVÝ AUDIT PŘED MODULARIZACÍ — OBNOVA ZTRACENÉHO SOUHRNU REŽIMU + VELKÝ ÚKLID MRTVÉHO KÓDU (6.11.70): kompletní statická i headless prověrka celého souboru před plánovaným rozdělením do modulů (AST audit duplicitních deklarací, ESLint no-undef/no-redeclare, kontrola všech 245 inline handlerů proti definicím, symetrie localStorage klíčů, mrtvé CSS třídy, duplicitní ID, Test Lab 25/25 headless). (1) OBNOVA REGRESE: pod nadpisem „Pracovní režim" se má zobrazovat dynamický souhrn aktivního režimu a šablony (element #appModeSummary) — při některém přepisu markupu element vypadl, zatímco jeho CSS (.mode-switch-note) i JS aktualizátor přežily; element vrácen, souhrn se opět zobrazuje. (2) OPRAVA ZASTARALÉHO POPISKU: karta „⚡ Jednoduchý režim" slibovala „bez TXT, bez verifieru, bez přísného režimu", což od zavedení šablon (6.11.62/6.11.66) neplatí — šablona „Ostrý test pod dohledem" v jednoduchém režimu zapíná přísný test i bezpečný offline verifier; popisek přepsán podle skutečného chování. (3) MRTVÝ KÓD PRYČ: funkce updateWorkPresetUI() a renderPresetNote() (jejich elementy dávno neexistují) včetně volání, legacy wrappery choosePreset/applyPreset/clearPreset a prázdný objekt PEDAGOGICAL_PRESETS (nic je nevolalo), nepoužívaná konstanta WELCOME_SKIP_KEY a ~6,5 kB mrtvého CSS po odstraněných preset modálech a starém onboardingu (.preset-modal-*, .preset-confirm-box, .preset-panel, .mode-card/.mode-help, .onboarding-box, .welcome-tip, .welcome-skip-link, #workPresetPanel). (4) LINT HYGIENA: odstraněny dvě redeklarace var ve stejném scope (steps→chainSteps, i→i2) — ESLint no-redeclare i no-undef jsou nyní čisté v celém souboru (jediná ponechaná výjimka: hlídaný typeof EXERCISE_SCORE_ALIAS v Test Labu). Chování aplikace se nemění s výjimkou obnoveného souhrnu a opraveného popisku. Ověřeno node --check + ESLint + headless (jsdom): boot bez JS chyb, Test Lab 25 pass / 0 fail, buildPrompt/exportZadani/všech 7 šablon/přepínání režimů beze změny.',
+    'PWA INSTALACE + VLAJKOVÁ IKONA GENERÁTORU (6.11.69): generátor má nově plnohodnotný PWA balíček pro GitHub Pages — manifest, service worker, ikony včetně maskable varianty a kopírování public/ do dist při buildu. Aplikace se na telefonu instaluje jako samostatná školní aplikace s vlastním názvem a prémiovou ikonou místo šedého zástupce Chromu. Service worker používá verzovanou cache a network-first strategii pro hlavní stránku a access-manifest.json, aby se kolegům po aktualizaci nedržela stará verze. Ověřeno buildem: dist obsahuje index.html, access-manifest.json, manifest.webmanifest, sw.js a ikony.',
+    'OPRAVA TICHÉHO SELHÁNÍ EXPORTU ZADÁNÍ + STATICKÝ AUDIT NEDEFINOVANÝCH ODKAZŮ (6.11.68): celý soubor prošel přes ESLint pravidlo no-undef (kvůli rodině chyb 6.11.66/6.11.67 — odkazy na nedefinované identifikátory, které node --check ani běh v prohlížeči neodhalí, dokud se nespustí konkrétní cesta). Audit našel jedinou skutečnou chybu: funkce exportZadani() („Exportovat zadání pro správce") volala downloadText(), který v generátoru neexistuje (žije pouze uvnitř šablony učitelského verifieru spolu s downloadCsv/RESULTS/CONFIG). Díky obalujícímu try/catch test nespadl, ale export se tiše neprovedl — místo stažení .json souboru se objevil toast „Export zadání selhal: downloadText is not defined". Opraveno na generátorový helper downloadBlobFile() (shodné pořadí argumentů). Druhý nález (EXERCISE_SCORE_ALIAS v Test Labu) je falešný poplach — je za strážcem typeof !== "undefined", takže nikdy nespadne; ponecháno beze změny. Po opravě hlásí no-undef napříč celým souborem už jen tento jeden hlídaný (bezpečný) odkaz. Ověřeno node --check + headless (jsdom): typeof downloadBlobFile === function, exportZadani() proběhne bez chyby, buildPrompt() i renderDidacticReview() beze změny, 0 JS chyb.',
+    'OPRAVA DRUHÉHO NEDEFINOVANÉHO POPISKU — DIFERENCIACE (6.11.67): po opravě FEEDBACK_MODE_LABEL (6.11.66) se odmaskovala sesterská chyba ve stejném bloku — řádek „Diferenciace" v didaktické kontrole (renderDidacticReview, hlavička výsledkové obrazovky) odkazoval na nedefinovaný DIFF_LEVEL_LABEL → ReferenceError „DIFF_LEVEL_LABEL is not defined" a test se nevygeneroval (projevilo se hlavně při zapnuté diferenciaci, kdy se tento řádek renderuje). Nově čte existující mapu SIMPLE_LOCK_LABELS.differentiationLevel (basic/standard/challenge). Prověřeny všechny ostatní *_LABEL odkazy: jediné zbývající jsou RELEASE_LABEL (definovaný) a zmínky v changelogu — žádný další nedefinovaný popisek v kódu není. Ověřeno node --check + headless (jsdom): renderResult() i buildPrompt() běží bez chyby i se zapnutou diferenciací, didaktická kontrola zobrazí správný popisek úrovně, 0 JS chyb.',
+    'ŠABLONA JAKO AUTORITA + SLOUČENÍ ZNÁMKOVACÍCH ŠABLON + OPRAVA PÁDU PROMPTU (6.11.66): (1) OPRAVA KRITICKÉ CHYBY: buildPrompt() padal na nedefinované konstantě FEEDBACK_MODE_LABEL (ReferenceError) — test se vůbec nevygeneroval a Test Lab hlásil červené FAIL „Prompt builder". Obě místa (feedbackBlock v promptu i hlavička didaktické kontroly) nově čtou existující mapu SIMPLE_LOCK_LABELS.feedbackMode. Tím se opraví jak generování testu (chyba u kolegyně), tak self-test. (2) SLOUČENÍ ŠABLON: samostatné šablony „Test na známku (bezpečný verifier)" (fl_graded) a „Jazykový test na známku" (cs_graded) odstraněny — byly po zapnutí hlídání obrazovky prakticky shodné s „Ostrý test pod dohledem". Klasifikace s offline verifierem teď probíhá přes „Ostrý test pod dohledem"; rychlou variantou zůstává „Test na známku (jen screenshot)". (3) ŠABLONA ZAMYKÁ VOLBY: dřívější „odrazový můstek" (volby šablony v pokročilém šly proklikat a šablona se tiše odznačila) nahrazen autoritativním modelem — když je v pokročilém aktivní šablona, všechny jí řízené volby (režim testu, režim výsledků, zpětná vazba, tolerance, diferenciace, stupnice, hlídání obrazovky) jsou viditelné, ale zamčené a zašedlé (.tpl-locked, pointer-events:none) a nejdou změnit. Pojistka i v pick()/setScreenGuard()/pickGrade() (toast vysvětlí, že volbu řídí šablona). Nad volbami je banner s tlačítkem „✏️ Upravit ručně (odepnout šablonu)" → clearSimpleTemplate() volby odemkne (aktuální hodnoty zůstanou). Tím padají všechny nesmyslné kombinace najednou (procvičení + hlídání obrazovky, ostrý → běžný, …). Texty detailu šablony, toastu i tooltipu sjednoceny s novým chováním. (4) POCTIVÝ POPISEK KARTY „BĚŽNÝ TEST"/„PROCVIČOVACÍ": při zapnutém hlídání obrazovky karta už neslibuje „bez zámku", ale uvádí, že opuštění testu uzamkne pokus (odznak „Zámek z hlídání obrazovky"). Ověřeno node --check + headless (jsdom): buildPrompt() vrací prompt bez chyby, šablony se vykreslí, výběr šablony v pokročilém zamkne ovládací prvky (.tpl-locked) i banner, odepnutí odemkne, žádné JS chyby.',
+    'HLÍDÁNÍ OBRAZOVKY ODPOJENO OD REŽIMU TESTU + ZAPNUTO U ZNÁMKOVACÍCH ŠABLON (6.11.65): zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí) byl dosud vázán JEN na přísný režim. Nově je samostatný přepínač „Hlídání obrazovky“ (state.screenGuard) nezávislý na režimu testu — lze ho zapnout i u běžného a procvičovacího testu. Při porušení student vidí 🔒 a pokračuje až po zadání odemykacího hesla učitelem; porušení vyhodnocuje učitel (nedopatření vs. úmysl). V generovaném testu řídí zamykání nový odvozený příznak CFG.lockOnLeave = (přísný režim NEBO screenGuard); přepsány obě varianty lock logiky (handleLeave, lockTest, setupLockDetection, onBeforeUnload). Tři známkovací šablony cizích jazyků/češtiny (Test na známku screenshot, Test na známku verifier, Jazykový test na známku) mají guard nově ZAPNUTÝ ve výchozím stavu — i méně důležité testy tak hlídají přepínání obrazovky. Přísné šablony mají zámek z podstaty (beze změny). Guard vyžaduje odemykací heslo: pokud není zadané, vygeneruje se automaticky (LOCK-…) a objeví se v pokynech pro učitele. V pokročilém režimu je ruční přepínač v sekci Čas & forma; v přísném režimu je skrytý (zámek tam platí vždy). Detail šablony guard vypisuje. Ověřeno node --check + headless E2E (fl_graded_quick vygeneroval HTML s lockOnLeave:true a lock detekcí, auto-heslo, ruční přepínač, divergence šablony, žádné JS chyby).',
+    'SJEDNOCENÍ ŠABLON NAPŘÍČ JEDNODUCHÝM I POKROČILÝM REŽIMEM (6.11.64): odstraněna dvojkolejnost. Dřívějších 9 samostatných systémových presetů v pokročilém režimu nahrazeno jednou sdílenou sadou šablon (5 cizojazyčných + 4 české) — stejné názvy, ikony i význam v obou režimech. Šablona nastavuje JEN režim testu, režim výsledků, zpětnou vazbu, toleranci a hodnocení; typy cvičení, počet, čas a body zůstávají vždy na učiteli (i v pokročilém — sjednocená filozofie). Chování podle režimu: v JEDNODUCHÉM se volby šablony skryjí (učitel je nevidí ani nerozladí), v POKROČILÉM se předvyplní, ale zůstanou viditelné a plně editovatelné (odrazový můstek). Aktivní šablona se zachová i při přepnutí mezi režimy. Když uživatel v pokročilém ručně změní režimovou volbu mimo šablonu, šablona se odznačí (byla jen startem). Detail karty i potvrzení jsou kontextové podle režimu. Odstraněn mrtvý kód (PEDAGOGICAL_PRESETS objekt, choosePreset/applyPreset detail modaly, warnIfPresetModeMismatch) — staré API zachováno jako tenké wrappery kvůli kompatibilitě. Český modul zobrazuje šablony společně se svým průvodcem (ortogonální vrstvy). Ověřeno node --check + headless test obou režimů (výběr, skrytí/zobrazení polí, divergence, přepnutí jazyka, žádné JS chyby).',
+    'PÁTÁ FL ŠABLONA — TEST NA ZNÁMKU JEN SE SCREENSHOTEM (6.11.63): k jednoduchým šablonám cizích jazyků přidána varianta „Test na známku (jen screenshot)“ pro učitele, kteří nechtějí řešit verifier. Nastaví běžný test + okamžitou známku + stručnou zpětnou vazbu (správně/špatně + skóre, BEZ vysvětlení) + přesnou shodu (pravopis se počítá), bez offline souboru a bez verifieru — jednodušší, ale méně bezpečné. Stávající offline varianta přejmenována na „Test na známku (bezpečný verifier)“ a obě jsou v UI i v detailu jasně rozlišené (🧾 screenshot vs 🛡️ verifier), aby bylo zřejmé, čím se liší (rychlost vs bezpečnost). Logika ověřena: bezny/instant/brief projde enforce beze změny, brief u běžného testu neodhalí klíč během testu (vysvětlení se ukazuje jen u procvičovacího režimu). Ověřeno node --check + headless test (5 FL karet, výběr nastaví bezny/instant/brief, detail modal, žádné JS chyby).',
+    'JEDNODUCHÉ ŠABLONY V SIMPLE MÓDU — VÝBĚR ZAPNE A SKRYJE VOLBY (6.11.62): nově lze v jednoduchém režimu vybrat šablonu podle cíle testu; šablona nastaví režim testu, režim výsledků, zpětnou vazbu, toleranci překlepů a hodnocení — a TYTO VOLBY SE SKRYJÍ (učitel je nevidí ani omylem nerozladí). Doplní jen látku, typy, počet, čas/body (u cizích jazyků i CEFR). Oddělené sady podle modulu: cizí jazyky (⚡ Procvičení, 🏠 Domácí procvičení, 🧾 Test na známku, 🔒 Ostrý test pod dohledem) a čeština (✍️ Procvičení pravopisu/mluvnice, 📖 Práce s textem, 🧾 Jazykový test na známku, 🔒 Ostrý test pod dohledem). Každá karta má rozbalovací detail „Co šablona zapne“ s úplným výčtem zamčených i doplňovaných voleb. Druhý klik na vybranou šablonu = detail. Klíčové, aby se neopakovalo, co potkalo kolegyni: žádná šablona neobsahuje vnitřně neslučitelnou kombinaci (ověřeno simulací enforce přes všechny šablony). Čeština nově smí zůstat v jednoduchém módu, pokud je aktivní šablona (jinak dál vyžaduje pokročilý kvůli modulu ČJ). Přepnutí do pokročilého šablonu „rozbalí“ (hodnoty zůstanou, zámek se sundá); přepnutí jazyka mezi cs/cizí zruší šablonu z druhé sady. Staré systémové presety (doporučení) přesunuty do pokročilého režimu. Ověřeno node --check + headless test v prohlížeči (render karet FL/CS, výběr šablony nastaví bezny/secureOffline/none dle locks, detail modal, žádné JS chyby).',
+  ]
+});
+// Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
+// hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
+// soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
+function computeBuildHash(){
+  const s=RELEASE.version+'|'+RELEASE.date+'|'+RELEASE.status;
+  let h=0x811c9dc5; // FNV-1a 32-bit
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0;}
+  return h.toString(16).padStart(8,'0');
+}
+const BUILD_HASH = computeBuildHash();
+const RELEASE_LABEL = RELEASE.version+' · '+RELEASE.date+' · '+BUILD_HASH;
+
+// Samostatný changelog MODULU ČESKÝ JAZYK. Modul má vlastní verzování (V16…),
+// nezávislé na verzi generátoru. Záznamy ve stejném formátu jako RELEASE.changes:
+// "NÁZEV (V16): text". Newest first. Zobrazuje se v changelog modalu pod přepínačem
+// „Modul ČJ" vedle hlavního changelogu generátoru.
+const RELEASE_CS = Object.freeze({
+  module:  'Modul Český jazyk',
+  version: 'V19',
+  date:    '2026-06-12',
+  changes: [
+    'BEZPEČNOSTNÍ AUDIT VAZEB (V19): šablony procházejí enforceModeConstraints (konec zakázané kombinace procvičovací + secureOffline) a toastem hlásí, co přepsaly na ostatních kartách. Varování pro známkovaný test čte skutečný režim (csDerivedGoal), ne jen goal ze šablony. Interpunkční checkbox je u interpunkčního jevu povinný a viditelně zamčený. Tlačítka počtu cvičení v ČJ skryta (počet = vybrané typy). Čeština vynucuje pokročilý mód, takže exerciseConfig modulu se skutečně propíše do generování. splitGenerate se po semi/manual umí vrátit. Ověřeno node --check + headless testy.',
+    'SKRYTÍ NASTAVENÍ CVIČENÍ V CS REŽIMU (V18): tlačítko Nastavit cvičení podrobně a celá sekce s typy cvičení jsou v CS režimu skryté — typy i počet určuje modul ČJ, ruční zásah nedává smysl. Ověřeno node --check.',
+    'DUPLIKÁT ODSTRANĚN ZE SKLADBY (V17): jev \'základní skladební dvojice\' odstraněn ze seznamu jevů kategorie Skladba — didakticky totožný s \'podmět a přísudek\', AI generovala překrývající se úlohy. Ověřeno node --check.',
+    'SLOUČENÍ DO GENERÁTORU (V16): modul naroubován do bezpečnostní větve generátoru (v6.11.25). Integrační háčky protaženy přes cfg → studentský CFG → verifier CONFIG i do hashe (csScoringPolicy, csFeedbackPolicy, isCzech). Vše české je zahrazené na jazyk=čeština; cizí jazyky (EN/ES/FR/LA) běží beze změny. Ověřeno node --check.',
+    'STRUKTUROVANÁ ZPĚTNÁ VAZBA (V16): objekt csFeedback (jev, pravidlo, proč správně/špatně, co zopakovat, typ chyby) se generuje u českých položek, zobrazuje studentovi v učícím režimu, učiteli v náhledu i ve verifieru a propisuje se do exportů feedbacku.',
+    'ČESKÉ HODNOCENÍ ODPOVĚDÍ (V16): normForScore respektuje zvolenou přesnost — diakritika, interpunkce a velká písmena se hodnotí podle zadání. U češtiny se vypíná fuzzy tolerance překlepů (pravopis musí sedět přesně).',
+    'TŘÍKROKOVÝ PRŮVODCE (V16): modul rozdělen do tří listů — 1/ učivo (ročník, oblost, jev), 2/ podoba úlohy, 3/ hodnocení a přesnost. Vlastní stav csModule, presety, bezpečnostní souhrn a kontrola rizik. Záloha a obnova generického stavu při přepnutí jazyka je symetrická.',
+    'POZN.: historie modulu před V16 byla vyvíjena v samostatné větvi a do tohoto changelogu se nepřenášela; sledování začíná verzí V16.',
+  ]
+});
+
+// POZN.: Klíče localStorage jsou záměrně zmrazené na 'v5_13_0', i když je aplikace
+// na vyšší verzi. Drží se tím šablony, historie a rozpracovaný stav napříč buildy
+// bez migrační smyčky. Verzi klíčů neměň jen kvůli bumpu verze aplikace.
+const SAVE_KEY  = 'sestavovac_v5_13_0';
+const TPL_KEY   = 'sestavovac_tpl_v5_13_0';
+const HIST_KEY  = 'sestavovac_hist_v5_13_0';
+const OLD_KEYS_TO_CLEAR = [
+  'sestavovac_v5_14_0','sestavovac_tpl_v5_14_0','sestavovac_hist_v5_14_0','sestavovac_v5_12_0','sestavovac_tpl_v5_12_0','sestavovac_hist_v5_12_0',
+  'sestavovac_v5_11_2','sestavovac_tpl_v5_11_2','sestavovac_hist_v5_11_2',
+  'sestavovac_v5_11_1','sestavovac_tpl_v5_11_1','sestavovac_hist_v5_11_1',
+  'sestavovac_v5','sestavovac_tpl_v5','sestavovac_hist_v5',
+  'sestavovac_v5_4','sestavovac_tpl_v5_4','sestavovac_hist_v5_4',
+  'sestavovac_v5_6','sestavovac_tpl_v5_6','sestavovac_hist_v5_6',
+  'sestavovac_hist_v5_7','sestavovac_hist_v5_7_4','sestavovac_v5_7_1','sestavovac_tpl_v5_7_1','sestavovac_hist_v5_7_1','sestavovac_v5_7_2','sestavovac_tpl_v5_7_2','sestavovac_hist_v5_7_2','sestavovac_hist_v5_7_3','sestavovac_v5_8_0','sestavovac_hist_v5_8_0','sestavovac_v5_8_2','sestavovac_v5_8_1','sestavovac_hist_v5_8_2','sestavovac_hist_v5_8_1','sestavovac_v5_8_3','sestavovac_hist_v5_8_3','sestavovac_v5_8_4','sestavovac_hist_v5_8_4','sestavovac_v5_8_5','sestavovac_v5_9_4','sestavovac_tpl_v5_9_4','sestavovac_hist_v5_9_4','sestavovac_hist_v5_9_0','sestavovac_v5_9_0','sestavovac_tpl_v5_9_0','sestavovac_hist_v5_8_5','sestavovac_v5_9_1','sestavovac_tpl_v5_9_1','sestavovac_hist_v5_9_1','sestavovac_v5_9_3','sestavovac_tpl_v5_9_3','sestavovac_hist_v5_9_3'
+];
+
+const CEFR_LEVELS = ['A1','A2','B1','B2','C1','C2'];
+const CEFR_DESC = {
+  A1:'Začátečník — základní fráze a pozdravy',
+  A2:'Mírně pokročilý — běžné každodenní situace',
+  B1:'Středně pokročilý — orientace v textu, každodenní témata',
+  B2:'Pokročilý — komplexnější témata, plynulejší vyjadřování',
+  C1:'Velmi pokročilý — náročné texty, přesné vyjadřování',
+  C2:'Mastery — akademická a literární úroveň, téměř rodilý mluvčí',
+};
+
+// minutes per exercise type for smart suggestion
+const TYPE_MIN = {
+  'multiple choice':4,'fill-in-the-blank':5,'matching':4,'word order':4,
+  'translation':6,'true/false':3,'error correction':5,
+  'cloze text':6,'sentence transformation':5,'reading comprehension':9,
+  'dialogue completion':5,'categorization':3,'word formation':4,
+  'listening comprehension':6,
+  'odd one out':3,'multiple matching':7,'banked cloze':6,'key word transformation':6,
+  'table-completion':5,
+  'transformation-chain':6,
+  'highlight-evidence':4,
+  'synonym choice':4,'antonym choice':4,'choose the correct response':4,'match word to definition':4,
+  'verb form':5,'preposition gap-fill':5,'question formation':5,'word family':4,
+  'short answer':5,'paraphrase the sentence':6,
+  'heading matching':7,'gist question':5,'summary cloze':6,
+};
+
+const DISABLED_EXERCISE_TYPES = ['open answer','image description'];
+const DISABLED_TYPE_ALIASES = ['open','open question','free answer','image','picture description','picture','describe picture','image description'];
+function isDisabledExerciseType(t) {
+  const raw = String(t || '').trim().toLowerCase();
+  return DISABLED_EXERCISE_TYPES.includes(raw) || DISABLED_TYPE_ALIASES.includes(raw);
+}
+function isAllowedExerciseType(t) {
+  return !!String(t || '').trim() && !DISABLED_EXERCISE_TYPES.includes(String(t).trim().toLowerCase());
+}
+function sanitizeExerciseTypeList(types) {
+  return (types || []).map(normalizeType).filter(isAllowedExerciseType);
+}
+
+
+const THEME_SPECS = {
+  modern:{nazev:'Moderní barevný',spec:`VIZUÁLNÍ DESIGN — Moderní barevný styl:
+  • Header: gradient pozadí (#667eea → #764ba2), bílý text, border-radius 0 0 16px 16px
+  • Karty cvičení: bílé, box-shadow 0 4px 20px rgba(0,0,0,0.1), border-radius 14px
+  • Tlačítka: gradient (#667eea → #764ba2), hover lift transform: translateY(-2px), border-radius 9px
+  • Progress bar průběhu testem: barevný gradient, animovaný (width transition)
+  • Feedback: správně #22c55e s barvou pozadí, špatně #ef4444
+  • Smooth CSS transitions (0.2s ease) na všech interaktivních prvcích
+  • Výsledková karta: animovaný gradient border, velká čísla procent`},
+
+  examBlue:{nazev:'Exam Blue / školní',spec:`VIZUÁLNÍ DESIGN — Exam Blue / školní styl:
+  • Vycházej z kompaktního modrého layoutu: primární #1a3a6c, světlejší #2756a8, pozadí #f0f4f8, karta #ffffff, text #1a2332, muted #6b7a8d, border #dde3ea.
+  • Intro: centrovaná karta max-width cca 560px, horní modrý gradient, název testu, předmět/třída, poté 2×2 overview grid: počet cvičení, body, čas, úroveň.
+  • Rules & Consequences: kompaktní světlý žlutý box (#fff8e1, border #ffc107) s krátkými odrážkami. Text pravidel musí odpovídat skutečnému režimu testu a jazyku UI.
+  • Test: sticky modrý header s názvem, jménem, timerem a Test ID; pod ním horizontální lišta Ex 1, Ex 2… se zaoblenými pill tlačítky.
+  • Cvičení: bílé karty, header cvičení v modrém gradientu, výrazné kulaté číslo otázky, hodně vzduchu a dobrá čitelnost na mobilu.
+  • Tlačítka: primární modrá #1a3a6c, submit zelený #2e7d32, varování/teacher akcent zlatý #e8a020, danger #c62828.
+  • Učitelský mód: tmavý zkouškový vzhled #0d1b2a / #071120 se zlatým akcentem #e8a020 a zeleně zvýrazněnými správnými odpověďmi. Má být kontrolní, ne přeplácaný.
+  • Výsledková karta: kompaktní modrá hlavička, velké body/procenta, jasná známka a screenshot-ready layout.`},
+  dark:{nazev:'Tmavý / neon',spec:`VIZUÁLNÍ DESIGN — Tmavý neon styl:
+  • Pozadí: #0a0e1a, karty: #0d1226, border: 1px solid rgba(0,245,255,0.15)
+  • Primární akcentová barva: #00f5ff (cyan neon); sekundární: #7b2fff
+  • Tlačítka: background #00f5ff, color #0a0e1a, box-shadow: 0 0 12px #00f5ff66
+  • Text: #c8cde8 běžný, #ffffff nadpisy, #00f5ff akcenty
+  • Feedback: správně #00f5ff, špatně #ff006e
+  • Výsledková karta: tmavá s neonovými čísly, glow efekt na procentech`},
+  nature:{nazev:'Příroda / zelená',spec:`VIZUÁLNÍ DESIGN — Přírodní zelený styl:
+  • Pozadí: #f1f8f4, karty: #ffffff s border-left: 4px solid #2d9b5f
+  • Primární: #2d9b5f; hover: #1e7a46; světlá varianta: #81c784
+  • Tlačítka: #2d9b5f, bílý text, border-radius 8px
+  • Nadpisy: #134e2a, text: #2d3748, hints: #6b8f71
+  • Feedback: správně #2d9b5f, špatně #f59e0b (oranžová místo červené)
+  • Výsledková karta: světlá, zelené akcenty, klidná a přehledná`},
+  akademicky:{nazev:'Akademický',spec:`VIZUÁLNÍ DESIGN — Akademický čistý styl:
+  • Pozadí: #f8fafc, karty: #ffffff, border: 1px solid #e2e8f0, border-radius 8px
+  • Primární: #1976d2; sekundární: #e3f2fd
+  • Tlačítka: #1976d2, bílý text, border-radius 6px, žádné výrazné stíny
+  • Text: #1e293b, nadpisy: #1a237e font-weight 700, řádkování 1.6
+  • Feedback: správně #16a34a, špatně #dc2626
+  • Výsledková karta: tabulkový layout, přehledný, profesionální`},
+  minimal:{nazev:'Minimalistický',spec:`VIZUÁLNÍ DESIGN — Minimalistický styl:
+  • Pozadí: #fafafa, karty: #ffffff, jemný border 1px solid #e5e7eb, bez výrazných stínů
+  • Primární akcent: #18181b; sekundární text: #52525b; doplňková šedá #f4f4f5
+  • Tlačítka: jednobarevná tmavá, bílý text, border-radius 6px, bez gradientů
+  • Layout: hodně volného prostoru, větší řádkování, jasná hierarchie nadpisů
+  • Feedback: správně #15803d, špatně #b91c1c, bez animovaného blikání kromě časového varování
+  • Výsledková karta: čistá, kontrastní, vhodná pro tisk i mobilní screenshot`},
+  pastel:{nazev:'Pastelový',spec:`VIZUÁLNÍ DESIGN — Pastelový přívětivý styl:
+  • Pozadí: #fff7ed nebo velmi světlý pastelový gradient, karty: #ffffff s jemným barevným okrajem
+  • Primární akcent: #fb7185; sekundární akcent: #93c5fd; doplněk: #fde68a
+  • Tlačítka: měkký gradient (#f9a8d4 → #93c5fd), zaoblené rohy 12px, decentní shadow
+  • Text: #1f2937, popisky #6b7280; důraz na čitelnost, ne dětský vzhled
+  • Feedback: správně #22c55e, špatně #ef4444, upozornění #f59e0b
+  • Výsledková karta: světlá, měkké barvy, velké procento a přehledné bloky výsledků`},
+
+  terakota:{nazev:'Teplá / Terakota',spec:`VIZUÁLNÍ DESIGN — Teplý terakotový styl (mobile-first, navržený pro pohodlné čtení a orientaci na telefonu):
+  • Pozadí: teplá krémová #faf4ec; karty čistě bílé #ffffff s jemným okrajem #ece2d6 a měkkým stínem 0 6px 24px rgba(120,80,60,0.10), border-radius 18px.
+  • Primární akcent: terakota #c75d3c; hover/tmavší #a84a2e; sekundární klidná modrozelená #2f7d77 pro doplňkové prvky a odkazy.
+  • Text: hlavní #2b211c (teplá tmavá, vysoký kontrast), tlumený #7a6a60; nadpisy font-weight 700, pohodlné řádkování 1.6.
+  • Header testu: plný terakotový pruh #c75d3c, bílý text, dolní rohy zaoblené (0 0 18px 18px); sticky a dobře čitelný i přes obsah pod ním.
+  • Lišta cvičení: velké zaoblené pill taby s min. výškou 44 px a dostatečnými mezerami; aktivní tab plně terakotový s bílým textem, hotové cvičení s jemnou zelenou #2f9e6e tečkou nebo okrajem.
+  • Karty otázek: hodně vnitřního prostoru (padding ~18px), výrazné kulaté číslo otázky v terakotovém kroužku, klikací odpovědi jako velké dlaždice (min. 48 px) s tučnějším terakotovým okrajem ve vybraném stavu.
+  • Tlačítka: plná terakota, bílý text, border-radius 12px, výška min. 48 px, jasný stisknutý stav; submit zelený #2f9e6e; danger #d24b3e.
+  • Feedback: správně #2f9e6e, špatně #d24b3e, upozornění #e0892f; klidná barevná změna bez agresivního blikání kromě časového varování.
+  • Učitelský mód: tlumený teplý tmavý vzhled #2b211c se světlým textem a terakotovým akcentem #c75d3c; správné odpovědi zeleně zvýrazněné.
+  • Výsledková karta: krémová #faf4ec, velké procento a známka, přehledné bloky, kompaktní na jeden mobilní screenshot.
+  • Mobilní priorita: jednosloupcové rozložení, velké dotykové cíle, vysoký kontrast textu, žádné drobné odkazy ani prvky závislé jen na hoveru.`},
+};
+
+const DOM_FIELDS = ['nazev','proKoho','latka','vlastniTyp','zadaniText',
+  'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
+const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin','bezpKod'];
+const SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
+const MAX_FILES = 12;
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+const MAX_IMAGE_PREVIEW_SIZE = 4 * 1024 * 1024;
+const MAX_EMBEDDED_TEXT_BYTES = 300 * 1024;
+const MAX_EMBEDDED_TEXT_CHARS = 24000;
+// Strop délky zdrojového textu vkládaného do promptu pro AI (Gemini). Sjednoceno s limitem
+// načítání souborů (MAX_EMBEDDED_TEXT_CHARS), aby nevznikala past, kdy se soubor tváří jako
+// „celý v promptu", ale do AI jde jen jeho část. Když je zdroj delší, UI to hlasitě hlásí.
+const MAX_SOURCE_CHARS_FOR_AI = 24000;
+const TEXT_EMBED_EXT = ['txt','md','markdown','csv','tsv','json','rtf','html','htm','xml','yaml','yml','srt'];
+const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','html','htm','xml','yaml','yml','srt','docx','png','jpg','jpeg','gif','webp','heic','mp3','wav','m4a','ogg','aac','flac','mp4','mov','m4v','webm'];
+
+const DEFAULT = {
+  appMode:'simple', workPreset:'quick',
+  jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', sourceSliceMode:'start',
+  cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
+  body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfig:[],
+  fuzzyTolerance:'off',
+  aiGradeScale:null, aiGradeRaw:'',
+  tema:'modern', zolicek:'NE', diferencovany:'NE',
+  overeni:'NE', anonymizace:'ANO',
+  skupiny:[], fileNames:[], urls:[''],
+  // ── Pedagogicko-didaktická vrstva (BOD 5/6/7/8/15) ──
+  ageGroup:'', ageGroupCustom:'',           // BOD 15 — věková skupina / ročník
+  testPurpose:'',                            // pedagogický účel testu (label presetu)
+  pedagogicalPreset:'',                      // BOD 6 — zvolený systémový preset
+  simpleTemplate:'',                         // jednoduchá šablona (simple mode) — zamyká a skrývá volby
+  screenGuard:false,                         // hlídání obrazovky (zámek při opuštění) nezávisle na testMode
+  feedbackMode:'brief',                      // BOD 8 — none | brief | learning
+  differentiationLevel:'standard',           // BOD 7 — basic | standard | challenge (celý test)
+  exercisePedagogyMap:null,                  // BOD 5 — typ → pedagogická funkce (cache)
+  didacticReview:null,                       // panel didaktické kontroly (poslední výpočet)
+};
+
+let state = JSON.parse(JSON.stringify(DEFAULT));
+let currentStep = 0;
+let maxStep = 0;
+let groupIdCounter = 0;
+let fileObjects = [];
+let fileReadPromises = [];
+let timeTipValue = 0;
+let saveTimer = null;
+let indicatorTimer = null;
+
+// ═══ DOM ══════════════════════════════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+const val = id => { const e = $(id); return e ? e.value : ''; };
+const setVal = (id, v) => { const e = $(id); if (e) e.value = (v == null) ? '' : String(v); };
+const trim = id => val(id).trim();
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function plainText(s){ return String(s ?? '').replace(/\s+/g,' ').trim(); }
+function isSpanishLike(j){ const s=String(j||'').toLowerCase(); return s.includes('španěl') || s.includes('spanish') || s.includes('español') || s.includes('spani'); }
+function isEnglishLike(j){ const s=String(j||'').toLowerCase(); return s.includes('anglič') || s.includes('english') || s.includes('angl'); }
+function isGermanLike(j){ const s=String(j||'').toLowerCase(); return s.includes('němč') || s.includes('nemeck') || s.includes('german') || s.includes('deutsch'); }
+function languageText(){ return state.jazyk || ''; }
+
+
+// ═══ App modal/toast helpers: no native alert/confirm/prompt in generator UI ═══
+let uiModalResolver = null;
+function ensureToastStack(){
+  let stack = document.getElementById('uiToastStack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.id = 'uiToastStack';
+    stack.className = 'ui-toast-stack';
+    document.body.appendChild(stack);
+  }
+  return stack;
+}
+function uiToast(message, type='ok', timeout=3600){
+  const stack = ensureToastStack();
+  const item = document.createElement('div');
+  item.className = 'ui-toast ' + (type || 'ok');
+  item.textContent = String(message || '');
+  stack.appendChild(item);
+  requestAnimationFrame(() => item.classList.add('visible'));
+  setTimeout(() => {
+    item.classList.remove('visible');
+    setTimeout(() => item.remove(), 220);
+  }, timeout);
+}
+function closeUiModal(value){
+  const modal = document.getElementById('uiModal');
+  if (modal) modal.remove();
+  document.removeEventListener('keydown', uiModalKeyHandler);
+  const resolve = uiModalResolver;
+  uiModalResolver = null;
+  if (resolve) resolve(value);
+}
+function uiModalKeyHandler(e){
+  const modal = document.getElementById('uiModal');
+  if (!modal) return;
+  if (e.key === 'Escape') closeUiModal(null);
+  if (e.key === 'Enter') {
+    const input = modal.querySelector('.ui-modal-input');
+    if (input && document.activeElement === input) closeUiModal(input.value.trim());
+  }
+}
+function uiModal({title='Potvrzení', message='', input=false, defaultValue='', okText='OK', cancelText='', danger=false, boxClass='', html=false} = {}){
+  if (uiModalResolver) closeUiModal(null);
+  return new Promise(resolve => {
+    uiModalResolver = resolve;
+    const backdrop = document.createElement('div');
+    backdrop.id = 'uiModal';
+    backdrop.className = 'ui-modal-backdrop';
+    backdrop.setAttribute('role', 'dialog');
+    backdrop.setAttribute('aria-modal', 'true');
+    const inputHtml = input ? `<input class="ui-modal-input" type="text" value="${esc(defaultValue)}" aria-label="${esc(title)}">` : '';
+    // html:true → message je důvěryhodné HTML složené v kódu (ne vstup uživatele).
+    const bodyHtml = html ? message : esc(message);
+    backdrop.innerHTML = `
+      <div class="ui-modal-box${boxClass ? ' ' + boxClass : ''}">
+        <div class="ui-modal-head">${esc(title)}</div>
+        <div class="ui-modal-body">${bodyHtml}</div>
+        ${inputHtml}
+        <div class="ui-modal-actions">
+          ${cancelText ? `<button type="button" class="ui-modal-btn" data-ui-cancel>${esc(cancelText)}</button>` : ''}
+          <button type="button" class="ui-modal-btn primary${danger ? ' danger' : ''}" data-ui-ok>${esc(okText)}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    const inputEl = backdrop.querySelector('.ui-modal-input');
+    const okBtn = backdrop.querySelector('[data-ui-ok]');
+    const cancelBtn = backdrop.querySelector('[data-ui-cancel]');
+    okBtn.addEventListener('click', () => closeUiModal(inputEl ? inputEl.value.trim() : true));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => closeUiModal(input ? null : false));
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeUiModal(input ? null : false); });
+    document.addEventListener('keydown', uiModalKeyHandler);
+    setTimeout(() => { if (inputEl) { inputEl.focus(); inputEl.select(); } else okBtn.focus(); }, 0);
+  });
+}
+function uiAlert(message, title='Upozornění', boxClass=''){
+  return uiModal({title, message, okText:'Rozumím', boxClass});
+}
+function uiConfirm(message, title='Potvrzení', danger=false){
+  return uiModal({title, message, okText:'Ano, pokračovat', cancelText:'Zrušit', danger}).then(Boolean);
+}
+function uiPrompt(title, defaultValue=''){
+  return uiModal({title, message:'Zadej název a potvrď.', input:true, defaultValue, okText:'Uložit', cancelText:'Zrušit'});
+}
+
+/* Generator Assistant — lokální poradce ke generátoru (KB + UI + volitelné AI). */
+// Generator Assistant
+/* Generator Assistant — core (KB + search). Vkládá se 1:1 do generátoru. */
+// Stav: 'reseno' | 'castecne' | 'ne'
+const GENERATOR_ASSISTANT_KB = [
+ {id:'split-screen',title:'Rozdělená obrazovka (split screen)',status:'reseno',
+  keywords:['split screen','rozdelena obrazovka','rozdeleni obrazovky','male okno','split window','multitasking','okno vedle sebe','dve aplikace vedle sebe'],
+  simple:'Ano, částečně. Test si hlídá, jestli neběží dlouho v malém okně (typické pro rozdělenou obrazovku), a zapíše to učiteli jako signál k posouzení.',
+  detailed:'Generovaný test vzorkuje každé 2 s poměr velikosti okna k displeji. Když je okno souvisle (od ~10 s) menší než 60 % displeje, počítá to jako „malé/rozdělené okno". Při odevzdání uloží jeden souhrnný signál split-window s podílem času v malém okně; ten se objeví v bezpečnostním záznamu, ve výsledku i v učitelském ověření. Je to vodítko, ne obvinění. Pozor: cílené rozdělení 70/30 nebo druhé fyzické zařízení tím nechytíš.',
+  evidence:['startSplitMonitor()','stopSplitMonitor()','recordSplitSummary()','windowIsSmall()','SPLIT_RATIO=0.60','SPLIT_MIN_RUN_MS','signál split-window']},
+
+ {id:'limity-detekce',title:'Co generátor NEdetekuje (druhé zařízení, kamera, nahrávání, Bluetooth)',status:'ne',
+  keywords:['druhy mobil','druhe zarizeni','druhy telefon','telefon vedle','mobil vedle','vedle notebooku','jine zarizeni','kamera','webkamera','nahravani obrazovky','screen recording','screrecording','obs','bluetooth','sluchatka','odposlech','spy','druhy pocitac','tablet vedle','mistnost','v mistnosti','kamera v mistnosti'],
+  simple:'Ne. Generátor vidí jen dění ve svém okně/prohlížeči na tomtéž zařízení. Druhý telefon vedle notebooku, kameru v místnosti, nahrávání obrazovky ani Bluetooth zařízení nepozná a ani poznat nemůže.',
+  detailed:'Veškerá detekce je vázaná na okno a prohlížeč: opuštění okna (visibilitychange, pagehide, blur), fullscreen, velikost okna (split monitor) a heartbeat. Nic z toho nevidí mimo prohlížeč. Druhé fyzické zařízení, kamera, odposlech, nahrávání obrazovky či Bluetooth jsou mimo dosah webové stránky. I split monitor podle vlastního komentáře v kódu „cílenou snahu (rozdělení 70/30, druhé zařízení) nechytí". Bezpečnost je tedy vodítko k lidskému posouzení, ne neprůstřelný dohled.',
+  evidence:['komentář u split monitoru: „druhé zařízení nechytí"','detekce jen okno/prohlížeč (visibilitychange, pagehide, blur)','detectDevice() určuje jen TYP aktuálního zařízení, ne počet zařízení']},
+
+ {id:'opusteni-okna',title:'Opuštění testu / přepnutí aplikace / blur',status:'reseno',
+  keywords:['opusteni testu','opustit test','prepnuti aplikace','prepnuti karty','blur','visibilitychange','pagehide','beforeunload','reload','ztrata fokusu','odejit z testu','alt tab'],
+  simple:'Ano. Když student během testu přepne aplikaci/kartu, otevře jiné okno nebo stránku načte znovu, test to pozná. V přísném režimu se zamkne, v běžném se to jen zapíše.',
+  detailed:'Detekce je vícevrstvá: visibilitychange (hidden), pagehide, beforeunload/reload příznak v sessionStorage/localStorage, heartbeat (lastActiveAt) a hlídaný blur fallback (jen když test běží, není otevřený modal, student nepíše do inputu a stránka je bez fokusu déle než ~800–1200 ms). Podezřelá mezera od heartbeatu nad 2–3 s = zámek (v přísném režimu). Nezamyká se při běžné mobilní klávesnici, file pickeru, selectu ani vlastním modalu.',
+  evidence:['getCompactSecurityBlock() (přísný i běžný)','visibilitychange / pagehide / beforeunload','heartbeat lastActiveAt','hlídaný blur fallback ~800–1200 ms','mezera >2–3 s = zámek']},
+
+ {id:'fullscreen',title:'Fullscreen / celá obrazovka',status:'reseno',
+  keywords:['fullscreen','cela obrazovka','celoobrazovkovy','fullscreenchange','rezim cele obrazovky'],
+  simple:'Ano. Test nabízí tlačítko na celou obrazovku jako volitelnou pomůcku. V samotném generátoru je fullscreen tlačítko v hlavičce.',
+  detailed:'Ve studentském testu je fullscreen volitelná pomůcka na intru (ne povinnost). V přísném režimu může opuštění celé obrazovky (fullscreenchange) buď zamknout, nebo zapsat samostatné varování; skutečné opuštění stránky ale zamyká vždy. V běžném režimu fullscreenchange zámek nespouští. Samotný generátor má fullscreen přepínač v hlavičce (toggleFullscreen).',
+  evidence:['toggleFullscreen() (hlavička generátoru, btnFs)','getCompactSecurityBlock(): „fullscreenchange smí zamknout/zapsat varování"','intro: fullscreen jako volitelná pomůcka']},
+
+ {id:'prisny-rezim',title:'Přísný režim',status:'reseno',
+  keywords:['prisny rezim','prisny test','zamek','zamyka','lock','uzamknuti','dohled','pod dohledem'],
+  simple:'Přísný režim test při skutečném opuštění zamkne a pokračovat lze jen přes odemykací heslo učitele. Slouží pro známkovanou práci pod dohledem.',
+  detailed:'Přísný režim napojuje lock screen na state.locked. Skutečné opuštění (visibilitychange hidden, pagehide, reload, přepnutí aplikace/okna) nastaví state.locked + lockReason, zapíše do securityEvents a uloží stav; po návratu se zobrazí zámek. Zámková obrazovka neukazuje rovnou pole pro heslo — student vidí jen 🔒 a výzvu „Kontaktuj učitele"; pole se odkryje až 5× poklepáním na zámek během ~2 s. Odemčení se loguje. Ve výsledku jsou počty varování, zámků i odemčení.',
+  evidence:['getCompactTestModeBlock() / getCompactSecurityBlock() větev prisny','state.locked + lockReason','odkrytí hesla 5× tapem na 🔒','testMode==="prisny"']},
+
+ {id:'bezny-rezim',title:'Běžný režim',status:'reseno',
+  keywords:['bezny rezim','bezny test','standardni test','monitorovani bez zamku','nezamyka'],
+  simple:'Běžný režim test nezamyká — opuštění okna jen zaznamená a ukáže učiteli ve výsledku. Studentovi se ale neříká, že se nezamyká.',
+  detailed:'Běžný režim monitoruje bez zámku: skutečné opuštění běžícího testu se zapíše do logs/securityEvents jako varování a zobrazí ve výsledku a v OVR4 payloadu (počet signálů + stručný záznam) jako „výsledek vyžaduje kontrolu", nikdy jako automatické obvinění. state.locked se nenastavuje, lock screen nevzniká. Studentská pravidla jsou formulovaná jako zákaz opustit test, ale neprozrazují, že režim nezamyká.',
+  evidence:['getCompactSecurityBlock() větev bezny','logs/securityEvents jako warning','OVR4 payload: počet signálů','testMode==="bezny"']},
+
+ {id:'procvicovaci-rezim',title:'Procvičovací režim',status:'reseno',
+  keywords:['procvicovaci rezim','procvicovani','uceni','trenink','mekka bezpecnost','feedback'],
+  simple:'Procvičovací režim je na učení: přívětivější feedback a nápovědy, žádné represivní zámky.',
+  detailed:'Cílem je učení — přidává se vstřícnější zpětná vazba, krátká vysvětlení a volitelné nápovědy (které ale přímo neprozradí odpověď). Bezpečnost je měkká, bez zámků; opuštění stránky se nanejvýš jemně zaloguje jako varování.',
+  evidence:['getCompactTestModeBlock() větev procviceci','getCompactSecurityBlock() větev procviceci']},
+
+ {id:'offline',title:'Offline režim / bezpečný offline balíček',status:'reseno',
+  keywords:['offline','bez internetu','funguje offline','secure offline','bezpecny offline','balicek','bez site','bez pripojeni'],
+  simple:'Ano. Hotový test je jeden HTML soubor a funguje offline. Bezpečný režim navíc nemá ve studentském souboru klíč odpovědí — opravuje se zvlášť učitelským souborem.',
+  detailed:'Vygenerovaný test je samostatný HTML bez externích knihoven, takže běží offline. V režimu „Bezpečný offline" (secureOffline) student_test.html neobsahuje správné odpovědi: student vytvoří zakódovaný answers.txt a učitel ho opraví v teacher_verifier.html. V tomto režimu se netvoří okamžitá známka ani QR/ověřovací .txt.',
+  evidence:['resultMode==="secureOffline"','getCompactVerificationBlock()','student_test.html → answers.txt → teacher_verifier.html','jeden HTML bez CDN']},
+
+ {id:'okamzita-znamka',title:'Okamžitá známka (instant)',status:'reseno',
+  keywords:['okamzita znamka','instant','hned vysledek','rovnou znamka','vysledek ihned','self scoring'],
+  simple:'V režimu „Okamžitá známka" student po odevzdání hned vidí výsledek a známku přímo v testu a pošle učiteli screenshot.',
+  detailed:'Režim resultMode="instant" počítá výsledek v prohlížeči studenta ihned po odevzdání a zobrazí výsledkovou kartu (jméno, Test ID, body, procenta, známka). Tento režim má ve studentském souboru hodnotící logiku; pro maximální ochranu klíče zvol „Bezpečný offline". Procenta se zaokrouhlují matematicky na celá %.',
+  evidence:['resultMode==="instant"','getGrade()','showResult()','výsledková karta: jméno/Test ID/body/%/známka']},
+
+ {id:'teacher-verifier',title:'Teacher verifier (učitelský opravovací soubor)',status:'reseno',
+  keywords:['teacher verifier','ucitelsky verifier','opravit answers','answers txt','oprava odpovedi','dekodovat odpovedi','ucitelsky opravovaci soubor'],
+  simple:'Teacher verifier je samostatný učitelský HTML soubor, který v bezpečném režimu dekóduje a opraví studentův answers.txt a spočítá známku.',
+  detailed:'V režimu Bezpečný offline student odevzdá zakódovaný answers.txt. Učitel ho nahraje (jednotlivě i hromadně) do teacher_verifier.html, který obsahuje privátní klíč a plné varianty s klíčem odpovědí, dekóduje odpovědi, nezávisle přepočítá body a známku a porovná je se studentovým záznamem. Tento soubor je jen pro učitele — nikdy ho nedávej studentům.',
+  evidence:['secureTeacherScript()','teacher_verifier.html','PRIVATE_KEY / VARIANTS_FULL','bulkVerifyFiles()','SHARED_SCORING_JS (stejné bodování jako student)']},
+
+ {id:'self-test',title:'Self-test bodování',status:'reseno',
+  keywords:['self test','selftest','self-test','test bodovani','overeni bodovani','overeni vypoctu','100 0 procent','kontrola hodnoceni'],
+  simple:'Self-test vezme tvůj právě vygenerovaný test, synteticky ho vyplní jednou úplně správně a jednou úplně špatně a ověří, že stroj dá 100 % a 0 %. U klasifikovaného testu je povinný.',
+  detailed:'runScoringSelfTest() spustí hodnoticí logiku skutečně staženého testu (v bezpečném režimu i celý šifrovací řetězec student→verifier), u každého typu úlohy vyplní jednou zcela správně a jednou zcela špatně a očekává 100 % a 0 %. Upozorní i na úlohy bez uloženého klíče. Chrání před tichou chybnou známkou (horší riziko než rozbitá stránka). Bez úspěšného self-testu generátor nepustí stažení klasifikovaného testu.',
+  evidence:['runScoringSelfTest() (btnSelfTest)','lastSelfTest gate','SHARED_SCORING_JS','očekává 100 % / 0 %']},
+
+ {id:'overeni-klice',title:'Ověření klíče druhým průchodem (AI)',status:'reseno',
+  keywords:['overit klic','overeni klice','druhy pruchod','spravnost klice','ai zkontroluje odpovedi','klic spravne odpovedi','je klic spravne'],
+  simple:'Tahle funkce nechá AI nezávisle vyřešit tvůj test a ukáže položky, kde se její odpověď liší od uloženého klíče — tam nejspíš je chyba v klíči. Vyžaduje Gemini klíč.',
+  detailed:'aiVerifyKey() požádá AI, aby sama vyřešila úlohy testu (negeneruje nový test) a porovná to s uloženým klíčem. Rozdílné položky označí jako podezřelé — levný signál, kde ručně zkontrolovat. Doplňuje self-test: self-test ověří, že STROJ počítá podle klíče správně; tohle hledá, jestli je sám KLÍČ obsahově správný. Silné u uzavřených typů (výběr, true/false, doplňování), slabší u otevřených překladů.',
+  evidence:['aiVerifyKey() (btnKeyCheck)','porovnání AI odpovědí s uloženým klíčem','vyžaduje Gemini klíč','keyCheckReport']},
+
+ {id:'gemini-api-klic',title:'Gemini API klíč',status:'reseno',
+  keywords:['gemini','api klic','apikey','klic gemini','ai generovani','primo generovat','vytvorit test primo','model gemini'],
+  simple:'Generátor umí volat Gemini a vytvořit test přímo. Klíč zadáš ve žluté sekci. Bez klíče zkopíruješ prompt do Claude/ChatGPT.',
+  detailed:'Ve žluté sekci zadáš Gemini API klíč; pak tlačítko „Vytvořit test přímo" pošle prompt (a multimodální přílohy) přes callGeminiJSON na Google API. Klíč se posílá jen v hlavičce požadavku na Google, nikam jinam. Bez klíče generátor funguje tak, že vygeneruje prompt k ručnímu zkopírování do jiného AI nástroje. Model lze změnit v poli „Model".',
+  evidence:['callGeminiJSON()','x-goog-api-key (jen na Google API)','buildGeminiFilePartsForApi()','geminiApiKey','„Vytvořit test přímo"']},
+
+ {id:'ukladani-api-klice',title:'Ukládání API klíče (relace vs trvale)',status:'reseno',
+  keywords:['ukladani klice','kam se uklada klic','sessionstorage klic','localstorage klic','zapamatovat klic','relace klic','trvale klic','uchovani klice'],
+  simple:'Klíč můžeš použít jen pro tuto relaci (po zavření prohlížeče se zapomene), nebo ho uložit trvale v tomto prohlížeči. Trvalé uložení je pohodlnější, ale klíč zůstává na zařízení.',
+  detailed:'„Relace" (useGeminiKeyForSession) drží klíč jen do zavření prohlížeče. „Uložit trvale" (saveGeminiKeyPermanent) zapíše klíč do úložiště prohlížeče, takže ho příště nemusíš zadávat — vhodné jen na vlastním zařízení. Klíč se odesílá výhradně do Google API v hlavičce, nikdy do žádné jiné služby ani do tohoto poradce.',
+  evidence:['useGeminiKeyForSession() (btnUseKeySession)','saveGeminiKeyPermanent() (btnSaveKeyPermanent)','geminiNote: „Relace = po zavření se zapomene"']},
+
+ {id:'pristupove-kody',title:'Přístupové kódy',status:'reseno',
+  keywords:['pristupovy kod','pristupove kody','access code','kod pro pristup','aktivacni kod','prihlaseni kodem','kod kolegy'],
+  simple:'Generátor umí pracovat s přístupovými kódy pro kolegy/uživatele. Kód se neukládá v čitelné podobě — uloží se jeho kryptografický otisk.',
+  detailed:'Přístupové kódy se ověřují přes KDF (PBKDF2, accDeriveKdf("access-code-v1",…)); ukládá se jen hash + sůl, ne samotný kód. Nové kódy generuje newAccessCode(); přístupová brána je accessGate. Politika je fail-closed (bez WebCrypto se generování bezpečných hodnot zablokuje, ne ošidí).',
+  evidence:['hashAccessCode()','accDeriveKdf("access-code-v1")','newAccessCode()','accessGate / accGateEl()']},
+
+ {id:'admin-sprava',title:'Admin správa přístupů',status:'reseno',
+  keywords:['admin','sprava pristupu','administrace','spravce','admin panel','ucet','sprava uctu','spravovat kody'],
+  simple:'Je tu panel správy přístupů (jen pro admina) a účet/zámkové volby. Otevřeš je z hlavičky (chipy „Účet" a „Správa přístupů").',
+  detailed:'openAdminPanel() otevírá správu přístupů (admin), openAccountModal() účet a bezpečnostní volby. Admin spravuje uživatele a generuje jim přístupové kódy (newAccessCode). Chipy v hlavičce (accChip, accAdminChip) jsou skryté, dokud nejsou relevantní.',
+  evidence:['openAdminPanel() (accAdminChip)','openAccountModal() (accChip)','newAccessCode(userId)']},
+
+ {id:'storage',title:'localStorage / sessionStorage (co se ukládá)',status:'reseno',
+  keywords:['localstorage','sessionstorage','uklada','co se uklada','data v prohlizeci','pamet prohlizece','soukromi dat','kam se uklada'],
+  simple:'V prohlížeči se drží jen rozpracovaný stav (nastavení, prompt, historie) a volitelně API klíč a bezpečnostní kód. PIN ani heslo se do historie/šablon neukládají.',
+  detailed:'Generátor ukládá snapshot rozpracovaného testu, šablony a historii do úložiště prohlížeče (klíče zmrazené na verzi v5_13_0). Volitelně API klíč (trvale) a školní bezpečnostní kód (SCHOOL_SECURITY_CODE_KEY). PIN a odemykací heslo se do historie ani šablon záměrně neukládají. V hotovém TESTU localStorage drží průběh a odpovědi, nikdy PIN.',
+  evidence:['saveSnapshot() / pushHistory()','SCHOOL_SECURITY_CODE_KEY (localStorage)','klíče zmrazené na v5_13_0','„LocalStorage ukládá průběh a odpovědi, nikdy PIN"']},
+
+ {id:'ochrana-answer-key',title:'Ochrana před únikem klíče odpovědí',status:'reseno',
+  keywords:['unik odpovedi','unik klice','answer key','spravne odpovedi unik','muze student videt odpovedi','skryt odpovedi','bezpecnostni skener','scanner'],
+  simple:'Ano. V bezpečném režimu studentský soubor správné odpovědi vůbec neobsahuje a před stažením to kontroluje bezpečnostní skener.',
+  detailed:'V režimu Bezpečný offline se klíč do studentského souboru nevkládá (odpovědi jsou zašifrované, dešifruje je až učitelský verifier privátním klíčem). Před exportem běží assertNoStudentAnswerKeys() a SecretScanner, který blokuje únik privátního klíče, plných variant a dalších citlivých dat do studentského souboru; má vlastní sadu 14 fixture testů (runScannerTests).',
+  evidence:['assertNoStudentAnswerKeys()','SecretScanner','runScannerTests() (14 testů)','stripItemForStudent','secureOffline = klíč jen v teacher_verifier']},
+
+ {id:'export-studentsky',title:'Export studentského testu',status:'reseno',
+  keywords:['export studenta','studentsky test','stahnout test','student_test','soubor pro studenty','rozdat test','html pro studenty'],
+  simple:'Stáhneš jeden HTML soubor pro studenty. V bezpečném režimu neobsahuje klíč odpovědí.',
+  detailed:'downloadGeneratedTest() vytvoří studentský HTML. V bezpečném režimu je to student_test.html bez klíče (secureStudentScript), který po odevzdání vytvoří zakódovaný answers.txt. Před stažením klasifikovaného testu musí projít self-test a bezpečnostní brána (secureGateBanner).',
+  evidence:['downloadGeneratedTest() (btnDownloadMain)','secureStudentScript()','student_test.html / answers.txt','self-test gate']},
+
+ {id:'ucitelsky-soubor',title:'Učitelský soubor / teacher export',status:'reseno',
+  keywords:['ucitelsky soubor','teacher export','soubor pro ucitele','ucitelska verze','klic pro ucitele','ucitelsky balicek'],
+  simple:'Vedle studentského souboru se generuje učitelský soubor (s klíčem / verifier). Je jen pro tebe, nedávej ho studentům.',
+  detailed:'V bezpečném režimu se generuje teacher_verifier.html s privátním klíčem a plnými variantami pro opravu. Učitelský mód uvnitř testu (intro tlačítko „Učitelský režim") chrání PIN. Bezpečnostní skener i názvové kontroly hlídají, aby se učitelský obsah nedostal do studentského exportu.',
+  evidence:['secureTeacherScript() / teacher_verifier.html','učitelský PIN (ucitelPin)','SecretScanner blokuje učitelský obsah ve studentském souboru']},
+
+ {id:'listening',title:'Listening comprehension (poslech)',status:'reseno',
+  keywords:['listening','poslech','poslechove cviceni','audio cviceni','poslech s porozumenim','nahravka poslech'],
+  simple:'Ano. Poslech zadáš přes audio/video soubor, URL nebo transkript. Student v testu poslech nevidí ani neslyší — pouští ho učitel; otázky jsou uzavřené a samoopravitelné.',
+  detailed:'usesListeningComprehension() zapíná poslechovou větev. Zdroj (audio/video soubor, URL nebo transkript) slouží Gemini a učiteli. Studentský test NEobsahuje přehrávač, URL ani transkript — jen pokyn, že poslech pustí učitel. Položky musí být auto-scorable (možnosti + correct index), žádné volné odpovědi; speechSynthesis se jako zdroj nepoužívá.',
+  evidence:['usesListeningComprehension()','getCompactListeningRules()','buildListeningUserBlock()','student nevidí transkript/přehrávač']},
+
+ {id:'reading',title:'Reading comprehension (čtení s porozuměním)',status:'reseno',
+  keywords:['reading','cteni s porozumenim','cteny text','reading comprehension','text k precteni','porozumeni textu'],
+  simple:'Ano, generátor umí cvičení na čtení s porozuměním.',
+  detailed:'usesReadingComprehension() zapíná větev pro čtení s porozuměním — text + návazné otázky. Funguje souběžně se zadáním látky a přílohami; konkrétní text můžeš dodat v zadání nebo souborem.',
+  evidence:['usesReadingComprehension()','readingBlock UI (přepíná se podle typu cvičení)']},
+
+ {id:'soubory',title:'Práce se soubory (DOCX/PDF/obrázky/audio/video)',status:'reseno',
+  keywords:['soubory','prilohy','docx','word','pdf','obrazek','obrazky','audio','video','nahrat soubor','vlozit soubor','import souboru','csv'],
+  simple:'Můžeš přiložit DOCX, PDF, obrázky, audio, video i textové soubory. Z DOCX se vytáhne text; ostatní se při přímém generování pošlou Gemini automaticky.',
+  detailed:'Pole pro soubory přijímá image/*, audio/*, video/*, .pdf, .txt, .md, .csv, .tsv, .docx aj. Z .docx generátor extrahuje text (extractDocxText). Při přímém generování přes Gemini se přílohy odešlou automaticky jako multimodální vstup (buildGeminiFilePartsForApi, obrázky se zmenší). Při kopírování promptu do jiného AI nástroje binární přílohy přiložíš ručně.',
+  evidence:['fileInput accept="image/*,audio/*,video/*,.pdf,.txt,.md,.csv,.tsv,.docx…"','extractDocxText()','buildGeminiFilePartsForApi()']},
+
+ {id:'kontrola-kvality',title:'Kontrola kvality vygenerovaného testu',status:'reseno',
+  keywords:['kontrola kvality','kvalita testu','validace','overeni kvality','je test ok','quality','kontrola vystupu ai'],
+  simple:'Před stažením generátor kontroluje, že úlohy dávají smysl (mají klíč, dost možností apod.), a nabízí self-test, ověření klíče a kontrolní checklist.',
+  detailed:'Výstup AI prochází striktní validací (validateExerciseSetStrict) — kontroluje typy, počty možností, existenci klíče atd. K tomu je panel kvality (qualityPanel), exportní checklist (exportChecklist), self-test bodování (runScoringSelfTest) a volitelné AI ověření klíče (aiVerifyKey). U klasifikovaného testu brání stažení bezpečnostní brána, dokud kontroly neprojdou.',
+  evidence:['validateExerciseSetStrict()','qualityPanel','exportChecklist','runScoringSelfTest()','aiVerifyKey()']},
+
+ {id:'rezim-jednoduchy-pokrocily',title:'Jednoduchý vs. pokročilý režim',status:'reseno',
+  keywords:['jednoduchy rezim','pokrocily rezim','simple advanced','rozdil rezimu','zjednoduseny','plne nastaveni','prepnout rezim'],
+  simple:'Jednoduchý režim skryje pokročilá nastavení a vyplní rozumné výchozí hodnoty, ať uděláš test rychle. Pokročilý odemkne všechny volby.',
+  detailed:'isSimpleMode() (state.appMode) řídí, kolik nastavení je vidět. V jednoduchém režimu se aplikují bezpečné defaulty (applySimpleDefaults: běžný režim atd.) a pokročilé sekce se skryjí (markAdvancedSections). Pokročilý režim zpřístupní detailní konfiguraci cvičení, bezpečnosti, diferenciace apod.',
+  evidence:['isSimpleMode() / state.appMode','applySimpleDefaults()','markAdvancedSections()']},
+
+ {id:'sablony',title:'Šablony',status:'reseno',
+  keywords:['sablona','sablony','template','ulozit nastaveni','znovu pouzit nastaveni','predloha'],
+  simple:'Nastavení testu můžeš uložit jako šablonu a příště ho rychle načíst. PIN/heslo se do šablony neukládají.',
+  detailed:'saveTemplate() uloží aktuální konfiguraci jako šablonu (do úložiště prohlížeče). Citlivé hodnoty jako PIN a odemykací heslo se do šablon záměrně neukládají.',
+  evidence:['saveTemplate()','loadTemplate','šablony bez PIN/hesla']},
+
+ {id:'historie',title:'Historie',status:'reseno',
+  keywords:['historie','minule testy','posledni prompty','vratit se k testu','drive vygenerovane','log promptu'],
+  simple:'Generátor si pamatuje dříve vygenerované prompty/nastavení a můžeš se k nim vrátit.',
+  detailed:'pushHistory() ukládá vygenerované prompty, renderHistory() je zobrazí a loadFromHistory(i) obnoví dřívější stav do formuláře. Hotový HTML test se nepersistuje (po obnovení ho vygeneruješ znovu), ale nastavení a prompt ano.',
+  evidence:['pushHistory()','renderHistory()','loadFromHistory()']},
+
+ {id:'bezpecnostni-report',title:'Bezpečnostní záznam / report',status:'reseno',
+  keywords:['bezpecnostni report','bezpecnostni zaznam','security report','log udalosti','co se stalo behem testu','signaly','varovani ve vysledku','securityevents'],
+  simple:'Test si vede záznam bezpečnostních událostí (opuštění okna, malé okno, zámky…) a ukáže ho ve výsledku a v učitelském ověření jako „výsledek vyžaduje kontrolu".',
+  detailed:'Generovaný test zapisuje události do securityEvents/logs (recordSec). Výsledková karta i OVR4/učitelské ověření zobrazí počet signálů a stručný přehled (např. split-window podíl, opuštění okna, zámky a odemčení). Formulace je „výsledek vyžaduje kontrolu", ne obvinění z podvodu.',
+  evidence:['securityEvents / recordSec()','recordSplitSummary() → signál split-window','výsledek + OVR4 payload: počet signálů']},
+
+ {id:'znamkovaci-stupnice',title:'Známkovací stupnice',status:'reseno',
+  keywords:['stupnice','znamkovani','znamka','skolni stupnice','vlastni stupnice','procenta na znamku','hranice znamek','klasifikace'],
+  simple:'Vyber školní stupnici (1–5) nebo si zadej vlastní pásma. Procenta se před zařazením zaokrouhlují matematicky na celá %.',
+  detailed:'Školní stupnice: 1=88–100, 2=74–87, 3=59–73, 4=44–58, 5=0–43 %. Vlastní stupnici zadáš v bodech nebo procentech, pásma odděluješ novým řádkem, středníkem, lomítkem nebo čárkou (parseCustomGradeScale). Nepokrytá pásma generátor označí; neúplná/rozbitá stupnice se nepustí dál. Zaokrouhlení je matematické: 87,5 % → 88 %, 87,4 % → 87 %.',
+  evidence:['getGrade()/gradeFor()','parseCustomGradeScale()','gradeScaleGaps()','školní pásma 88/74/59/44']},
+
+
+ {id:'tisk-pdf-papir',title:'Tisk / PDF / papírová verze testu',status:'reseno',
+  keywords:['tisk','vytisknout','papir','papír','pdf','ulozit jako pdf','uložit jako pdf','studentsky arch','student sheet','pracovni list','print','printable'],
+  simple:'Ano. V teacher verifieru je sekce „Tisk / papírová verze“, kde otevřeš prázdný studentský arch nebo verzi s klíčem a přes prohlížeč ji vytiskneš / uložíš jako PDF.',
+  detailed:'Tisk se řeší z učitelského souboru teacher_verifier.html. Sekce „Tisk / papírová verze“ má dvě tlačítka: „Tisk — prázdný arch“ pro studenty a „Tisk — s klíčem (jen učitel)“. Funkce openPrint(false/true) otevře tisknutelné HTML vytvořené přes buildPrintableHtml(withKey); v horní liště tisknutelné stránky je tlačítko window.print(), takže lze tisknout na papír nebo v dialogu prohlížeče uložit jako PDF. U diferencovaného testu se tisknou všechny varianty.',
+  evidence:['teacher_verifier.html: sekce „Tisk / papírová verze“','openPrint(false) / openPrint(true)','buildPrintableHtml(withKey)','window.print()','prtVariantHtml()']},
+
+ {id:'co-dat-studentum',title:'Co dát studentům a co si nechat jen pro učitele',status:'reseno',
+  keywords:['co poslat studentum','co dat studentum','co sdilet','studentum','studentům','soubor pro studenty','teacher nedavat','nesdilet verifier','do not send'],
+  simple:'Studentům dávej jen studentský HTML soubor. Učitelský verifier / učitelský export obsahuje správné odpovědi a klíče, takže zůstává pouze u učitele.',
+  detailed:'Studentský export vzniká přes downloadGeneratedTest() jako student_test.html. V bezpečném offline režimu neobsahuje klíč odpovědí. Učitelský soubor teacher_verifier.html naopak obsahuje privátní klíč a VARIANTS_FULL se správnými odpověďmi; generátor ho i názvem označuje jako DO_NOT_SEND_TEACHER_VERIFIER_contains_answers. Proto se studentům posílá/publikuje jen student_test.html, zatímco teacher verifier se ukládá bezpečně jen u učitele.',
+  evidence:['downloadGeneratedTest()','student_test.html','teacher_verifier.html','PRIVATE_KEY / VARIANTS_FULL','teacherVerifierFileName()','DO_NOT_SEND_TEACHER_VERIFIER_contains_answers']},
+
+ {id:'odevzdani-studentu',title:'Co student po dokončení odevzdává',status:'reseno',
+  keywords:['co odevzda student','co ma student poslat','odevzdani','odevzdávání','screenshot','answers.txt','zalozni kod','záložní kód','výsledek'],
+  simple:'Záleží na režimu výsledků. U okamžité známky student pošle screenshot výsledkové karty; v bezpečném offline režimu stáhne a pošle zakódovaný answers.txt.',
+  detailed:'Režim resultMode="instant" zobrazí studentovi po odevzdání výsledkovou kartu se jménem, Test ID, body, procenty a známkou; instrukce počítá se screenshotem výsledku. Režim resultMode="secureOffline" studentovi známku hned neukáže: po odevzdání vytvoří zakódovaný answers.txt s odpověďmi a bezpečnostním záznamem, který učitel načte do teacher_verifier.html. Pokud download souboru selže, verifier počítá i s nouzovým vložením záložního textu.',
+  evidence:['resultMode==="instant"','showResult()','výsledková karta: jméno/Test ID/body/%/známka','resultMode==="secureOffline"','downloadAnswers()','SECURE-ANSWERS-V1','bulkVerifyPasted()']},
+
+ {id:'nouzova-zaloha-answers',title:'Nouzová záloha, když nejde stáhnout answers.txt',status:'reseno',
+  keywords:['nejde stahnout answers','nejde stáhnout answers','nejde stáhnout soubor','zaloha','záloha','backup','SECURE-ANSWERS','vlozit kod','vložit kód'],
+  simple:'Ano. Když studentovi v bezpečném offline režimu nejde stáhnout answers.txt, může poslat celý záložní text od „SECURE-ANSWERS-V1“ a učitel ho vloží do teacher verifieru.',
+  detailed:'Studentský bezpečný výstup má textový formát začínající SECURE-ANSWERS-V1. Teacher verifier obsahuje pole „Nouzová záloha“, kam lze celý text vložit, a tlačítko „Načíst vloženou zálohu“ volající bulkVerifyPasted(). Je to záložní cesta pro situaci, kdy prohlížeč nebo zařízení blokuje stažení souboru.',
+  evidence:['SECURE-ANSWERS-V1','teacher_verifier.html: „Nouzová záloha“','pasteBox','bulkVerifyPasted()','downloadAnswers()']},
+
+ {id:'hromadne-vyhodnoceni',title:'Hromadné vyhodnocení, CSV, feedback a archiv',status:'reseno',
+  keywords:['hromadne vyhodnoceni','hromadné vyhodnocení','csv','excel','tabulka vysledku','feedback','individualni zpetna vazba','archiv','polozkova analyza','položková analýza'],
+  simple:'Ano. Teacher verifier umí hromadně načíst více answers.txt, spočítat výsledky, stáhnout CSV, vygenerovat feedback a uložit archiv.',
+  detailed:'V teacher_verifier.html je sekce Hromadné vyhodnocení: učitel přetáhne nebo vybere více answers.txt a verifier je opraví. K dispozici jsou exporty „Stáhnout CSV“, „Stáhnout feedback HTML“, individuální feedback pro vybraného studenta i jednotlivé feedbacky. Verifier obsahuje také souhrn problematických otázek, položkovou analýzu, bezpečnostní signály a archivní HTML/JSON pro školní úložiště.',
+  evidence:['bulkVerifyFiles()','downloadCsv()','downloadFeedbackHtml()','downloadSelectedFeedbackHtml()','downloadIndividualFeedbacks()','renderProblemSummary()','renderItemAnalysis()','downloadArchiveHtml()','downloadArchiveJson()']},
+
+ {id:'zpetna-vazba',title:'Zpětná vazba a zobrazení správných odpovědí',status:'reseno',
+  keywords:['zpetna vazba','zpětná vazba','feedback','spravne odpovedi','správné odpovědi','ukaze klic','ukáže klíč','vysvetleni','vysvětlení'],
+  simple:'Ano, režim zpětné vazby se nastavuje. U klasifikace můžeš vypnout okamžitou zpětnou vazbu; v bezpečném offline režimu student po testu nevidí známku ani klíč, vše řeší učitel ve verifieru.',
+  detailed:'Volba feedbackMode rozlišuje „Bez okamžité ZV“, „Stručná“ a „Učící“. Režim resultMode="instant" může ukazovat výsledek hned podle nastavení feedbacku. Režim resultMode="secureOffline" je pro klasifikaci bezpečnější: student nevidí známku ani správné odpovědi hned, stáhne answers.txt a učitel zpětnou vazbu vytvoří ve verifieru. Ve verifieru lze také zvolit úroveň feedbacku: chyby + správné odpovědi, jen body a známka, chyby bez správných odpovědí nebo kompletní rozbor.',
+  evidence:['feedbackModeBtns','feedbackMode','resultMode==="instant"','resultMode==="secureOffline"','feedbackLevel','downloadFeedbackHtml()','hideCorrectExport']},
+
+ {id:'editor-upravy-testu',title:'Úprava otázek a odpovědí po vygenerování',status:'reseno',
+  keywords:['upravit test','upravit otazky','upravit odpovedi','editor','chyba v klici','alternativni odpovedi','přijatelné odpovědi','rozšířit odpovědi'],
+  simple:'Ano. Po vygenerování lze otevřít editor otázek a odpovědí, opravit klíč, doplnit alternativní odpovědi a potom test znovu sestavit.',
+  detailed:'Ve výsledkové sekci je tlačítko „Upravit otázky a odpovědi“ (openTestEditor). Editor umožňuje měnit znění úloh, možnosti, správné odpovědi, alternativní odpovědi i vysvětlení. Funkce „Rozšířit přijatelné odpovědi“ umí přes AI navrhnout další uznatelné varianty pro textově opravované úlohy. Po úpravě se test znovu sestaví přes assembleTestHtml() a před stažením je vhodné znovu spustit self-test bodování.',
+  evidence:['openTestEditor()','openEditorFromData()','edApply()','assembleTestHtml()','enrichAltAnswers()','runScoringSelfTest()']},
+
+ {id:'diferenciace-skupiny',title:'Diferenciace a různé skupiny studentů',status:'reseno',
+  keywords:['diferenciace','diferencovany test','diferencovaný test','skupiny','slabsi studenti','silnejsi studenti','svp','různé varianty','varianty testu'],
+  simple:'Ano. Generátor umí diferencovaný test pro skupiny. Skupiny mohou dostat jiný obsah nebo náročnost, ale počet cvičení, typy a bodování mají zůstat stejné kvůli férovému srovnání.',
+  detailed:'V pokročilém nastavení lze zapnout diferenciaci, vytvořit skupiny, popsat jejich podmínky a přiřadit studenty ideálně pomocí kódů. Generátor má pravidlo, že se u skupin mění obsah otázek / míra podpory, ne celková struktura: počet cvičení, typy cvičení a body zůstávají stejné. Učitel může zvolit i obecnou míru podpory / náročnosti: základní podpora, standard, challenge. U klasifikovaných testů je diferenciace označena jako pedagogicky citlivá a má měřit stejné učivo.',
+  evidence:['diferencovany','skupiny','buildDiffBlock()','differentiationLevel','renderDiffLevelNote()','group_variants','Náhled jako student/skupina']},
+
+ {id:'anonymizace-gdpr',title:'Anonymizace jmen a ochrana údajů studentů',status:'reseno',
+  keywords:['anonymizace','gdpr','jmena studentu','jména studentů','osobni udaje','osobní údaje','student a1','kody studentu','kódy studentů'],
+  simple:'Ano. U diferenciace je doporučené používat studentské kódy a zapnout anonymizaci, aby se do AI neposílala skutečná jména studentů.',
+  detailed:'V nastavení diferenciace je volba „Anonymizovat v promptu“. Při zapnutí se do promptu místo skutečných jmen vloží anonymní označení typu Student A1, Student A2. Lokální mapování mezi skutečnými jmény a kódy zůstává jen v prohlížeči učitele a neposílá se do promptu ani se neukládá do šablon. Doporučení v UI výslovně říká používat kódy místo skutečných jmen.',
+  evidence:['anonymizace','Lokální mapování pro učitele','buildDiffBlock()','Student A1 / Student A2','šablony bez PIN/hesla']},
+
+ {id:'podpurna-opatreni',title:'Podpůrná opatření: delší čas, větší písmo, dyslexie-friendly',status:'reseno',
+  keywords:['podpurna opatreni','podpůrná opatření','delsi cas','delší čas','bez limitu','vetsi pismo','větší písmo','dyslexie','dyslexia','svp'],
+  simple:'Ano. U skupin lze nastavit podpůrná opatření: prodloužený čas, bez časového limitu, větší písmo nebo dyslexie-friendly zobrazení.',
+  detailed:'V kartě skupiny je sekce podpůrných opatření. U konkrétní skupiny lze nastavit násobek času, volbu bez časového limitu, větší písmo a dyslexie-friendly zobrazení. Ve studentském testu se po zadání jména/kódu aktivní úpravy zobrazí v informační liště a časovač se upraví podle A11Y.timeMult nebo A11Y.noLimit.',
+  evidence:['group-a11y','A11Y.timeMult','A11Y.noLimit','A11Y.font','A11Y.dys','timerVal=A11Y.noLimit?Infinity']},
+
+ {id:'casovy-limit',title:'Časový limit a vypršení času',status:'reseno',
+  keywords:['casovy limit','časový limit','casovac','časovač','vyprsi cas','vyprší čas','konec casu','timer','automaticky odevzdat'],
+  simple:'Ano. Test má časovač. Po vypršení času se test automaticky odevzdá; u podpůrných opatření může mít skupina prodloužený čas nebo žádný limit.',
+  detailed:'Délka testu se nastavuje v minutách v generátoru. Ve studentském testu běží timerDisplay a startTimer() každou sekundu snižuje timerVal. Pod 5 minut se mění varovný stav, pod 1 minutu kritický stav. Když timerVal klesne na 0, interval se zastaví a volá se doSubmit(), tedy automatické odevzdání. Podpůrná opatření mohou čas vynásobit nebo nastavit nekonečný limit.',
+  evidence:['casCustom / state.cas','timerDisplay','startTimer()','timerVal','doSubmit()','A11Y.timeMult','A11Y.noLimit']},
+
+ {id:'jazyk-pokynu-ui',title:'Jazyk pokynů, tlačítek a rozhraní testu',status:'reseno',
+  keywords:['jazyk pokynu','jazyk pokynů','pokyny cesky','pokyny česky','ui cesky','ui česky','cely test ve spanelstine','celý test v angličtině','cilovy jazyk'],
+  simple:'Ano. Lze zvolit, jestli bude celý studentský test v cílovém jazyce, pokyny česky, nebo UI česky a zadání cvičení v cílovém jazyce. Teacher verifier zůstává česky.',
+  detailed:'Volba instrJazyk má tři režimy: target = celý studentský test v cílovém jazyce, cs = české UI i pokyny, mixed = UI a technické texty česky, ale zadání cvičení a jazykový obsah v cílovém jazyce. Funkce getInstructionLanguageBlock() tuto politiku posílá do generování. U bezpečného offline balíčku učitelský verifier zůstává vždy česky, protože je to pracovní nástroj učitele.',
+  evidence:['instrJazykBtns','state.instrJazyk','getInstructionLanguageBlock()','getUiLang()','teacher verifier zůstává vždy česky']},
+
+ {id:'nahled-pred-stazenim',title:'Náhled testu před stažením',status:'reseno',
+  keywords:['nahled','náhled','preview','zkontrolovat test','pred stazenim','před stažením','mobilni nahled','mobilní náhled'],
+  simple:'Ano. Po vygenerování lze test otevřít v náhledu a přepínat šířku zobrazení, aby šel rychle zkontrolovat před stažením.',
+  detailed:'Výsledková sekce má tlačítko náhledu, které otevírá overlay s iframe preview. V horní liště náhledu lze přepínat šířku zobrazení, typicky mobilní a plnou šířku. Náhled slouží ke kontrole vzhledu a ovládání před stažením studentského souboru; pro kontrolu správnosti bodování slouží samostatně self-test a ověření klíče.',
+  evidence:['btnPreview','preview-overlay','preview-frame','preview-w-btn','runScoringSelfTest()','aiVerifyKey()']},
+
+ {id:'spanelstina-prizvuk',title:'Španělština a přízvuky',status:'reseno',
+  keywords:['spanelstina','prizvuk','akcent','accent','tilde','spanelsky','diakritika spanelstina'],
+  simple:'U španělštiny se za chybějící/špatný přízvuk u jinak správné odpovědi odečítá 0,5 bodu (nikdy ne pod 0). Ñ se bere jako samostatné písmeno.',
+  detailed:'getCompactSpanishRules() přidává španělská pravidla: vyžaduje člen u izolovaných substantiv, nezrazuje rod členem před mezerou a u přízvuků odečítá 0,5 bodu za chybějící/špatný přízvuk. Hodnoticí engine (textScore v SHARED_SCORING_JS) dává za odpověď lišící se jen přízvukem poloviční kredit.',
+  evidence:['getCompactSpanishRules()','textScore() v SHARED_SCORING_JS','0,5 bodu za přízvuk','ñ = samostatné písmeno']},
+
+ {id:'chyba-503',title:'Chyba 503 / UNAVAILABLE při generování',status:'reseno',
+  keywords:['503','unavailable','service unavailable','pretizeny','přetížený','pretizene','přetížené servery','high demand','server nedostupny','server nedostupný','generovani selhalo','generování selhalo','zkus znovu'],
+  simple:'Chyba 503 má dvě možné příčiny: přetížené servery Gemini (trvá pár minut) nebo vyčerpaný denní limit requestů (Free tier = 20/den). Zkontroluj na aistudio.google.com → Rate Limit, jestli máš RPD na 20/20.',
+  detailed:'HTTP 503 UNAVAILABLE znamená buď (1) přetížení serverů Gemini — stává se ve špičkách, zpravidla odezní za 2–5 minut, nebo (2) vyčerpaný denní limit RPD — Google na Free tier povoluje 20 requestů denně a po dosažení vrací 503 místo 429. Jak poznat: jdi na aistudio.google.com → Rate Limit, podívej se na sloupec RPD u modelu gemini-2.5-flash. Pokud je 20/20, limit je vyčerpaný a resetuje se o půlnoci UTC (cca 1–2 hod. v noci CZ). Řešení: Pay-as-you-go (přidej kartu v AI Studiu) zvyšuje limit na 1000/den. Alternativa: Gemini 2.5 Flash Lite má oddělený limit (také 20/den, ale zpravidla méně vytížený).',
+  evidence:['geminiApiErrorMessage()','HTTP 503','UNAVAILABLE','RPD','Rate Limit','aistudio.google.com']},
+
+ {id:'chyba-429',title:'Chyba 429 / RESOURCE_EXHAUSTED / překročen limit',status:'reseno',
+  keywords:['429','resource exhausted','resource_exhausted','prekrocen limit','překročen limit','kvota','kvóta','quota','too many requests','denni limit','denní limit','rpm','rpd','rate limit'],
+  simple:'Byl překročen limit požadavků nebo kvóta API klíče. Generátor tlačítko dočasně zablokuje. Počkej alespoň minutu a zkus znovu, nebo ověř limity v AI Studiu.',
+  detailed:'HTTP 429 RESOURCE_EXHAUSTED znamená překročení limitu — buď RPM (requests per minute, Free tier = 5/min) nebo RPD (requests per day, Free tier = 20/den). Generátor na 429 automaticky čeká a zobrazí cooldown timer. Neklikej opakovaně — každý zbytečný request pálí denní kvótu. Na aistudio.google.com → Rate Limit uvidíš aktuální vytížení. Pokud je RPM překročen, stačí počkat minutu. Pokud je RPD 20/20, limit se resetuje o půlnoci UTC.',
+  evidence:['geminiCooldownRemainingMs()','geminiUpdateCooldownUI()','GEMINI_COOLDOWN_MS','HTTP 429','RESOURCE_EXHAUSTED']},
+
+ {id:'chyba-400',title:'Chyba 400 / INVALID_ARGUMENT při generování',status:'reseno',
+  keywords:['400','invalid argument','invalid_argument','neplatny klic','neplatný klíč','api key not valid','spatny klic','špatný klíč','klic nefunguje','klíč nefunguje','neplatny pozadavek','neplatný požadavek'],
+  simple:'Chyba 400 nejčastěji znamená neplatný API klíč. Zkontroluj klíč ve žluté sekci — zkopíruj ho znovu z aistudio.google.com → API Keys.',
+  detailed:'HTTP 400 INVALID_ARGUMENT nastane když: (1) API klíč je neplatný, expiroval nebo byl zrušen — nejčastější příčina, (2) zvolený model neexistuje nebo není dostupný pro tento endpoint, (3) kombinace příloh nebo URL není pro API podporovaná. Řešení pro případ (1): jdi na aistudio.google.com → API Keys, regeneruj klíč nebo vytvoř nový, vlož ho znovu do generátoru. Pro případ (2): přepni model na gemini-2.5-flash ve žluté sekci. Klíče na Free tier jsou občas automaticky zrušeny po dlouhé nečinnosti.',
+  evidence:['geminiApiErrorMessage()','HTTP 400','INVALID_ARGUMENT','getGeminiInputKey()','useGeminiKeyForSession()']},
+
+ {id:'chyba-401-403',title:'Chyba 401 / 403 / PERMISSION_DENIED při generování',status:'reseno',
+  keywords:['401','403','permission denied','permission_denied','unauthenticated','nemam opravneni','nemám oprávnění','pristup odepren','přístup odepřen','klic nema opravneni','klíč nemá oprávnění'],
+  simple:'Chyba 401/403 znamená, že API klíč nemá oprávnění. Zkontroluj klíč nebo vytvoř nový s správným projektem v AI Studiu.',
+  detailed:'HTTP 401 nebo 403 PERMISSION_DENIED nastane když API klíč není oprávněn pro daný model nebo projekt. Může to být: (1) klíč patří jinému projektu, (2) projekt nemá povolenou Gemini API, (3) klíč byl omezen nebo odvolán. Řešení: jdi na aistudio.google.com → API Keys, zkontroluj ke kterému projektu klíč patří, případně vytvoř nový klíč ve správném projektu.',
+  evidence:['geminiApiErrorMessage()','HTTP 401','HTTP 403','PERMISSION_DENIED','UNAUTHENTICATED']},
+
+ {id:'chyba-504',title:'Chyba 504 / DEADLINE_EXCEEDED — timeout',status:'reseno',
+  keywords:['504','deadline exceeded','deadline_exceeded','timeout','vyprselo','vypršelo','cas vyprsel','čas vypršel','prilis dlouhy test','příliš dlouhý','nestihlo','nestihlo se vygenerovat'],
+  simple:'Chyba 504 znamená, že Gemini nestihlo vygenerovat odpověď v časovém limitu. Zkus zmenšit test — méně cvičení nebo méně položek.',
+  detailed:'HTTP 504 DEADLINE_EXCEEDED nastane když generování trvá déle než interní limit Google API (obvykle 180 s). Typické příčiny: příliš mnoho cvičení najednou, příliš velký vstupní soubor (PDF/obrázek), nebo náročná kombinace typů. Řešení: (1) zmenši počet cvičení nebo položek, (2) použij hybridní generování (složitá cvičení zvlášť), (3) odstraň velké přílohy nebo zkracej URL obsah, (4) přepni na silnější model gemini-2.5-flash pokud používáš Lite.',
+  evidence:['geminiApiErrorMessage()','HTTP 504','DEADLINE_EXCEEDED','GEMINI_TIMEOUT_MS','hybridní generování']},
+
+ {id:'chyba-poskozeny-json',title:'Poškozený JSON — generátor nemůže sestavit test',status:'reseno',
+  keywords:['poskozeny json','poškozený json','spatny json','špatný json','nepodařilo opravit','nepodarilo opravit','json selhal','test negeneruje','generátor nemůže','blbý výstup','divný výstup','nesmyslný výstup'],
+  simple:'Gemini vrátilo neúplný nebo chybně naformátovaný výstup. Generátor se pokusí opravit automaticky. Pokud selže, zkus generovat znovu nebo použij hybridní generování.',
+  detailed:'Poškozený JSON nastane když model vrátí text, který nejde naparsovat jako validní JSON — typicky useknutý výstup (příliš dlouhý test), model vložil text mimo JSON strukturu, nebo nesprávně escapoval znaky. Generátor automaticky zkusí opravit (repairGeminiJson) a při selhání zobrazí chybu. Řešení: (1) zkus generovat znovu — modely jsou nedeterministické, druhý pokus bývá lepší, (2) zmenši test (méně cvičení/položek), (3) zapni hybridní generování — složitá cvičení zvlášť produkují menší JSON, (4) pokud selháváš opakovaně u jednoho typu, nastav ho na ruční editaci (✏️ v pokročilém módu).',
+  evidence:['repairGeminiJson()','lastGeminiJsonRepaired','lastGeminiRawResponse','hybridní generování','runHybridGeneration()']},
+
+ {id:'chyba-data-mimo-zadani',title:'Chyba: data mimo zadání — generátor negeneruje test',status:'reseno',
+  keywords:['data mimo zadani','data mimo zadání','pocet polozek','počet položek','ocekavano','očekáváno','spatny pocet','špatný počet','validator','validátor','negeneruje','test negeneruje','chyba validace'],
+  simple:'Gemini vygenerovalo správný JSON, ale s jiným počtem položek nebo špatným typem cvičení než bylo zadáno. Generátor to odmítne a zobrazí co konkrétně nesedí. Zkus generovat znovu.',
+  detailed:'Validátor striktně kontroluje: počet cvičení, typy cvičení, počet položek v každém cvičení a povinná pole. Chyba data mimo zadání nastane když Gemini nedodrží přesné zadání — například u ordering vygeneruje 1 otázku místo 5. Generátor automaticky zkusí jednu opravu (pošle AI seznam chyb). Pokud ani oprava neprojde, zobrazí se detail chyby. Řešení: (1) zkus generovat znovu, (2) pokud se chyba opakuje u konkrétního typu, zkus hybridní generování, (3) složité typy (ordering, categorisation-board) nastav na ruční editaci.',
+  evidence:['validateExerciseSetStrict()','buildExerciseSpecs()','isExerciseValidation','validationDetails','opravný pokyn']},
+
+ {id:'chyba-sit',title:'Chyba sítě / fetch selhal / offline',status:'reseno',
+  keywords:['sit','síť','network','fetch','offline','neni internet','není internet','odpojeni','odpojení','selhala sit','selhala síť','cors','proxy'],
+  simple:'Generátor nemůže dosáhnout Gemini API kvůli síťovému problému. Zkontroluj připojení k internetu a zkus znovu.',
+  detailed:'Síťová chyba nastane když fetch() požadavek selže ještě před tím, než API odpověď dorazí — typicky kvůli výpadku internetu, firemnímu proxy nebo firewallu blokujícímu api.generativelanguage.googleapis.com. Školní sítě občas blokují přímé API volání. Řešení: (1) zkontroluj připojení k internetu, (2) zkus na mobilních datech jestli to funguje, (3) pokud blokuje školní síť, generuj z domova nebo použij mobilní hotspot.',
+  evidence:['callGeminiJSON()','geminiNetworkErrorMessage()','fetch selhal','TypeError']},
+
+ {id:'chyba-model-nenalezen',title:'Chyba: model nenalezen / není podporován',status:'reseno',
+  keywords:['model nenalezen','model nenalezeny','model not found','not found','not supported','unsupported','404','model nefunguje','spatny model','špatný model','neexistujici model','neexistující model'],
+  simple:'Název modelu ve žluté sekci neexistuje nebo již není dostupný. Přepni na gemini-2.5-flash přes tlačítko Výchozí nebo ⚡ Silný.',
+  detailed:'HTTP 404 nebo odpověď obsahující not found nastane když zadaný název modelu Google nezná. Modely jsou občas zrušeny nebo přejmenovány. Generátor má dvě záchranná tlačítka: ⚡ Silný nastaví gemini-2.5-flash (doporučený), 🪶 Lite nastaví gemini-2.5-flash-lite. Tlačítko Výchozí obnoví výchozí model. Aktuální seznam modelů najdeš na ai.google.dev/gemini-api/docs/models.',
+  evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']},
+
+ {id:'typy-cviceni-prehled',title:'Přehled typů cvičení — co který typ dělá',status:'reseno',
+  keywords:['typy cviceni','typy cvičení','co je ordering','co je matching','co je cloze','co je highlight','co je error tagging','co je transformation','co je categorisation','jaké typy','seznam typů','přehled typů','co umí'],
+  simple:'Generátor nabízí přes 20 typů cvičení: od klasických (multiple choice, true/false, fill-in-the-blank) přes složitější (ordering, categorisation-board, highlight-evidence, error-tagging) až po produktivní (translation, transformation-chain). Každý typ testuje jiné jazykové dovednosti.',
+  detailed:'Základní typy: multiple choice (výběr z možností), true/false (pravda/nepravda), fill-in-the-blank (doplňování), matching (párování), word order (sestavení věty). Složitější: ordering (seřazení vět/kroků), multi-select (více správných odpovědí), highlight-evidence (označení důkazní věty v textu), error-tagging (označení chyby ve větě a její oprava), banked cloze (doplňování ze zásoby slov), multiple matching (přiřazení více položek). Produktivní: translation (překlad), transformation-chain (transformace věty), error correction (oprava chyby). Specifické: categorisation-board (třídění do kategorií), table-completion (doplňování tabulky), reading comprehension (čtení s porozuměním), listening comprehension (poslech). V generátoru je ke každému typu pedagogická funkce (BOD 5).',
+  evidence:['EXERCISE_TYPES','normalizeType()','MANUAL_SUPPORTED_TYPES','isManualSupported()','pedagogická mapa typů']},
+
+ {id:'typy-ordering-vs-wordorder',title:'Ordering vs. word order — jaký je rozdíl',status:'reseno',
+  keywords:['ordering','word order','rozdil ordering','rozdíl ordering','serazeni','seřazení','slozeni vety','složení věty','poradi slov','pořadí slov','kdy ordering','kdy word order'],
+  simple:'Word order = student skládá větu z jednotlivých slov (drag & drop nebo klikání). Ordering = student řadí celé fráze nebo kroky do správného pořadí (1., 2., 3…). Word order je na úrovni věty, ordering na úrovni celků.',
+  detailed:'Word order testuje syntaxi — student dostane zamíchaná slova a sestaví z nich správnou větu. Hodí se na procvičení slovosledu, pomocných sloves, negace. Ordering testuje logické pořadí — student dostane celé fráze nebo kroky a seřadí je. Hodí se na procvičení podmínkových vět, kroků procesu, časové posloupnosti. Ordering generuje N samostatných bloků (každý je jedna otázka se svými frázemi), zatímco word order generuje jednu větu na otázku.',
+  evidence:['ordering','word-order','ordBadgeHtml()','clickOrd()']},
+
+ {id:'typy-multiselect-vs-multiplechoice',title:'Multi-select vs. multiple choice — jaký je rozdíl',status:'reseno',
+  keywords:['multi select','multiselect','multiple choice','vice spravnych','více správných','jedna spravna','jedna správná','checkbox','radio','kdy multi select'],
+  simple:'Multiple choice = právě jedna správná odpověď (radio button). Multi-select = může být více správných najednou (checkboxy). Multi-select je náročnější — student musí zaškrtnout přesně ty správné.',
+  detailed:'Multiple choice má vždy právě jednu správnou odpověď — student vybere jednu z nabídnutých možností. Multi-select může mít 1–N správných odpovědí; student zaškrtne všechny správné. Bodování multi-select je přísnější: za každou nesprávně zaškrtnutou nebo nezaškrtnutou možnost se odečítá část bodu. Správný klíč u multi-select je pole indexů (např. [0,2]), ne jedno číslo.',
+  evidence:['multi-select','multiple choice','multiSelectScore()','correct[]','MULTI-SELECT RULES']},
+
+ {id:'typy-highlight-evidence',title:'Highlight-evidence — označení důkazní věty',status:'reseno',
+  keywords:['highlight evidence','highlight-evidence','zvyrazneni','zvýraznění','dukaz','důkaz','oznacit vetu','označit větu','ukazat dukaz','ukázat důkaz','evidence','podtrhnout'],
+  simple:'Student dostane odstavec textu a musí kliknout na větu, která nejlépe podporuje dané tvrzení (důkazní věta). Testuje porozumění textu a schopnost najít relevantní informaci.',
+  detailed:'Highlight-evidence zobrazí text rozdělený do vět. Student klikne na větu, která je správnou odpovědí. Správný klíč je index věty (0, 1, 2…) v poli sentences[]. Bodování: kliknutí na správnou větu = plný počet bodů, jiná věta = 0. Tento typ vyžaduje kvalitní zdrojový text; generátor ho vytvoří automaticky nebo použij vlastní text ve vstupním poli.',
+  evidence:['highlight-evidence','sentences[]','correct (index)','edEvidenceBlock()']},
+
+ {id:'typy-error-tagging',title:'Error-tagging — označení a oprava chyby',status:'reseno',
+  keywords:['error tagging','error-tagging','oznaceni chyby','označení chyby','oprava chyby','chyba ve vete','chyba ve větě','najdi chybu','podtrhni chybu','grammar error'],
+  simple:'Student dostane větu s chybou, klikne na chybné slovo a napíše opravenou verzi. Testuje gramatické povědomí a schopnost identifikovat a opravit chybu.',
+  detailed:'Error-tagging zobrazí větu jako klikatelná slova (tokeny). Student klikne na slovo kde je chyba — vybraný token se zvýrazní — a pak napíše opravenou verzi do textového pole. Klíč obsahuje: token (chybné slovo), etype (typ chyby), corr (správná oprava). Bodování: správný token + správná oprava = plný počet bodů; jen token nebo jen oprava = částečný kredit.',
+  evidence:['error-tagging','token','etype','corr','errorTagScore()']},
+
+ {id:'typy-categorisation-board',title:'Categorisation-board — třídění do kategorií',status:'reseno',
+  keywords:['categorisation board','categorisation-board','trideni','třídění','kategorie','kategorizace','sorting','rozdelit do skupin','rozdělit do skupin','drag drop kategorie'],
+  simple:'Student třídí slova nebo fráze do správných kategorií přetažením nebo klikáním. Každá položka patří do právě jedné kategorie. Testuje třídění slovní zásoby nebo gramatických jevů.',
+  detailed:'Categorisation-board zobrazí N kategorií jako sloupce a zamíchané položky. Student přiřadí každou položku do správné kategorie. Každá kategorie (entries s {text, category}) má přesně jeden správný sloupec. Generátor generuje 6–10 položek na jeden board. Bodování je částečné: 4/4 = plný počet, 3/4 = 75 % atd. Typ je označen jako složitý (MANUAL_SUPPORTED_TYPES) — generuje se zvlášť v hybrid módu.',
+  evidence:['categorisation-board','entries[{text,category}]','categories[]','catBoardScore()','MANUAL_SUPPORTED_TYPES']},
+
+ {id:'pocet-polozek-doporuceni',title:'Kolik položek dát do každého cvičení',status:'reseno',
+  keywords:['kolik polozek','kolik položek','kolik otazek','kolik otázek','doporuceny pocet','doporučený počet','optimalni pocet','optimální počet','prilis mnoho','příliš mnoho','prilis malo','příliš málo'],
+  simple:'Doporučení: 5–10 položek na cvičení. Méně než 3 je pedagogicky slabé, více než 15 zvyšuje riziko chyb generování a pomalého tisku.',
+  detailed:'Optimální počet závisí na typu: multiple choice 5–8, true/false 8–12, fill-in-the-blank 6–10, matching 5–8 párů, ordering 3–6 bloků, categorisation-board 6–10 položek, multi-select 4–6, transformation-chain 4–6, error-tagging 4–6. U složitých typů (ordering, categorisation-board) drž se raději spodní hranice — model má obtížnější strukturovaný výstup a více položek zvyšuje riziko poškodeného JSONu nebo timeoutu.',
+  evidence:['pocetOtazek','validateExerciseSetStrict()','MIN_ITEMS','MAX_ITEMS']},
+
+ {id:'hybrid-generovani',title:'Hybridní generování — co to je a proč existuje',status:'reseno',
+  keywords:['hybrid','hybridni','hybridní','proc se generuje po cvicenich','proč se generuje po cvičeních','automaticky zvlast','automaticky zvlášť','slozita cviceni','složitá cvičení','proc trva dele','proč trvá déle','jak funguje generovani'],
+  simple:'Hybridní generování automaticky rozpozná složitá cvičení (ordering, categorisation-board atd.) a vygeneruje je každé vlastním API požadavkem. Jednoduchá cvičení jdou najednou. Žádná akce není potřeba — funguje automaticky.',
+  detailed:'Složitá cvičení (MANUAL_SUPPORTED_TYPES: ordering, categorisation-board, multi-select, highlight-evidence, transformation-chain, error-tagging, banked cloze, multiple matching, table-completion) mají komplexní JSON strukturu, kterou model při generování více cvičení najednou občas pokazí. Hybridní generování řeší tím, že tato cvičení generuje každé zvlášť (split), jednoduchá jdou v jednom batchi. Výsledky se složí ve správném pořadí. Pokud složité cvičení selže i po 2 pokusech, test se sestaví bez něj a zobrazí se doporučení pro ruční editaci. Tlačítko Každé cvičení zvlášť je manuální alternativa — generuje zvlášť i jednoduchá cvičení.',
+  evidence:['runHybridGeneration()','MANUAL_SUPPORTED_TYPES','isManualSupported()','complexIdxs','simpleIdxs','hybridBanner']},
+
+ {id:'hybrid-hlasky',title:'Hlášky při hybridním generování — co znamenají',status:'reseno',
+  keywords:['hybrid hlaska','hybrid hláška','generuje zvlast','generuje zvlášť','pokus 1 2','co znamena hybrid','co znamená hybrid','zlute hlasky','žluté hlášky','jak dlouho trva','jak dlouho trvá'],
+  simple:'Hlášky "⚡ Hybrid: složité cvičení 1/2…" jsou normální — informují o průběhu. Číslo X/Y znamená kolikáté složité cvičení se právě generuje z celkového počtu.',
+  detailed:'Při hybridním generování se zobrazují průběžné hlášky: "⚡ Hybrid: složité cvičení X/Y (typ)…" = generuje se X-té složité cvičení z Y celkových složitých. "⚡ Hybrid: generuji N jednoduchých cvičení najednou…" = batch jednoduchých. "Gemini vrátilo neúplný výstup — opakuji (pokus X/Y, za N s)…" = model vrátil špatná data, generátor to zkouší znovu automaticky (normální). "⚡ Hybrid: sestavuji test a validuji…" = vše vygenerováno, probíhá validace. Pokud se zobrazí ⚠️ s doporučením ruční editace, jedno ze složitých cvičení se nepodařilo automaticky.',
+  evidence:['runHybridGeneration()','setGenMsg()','geminiWaitBeforeRetry()','MAX_SINGLE=2']},
+
+ {id:'rucni-editace-cviceni',title:'Ruční editace složitých cvičení (✏️)',status:'reseno',
+  keywords:['rucni editace','ruční editace','rucne zadat','ručně zadat','ceruzka','tužka','pencil','manual mode','manualni','manuální','slozite cviceni rucne','složité cvičení ručně','editovat cviceni','editovat cvičení'],
+  simple:'Pro složitá cvičení lze v pokročilém módu zapnout ruční zadání (✏️). Místo generování AI vyplníš otázky a odpovědi sám přes formulář v editoru.',
+  detailed:'V pokročilém módu je u každého složitého cvičení (MANUAL_SUPPORTED_TYPES) přepínač 🤖/✏️. Přepnutí na ✏️ (manualMode=true) způsobí, že toto cvičení AI negeneruje — místo toho se otevře editor otázek a odpovědí kde zadáš obsah ručně. Ostatní cvičení se generují normálně (hybridně). Ruční editace je záchranná síť pro případy kdy AI opakovaně selhává u konkrétního složitého typu.',
+  evidence:['manualMode','isManualSupported()','MANUAL_SUPPORTED_TYPES','ex-manual-toggle','generateTestWithManual()']},
+
+ {id:'answers-txt-format',title:'Co je answers.txt a jak ho číst',status:'reseno',
+  keywords:['answers txt','answers.txt','vysledkovy soubor','výsledkový soubor','jak cist vysledky','jak číst výsledky','odevzdany soubor','odevzdaný soubor','co je v souboru','studentsky soubor','studentský soubor','co odevzdava student','co odevzdává student'],
+  simple:'answers.txt je soubor který student odevzdá po dokončení testu. Obsahuje jeho odpovědi, výsledky, skóre a bezpečnostní záznamy. Nahraješ ho do hromadného vyhodnocení.',
+  detailed:'answers.txt je JSON soubor se strukturou: studentInfo (jméno, skupina, PIN), answers (odpovědi na každou otázku), scoring (skóre za každou otázku), summary (celkové skóre, procenta, čas), security (bezpečnostní záznamy — blur, split screen, fullscreen opuštění). Soubor je čitelný i v textovém editoru — je to čitelný JSON. Pro hromadné vyhodnocení ho nahraj přes rozhraní hromadného vyhodnocení; generátor ho zpracuje a zobrazí výsledkovou tabulku.',
+  evidence:['answers.txt','buildStudentPackage()','STUDENT_ANSWERS_SCHEMA','hromadné vyhodnocení']},
+
+ {id:'bezpecnostni-signaly-vyznam',title:'Bezpečnostní signály ve výsledku — co znamenají a kolik je normální',status:'reseno',
+  keywords:['bezpecnostni signal','bezpečnostní signál','blur','split screen signal','opusteni testu','opuštění testu','podvadeni','podvádění','bezpecnostni zaznam','bezpečnostní záznam','jak cist bezpecnostni','jak číst bezpečnostní','kolik signalu je normal','kolik signálů je normální'],
+  simple:'Bezpečnostní signály jsou indicie, ne důkazy. Blur = student přepnul okno/aplikaci. Split-screen = test běžel v malém okně. Fullscreen exit = opustil fullscreen. Každý student je jiný — 1–3 signály mohou být náhodné.',
+  detailed:'Typy signálů: blur-count (kolikrát student přepnul z okna testu — 1–2 může být náhodné, 10+ je podezřelé), blur-total-ms (celkový čas mimo okno), split-window (podíl času s malým oknem — typické pro rozdělenou obrazovku), fullscreen-exit (kolikrát opustil povinný fullscreen). Signály jsou vodítko pro učitele, ne automatické hodnocení. Kontext je důležitý: student s dyslexií mohl mít zapnutou čtečku v druhém okně; student na slabém PC mohl mít pomalé překreslování. Signály vidíš v teacher verifieru v záložce Bezpečnostní záznam.',
+  evidence:['startBlurMonitor()','startSplitMonitor()','recordSplitSummary()','security{}','SPLIT_RATIO','BLUR_THRESHOLD']},
+
+ {id:'bodovani-nesedi',title:'Bodování nesedí — co dělat',status:'reseno',
+  keywords:['bodovani nesedi','bodování nesedí','spatne body','špatné body','chybne body','chybné body','dostal 0','dostala 0','spatny vysledek','špatný výsledek','chybny vysledek','chybný výsledek','student ma 0','špatně ohodnoceno','chybne ohodnoceno'],
+  simple:'Pokud bodování nesedí: (1) zkontroluj klíč správných odpovědí v teacher verifieru, (2) spusť ověření klíče, (3) oprav klíč v editoru a výsledky vygeneruj znovu.',
+  detailed:'Nejčastější příčiny chybného bodování: (1) AI vygenerovala špatnou správnou odpověď — zkontroluj klíč v teacher verifieru, oprav v editoru, (2) alt_answers chybí — student napsal synonymum nebo jiný tvar, přidej ho jako přijatelnou alternativu, (3) mezery nebo velikost písmen — bodovací engine ignoruje velikost a okrajové mezery, ale ne vnitřní, (4) u překladu/transformace je bodování AI-based — může se lišit od tvého očekávání, (5) u multi-select zkontroluj jestli klíč je pole indexů [0,2] a ne jedno číslo. Spusť self-test pro ověření bodování všech typů.',
+  evidence:['textScore()','SHARED_SCORING_JS','alt_answers[]','runScoringSelfTest()','aiVerifyKey()']},
+
+ {id:'student-odevzdal-dvakrat',title:'Student odevzdal test dvakrát — co dělat',status:'reseno',
+  keywords:['odevzdal dvakrat','odevzdal dvakrát','odevzdala dvakrat','odevzdala dvakrát','duplicitni odpovedi','duplicitní odpovědi','dva soubory','dvakrat odevzdal','dvakrát odevzdal','submitted twice'],
+  simple:'Generátor nebrání odevzdání dvakrát — student může po odevzdání obnovit stránku a odevzdat znovu. Máš-li dva soubory od stejného studenta, použij ten starší (první odevzdání).',
+  detailed:'Studentský test nemá serverovou autentizaci — odevzdání je lokální akce (stažení souboru). Student může stránku obnovit a odevzdat znovu s jinými odpověďmi. Pokud máš duplicitní answers.txt od stejného studenta (stejné jméno, podobný čas), zpravidla platí první odevzdání jako oficielní. V hromadném vyhodnocení se soubory zpracovávají individuálně — duplicity musíš vyřešit ručně výběrem správného souboru.',
+  evidence:['doSubmit()','buildStudentPackage()','hromadné vyhodnocení']},
+
+ {id:'workflow-pred-nasazenim',title:'Správný postup před ostrým nasazením testu',status:'reseno',
+  keywords:['postup','workflow','jak pripravit test','jak připravit test','co udelat pred','co udělat před','checklist','kontrolni seznam','kontrolní seznam','pred nasazenim','před nasazením','jak spravne','jak správně','co zkontrolovat'],
+  simple:'Doporučený postup: vygeneruj test → zkontroluj v náhledu → spusť self-test → spusť ověření klíče → oprav chyby v editoru → stáhni studentský soubor → dej studentům. Nikdy nedávej test studentům bez self-testu.',
+  detailed:'Krok 1: Vygeneruj test. Krok 2: Zkontroluj v náhledu (mobilní i plná šířka) — překontroluj otázky, odpovědi a vizuální vzhled. Krok 3: Self-test — automaticky ověří bodování pro všechny typy cvičení. Pokud projde s varováním (položky bez klíče), rozhodni jestli je budeš opravovat ručně nebo přijmout. Krok 4: Ověření klíče (AI druhý průchod) — AI projde uzavřené otázky a zkontroluje správnost klíče. Krok 5: Oprav případné chyby v editoru (✏️). Krok 6: Stáhni studentský soubor (nikoliv teacher verifier). Krok 7: Otestuj soubor sám jako student — otevři, vyplň, odevzdej. Krok 8: Dej soubor studentům.',
+  evidence:['runScoringSelfTest()','aiVerifyKey()','openTestEditor()','btnDownloadStudent','nahled-pred-stazenim']},
+
+ {id:'sdileni-bez-github',title:'Jak nasdílet test bez GitHub Pages',status:'reseno',
+  keywords:['bez github','bez GitHub','sdileni souboru','sdílení souboru','poslat soubor','poslat test','email','email soubor','usb','uloziste','úložiště','google drive','onedrive','jak dat studentum','jak dát studentům','lokalni sit','lokální síť','classroom'],
+  simple:'Studentský soubor (HTML) lze nasdílet přes Google Classroom, email, USB, Google Drive nebo OneDrive. Student ho otevře v prohlížeči. Offline verze funguje i bez internetu.',
+  detailed:'Možnosti distribuce: (1) Google Classroom — přilož HTML soubor jako přílohu nebo sdílej link ze Google Drive, (2) Email — přilož HTML soubor, student stáhne a otevře v prohlížeči, (3) USB/flash disk — zkopíruj soubor, student otevře lokálně (funguje offline), (4) Školní síť — ulož na sdílené úložiště školy, (5) GitHub Pages — vytvoří veřejný link, vhodné pro opakované použití. Pozor: test otevřený přes file:// (lokálně bez serveru) může mít omezení v některých prohlížečích (Chrome blokuje LocalStorage). GitHub Pages nebo jakýkoliv HTTP server toto řeší.',
+  evidence:['offline balíček','buildStudentPackage()','GitHub Pages','file:// vs https://']},
+
+ {id:'github-pages-hosting',title:'Jak nahrát test na GitHub Pages',status:'reseno',
+  keywords:['github pages','github','nahrát na web','nahrát na github','jak dát na web','hosting','web','link pro studenty','odkaz pro studenty','github io','github.io','repository','repozitář','jak aktualizovat','pencil tlacitko','pencil tlačítko'],
+  simple:'Jdi na github.com → tvůj repozitář → složka kde jsou testy → Add file nebo nahraj soubor. Po nahrání bude test dostupný na adrese username.github.io/repo/soubor.html. Editace probíhá přes tlačítko ✏️ (pencil) u souboru.',
+  detailed:'Postup pro nový test: (1) Přihlas se na github.com, (2) jdi do svého repozitáře (např. interaktivni-testy), (3) naviguj do správné složky, (4) klikni Add file → Upload files, (5) nahraj HTML soubor, (6) potvrď commit. URL bude username.github.io/repozitář/soubor.html. Pro editaci existujícího souboru: klikni na soubor → ikona tužky (pencil) → edituj → potvrď commit. Změny se projeví za 1–2 minuty. Generátor (src/index.html) edituj přes pencil ve složce src.',
+  evidence:['GitHub Pages','daniel22-dev.github.io','interaktivni-testy','src/index.html']},
+
+ {id:'github-test-nenacte',title:'Test na GitHubu se nenačte nebo zobrazuje chybu',status:'reseno',
+  keywords:['nefunguje link','nefunguje odkaz','nenacte se','nenačte se','github chyba','404 github','test nejde otevrit','test nejde otevřít','bily ekran','bílý ekrán','prazdna stranka','prázdná stránka','cors','mixed content'],
+  simple:'Nejčastější příčiny: (1) překlep v URL, (2) soubor ještě nebyl nahrán nebo commit ještě neproběhl (počkej 1–2 min), (3) GitHub Pages není zapnuto v nastavení repozitáře.',
+  detailed:'Kontrolní seznam: (1) Zkontroluj URL — github.io (ne github.com), správné jméno repozitáře a souboru, (2) Počkej 2–3 minuty po nahrání — GitHub Pages má zpoždění při nasazení, (3) Zkontroluj že GitHub Pages je zapnuto: Settings → Pages → Source = main/root nebo /docs, (4) Zkontroluj že soubor je v správné složce a má příponu .html, (5) Vymaž cache prohlížeče (Ctrl+Shift+R). Pokud vidíš bílý ekrán: otevři DevTools (F12) → Console a podívej se na chybové hlášky. CORS chyba znamená že zdroj blokuje přístup — pro HTML testy to zpravidla nenastane.',
+  evidence:['GitHub Pages','Settings → Pages','github.io','deploy']},
+
+ {id:'prisny-vs-procvicovaci-student',title:'Přísný vs. procvičovací režim — co vidí student',status:'reseno',
+  keywords:['co vidi student','co vidí student','prisny rezim student','přísný režim student','procvicovaci student','procvičovací student','po odevzdani','po odevzdání','spravne odpovedi po odevzdani','správné odpovědi po odevzdání','muzou studenti videt vysledek','můžou studenti vidět výsledek'],
+  simple:'Přísný režim: student po odevzdání vidí jen celkové skóre a zprávu. Žádné správné odpovědi. Procvičovací: student vidí hned u každé otázky zda odpověděl správně a jaká je správná odpověď.',
+  detailed:'Přísný (bezpečný offline) režim: po odevzdání student dostane výsledkovou obrazovku se jménem, skóre, procentem, známkou a časem. Správné odpovědi ani vysvětlení se nezobrazí — tím se minimalizuje riziko úniku klíče. Výsledkový soubor (answers.txt) obsahuje bodování ale ne klíč. Procvičovací (instant) režim: po odevzdání student vidí detailní přehled každé otázky — zda odpověděl správně, jaká je správná odpověď a případné vysvětlení. Vhodné pro procvičování, ne pro klasifikaci.',
+  evidence:['secure mode','instant mode','doSubmit()','showResultCard()','zpetna-vazba']},
+
+ {id:'student-ztratil-pripojeni',title:'Student ztratil připojení během testu — co se stane',status:'reseno',
+  keywords:['ztratil pripojeni','ztratil připojení','vypadl internet','výpadek internetu','offline student','student offline','test se zavrel','test se zavřel','ztratil test','odpovedi se ztratily','odpovědi se ztratily','autosave','autoukládání'],
+  simple:'Offline balíček funguje i bez internetu — test se neztratí. Odpovědi se průběžně ukládají lokálně. Pokud student obnoví stránku, může pokračovat od místa kde skončil (v přísném režimu).',
+  detailed:'Studentský test je kompletní offline HTML — nepotřebuje internet ke svému chodu. Odpovědi se průběžně ukládají do sessionStorage nebo localStorage (podle režimu). Při neúmyslném obnovení stránky (F5, výpadek) se test znovu otevře s uloženými odpověďmi. Časovač pokračuje od uloženého stavu. Pokud student zavře kartu záměrně a chce se vrátit, záleží na nastavení — v přísném režimu to může být zablokováno. Bezpečnostní záznamy (blur, split) se resetují při obnově stránky.',
+  evidence:['sessionStorage','localStorage','autosave','restoreAnswers()','timerVal']},
+
+ {id:'zmena-pinu-hesla',title:'Jak změnit PIN nebo heslo k testu',status:'reseno',
+  keywords:['zmenit pin','změnit pin','zmenit heslo','změnit heslo','zapomenuty pin','zapomenutý pin','novy pin','nový pin','pristupovy kod','přístupový kód','pin nefunguje','student nezna pin','student nezná pin'],
+  simple:'PIN a hesla jsou součástí vygenerovaného testu — nelze je změnit bez přegenerování. Chceš-li jiný PIN, uprav ho v nastavení skupin a vygeneruj test znovu.',
+  detailed:'Přístupové kódy (PINy a hesla skupin) jsou zapsány přímo do HTML souboru při generování. Nejde je změnit bez vytvoření nového souboru. Postup pro změnu: (1) v generátoru uprav PINy ve správě skupin, (2) vygeneruj test znovu (obsah zůstane stejný, jen kódy se změní), (3) nahraď studentský soubor novým. Pokud student zapomněl PIN, sdělíš mu ho — PIN je viditelný v generátoru v nastavení skupin nebo v teacher verifieru.',
+  evidence:['accessGroups[]','group.pin','group.password','buildAccessManifest()','pristy-kodove']},
+
+ {id:'flash-vs-lite',title:'Gemini Flash vs. Flash Lite — jaký je rozdíl',status:'reseno',
+  keywords:['flash vs lite','flash lite','ktery model','který model','lepsi model','lepší model','horsi model','horší model','kdy pouzit lite','kdy použít lite','rychlejsi model','rychlejší model','kvalita modelu','model doporuceni','model doporučení'],
+  simple:'Flash (gemini-2.5-flash) je výkonnější — lepší kvalita cvičení, ale pomalejší a s nižším denním limitem spotřebovaným rychleji. Lite (gemini-2.5-flash-lite) je rychlejší a levnější, vhodný pro jednoduché typy a když Flash vrací chyby 503/kvóta.',
+  detailed:'Gemini 2.5 Flash: doporučený model pro generování testů. Lepší porozumění kontextu, přesnější dodržení struktury JSON, vhodnější pro složité typy (ordering, categorisation-board, transformation-chain). Pomalejší (30–60 s na cvičení), Free tier: 20 req/den, 5 req/min. Gemini 2.5 Flash Lite: rychlejší (10–20 s), stejné denní limity (20 req/den) ale jiný pool. Vhodný pro jednoduché typy (multiple choice, true/false, fill-in-the-blank) nebo když Flash je přetížen. U složitých typů občas vrátí neúplný JSON. Přepnutí: ve žluté sekci klikni na tlačítko 🪶 Lite nebo ⚡ Silný.',
+  evidence:['GEMINI_MODEL_DEFAULT','gemini-2.5-flash','gemini-2.5-flash-lite','quickModel()','RPD','RPM']},
+
+ {id:'pristup-kolega',title:'Jak přidat kolegu jako uživatele generátoru',status:'reseno',
+  keywords:['pridat kolegu','přidat kolegu','kolega','sdileni generatoru','sdílení generátoru','vice uzivatelu','více uživatelů','jak dat kolegovi','jak dát kolegovi','pristup kolegy','přístup kolegy','kdo muze pouzivat','kdo může používat'],
+  simple:'Generátor je jeden HTML soubor — sdílení probíhá sdílením souboru nebo odkazu na GitHub Pages. Každý kolega potřebuje vlastní Gemini API klíč.',
+  detailed:'Generátor nemá uživatelské účty — je to standalone HTML soubor. Sdílení: (1) pošli kolegovi link na GitHub Pages (nebo přímo soubor), (2) kolega si vytvoří vlastní Gemini API klíč na aistudio.google.com a zadá ho do žluté sekce. API klíče jsou osobní — každý učitel by měl mít svůj (Free tier zdarma). Přístup k testu samotného mají studenti přes PINy/hesla skupin — to nastavuješ v generátoru.',
+  evidence:['GitHub Pages','getGeminiInputKey()','useGeminiKeyForSession()','saveGeminiKeyPermanent()']},
+
+ {id:'vice-variant-testu',title:'Jak vytvořit více variant testu',status:'reseno',
+  keywords:['vice variant','více variant','varianta a b','varianta A B','ruzne verze','různé verze','a b testing','zamichane otazky','zamíchané otázky','nahodne poradi','náhodné pořadí','opisovani','opisování','jak zamichat','jak zamíchat'],
+  simple:'Vygeneruj test vícekrát — každé generování produkuje jiné otázky (model je nedeterministický). Nebo použij jiné klíčové slovo pro téma. Generátor nemá automatické míchání variant.',
+  detailed:'Nejjednodušší způsob více variant: spusť generování dvakrát se stejným nastavením — Gemini vždy vygeneruje trochu jiné otázky. Alternativy: (1) změň trochu téma (npr. "First conditional — věty o cestování" vs. "First conditional — věty o práci"), (2) změň vstupní text (jiný článek nebo ukázka), (3) změň kombinaci typů cvičení. Generátor nemá vestavěné míchání pořadí otázek ani automatické varianty A/B — každá varianta je samostatný soubor.',
+  evidence:['buildContentPrompt()','generateTest()','GEMINI_TEMPERATURE']},
+
+ {id:'test-pro-cast-latky',title:'Jak udělat test jen pro část látky nebo konkrétní text',status:'reseno',
+  keywords:['cast latky','část látky','konkretni text','konkrétní text','urcita latka','určitá látka','jen z textu','jen z tohoto','vlastni text','vlastní text','nahrat text','nahrát text','vstupni text','vstupní text','omezit obsah','omezit téma'],
+  simple:'Vlož svůj text do vstupního pole (nebo nahraj soubor) a generátor vytvoří otázky výhradně z tohoto obsahu. Čím konkrétnější vstup, tím přesnější výstup.',
+  detailed:'Způsoby omezení obsahu: (1) Vstupní text — vlož přímo text, ze kterého mají být otázky (článek, ukázka, slovní zásoba). Generátor ho přijme jako primární zdroj. (2) Příloha — nahraj PDF, DOCX nebo obrázek; generátor ho zpracuje jako vstup. (3) URL — vlož odkaz na webovou stránku. (4) Téma + kontext — v poli tématu buď velmi konkrétní: místo "conditional sentences" napiš "second conditional — nereálné podmínky, věty o cestování, úroveň B1". Čím konkrétnější zadání, tím méně se generátor odchyluje od tvého záměru.',
+  evidence:['buildContentPrompt()','filePartsForGemini()','urlContext','state.tema','state.kontext']},
+
+ {id:'sablony-ulozeni',title:'Jak uložit nastavení jako šablonu a znovu ho použít',status:'reseno',
+  keywords:['sablona','šablona','ulozit nastaveni','uložit nastavení','znovupouzit','znovu použít','preset','ulozit preset','uložit preset','oblibene nastaveni','oblíbené nastavení','jak ulozit','jak uložit','template'],
+  simple:'Po konfiguraci testu klikni na Uložit jako šablonu (v sekci šablon). Šablona uloží celé nastavení — typy cvičení, počty, body, skupiny. Při příštím použití klikni na název šablony a nastavení se načte.',
+  detailed:'Šablony ukládají kompletní stav generátoru: počet cvičení, typy a jejich detailní nastavení (počty otázek, body, b/ot), skupiny, jazykovou úroveň, jazyk pokynů a časový limit. Uložení: klikni na ikonu 💾 nebo tlačítko Uložit jako šablonu, zadej název. Načtení: klikni na název šablony v přehledu. Šablony jsou uloženy v localStorage — jsou dostupné jen v tom prohlížeči kde byly vytvořeny. Pro přenos na jiné zařízení použij export šablony (pokud je dostupný).',
+  evidence:['state.templates','saveTemplate()','loadTemplate()','deleteTemplate()','localStorage']},
+
+ {id:'historie-snapshoty',title:'Historie a jak se vrátit k předchozímu nastavení',status:'reseno',
+  keywords:['historie','history','snapshot','vraceni','vracení','zpet','zpět','undo','predchozi nastaveni','předchozí nastavení','jak se vratit','jak se vrátit','smazal jsem','smazala jsem','omylem smazal'],
+  simple:'Generátor průběžně ukládá snapshoty (historii) nastavení. V sekci Historie najdeš předchozí stavy — kliknutím se vrátíš k libovolnému bodu.',
+  detailed:'Snapshot se vytvoří automaticky při každé změně nastavení (přidání cvičení, změna počtu, uložení šablony). Historie zobrazuje chronologický seznam snapshotů s časovou značkou. Kliknutím na snapshot obnovíš celý stav generátoru na ten okamžik. Snapshoty jsou uloženy v sessionStorage — dostupné jen v aktuální relaci prohlížeče; po zavření prohlížeče se smažou. Pro dlouhodobé uchování nastavení použij šablony.',
+  evidence:['saveSnapshot()','loadSnapshot()','historyStack','sessionStorage','renderHistory()']},
+
+ {id:'archivace-vysledku',title:'Jak archivovat výsledky testů',status:'reseno',
+  keywords:['archivace','archivovat','ulozit vysledky','uložit výsledky','archiv testu','archiv testů','uchovat vysledky','uchovati výsledky','dlouhodobe ulozeni','dlouhodobé uložení','csv export','export vysledku','export výsledků'],
+  simple:'Po hromadném vyhodnocení stáhni CSV soubor s výsledky — ten lze otevřít v Excelu nebo Google Sheets. Samotné answers.txt soubory si ulož do složky pro daný test.',
+  detailed:'Doporučená archivace: (1) answers.txt soubory od studentů ulož do pojmenované složky (např. "Třída_4A_Test_Kondicionály_2026-06"). (2) Po hromadném vyhodnocení stáhni CSV — obsahuje jméno, skupinu, skóre, procenta, čas a výsledky po cvičeních. (3) Ulož i původní studentský HTML soubor a teacher verifier — bez nich nelze výsledky zpětně ověřit. (4) Vygenerovaný test si zálouj — lze ho znovu použít příští rok nebo upravit. Generátor sám výsledky neukládá na server — vše je lokální.',
+  evidence:['hromadné vyhodnocení','buildCsvExport()','downloadCsv()','teacher verifier']},
+
+ {id:'student-nema-vysledek',title:'Student odevzdal ale nemám výsledek — co dělat',status:'reseno',
+  keywords:['nemas vysledek','nemáš výsledek','student neodevzdal','student neodevzdala','chybi soubor','chybí soubor','neposla soubor','neposlala soubor','kde je soubor','ztraceny soubor','ztracený soubor','student tvrdi ze odevzdal','student tvrdí že odevzdal'],
+  simple:'Student musí po dokončení testu stáhnout a odevzdat soubor answers.txt. Pokud ho nemáš, buď ho neposlal/nestáhl, nebo ho poslal do špatné složky. Požádej studenta o opětovné stažení — pokud neobnovil stránku, soubor stále lze stáhnout.',
+  detailed:'Příčiny chybějícího souboru: (1) Student nedokončil test nebo zavřel okno před odevzdáním, (2) student stáhl soubor ale neposlal ho, (3) soubor byl zablokován antivirem nebo školním firewallem, (4) student odevzdal jiný soubor (HTML místo .txt). Řešení: (1) požádej studenta ať znovu otevře test v prohlížeči — pokud ho nezavřel a neobnovil, může stáhnout soubor znovu, (2) pokud stránku obnovil nebo zavřel, soubor je ztracen — student musí test opakovat, (3) zkontroluj emailovou schránku nebo odevzdávárnu třídy.',
+  evidence:['doSubmit()','downloadAnswers()','buildStudentPackage()','answers.txt']},
+
+ {id:'test-se-zobrazuje-jinak',title:'Test se studentovi zobrazuje jinak než v náhledu',status:'reseno',
+  keywords:['zobrazuje jinak','vypadá jinak','jiny vzhled','jiný vzhled','student vidi jine','student vidí jiné','rozliseni','rozlišení','mobil pc','mobil pocitac','mobil počítač','jiny prohlizec','jiný prohlížeč','safari chrome'],
+  simple:'Test je responzivní — na mobilu vypadá jinak než na PC. To je záměr. Pokud jsou rozdíly závažné (prvky se překrývají, texty se nevejdou), zkontroluj náhled v mobilním zobrazení.',
+  detailed:'Rozdíly mezi zařízeními jsou normální a žádoucí — test se přizpůsobuje šířce obrazovky. Problémy nastávají když: (1) student používá velmi starý prohlížeč (IE, starý Safari) — test je otestován pro Chrome, Firefox, Edge, moderní Safari, (2) student má zapnutý čtečkový/accessibility mód který mění layout, (3) na iOS Safari může být jiné chování fullscreenu a drag&drop. Pokud student hlásí nefunkčnost: požádej ho aby otevřel test v Chrome. Vizuální rozdíly (barvy, fonty) mohou způsobit tmavý režim operačního systému.',
+  evidence:['responsive CSS','viewport','@media','prefers-color-scheme']},
+
+ {id:'prilohy-typy-a-limity',title:'Jaké přílohy lze nahrát a jak velké',status:'reseno',
+  keywords:['prilohy','přílohy','jake soubory','jaké soubory','pdf priloha','pdf příloha','docx priloha','obrazek priloha','obrázek příloha','audio priloha','video priloha','jak velky soubor','jak velký soubor','limit prilohy','limit přílohy','nahrat soubor','nahrát soubor'],
+  simple:'Lze nahrát: PDF, DOCX, obrázky (JPG, PNG, GIF, WebP), audio (MP3, WAV, M4A) a video (MP4). Doporučený limit: do 10 MB. Větší soubory mohou způsobit timeout.',
+  detailed:'Podporované typy: dokumenty (PDF, DOCX, TXT), obrázky (JPEG, PNG, GIF, WebP — Gemini Vision), audio (MP3, WAV, OGG, M4A, FLAC), video (MP4, MOV, AVI, MKV). Praktické limity: Gemini API má limit 20 MB na soubor, ale větší soubory vedou k timeoutu (504) nebo pomalejšímu generování. Doporučení: PDF do 5 MB, obrázky do 2 MB, audio do 10 MB, video do 15 MB. Přílohy se konvertují na base64 a posílají přímo do Gemini API — nenahrávají se na žádný server.',
+  evidence:['filePartsForGemini()','readFileAsBase64()','MIME types','MAX_FILE_SIZE']},
+
+ {id:'url-kontext',title:'Použití URL jako vstupního kontextu',status:'reseno',
+  keywords:['url','odkaz','link','webova stranka','webová stránka','z internetu','z webu','pridat url','přidat url','url kontext','url context','vlozit odkaz','vložit odkaz','nacist z webu','načíst z webu'],
+  simple:'Do pole URL kontextu vlož odkaz na webovou stránku a generátor vytvoří otázky z jejího obsahu. Funguje pro veřejně dostupné stránky. Stránky za přihlášením nebo s blokem robotů nefungují.',
+  detailed:'URL kontext pošle odkaz přímo do Gemini API — model načte obsah stránky a použije ho jako zdroj pro otázky. Funguje pro: veřejné články, Wikipedie, vzdělávací weby, online texty. Nefunguje pro: stránky za přihlášením (Google Docs, školní systémy), stránky blokující crawlery (robots.txt), PDF přímo v URL (lepší je stáhnout a nahrát jako přílohu). Tip: pokud URL nefunguje, zkopíruj text stránky do vstupního textového pole.',
+  evidence:['urlContext','state.urlContext','useUrlContext','filePartsForGemini()']},
+
+ {id:'procvicovaci-test-bez-hodnoceni',title:'Procvičovací test bez hodnocení nebo klasifikace',status:'reseno',
+  keywords:['procvicovaci test','procvičovací test','bez hodnoceni','bez hodnocení','bez znamky','bez známky','jen procvicovani','jen procvičování','nehodnotit','nehodnotím','formativni','formativní','neznamkovany','neznámkovaný'],
+  simple:'Použij procvičovací (instant) režim — student vidí hned správné odpovědi a vysvětlení. Nenastavuj časový limit nebo nastav velkorysý. Takový test slouží jako procvičování, ne klasifikace.',
+  detailed:'Pro formativní (nehodnotící) použití: (1) zvol instant (okamžitá známka) režim — student dostane zpětnou vazbu ihned, (2) nastav velkorysý časový limit nebo nulový (bez limitu), (3) nastav procvičovací přístupový kód (nebo žádný), (4) v nastavení skupin lze zapnout "zobrazit správné odpovědi". V procvičovacím režimu student vidí u každé otázky zda odpověděl správně a jaká je správná odpověď. Tento režim není vhodný pro klasifikaci — správné odpovědi jsou viditelné.',
+  evidence:['instant mode','procvičovací režim','showCorrect','group.showFeedback','okamžitá-znamka']},
+
+ {id:'maturita-pouziti',title:'Jak generátor použít pro maturitní přípravu',status:'reseno',
+  keywords:['maturita','maturitni','maturitní','priprava na maturitu','příprava na maturitu','maturitni test','maturitní test','statnice','státnice','maturitni cviceni','maturitní cvičení'],
+  simple:'Generátor je vhodný pro maturitní přípravu — lze generovat testy zaměřené na konkrétní jazykové jevy, úroveň CEFR a typy úloh podobné maturitním. Pro ostré maturitní zkoušení doporučuji přísný offline režim.',
+  detailed:'Doporučená nastavení pro maturitní přípravu: (1) jazyková úroveň B1/B2 nebo C1/C2 dle třídy, (2) typy cvičení podobné maturitě — reading comprehension, error correction, transformation-chain, fill-in-the-blank, multiple choice, (3) zadání v cílovém jazyce (instrJazyk = target), (4) přísný offline režim pro ostrá přezkoušení, procvičovací pro opakování. Vstupní text: lze vložit autentický text z maturitních zadání nebo podobné texty. Generátor vytvoří otázky přesně zaměřené na daný text.',
+  evidence:['instrJazyk','jazykova-uroven','CEFR','reading comprehension','transformation-chain']},
+
+ {id:'co-kdyz-kolega-zapomnel-pin',title:'Kolega zapomněl PIN nebo přístup — co dělat',status:'reseno',
+  keywords:['zapomenuty pin','zapomenutý pin','zapomnel pristup','zapomněl přístup','nema pristup','nemá přístup','obnovit pristup','obnovit přístup','jak zjistit pin','jak zjistit přístup','admin pin','admin přístup'],
+  simple:'PIN a přístupy jsou viditelné v generátoru v nastavení skupin nebo v teacher verifieru. Sdělíš kolegovi PIN přímo — nebo mu pošleš nový soubor s novým PINem.',
+  detailed:'PINy a přístupy nejsou nikde šifrovány — jsou viditelné v generátoru (nastavení skupin → PIN skupiny) a v teacher verifieru (sekce přístupy). Pokud kolega ztratil přístup k teacher verifieru: otevři generátor, načti příslušnou šablonu nebo nastavení, zkontroluj PINy skupin. Pokud chceš PIN změnit: uprav ho v generátoru, vygeneruj test znovu, předej kolegovi nový soubor. Admin heslo (pokud je nastaveno) je viditelné v nastavení skupin — není šifrováno.',
+  evidence:['group.pin','group.password','buildAccessManifest()','admin-sprava']},
+
+ {id:'anonymizace-gdpr-detail',title:'Anonymizace a GDPR — jak chránit data studentů',status:'reseno',
+  keywords:['anonymizace','gdpr','ochrana dat','osobni udaje','osobní údaje','jmeno studenta','jméno studenta','skryt jmena','skrýt jména','anonymni','anonymní','pravni','právní'],
+  simple:'Generátor ukládá data pouze lokálně (v prohlížeči studenta a v answers.txt). Žádná data se neodesílají na server. Pro GDPR: anonymizuj jména v hromadném vyhodnocení nebo použij přezdívky/čísla.',
+  detailed:'Tok dat: studentova data (jméno, odpovědi, výsledky) zůstávají výhradně na jeho zařízení a v souboru answers.txt který odevzdá učiteli. Nic se neodesílá na external server — generátor je offline tool. Gemini API dostává pouze obsah testu při generování (ne studentská data). Pro GDPR compliance: (1) použij čísla nebo přezdívky místo jmen, (2) v hromadném vyhodnocení lze anonymizovat zobrazená jména, (3) answers.txt soubory uchovávej zabezpečeně (ne v emailu bez šifrování). Generátor nabízí anonymizaci v sekci diferenciace.',
+  evidence:['anonymizace','buildLocalTeacherMap()','Student A1','GDPR','localStorage']},
+
+ {id:'vice-testu-na-jednom-webu',title:'Jak mít více testů na jednom GitHub Pages webu',status:'reseno',
+  keywords:['vice testu','více testů','vice souboru','více souborů','seznam testu','seznam testů','rozcestnik','rozcestník','index stranka','index stránka','jak organizovat','jak organizovat testy','repo struktura'],
+  simple:'Nahraj každý test jako samostatný HTML soubor do repozitáře. Studentovi dáš přímý odkaz na konkrétní soubor. Volitelně vytvoř index.html jako rozcestník.',
+  detailed:'Doporučená struktura repozitáře: /testy/trida-4a-kondicionaly.html, /testy/trida-3b-pasivum.html atd. Každý test má vlastní URL: username.github.io/repo/testy/soubor.html. Pro rozcestník: vytvoř index.html se seznamem odkazů (nebo použi GitHub Pages automatickou navigaci). Generátor (src/index.html) je oddělen od studentských testů — drž ho ve složce src/, studentské testy v /testy/ nebo přímo v root.',
+  evidence:['GitHub Pages','interaktivni-testy','repository structure','index.html']},
+
+ {id:'uprava-po-generovani',title:'Jak upravit otázky a odpovědi po vygenerování',status:'reseno',
+  keywords:['upravit otazky','upravit otázky','upravit odpovedi','upravit odpovědi','zmenit otazku','změnit otázku','zmenit odpoved','změnit odpověď','editor','editovat test','editovat','opravit test','opravit chybu','ai vygenerovala spatne','AI vygenerovala špatně'],
+  simple:'Po vygenerování klikni na ikonu ✏️ (editor) u konkrétního cvičení nebo otevři plný editor otázek. Lze měnit zadání, správné odpovědi, přijatelné alternativy i vysvětlení.',
+  detailed:'Editor otázek a odpovědí (openTestEditor) umožňuje: (1) upravit text otázky/zadání, (2) změnit správnou odpověď, (3) přidat přijatelné alternativy (alt_answers) pro synonyma nebo jiné tvary, (4) přidat nebo smazat položky cvičení, (5) přidat vysvětlení správné odpovědi (zobrazí se v procvičovacím režimu). Po editaci klikni na Uložit a přestavit — test se sestaví znovu s opravenými daty. Pro složité typy (highlight-evidence, ordering) je editor plně funkční.',
+  evidence:['openTestEditor()','edItemHtml()','saveEditorChanges()','alt_answers[]','Uložit a přestavit']},
+
+ {id:'pridat-alternativni-odpovedi',title:'Jak přidat přijatelné alternativy ke správné odpovědi',status:'reseno',
+  keywords:['alternativy','alternativa','alt odpoved','alt odpověď','synonymum','synonyma','jiny tvar','jiný tvar','student ma pravdu','student má pravdu','spravna ale jina','správná ale jiná','alt answers','uznane odpovedi','uznané odpovědi'],
+  simple:'V editoru otázek klikni na + Alternativa pod správnou odpovědí. Alternativy jsou uznány jako správné při hodnocení (oranžová barva v editoru). Vhodné pro synonyma, různé tvary nebo různé správné překlady.',
+  detailed:'Přijatelné alternativy (alt_answers[]) jsou další odpovědi, které se hodnotí jako plně správné — například u překladu může být správných více variant. Přidání: otevři editor (✏️), u otázky klikni na + Alternativa, napiš alternativní odpověď. Alternativy jsou viditelné v teacher verifieru (oranžová barva) a v hromadném vyhodnocení. Bodovací engine porovnává studentovu odpověď nejdříve se správnou odpovědí, pak s alternativami — pokud sedí cokoliv z toho, dostane plný počet bodů.',
+  evidence:['alt_answers[]','edAltAnswers','textScore()','alternativy']},
+
+ {id:'smazat-cviceni',title:'Jak smazat nebo přeskládat cvičení po vygenerování',status:'reseno',
+  keywords:['smazat cviceni','smazat cvičení','odstranit cviceni','odstranit cvičení','preskladat','přeskládat','zmenit poradi','změnit pořadí','presunout cviceni','přesunout cvičení','mazani cviceni','mazání cvičení'],
+  simple:'V editoru otázek lze mazat jednotlivé položky uvnitř cvičení. Celé cvičení smazat nebo přeskládat nelze přímo v editoru — nejjednodušší je upravit nastavení a vygenerovat znovu.',
+  detailed:'Co lze v editoru: mazat jednotlivé otázky/položky uvnitř cvičení (tlačítko ✕ u položky), přidat novou položku (+ Přidat položku), měnit obsah. Co nelze přímo: smazat celé cvičení nebo změnit pořadí cvičení. Workaround: (1) pokud chceš cvičení smazat, v editoru smaž všechny jeho položky — cvičení zůstane prázdné, ale při přestavení se přeskočí, nebo (2) uprav konfiguraci v generátoru a vygeneruj znovu. Přeskládání pořadí cvičení: zatím nepodporováno — plánovaná funkce.',
+  evidence:['edDelItem()','edAddItem()','openTestEditor()','saveEditorChanges()']},
+
+ {id:'ai-klic-nespravny',title:'AI vygenerovala špatnou správnou odpověď — jak opravit',status:'reseno',
+  keywords:['spatna odpoved','špatná odpověď','spatny klic','špatný klíč','ai se spleta','ai se splete','chybna odpoved','chybná odpověď','generátor spletl','nesouhlas s klicem','nesouhlas s klíčem','opravit klic','opravit klíč'],
+  simple:'Otevři editor (✏️), najdi otázku s chybnou odpovědí a přepiš ji. Pak klikni Uložit a přestavit. Spusť ověření klíče pro kontrolu ostatních otázek.',
+  detailed:'Postup opravy: (1) klikni na ✏️ (editor) u cvičení s chybou, (2) najdi konkrétní otázku, (3) přepiš pole Odpověď na správnou hodnotu, (4) volitelně přidej vysvětlení proč je tato odpověď správná, (5) klikni Uložit a přestavit. Pro prevenci: před nasazením spusť Ověření klíče — AI projde všechny uzavřené otázky a upozorní na podezřelé odpovědi. Pokud se chybné odpovědi opakují u určitého typu, zkus přesnější zadání tématu nebo konkrétnější vstupní text.',
+  evidence:['openTestEditor()','edAnswer','saveEditorChanges()','aiVerifyKey()','keyDiffsAcknowledged']},
+ {id:'typy-banked-cloze',title:'Banked cloze — doplňování ze zásoby slov',status:'reseno',
+  keywords:['banked cloze','cloze','banka slov','zásoba slov','word bank','doplnit ze seznamu','doplnit ze zásoby','vyber ze slov','vyber ze seznamu','cloze test','mezerovy test','mezerový test'],
+  simple:'Student dostane text s mezerami a seznam slov (banku). Vybírá správné slovo ze zásoby pro každou mezeru. Testuje slovní zásobu a gramatiku v kontextu.',
+  detailed:'Banked cloze zobrazí text s mezerami a pod ním nabídku slov (word bank). Student přiřadí každé slovo do správné mezery — buď přetažením nebo výběrem z dropdown menu. Každé slovo lze použít jen jednou. Klíč obsahuje pole správných odpovědí (answers[]) odpovídající pořadí mezer. Bodování: každá správná mezera = poměrná část bodů. Typ je označen jako složitý (MANUAL_SUPPORTED_TYPES) a v hybrid módu se generuje zvlášť.',
+  evidence:['banked cloze','banked-cloze','answers[]','word bank','MANUAL_SUPPORTED_TYPES','clozeScore()']},
+
+ {id:'typy-table-completion',title:'Table-completion — doplňování tabulky',status:'reseno',
+  keywords:['table completion','table-completion','tabulka','doplnit tabulku','doplňování tabulky','doplnit do tabulky','gramaticka tabulka','gramatická tabulka','sklonovani','skloňování','casovani','časování','paradigma'],
+  simple:'Student doplňuje chybějící buňky v tabulce. Vhodné pro paradigmata (časování sloves, skloňování, nepravidelné tvary). Testuje systematické gramatické znalosti.',
+  detailed:'Table-completion zobrazí tabulku s předvyplněnými záhlavími a části buněk. Student doplní prázdné buňky. Struktura: rows[] kde každý řádek má label a cells[] (buňky — část je prefilled, část je prázdná pro student). Bodování: každá správně doplněná buňka = poměrná část bodů. Typ je označen jako složitý a v hybrid módu se generuje zvlášť. Vhodné například pro: časování sloves (I go/he goes/they go), stupňování přídavných jmen, nepravidelná minulá příčestí.',
+  evidence:['table-completion','rows[]','cells[]','tableScore()','MANUAL_SUPPORTED_TYPES']},
+
+ {id:'bezpecnostni-incident',title:'Bezpečnostní incident — klíč unikl, co dělat',status:'reseno',
+  keywords:['klic unikl','klíč unikl','studenti maji klic','studenti mají klíč','podvod','opisovani','opisování','bezpecnostni incident','bezpečnostní incident','zneplatnit test','zneplatnit','odvolat test','test unikl','fotka testu','foto testu','sdilel test','sdílel test'],
+  simple:'Pokud klíč nebo test unikl: (1) okamžitě smaž soubor z GitHub Pages nebo přestaň ho distribuovat, (2) vygeneruj nový test s jiným obsahem, (3) změň PINy skupin. Starý soubor nelze vzdáleně zneplatnit.',
+  detailed:'Generátor nemá serverovou kontrolu — jakmile student má soubor, nelze ho vzdáleně deaktivovat. Možnosti při incidentu: (1) Pokud test ještě nepsal: přestaň distribuovat odkaz, nahraj na GitHub Pages nový soubor (jiný název nebo přepiš původní), vygeneruj test s jiným obsahem a novými PINy. (2) Pokud test právě probíhá: není technická možnost zastavit — pouze organizačně (svolat studenty, přerušit). (3) Po incidentu: vygeneruj novou variantu testu, použij jiný vstupní text, změň typy cvičení. Prevence: distribuuj odkaz/soubor těsně před testem, ne dny předem.',
+  evidence:['GitHub Pages','buildStudentPackage()','accessGroups[]','group.pin','offline balíček']},
+
+ {id:'access-manifest',title:'Co je access-manifest.json a jak funguje',status:'reseno',
+  keywords:['access manifest','access-manifest','manifest','pristupovy manifest','přístupový manifest','json manifest','sprava pristupu','správa přístupů','jak funguje pristup','jak funguje přístup','kdo ma pristup','kdo má přístup'],
+  simple:'Access-manifest.json je soubor který definuje kdo má přístup ke generátoru — seznam učitelů s jejich rolemi. Generuje se při nastavení přístupů a je součástí hostovaného generátoru.',
+  detailed:'Access-manifest.json obsahuje seznam autorizovaných uživatelů: každý záznam má email (nebo identifikátor), roli (admin/trainedTeacher) a volitelně jméno. Generátor při spuštění manifest načte a ověří přihlášeného uživatele. Bez manifestu nebo pro neznámého uživatele se generátor nespustí (ochrana před neoprávněným použitím). Manifest se edituje v sekci Admin správa přístupů. Role admin: plný přístup včetně správy přístupů. Role trainedTeacher: přístup ke generování testů bez správy přístupů. Soubor je hostován spolu s generátorem na GitHub Pages.',
+  evidence:['access-manifest.json','buildAccessManifest()','admin-sprava','trainedTeacher','OFFICIAL_ORIGINS']},
+
+ {id:'role-admin-teacher',title:'Role admin vs. trainedTeacher — jaký je rozdíl',status:'reseno',
+  keywords:['admin','administrator','trained teacher','trainedTeacher','role','opravneni','oprávnění','co muze admin','co může admin','rozdil roli','rozdíl rolí','kdo je admin','kdo muze','kdo může','pristupova uroven','přístupová úroveň'],
+  simple:'Admin má plný přístup — včetně správy přístupů, přidávání kolegů a změny nastavení generátoru. TrainedTeacher má přístup ke generování testů, ale nemůže spravovat přístupy ostatních.',
+  detailed:'Role admin: může generovat testy, spravovat access-manifest (přidávat/odebírat uživatele, měnit role), měnit nastavení generátoru, přistupovat ke všem funkcím. Role trainedTeacher: může generovat testy, používat všechny funkce generátoru (editor, šablony, historii, hromadné vyhodnocení), ale nemá přístup ke správě přístupů a nevidí sekci Admin. Prakticky: admin = osoba zodpovědná za nástroj (ty), trainedTeacher = kolegové kteří prošli školením a smějí nástroj používat. Doporučení: nastav sebe jako admin, kolegy jako trainedTeacher.',
+  evidence:['admin role','trainedTeacher','access-manifest.json','admin-sprava','buildAccessManifest()']},
+
+ {id:'logo-skola',title:'Jak přidat logo školy nebo název školy do generátoru',status:'reseno',
+  keywords:['logo','logo skoly','logo školy','nazev skoly','název školy','skola','škola','branding','vlastni logo','vlastní logo','pridat logo','přidat logo','upravit generátor','vzhled generátoru'],
+  simple:'Název školy a základní branding lze nastavit v konfiguraci generátoru. Logo jako obrázek vyžaduje úpravu HTML — to je nad rámec běžného nastavení.',
+  detailed:'Generátor má proměnnou pro název školy (SCHOOL_NAME nebo podobnou konstantu) která se zobrazuje v záhlaví a v exportovaných testech. Změna: otevři src/index.html v editoru, najdi konstantu SCHOOL_NAME (nebo podobnou) a uprav. Pro přidání loga: vlož <img> tag do záhlaví generátoru v HTML. Tato změna vyžaduje přímou editaci HTML souboru — není dostupná přes UI. Po změně nahraj soubor na GitHub Pages.',
+  evidence:['SCHOOL_NAME','src/index.html','GitHub Pages','pencil tlačítko']},
+
+ {id:'prirazeni-skupin',title:'Jak přiřadit studenty do skupin',status:'reseno',
+  keywords:['prirazeni skupin','přiřazení skupin','skupiny','skupina','student ve skupine','student ve skupině','jak vytvorit skupiny','jak vytvořit skupiny','kdo je v jake skupine','kdo je v jaké skupině','trida','třída','rozdelit studenty','rozdělit studenty','skupinovy pin','skupinový pin'],
+  simple:'Skupiny se nastavují v generátoru — každá má svůj název, PIN a případně podpůrná opatření. Student si sám vybere skupinu při zahájení testu zadáním správného PINu.',
+  detailed:'Skupiny v generátoru fungují jako přístupové brány: každá skupina má PIN (nebo heslo) a nastavení (podpůrná opatření, čas, anonymizace). Student zadá PIN své skupiny při zahájení testu — tím se identifikuje jako člen dané skupiny a aktivují se jeho nastavení. Přiřazení: není automatické — student musí znát PIN své skupiny. Ty jako učitel určíš PINy skupin, zapíšeš je na tabuli nebo pošleš studentům. Doporučení: pojmenuj skupiny po třídách nebo úrovních (4A, 4B, skupina-B1, skupina-B2).',
+  evidence:['accessGroups[]','group.pin','group.name','group.a11y','buildAccessManifest()','diferenciace-skupiny']},
+
+ {id:'anonymizace-v-diferenciaci',title:'Jak funguje anonymizace v diferenciovaném testu',status:'reseno',
+  keywords:['anonymizace diferenciace','anonymizace skupiny','anonymni skupina','anonymní skupina','skryt skupinu','skrýt skupinu','nevidet skupinu','nevidět skupinu','anonymni trida','anonymní třída','diferenciace anonymizace'],
+  simple:'V diferenciovaném testu lze pro každou skupinu nastavit anonymizaci zvlášť. Anonymizace v teacher verifieru nahradí jméno studenta generovaným kódem — učitel vidí výsledky, ale ne kdo je kdo.',
+  detailed:'Anonymizace funguje na dvou úrovních: (1) Globální — všichni studenti jsou anonymizováni stejně, jména se nahradí kódy (Student A1, Student A2…). (2) Skupinová — lze nastavit per-skupina, například skupina "SVP" je anonymizována zatímco ostatní ne. V teacher verifieru se anonymizovaní studenti zobrazí pod kódem; lokální mapa (uložená v localStorage) umožňuje učiteli rozklíčovat kód na jméno — ale tato mapa zůstane jen v jeho prohlížeči. Anonymizace chrání před nechtěným prozrazením jmen při sdílení obrazovky.',
+  evidence:['anonymizace','buildLocalTeacherMap()','Student A1','group.anonymize','diferenciace-skupiny','anonymizace-gdpr']}
+];
+
+const GA_NOT_ADDRESSED = 'Tento jev není v generátoru nijak výslovně řešen.';
+const GA_CHIPS = ['tisk / PDF','co dát studentům','answers.txt','hromadné vyhodnocení','zpětná vazba','diferenciace','anonymizace','split screen','API klíč','self-test','teacher verifier','fullscreen','export','chyba 503','chyba 429','chyba 400','poškozený JSON','data mimo zadání','model nenalezen','síťová chyba','hybridní generování','ordering','categorisation-board','highlight-evidence','Flash vs Lite','GitHub Pages','šablony','archivace','GDPR','maturita','editor','alternativy'];
+let gaState = { ai:null, mode:'simple', loading:false, query:'' };
+
+function gaStatusMeta(status){
+  if(status==='reseno')   return {cls:'ga-st-ok',  label:'✅ Řešeno'};
+  if(status==='castecne') return {cls:'ga-st-mid', label:'🟡 Částečně řešeno'};
+  return {cls:'ga-st-no', label:'⛔ Není výslovně řešeno'};
+}
+// Odpovídá vždy AI, ale POUZE z popisu funkcí generátoru (GENERATOR_ASSISTANT_KB).
+// Posílá se jen dotaz + popis funkcí; NIKDY zdrojový kód, API klíč ani klíč odpovědí.
+async function gaRunSearch(){
+  const ta=document.getElementById('gaQuery'); if(!ta) return;
+  const q=ta.value.trim();
+  if(!q){ gaState.ai=null; gaState.query=''; gaState.loading=false; renderGeneratorAssistantAnswer(); return; }
+  gaState.query=q;
+  if(!(typeof geminiApiKey!=='undefined' && geminiApiKey)){
+    gaState.ai=null; gaState.loading=false;
+    const box=document.getElementById('gaResult');
+    if(box) box.innerHTML='<div class="ga-card"><span class="ga-status ga-st-mid">⚠ Potřebuješ AI klíč</span>'
+      +'<p class="ga-hint">Poradce odpovídá přes AI. Zadej prosím Gemini API klíč ve žluté sekci a zkus dotaz znovu.</p></div>';
+    return;
+  }
+  gaState.ai=null; gaState.query=q; gaState.loading=true; renderGeneratorAssistantAnswer();
+  const btn=document.getElementById('gaFind'); const old=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='⏳ Hledám…'; }
+  const podklady=GENERATOR_ASSISTANT_KB.map(e=>({title:e.title,status:e.status,keywords:e.keywords||[],simple:e.simple,detailed:e.detailed,evidence:e.evidence}));
+  const prompt='Jsi nápověda k JEDNOMU konkrétnímu generátoru testů (webová aplikace pro učitele). '
+    +'Odpovídej VÝHRADNĚ z dodaných podkladů (pole "podklady" = popis skutečných funkcí tohoto generátoru). '
+    +'Nevymýšlej funkce, nic nedomýšlej, nepiš "pravděpodobně". Urči stav: '
+    +'"reseno" = jev je v podkladech jasně popsán; "castecne" = souvisí jen částečně nebo nepřímo; "ne" = v podkladech není. '
+    +'Pokud status="ne", pole simple MUSÍ být přesně: "Tento jev není v generátoru nijak výslovně řešen." '
+    +'a do detailed můžeš dodat, že generátor řeší jen chování v rámci okna/prohlížeče, pokud to z podkladů plyne. '
+    +'Odpověz česky, srozumitelně pro běžného učitele. simple = krátká netechnická odpověď (1-3 věty). '
+    +'detailed = podrobnější vysvětlení. evidence = pole názvů funkcí/konstant/sekcí z podkladů, o které se odpověď opírá (zkopíruj je z podkladů, nevymýšlej nové). '
+    +'Vrať POUZE JSON: {"status":"reseno|castecne|ne","simple":"...","detailed":"...","evidence":["..."]} bez dalšího textu. '
+    +'Dotaz učitele: '+JSON.stringify(q)+'\npodklady: '+JSON.stringify(podklady);
+  try{
+    const out=await callGeminiJSON(prompt);
+    if(ta.value.trim()!==q){
+      gaState.loading=false;
+      if(btn){ btn.disabled=false; btn.textContent=old; }
+      return;
+    }
+    const st=(out&&typeof out.status==='string')?out.status.toLowerCase().trim():'';
+    const status=(st==='reseno'||st==='castecne'||st==='ne')?st:'ne';
+    gaState.ai={
+      status,
+      simple:String((out&&out.simple)||GA_NOT_ADDRESSED),
+      detailed:String((out&&out.detailed)||''),
+      evidence:Array.isArray(out&&out.evidence)?out.evidence.map(String).filter(Boolean).slice(0,12):[]
+    };
+  }catch(err){
+    gaState.ai=null; gaState.loading=false;
+    if(btn){ btn.disabled=false; btn.textContent=old; }
+    const box=document.getElementById('gaResult');
+    if(box) box.innerHTML='<div class="ga-card"><span class="ga-status ga-st-no">Chyba AI</span>'
+      +'<p class="ga-hint">'+esc('AI se nepodařilo zavolat: '+(err&&err.message?err.message:err))+'</p></div>';
+    uiToast('AI dotaz selhal.','warn');
+    return;
+  }
+  gaState.loading=false;
+  if(btn){ btn.disabled=false; btn.textContent=old; }
+  renderGeneratorAssistantAnswer();
+}
+function renderGeneratorAssistantAnswer(){
+  const box=document.getElementById('gaResult'); if(!box) return;
+  if(gaState.loading){ box.innerHTML='<div class="ga-card"><p class="ga-hint">⏳ Hledám odpověď v popisu generátoru…</p></div>'; return; }
+  const a=gaState.ai;
+  if(!a){ box.innerHTML='<p class="ga-hint">Napiš dotaz a klikni na „Najít odpověď". Odpovídá AI, ale jen z toho, co generátor opravdu umí.</p>'; return; }
+  const currentQ=(document.getElementById('gaQuery')?.value||'').trim();
+  if(gaState.query && currentQ && currentQ!==gaState.query){
+    gaState.ai=null;
+    box.innerHTML='<p class="ga-hint">Máš rozepsaný nový dotaz. Klikni na „Najít odpověď", aby se nezobrazovala stará odpověď.</p>';
+    return;
+  }
+  const meta=gaStatusMeta(a.status);
+  const evi=(a.evidence||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
+  const body = (gaState.mode==='detailed')
+    ? '<div class="ga-lbl">Podrobná odpověď</div><p class="ga-det">'+esc(a.detailed||a.simple||'(bez podrobností)')+'</p>'
+    : '<div class="ga-lbl">Jednoduchá odpověď</div><p class="ga-simple">'+esc(a.simple)+'</p>';
+  box.innerHTML='<div class="ga-card">'
+    + '<span class="ga-status '+meta.cls+'">'+esc(meta.label)+'</span>'
+    + '<span class="ga-aimark">✨ odpověď AI z popisu generátoru</span>'
+    + body
+    + (evi?'<details class="ga-evi"'+(gaState.mode==='detailed'?' open':'')+'><summary>Opora v generátoru</summary><ul>'+evi+'</ul></details>':'')
+    + '</div>';
+}
+function gaSetMode(mode){
+  gaState.mode = (mode==='detailed') ? 'detailed' : 'simple';
+  document.querySelectorAll('.ga-mode-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-mode')===gaState.mode));
+  const currentQ=(document.getElementById('gaQuery')?.value||'').trim();
+  if(gaState.ai && gaState.query && currentQ!==gaState.query){ gaState.ai=null; gaState.loading=false; }
+  renderGeneratorAssistantAnswer();
+}
+function gaPlainAnswer(){
+  const a=gaState.ai; if(!a) return '';
+  const meta=gaStatusMeta(a.status);
+  const lines=['Stav: '+meta.label.replace(/^\S+\s/,'')];
+  if(gaState.mode==='detailed') lines.push('Podrobně: '+(a.detailed||a.simple||''));
+  else lines.push('Jednoduše: '+a.simple);
+  if(a.evidence&&a.evidence.length) lines.push('Opora v generátoru: '+a.evidence.join('; '));
+  lines.push('(Odpověď vygenerovala AI z popisu funkcí generátoru.)');
+  return lines.filter(Boolean).join('\n');
+}
+async function copyGeneratorAssistantAnswer(){
+  if(!gaState.ai){ uiToast('Nejdřív najdi odpověď.','warn'); return; }
+  const txt=gaPlainAnswer();
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(txt); }
+    else { const tt=document.createElement('textarea'); tt.value=txt; document.body.appendChild(tt); tt.select(); document.execCommand('copy'); tt.remove(); }
+    uiToast('Odpověď zkopírována.');
+  }catch(_){ uiToast('Kopírování se nepodařilo — označ text ručně.','warn'); }
+}
+function gaClear(){
+  const ta=document.getElementById('gaQuery'); if(ta) ta.value='';
+  gaState.ai=null; gaState.query=''; gaState.loading=false;
+  renderGeneratorAssistantAnswer();
+  if(ta) ta.focus();
+}
+function gaOnQueryInput(){
+  const ta=document.getElementById('gaQuery');
+  const current=(ta&&ta.value?ta.value:'').trim();
+  if(gaState.ai && current!==gaState.query){
+    gaState.ai=null; gaState.loading=false;
+    renderGeneratorAssistantAnswer();
+  }
+}
+
+function closeGeneratorAssistant(){
+  const b=document.getElementById('gaBackdrop'); if(b) b.remove();
+  document.removeEventListener('keydown', gaKeyHandler);
+}
+function gaKeyHandler(e){ if(e.key==='Escape'){ if(document.activeElement && document.activeElement.id==='gaQuery'){ e.preventDefault(); return; } closeGeneratorAssistant(); } }
+function openGeneratorAssistant(){
+  if(document.getElementById('gaBackdrop')) return;
+  gaState.ai=null; gaState.query=''; gaState.loading=false;
+  const chips=GA_CHIPS.map(c=>'<button type="button" class="ga-chip" data-q="'+esc(c)+'">'+esc(c)+'</button>').join('');
+  const bd=document.createElement('div');
+  bd.id='gaBackdrop'; bd.className='ui-modal-backdrop'; bd.setAttribute('role','dialog'); bd.setAttribute('aria-modal','true'); bd.setAttribute('aria-label','Poradce ke generátoru');
+  bd.innerHTML='<div class="ui-modal-box ga-box">'
+    + '<div class="ga-head"><span>💬 Poradce ke generátoru</span><button type="button" class="ga-x" id="gaClose" aria-label="Zavřít">✕</button></div>'
+    + '<div class="ga-desc">Zeptej se na cokoliv o funkcích, bezpečnosti nebo ovládání generátoru. Odpovídá AI, ale drží se jen toho, co generátor opravdu umí — když to v něm není, řekne to. (Vyžaduje Gemini klíč ve žluté sekci.)</div>'
+    + '<textarea id="gaQuery" class="ga-input" rows="2" placeholder="Např. „Jak je řešen split screen?" nebo „Kde se ukládá API klíč?""></textarea>'
+    + '<div class="ga-controls"><div class="ga-mode" role="group" aria-label="Úroveň odpovědi">'
+      + '<button type="button" class="ga-mode-btn'+(gaState.mode==='simple'?' active':'')+'" data-mode="simple">Jednoduše</button>'
+      + '<button type="button" class="ga-mode-btn'+(gaState.mode==='detailed'?' active':'')+'" data-mode="detailed">Podrobně</button></div>'
+      + '<button type="button" class="ga-find" id="gaFind">🔎 Najít odpověď</button></div>'
+    + '<div class="req-note">Poradce odpovídá přes AI — každý dotaz = 1 požadavek z denní kvóty (RPD).</div>'
+    + '<div class="ga-chips" id="gaChips">'+chips+'</div>'
+    + '<div class="ga-result" id="gaResult" aria-live="polite"><p class="ga-hint">Napiš dotaz a klikni na „Najít odpověď".</p></div>'
+    + '<div class="ga-actions">'
+      + '<button type="button" class="ga-act" id="gaCopy">📋 Zkopírovat odpověď</button>'
+      + '<button type="button" class="ga-act" id="gaClearBtn">🧹 Vyčistit</button></div>'
+    + '<div class="ga-foot">Odpovídá AI z popisu funkcí generátoru — když daná věc v generátoru není, řekne to. Posílá jen tvůj dotaz a popis funkcí; NEodesílá zdrojový kód, API klíč ani klíč odpovědí. Dotazy se nikam neukládají.</div>'
+    + '</div>';
+  document.body.appendChild(bd);
+  // Poradce se zavírá jen křížkem nebo klávesou Escape mimo pole dotazu.
+  // Kliknutí mimo okno se ignoruje, aby při mazání/psaní omylem nevyskočil ven.
+  document.getElementById('gaClose').addEventListener('click',closeGeneratorAssistant);
+  document.getElementById('gaFind').addEventListener('click',gaRunSearch);
+  document.getElementById('gaCopy').addEventListener('click',copyGeneratorAssistantAnswer);
+  document.getElementById('gaClearBtn').addEventListener('click',gaClear);
+  bd.querySelectorAll('.ga-mode-btn').forEach(b=>b.addEventListener('click',()=>gaSetMode(b.getAttribute('data-mode'))));
+  bd.querySelectorAll('.ga-chip').forEach(b=>b.addEventListener('click',()=>{ const ta=document.getElementById('gaQuery'); if(ta) ta.value=b.getAttribute('data-q'); gaRunSearch(); }));
+  const ta=document.getElementById('gaQuery');
+  ta.addEventListener('input',gaOnQueryInput);
+  ta.addEventListener('keydown',e=>{ if((e.key==='Enter'&&(e.ctrlKey||e.metaKey))){ e.preventDefault(); gaRunSearch(); } });
+  document.addEventListener('keydown', gaKeyHandler);
+  setTimeout(()=>ta.focus(),0);
+  try{ if(!gaState._verified){ gaState._verified=true; verifyGeneratorAssistantKB(); } }catch(_){}
+}
+// Dev kontrola driftu: ověří, že kódové „opory" (názvy funkcí foo(), KONSTANTY) z KB skutečně
+// existují v aktuálním dokumentu. Jen do konzole; nehlásí kolegům. Volej window.verifyGeneratorAssistantKB().
+function verifyGeneratorAssistantKB(){
+  const src=document.documentElement ? document.documentElement.outerHTML : '';
+  const miss=[];
+  GENERATOR_ASSISTANT_KB.forEach(e=>{
+    (e.evidence||[]).forEach(ev=>{
+      const syms=(String(ev).match(/[A-Za-z_][\w]*\(\)|[A-Z][A-Z0-9_]{3,}/g)||[]);
+      syms.forEach(sym=>{ const bare=sym.replace(/\(\)$/,''); if(src.indexOf(bare)<0) miss.push(e.id+' → '+sym); });
+    });
+  });
+  if(miss.length) console.warn('[Generator Assistant] Opory bez nálezu v kódu (zkontroluj KB):', miss);
+  else console.info('[Generator Assistant] KB integrita OK: všechny kódové opory nalezeny.');
+  return miss;
+}
+if(typeof window!=='undefined'){ window.verifyGeneratorAssistantKB=verifyGeneratorAssistantKB; window.openGeneratorAssistant=openGeneratorAssistant; }
+/* konec Generator Assistant */
+
+function isSimpleMode(){ return (state.appMode || 'simple') !== 'advanced'; }
+function randomChunk(chars){
+  if (!(window.crypto && window.crypto.getRandomValues))
+    throw new Error('WebCrypto není dostupné — generování bezpečného kódu/PINu selhalo.');
+  const arr = new Uint32Array(chars);
+  window.crypto.getRandomValues(arr);
+  return Array.from(arr).map(n => (n % 36).toString(36).toUpperCase()).join('');
+}
+function fillSimpleSecrets(){
+  if (!trim('ucitelPin')) setVal('ucitelPin', 'PIN-' + randomChunk(8));   // ≥8 znaků, silné
+  if (!trim('heslo')) setVal('heslo', 'LOCK-' + randomChunk(8) + '-' + randomChunk(4)); // ≥12 znaků
+  validate(); saveSnapshot();
+  uiToast('Vygenerováno. PIN a odemykací heslo si před použitím testu poznamenej. Do historie ani šablon se neukládají.', 'warn', 5200);
+}
+function applySimpleDefaults(){
+  if (!isSimpleMode()) return;
+  state.testMode = 'bezny';
+  state.layout = state.layout || 'tabs';
+  state.resultMode = 'instant';
+  state.odevzdavani = 'B';
+  state.randomizace = 'NE';
+  state.gradeTyp = 'skola';
+  state.exerciseDetail = false;
+  state.zolicek = 'NE';
+  state.diferencovany = 'NE';
+  state.anonymizace = 'ANO';
+  state.overeni = 'NE';
+  state.identityMode = 'name';
+  state.fuzzyTolerance = 'off';
+  state.screenGuard = false;
+  if (!state.body || state.body <= 0) { state.body = 30; setVal('bodyCustom', 30); }
+  // Aktivní jednoduchá šablona přebíjí tvrdé defaulty svými zamčenými hodnotami.
+  // Tím může i v jednoduchém módu vzniknout např. offline/přísný test — volby jsou
+  // ale schované, takže je učitel nevidí ani nemění (řídí je výhradně šablona).
+  applySimpleTemplateLocks();
+}
+// Aplikuje zamčené hodnoty aktivní jednoduché šablony na state. Volá se z
+// applySimpleDefaults (po defaultech). NEVOLÁ enforceModeConstraints — to běží
+// buď jako volající (applySimpleDefaults je z něj volán), nebo navazuje samostatně;
+// zavolání zde by způsobilo nekonečnou rekurzi.
+function applySimpleTemplateLocks(){
+  // Drží zamčené hodnoty šablony — voláno opakovaně z applySimpleDefaults.
+  // Účinné jen v jednoduchém módu (v pokročilém se hodnoty nedrží, jsou volné).
+  if (!isSimpleMode()) return;
+  applyTemplateValues(state.simpleTemplate || '');
+}
+// Jednorázově zapíše hodnoty šablony do state. Funguje v OBOU režimech.
+// V jednoduchém se pak volby skryjí, v pokročilém zůstanou viditelné a editovatelné.
+function applyTemplateValues(id){
+  const t = simpleTemplateById(id || '');
+  if (!t) return;
+  const L = t.locks || {};
+  // screenGuard je „opt-in" prvek šablony. Před aplikací ho vynulujeme, aby
+  // nezůstal viset z předchozí šablony — pokud ho nová šablona chce, locks ho zapne.
+  state.screenGuard = false;
+  for (const k in L){ if (Object.prototype.hasOwnProperty.call(L,k)) state[k] = L[k]; }
+  ensureUnlockPasswordForGuard();
+}
+// Hlídání obrazovky potřebuje odemykací heslo učitele — bez něj by se zámek
+// neaktivoval (jen by se zaznamenalo varování). Když je guard zapnutý a heslo
+// prázdné, vygenerujeme čitelné heslo automaticky, ať guard funguje i v jednoduchém
+// režimu bez nutnosti cokoli zadávat. Heslo se objeví v pokynech pro učitele.
+function ensureUnlockPasswordForGuard(){
+  if (!state.screenGuard) return;
+  try {
+    if (!trim('heslo')) {
+      setVal('heslo', 'LOCK-' + randomChunk(8) + '-' + randomChunk(4));
+    }
+  } catch(_){}
+}
+function setAppMode(mode){
+  if (mode === 'advanced') {
+    state.appMode = 'advanced';
+    state.workPreset = 'advanced';
+    // Šablony jsou sjednocené napříč režimy — aktivní šablona zůstává i v pokročilém,
+    // kde slouží jako odrazový můstek (předvyplní režim/hodnocení, ale volby jsou
+    // viditelné a editovatelné). Nemažeme ji.
+    if (!state.testMode) state.testMode = 'bezny';
+    if (!state.resultMode) state.resultMode = 'instant';
+    if (state.splitGenerate === undefined) state.splitGenerate = false;
+    if (Array.isArray(state.exerciseConfig)) state.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+    if (!state.layout) state.layout = 'tabs';
+    if (!state.odevzdavani) state.odevzdavani = 'B';
+  } else {
+    state.appMode = 'simple';
+    state.workPreset = 'quick';
+  }
+  enforceModeConstraints();
+  applyVisualState(); validate(); saveSnapshot();
+}
+

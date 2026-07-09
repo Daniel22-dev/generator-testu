@@ -1,10 +1,14 @@
-import fs   from "node:fs";
+// scripts/build.mjs — v2 (modulární skládání)
+// Složí dist/index.html ze src/shell.html + src/styles.css + src/js/*.js.
+// Pořadí JS modulů = abecední řazení názvů souborů (číselné prefixy 01–16 → hlavní
+// blok, 50 → CS modul, 60 → PWA). Chování je identické s původním jedním souborem —
+// jde o čistou konkatenaci, žádné ES moduly, žádné přepisy.
+import fs from "node:fs";
 import path from "node:path";
 
-const SRC  = path.resolve("src/index.html");
 const DIST_DIR = path.resolve("dist");
 const DIST = path.join(DIST_DIR, "index.html");
-const MANIFEST_SRC  = path.resolve("src/access-manifest.json");
+const MANIFEST_SRC = path.resolve("src/access-manifest.json");
 const MANIFEST_DIST = path.join(DIST_DIR, "access-manifest.json");
 const PUBLIC_DIR = path.resolve("public");
 
@@ -21,36 +25,37 @@ function copyDir(src, dest) {
 
 fs.mkdirSync(DIST_DIR, { recursive: true });
 
-if (!fs.existsSync(SRC)) {
-  console.error("❌  Chyba: src/index.html neexistuje.");
-  process.exit(1);
-}
+const shell = fs.readFileSync("src/shell.html", "utf8");
+const styles = fs.readFileSync("src/styles.css", "utf8");
 
-const source = fs.readFileSync(SRC, "utf8");
+const jsDir = "src/js";
+const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith(".js")).sort();
+const mainParts = jsFiles.filter(f => !f.startsWith("50-") && !f.startsWith("60-"));
+const jsMain = mainParts.map(f => fs.readFileSync(path.join(jsDir, f), "utf8")).join("");
+const jsCs  = fs.readFileSync(path.join(jsDir, "50-cs-module.js"), "utf8");
+const jsPwa = fs.readFileSync(path.join(jsDir, "60-pwa.js"), "utf8");
+
+// replace() s funkcí kvůli $-sekvencím v kódu (jinak by "$&" apod. rozbily obsah)
+let out = shell
+  .replace("{{STYLES}}", () => styles)
+  .replace("{{JS_MAIN}}", () => jsMain)
+  .replace("{{JS_CS}}", () => jsCs)
+  .replace("{{JS_PWA}}", () => jsPwa);
 
 const buildTime = new Date().toISOString();
-const output = source.replace(
-  /(<html[^>]*>)/i,
-  `$1
-<!-- BUILD: ${buildTime} -->`
-);
+out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
 
-fs.writeFileSync(DIST, output, "utf8");
+fs.writeFileSync(DIST, out, "utf8");
 
 if (fs.existsSync(MANIFEST_SRC)) {
   fs.copyFileSync(MANIFEST_SRC, MANIFEST_DIST);
   console.log("✅  access-manifest.json zkopírován do dist/");
 }
-
 if (fs.existsSync(PUBLIC_DIR)) {
   copyDir(PUBLIC_DIR, DIST_DIR);
   console.log("✅  PWA soubory z public/ zkopírovány do dist/");
 }
 
-const srcKB  = (fs.statSync(SRC).size  / 1024).toFixed(1);
-const distKB = (fs.statSync(DIST).size / 1024).toFixed(1);
-
-console.log("✅  Build dokončen");
-console.log(`   src/index.html  →  ${srcKB} kB`);
-console.log(`   dist/index.html →  ${distKB} kB`);
+console.log("✅  Build dokončen z", mainParts.length + 2, "JS modulů");
+console.log(`   dist/index.html →  ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
 console.log(`   Čas: ${buildTime}`);
