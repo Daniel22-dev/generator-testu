@@ -96,6 +96,15 @@ if (fs.existsSync(PUBLIC_DIR)) {
   console.log("✅  PWA soubory z public/ zkopírovány do dist/");
 }
 
+const studioManifestTemplate = path.resolve("studio/app-manifest.template.json");
+if (fs.existsSync(studioManifestTemplate)) {
+  const studioManifest = fs.readFileSync(studioManifestTemplate, "utf8")
+    .replaceAll("__APP_VERSION__", appVersion)
+    .replaceAll("__BUILD_TIME__", buildTime);
+  fs.writeFileSync(path.join(DIST_DIR, "studio-manifest.json"), studioManifest, "utf8");
+  console.log("✅  studio-manifest.json vytvořen");
+}
+
 console.log("✅  Build dokončen z", mainParts.length + 2, "JS modulů");
 console.log(`   dist/index.html →  ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
 console.log(`   Čas: ${buildTime}`);

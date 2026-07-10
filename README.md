@@ -121,3 +121,9 @@ Kontrola `npm run check:versions` zabrání nasazení, pokud se verze rozcházej
 ## Omezení rozsahu
 
 Verze 7.0.4 neřeší školní server, centrální identitu, databázi ani serverovou úschovu API klíče. Přístupová brána v klientském kódu je organizační opatření, nikoli neobejitelná autentizace. Rozpracovaný studentský pokus se po zavření nebo obnovení stránky plně neobnoví. Tyto body musí být zohledněny v provozních pravidlech a později posouzeny se školním IT.
+
+## Napojení na AI Studio GHRAB
+
+Build vytváří veřejný soubor `dist/studio-manifest.json`. AI Studio z něj automaticky načítá aktuální verzi, stav, adresu a metadata aplikace.
+
+Po úspěšném nasazení workflow volitelně odešle událost do repozitáře `AI-Studio-GHRAB`. Pro okamžitou synchronizaci nastav repository secret `AI_STUDIO_DISPATCH_TOKEN`. Bez secretu Studio změnu zachytí při pravidelné hodinové kontrole.
