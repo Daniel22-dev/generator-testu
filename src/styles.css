@@ -1673,3 +1673,6 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 .acc-static-link:hover,.acc-static-link:focus-visible{background:rgba(255,255,255,.1);outline:2px solid #f59e0b;outline-offset:2px}
 
 .acc-static-version{text-align:center;margin-top:10px;color:var(--t4);font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace}
+
+/* AI Studio GHRAB handoff */
+.studio-import-banner{margin:12px auto 4px;max-width:1180px;border:1px solid rgba(80,232,255,.55);background:linear-gradient(135deg,rgba(4,31,48,.96),rgba(10,18,40,.96));color:#e8fbff;border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 36px rgba(0,0,0,.24),0 0 28px rgba(80,232,255,.09)}.studio-import-banner span{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.studio-import-banner small{opacity:.76;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.studio-import-banner a{color:#7eefff;font-weight:800;text-decoration:none}.studio-import-banner button{border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer}@media(max-width:720px){.studio-import-banner{margin:8px;align-items:flex-start;flex-wrap:wrap}.studio-import-banner a{width:100%}}

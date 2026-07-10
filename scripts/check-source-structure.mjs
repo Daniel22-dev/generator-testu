@@ -18,7 +18,7 @@ const requiredOrder = [
   '14c-test-css.js',
   '14d-generator-release-guides.js',
 ];
-const forbidden = ['13-secure-export.js', '14-test-html-builders.js'];
+const migrated = ['13-secure-export.js', '14-test-html-builders.js'];
 const maxSplitSize = 90 * 1024;
 
 let failed = 0;
@@ -28,8 +28,11 @@ function pass(msg){ console.log('✅  ' + msg); }
 if (!fs.existsSync(jsDir)) fail('Chybi slozka src/js.');
 const files = fs.existsSync(jsDir) ? fs.readdirSync(jsDir).filter(f => f.endsWith('.js')).sort() : [];
 
-for (const name of forbidden) {
-  if (files.includes(name)) fail(`Puvodni velky modul ${name} je porad ve zdroji.`);
+for (const name of migrated) {
+  if (!files.includes(name)) continue;
+  const text = fs.readFileSync(path.join(jsDir, name), 'utf8');
+  const size = fs.statSync(path.join(jsDir, name)).size;
+  if (!text.includes('MIGRATION_TOMBSTONE') || size > 2048) fail(`Puvodni velky modul ${name} je porad ve zdroji.`);
 }
 
 let lastIndex = -1;
@@ -43,6 +46,6 @@ for (const name of requiredOrder) {
 }
 
 if (!failed) {
-  pass(`Zdrojova struktura OK: ${requiredOrder.length} split modulu, bez puvodnich monolitu.`);
+  pass(`Zdrojova struktura OK: ${requiredOrder.length} split modulu, puvodni nazvy pouze jako migracni tombstones.`);
 }
 process.exit(failed ? 1 : 0);

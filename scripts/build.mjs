@@ -61,7 +61,8 @@ const styles = fs.readFileSync("src/styles.css", "utf8");
 const appVersion = String(readJson("package.json").version || "").trim();
 
 const jsDir = "src/js";
-const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith(".js")).sort();
+const migrationTombstones = new Set(['13-secure-export.js','14-test-html-builders.js']);
+const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith(".js") && !migrationTombstones.has(f)).sort();
 const mainParts = jsFiles.filter(f => !f.startsWith("50-") && !f.startsWith("60-"));
 function inlineScriptTag(file) {
   const code = fs.readFileSync(path.join(jsDir, file), "utf8");
@@ -101,6 +102,12 @@ if (fs.existsSync(studioManifestTemplate)) {
   const studioManifest = fs.readFileSync(studioManifestTemplate, "utf8")
     .replaceAll("__APP_VERSION__", appVersion)
     .replaceAll("__BUILD_TIME__", buildTime);
+  const parsedStudioManifest = JSON.parse(studioManifest);
+  const statusText = `${parsedStudioManifest.status?.cs || ''} ${parsedStudioManifest.status?.en || ''}`.toLowerCase();
+  if (/produk|production/.test(statusText)) {
+    console.error("❌ Manifest pro AI Studio nesmí před schválením školy deklarovat produkční provoz.");
+    process.exit(1);
+  }
   fs.writeFileSync(path.join(DIST_DIR, "studio-manifest.json"), studioManifest, "utf8");
   console.log("✅  studio-manifest.json vytvořen");
 }
