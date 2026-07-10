@@ -728,13 +728,16 @@ const SecretScanner = (function(){
   // 6 povinných scénářů (ze specifikace) + 8 regresních. Volej po každé změně pravidel.
   // V prohlížeči: runScannerTests() nebo SecretScanner.runTests().
   function runTests(){
+    // Testovací hodnoty se skládají až za běhu, aby veřejný repozitář neobsahoval řetězce podobné skutečným tajným klíčům.
+    const fakeInlineCredential = ['not','a','real','key','1234567890'].join('-');
+    const fakeGithubToken = ['gh','p_','AbCdEfGhIjKlMnOpQrStUvWxYz012345'].join('');
     const cases = [
       // Povinné
       {n:'1: student smí obsahovat teacher_verifier.html (false-positive guard)',target:'student',fn:'student_test.html',c:'<div>Odpovědi jsou v teacher_verifier.html</div>',expect:true},
       {n:'2: student nesmí obsahovat PRIVATE_KEY',target:'student',fn:'student_test.html',c:'const PRIVATE_KEY={"kty":"RSA","d":"abc"};',expect:false},
       {n:'3: student nesmí obsahovat VARIANTS_FULL',target:'student',fn:'student_test.html',c:'const VARIANTS_FULL=[{"correct":"a"}];',expect:false},
       {n:'4: teacher verifier smí obsahovat privátní data (PRIVATE_KEY + VARIANTS_FULL)',target:'teacher',fn:'teacher_verifier.html',c:'<h1>Učitelský verifier</h1>const PRIVATE_KEY={"kty":"RSA","d":"x"};const VARIANTS_FULL=[];',expect:true},
-      {n:'5: public export nesmí obsahovat inline API klíč',target:'public',fn:'student_test.html',c:'const cfg={apiKey:"AIzaSyFakeTestKey12345678901234"};',expect:false},
+      {n:'5: public export nesmí obsahovat inline API klíč',target:'public',fn:'student_test.html',c:'const cfg={apiKey:"'+fakeInlineCredential+'"};',expect:false},
       {n:'6: "What does alert() do?" nesmí být blokováno',target:'student',fn:'student_test.html',c:'<div class="q">What does alert() do? Shows a native dialog.</div>',expect:true},
       // Regresní
       {n:'R1: PUBLIC_KEY (šifrovací key_ops:encrypt) ve studentském souboru projde',target:'student',fn:'student_test.html',c:'const PUBLIC_KEY={key_ops:["encrypt"],n:"abc"};',expect:true},
@@ -744,9 +747,9 @@ const SecretScanner = (function(){
       {n:'R5: student-instant smí mít answer key (záměrné chování)',target:'student-instant',fn:'instant.html',c:'{"correct":"a","explanation":"správně","points_total":2}',expect:true},
       {n:'R6: student-instant nesmí mít PRIVATE_KEY',target:'student-instant',fn:'instant.html',c:'const PRIVATE_KEY={"kty":"RSA","d":"secret"};',expect:false},
       {n:'R7: teacher smí mít PEM klíč (záměrná výjimka na řádku s target===teacher)',target:'teacher',fn:'teacher_verifier.html',c:'-----BEGIN RSA PRIVATE KEY-----\nabc\n-----END RSA PRIVATE KEY-----',expect:true},
-      {n:'R8: GitHub token blokuje ve studentském souboru',target:'student',fn:'student_test.html',c:'const t="ghp_AbCdEfGhIjKlMnOpQrStUvWxYz012345";',expect:false},
+      {n:'R8: GitHub token blokuje ve studentském souboru',target:'student',fn:'student_test.html',c:'const t="'+fakeGithubToken+'";',expect:false},
       {n:'R9: běžná věta z textu (secret: s mezerami) studentský soubor NEblokuje',target:'student',fn:'student_test.html',c:'<div class="src">The agent revealed the secret: "the meeting is tonight" and left.</div>',expect:true},
-      {n:'R10: reálný inline klíč (apiKey bez mezer, s číslicí) blokuje',target:'student',fn:'student_test.html',c:'const cfg={apiKey:"AIzaSyFakeTestKey12345678901234"};',expect:false},
+      {n:'R10: reálný inline klíč (apiKey bez mezer, s číslicí) blokuje',target:'student',fn:'student_test.html',c:'const cfg={apiKey:"'+fakeInlineCredential+'"};',expect:false},
     ];
     var pass=0, fail=0;
     var results = cases.map(function(tc){

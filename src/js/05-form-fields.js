@@ -428,7 +428,7 @@ function renderStudentTags(gid) {
 }
 
 function buildTeacherMappingText() {
-  if (state.diferencovany !== 'ANO' || state.anonymizace !== 'ANO') return '';
+  if (state.diferencovany !== 'ANO') return '';
   const lines = [];
   state.skupiny.forEach((g, gi) => {
     const label = String.fromCharCode(65 + gi);
@@ -445,7 +445,7 @@ function renderTeacherMapping() {
   const text = $('teacherMappingText');
   if (!box || !text) return;
   const mapping = buildTeacherMappingText();
-  const show = state.diferencovany === 'ANO' && state.anonymizace === 'ANO' && mapping.length > 0;
+  const show = state.diferencovany === 'ANO' && mapping.length > 0;
   box.classList.toggle('hidden', !show);
   text.textContent = mapping;
 }
@@ -541,6 +541,17 @@ function initTooltips() {
 
 // ═══ Validation ═══════════════════════════════════════════════════════════════
 function onInput() { validate(); renderSourceMeters(); saveSnapshot(); }
+function onCustomTypeInput(){
+  const custom = trim('vlastniTyp');
+  const distinct = new Set(sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])])).size;
+  if (distinct <= 10 && distinct > (state.pocet||0)) {
+    state.pocet = distinct;
+    syncExerciseConfig();
+    renderSmartTimeTip();
+  }
+  onInput();
+}
+
 
 // Blokuje notoricky slabá tajemství. Cílem není dokonalý slovníkový test, ale
 // odchytit nejčastější chyby (sekvence, opakování, jméno učitele, „heslo/test").
@@ -557,17 +568,67 @@ function isWeakSecret(s){
   return false;
 }
 
+function workflowTypeStats(){
+  const custom=trim('vlastniTyp');
+  const types=sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])]);
+  return {types, distinct:new Set(types).size};
+}
+function hasListeningSource(){
+  if(!usesListeningComprehension()) return true;
+  const hasFile=(typeof fileObjects!=='undefined'&&Array.isArray(fileObjects)&&fileObjects.length>0)
+    || (Array.isArray(state.fileNames)&&state.fileNames.length>0);
+  const hasUrl=Array.isArray(state.urls)&&state.urls.some(u=>String(u||'').trim());
+  return !!(hasFile||hasUrl||trim('listeningTranscript'));
+}
+function gradeScaleOverlaps(scale){
+  if(!Array.isArray(scale)||scale.length<2) return [];
+  const s=scale.slice().sort((a,b)=>a.min-b.min), out=[];
+  for(let i=1;i<s.length;i++) if(s[i].min<=s[i-1].max) out.push(Math.max(s[i].min,s[i-1].min)+'–'+Math.min(s[i].max,s[i-1].max)+' %');
+  return Array.from(new Set(out));
+}
+function workflowGroupValidation(){
+  if(state.diferencovany!=='ANO') return {ok:true,messages:[]};
+  const msgs=[], seen=new Map(), all=[];
+  (state.skupiny||[]).forEach((g,gi)=>{
+    (Array.isArray(g.studenti)?g.studenti:[]).forEach(raw=>{
+      const n=normalizeStudentIdentity(raw);
+      if(!n) return;
+      all.push(n);
+      if(seen.has(n)) msgs.push('Identifikátor „'+plainText(raw)+'“ je ve více skupinách nebo vícekrát. Každý student/kód smí být právě v jedné skupině.');
+      else seen.set(n,gi);
+    });
+  });
+  if((state.identityMode||'name')==='oneTimeCode'){
+    const rosterCodes=(typeof rosterEntries!=='undefined'&&Array.isArray(rosterEntries)?rosterEntries:[]).map(e=>normalizeStudentIdentity(e.code)).filter(Boolean);
+    const rosterSet=new Set(rosterCodes), groupSet=new Set(all);
+    const unknown=Array.from(groupSet).filter(x=>!rosterSet.has(x));
+    const missing=Array.from(rosterSet).filter(x=>!groupSet.has(x));
+    if(unknown.length) msgs.push('Ve skupinách jsou položky, které nejsou mezi vygenerovanými jednorázovými kódy: '+unknown.slice(0,5).join(', ')+(unknown.length>5?'…':'')+'.');
+    if(missing.length) msgs.push('Některé vygenerované kódy nejsou přiřazeny do žádné skupiny: '+missing.slice(0,5).join(', ')+(missing.length>5?'…':'')+'.');
+  }
+  return {ok:msgs.length===0,messages:Array.from(new Set(msgs))};
+}
+
 function validate() {
-  applySimpleDefaults();
+  enforceModeConstraints();
   const jazykOk = !!state.jazyk;
   $('next0').disabled = !(trim('nazev') && trim('proKoho') && jazykOk && trim('latka'));
 
   // When exerciseDetail is on, types live in exerciseConfig — no global selection needed
   const customTypeDisabled = isDisabledExerciseType(trim('vlastniTyp'));
+  const customTypeUnsupported = !!trim('vlastniTyp') && !isAllowedExerciseType(normalizeType(trim('vlastniTyp')));
+  const typeStats=workflowTypeStats();
   const hasTyp = state.exerciseDetail
     ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => isAllowedExerciseType(normalizeType(ex.typ || 'multiple choice')) && (ex.pocetOtazek || 0) > 0 && (ex.body || 0) > 0)
-    : ((sanitizeExerciseTypeList(state.typyCviceni).length > 0 || (trim('vlastniTyp') && !customTypeDisabled)));
-  $('next1').disabled = !(hasTyp && state.uroven.length > 0);
+    : ((sanitizeExerciseTypeList(state.typyCviceni).length > 0 || (trim('vlastniTyp') && !customTypeDisabled && !customTypeUnsupported)) && typeStats.distinct <= 10 && typeStats.distinct <= state.pocet);
+  const listeningOk=hasListeningSource();
+  $('next1').disabled = !(hasTyp && state.uroven.length > 0 && listeningOk);
+  const hint1=$('validHint1'), step1Msg=[];
+  if(customTypeUnsupported) step1Msg.push('Vlastní typ cvičení není technicky podporován. Použij některý z nabízených typů nebo jeho běžný synonymní název (např. gap fill).');
+  if(!state.exerciseDetail && typeStats.distinct>10) step1Msg.push('Vybráno je '+typeStats.distinct+' různých typů, ale jeden test podporuje nejvýše 10.');
+  else if(!state.exerciseDetail && typeStats.distinct>state.pocet) step1Msg.push('Počet cvičení musí být alespoň stejný jako počet různých typů ('+typeStats.distinct+').');
+  if(!listeningOk) step1Msg.push('Listening comprehension vyžaduje zdroj: audio/video soubor, URL nebo transkript. Bez zdroje by student neměl co poslouchat.');
+  if(hint1) hint1.textContent=step1Msg.join(' ');
 
   const hasBody = state.exerciseDetail
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0) > 0
@@ -579,8 +640,12 @@ function validate() {
   const curScaleText = trim('vlastniSkala');
   const aiScaleValid = !!(state.aiGradeScale && state.aiGradeScale.length && state.aiGradeRaw === curScaleText);
   if (state.aiGradeScale && state.aiGradeRaw !== curScaleText) { state.aiGradeScale = null; state.aiGradeRaw = ''; const pv=$('aiScalePreview'); if(pv){pv.classList.add('hidden');pv.innerHTML='';} }
-  const localScaleValid = isCustomGradeScaleValid(curScaleText, effTotalBody);
-  const gradeOk = state.gradeTyp !== 'vlastni' || localScaleValid || aiScaleValid;
+  const localParsedScale=parseCustomGradeScale(curScaleText, effTotalBody);
+  const localScaleValid = localParsedScale.length>0;
+  const parsedForValidation=aiScaleValid?state.aiGradeScale:localParsedScale;
+  const scaleGaps=gradeScaleGaps(parsedForValidation);
+  const scaleOverlaps=gradeScaleOverlaps(parsedForValidation);
+  const gradeOk = state.gradeTyp !== 'vlastni' || ((localScaleValid || aiScaleValid) && scaleGaps.length===0 && scaleOverlaps.length===0);
   $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk);
   const skala = $('vlastniSkala');
   const skalaErr = $('vlastniSkalaErr');
@@ -594,13 +659,20 @@ function validate() {
       else { skalaErr.style.color = '#fcd34d'; skalaErr.style.background = 'rgba(245,158,11,.08)'; skalaErr.style.borderColor = 'rgba(245,158,11,.4)'; }
     };
     if (skalaBad) {
-      setMsg(curScaleText
-        ? '⚠️ Stupnici se nepodařilo přečíst. Napiš každé pásmo na vlastní řádek nebo je odděl středníkem / lomítkem / čárkou (např. „✓✓ = 45-50 b“, „✓ = 40-44 b“, „mínus = 0-29 b“), nebo ji popiš slovně a klikni na „📖 Přečíst stupnici pomocí AI“ níže.'
-        : '⚠️ Zadej vlastní stupnici, jinak nelze pokračovat. Můžeš ji napsat strukturovaně („✓✓ = 45-50 b“) nebo slovně a nechat ji přečíst AI.', 'err');
+      if (!curScaleText) {
+        setMsg('⚠️ Zadej vlastní stupnici, jinak nelze pokračovat. Můžeš ji napsat strukturovaně („✓✓ = 45-50 b“) nebo slovně a nechat ji přečíst AI.', 'err');
+      } else if (!parsedForValidation.length) {
+        setMsg('⚠️ Stupnici se nepodařilo přečíst. Napiš každé pásmo na vlastní řádek nebo je odděl středníkem / lomítkem / čárkou (např. „✓✓ = 45-50 b“, „✓ = 40-44 b“, „mínus = 0-29 b“), nebo ji popiš slovně a klikni na „📖 Přečíst stupnici pomocí AI“ níže.', 'err');
+      } else if (scaleGaps.length) {
+        setMsg('⚠️ Stupnice nepokrývá celé rozpětí 0–100 %: ' + scaleGaps.join(', ') + '. Doplň všechna pásma; jinak by se studentovi mohla zobrazit známka „?“.', 'err');
+      } else if (scaleOverlaps.length) {
+        setMsg('⚠️ Pásma stupnice se překrývají: ' + scaleOverlaps.join(', ') + '. Uprav hranice tak, aby každé procento patřilo právě do jednoho pásma.', 'err');
+      }
     } else if (state.gradeTyp === 'vlastni') {
       const parsedScale = aiScaleValid ? state.aiGradeScale : parseCustomGradeScale(curScaleText, effTotalBody);
-      const gaps = gradeScaleGaps(parsedScale);
-      if (gaps.length) setMsg('ℹ️ Stupnice je platná, ale nepokrývá: ' + gaps.join(', ') + '. V těchto pásmech se studentovi zobrazí známka „?“. Pokud je to záměr (např. jen prahy „od…“), můžeš pokračovat; jinak rozsahy doplň.', 'info');
+      const gaps = gradeScaleGaps(parsedScale), overlaps=gradeScaleOverlaps(parsedScale);
+      if (gaps.length) setMsg('⚠️ Stupnice nepokrývá celé rozpětí 0–100 %: ' + gaps.join(', ') + '. Doplň všechna pásma; jinak by se studentovi mohla zobrazit známka „?“.', 'err');
+      else if(overlaps.length) setMsg('⚠️ Pásma stupnice se překrývají: '+overlaps.join(', ')+'. Uprav hranice tak, aby každé procento patřilo právě do jednoho pásma.', 'err');
       else { skalaErr.classList.add('hidden'); skalaErr.textContent = ''; }
     } else {
       skalaErr.classList.add('hidden'); skalaErr.textContent = '';
@@ -622,7 +694,8 @@ function validate() {
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
   const rosterOk = (state.identityMode || 'name') !== 'oneTimeCode'
     || (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries) && rosterEntries.length > 0);
-  $('next3').disabled = !(secretOk && groupsOk && rosterOk);
+  const groupLogic=workflowGroupValidation();
+  $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
   if (!rosterOk) msg.push('Identita „jednorázový kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
   if (!trim('heslo') || !trim('ucitelPin')) msg.push('Doplň odemykací heslo i samostatný učitelský PIN.');
@@ -634,7 +707,8 @@ function validate() {
   if (needsSecurityCode && securityCode.length < 16) msg.push((typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline') ? 'Bezpečnostní kód výsledků je u klasifikovaného (bezpečného offline) testu povinný — vlož týmový kód od správce (alespoň 16 znaků).' : 'Doplň bezpečnostní kód výsledků alespoň o 16 znacích; u žolíka slouží pro kontrolní kód reportu.');
   if (securityCode && (securityCode === trim('ucitelPin') || securityCode === trim('heslo'))) msg.push('Bezpečnostní kód výsledků musí být jiný než PIN i odemykací heslo.');
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
-  $('validHint3').textContent = msg.join(' ');
+  if(!groupLogic.ok) msg.push(...groupLogic.messages);
+  $('validHint3').textContent = Array.from(new Set(msg)).join(' ');
 }
 
 // ═══ Joker text helper ════════════════════════════════════════════════════════
@@ -1131,9 +1205,11 @@ function buildDiffBlock() {
   return state.skupiny.map((g, gi) => {
     const students = Array.isArray(g.studenti) ? g.studenti : [];
     const label = String.fromCharCode(65 + gi);
-    const studentLine = state.anonymizace === 'ANO'
-      ? (students.length ? students.map((_, i) => `Student ${label}${i+1}`).join(', ') : '(žádní přiřazeni)')
-      : (students.length ? students.join(', ') : '(žádní přiřazeni)');
+    // Privacy by design: skutečná jména se do AI promptu neposílají nikdy.
+    // I starší uložené konfigurace s anonymizace='NE' se zde bezpečně pseudonymizují.
+    const studentLine = students.length
+      ? students.map((_, i) => `Student ${label}${i+1}`).join(', ')
+      : '(žádní přiřazeni)';
     return [
       '┌─────────────────────────────────────────────────────────',
       '│ ' + ((g.nazev || 'Bez názvu').toUpperCase()),
@@ -1463,7 +1539,7 @@ function buildPrompt() {
     ? buildExerciseDetail()
     : `Typy cvičení: ${typy || 'dle uvážení'}\nCelkový počet bodů: ${body ? body + ' bodů; rozděl rozumně mezi cvičení' : 'neurčen — nastav dle uvážení'}`;
   const diffText = state.diferencovany === 'ANO'
-    ? `Diferenciace je zapnutá. Přiřazení probíhá podle ${state.anonymizace==='ANO'?'anonymního kódu studenta':'jména v intru'}.\n\n${buildDiffBlock()}`
+    ? `Diferenciace je zapnutá. Přiřazení v AI zadání probíhá vždy podle anonymního kódu studenta.\n\n${buildDiffBlock()}`
     : '';
   const jokerText = state.zolicek === 'ANO'
     ? `Žolík je zapnutý.${getJokerText(state.jazyk, state.zolicek)}\nNa úvodní obrazovce musí student nevratně zvolit, zda píše test, nebo bere žolíka. Pokud bere žolíka, test se otevře normálně, úlohy se vyplňují a body se počítají, ale ve výsledku a na watermarku musí být jasně uvedeno ŽOLÍK POUŽIT. Žolík nesmí zpřístupnit správné odpovědi ani vysvětlení navíc. Pokud je test přísný, i žolíkový student zůstává v testovém prostředí a platí zámek při opuštění testu. U žolíka se nevyžaduje ověřovací .txt; stačí screenshot s kontrolním kódem reportu.`

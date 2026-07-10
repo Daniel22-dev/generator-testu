@@ -31,8 +31,8 @@ const EMBEDDED_MANIFEST = Object.freeze({
   issuedAt: '2026-05-30',
   entries: [
     Object.freeze({
-      userId: 'BALAZ',
-      displayName: 'Daniel Baláž',
+      userId: 'ADMIN',
+      displayName: 'Správce aplikace',
       role: 'admin',
       status: 'active',
       accessCodeHash: 'pbkdf2-v1$yeYMLdvhsnuoXQ2Rpj2i_qmyUfQc7PQV652ssgeLV7E',

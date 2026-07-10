@@ -104,10 +104,16 @@ function chooseSimpleTemplate(id){
   uiToast(msg, 'ok', 4200);
 }
 function clearSimpleTemplate(){
+  const wasSimple = isSimpleMode();
   state.simpleTemplate = '';
-  // V jednoduchém módu se vrátí výchozí nastavení (bezny/instant…). V pokročilém
-  // necháme aktuální hodnoty být — uživatel je vidí a může s nimi dál pracovat.
-  if (isSimpleMode()) applySimpleDefaults();
+  // Karta „Bez šablony“ v jednoduchém režimu výslovně znamená ruční nastavení,
+  // proto skutečně přepne do pokročilého režimu. V pokročilém pouze odepne šablonu.
+  if (wasSimple) {
+    state.appMode = 'advanced';
+    state.workPreset = 'advanced';
+    try { uiToast('Přepnuto do pokročilého režimu. Aktuální hodnoty zůstaly zachované a můžeš je ručně upravit.', 'ok', 4200); } catch(_){}
+  }
+  enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
   renderSimpleTemplates();
 }
@@ -276,6 +282,10 @@ function toggleType(t) {
   const wasFloorBound = (state.pocet||0) === prevDistinct;
 
   const wasSelected = state.typyCviceni.includes(t);
+  if (!wasSelected && prevDistinct >= 10) {
+    try { uiToast('Jeden test může mít nejvýše 10 různých typů cvičení. Odeber některý typ nebo použij detailní konfiguraci.', 'warn', 5000); } catch(_){}
+    return;
+  }
   state.typyCviceni = wasSelected
     ? state.typyCviceni.filter(x=>x!==t)
     : [...state.typyCviceni, t];
@@ -315,9 +325,9 @@ function flashCompBlock(id){
 }
 
 function pickVariant(v) {
-  // Varianta A (průběžné odevzdávání) je kompatibilní jen s okamžitým režimem.
-  // V bezpečném offline režimu studentský soubor nemá answer key, proto musí být celkové odevzdání.
-  if ((state.resultMode || 'instant') === 'secureOffline') v = 'B';
+  // Varianta A vyžaduje okamžitý režim A současně alespoň stručnou zpětnou vazbu.
+  // Jinak by se cvičení uzamklo bez informace, proč student uspěl/neuspěl.
+  if ((state.resultMode || 'instant') === 'secureOffline' || state.feedbackMode === 'none') v = 'B';
   state.odevzdavani=v; applyVisualState(); validate(); saveSnapshot();
 }
 

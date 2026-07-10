@@ -4,8 +4,8 @@
   "issuedAt": "2026-06-12",
   "entries": [
     {
-      "userId": "BALAZ",
-      "displayName": "Daniel Baláž",
+      "userId": "ADMIN",
+      "displayName": "Správce aplikace",
       "role": "admin",
       "status": "active",
       "accessCodeHash": "pbkdf2-v1$yeYMLdvhsnuoXQ2Rpj2i_qmyUfQc7PQV652ssgeLV7E",
@@ -15,15 +15,15 @@
       "note": "Správce aplikace"
     },
     {
-      "userId": "STILLEROVA",
-      "displayName": "Adéla Stillerová",
+      "userId": "TEACHER_01",
+      "displayName": "Učitel 01",
       "role": "trainedTeacher",
       "status": "active",
       "accessCodeHash": "pbkdf2-v1$Bw7R1D5M2JivVTQukxOxN6O46MIGWyag4kXz2HLbUOM",
       "salt": "UlKnrD8iWcmW2TStDdWu9g",
       "issuedAt": "2026-06-12T07:09:30.060Z",
       "revokedAt": null,
-      "note": ""
+      "note": "Účet proškoleného učitele pro řízený školní provoz"
     }
   ]
 }

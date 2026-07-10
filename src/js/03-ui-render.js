@@ -47,8 +47,10 @@ function applyVisualState() {
   renderFeedbackModeNote();
   renderResultModeNote();
   renderDiffLevelNote();
-  $('varA').disabled = (state.resultMode || 'instant') === 'secureOffline';
-  $('varA').title = $('varA').disabled ? 'V bezpečném offline režimu je dostupné pouze celkové odevzdání.' : '';
+  $('varA').disabled = (state.resultMode || 'instant') === 'secureOffline' || state.feedbackMode === 'none';
+  $('varA').title = (state.resultMode || 'instant') === 'secureOffline'
+    ? 'V bezpečném offline režimu je dostupné pouze celkové odevzdání.'
+    : (state.feedbackMode === 'none' ? 'Průběžné odevzdávání vyžaduje alespoň stručnou okamžitou zpětnou vazbu.' : '');
   $('groupBuilder').classList.toggle('hidden', state.diferencovany !== 'ANO');
   const instantResultBtn = document.querySelector('#resultModeBtns .tag-btn[data-val="instant"]');
   const secureResultBtn = document.querySelector('#resultModeBtns .tag-btn[data-val="secureOffline"]');
@@ -68,8 +70,15 @@ function applyVisualState() {
   const fbField = $('feedbackModeField');
   if (fbField) fbField.classList.toggle('feedback-mode-na', fbOffline);
   document.querySelectorAll('#feedbackModeBtns .tag-btn').forEach(function(b){
-    b.disabled = fbOffline;
-    b.title = fbOffline ? 'V bezpečném offline režimu o zpětné vazbě rozhoduje učitel až při opravě ve verifieru — tato volba se na studentský test neprojeví.' : '';
+    const forbiddenPracticeNone=state.testMode==='procviceci'&&b.dataset.val==='none';
+    b.disabled = fbOffline || forbiddenPracticeNone;
+    b.title = fbOffline ? 'V bezpečném offline režimu o zpětné vazbě rozhoduje učitel až při opravě ve verifieru.'
+      : (forbiddenPracticeNone?'Procvičovací režim musí poskytovat učící zpětnou vazbu.':'');
+  });
+  document.querySelectorAll('#zolicekBtns .tag-btn').forEach(function(b){
+    const forbidden=state.testMode==='procviceci'&&b.dataset.val==='ANO';
+    b.disabled=forbidden;
+    b.title=forbidden?'Žolík je klasifikační výjimka a v procvičovacím režimu se nepoužívá.':'';
   });
   const strictRiskField = $('strictRiskField');
   if (strictRiskField) strictRiskField.classList.toggle('hidden', state.testMode !== 'prisny');
@@ -82,6 +91,10 @@ function applyVisualState() {
   // Roster jednorázových kódů má smysl jen v režimu identity „jednorázový kód".
   const rosterField = $('rosterField');
   if (rosterField) rosterField.classList.toggle('hidden', (state.identityMode || 'name') !== 'oneTimeCode');
+  const groupHint=$('groupIdentityHint');
+  if(groupHint) groupHint.innerHTML=(state.identityMode||'name')==='oneTimeCode'
+    ? '<strong>Režim jednorázových kódů:</strong> do skupin vlož výhradně právě vygenerované kódy. Každý kód musí být právě v jedné skupině; průvodce jiné kombinace nepovolí.'
+    : 'Vytvoř skupiny, popiš podmínky a přidej každého studenta právě jednou. Doporučeny jsou anonymní školní kódy místo skutečných jmen.';
   if (state.diferencovany === 'ANO') renderGroups();
   renderTeacherMapping();
   renderSourceMeters();
@@ -196,6 +209,11 @@ function updateProgress() {
   const modePanel = $('appModePanel');
   if (modePanel) modePanel.classList.toggle('hidden', currentStep !== 0);
 
+  const progress = $('progressBar');
+  if (progress) {
+    progress.setAttribute('aria-valuenow', String(Math.min(4, currentStep + 1)));
+    progress.setAttribute('aria-valuetext', currentStep < 4 ? (STEP_LABELS[currentStep] + ' — krok ' + (currentStep + 1) + ' ze 4') : 'Konfigurace dokončena');
+  }
   const segNames = ['seg0','seg1','seg2','seg3'];
   const lblNames = ['lbl0','lbl1','lbl2','lbl3'];
   segNames.forEach((id, i) => {
@@ -228,6 +246,8 @@ function pick(key, value) {
     try { uiToast('Tuto volbu určuje šablona „' + ((t&&t.label)||'') + '". Pro ruční úpravu klikni na „✖ Bez šablony".', 'warn', 4200); } catch(_){}
     return;
   }
+  // Ochrana identity studentů je od v7 povinná a nelze ji vypnout.
+  if (key === 'anonymizace') value = 'ANO';
   state[key] = value;
   // Speciální případ: procvičovací + bezpečný offline jsou neslučitelné.
   if (key === 'resultMode' && value === 'secureOffline' && state.testMode === 'procviceci') {
@@ -276,6 +296,8 @@ function unmarkTemplateIfDiverged(key){
 }
 
 function pickNum(key, value) {
+  // Ochrana identity studentů je od v7 povinná a nelze ji vypnout.
+  if (key === 'anonymizace') value = 'ANO';
   state[key] = value;
   if (key==='cas') setVal('casCustom', value);
   if (key==='body') { setVal('bodyCustom', value); syncExercisePoints(); }

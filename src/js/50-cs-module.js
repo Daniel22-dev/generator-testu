@@ -391,7 +391,7 @@
     const ageField = document.getElementById('ageGroupBtns') && document.getElementById('ageGroupBtns').closest('.field');
     const globalTypesField = document.getElementById('globalTypesField');
     const typeGuide = document.getElementById('typeGuidePanel');
-    csSetHidden(cefrField, active); csSetHidden(instrField, active); csSetHidden(ageField, active); csSetHidden(globalTypesField, active); csSetHidden(typeGuide, active);
+    csSetHidden(cefrField, active); csSetHidden(instrField, active); csSetHidden(ageField, active); csSetHidden(globalTypesField, active || !!state.exerciseDetail); csSetHidden(typeGuide, active);
     const countField = document.getElementById('pocetBtns') && document.getElementById('pocetBtns').closest('.field');
     const sourceField = document.getElementById('tabBtnText') && document.getElementById('tabBtnText').closest('.field');
     const listeningField = document.getElementById('listeningBlock');
@@ -480,6 +480,11 @@
     const m = csModule();
     m.preset=k; m.domain=p.domain; m.phenomenon=p.phenomenon; m.goal=p.goal; m.correctionMode=p.correctionMode; m.difficulty=p.difficulty || m.difficulty || 'standardni'; m.exerciseTypes=csClone(p.exercises); if (p.stage) m.stage=p.stage; csSyncCorrectionMode(m);
     state.pocet=p.pocet; state.body=p.body; state.cas=p.cas; state.resultMode=p.resultMode; state.feedbackMode=p.feedbackMode;
+    // Účel české šablony musí odpovídat skutečnému režimu testu. Dříve practice
+    // preset ponechal historickou hodnotu „běžný test", takže UI i bezpečnostní
+    // chování odporovaly popisu šablony. Známkované/diagnostické presety zůstávají
+    // v běžném režimu; bezpečnost výsledku samostatně určuje resultMode.
+    state.testMode = p.goal === 'practice' ? 'procviceci' : 'bezny';
     // Šablona zapisuje resultMode/feedbackMode mimo pick() — křížová pravidla se musí
     // vynutit ručně, jinak vznikne např. zakázané procvičovací + secureOffline.
     // Záměr šablony má přednost: secureOffline šablona při procvičovacím režimu přepne na běžný test

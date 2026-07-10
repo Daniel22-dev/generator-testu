@@ -6,6 +6,35 @@
 import fs from "node:fs";
 import path from "node:path";
 
+
+function readJson(file) {
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
+function assertVersionSync() {
+  const pkg = readJson("package.json");
+  const core = fs.readFileSync("src/js/01-core.js", "utf8");
+  const sw = fs.readFileSync("public/sw.js", "utf8");
+  const manifest = readJson("public/manifest.webmanifest");
+
+  const versions = {
+    "package.json version": String(pkg.version || "").trim(),
+    "src/js/01-core.js RELEASE.version": core.match(/version:\s*['\"]([^'\"]+)['\"]/)?.[1] || "",
+    "public/sw.js CACHE_NAME": sw.match(/CACHE_NAME\s*=\s*['\"][^'\"]*v([^'\"]+)['\"]/)?.[1] || "",
+    "public/manifest.webmanifest start_url": String(manifest.start_url || "").match(/[?&]v=([^&]+)/)?.[1] || "",
+  };
+
+  const values = Object.values(versions);
+  if (values.some(v => !v) || new Set(values).size !== 1) {
+    console.error("❌ Nesedi verze napric projektem:");
+    for (const [label, value] of Object.entries(versions)) {
+      console.error(`   - ${label}: ${value || "NENALEZENO"}`);
+    }
+    process.exit(1);
+  }
+  console.log(`✅  Verze sedi napric projektem: ${versions["package.json version"]}`);
+}
+
 const DIST_DIR = path.resolve("dist");
 const DIST = path.join(DIST_DIR, "index.html");
 const MANIFEST_SRC = path.resolve("src/access-manifest.json");
@@ -22,6 +51,8 @@ function copyDir(src, dest) {
     else fs.copyFileSync(from, to);
   }
 }
+
+assertVersionSync();
 
 fs.mkdirSync(DIST_DIR, { recursive: true });
 

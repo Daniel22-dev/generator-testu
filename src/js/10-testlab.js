@@ -53,7 +53,7 @@ function tlChecks(){
       if (!BUILD_HASH) problems.push('chybí BUILD_HASH');
       if (problems.length) return tlFail('Release metadata', 'Release metadata nejsou kompletní.', problems.join('\n'));
       var detail = 'verze: ' + RELEASE.version + '\ndatum: ' + RELEASE.date + '\nstav: ' + RELEASE.status + '\nbuild: ' + BUILD_HASH;
-      if (RELEASE.status !== 'approved-for-school-use') return tlWarn('Release metadata', 'Verze není označena jako schválená pro ostré školní použití.', detail);
+      if (RELEASE.status !== 'production-serverless') return tlWarn('Release metadata', 'Verze není označena jako produkční serverless vydání.', detail);
       return tlPass('Release metadata', 'Release metadata jsou kompletní a verze je schválená.', detail);
     }},
     { name:'HTML modal vrstva', run:function(){

@@ -1,0 +1,68 @@
+GENERÁTOR INTERAKTIVNÍCH TESTŮ 7.0.1
+TESTOVACÍ PROTOKOL — NÁVAZNOST PRŮVODCE A KOMBINACE
+Datum: 2026-07-10
+Rozsah: produkční serverless/PWA verze bez školního serveru
+
+OVĚŘENÍ ČISTÉHO DISTRIBUČNÍHO ZIPU
+PASS  npm ci — 107 balíčků nainstalováno, 0 zranitelností
+PASS  kontrola shody verzí 7.0.1
+PASS  produkční invarianty
+PASS  struktura zdrojových modulů
+PASS  kontrola citlivých údajů
+PASS  ESLint — 0 chyb
+PASS  produkční build — 27 JS modulů, dist/index.html 1573,4 kB
+PASS  npm run test:workflow — 28 PASS / 0 FAIL
+PASS  npm run test:headless — všechny kontroly prošly
+PASS  interní Test Lab — 25 PASS / 2 kontextová WARN / 0 FAIL
+PASS  npm audit --audit-level=high — 0 zranitelností
+PASS  ZIP neobsahuje node_modules, dist ani .git
+
+GITHUB ACTIONS
+- krok 1: npm test — statické kontroly, lint, build a workflow matice
+- krok 2: npm run test:headless — runtime, secure balík a Test Lab
+- nasazení se provede pouze po úspěchu obou kroků
+
+WORKFLOW MATICE
+PASS: 28
+FAIL: 0
+
+POKRYTÍ
+- 576 kartézských kombinací hlavních režimů
+- 14 průchodů rychlými šablonami
+- 13 presetů českého jazyka
+- 38 typů cvičení samostatně
+- všech 703 dvojic podporovaných typů cvičení
+- 315 neprázdných kombinací CEFR napříč 5 cizími jazyky
+- 72 kombinací sekundárních voleb
+- 30 kombinací jazyk × simple/advanced × jazyk instrukcí
+- 20 stavů aktivace, deaktivace a viditelnosti polí
+- 16 kombinací povinných polí prvního kroku
+- 4 historické rozporné snapshoty
+- souvislý průchod všemi 4 kroky až k výslednému promptu
+- platný i neplatný jednorázový kód v instantním runtime
+- platný i neplatný jednorázový kód v secure runtime
+- 16 sestavených kombinací instantního studentského HTML
+- secure veřejná konfigurace pouze se solenými SHA-256 otisky
+
+HLAVNÍ OPRAVY
+- „Bez šablony“ skutečně přepíná do pokročilého režimu.
+- Procvičování vynucuje instantní učící zpětnou vazbu a vypíná žolík.
+- Secure režim vynucuje celkové odevzdání a žádnou okamžitou zpětnou vazbu.
+- České practice presety používají skutečný procvičovací režim.
+- Detailní rozpis cvičení již nezobrazuje konkurenční globální výběr typů.
+- Historické rozporné konfigurace se při načtení automaticky opraví.
+- Listening bez zdroje, nepodporované typy a neslučitelné počty jsou blokovány.
+- Vlastní stupnice musí pokrýt 0–100 % bez mezer a překryvů.
+- Diferenciace vyžaduje unikátní členy a přesnou vazbu rosteru 1:1.
+- Jednorázový kód je tvrdě ověřen v obou studentských runtime.
+- GitHub Actions mají oddělenou workflow a headless kontrolu.
+
+HRANICE TESTU
+Audit vyčerpává konečné podporované volby a definované závislosti aplikace.
+Libovolný volný text učitele a všechny možné odpovědi generativní AI tvoří
+nekonečný prostor; jejich obsah proto stále vyžaduje kontrolu učitele.
+
+VERDIKT
+Workflow je po opravách logicky konzistentní. Nebyla nalezena žádná známá
+povolená kombinace voleb, která by byla přímo rozporná a vedla k rozbitému,
+nevyhodnotitelnému nebo nefunkčnímu testu.

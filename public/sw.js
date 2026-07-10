@@ -1,4 +1,4 @@
-const CACHE_NAME = 'generator-testu-pwa-v6.12.0';
+const CACHE_NAME = 'generator-testu-pwa-v7.0.1';
 const CORE_ASSETS = [
   './',
   './index.html',

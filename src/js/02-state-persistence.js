@@ -52,17 +52,24 @@ function enforceModeConstraints() {
     state.resultMode = 'secureOffline';
     state.odevzdavani = 'B';
   }
-  // Procvičovací mód → okamžitý výsledek (zpětná vazba za pochodu).
-  if (state.testMode === 'procviceci' && state.resultMode !== 'instant') {
+  // Procvičovací mód → okamžitý výsledek a skutečně formativní chování.
+  // Žolík je klasifikační výjimka, proto v procvičování nedává smysl.
+  if (state.testMode === 'procviceci') {
     state.resultMode = 'instant';
+    state.feedbackMode = 'learning';
+    state.zolicek = 'NE';
   }
   // Bezpečný offline → celkové odevzdání. Normálně by v jednoduchém módu přepnul do
   // pokročilého, ALE pokud offline nastavila jednoduchá šablona, smí zůstat v simple
   // (volby jsou skryté, řídí je šablona — to je celý smysl šablon na známku/přísných).
   if ((state.resultMode || 'instant') === 'secureOffline') {
     state.odevzdavani = 'B';
+    state.feedbackMode = 'none';
     if (isSimpleMode() && !state.simpleTemplate) { state.appMode = 'advanced'; state.workPreset = 'advanced'; }
   }
+  // Bez okamžité zpětné vazby nelze použít průběžné odevzdávání: cvičení by se
+  // nevratně uzamklo bez jakékoli informace pro studenta.
+  if (state.feedbackMode === 'none') state.odevzdavani = 'B';
   // Okamžitá známka + přísný test jsou navzájem neslučitelné → vrátit na secureOffline.
   if (state.resultMode === 'instant' && state.testMode === 'prisny') {
     state.resultMode = 'secureOffline';
@@ -355,7 +362,8 @@ function loadSnapshot() {
     if (!state.layout) state.layout = 'tabs';
     if (!state.resultMode) state.resultMode = 'instant';
     if (!state.gradeTyp) state.gradeTyp = 'skola';
-    if (!state.anonymizace) state.anonymizace = 'ANO';
+    // Od v7 je anonymizace komunikace s AI povinná; staré volby 'NE' migrujeme.
+    state.anonymizace = 'ANO';
     if (!Array.isArray(state.fileNames)) state.fileNames = [];
     state.fileNames = [];
     maxStep = Math.max(0, Math.min(4, snap.maxStep || snap.currentStep || 0));
@@ -363,6 +371,7 @@ function loadSnapshot() {
     if (state.skupiny?.length) groupIdCounter = Math.max(...state.skupiny.map(g => Number(g.id)||0)) + 1;
     Object.entries(snap.dom || {}).forEach(([id, v]) => setVal(id, v));
     SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
+    enforceModeConstraints();
     return true;
   } catch(_) { try { localStorage.removeItem(SAVE_KEY); } catch(__){} return false; }
 }
@@ -589,15 +598,8 @@ function loadHistory() {
 }
 function pushHistory(prompt) {
   try {
-    // Pro historii vždy generujeme anonymizovanou verzi promptu — bez ohledu na user volbu.
-    // Jména studentů v historii localStorage nikdy.
-    let promptForHistory = prompt;
-    const hasRealNames = state.skupiny.some(g => Array.isArray(g.studenti) && g.studenti.length > 0);
-    if (state.diferencovany === 'ANO' && state.anonymizace !== 'ANO' && hasRealNames) {
-      const origAnon = state.anonymizace;
-      state.anonymizace = 'ANO';
-      try { promptForHistory = buildPrompt(); } finally { state.anonymizace = origAnon; }
-    }
+    // Prompt je od v7 pseudonymizovaný už při sestavení; sanitizace je druhá pojistka.
+    const promptForHistory = prompt;
     const safePrompt = sanitizePromptForStorage(promptForHistory);
     const hash = shortHash(safePrompt);
     let hist = loadHistory().filter(h => h && h.hash !== hash);

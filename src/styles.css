@@ -3,7 +3,7 @@
 :root {
   --bg:    #080a14; --bg2:   #0f1120; --bg3:   #0c0e1a;
   --bdr:   #2d3148; --bdr2:  #1e2238;
-  --t1:    #f0f2ff; --t2:    #c8cde8; --t3:    #a8b0d0; --t4:    #6e7899; --t5: #3d4462;
+  --t1:    #f0f2ff; --t2:    #c8cde8; --t3:    #a8b0d0; --t4:    #7883a5; --t5: #3d4462;
   --acc:   #f59e0b; --acc-d: #f59e0b18; --acc-b: #f59e0b55; --acc-btn: #fbbf24;
   --ok:    #10b981; --ok-d:  #0d2417; --ok-b:  #10b98155;
   --err:   #ef4444;
@@ -20,6 +20,10 @@ body.light {
   --card-shadow: 0 2px 16px rgba(0,0,0,0.08);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 2px;
+}
 body { background: var(--bg); color: var(--t2); font-family: Georgia, serif; min-height: 100vh; padding: 20px 14px; -webkit-tap-highlight-color: transparent; transition: background 0.2s, color 0.2s; }
 /* Šířka se přizpůsobí obrazovce: na mobilu pohodlný sloupec, na monitoru se využije
    víc plochy. Průvodce je svislý, takže nad ~1080px už je širší sloupec hůř čitelný —
@@ -73,6 +77,21 @@ body { background: var(--bg); color: var(--t2); font-family: Georgia, serif; min
 .banner.amber { background: var(--acc-d); border: 1px solid var(--acc-b); color: var(--acc); }
 .banner button { background: transparent; border: 1px solid currentColor; border-radius: 5px; color: inherit; padding: 3px 8px; cursor: pointer; font-size: 12.5px; font-family: Georgia, serif; opacity: 0.8; }
 .banner button:hover { opacity: 1; }
+
+
+.privacy-lock-note, .ai-data-notice {
+  border: 1px solid var(--ok-b);
+  background: var(--ok-d);
+  color: var(--t2);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.privacy-lock-note { margin-bottom: 8px; }
+.ai-data-notice { margin: 9px 0 11px; border-color: var(--acc-b); background: var(--acc-d); }
+.privacy-lock-note strong { color: var(--ok); }
+.ai-data-notice strong { color: var(--acc); }
 
 /* ── Complex-type hybrid banner ──────────────────────────────────────────── */
 .hybrid-banner { border-radius: 8px; padding: 8px 12px; margin-top: 8px; margin-bottom: 4px; font-size: 13px; background: #7c3aed18; border: 1px solid #7c3aed55; color: #a78bfa; display: none; gap: 8px; flex-direction: column; }
@@ -1602,6 +1621,7 @@ body.acc-locked { overflow:hidden; }
 }
 
 @media (max-width: 360px) {
+  #btnFs { display: none; }
   .hdr-btns { gap: 3px; }
   .hdr-btn {
     min-width: 38px;
