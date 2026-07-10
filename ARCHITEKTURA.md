@@ -1,6 +1,6 @@
 # Architektura projektu
 
-Generátor interaktivních testů 7.0.1 je produkční serverless/PWA aplikace bez školního backendu. Zdroj je rozdělen do doménových souborů; build z něj vytváří jeden samostatný `dist/index.html` a související PWA soubory.
+Generátor interaktivních testů 7.0.2 je produkční serverless/PWA aplikace bez školního backendu. Zdroj je rozdělen do doménových souborů; build z něj vytváří jeden samostatný `dist/index.html` a související PWA soubory.
 
 ## Build
 
@@ -106,4 +106,4 @@ Aplikace nezobrazuje pevné univerzální hodnoty kvót. Aktivní limity závise
 - centrální auditní log,
 - úplné obnovení rozpracovaného studentského pokusu po reloadu nebo pádu.
 
-Tyto části nejsou součástí verze 7.0.1 a musí být řešeny provozními pravidly nebo budoucí serverovou etapou.
+Tyto části nejsou součástí verze 7.0.2 a musí být řešeny provozními pravidly nebo budoucí serverovou etapou.

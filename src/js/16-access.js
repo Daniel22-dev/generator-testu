@@ -17,7 +17,8 @@ const ACCESS_PROFILE_KEY = 'ghr_access_profile_v1';
 // takže přežije reload (např. po „Sestavit nový test"), ale po zavření tabu zmizí —
 // nová relace i jiný tab tedy PIN zase vyžadují. Bezpečnost zůstává, mizí jen otravné
 // opakované zadávání PINu při návratu na začátek ve stejné relaci.
-const ACCESS_SESSION_KEY = 'ghr_access_session_unlocked_v1';
+const ACCESS_SESSION_KEY = 'ghr_access_session_unlocked_v2';
+const ACCESS_LEGACY_SESSION_KEYS = ['ghr_access_session_unlocked_v1'];
 const ADMIN_WORKING_MANIFEST_KEY = 'ghr_admin_working_manifest_v1';
 const ACCESS_KDF_ITER = 200000;
 const ACCESS_POLICY_VERSION = 1;
@@ -150,16 +151,39 @@ function wipeProfile(){
 }
 
 // ── Odemčení v rámci relace (přežije reload, ne zavření tabu) ─────────────────
+function accSessionToken(p){
+  return p && p.userId ? String(p.userId) + '|' + String(RELEASE.version) : '';
+}
 function accSetSessionUnlock(){
-  try { var p = Access.profile; if (p && p.userId) sessionStorage.setItem(ACCESS_SESSION_KEY, String(p.userId)); }
-  catch (e) {}
+  try {
+    var p = Access.profile;
+    if (p && p.userId) sessionStorage.setItem(ACCESS_SESSION_KEY, accSessionToken(p));
+    ACCESS_LEGACY_SESSION_KEYS.forEach(function(key){ sessionStorage.removeItem(key); });
+  } catch (e) {}
 }
 function accClearSessionUnlock(){
-  try { sessionStorage.removeItem(ACCESS_SESSION_KEY); } catch (e) {}
+  try {
+    sessionStorage.removeItem(ACCESS_SESSION_KEY);
+    ACCESS_LEGACY_SESSION_KEYS.forEach(function(key){ sessionStorage.removeItem(key); });
+  } catch (e) {}
 }
 function accSessionUnlockValid(p){
-  try { return !!(p && p.userId && sessionStorage.getItem(ACCESS_SESSION_KEY) === String(p.userId)); }
+  try { return !!(p && p.userId && sessionStorage.getItem(ACCESS_SESSION_KEY) === accSessionToken(p)); }
   catch (e) { return false; }
+}
+function accConsumeBootCommand(){
+  var out = { forceLock:false, resetAccess:false };
+  try {
+    var u = new URL(location.href);
+    out.forceLock = u.searchParams.get('lock') === '1';
+    out.resetAccess = u.searchParams.get('reset-access') === '1';
+    if (out.forceLock || out.resetAccess){
+      u.searchParams.delete('lock');
+      u.searchParams.delete('reset-access');
+      if (history && history.replaceState) history.replaceState(null, '', u.pathname + (u.search || '') + (u.hash || ''));
+    }
+  } catch (e) {}
+  return out;
 }
 // Rerevalidace proti aktuálnímu manifestu (zdroj pravdy pro odvolání / rotaci kódu).
 // Vrací true, když je profil pořád platný; jinak false (a volající vyžádá PIN/blokaci).
@@ -599,6 +623,9 @@ async function accessBoot(){
   }
   updateAccessEnvBanner();
   try { if (typeof setGenUI === 'function') setGenUI('idle'); } catch(_){}
+  var bootCommand = accConsumeBootCommand();
+  if (bootCommand.resetAccess) wipeProfile();
+  else if (bootCommand.forceLock) accClearSessionUnlock();
   Access.profile = loadProfileRaw();
   var p = Access.profile;
   // Pokud uživatel už v této relaci (tomto tabu) PIN zadal a profil je pořád platný

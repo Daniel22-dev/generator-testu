@@ -16,7 +16,13 @@
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <style>{{STYLES}}</style>
 </head>
-<body>
+<body class="acc-locked">
+<div id="accessGate" class="access-gate" role="dialog" aria-modal="true" aria-label="Ověření přístupu">
+  <div class="acc-box">
+    <div class="acc-title">🔐 Ověřuji přístup</div>
+    <div class="acc-sub">Načítám přístupový profil a aktuální školní seznam. Pokud tato obrazovka nezmizí, obnov stránku nebo otevři adresu s <code>?lock=1</code>.</div>
+  </div>
+</div>
 <div class="wrap">
   <div id="tooltip" class="tooltip-popup"></div>
 

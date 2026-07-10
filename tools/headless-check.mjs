@@ -48,6 +48,77 @@ const checkAsync = async (name, fn) => {
 console.log('=== headless-check:', target, '===');
 check('boot bez JS chyb', () => { if (w.__errors.length) throw new Error(w.__errors.join(' | ')); });
 check('RELEASE definován', () => w.eval('RELEASE.version + " · " + RELEASE.date'));
+check('čerstvé zařízení je fail-closed a zobrazuje aktivační bránu', () => {
+  const gate = w.document.getElementById('accessGate');
+  const input = w.document.getElementById('accCodeInp');
+  if (!w.document.body.classList.contains('acc-locked')) throw new Error('body není zamčené');
+  if (!gate || !input) throw new Error('aktivační brána nebo pole chybí');
+  return 'access code gate';
+});
+check('session odemčení je svázané s aktuální verzí', () => {
+  w.eval("Access.profile={userId:'ADMIN',role:'admin',displayName:'Admin'}; accSetSessionUnlock();");
+  const token = w.sessionStorage.getItem('ghr_access_session_unlocked_v2');
+  if (token !== 'ADMIN|' + w.eval('RELEASE.version')) throw new Error('neočekávaný token: ' + token);
+  w.eval('accClearSessionUnlock(); Access.profile=null;');
+  return token;
+});
+
+const seededAccessProfile = {
+  userId: 'ADMIN',
+  displayName: 'Správce aplikace',
+  role: 'admin',
+  pinHash: 'pbkdf2-v1$headless-pin-hash',
+  pinSalt: 'headless-pin-salt',
+  activationCodeHashRef: 'pbkdf2-v1$yeYMLdvhsnuoXQ2Rpj2i_qmyUfQc7PQV652ssgeLV7E',
+  acceptedPolicyVersion: 1,
+  activatedAt: '2026-07-10T00:00:00.000Z'
+};
+async function accessScenario(url, withSession = true){
+  const d = new JSDOM(html, {
+    runScripts: 'dangerously',
+    url,
+    pretendToBeVisual: true,
+    beforeParse(x) {
+      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
+      x.matchMedia = x.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
+      x.scrollTo = () => {};
+      x.HTMLElement.prototype.scrollIntoView = () => {};
+      if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
+      x.URL.createObjectURL = () => 'blob:access-test';
+      x.URL.revokeObjectURL = () => {};
+      x.fetch = async u => { throw new Error('network disabled in access scenario: ' + u); };
+      x.localStorage.setItem('ghr_access_profile_v1', JSON.stringify(seededAccessProfile));
+      if (withSession) x.sessionStorage.setItem('ghr_access_session_unlocked_v2', 'ADMIN|7.0.2');
+    }
+  });
+  await new Promise(r => setTimeout(r, 500));
+  return d;
+}
+await checkAsync('stejná verze může obnovit již odemčenou relaci', async () => {
+  const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/');
+  try {
+    if (d.window.document.body.classList.contains('acc-locked')) throw new Error('relace zůstala zamčená');
+    if (d.window.document.getElementById('accessGate')) throw new Error('brána nebyla odstraněna');
+    return 'session restored';
+  } finally { d.window.close(); }
+});
+await checkAsync('?lock=1 vždy vynutí místní PIN', async () => {
+  const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/?lock=1');
+  try {
+    if (!d.window.document.body.classList.contains('acc-locked')) throw new Error('stránka není zamčená');
+    if (!d.window.document.getElementById('accPinInp')) throw new Error('PIN pole chybí');
+    if (d.window.sessionStorage.getItem('ghr_access_session_unlocked_v2')) throw new Error('session token nebyl smazán');
+    return 'PIN gate';
+  } finally { d.window.close(); }
+});
+await checkAsync('?reset-access=1 smaže profil a vyžádá aktivaci', async () => {
+  const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/?reset-access=1');
+  try {
+    if (!d.window.document.getElementById('accCodeInp')) throw new Error('aktivační pole chybí');
+    if (d.window.localStorage.getItem('ghr_access_profile_v1')) throw new Error('profil nebyl smazán');
+    return 'activation gate';
+  } finally { d.window.close(); }
+});
 check('changelog max 10 záznamů', () => { const n = w.eval('RELEASE.changes.length'); if (n > 10) throw new Error(n + ' záznamů'); return n; });
 check('buildPrompt() > 500 znaků', () => { const n = w.buildPrompt().length; if (n < 500) throw new Error('jen ' + n); return n; });
 check('exportZadani() bez výjimky', () => w.exportZadani());

@@ -1,6 +1,6 @@
 # Bezpečnostní hranice serverless verze
 
-Generátor interaktivních testů 7.0.1 běží jako klientská PWA bez školního serveru. Je technicky připraven k řízenému oficiálnímu používání učiteli, ale jeho bezpečnostní model má jasné hranice.
+Generátor interaktivních testů 7.0.2 běží jako klientská PWA bez školního serveru. Je technicky připraven k řízenému oficiálnímu používání učiteli, ale jeho bezpečnostní model má jasné hranice.
 
 ## Ochrany, které aplikace poskytuje
 
@@ -117,4 +117,4 @@ Již stažený serverless HTML soubor nelze vzdáleně zneplatnit.
 
 ## Hranice tohoto auditu
 
-Audit verze 7.0.1 neposuzuje budoucí školní server, SSO, databázi ani serverovou proxy pro API. Tyto části musí projít samostatným návrhem a kontrolou školního IT.
+Audit verze 7.0.2 neposuzuje budoucí školní server, SSO, databázi ani serverovou proxy pro API. Tyto části musí projít samostatným návrhem a kontrolou školního IT.

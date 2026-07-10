@@ -1,6 +1,6 @@
 # Provozní pravidla Generátoru interaktivních testů
 
-Tato pravidla platí pro oficiální řízené používání produkční serverless verze 7.0.1 učiteli. Technické hranice doplňuje `SECURITY.md`.
+Tato pravidla platí pro oficiální řízené používání produkční serverless verze 7.0.2 učiteli. Technické hranice doplňuje `SECURITY.md`.
 
 ## 1. Účel a odpovědnost
 
@@ -125,4 +125,4 @@ Při chybě, která může ovlivnit data, hodnocení nebo bezpečnost:
 
 ## 12. Hranice aktuální verze
 
-Serverless verze nemá školní SSO, centrální databázi, serverovou ochranu API klíče ani neobejitelnou autorizaci. Tyto body jsou určeny k samostatnému projednání se školním IT a nejsou součástí auditu 7.0.1.
+Serverless verze nemá školní SSO, centrální databázi, serverovou ochranu API klíče ani neobejitelnou autorizaci. Tyto body jsou určeny k samostatnému projednání se školním IT a nejsou součástí tohoto serverless vydání.
