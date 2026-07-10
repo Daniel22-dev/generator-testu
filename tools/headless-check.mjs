@@ -88,12 +88,35 @@ async function accessScenario(url, withSession = true){
       x.URL.revokeObjectURL = () => {};
       x.fetch = async u => { throw new Error('network disabled in access scenario: ' + u); };
       x.localStorage.setItem('ghr_access_profile_v1', JSON.stringify(seededAccessProfile));
-      if (withSession) x.sessionStorage.setItem('ghr_access_session_unlocked_v2', 'ADMIN|7.0.2');
+      if (withSession) x.sessionStorage.setItem('ghr_access_session_unlocked_v2', 'ADMIN|7.0.3');
     }
   });
   await new Promise(r => setTimeout(r, 500));
   return d;
 }
+await checkAsync('nikdy nekončící načtení manifestu nezamrzne přístupovou bránu', async () => {
+  const d = new JSDOM(html, {
+    runScripts: 'dangerously',
+    url: 'https://daniel22-dev.github.io/generator-testu/',
+    pretendToBeVisual: true,
+    beforeParse(x) {
+      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
+      x.matchMedia = x.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
+      x.scrollTo = () => {};
+      x.HTMLElement.prototype.scrollIntoView = () => {};
+      if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
+      x.URL.createObjectURL = () => 'blob:pending-manifest';
+      x.URL.revokeObjectURL = () => {};
+      x.fetch = async () => await new Promise(() => {});
+    }
+  });
+  await new Promise(r => setTimeout(r, 3100));
+  try {
+    if (!d.window.document.getElementById('accCodeInp')) throw new Error('po timeoutu se nezobrazila aktivace');
+    if (!d.window.document.body.classList.contains('acc-locked')) throw new Error('aplikace není zamčená');
+    return 'timeout fallback → activation gate';
+  } finally { d.window.close(); }
+});
 await checkAsync('stejná verze může obnovit již odemčenou relaci', async () => {
   const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/');
   try {

@@ -22,6 +22,8 @@ const ACCESS_LEGACY_SESSION_KEYS = ['ghr_access_session_unlocked_v1'];
 const ADMIN_WORKING_MANIFEST_KEY = 'ghr_admin_working_manifest_v1';
 const ACCESS_KDF_ITER = 200000;
 const ACCESS_POLICY_VERSION = 1;
+const ACCESS_MANIFEST_TIMEOUT_MS = 2500;
+const ACCESS_BOOT_WATCHDOG_MS = 5000;
 const ACCESS_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // bez matoucích 0/O/1/I/L
 
 // Vestavěný (výchozí) přístupový seznam. Funguje offline i bez externího souboru.
@@ -215,6 +217,26 @@ function accFindEntry(m, userId){
   }
   return null;
 }
+async function accFetchManifestWithTimeout(){
+  var controller = typeof AbortController === 'function' ? new AbortController() : null;
+  var timer = null;
+  var timeoutPromise = new Promise(function(_, reject){
+    timer = setTimeout(function(){
+      try { if (controller) controller.abort(); } catch (_) {}
+      reject(new Error('ACCESS_MANIFEST_TIMEOUT'));
+    }, ACCESS_MANIFEST_TIMEOUT_MS);
+  });
+  try {
+    var url = new URL('access-manifest.json', location.href);
+    // Parametr verze omezuje návrat starého souboru z PWA/proxy cache.
+    url.searchParams.set('appv', String(RELEASE.version));
+    var options = { cache: 'no-store' };
+    if (controller) options.signal = controller.signal;
+    return await Promise.race([fetch(url.href, options), timeoutPromise]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 async function loadEffectiveManifest(){
   var proto = (location.protocol || '').toLowerCase();
   Access.envOfficial = (proto === 'http:' || proto === 'https:');
@@ -222,13 +244,14 @@ async function loadEffectiveManifest(){
   var source = 'embedded';
   if (Access.envOfficial){
     try {
-      var url = new URL('access-manifest.json', location.href);
-      var resp = await fetch(url.href, { cache: 'no-store' });
+      var resp = await accFetchManifestWithTimeout();
       if (resp && resp.ok){
         var ext = await resp.json();
         if (accValidManifest(ext)){ manifest = ext; source = 'external'; }
       }
-    } catch (e) { /* offline / 404 / blokováno → vestavěný */ }
+    } catch (e) {
+      console.warn('Přístupový seznam se nepodařilo načíst; používám vestavěný seznam.', e && e.message ? e.message : e);
+    }
   }
   Access.manifest = manifest;
   Access.manifestSource = source;
@@ -608,19 +631,50 @@ function accOnGranted(){
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
+function accApplyEmbeddedFallback(){
+  Access.manifest = EMBEDDED_MANIFEST;
+  Access.manifestSource = 'embedded';
+  var proto = (location.protocol || '').toLowerCase();
+  Access.envOfficial = (proto === 'http:' || proto === 'https:');
+  if (!Access.envOfficial) Access.envKind = 'local';
+  else if (!isOfficialOriginConfigured()) Access.envKind = 'unverified';
+  else if (isOfficialDeployment()) Access.envKind = 'official';
+  else Access.envKind = 'unofficialCopy';
+  Access.blockAllGeneration = (Access.envKind === 'unofficialCopy');
+  Access.warnLevel = (!Access.envOfficial || Access.envKind === 'unofficialCopy') ? 'block' : 'soft';
+}
+function accFinishGateFromLocalProfile(message){
+  accSetAppGated(true);
+  accEnsureGate();
+  Access.profile = loadProfileRaw();
+  if (Access.profile && Access.profile.pinHash) accShowPin(message || 'Online seznam nebyl dostupný. Používá se bezpečná vestavěná kopie.', false);
+  else accShowActivate(message || 'Online seznam nebyl dostupný. Používá se bezpečná vestavěná kopie.', false);
+}
+function accBootFailSafe(error){
+  console.error('Přístupová brána přešla do nouzového režimu.', error);
+  accApplyEmbeddedFallback();
+  updateAccessEnvBanner();
+  accFinishGateFromLocalProfile('Načtení přístupu se nepodařilo dokončit. Aplikace přešla na vestavěný seznam; můžeš pokračovat.');
+}
+function accStartBootWatchdog(){
+  setTimeout(function(){
+    var gate = accGateEl();
+    var isWaiting = !!(gate && document.body.classList.contains('acc-locked')
+      && String(gate.textContent || '').indexOf('Ověřuji přístup') !== -1
+      && !document.getElementById('accCodeInp')
+      && !document.getElementById('accPinInp'));
+    if (isWaiting) accBootFailSafe(new Error('ACCESS_BOOT_WATCHDOG'));
+  }, ACCESS_BOOT_WATCHDOG_MS);
+}
+async function runAccessBootSafely(){
+  try { await accessBoot(); }
+  catch (e) { accBootFailSafe(e); }
+}
 async function accessBoot(){
+  accSetAppGated(true);
+  accEnsureGate();
   try { await loadEffectiveManifest(); }
-  catch (e){
-    Access.manifest = EMBEDDED_MANIFEST; Access.manifestSource = 'embedded';
-    if (!Access.envOfficial){ Access.envKind = 'local'; }
-    else if (!isOfficialOriginConfigured()){ Access.envKind = 'unverified'; }
-    else if (isOfficialDeployment()){ Access.envKind = 'official'; }
-    else { Access.envKind = 'unofficialCopy'; }
-    Access.blockAllGeneration = (Access.envKind === 'unofficialCopy');
-    if (!Access.envOfficial) Access.warnLevel = 'block';
-    else if (Access.envKind === 'unofficialCopy') Access.warnLevel = 'block';
-    else Access.warnLevel = 'soft';
-  }
+  catch (e){ accApplyEmbeddedFallback(); }
   updateAccessEnvBanner();
   try { if (typeof setGenUI === 'function') setGenUI('idle'); } catch(_){}
   var bootCommand = accConsumeBootCommand();
@@ -1081,29 +1135,37 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+function safeInitStep(name, fn){
+  try { return fn(); }
+  catch (e) { console.error('Inicializační krok selhal: ' + name, e); return undefined; }
+}
 (function init(){
-  applyMode();
-  applyReleaseBadge();
-  updateDeviceBadge();
-  window.addEventListener('resize', (function(){ let tmr; return function(){ clearTimeout(tmr); tmr=setTimeout(updateDeviceBadge, 200); }; })());
-  loadGeminiKey();
-  loadGeminiModel();
-  applyKeyEnvUI();
-  migrateStorage();
-  clearOldUnsafeStorage();
-  markAdvancedSections(); // Jednou: označí advanced-only prvky, CSS pak řídí viditelnost.
-  setupDragDrop();
-  const restored = loadSnapshot();
-  if (restored) $('restoredBanner').classList.remove('hidden');
-  showOnlyStep(currentStep);
-  if (currentStep === 4) renderResult(); // obnova relace na kroku 4 — přestaví prompt a chips ze stavu
-  renderTemplates();
-  applyVisualState();
-  validate();
-  updateProgress();
-  enhanceA11y();
-  setTimeout(initTooltips, 100);
-  // Přístupová brána (aktivace/PIN) se spustí jako první. Po vpuštění
-  // accessBoot → onGranted znovu vyvolá stávající úvodní průvodce „jak používat ostře“.
-  setTimeout(accessBoot, 120);
+  // Naplánuj bránu úplně jako první. I kdyby starý snapshot nebo část UI selhala,
+  // uživatel nezůstane navždy na statické obrazovce „Ověřuji přístup“.
+  accSetAppGated(true);
+  accEnsureGate();
+  accStartBootWatchdog();
+  setTimeout(runAccessBootSafely, 0);
+
+  safeInitStep('applyMode', applyMode);
+  safeInitStep('applyReleaseBadge', applyReleaseBadge);
+  safeInitStep('updateDeviceBadge', updateDeviceBadge);
+  window.addEventListener('resize', (function(){ let tmr; return function(){ clearTimeout(tmr); tmr=setTimeout(function(){ safeInitStep('updateDeviceBadge resize', updateDeviceBadge); }, 200); }; })());
+  safeInitStep('loadGeminiKey', loadGeminiKey);
+  safeInitStep('loadGeminiModel', loadGeminiModel);
+  safeInitStep('applyKeyEnvUI', applyKeyEnvUI);
+  safeInitStep('migrateStorage', migrateStorage);
+  safeInitStep('clearOldUnsafeStorage', clearOldUnsafeStorage);
+  safeInitStep('markAdvancedSections', markAdvancedSections);
+  safeInitStep('setupDragDrop', setupDragDrop);
+  const restored = safeInitStep('loadSnapshot', loadSnapshot);
+  if (restored) safeInitStep('restoredBanner', function(){ $('restoredBanner').classList.remove('hidden'); });
+  safeInitStep('showOnlyStep', function(){ showOnlyStep(currentStep); });
+  if (currentStep === 4) safeInitStep('renderResult', renderResult);
+  safeInitStep('renderTemplates', renderTemplates);
+  safeInitStep('applyVisualState', applyVisualState);
+  safeInitStep('validate', validate);
+  safeInitStep('updateProgress', updateProgress);
+  safeInitStep('enhanceA11y', enhanceA11y);
+  setTimeout(function(){ safeInitStep('initTooltips', initTooltips); }, 100);
 })();
