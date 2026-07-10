@@ -1,8 +1,8 @@
-// scripts/build.mjs — v2 (modulární skládání)
+// scripts/build.mjs — v3 (izolované classic script tagy)
 // Složí dist/index.html ze src/shell.html + src/styles.css + src/js/*.js.
-// Pořadí JS modulů = abecední řazení názvů souborů (číselné prefixy 01–16 → hlavní
-// blok, 50 → CS modul, 60 → PWA). Chování je identické s původním jedním souborem —
-// jde o čistou konkatenaci, žádné ES moduly, žádné přepisy.
+// Pořadí JS modulů = abecední řazení názvů souborů. Každý modul je vložen do
+// samostatného classic <script> tagu; nejde o ES moduly ani import/export. Tím
+// runtime chyba jednoho modulu nezastaví následující přístupový/init modul.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -58,20 +58,29 @@ fs.mkdirSync(DIST_DIR, { recursive: true });
 
 const shell = fs.readFileSync("src/shell.html", "utf8");
 const styles = fs.readFileSync("src/styles.css", "utf8");
+const appVersion = String(readJson("package.json").version || "").trim();
 
 const jsDir = "src/js";
 const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith(".js")).sort();
 const mainParts = jsFiles.filter(f => !f.startsWith("50-") && !f.startsWith("60-"));
-const jsMain = mainParts.map(f => fs.readFileSync(path.join(jsDir, f), "utf8")).join("");
-const jsCs  = fs.readFileSync(path.join(jsDir, "50-cs-module.js"), "utf8");
-const jsPwa = fs.readFileSync(path.join(jsDir, "60-pwa.js"), "utf8");
+function inlineScriptTag(file) {
+  const code = fs.readFileSync(path.join(jsDir, file), "utf8");
+  // Každý zdrojový modul je samostatný classic script. Runtime chyba v jednom
+  // modulu tak nezastaví načtení přístupové brány ani závěrečného init modulu.
+  return `<script data-source="${file}">\n${code}\n</script>`;
+}
+
+const jsMainTags = mainParts.map(inlineScriptTag).join("\n");
+const jsCsTag = inlineScriptTag("50-cs-module.js");
+const jsPwaTag = inlineScriptTag("60-pwa.js");
 
 // replace() s funkcí kvůli $-sekvencím v kódu (jinak by "$&" apod. rozbily obsah)
 let out = shell
   .replace("{{STYLES}}", () => styles)
-  .replace("{{JS_MAIN}}", () => jsMain)
-  .replace("{{JS_CS}}", () => jsCs)
-  .replace("{{JS_PWA}}", () => jsPwa);
+  .replace("{{APP_VERSION}}", () => appVersion)
+  .replace("{{JS_MAIN_TAGS}}", () => jsMainTags)
+  .replace("{{JS_CS_TAG}}", () => jsCsTag)
+  .replace("{{JS_PWA_TAG}}", () => jsPwaTag);
 
 const buildTime = new Date().toISOString();
 out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);

@@ -1,0 +1,9 @@
+Toto je opravny balicek 7.0.4 proti aktualne nasazene verzi 7.0.3.
+
+Na GitHub nahrajte OBSAH teto slozky primo do korene repozitare generator-testu.
+Povolte prepsani stejnojmennych souboru a commitnete do vetve main.
+
+Pred potvrzenim uploadu musi GitHub ukazat mimo jine:
+- novy soubor src/js/99-init.js
+- novy soubor OPRAVA-NEFUNKCNI-BRANY-V7.0.4.md
+- zmenene soubory src/shell.html, scripts/build.mjs a package.json

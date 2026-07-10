@@ -1667,7 +1667,9 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 }
 
 
-/* v7.0.3: nouzové odkazy fungují i když inicializace JavaScriptu selže. */
+/* v7.0.4: nouzová tlačítka fungují nezávisle na hlavní aplikaci. */
 .acc-static-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
-.acc-static-link{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#e5e7eb;text-decoration:none;font-size:12px;background:rgba(255,255,255,.05)}
+.acc-static-link{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#e5e7eb;text-decoration:none;font-size:12px;font-family:Georgia,serif;background:rgba(255,255,255,.05);cursor:pointer}
 .acc-static-link:hover,.acc-static-link:focus-visible{background:rgba(255,255,255,.1);outline:2px solid #f59e0b;outline-offset:2px}
+
+.acc-static-version{text-align:center;margin-top:10px;color:var(--t4);font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace}

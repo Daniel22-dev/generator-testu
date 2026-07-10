@@ -22,11 +22,71 @@
     <div class="acc-title">🔐 Ověřuji přístup</div>
     <div class="acc-sub">Načítám přístupový profil a aktuální školní seznam. Obvykle to trvá jen několik sekund.</div>
     <div class="acc-static-actions">
-      <a class="acc-static-link" href="?lock=1">Zkusit znovu a vyžádat PIN</a>
-      <a class="acc-static-link" href="?reset-access=1">Obnovit místní přístup</a>
+      <button type="button" class="acc-static-link" data-access-recovery="lock">Zkusit znovu a vyžádat PIN</button>
+      <button type="button" class="acc-static-link" data-access-recovery="reset">Obnovit místní přístup</button>
     </div>
+    <div class="acc-static-version">Nouzová brána v{{APP_VERSION}}</div>
   </div>
 </div>
+<script>
+/* Nezávislá nouzová obsluha přístupové brány. Tento blok je schválně oddělený
+   od hlavní aplikace, aby fungoval i při chybě některého aplikačního modulu. */
+(function(){
+  const PROFILE_KEY = 'ghr_access_profile_v1';
+  const SESSION_KEYS = ['ghr_access_session_unlocked_v2','ghr_access_session_unlocked_v1'];
+  let busy = false;
+  async function clearPwaState(){
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(function(r){ return r.unregister(); }));
+      }
+    } catch (_) {}
+    try {
+      if (window.caches && caches.keys) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(function(k){ return caches.delete(k); }));
+      }
+    } catch (_) {}
+  }
+  async function recover(mode){
+    if (busy) return;
+    busy = true;
+    try { SESSION_KEYS.forEach(function(k){ sessionStorage.removeItem(k); }); } catch (_) {}
+    if (mode === 'reset') {
+      try { localStorage.removeItem(PROFILE_KEY); } catch (_) {}
+    }
+    const gate = document.getElementById('accessGate');
+    if (gate) {
+      const sub = gate.querySelector('.acc-sub');
+      if (sub) sub.textContent = 'Čistím starou cache a znovu načítám přístupovou bránu…';
+      gate.querySelectorAll('button').forEach(function(b){ b.disabled = true; });
+    }
+    await clearPwaState();
+    const url = new URL(location.href);
+    url.searchParams.delete('lock');
+    url.searchParams.delete('reset-access');
+    url.searchParams.set(mode === 'reset' ? 'reset-access' : 'lock', '1');
+    url.searchParams.set('fresh', Date.now().toString());
+    location.replace(url.href);
+  }
+  window.__accessGateRecover = recover;
+  document.addEventListener('click', function(e){
+    const btn = e.target && e.target.closest ? e.target.closest('[data-access-recovery]') : null;
+    if (!btn) return;
+    e.preventDefault();
+    recover(btn.getAttribute('data-access-recovery') || 'lock');
+  });
+  setTimeout(function(){
+    const gate = document.getElementById('accessGate');
+    if (!gate || !document.body.classList.contains('acc-locked')) return;
+    const hasForm = document.getElementById('accCodeInp') || document.getElementById('accPinInp');
+    if (hasForm) return;
+    const sub = gate.querySelector('.acc-sub');
+    if (sub) sub.textContent = 'Přístupová brána se nespustila. Použij některé z tlačítek níže; odstraní starou PWA cache a načtou čistou verzi.';
+  }, 6000);
+})();
+</script>
 <div class="wrap">
   <div id="tooltip" class="tooltip-popup"></div>
 
@@ -1017,11 +1077,11 @@
 
 <div class="save-indicator" id="saveIndicator">✓ Uloženo</div>
 
-<script>{{JS_MAIN}}</script>
+{{JS_MAIN_TAGS}}
 
 <!-- MODUL ČESKÝ JAZYK V16: český modul rozdělený do tří menších listů -->
-<script>{{JS_CS}}</script>
-<script>{{JS_PWA}}</script>
+{{JS_CS_TAG}}
+{{JS_PWA_TAG}}
 
 </body>
 </html>

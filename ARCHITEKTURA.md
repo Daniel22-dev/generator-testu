@@ -1,6 +1,6 @@
 # Architektura projektu
 
-Generátor interaktivních testů 7.0.2 je produkční serverless/PWA aplikace bez školního backendu. Zdroj je rozdělen do doménových souborů; build z něj vytváří jeden samostatný `dist/index.html` a související PWA soubory.
+Generátor interaktivních testů 7.0.4 je produkční serverless/PWA aplikace bez školního backendu. Zdroj je rozdělen do doménových souborů; build z něj vytváří jeden samostatný `dist/index.html` a související PWA soubory.
 
 ## Build
 
@@ -29,14 +29,15 @@ Build skládá vlastní HTML, CSS a JavaScript. Nezavádí runtime framework ani
 
 ## Kontrakt pořadí modulů
 
-JavaScriptové soubory nejsou ES moduly s `import/export`; build je konkatenace. Pořadí je proto součástí architektury.
+JavaScriptové soubory nejsou ES moduly s `import/export`, ale každý se ve výsledném HTML spouští v samostatném classic `<script>` tagu. Sdílejí jednu globální stránku, proto je pořadí stále součástí architektury. Oddělené tagy zajišťují, že runtime chyba jednoho modulu nezastaví načtení následujících modulů ani přístupové brány.
 
 1. Prefixy `01-` až `16-` určují pořadí hlavní aplikace.
 2. Bezpečný export je rozdělen na `13a` až `13g`.
 3. Build HTML testů je rozdělen na `14a` až `14d`.
-4. `50-cs-module.js` rozšiřuje hlavní aplikaci a musí následovat až po ní.
-5. `60-pwa.js` se skládá jako poslední.
-6. Přejmenování nebo přesun souboru vyžaduje kompletní `npm test`.
+4. `16-access.js` definuje přístupovou vrstvu; vlastní spuštění je oddělené v `99-init.js`.
+5. `99-init.js` musí následovat po všech hlavních aplikačních modulech.
+6. `50-cs-module.js` a `60-pwa.js` se načítají jako samostatné navazující skripty.
+7. Přejmenování nebo přesun souboru vyžaduje kompletní `npm test` a `npm run test:headless`.
 
 ## Datový tok AI
 

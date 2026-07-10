@@ -8,7 +8,7 @@
 // Exit code:  0 = vše OK, 1 = jakýkoli FAIL nebo JS chyba
 
 import fs from 'node:fs';
-import { JSDOM } from 'jsdom';
+import { JSDOM, VirtualConsole } from 'jsdom';
 import { webcrypto } from 'node:crypto';
 
 const target = process.argv[2] || 'dist/index.html';
@@ -48,6 +48,53 @@ const checkAsync = async (name, fn) => {
 console.log('=== headless-check:', target, '===');
 check('boot bez JS chyb', () => { if (w.__errors.length) throw new Error(w.__errors.join(' | ')); });
 check('RELEASE definován', () => w.eval('RELEASE.version + " · " + RELEASE.date'));
+check('statická brána ukazuje aktuální verzi', () => { const m=html.match(/Nouzová brána v([0-9.]+)/); if(!m||m[1]!=='7.0.4') throw new Error(m?m[0]:'marker chybí'); return m[0]; });
+
+check('produkční build používá izolované script tagy', () => {
+  const scripts = [...w.document.querySelectorAll('script[data-source]')].map(x => x.getAttribute('data-source'));
+  if (scripts.length < 27) throw new Error('jen ' + scripts.length + ' izolovaných modulů');
+  const accessIdx = scripts.indexOf('16-access.js');
+  const initIdx = scripts.indexOf('99-init.js');
+  if (accessIdx < 0 || initIdx < 0 || initIdx <= accessIdx) throw new Error('16-access / 99-init nejsou ve správném pořadí');
+  if (!w.__ACCESS_INIT_REACHED__) throw new Error('samostatný init modul se nespustil');
+  return scripts.length + ' script tagů';
+});
+await checkAsync('chyba před init modulem nezablokuje přístupovou bránu', async () => {
+  const faultHtml = html.replace(
+    '<script data-source="99-init.js">',
+    '<script>throw new Error("SIMULATED_MODULE_FAILURE");</script>\n<script data-source="99-init.js">'
+  );
+  const quietConsole = new VirtualConsole();
+  quietConsole.on('jsdomError', () => {});
+  const d = new JSDOM(faultHtml, {
+    runScripts: 'dangerously',
+    virtualConsole: quietConsole,
+    url: 'https://daniel22-dev.github.io/generator-testu/',
+    pretendToBeVisual: true,
+    beforeParse(x) {
+      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
+      x.matchMedia = x.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
+      x.scrollTo = () => {};
+      x.HTMLElement.prototype.scrollIntoView = () => {};
+      x.URL.createObjectURL = () => 'blob:isolation-test';
+      x.URL.revokeObjectURL = () => {};
+      x.fetch = async u => { throw new Error('network disabled in isolation test: ' + u); };
+    }
+  });
+  await new Promise(r => setTimeout(r, 800));
+  try {
+    if (!d.window.__ACCESS_INIT_REACHED__) throw new Error('99-init se po předchozí chybě nespustil');
+    if (!d.window.document.getElementById('accCodeInp')) throw new Error('aktivační brána se po předchozí chybě nezobrazila');
+    return 'init pokračoval po simulované chybě';
+  } finally { d.window.close(); }
+});
+check('nouzová tlačítka mají nezávislou obsluhu', () => {
+  const staticButtons = (html.match(/data-access-recovery="(?:lock|reset)"/g) || []);
+  if (staticButtons.length !== 2) throw new Error('ve statickém HTML nejsou obě recovery tlačítka');
+  if (typeof w.__accessGateRecover !== 'function') throw new Error('chybí nezávislá recovery funkce');
+  if (!/serviceWorker\.getRegistrations/.test(html) || !/caches\.keys/.test(html)) throw new Error('recovery nečistí service worker a PWA cache');
+  return 'lock, reset + cache cleanup';
+});
 check('čerstvé zařízení je fail-closed a zobrazuje aktivační bránu', () => {
   const gate = w.document.getElementById('accessGate');
   const input = w.document.getElementById('accCodeInp');
@@ -88,7 +135,7 @@ async function accessScenario(url, withSession = true){
       x.URL.revokeObjectURL = () => {};
       x.fetch = async u => { throw new Error('network disabled in access scenario: ' + u); };
       x.localStorage.setItem('ghr_access_profile_v1', JSON.stringify(seededAccessProfile));
-      if (withSession) x.sessionStorage.setItem('ghr_access_session_unlocked_v2', 'ADMIN|7.0.3');
+      if (withSession) x.sessionStorage.setItem('ghr_access_session_unlocked_v2', 'ADMIN|7.0.4');
     }
   });
   await new Promise(r => setTimeout(r, 500));
