@@ -3,10 +3,14 @@ import { JSDOM } from 'jsdom';
 import { webcrypto } from 'node:crypto';
 
 const target = process.argv[2] || 'dist/index.html';
-const html = fs.readFileSync(target, 'utf8');
+let html = fs.readFileSync(target, 'utf8');
+html = html
+  .replace(/<script type="module" data-ghrab-access-bootstrap>[\s\S]*?<\/script>/, '')
+  .replace(/type="application\/ghrab-protected"\s+data-ghrab-protected\s*/g, '')
+  .replace('<body>', '<body><script>window.__GHRAB_STUDIO_ACCESS__={appId:"generator",permit:{sub:"TEST",displayName:"Test",role:"admin",apps:["*"],iat:1,exp:4102444800,jti:"workflow"}};<\/script>');
 const dom = new JSDOM(html, {
   runScripts: 'dangerously',
-  url: 'https://school.example/generator/',
+  url: 'https://daniel22-dev.github.io/generator-testu/',
   pretendToBeVisual: true,
   beforeParse(w) {
     if (!w.crypto || !w.crypto.subtle) Object.defineProperty(w, 'crypto', { value: webcrypto });

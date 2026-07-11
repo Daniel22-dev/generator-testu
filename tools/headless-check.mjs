@@ -1,26 +1,24 @@
-// tools/headless-check.mjs
-// Headless verifikace Generátoru testů (jsdom). Používá se jako "definition of done"
-// v každém vlákně modularizace: soubor musí projít 100% stejně před úpravou i po ní.
-//
-// Instalace:  npm i -D jsdom
-// Spuštění:   node tools/headless-check.mjs [cesta/k/index.html]
-//             (výchozí: dist/index.html — spusť nejdřív `node scripts/build.mjs`)
-// Exit code:  0 = vše OK, 1 = jakýkoli FAIL nebo JS chyba
-
+// tools/headless-check.mjs — central access edition
 import fs from 'node:fs';
-import { JSDOM, VirtualConsole } from 'jsdom';
+import { JSDOM } from 'jsdom';
 import { webcrypto } from 'node:crypto';
 
 const target = process.argv[2] || 'dist/index.html';
-const html = fs.readFileSync(target, 'utf8');
-
+const protectedHtml = fs.readFileSync(target, 'utf8');
+function executableHtml(html = protectedHtml){
+  return html
+    .replace(/<script type="module" data-ghrab-access-bootstrap>[\s\S]*?<\/script>/, '')
+    .replace(/type="application\/ghrab-protected"\s+data-ghrab-protected\s*/g, '')
+    .replace('<body>', '<body><script>window.__GHRAB_STUDIO_ACCESS__={appId:"generator",permit:{sub:"HEADLESS",displayName:"Headless Admin",role:"admin",apps:["*"],iat:1,exp:4102444800,jti:"headless"}};<\/script>');
+}
+const html = executableHtml();
 const dom = new JSDOM(html, {
   runScripts: 'dangerously',
   url: 'https://daniel22-dev.github.io/generator-testu/',
   pretendToBeVisual: true,
   beforeParse(w) {
     if (!w.crypto || !w.crypto.subtle) Object.defineProperty(w, 'crypto', { value: webcrypto });
-    w.matchMedia = w.matchMedia || (q => ({ matches: false, media: q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
+    w.matchMedia = w.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
     w.scrollTo = () => {};
     w.HTMLElement.prototype.scrollIntoView = () => {};
     if (w.HTMLAnchorElement) w.HTMLAnchorElement.prototype.click = () => {};
@@ -28,166 +26,32 @@ const dom = new JSDOM(html, {
     w.URL.revokeObjectURL = () => {};
     w.__errors = [];
     w.addEventListener('error', e => w.__errors.push(String(e.message || e.error)));
-    w.fetch = async (u) => { throw new Error('network disabled in harness: ' + u); };
+    w.fetch = async u => { throw new Error('network disabled in harness: ' + u); };
   }
 });
-
 const w = dom.window;
 await new Promise(r => setTimeout(r, 1500));
-
 let failed = 0;
-const check = (name, fn) => {
-  try { const v = fn(); console.log('PASS', name, v !== undefined ? '→ ' + String(v).slice(0, 80) : ''); }
-  catch (e) { failed++; console.log('FAIL', name, '—', e.message); }
-};
-const checkAsync = async (name, fn) => {
-  try { const v = await fn(); console.log('PASS', name, v !== undefined ? '→ ' + String(v).slice(0, 80) : ''); }
-  catch (e) { failed++; console.log('FAIL', name, '—', e && e.message ? e.message : String(e)); }
-};
-
+const check = (name, fn) => { try { const v=fn(); console.log('PASS',name,v!==undefined?'→ '+String(v).slice(0,80):''); } catch(e){ failed++; console.log('FAIL',name,'—',e.message); } };
+const checkAsync = async (name, fn) => { try { const v=await fn(); console.log('PASS',name,v!==undefined?'→ '+String(v).slice(0,80):''); } catch(e){ failed++; console.log('FAIL',name,'—',e&&e.message?e.message:String(e)); } };
 console.log('=== headless-check:', target, '===');
-check('boot bez JS chyb', () => { if (w.__errors.length) throw new Error(w.__errors.join(' | ')); });
-check('RELEASE definován', () => w.eval('RELEASE.version + " · " + RELEASE.date'));
-check('statická brána ukazuje aktuální verzi', () => { const m=html.match(/Nouzová brána v([0-9.]+)/); if(!m||m[1]!=='7.0.4') throw new Error(m?m[0]:'marker chybí'); return m[0]; });
-
-check('produkční build používá izolované script tagy', () => {
-  const scripts = [...w.document.querySelectorAll('script[data-source]')].map(x => x.getAttribute('data-source'));
-  if (scripts.length < 27) throw new Error('jen ' + scripts.length + ' izolovaných modulů');
-  const accessIdx = scripts.indexOf('16-access.js');
-  const initIdx = scripts.indexOf('99-init.js');
-  if (accessIdx < 0 || initIdx < 0 || initIdx <= accessIdx) throw new Error('16-access / 99-init nejsou ve správném pořadí');
-  if (!w.__ACCESS_INIT_REACHED__) throw new Error('samostatný init modul se nespustil');
-  return scripts.length + ' script tagů';
+check('veřejný build je fail-closed', () => {
+  if (!/data-ghrab-access="checking"/.test(protectedHtml)) throw new Error('chybí checking stav');
+  if (!/app-guard\.js/.test(protectedHtml) || !/protectApp\(APP_ID/.test(protectedHtml)) throw new Error('chybí centrální guard');
+  const protectedCount=(protectedHtml.match(/application\/ghrab-protected/g)||[]).length;
+  if(protectedCount<27) throw new Error('jen '+protectedCount+' chráněných modulů');
+  return protectedCount+' inertních modulů';
 });
-await checkAsync('chyba před init modulem nezablokuje přístupovou bránu', async () => {
-  const faultHtml = html.replace(
-    '<script data-source="99-init.js">',
-    '<script>throw new Error("SIMULATED_MODULE_FAILURE");</script>\n<script data-source="99-init.js">'
-  );
-  const quietConsole = new VirtualConsole();
-  quietConsole.on('jsdomError', () => {});
-  const d = new JSDOM(faultHtml, {
-    runScripts: 'dangerously',
-    virtualConsole: quietConsole,
-    url: 'https://daniel22-dev.github.io/generator-testu/',
-    pretendToBeVisual: true,
-    beforeParse(x) {
-      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
-      x.matchMedia = x.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
-      x.scrollTo = () => {};
-      x.HTMLElement.prototype.scrollIntoView = () => {};
-      x.URL.createObjectURL = () => 'blob:isolation-test';
-      x.URL.revokeObjectURL = () => {};
-      x.fetch = async u => { throw new Error('network disabled in isolation test: ' + u); };
-    }
-  });
-  await new Promise(r => setTimeout(r, 800));
-  try {
-    if (!d.window.__ACCESS_INIT_REACHED__) throw new Error('99-init se po předchozí chybě nespustil');
-    if (!d.window.document.getElementById('accCodeInp')) throw new Error('aktivační brána se po předchozí chybě nezobrazila');
-    return 'init pokračoval po simulované chybě';
-  } finally { d.window.close(); }
+check('aplikační runtime po povolení naběhne bez JS chyb', () => { if(w.__errors.length) throw new Error(w.__errors.join(' | ')); return w.eval('RELEASE.version'); });
+check('centrální admin se promítl do Generátoru', () => {
+  if(!w.accIsAdmin()) throw new Error('admin role nebyla převzata');
+  if(w.currentCreator().id!=='HEADLESS') throw new Error('Creator ID není z permitu');
+  if(!w.__ACCESS_INIT_REACHED__) throw new Error('init se nespustil');
+  return w.currentCreator().name;
 });
-check('nouzová tlačítka mají nezávislou obsluhu', () => {
-  const staticButtons = (html.match(/data-access-recovery="(?:lock|reset)"/g) || []);
-  if (staticButtons.length !== 2) throw new Error('ve statickém HTML nejsou obě recovery tlačítka');
-  if (typeof w.__accessGateRecover !== 'function') throw new Error('chybí nezávislá recovery funkce');
-  if (!/serviceWorker\.getRegistrations/.test(html) || !/caches\.keys/.test(html)) throw new Error('recovery nečistí service worker a PWA cache');
-  return 'lock, reset + cache cleanup';
-});
-check('čerstvé zařízení je fail-closed a zobrazuje aktivační bránu', () => {
-  const gate = w.document.getElementById('accessGate');
-  const input = w.document.getElementById('accCodeInp');
-  if (!w.document.body.classList.contains('acc-locked')) throw new Error('body není zamčené');
-  if (!gate || !input) throw new Error('aktivační brána nebo pole chybí');
-  return 'access code gate';
-});
-check('session odemčení je svázané s aktuální verzí', () => {
-  w.eval("Access.profile={userId:'ADMIN',role:'admin',displayName:'Admin'}; accSetSessionUnlock();");
-  const token = w.sessionStorage.getItem('ghr_access_session_unlocked_v2');
-  if (token !== 'ADMIN|' + w.eval('RELEASE.version')) throw new Error('neočekávaný token: ' + token);
-  w.eval('accClearSessionUnlock(); Access.profile=null;');
-  return token;
-});
-
-const seededAccessProfile = {
-  userId: 'ADMIN',
-  displayName: 'Správce aplikace',
-  role: 'admin',
-  pinHash: 'pbkdf2-v1$headless-pin-hash',
-  pinSalt: 'headless-pin-salt',
-  activationCodeHashRef: 'pbkdf2-v1$yeYMLdvhsnuoXQ2Rpj2i_qmyUfQc7PQV652ssgeLV7E',
-  acceptedPolicyVersion: 1,
-  activatedAt: '2026-07-10T00:00:00.000Z'
-};
-async function accessScenario(url, withSession = true){
-  const d = new JSDOM(html, {
-    runScripts: 'dangerously',
-    url,
-    pretendToBeVisual: true,
-    beforeParse(x) {
-      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
-      x.matchMedia = x.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
-      x.scrollTo = () => {};
-      x.HTMLElement.prototype.scrollIntoView = () => {};
-      if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
-      x.URL.createObjectURL = () => 'blob:access-test';
-      x.URL.revokeObjectURL = () => {};
-      x.fetch = async u => { throw new Error('network disabled in access scenario: ' + u); };
-      x.localStorage.setItem('ghr_access_profile_v1', JSON.stringify(seededAccessProfile));
-      if (withSession) x.sessionStorage.setItem('ghr_access_session_unlocked_v2', 'ADMIN|7.0.4');
-    }
-  });
-  await new Promise(r => setTimeout(r, 500));
-  return d;
-}
-await checkAsync('nikdy nekončící načtení manifestu nezamrzne přístupovou bránu', async () => {
-  const d = new JSDOM(html, {
-    runScripts: 'dangerously',
-    url: 'https://daniel22-dev.github.io/generator-testu/',
-    pretendToBeVisual: true,
-    beforeParse(x) {
-      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
-      x.matchMedia = x.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
-      x.scrollTo = () => {};
-      x.HTMLElement.prototype.scrollIntoView = () => {};
-      if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
-      x.URL.createObjectURL = () => 'blob:pending-manifest';
-      x.URL.revokeObjectURL = () => {};
-      x.fetch = async () => await new Promise(() => {});
-    }
-  });
-  await new Promise(r => setTimeout(r, 3100));
-  try {
-    if (!d.window.document.getElementById('accCodeInp')) throw new Error('po timeoutu se nezobrazila aktivace');
-    if (!d.window.document.body.classList.contains('acc-locked')) throw new Error('aplikace není zamčená');
-    return 'timeout fallback → activation gate';
-  } finally { d.window.close(); }
-});
-await checkAsync('stejná verze může obnovit již odemčenou relaci', async () => {
-  const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/');
-  try {
-    if (d.window.document.body.classList.contains('acc-locked')) throw new Error('relace zůstala zamčená');
-    if (d.window.document.getElementById('accessGate')) throw new Error('brána nebyla odstraněna');
-    return 'session restored';
-  } finally { d.window.close(); }
-});
-await checkAsync('?lock=1 vždy vynutí místní PIN', async () => {
-  const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/?lock=1');
-  try {
-    if (!d.window.document.body.classList.contains('acc-locked')) throw new Error('stránka není zamčená');
-    if (!d.window.document.getElementById('accPinInp')) throw new Error('PIN pole chybí');
-    if (d.window.sessionStorage.getItem('ghr_access_session_unlocked_v2')) throw new Error('session token nebyl smazán');
-    return 'PIN gate';
-  } finally { d.window.close(); }
-});
-await checkAsync('?reset-access=1 smaže profil a vyžádá aktivaci', async () => {
-  const d = await accessScenario('https://daniel22-dev.github.io/generator-testu/?reset-access=1');
-  try {
-    if (!d.window.document.getElementById('accCodeInp')) throw new Error('aktivační pole chybí');
-    if (d.window.localStorage.getItem('ghr_access_profile_v1')) throw new Error('profil nebyl smazán');
-    return 'activation gate';
-  } finally { d.window.close(); }
+check('veřejný build neobsahuje starou PIN bránu', () => {
+  if(/access-manifest\.json|ghr_access_profile_v1|id="accCodeInp"/.test(protectedHtml)) throw new Error('zůstal starý přístupový model');
+  return 'jen AI Studio permit';
 });
 check('changelog max 10 záznamů', () => { const n = w.eval('RELEASE.changes.length'); if (n > 10) throw new Error(n + ' záznamů'); return n; });
 check('buildPrompt() > 500 znaků', () => { const n = w.buildPrompt().length; if (n < 500) throw new Error('jen ' + n); return n; });
@@ -222,7 +86,7 @@ check('appModeSummary element existuje a má text', () => {
 });
 
 check('PWA soubory existují v dist', () => {
-  const required = ['dist/manifest.webmanifest', 'dist/sw.js', 'dist/icons/icon-192.png', 'dist/icons/icon-512.png', 'dist/access-manifest.json'];
+  const required = ['dist/manifest.webmanifest', 'dist/sw.js', 'dist/icons/icon-192.png', 'dist/icons/icon-512.png'];
   const missing = required.filter(f => !fs.existsSync(f));
   if (missing.length) throw new Error('chybí: ' + missing.join(', '));
   return required.length + ' souborů';

@@ -193,7 +193,7 @@ function showFirstRunFlow(profile) {
           '<p>Právě spouštíš <strong>aplikaci pro tvorbu interaktivních testů</strong> s podporou umělé inteligence. Pomůže ti snadno vygenerovat, přizpůsobit a distribuovat testy pro studenty.</p>' +
           (isAdmin ? '<p>Jako <strong>administrátor</strong> máš plný přístup ke všem funkcím, včetně správy přístupů ostatních uživatelů.</p>' : '') +
           (isAdmin ? '' : '<p>Pokud budeš mít dotazy, obrať se na <strong>Poradce ke generátoru</strong> — ikona <span style="font-size:15px">💬</span> vpravo nahoře. Pokud si ani tam neporadíš, napiš správci aplikace.</p>') +
-          '<p>Každý učitel obdržel <strong>unikátní aktivační kód</strong> — pečlivě si ho uchovej pro případ, že budeš potřebovat obnovit přístup na novém zařízení.</p>' +
+          '<p>Přístup je řízen centrálně přes <strong>AI Studio GHRAB</strong>. Osobní přístupový soubor si bezpečně uchovej pro případ nového zařízení nebo obnovení prohlížeče.</p>' +
           '<p>Hodně štěstí při generování! 🚀</p>' +
         '</div>' +
         '<div class="welcome-actions">' +

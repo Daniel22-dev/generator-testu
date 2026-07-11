@@ -1,13 +1,12 @@
-GENERÁTOR TESTŮ 7.0.5 — AI STUDIO READY
+GENERÁTOR TESTŮ 7.0.6 — CENTRÁLNĚ CHRÁNĚNÝ
+
+Nejdříve musí být nasazeno AI Studio GHRAB 0.6.1.
 
 1. Rozbal ZIP.
-2. Na GitHubu otevři repozitář generator-testu.
-3. Nahraj OBSAH této složky přímo do kořene repozitáře.
-4. Povol přepsání souborů a potvrď commit do větve main.
-5. Počkej na zelený běh v Actions.
-6. Otevři aplikaci a proveď Ctrl+F5.
+2. V GitHub Desktopu otevři repozitář generator-testu.
+3. Nahraď obsah repozitáře obsahem rozbaleného ZIPu; zachovej pouze lokální složku .git.
+4. Commit: Generátor testů v7.0.6.
+5. Push origin a počkej na zelený běh v Actions.
+6. Proveď Ctrl+Shift+R a ověř přímou adresu bez přístupu i se správcovským přístupem.
 
-Důležité:
-- soubory 13-secure-export.js a 14-test-html-builders.js jsou záměrné malé migrační tombstones; webové nahrání jimi přepíše staré monolity,
-- verze 7.0.5 přidává Studio Bridge v1,
-- studio-manifest.json se vytvoří automaticky při buildu.
+Verze 7.0.6 nahrazuje starou lokální PIN bránu podepsaným přístupem AI Studia. Soukromé klíče ani osobní přístupové soubory do repozitáře nepatří.

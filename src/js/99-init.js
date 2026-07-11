@@ -1,5 +1,4 @@
-// v7.0.4: samostatný startovací modul. Je oddělen od aplikačních modulů,
-// aby chyba v jedné části formuláře nezablokovala přístupovou bránu.
+// v7.0.6: aplikační start probíhá až po kryptografickém ověření AI Studiem.
 window.__ACCESS_INIT_REACHED__ = true;
 
 // ── Jednotné zavírání informačních modalů klávesou Escape ────────────────────
@@ -34,12 +33,7 @@ function safeInitStep(name, fn){
   catch (e) { console.error('Inicializační krok selhal: ' + name, e); return undefined; }
 }
 (function init(){
-  // Naplánuj bránu úplně jako první. I kdyby starý snapshot nebo část UI selhala,
-  // uživatel nezůstane navždy na statické obrazovce „Ověřuji přístup“.
-  accSetAppGated(true);
-  accEnsureGate();
-  accStartBootWatchdog();
-  setTimeout(runAccessBootSafely, 0);
+  safeInitStep('accOnGranted', accOnGranted);
 
   safeInitStep('applyMode', applyMode);
   safeInitStep('applyReleaseBadge', applyReleaseBadge);

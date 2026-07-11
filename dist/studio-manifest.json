@@ -1,0 +1,43 @@
+{
+  "schema": "ai-studio-app-manifest-v1",
+  "id": "generator",
+  "name": {
+    "cs": "Generátor interaktivních testů",
+    "en": "Interactive Test Generator"
+  },
+  "version": "7.0.6",
+  "status": {
+    "cs": "Připraveno k řízenému pilotu",
+    "en": "Ready for controlled pilot"
+  },
+  "description": {
+    "cs": "Tvorba procvičování a klasifikovaných testů, variant, kódů i bezpečného offline odevzdání.",
+    "en": "Create practice and graded tests, variants, access codes and secure offline submissions."
+  },
+  "launchUrl": "https://daniel22-dev.github.io/generator-testu/",
+  "repository": "daniel22-dev/generator-testu",
+  "icon": "assets/apps/generator.png",
+  "accent": "#50e8ff",
+  "tags": [
+    {
+      "cs": "Testování",
+      "en": "Assessment"
+    },
+    {
+      "cs": "AJ · ŠJ · NJ · ČJ",
+      "en": "EN · ES · DE · CS"
+    }
+  ],
+  "capabilities": [
+    "assessment",
+    "practice",
+    "offline-submit",
+    "variants"
+  ],
+  "compatibility": {
+    "studioMinVersion": "0.5.1",
+    "materialSchema": "ghrab-material-v1",
+    "studioBridge": "1.1"
+  },
+  "publishedAt": "2026-07-11T06:29:40.113Z"
+}

@@ -627,21 +627,10 @@ async function generateTest(){
       const proceed = await uiConfirm('Vývojové spuštění z místního souboru (file://). Ostrý (klasifikovaný) test by se měl generovat jen z oficiální adresy. Jako admin můžeš pro účely testování pokračovat, ale vygenerovaný test NEPOUŽÍVEJ pro skutečné známkování. Pokračovat?', 'Vývojové spuštění — ostrý test', true);
       if (!proceed) return;
     } else {
-      const oficialni = OFFICIAL_ORIGINS.length ? OFFICIAL_ORIGINS.join(', ') : 'oficiální školní adresa (zatím nenastavená)';
+      const oficialni = (typeof OFFICIAL_ORIGINS!=='undefined'&&OFFICIAL_ORIGINS.length) ? OFFICIAL_ORIGINS.join(', ') : 'oficiální školní adresa';
       setGenErr('Ostrý (klasifikovaný) test lze generovat jen z oficiální adresy (' + oficialni + '). Tahle kopie běží z neověřeného umístění (' + (location.origin && location.origin !== 'null' ? location.origin : 'místní soubor') + (location.pathname || '') + '), takže nelze ověřit aktuálnost přístupového seznamu ani odvolání přístupů. Otevři oficiální odkaz a spusť generování znovu. Pro neznámkovaný procvičovací test přepni „Režim výsledků" na okamžitou známku.');
       return;
     }
-  }
-  // Ostrý (klasifikovaný) test po síti: vyžaduj ŽIVÝ externí access-manifest.json, ať platí
-  // případná odvolání/rotace přístupů (vestavěný seznam je „zamrzlý" k datu vydání souboru).
-  // VÝJIMKA: admin. Jednak je zdroj pravdy (odvolání se týkají kolegů, ne jeho), jednak by se
-  // jinak sám zamkl, dokud nenasadí externí manifest. Místní admin-dev řeší pravidlo výše.
-  if ((state.resultMode || 'instant') === 'secureOffline'
-      && typeof Access !== 'undefined'
-      && Access.manifestSource !== 'external'
-      && !(Access.profile && Access.profile.role === 'admin')){
-    setGenErr('Pro ostrý (klasifikovaný) test musí být načtený aktuální access-manifest.json z oficiální adresy — aby platila případná odvolání nebo změny přístupů. Teď se používá jen vestavěný seznam (zamrzlý k datu vydání souboru). Otevři oficiální odkaz, kde je manifest dostupný, a zkus to znovu; pokud potíž trvá, požádej správce. Pro neznámkované procvičování přepni „Režim výsledků" na okamžitou známku.');
-    return;
   }
   // Když uživatel klíč napsal, ale nezvolil žádné tlačítko (relace/trvale), vezmeme ho
   // automaticky pro tuto relaci — ať generování nezačne padat jen kvůli nekliknutí.

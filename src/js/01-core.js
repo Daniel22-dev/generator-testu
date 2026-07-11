@@ -17,10 +17,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.0.5',
-  date:    '2026-07-10',
+  version: '7.0.6',
+  date:    '2026-07-11',
   status:  'production-serverless',
   changes: [
+    'CENTRÁLNÍ PŘÍSTUP AI STUDIO GHRAB (7.0.6): původní lokální aktivační kódy a PIN brána byly nahrazeny kryptograficky podepsaným oprávněním vydávaným v AI Studiu. Generátor se nespustí před ověřením podpisu, platnosti, role, povolení aplikace a revokačního seznamu. Správce aktivuje přístup pouze jednou ve Studiu a stejná relace otevře všechny povolené aplikace; auditní Creator ID a role zůstávají ve výstupech zachované. Přímá adresa bez oprávnění zobrazí jednotnou zamykací obrazovku.',
     'NAPOJENÍ NA AI STUDIO GHRAB (7.0.5): Generátor umí bezpečně převzít krátkodobou lokální předávku GHRAB Material v1. Automaticky doplní název, skupinu/úroveň, předmět a látku i zdrojový obsah včetně strukturovaných úloh. Předávka má omezenou platnost, po načtení se smaže a nic se neposílá na server. Přidán viditelný návrat do AI Studia a anonymní místní záznam přínosu pro pilot.',
     'ODDĚLENÁ A NEZÁVISLÁ PŘÍSTUPOVÁ BRÁNA (7.0.4): zdrojové moduly se již neskládají do jediného obřího scriptu. Každý modul se spouští samostatně a závěrečný init je v samostatném modulu 99-init.js, takže chyba v jedné části formuláře už nezastaví spuštění PINu nebo aktivace. Statická nouzová tlačítka mají vlastní malý skript nezávislý na aplikaci; umějí odregistrovat service worker, smazat PWA cache, vynutit PIN nebo úplně obnovit místní profil. Přidán regresní test izolace modulů a funkčnosti nouzové obsluhy.',
     'OPRAVA ZAMRZNUTÉ PŘÍSTUPOVÉ BRÁNY (7.0.3): načtení externího access-manifestu má pevný časový limit a při nedostupnosti automaticky přejde na vestavěný seznam. Přístupový boot se plánuje ještě před inicializací formuláře, takže poškozený starý snapshot nebo jiná chyba rozhraní už nemůže zabránit zobrazení PINu či aktivace. Přidán watchdog a nouzová obsluha neošetřené chyby; statická brána nabízí odkazy pro nové načtení a reset místního profilu. Regresní test ověřuje i nikdy nekončící síťový požadavek.',
@@ -29,9 +30,7 @@ const RELEASE = Object.freeze({
     'PRODUKČNÍ SERVERLESS VYDÁNÍ (7.0.0): odstraněn rozpor mezi pilotní dokumentací a stavem aplikace; verze je nyní označena jako technicky ověřená produkční serverless varianta, nikoli jako formálně schválená školou. Kritická ochrana soukromí: jména studentů v diferenciaci se do AI promptu již nikdy neposílají a staré nastavení se automaticky převádí na bezpečný režim. Před prvním AI požadavkem v relaci se zobrazuje transparentní informace o přenosu zadání, URL a příloh do Gemini. Výchozí modely aktualizovány na stabilní gemini-3.5-flash a gemini-3.1-flash-lite, staré 2.5 volby se migrují. Odstraněny zastaralé pevné údaje o kvótách; aplikace odkazuje na aktivní limity projektu v AI Studiu. Opraveny ARIA role průvodce, kontrast pomocných textů, fokus klávesnice a mobilní hlavička. Doplněna produkční kontrola npm test, provozní pravidla, checklist vydání a auditní zpráva. Druhá kritická oprava soukromí odstranila čitelný seznam studentů z generovaných HTML: rozpis variant nyní používá náhodnou sůl a SHA-256 otisky, neznámý identifikátor je odmítnut místo přiřazení výchozí varianty. Interní poradce byl obsahově přepsán podle skutečného chování 7.0.0 a testy nově hlídají API kontrakt i soukromí výstupního rosteru.',
     'TECHNICKÁ STABILIZACE A PILOTNÍ PRAVIDLA (6.12.2): priorita A+B bez serveru. Velké bloky secure exportu a HTML builderů byly opatrně rozděleny na menší části 13a…13g a 14a…14d; spojení těchto částí bylo ověřeno proti původnímu obsahu. Přidán ESLint, kontrola struktury zdroje, kontrola známých osobních údajů v public access manifestu a rozšířený headless test: PWA soubory, bezpečné vložení JSON před &lt;/script&gt; a sestavení secureOffline balíku student + teacher verifier. Přístupové manifesty v repozitáři jsou anonymizované na obecné identifikátory ADMIN/TEACHER_01. Doplněn dokument PILOTNI-PRAVIDLA.md pro řízený školní pilot. Funkční chování aplikace se nemění.',
     'STABILIZAČNÍ BALÍK PRO GITHUB A PWA (6.12.1): doplněn jsdom do devDependencies, přidán package-lock pro opakovatelné instalace, GitHub Actions nově používají npm ci a před nasazením spouštějí npm test. Build nově kontroluje shodu verzí napříč package.json, RELEASE.version, PWA service workerem a manifestem, aby se předešlo staré cache nebo nejednotnému označení verze. Doplněny provozní dokumenty ARCHITEKTURA.md, SECURITY.md a CONTRIBUTING.md pro bezpečný další vývoj bez serveru. Funkční chování aplikace se nemění.',
-    'MODULARIZACE ZDROJE — 18 MODULŮ, JEDEN VÝSTUP (6.12.0): zdrojový kód rozdělen z jednoho 1,6MB src/index.html do modulární struktury src/shell.html + src/styles.css + src/js/01-core…16-access + 50-cs-module + 60-pwa. Build (scripts/build.mjs v2) moduly čistě konkatenuje do jednoho offline dist/index.html — žádné ES moduly, žádné přejmenování, chování 1:1. Složený výstup ověřen BYTE-IDENTICKY proti původnímu souboru 6.11.70 (po odečtení BUILD komentáře) a headless kontrolou tools/headless-check.mjs (jsdom: boot bez chyb, Test Lab 25 pass / 0 fail, buildPrompt, exportZadani, všech 7 šablon, přepínání režimů). Původní jednosouborový zdroj byl při modularizaci archivován; produkční balík jej již neobsahuje. Pořadí modulů je kontrakt (číselné prefixy): 50-cs-module monkey-patchuje funkce hlavního bloku a skládá se až po něm. package.json má nově skript npm test (headless kontrola nad dist). Přínos: do vlákna AI asistenta se nahrává jen dotčený modul (20–220 kB) místo celého souboru; verze a changelog žijí v src/js/01-core.js.',
-    'HLOUBKOVÝ AUDIT PŘED MODULARIZACÍ — OBNOVA ZTRACENÉHO SOUHRNU REŽIMU + VELKÝ ÚKLID MRTVÉHO KÓDU (6.11.70): kompletní statická i headless prověrka celého souboru před plánovaným rozdělením do modulů (AST audit duplicitních deklarací, ESLint no-undef/no-redeclare, kontrola všech 245 inline handlerů proti definicím, symetrie localStorage klíčů, mrtvé CSS třídy, duplicitní ID, Test Lab 25/25 headless). (1) OBNOVA REGRESE: pod nadpisem „Pracovní režim" se má zobrazovat dynamický souhrn aktivního režimu a šablony (element #appModeSummary) — při některém přepisu markupu element vypadl, zatímco jeho CSS (.mode-switch-note) i JS aktualizátor přežily; element vrácen, souhrn se opět zobrazuje. (2) OPRAVA ZASTARALÉHO POPISKU: karta „⚡ Jednoduchý režim" slibovala „bez TXT, bez verifieru, bez přísného režimu", což od zavedení šablon (6.11.62/6.11.66) neplatí — šablona „Ostrý test pod dohledem" v jednoduchém režimu zapíná přísný test i bezpečný offline verifier; popisek přepsán podle skutečného chování. (3) MRTVÝ KÓD PRYČ: funkce updateWorkPresetUI() a renderPresetNote() (jejich elementy dávno neexistují) včetně volání, legacy wrappery choosePreset/applyPreset/clearPreset a prázdný objekt PEDAGOGICAL_PRESETS (nic je nevolalo), nepoužívaná konstanta WELCOME_SKIP_KEY a ~6,5 kB mrtvého CSS po odstraněných preset modálech a starém onboardingu (.preset-modal-*, .preset-confirm-box, .preset-panel, .mode-card/.mode-help, .onboarding-box, .welcome-tip, .welcome-skip-link, #workPresetPanel). (4) LINT HYGIENA: odstraněny dvě redeklarace var ve stejném scope (steps→chainSteps, i→i2) — ESLint no-redeclare i no-undef jsou nyní čisté v celém souboru (jediná ponechaná výjimka: hlídaný typeof EXERCISE_SCORE_ALIAS v Test Labu). Chování aplikace se nemění s výjimkou obnoveného souhrnu a opraveného popisku. Ověřeno node --check + ESLint + headless (jsdom): boot bez JS chyb, Test Lab 25 pass / 0 fail, buildPrompt/exportZadani/všech 7 šablon/přepínání režimů beze změny.',
-  ]
+    'MODULARIZACE ZDROJE — 18 MODULŮ, JEDEN VÝSTUP (6.12.0): zdrojový kód rozdělen z jednoho 1,6MB src/index.html do modulární struktury src/shell.html + src/styles.css + src/js/01-core…16-access + 50-cs-module + 60-pwa. Build (scripts/build.mjs v2) moduly čistě konkatenuje do jednoho offline dist/index.html — žádné ES moduly, žádné přejmenování, chování 1:1. Složený výstup ověřen BYTE-IDENTICKY proti původnímu souboru 6.11.70 (po odečtení BUILD komentáře) a headless kontrolou tools/headless-check.mjs (jsdom: boot bez chyb, Test Lab 25 pass / 0 fail, buildPrompt, exportZadani, všech 7 šablon, přepínání režimů). Původní jednosouborový zdroj byl při modularizaci archivován; produkční balík jej již neobsahuje. Pořadí modulů je kontrakt (číselné prefixy): 50-cs-module monkey-patchuje funkce hlavního bloku a skládá se až po něm. package.json má nově skript npm test (headless kontrola nad dist). Přínos: do vlákna AI asistenta se nahrává jen dotčený modul (20–220 kB) místo celého souboru; verze a changelog žijí v src/js/01-core.js.',  ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
@@ -437,23 +436,23 @@ const GENERATOR_ASSISTANT_KB = [
   detailed:'„Relace" (useGeminiKeyForSession) drží klíč jen do zavření prohlížeče. „Uložit trvale" (saveGeminiKeyPermanent) zapíše klíč do úložiště prohlížeče, takže ho příště nemusíš zadávat — vhodné jen na vlastním zařízení. Klíč se odesílá výhradně do Google API v hlavičce, nikdy do žádné jiné služby ani do tohoto poradce.',
   evidence:['useGeminiKeyForSession() (btnUseKeySession)','saveGeminiKeyPermanent() (btnSaveKeyPermanent)','geminiNote: „Relace = po zavření se zapomene"']},
 
- {id:"pristupove-kody",title:"Přístupové kódy",status:"reseno",
-  keywords:["pristupovy kod", "pristupove kody", "access code", "kod pro pristup", "aktivacni kod", "prihlaseni kodem", "kod kolegy"],
-  simple:"Každý oprávněný učitel dostane osobní aktivační kód. Aplikace ho po ověření neukládá čitelně; v manifestu je pouze solený kryptografický otisk.",
-  detailed:"Správce přidá uživatele ve Správě přístupů a vygeneruje jednorázově zobrazený aktivační kód. V access-manifest.json zůstává userId, zobrazované jméno, role, stav, sůl a PBKDF2 otisk kódu. Učitel kód použije k aktivaci zařízení a nastaví si místní PIN, který se rovněž ukládá pouze jako solený otisk. Kód ani PIN nelze z aplikace zpětně přečíst.",
-  evidence:["newAccessCode()", "hashAccessCode()", "hashLocalPin()", "accTryActivate()", "access-manifest.json"]},
+ {id:"pristupove-kody",title:"Přístup z AI Studia",status:"reseno",
+  keywords:["pristupovy kod","pristupovy soubor","access code","prihlaseni","AI Studio","odemknout aplikaci"],
+  simple:"Přístup se aktivuje jednou v AI Studiu pomocí osobního podepsaného souboru nebo kódu. Generátor si stejné ověřené oprávnění přečte automaticky.",
+  detailed:"Správce vydá v AI Studiu osobní oprávnění s rolí, seznamem povolených aplikací, platností a jedinečným JTI. Soubor nebo kód je digitálně podepsán ECDSA klíčem. Generátor před spuštěním ověří podpis, vydavatele, platnost, revokační seznam a oprávnění generator. Neexistuje samostatný PIN Generátoru; na jednom zařízení se přístup aktivuje pouze ve Studiu.",
+  evidence:["ghrab.access.permit.v2","/AI-Studio-GHRAB/access/app-guard.js","protectApp('generator')","JTI"]},
 
  {id:"admin-sprava",title:"Admin správa přístupů",status:"reseno",
-  keywords:["admin", "sprava pristupu", "administrace", "spravce", "admin panel", "ucet", "sprava uctu", "spravovat kody"],
-  simple:"Admin může přidat nebo odvolat učitele, otočit aktivační kód a exportovat access-manifest.json. Změny začnou platit až po nahrání exportovaného manifestu na oficiální web.",
-  detailed:"Panel Správa přístupů pracuje s lokální pracovní kopií manifestu. Admin může přidat trainedTeacher, přejmenovat záznam, odvolat nebo obnovit přístup a vydat nový osobní kód. Tlačítko Export vytvoří access-manifest.json; teprve jeho nasazení vedle aplikace mění přihlašování ostatních. Jde o organizační klientskou bránu, nikoli o neobejitelnou serverovou autentizaci.",
-  evidence:["openAdminPanel()", "accAdminAddTeacher()", "accAdminAction()", "accAdminExport()", "Access.workingManifest"]},
+  keywords:["admin","sprava pristupu","administrace","spravce","vydat pristup","odvolat pristup"],
+  simple:"Admin spravuje přístupy centrálně v AI Studiu. Soukromým podpisovým klíčem vydává osobní oprávnění a pomocí JTI může konkrétní přístup zneplatnit.",
+  detailed:"Tlačítko Správa přístupů otevírá administrátorský nástroj AI Studia. Soukromý podpisový klíč se načítá pouze při vydávání přístupu a nesmí být v GitHubu. Kolegovi se posílá jen jeho .ghrab-access.json. Zneplatnění se provádí přidáním JTI do centrálního revokačního seznamu a novým nasazením Studia. Bez serveru jde o silnou organizační a kryptografickou bránu, nikoli o ověření skutečné identity uživatele.",
+  evidence:["openAdminPanel()","AI Studio access issuer","revoked-access.json","JTI","ECDSA P-256"]},
 
  {id:"storage",title:"localStorage / sessionStorage (co se ukládá)",status:"reseno",
-  keywords:["localstorage", "sessionstorage", "uklada", "co se uklada", "data v prohlizeci", "pamet prohlizece", "soukromi dat", "kam se uklada"],
-  simple:"Generátor lokálně ukládá rozpracované nastavení, nejvýše pět položek historie a pedagogické šablony. Hesla, učitelský PIN, přílohy a skutečná jména studentů se do těchto snapshotů neukládají.",
-  detailed:"Snapshoty a historie používají localStorage; jména studentů jsou před uložením nahrazena kódy Student A1…, přílohy se neukládají a citlivá pole se čistí. Volitelně lze lokálně uložit Gemini API klíč a týmový bezpečnostní kód pouze na důvěryhodném zařízení. Přístupový profil obsahuje hash místního PINu, nikoli PIN. Ve studentském secure testu se odpovědi drží za běhu v paměti; localStorage slouží zejména k zámku po odevzdání, ne k úplnému obnovení rozpracovaného pokusu.",
-  evidence:["getStoredState()", "anonymizeGroupsForStorage()", "pushHistory()", "SCHOOL_SECURITY_CODE_KEY", "ACCESS_PROFILE_KEY", "submittedLocked()"]},
+  keywords:["localstorage","sessionstorage","uklada","co se uklada","data v prohlizeci","soukromi dat","kam se uklada"],
+  simple:"Generátor lokálně ukládá rozpracované nastavení, nejvýše pět položek historie, pedagogické šablony a ověřený podepsaný přístup AI Studia. Hesla testu, přílohy a skutečná jména studentů se do běžných snapshotů neukládají.",
+  detailed:"Snapshoty a historie používají localStorage; jména studentů jsou před uložením nahrazena kódy Student A1…, přílohy se neukládají a citlivá pole se čistí. Volitelně lze lokálně uložit Gemini API klíč a týmový bezpečnostní kód pouze na důvěryhodném zařízení. Centrální permit AI Studia je uložen pod klíčem ghrab.access.permit.v2 a obsahuje podepsané nároky, nikoli soukromý podpisový klíč. Ve studentském secure testu se odpovědi drží za běhu v paměti.",
+  evidence:["getStoredState()","anonymizeGroupsForStorage()","pushHistory()","ghrab.access.permit.v2","submittedLocked()"]},
 
  {id:'ochrana-answer-key',title:'Ochrana před únikem klíče odpovědí',status:'reseno',
   keywords:['unik odpovedi','unik klice','answer key','spravne odpovedi unik','muze student videt odpovedi','skryt odpovedi','bezpecnostni skener','scanner'],
@@ -771,7 +770,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"github-test-nenacte",title:"Test na GitHubu se nenačte nebo zobrazuje chybu",status:"reseno",
   keywords:["nefunguje link", "nefunguje odkaz", "nenacte se", "nenačte se", "github chyba", "404 github", "test nejde otevrit", "test nejde otevřít", "bily ekran", "bílý ekrán", "prazdna stranka", "prázdná stránka", "cors", "mixed content"],
   simple:"Nejdřív zkontroluj stav GitHub Actions a Pages deploymentu, potom přesnou github.io adresu a cache PWA. Změna není dostupná, dokud nasazovací workflow neskončí úspěšně.",
-  detailed:"Postup: (1) v záložce Actions otevři poslední běh workflow a ověř zelený build i deploy, (2) zkontroluj Pages URL a cestu repozitáře, (3) proveď tvrdé obnovení nebo zavři a znovu otevři nainstalovanou PWA, (4) ověř že dist/ při buildu obsahoval index.html, manifest, service worker a access-manifest.json, (5) při bílé stránce zkontroluj konzoli prohlížeče. Neupravuj ručně nasazený dist/index.html; oprav zdroj, spusť npm test a vytvoř nový commit.",
+  detailed:"Postup: (1) v záložce Actions otevři poslední běh workflow a ověř zelený build i deploy, (2) zkontroluj Pages URL a cestu repozitáře, (3) proveď tvrdé obnovení nebo zavři a znovu otevři nainstalovanou PWA, (4) ověř že dist/ při buildu obsahoval index.html, PWA manifest, service worker a studio-manifest.json, (5) při bílé stránce zkontroluj konzoli prohlížeče. Neupravuj ručně nasazený dist/index.html; oprav zdroj, spusť npm test a vytvoř nový commit.",
   evidence:[".github/workflows/deploy.yml", "GitHub Actions", "dist/index.html", "public/sw.js", "npm test"]},
 
  {id:"prisny-vs-procvicovaci-student",title:"Co vidí student v ostrém a procvičovacím režimu",status:"reseno",
@@ -786,11 +785,11 @@ const GENERATOR_ASSISTANT_KB = [
   detailed:"Studentský HTML je samostatný a po načtení nepotřebuje server ani Gemini. Aktuální odpovědi a časovač jsou ale během pokusu převážně v paměti. Krátký výpadek sítě nevadí, pokud stránka zůstane otevřená; obnovení stránky, pád prohlížeče nebo zavření karty může rozpracovaný pokus smazat. U klasifikovaného testu proto zakaž reload, připrav náhradní zařízení/postup a incident řeš podle jednotných pravidel.",
   evidence:["offline HTML", "RESP", "STARTED_AT", "startTimer()", "submittedLocked()"]},
 
- {id:"zmena-pinu-hesla",title:"Změna PINu nebo hesla",status:"reseno",
-  keywords:["zmena pinu", "změna pinu", "zmena hesla", "změna hesla", "novy pin", "nový pin", "odemykaci heslo", "učitelský pin"],
-  simple:"Přístupový místní PIN zařízení lze resetovat aktivačním kódem. PIN učitele a odemykací heslo konkrétního testu změníš pouze novým vygenerováním výstupu.",
-  detailed:"Místní PIN profilu je uložen jen jako hash; použij volbu Reset PIN a znovu ověř osobní aktivační kód. Nemáš-li platný kód, admin vygeneruje nový a nasadí aktualizovaný manifest. Učitelský PIN a odemykací heslo vložené do konkrétního testu nelze po exportu bezpečně přepsat bez změny integrity; uprav je v generátoru a vytvoř nový student_test.html i teacher_verifier.html.",
-  evidence:["accResetPinFlow()", "hashLocalPin()", "ucitelPin", "heslo", "buildSecureOfflinePackage()"]},
+ {id:"zmena-pinu-hesla",title:"Změna přístupu, PINu nebo hesla",status:"reseno",
+  keywords:["zmena pinu","zmena hesla","novy pristup","odemykaci heslo","ucitelsky pin"],
+  simple:"Přístup do Generátoru se mění vydáním nového oprávnění v AI Studiu. Učitelský PIN a odemykací heslo konkrétního testu změníš pouze novým sestavením výstupu.",
+  detailed:"Generátor již nemá vlastní místní přístupový PIN. Pokud uživatel ztratí osobní přístupový soubor nebo získá další školení, správce v AI Studiu vydá nový kumulativní přístup. Učitelský PIN a odemykací heslo vložené do konkrétního testu nelze po exportu bezpečně přepsat bez změny integrity; uprav je v generátoru a vytvoř nový student_test.html i teacher_verifier.html.",
+  evidence:["AI Studio Můj přístup","Vydání přístupu","teacher_verifier.html","student_test.html"]},
 
  {id:'flash-vs-lite',title:'Gemini Flash vs. Flash Lite — jaký je rozdíl',status:'reseno',
   keywords:['flash vs lite','flash lite','ktery model','který model','lepsi model','lepší model','horsi model','horší model','kdy pouzit lite','kdy použít lite','rychlejsi model','rychlejší model','kvalita modelu','model doporuceni','model doporučení'],
@@ -799,10 +798,10 @@ const GENERATOR_ASSISTANT_KB = [
   evidence:['GEMINI_MODEL_DEFAULT','gemini-3.5-flash','gemini-3.1-flash-lite','quickModel()','Rate limits']},
 
  {id:"pristup-kolega",title:"Jak dát přístup kolegovi",status:"reseno",
-  keywords:["kolega pristup", "kolega přístup", "pridat ucitele", "přidat učitele", "aktivace kolegy", "trainedteacher"],
-  simple:"Admin přidá kolegu jako trainedTeacher, předá mu jednorázově zobrazený osobní aktivační kód a nasadí nový access-manifest.json. Kolega si na svém zařízení nastaví místní PIN.",
-  detailed:"Ve Správě přístupů vytvoř userId a zobrazované jméno, bezpečně předej vygenerovaný kód, exportuj manifest a nahraj jej k oficiální aplikaci. Kolega aplikaci aktivuje a nastaví nejméně šestimístný místní PIN. Brána řídí oprávněné používání v rámci sboru, ale není serverovou autentizací. Každý učitel má používat vlastní omezený Gemini API klíč; klíče se mezi kolegy nesdílejí.",
-  evidence:["accAdminAddTeacher()", "trainedTeacher", "accAdminExport()", "accTryActivate()", "openAccountModal()"]},
+  keywords:["pristup kolega","pridat ucitele","novy ucitel","vydat pristup","skoleni"],
+  simple:"Po absolvování školení vydá správce kolegovi v AI Studiu osobní podepsaný přístup a povolí v něm Generátor i všechny dříve absolvované aplikace.",
+  detailed:"V AI Studiu otevři Správa → Vydání přístupu, načti soukromý podpisový klíč, vyplň jméno a interní identifikátor, nastav roli Proškolený učitel, platnost a kumulativní seznam aplikací. Kolegovi pošli pouze soubor .ghrab-access.json. Ten jej jednou aktivuje ve Studiu; Generátor i ostatní povolené nástroje se pak otevřou bez dalšího zadávání.",
+  evidence:["AI Studio access issuer",".ghrab-access.json","apps: generator","kumulativní oprávnění"]},
 
  {id:"vice-variant-testu",title:"Více variant testu",status:"reseno",
   keywords:["vice variant", "více variant", "varianta a b", "nahodne poradi", "náhodné pořadí", "diferencovane varianty"],
@@ -870,11 +869,11 @@ const GENERATOR_ASSISTANT_KB = [
   detailed:"Nastav odpovídající CEFR, používej typy úloh podobné procvičovaným dovednostem a pracuj jen s legálně použitelnými podklady. Učitel musí zkontrolovat věcnou správnost, bodování i shodu s cílem přípravy. Pro interní klasifikované cvičení lze použít secureOffline a dohled; pro samotnou oficiální maturitní zkoušku je nutné postupovat podle platných školních a právních pravidel a schválených materiálů.",
   evidence:["CEFR", "reading comprehension", "transformation-chain", "secureOffline", "PROVOZNI-PRAVIDLA.md"]},
 
- {id:"co-kdyz-kolega-zapomnel-pin",title:"Kolega zapomněl místní PIN",status:"reseno",
-  keywords:["zapomnel pin", "zapomněl pin", "reset pin", "obnovit pristup", "obnovit přístup", "nema pristup", "nemá přístup"],
-  simple:"PIN nelze zjistit, protože je uložen jen jako solený otisk. Kolega použije Reset PIN a znovu zadá svůj platný aktivační kód.",
-  detailed:"Je-li aktivační kód stále platný, na přístupové obrazovce zvol Reset PIN, ověř kód a nastav nový PIN. Nemá-li kolega původní kód nebo byl otočen, admin ve Správě přístupů vydá nový kód, exportuje a nasadí nový manifest; kolega potom zařízení aktivuje znovu. Nikdy neposílej ani nehledej PIN v souborech — čitelná hodnota se neukládá.",
-  evidence:["accResetPinFlow()", "accTryActivate()", "hashLocalPin()", "accAdminAction(\"newcode\")", "accAdminExport()"]},
+ {id:"co-kdyz-kolega-zapomnel-pin",title:"Kolega ztratil přístupový soubor",status:"reseno",
+  keywords:["ztratil pristup","zapomnel pristup","novy pocitac","novy prohlizec","pristupovy soubor"],
+  simple:"Kolega znovu načte svůj osobní přístupový soubor v AI Studiu. Pokud jej nemá nebo už neplatí, správce vydá nový kumulativní přístup.",
+  detailed:"Přístup je uložen v konkrétním prohlížeči. Na novém zařízení, po vymazání dat nebo v jiném prohlížeči je nutné znovu aktivovat .ghrab-access.json či textový kód. Ztracený soubor nelze ze Studia zpětně stáhnout; správce vytvoří nový, uloží jeho JTI a podle potřeby zneplatní původní oprávnění.",
+  evidence:["Můj přístup","ghrab.access.permit.v2","JTI","revoked-access.json"]},
 
  {id:"anonymizace-gdpr-detail",title:"Anonymizace a GDPR — jak chránit data studentů",status:"reseno",
   keywords:["anonymizace", "gdpr", "ochrana dat", "osobni udaje", "osobní údaje", "jmeno studenta", "jméno studenta", "skryt jmena", "skrýt jména", "anonymni", "anonymní", "pravni", "právní"],
@@ -924,22 +923,22 @@ const GENERATOR_ASSISTANT_KB = [
   evidence:['table-completion','rows[]','cells[]','tableScore()','MANUAL_SUPPORTED_TYPES']},
 
  {id:"bezpecnostni-incident",title:"Bezpečnostní incident — co dělat",status:"reseno",
-  keywords:["klic unikl", "klíč unikl", "studenti maji klic", "studenti mají klíč", "podvod", "opisovani", "opisování", "bezpecnostni incident", "bezpečnostní incident", "zneplatnit test", "zneplatnit", "odvolat test", "test unikl", "fotka testu", "foto testu", "sdilel test", "sdílel test"],
-  simple:"Při úniku testu, verifieru, přístupového kódu nebo API klíče zastav distribuci, odstraň veřejný odkaz a vytvoř nové bezpečnostní materiály. Již stažený soubor nelze bez serveru vzdáleně zneplatnit.",
-  detailed:"Únik student_test.html: přestaň používat odkaz a vygeneruj nový test/Test ID. Únik teacher_verifier.html: považuj klíč i správné odpovědi za kompromitované a vytvoř nový pár souborů. Únik aktivačního kódu: admin kód otočí, exportuje a nasadí nový manifest. Únik Gemini API klíče: okamžitě jej zneplatni v Google AI Studio/Cloud Console, vytvoř nový omezený klíč a zkontroluj využití. Událost zaznamenej bez zbytečných osobních údajů a postupuj podle školních pravidel.",
-  evidence:["openIncidentChecklist()", "accAdminAction(\"newcode\")", "accAdminExport()", "testId", "teacher_verifier.html"]},
+  keywords:["klic unikl","studenti maji klic","podvod","bezpecnostni incident","zneplatnit pristup","test unikl","pristupovy soubor unikl"],
+  simple:"Při úniku testu, verifieru, osobního přístupu nebo API klíče zastav distribuci a zneplatni dotčený prostředek. Již stažený studentský soubor nelze bez serveru vzdáleně zrušit.",
+  detailed:"Únik student_test.html: přestaň používat odkaz a vygeneruj nový Test ID. Únik teacher_verifier.html: vytvoř nový pár souborů. Únik osobního .ghrab-access.json: přidej jeho JTI do revokačního seznamu a vydej nový přístup. Únik soukromého podpisového klíče AI Studia: okamžitě vytvoř nový pár klíčů a přegeneruj přístupy. Únik Gemini API klíče: zneplatni jej v Google AI Studio/Cloud Console a zkontroluj využití.",
+  evidence:["JTI","revoked-access.json","teacher_verifier.html","Gemini API key","nový podpisový pár"]},
 
- {id:"access-manifest",title:"Co je access-manifest.json a jak funguje",status:"castecne",
-  keywords:["access manifest", "access-manifest", "manifest", "pristupovy manifest", "přístupový manifest", "json manifest", "sprava pristupu", "správa přístupů", "jak funguje pristup", "jak funguje přístup", "kdo ma pristup", "kdo má přístup"],
-  simple:"access-manifest.json je veřejně načítaný seznam oprávněných identifikátorů, rolí a kryptografických otisků aktivačních kódů. Neobsahuje hesla ani přihlašovací e-maily.",
-  detailed:"Každý záznam má userId, displayName, roli admin nebo trainedTeacher, stav, PBKDF2 hash aktivačního kódu, sůl a časové údaje. Aplikace načte externí manifest vedle stránky; není-li dostupný, použije vestavěnou kopii a upozorní na to. Po aktivaci ukládá na zařízení lokální profil a hash PINu. Protože vše běží v prohlížeči, jde o řízenou organizační bránu a auditní identitu ve výstupech, nikoli o neobejitelnou autentizaci; tu by zajistil až server/SSO.",
-  evidence:["loadEffectiveManifest()", "accValidManifest()", "accessCodeHash", "salt", "ACCESS_PROFILE_KEY"]},
+ {id:"access-manifest",title:"Jak funguje podepsaný přístup AI Studia",status:"reseno",
+  keywords:["podepsany pristup","permit","pristupovy soubor","verejny klic","revokace","jak funguje pristup"],
+  simple:"AI Studio vydává digitálně podepsaný přístup s rolí, platností a seznamem aplikací. Dílčí aplikace podpis ověřují veřejným klíčem ještě před spuštěním svého rozhraní.",
+  detailed:"Permit má formát ghrab1.payload.signature. Obsahuje vydavatele, publikum, subjekt, roli, povolené aplikace, čas vydání, konec platnosti a JTI. Soukromý ECDSA P-256 klíč zůstává jen u správce; veřejný klíč může být v repozitáři a slouží pouze k ověření. Generátor také kontroluje revokační seznam. Protože vše běží bez serveru, nelze spolehlivě potvrdit fyzickou identitu uživatele ani zabránit předání souboru jiné osobě.",
+  evidence:["ghrab1.payload.signature","ECDSA P-256","access-public-key.json","revoked-access.json","protectApp('generator')"]},
 
- {id:"role-admin-teacher",title:"Role admin vs. trainedTeacher",status:"reseno",
-  keywords:["admin", "administrator", "trained teacher", "trainedTeacher", "role", "opravneni", "oprávnění", "co muze admin", "co může admin", "rozdil roli", "rozdíl rolí", "kdo je admin", "kdo muze", "kdo může", "pristupova uroven", "přístupová úroveň"],
-  simple:"Obě role mohou používat generátor. Admin navíc spravuje pracovní přístupový manifest, exportuje jej a otevírá administrační nástroje; trainedTeacher přístupy ostatních nespravuje.",
-  detailed:"Admin může přidávat, odvolávat a obnovovat záznamy, vydávat nové aktivační kódy, importovat/exportovat manifest, otevřít Test Lab a incidentní checklist. trainedTeacher používá běžné funkce generátoru, šablony, historii, editor a vyhodnocování, ale admin panel nemá. Role sama o sobě nemění globální nastavení nasazené aplikace; změny zdroje a vydání se provádějí v repozitáři.",
-  evidence:["accIsAdmin()", "openAdminPanel()", "accAdminExport()", "trainedTeacher", "openTestLab()"]},
+ {id:"role-admin-teacher",title:"Role admin vs. proškolený učitel",status:"reseno",
+  keywords:["admin","administrator","proskoleny ucitel","role","opravneni","co muze admin"],
+  simple:"Proškolený učitel používá jen aplikace uvedené ve svém přístupu. Admin má automaticky otevřeny všechny aplikace a navíc správcovské nástroje AI Studia.",
+  detailed:"Role admin obchází jednotlivý seznam aplikací, otevírá Test Lab a odkazy na centrální správu. Role trainedTeacher používá běžné funkce Generátoru, ale nevydává cizí přístupy. Rozsah oprávnění je součástí digitálně podepsaného permitu a nelze jej změnit prostou editací JSON bez zneplatnění podpisu.",
+  evidence:["accIsAdmin()","openAdminPanel()","role: admin","apps[]","digitální podpis"]},
 
  {id:"logo-skola",title:"Jak změnit logo nebo název aplikace",status:"reseno",
   keywords:["logo", "logo skoly", "logo školy", "nazev skoly", "název školy", "skola", "škola", "branding", "vlastni logo", "vlastní logo", "pridat logo", "přidat logo", "upravit generátor", "vzhled generátoru"],

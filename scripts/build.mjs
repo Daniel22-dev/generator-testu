@@ -1,4 +1,4 @@
-// scripts/build.mjs — v3 (izolované classic script tagy)
+// scripts/build.mjs — v4 (centrálně chráněné izolované classic script tagy)
 // Složí dist/index.html ze src/shell.html + src/styles.css + src/js/*.js.
 // Pořadí JS modulů = abecední řazení názvů souborů. Každý modul je vložen do
 // samostatného classic <script> tagu; nejde o ES moduly ani import/export. Tím
@@ -37,8 +37,6 @@ function assertVersionSync() {
 
 const DIST_DIR = path.resolve("dist");
 const DIST = path.join(DIST_DIR, "index.html");
-const MANIFEST_SRC = path.resolve("src/access-manifest.json");
-const MANIFEST_DIST = path.join(DIST_DIR, "access-manifest.json");
 const PUBLIC_DIR = path.resolve("public");
 
 function copyDir(src, dest) {
@@ -68,7 +66,7 @@ function inlineScriptTag(file) {
   const code = fs.readFileSync(path.join(jsDir, file), "utf8");
   // Každý zdrojový modul je samostatný classic script. Runtime chyba v jednom
   // modulu tak nezastaví načtení přístupové brány ani závěrečného init modulu.
-  return `<script data-source="${file}">\n${code}\n</script>`;
+  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${code}\n</script>`;
 }
 
 const jsMainTags = mainParts.map(inlineScriptTag).join("\n");
@@ -88,10 +86,6 @@ out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
 
 fs.writeFileSync(DIST, out, "utf8");
 
-if (fs.existsSync(MANIFEST_SRC)) {
-  fs.copyFileSync(MANIFEST_SRC, MANIFEST_DIST);
-  console.log("✅  access-manifest.json zkopírován do dist/");
-}
 if (fs.existsSync(PUBLIC_DIR)) {
   copyDir(PUBLIC_DIR, DIST_DIR);
   console.log("✅  PWA soubory z public/ zkopírovány do dist/");
