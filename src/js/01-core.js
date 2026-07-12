@@ -17,10 +17,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.0.7',
-  date:    '2026-07-11',
+  version: '7.0.8',
+  date:    '2026-07-12',
   status:  'production-serverless',
   changes: [
+    'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
     'SJEDNOCENÁ IDENTITA ŠKOLY (7.0.7): záhlaví nyní používá stejné oficiální logo a výrazný název GYMNÁZIUM, OSTRAVA-HRABŮVKA jako ostatní nástroje AI Studia. Autorský blok v zápatí byl sjednocen na společný dvouřádkový formát.',
     'CENTRÁLNÍ PŘÍSTUP AI STUDIO GHRAB (7.0.6): původní lokální aktivační kódy a PIN brána byly nahrazeny kryptograficky podepsaným oprávněním vydávaným v AI Studiu. Generátor se nespustí před ověřením podpisu, platnosti, role, povolení aplikace a revokačního seznamu. Správce aktivuje přístup pouze jednou ve Studiu a stejná relace otevře všechny povolené aplikace; auditní Creator ID a role zůstávají ve výstupech zachované. Přímá adresa bez oprávnění zobrazí jednotnou zamykací obrazovku.',
     'NAPOJENÍ NA AI STUDIO GHRAB (7.0.5): Generátor umí bezpečně převzít krátkodobou lokální předávku GHRAB Material v1. Automaticky doplní název, skupinu/úroveň, předmět a látku i zdrojový obsah včetně strukturovaných úloh. Předávka má omezenou platnost, po načtení se smaže a nic se neposílá na server. Přidán viditelný návrat do AI Studia a anonymní místní záznam přínosu pro pilot.',

@@ -1,9 +1,11 @@
-const CACHE_NAME = 'generator-testu-pwa-v7.0.7';
+const CACHE_NAME = 'generator-testu-pwa-v7.0.8';
 const CORE_ASSETS = [
   './',
   './index.html',
   './access-manifest.json',
   './manifest.webmanifest',
+  './manual/',
+  './manual/index.html',
   './icons/icon-32.png',
   './icons/icon-192.png',
   './icons/icon-512.png',

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="cs" data-ghrab-access="checking">
-<!-- BUILD: 2026-07-11T20:37:03.000Z -->
+<!-- BUILD: 2026-07-12T15:19:50.841Z -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1707,6 +1707,12 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 .app-owner-footer strong{color:var(--t2)}
 @media(max-width:760px){.header-top{flex-direction:column;gap:10px}.school-brand-lockup{width:100%}.school-logo-wrap{flex-basis:60px!important;width:60px!important;height:60px!important;max-width:60px!important;max-height:60px!important;border-radius:15px!important}.school-name{font-size:clamp(14px,4vw,18px);letter-spacing:.055em}.hdr-btns{align-self:flex-end;max-width:100%}}
 @media(max-width:430px){.school-logo-wrap{flex-basis:54px!important;width:54px!important;height:54px!important;max-width:54px!important;max-height:54px!important;padding:5px!important}.school-name{font-size:13px;line-height:1.18}.hdr-btns{width:100%;justify-content:flex-end}.hdr-btn{min-width:34px;padding:6px 8px}}
+
+
+/* Interaktivní manuál celé aplikace — oddělený od kontextových nápověd */
+a.manual-launch-btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;position:relative}
+a.manual-launch-btn::after{content:"";position:absolute;inset:-3px;border-radius:inherit;border:1px solid color-mix(in srgb,var(--acc, var(--accent, #65d9ff)) 44%,transparent);pointer-events:none;opacity:.75}
+a.manual-launch-btn:hover::after,a.manual-launch-btn:focus-visible::after{opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--acc, var(--accent, #65d9ff)) 12%,transparent)}
 </style>
 </head>
 <body>
@@ -1728,6 +1734,7 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
       <button class="hdr-btn" id="btnStrict" onclick="showStrictSituations()" aria-label="Situace a meze přísného testu" title="Co čekat od přísného testu — situace a meze">🔒</button>
       <button class="hdr-btn" id="btnMode" onclick="toggleMode()" aria-label="Přepnout světlý nebo tmavý režim" title="Světlý/tmavý režim">☀️</button>
       <button class="hdr-btn" id="btnAssistant" onclick="openGeneratorAssistant()" aria-label="Otevřít poradce generátoru" title="Zeptat se na funkce, bezpečnost a ovládání generátoru">💬</button>
+      <a class="hdr-btn manual-launch-btn" id="btnManual" href="./manual/" target="_blank" rel="noopener" aria-label="Otevřít interaktivní manuál celé aplikace" title="Interaktivní manuál celé aplikace">📖</a>
       <button class="hdr-btn" id="btnFs" onclick="toggleFullscreen()" aria-label="Přepnout celou obrazovku" title="Celá obrazovka"><span class="fs-ico-hdr" aria-hidden="true"></span></button>
       </div>
     </div>
@@ -2725,10 +2732,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.0.7',
-  date:    '2026-07-11',
+  version: '7.0.8',
+  date:    '2026-07-12',
   status:  'production-serverless',
   changes: [
+    'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
     'SJEDNOCENÁ IDENTITA ŠKOLY (7.0.7): záhlaví nyní používá stejné oficiální logo a výrazný název GYMNÁZIUM, OSTRAVA-HRABŮVKA jako ostatní nástroje AI Studia. Autorský blok v zápatí byl sjednocen na společný dvouřádkový formát.',
     'CENTRÁLNÍ PŘÍSTUP AI STUDIO GHRAB (7.0.6): původní lokální aktivační kódy a PIN brána byly nahrazeny kryptograficky podepsaným oprávněním vydávaným v AI Studiu. Generátor se nespustí před ověřením podpisu, platnosti, role, povolení aplikace a revokačního seznamu. Správce aktivuje přístup pouze jednou ve Studiu a stejná relace otevře všechny povolené aplikace; auditní Creator ID a role zůstávají ve výstupech zachované. Přímá adresa bez oprávnění zobrazí jednotnou zamykací obrazovku.',
     'NAPOJENÍ NA AI STUDIO GHRAB (7.0.5): Generátor umí bezpečně převzít krátkodobou lokální předávku GHRAB Material v1. Automaticky doplní název, skupinu/úroveň, předmět a látku i zdrojový obsah včetně strukturovaných úloh. Předávka má omezenou platnost, po načtení se smaže a nic se neposílá na server. Přidán viditelný návrat do AI Studia a anonymní místní záznam přínosu pro pilot.',

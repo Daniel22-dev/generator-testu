@@ -15,6 +15,7 @@
     "en": "Create practice and graded tests, variants, access codes and secure offline submissions."
   },
   "launchUrl": "https://daniel22-dev.github.io/generator-testu/",
+  "manualUrl": "https://daniel22-dev.github.io/generator-testu/manual/",
   "repository": "daniel22-dev/generator-testu",
   "icon": "assets/apps/generator.png",
   "accent": "#50e8ff",

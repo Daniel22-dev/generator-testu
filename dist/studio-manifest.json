@@ -5,7 +5,7 @@
     "cs": "Generátor interaktivních testů",
     "en": "Interactive Test Generator"
   },
-  "version": "7.0.7",
+  "version": "7.0.8",
   "status": {
     "cs": "Připraveno k řízenému pilotu",
     "en": "Ready for controlled pilot"
@@ -15,6 +15,7 @@
     "en": "Create practice and graded tests, variants, access codes and secure offline submissions."
   },
   "launchUrl": "https://daniel22-dev.github.io/generator-testu/",
+  "manualUrl": "https://daniel22-dev.github.io/generator-testu/manual/",
   "repository": "daniel22-dev/generator-testu",
   "icon": "assets/apps/generator.png",
   "accent": "#50e8ff",
@@ -39,5 +40,5 @@
     "materialSchema": "ghrab-material-v1",
     "studioBridge": "1.1"
   },
-  "publishedAt": "2026-07-11T20:37:03.000Z"
+  "publishedAt": "2026-07-12T15:19:50.841Z"
 }
