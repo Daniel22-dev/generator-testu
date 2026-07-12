@@ -5,7 +5,7 @@
     "cs": "Generátor interaktivních testů",
     "en": "Interactive Test Generator"
   },
-  "version": "7.0.6",
+  "version": "7.0.7",
   "status": {
     "cs": "Připraveno k řízenému pilotu",
     "en": "Ready for controlled pilot"
@@ -39,5 +39,5 @@
     "materialSchema": "ghrab-material-v1",
     "studioBridge": "1.1"
   },
-  "publishedAt": "2026-07-11T06:29:40.113Z"
+  "publishedAt": "2026-07-11T20:37:03.000Z"
 }

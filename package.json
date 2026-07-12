@@ -1,6 +1,6 @@
 {
   "name": "generator-testu",
-  "version": "7.0.6",
+  "version": "7.0.7",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
