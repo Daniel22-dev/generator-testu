@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="cs" data-ghrab-access="checking">
-<!-- BUILD: 2026-07-12T15:19:50.841Z -->
+<!-- BUILD: 2026-07-13T11:23:57.490Z -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2732,10 +2732,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.0.8',
-  date:    '2026-07-12',
+  version: '7.1.0',
+  date:    '2026-07-13',
   status:  'production-serverless',
   changes: [
+    'ANONYMNÍ TECHNICKÉ METRIKY VÝSTUPŮ (7.1.0): po skutečném dokončení generování zapisuje Generátor do společného modulu AI Studia jedinou technickou událost test-package. Eviduje pouze počet úspěšných, chybných nebo zrušených generovacích běhů; prompt, téma, otázky, odpovědi ani jiné části testu se neukládají. Manuál je z měření používání výslovně vyloučen.',
     'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
     'SJEDNOCENÁ IDENTITA ŠKOLY (7.0.7): záhlaví nyní používá stejné oficiální logo a výrazný název GYMNÁZIUM, OSTRAVA-HRABŮVKA jako ostatní nástroje AI Studia. Autorský blok v zápatí byl sjednocen na společný dvouřádkový formát.',
     'CENTRÁLNÍ PŘÍSTUP AI STUDIO GHRAB (7.0.6): původní lokální aktivační kódy a PIN brána byly nahrazeny kryptograficky podepsaným oprávněním vydávaným v AI Studiu. Generátor se nespustí před ověřením podpisu, platnosti, role, povolení aplikace a revokačního seznamu. Správce aktivuje přístup pouze jednou ve Studiu a stejná relace otevře všechny povolené aplikace; auditní Creator ID a role zůstávají ve výstupech zachované. Přímá adresa bez oprávnění zobrazí jednotnou zamykací obrazovku.',
@@ -2745,8 +2746,7 @@ const RELEASE = Object.freeze({
     'OPRAVA PŘÍSTUPOVÉ BRÁNY (7.0.2): aplikace je nyní zamčená už v samotném HTML ještě před spuštěním JavaScriptu, takže při chybě načtení nezůstane generátor otevřený. Odemčení relace je navázané na konkrétní verzi aplikace; po nasazení nové verze se existující zařízení znovu zeptá na místní PIN. Přidány servisní adresy ?lock=1 pro okamžité uzamčení a ?reset-access=1 pro smazání místního přístupového profilu a novou aktivaci. Headless test nově ověřuje, že čerstvé zařízení vždy zobrazí aktivační bránu a že session token obsahuje aktuální verzi.',
     'KOMPLETNÍ AUDIT NÁVAZNOSTI PRŮVODCE (7.0.1): přidána vydávací workflow matice, která ověřuje křížové závislosti jednoduchého i pokročilého režimu, všechny šablony, 13 presetů českého modulu, všech 38 podporovaných typů cvičení samostatně a všech 703 dvojic, 315 kombinací CEFR napříč pěti cizími jazyky, aktivaci a skrytí polí, obnovu starých rozporných stavů, úplný průchod kroky a runtime jednorázových kódů v instant i secure režimu. Opraveno: karta Bez šablony skutečně otevírá pokročilý režim; procvičování vždy vynutí instantní učící zpětnou vazbu a vypne žolík; secure režim vynutí celkové odevzdání bez okamžité zpětné vazby; české procvičovací presety nyní nastavují skutečný procvičovací režim; český modul už mimo češtinu neodkrývá globální typy při detailním rozpisu; vlastní stupnice blokuje mezery a překryvy s přesným vysvětlením; listening bez zdroje, nepodporované vlastní typy, více typů než cvičení, duplicitní členové skupin a neúplné 1:1 přiřazení rosteru jsou zablokovány. Jednorázové kódy se kontrolují i bez diferenciace v obou výstupech.',
     'PRODUKČNÍ SERVERLESS VYDÁNÍ (7.0.0): odstraněn rozpor mezi pilotní dokumentací a stavem aplikace; verze je nyní označena jako technicky ověřená produkční serverless varianta, nikoli jako formálně schválená školou. Kritická ochrana soukromí: jména studentů v diferenciaci se do AI promptu již nikdy neposílají a staré nastavení se automaticky převádí na bezpečný režim. Před prvním AI požadavkem v relaci se zobrazuje transparentní informace o přenosu zadání, URL a příloh do Gemini. Výchozí modely aktualizovány na stabilní gemini-3.5-flash a gemini-3.1-flash-lite, staré 2.5 volby se migrují. Odstraněny zastaralé pevné údaje o kvótách; aplikace odkazuje na aktivní limity projektu v AI Studiu. Opraveny ARIA role průvodce, kontrast pomocných textů, fokus klávesnice a mobilní hlavička. Doplněna produkční kontrola npm test, provozní pravidla, checklist vydání a auditní zpráva. Druhá kritická oprava soukromí odstranila čitelný seznam studentů z generovaných HTML: rozpis variant nyní používá náhodnou sůl a SHA-256 otisky, neznámý identifikátor je odmítnut místo přiřazení výchozí varianty. Interní poradce byl obsahově přepsán podle skutečného chování 7.0.0 a testy nově hlídají API kontrakt i soukromí výstupního rosteru.',
-    'TECHNICKÁ STABILIZACE A PILOTNÍ PRAVIDLA (6.12.2): priorita A+B bez serveru. Velké bloky secure exportu a HTML builderů byly opatrně rozděleny na menší části 13a…13g a 14a…14d; spojení těchto částí bylo ověřeno proti původnímu obsahu. Přidán ESLint, kontrola struktury zdroje, kontrola známých osobních údajů v public access manifestu a rozšířený headless test: PWA soubory, bezpečné vložení JSON před &lt;/script&gt; a sestavení secureOffline balíku student + teacher verifier. Přístupové manifesty v repozitáři jsou anonymizované na obecné identifikátory ADMIN/TEACHER_01. Doplněn dokument PILOTNI-PRAVIDLA.md pro řízený školní pilot. Funkční chování aplikace se nemění.',
-    'STABILIZAČNÍ BALÍK PRO GITHUB A PWA (6.12.1): doplněn jsdom do devDependencies, přidán package-lock pro opakovatelné instalace, GitHub Actions nově používají npm ci a před nasazením spouštějí npm test. Build nově kontroluje shodu verzí napříč package.json, RELEASE.version, PWA service workerem a manifestem, aby se předešlo staré cache nebo nejednotnému označení verze. Doplněny provozní dokumenty ARCHITEKTURA.md, SECURITY.md a CONTRIBUTING.md pro bezpečný další vývoj bez serveru. Funkční chování aplikace se nemění.',]
+  ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
@@ -9179,6 +9179,20 @@ async function runHybridGeneration(state, filePack, useUrlContext, complexIdxs, 
 }
 
 
+function recordGeneratorTelemetry(outcome){
+  try{
+    window.GHRABTelemetry?.recordOutput({
+      outputKind:'test-package',
+      attemptedQuantity:1,
+      successfulQuantity:outcome==='success'?1:0,
+      failedQuantity:outcome==='error'?1:0,
+      cancelledQuantity:outcome==='cancelled'?1:0,
+      outcome
+    });
+  }catch(error){ console.warn('Telemetrie Generátoru se nezapsala.',error); }
+}
+
+
 async function generateTest(){
   // NEOFICIÁLNÍ kopie (cizí fork/hosting) → generování je zakázané. Tvrdá zarážka.
   // Platí jen když je nastavená oficiální adresa (jinak je envKind 'unverified' a pustí).
@@ -9313,6 +9327,7 @@ async function generateTest(){
         if (!ok) {
           const diag2 = $('geminiRawDiag'); if (diag2) diag2.remove();
           generatedPackage = null; generatedTestHtml = ''; generatedIntegrity = null;
+          recordGeneratorTelemetry('cancelled');
           setGenUI('idle');
           uiToast('Test byl zahozen. Zkontroluj zadání a spusť generování znovu.', 'warn', 4500);
           return;
@@ -9324,8 +9339,14 @@ async function generateTest(){
         );
       }
     }
+    recordGeneratorTelemetry('success');
   }
-  catch(e){generatedTestHtml='';generatedPackage=null;setGenErr(e?.message||String(e));}
+  catch(e){
+    generatedTestHtml='';generatedPackage=null;
+    const cancelled=geminiCancelRequested||/zrušeno|cancelled|canceled|abort/i.test(String(e?.message||e));
+    recordGeneratorTelemetry(cancelled?'cancelled':'error');
+    setGenErr(e?.message||String(e));
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════

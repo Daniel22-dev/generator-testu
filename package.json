@@ -1,6 +1,6 @@
 {
   "name": "generator-testu",
-  "version": "7.0.8",
+  "version": "7.1.0",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
     "check:production": "node scripts/check-production-readiness.mjs",
-    "test:workflow": "node tools/workflow-matrix-check.mjs dist/index.html",
+    "test:workflow": "node tools/run-workflow-audit.mjs dist/index.html",
     "test:headless": "node tools/headless-check.mjs dist/index.html"
   },
   "engines": {

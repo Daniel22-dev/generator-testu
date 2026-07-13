@@ -608,6 +608,20 @@ async function runHybridGeneration(state, filePack, useUrlContext, complexIdxs, 
 }
 
 
+function recordGeneratorTelemetry(outcome){
+  try{
+    window.GHRABTelemetry?.recordOutput({
+      outputKind:'test-package',
+      attemptedQuantity:1,
+      successfulQuantity:outcome==='success'?1:0,
+      failedQuantity:outcome==='error'?1:0,
+      cancelledQuantity:outcome==='cancelled'?1:0,
+      outcome
+    });
+  }catch(error){ console.warn('Telemetrie Generátoru se nezapsala.',error); }
+}
+
+
 async function generateTest(){
   // NEOFICIÁLNÍ kopie (cizí fork/hosting) → generování je zakázané. Tvrdá zarážka.
   // Platí jen když je nastavená oficiální adresa (jinak je envKind 'unverified' a pustí).
@@ -742,6 +756,7 @@ async function generateTest(){
         if (!ok) {
           const diag2 = $('geminiRawDiag'); if (diag2) diag2.remove();
           generatedPackage = null; generatedTestHtml = ''; generatedIntegrity = null;
+          recordGeneratorTelemetry('cancelled');
           setGenUI('idle');
           uiToast('Test byl zahozen. Zkontroluj zadání a spusť generování znovu.', 'warn', 4500);
           return;
@@ -753,8 +768,14 @@ async function generateTest(){
         );
       }
     }
+    recordGeneratorTelemetry('success');
   }
-  catch(e){generatedTestHtml='';generatedPackage=null;setGenErr(e?.message||String(e));}
+  catch(e){
+    generatedTestHtml='';generatedPackage=null;
+    const cancelled=geminiCancelRequested||/zrušeno|cancelled|canceled|abort/i.test(String(e?.message||e));
+    recordGeneratorTelemetry(cancelled?'cancelled':'error');
+    setGenErr(e?.message||String(e));
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
