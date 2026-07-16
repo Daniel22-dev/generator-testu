@@ -1,0 +1,40 @@
+{
+  "schema": "GHRAB-QA-MANIFEST-1",
+  "qaStandard": "1.0",
+  "appId": "generator-testu",
+  "appName": "Generátor interaktivních testů",
+  "version": "7.1.2",
+  "entryPoint": "dist/index.html",
+  "features": {
+    "ai": true,
+    "pwa": true,
+    "centralAccessGuard": true,
+    "localPersistence": true,
+    "studentRuntime": true,
+    "secureOfflineRuntime": true,
+    "fileExport": true
+  },
+  "requiredViewports": [
+    "360x800",
+    "412x915",
+    "768x1024",
+    "1366x768",
+    "1920x1080"
+  ],
+  "criticalFlows": [
+    "teacher-configures-test",
+    "prompt-is-built",
+    "instant-student-test-starts",
+    "secure-student-test-starts",
+    "teacher-verifier-opens",
+    "student-result-is-exported"
+  ],
+  "appSpecificGates": [
+    "workflow-matrix",
+    "privacy-invariants",
+    "deadline-timers",
+    "secure-package-smoke",
+    "instant-runtime-smoke",
+    "exported-runtime-visual-qa"
+  ]
+}

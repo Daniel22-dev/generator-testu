@@ -4,7 +4,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.1** je technicky ověřená produkční serverless varianta. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
+Verze **7.1.2** je technicky ověřená produkční serverless varianta. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
 
 Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 
@@ -128,8 +128,12 @@ Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření 
 
 ## Omezení rozsahu
 
-Verze 7.1.1 nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
+Verze 7.1.2 nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
 
 ## Napojení na AI Studio GHRAB
 
 Build vytváří `dist/studio-manifest.json`. Studio z něj načítá verzi, stav, adresu a metadata. Studio Bridge v1 umí přes krátkodobou lokální předávku `ghrab-material-v1` doplnit název, skupinu, předmět a zdrojový obsah bez serverového ukládání předávky.
+
+## Jednotná certifikace GHRAB QA
+
+Aplikace obsahuje `qa/qa-manifest.json` a řídí se dokumentem `docs/qa/GHRAB-QA-STANDARD-1.0.md`. `npm test` ověřuje, že manifest odpovídá verzi aplikace a obsahuje všechny povinné rozměry, kritické workflow a specifické testovací brány. Finální označení `READY` vyžaduje také vizuální kontrolu ve skutečném prohlížeči a krátký smoke test nasazené verze na reálném zařízení.

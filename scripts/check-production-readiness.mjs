@@ -20,6 +20,7 @@ const formFields = read('src/js/05-form-fields.js');
 const gemini = read('src/js/07-gemini.js');
 const secureHelpers = read('src/js/13a-secure-helpers.js');
 const securePackage = read('src/js/13c-secure-package.js');
+const secureStudentShell = read('src/js/13d-secure-student-shell.js');
 const secureStudentRuntime = read('src/js/13e-secure-student-runtime.js');
 const assembler = read('src/js/13g-assemble-test-html.js');
 const instantRuntime = read('src/js/14b-instant-test-runtime.js');
@@ -53,6 +54,7 @@ requireText(assembler, /diffGroups:\s*publicDiffGroups/, 'Vystupni konfigurace n
 requireText(securePackage, /studentHashes:Array\.isArray\(g\.studentHashes\)/, 'Secure studentsky balicek neprenasi jen hashovany roster.');
 requireText(instantRuntime, /await resolveStudentGroup\(n\)/, 'Instant runtime nevybira variantu podle hashovane identity.');
 requireText(secureStudentRuntime, /await chooseVariant\(name\)/, 'Secure runtime nevybira variantu podle hashovane identity.');
+requireText(secureStudentShell, /\.btn-fullscreen\{[^}]*display:flex[^}]*width:100%[^}]*margin:10px 0 12px/s, 'Secure studentsky fullscreen nema vlastni radek a bezpecne svisle odsazeni.');
 forbidText([securePackage, secureStudentRuntime, instantRuntime, assembler].join('\n'), /g\.students|\.students\s*\|\|/, 'Studentsky runtime nebo vystup stale pracuje s citelnym seznamem studentu.');
 requireText(secureStudentRuntime, /if\(\(CFG\.diffGroups\|\|\[\]\)\.length&&!ACTIVE_KEY\)/, 'Secure runtime neodmita neznamy diferenciacni identifikator.');
 requireText(instantRuntime, /if\(\(CFG\.diffGroups\|\|\[\]\)\.length&&!g\)/, 'Instant runtime neodmita neznamy diferenciacni identifikator.');

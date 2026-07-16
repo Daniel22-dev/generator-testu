@@ -62,3 +62,12 @@
 - [ ] GitHub Actions prošly instalací, testy, auditem a deployem.
 - [ ] Správce provedl smoke test nasazené URL.
 - [ ] Uživatelé dostali stručnou informaci o významných změnách.
+
+## GHRAB QA Standard 1.0
+
+- [ ] `node scripts/check-qa-manifest.mjs` projde a verze manifestu odpovídá aplikaci.
+- [ ] Vizuální QA proběhne na 360×800, 412×915, 768×1024, 1366×768 a 1920×1080.
+- [ ] Zvlášť jsou otevřeny a zkontrolovány všechny exportované HTML runtimy.
+- [ ] Každý nový potvrzený nález má po opravě regresní pojistku.
+- [ ] Certifikační protokol neobsahuje žádný otevřený BLOCKER ani MAJOR.
+- [ ] Nasazený smoke test na PC a telefonu je potvrzen před označením READY.

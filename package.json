@@ -1,12 +1,12 @@
 {
   "name": "generator-testu",
-  "version": "7.1.1",
+  "version": "7.1.2",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "check:versions": "node scripts/check-versions.mjs",
-    "test": "node scripts/check-versions.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-production-readiness.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && node scripts/check-deadline-timers.mjs && npm run lint && node scripts/build.mjs && node scripts/check-sw-precache.mjs && npm run test:workflow",
+    "test": "node scripts/check-versions.mjs && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-production-readiness.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && node scripts/check-deadline-timers.mjs && npm run lint && node scripts/build.mjs && node scripts/check-sw-precache.mjs && npm run test:workflow",
     "lint": "node scripts/generate-eslint-globals.mjs && eslint .",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
@@ -17,7 +17,8 @@
     "check:precache": "node scripts/check-sw-precache.mjs",
     "generate:eslint-globals": "node scripts/generate-eslint-globals.mjs",
     "fix:lockfile-registry": "node scripts/normalize-lockfile-registry.mjs",
-    "check:timers": "node scripts/check-deadline-timers.mjs"
+    "check:timers": "node scripts/check-deadline-timers.mjs",
+    "check:qa-manifest": "node scripts/check-qa-manifest.mjs"
   },
   "engines": {
     "node": ">=18"
