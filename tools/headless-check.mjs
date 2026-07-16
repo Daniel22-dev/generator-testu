@@ -185,16 +185,19 @@ for (const [lang, ids] of [['angličtina', ['fl_practice','fl_homework','fl_grad
 // Test Lab jako admin
 w.eval("Access.profile={role:'admin',userId:'BALAZ',displayName:'Admin',status:'active'};Access.granted=true;");
 const checks = w.tlChecks();
-let pass = 0, fail = 0, warn = 0;
+let pass = 0, fail = 0, expectedWarn = 0, unexpectedWarn = 0;
 for (const c of checks) {
   let r;
   try { r = await c.run(); } catch (e) { r = { status: 'fail', name: c.name, message: String(e && e.message || e) }; }
   if (r.status === 'pass') pass++;
-  else if (r.status === 'warn') warn++;
-  else { fail++; console.log('TESTLAB FAIL:', r.name, '—', r.message); }
+  else if (r.status === 'warn') {
+    const expected = r.name === 'Self-test bodování (spuštění)' && /Není vygenerovaný test/.test(String(r.message || ''));
+    if (expected) expectedWarn++;
+    else { unexpectedWarn++; console.log('TESTLAB WARN:', r.name, '—', r.message); }
+  } else { fail++; console.log('TESTLAB FAIL:', r.name, '—', r.message); }
 }
-console.log(`Test Lab: ${pass} pass / ${warn} warn / ${fail} fail`);
-if (fail > 0) failed++;
+console.log(`Test Lab: ${pass} pass / ${unexpectedWarn} neočekávaných warn / ${fail} fail` + (expectedWarn ? ` (${expectedWarn} očekávaný skip: self-test bez vygenerovaného testu)` : ''));
+if (fail > 0 || unexpectedWarn > 0) failed++;
 
 check('žádné JS chyby po celém běhu', () => { if (w.__errors.length) throw new Error(w.__errors.slice(0, 5).join(' | ')); });
 

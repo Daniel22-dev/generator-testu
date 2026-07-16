@@ -11,7 +11,12 @@ function stripItemForStudent(item, type) {
   delete out.transcript;
   delete out.explanation;
   if (type === 'listening comprehension') {
-    // Audio/video/source URL is teacher-only. The student file only shows a generic instruction.
+    // Audio, transkript i jakýkoli alternativní zdroj zůstávají pouze učiteli.
+    delete out.source;
+    delete out.text;
+    delete out.passage;
+    delete out.source_url;
+    delete out.audio_url;
     out.audio_source_note = '__TEACHER_PLAYS_AUDIO__';
   }
   if (type === 'categorisation-board' && Array.isArray(item.entries)) {
@@ -72,9 +77,9 @@ async function generateSecureKeyPair() {
     const pair = await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'}, true, ['encrypt','decrypt']);
     const publicJwk = await crypto.subtle.exportKey('jwk', pair.publicKey);
     const privateJwk = await crypto.subtle.exportKey('jwk', pair.privateKey);
-    return { publicJwk, privateJwk, crypto:true };
+    return { publicJwk, privateJwk };
   } catch(e) {
-    return { publicJwk:null, privateJwk:null, crypto:false, error:String(e && e.message ? e.message : e) };
+    throw new Error('Bezpečný offline test: nepodařilo se vytvořit šifrovací klíče (RSA-OAEP). Test NEBYL sestaven. Detail: ' + String(e && e.message ? e.message : e));
   }
 }
 function securePublicCfg(cfg, keyInfo) {
@@ -120,8 +125,7 @@ function securePublicCfg(cfg, keyInfo) {
     diffRosterSalt:cfg.diffRosterSalt||'',
     diffRosterScheme:cfg.diffRosterScheme||'sha256-v1',
     diffGroups:(cfg.diffGroups||[]).map(g=>({key:g.key,name:g.name,studentHashes:Array.isArray(g.studentHashes)?g.studentHashes.slice():[],a11y:g.a11y||null})),
-    publicKey:keyInfo.publicJwk,
-    crypto:keyInfo.crypto
+    publicKey:keyInfo.publicJwk
   };
 }
 async function assembleSecureOfflinePackage(st, cfg, variants) {
@@ -130,7 +134,7 @@ async function assembleSecureOfflinePackage(st, cfg, variants) {
   const publicCfg = securePublicCfg(cfg, keyInfo);
   const studentHtml = buildSecureStudentHtml(publicCfg, studentVariants);
   const studentHtmlSha256 = await sha256HexText(studentHtml);
-  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, crypto:keyInfo.crypto, cryptoError:keyInfo.error||'', roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?rosterForVerifier():[]), studentHtmlSha256 });
+  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?rosterForVerifier():[]), studentHtmlSha256 });
   const teacherHtml = buildSecureTeacherVerifierHtml(teacherCfg, variants);
   const teacherHtmlSha256 = await sha256HexText(teacherHtml);
   return {

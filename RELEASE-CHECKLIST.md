@@ -3,35 +3,40 @@
 ## Povinné automatické kontroly
 
 - [ ] `npm ci` proběhlo bez chyby.
-- [ ] `npm test` skončilo úspěšně včetně `test:workflow`.
-- [ ] `npm run test:headless` skončilo úspěšně.
-- [ ] `npm audit --audit-level=high` nehlásí známou závažnou zranitelnost.
+- [ ] `npm run check:lockfile` potvrzuje 0 interních registry URL.
+- [ ] `npm test` skončilo úspěšně včetně workflow matice.
+- [ ] `npm run test:headless` skončilo úspěšně bez neočekávaných warnů.
+- [ ] `npm audit --audit-level=high` nehlásí závažnou zranitelnost.
 - [ ] Verze je shodná v package, RELEASE, service workeru a manifestu.
-- [ ] Produkční ZIP neobsahuje `node_modules/`, `dist/`, lokální screenshoty, cache ani testovací tajné údaje.
+- [ ] `npm run check:precache` potvrzuje existenci všech PWA aktiv.
+- [ ] `npm run check:timers` potvrzuje deadline časovače obou runtime.
+- [ ] Produkční ZIP neobsahuje `node_modules/`, lokální `dist/`, `archive/`, screenshoty, cache ani testovací tajné údaje.
 
 ## Funkční kontrola
 
 - [ ] Aplikace se otevře na desktopu i telefonu.
+- [ ] Centrální permit AI Studia odemkne aplikaci; bez permitu zůstává build inertní.
 - [ ] Funguje jednoduchý i pokročilý režim.
-- [ ] Workflow matice hlásí 0 FAIL a souvislý průchod všemi čtyřmi kroky končí neprázdným promptem.
-- [ ] Funguje angličtina, španělština, němčina a čeština podle podporovaného rozsahu.
-- [ ] Lze vytvořit běžný test i secureOffline balík.
-- [ ] Studentský HTML neobsahuje answer key.
+- [ ] Workflow matice hlásí 28 PASS / 0 FAIL.
+- [ ] Fungují podporované jazyky a český modul.
+- [ ] Lze vytvořit instantní test i secureOffline balík.
+- [ ] Studentský HTML neobsahuje answer key ani soukromý klíč.
 - [ ] Učitelský verifier načte zkušební `answers.txt`.
-- [ ] Platný diferenciační kód otevře správnou variantu.
-- [ ] Neplatný diferenciační kód je odmítnut.
-- [ ] PWA se po aktualizaci nevrací ke staré cache.
+- [ ] Platný jednorázový kód otevře správnou variantu a neplatný je odmítnut.
+- [ ] Test s limitem 1 minuta se po dvou minutách v jiné aplikaci automaticky ukončí.
+- [ ] PWA service worker je `activated` a cache má aktuální verzi.
+- [ ] Offline reload dojde alespoň k centrální bráně / poslední známé cache.
+- [ ] Nová verze neprovede automatický reload rozpracované práce.
 
-## Ochrana dat
+## Ochrana dat a exportů
 
-- [ ] Testovací jména v diferenciaci se v promptu objeví pouze jako anonymní kódy.
-- [ ] V UI není možnost odesílat skutečná jména studentů do AI.
-- [ ] Studentský HTML neobsahuje čitelný seznam jmen nebo kódů skupin.
-- [ ] Veřejný roster obsahuje jen `studentHashes` a náhodnou sůl testu.
-- [ ] Pro ostrý diferencovaný test jsou použity náhodné jednorázové kódy, ne jména.
-- [ ] Před prvním AI požadavkem v relaci se zobrazí informace o přenosu dat.
-- [ ] V repozitáři není API klíč, heslo, ostrý seznam uživatelů, verifier ani studentský výsledek.
-- [ ] Dokumentace a interní poradce odpovídají skutečnému chování aplikace.
+- [ ] Skutečná jména se v promptu objeví pouze jako anonymní kódy.
+- [ ] Studentský HTML obsahuje jen `studentHashes` a náhodnou sůl.
+- [ ] Pro ostrý diferencovaný test jsou použity náhodné jednorázové kódy.
+- [ ] Před prvním AI požadavkem se zobrazí informace o přenosu dat.
+- [ ] V repozitáři není API klíč, heslo, e-mail, rodné číslo, ostrý roster, verifier ani studentský výsledek.
+- [ ] CSV se jménem `=1+1` zobrazí text, nikoli vypočtenou hodnotu.
+- [ ] Simulované zaplnění `localStorage` vyvolá varovný toast a uložení šablony nehlásí úspěch.
 
 ## Obsahová a vizuální kontrola
 
@@ -39,16 +44,14 @@
 - [ ] Self-test bodování nemá FAIL.
 - [ ] AI kontrola klíče je chápána jen jako pomocná kontrola.
 - [ ] Mobilní hlavička, formulář a hlavní dialogy jsou ovladatelné bez překryvů.
-- [ ] Klávesnicový fokus je viditelný.
-- [ ] Důležitá ikonová tlačítka mají přístupný název.
-- [ ] Audit přístupnosti nehlásí WCAG A/AA porušení v hlavním scénáři.
+- [ ] Klávesnicový fokus je viditelný a ikonová tlačítka mají přístupný název.
 - [ ] Chybové zprávy neuvádějí neověřené pevné hodnoty kvót.
 
 ## Provozní připravenost
 
-- [ ] Je určena odpovědná osoba za vydání a incidenty.
-- [ ] Uživatelé znají pravidla pro API klíč a anonymizaci.
-- [ ] Je připraven postup pro reload/pád zařízení během testu.
+- [ ] Je určena odpovědná osoba za vydání, revokace a incidenty.
+- [ ] Uživatelé znají pravidla API klíče, anonymizace a offline permitu.
+- [ ] Je připraven postup pro reload, pád zařízení a nový pokus.
 - [ ] Je určeno bezpečné úložiště výsledků a doba uchování.
 - [ ] Teacher verifier nebude zveřejněn ani předán studentům.
 
@@ -56,6 +59,6 @@
 
 - [ ] Changelog obsahuje nový záznam a nejvýše deset položek.
 - [ ] Datum vydání je správné.
-- [ ] GitHub Actions prošly buildem a testy.
+- [ ] GitHub Actions prošly instalací, testy, auditem a deployem.
 - [ ] Správce provedl smoke test nasazené URL.
 - [ ] Uživatelé dostali stručnou informaci o významných změnách.

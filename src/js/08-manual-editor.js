@@ -624,27 +624,23 @@ function recordGeneratorTelemetry(outcome){
 
 async function generateTest(){
   // NEOFICIÁLNÍ kopie (cizí fork/hosting) → generování je zakázané. Tvrdá zarážka.
-  // Platí jen když je nastavená oficiální adresa (jinak je envKind 'unverified' a pustí).
+  // Oficiální adresa je jediná produkční cesta; file:// a localhost jsou vývojové prostředí.
   if (typeof Access !== 'undefined' && Access.blockAllGeneration){
     var expected = OFFICIAL_ORIGINS.join(', ') + (OFFICIAL_PATH_PREFIXES.length ? (' (cesta: ' + OFFICIAL_PATH_PREFIXES.join(', ') + ')') : '');
     setGenErr('⛔ Tohle je neoficiální kopie aplikace — generování testu je tu zakázané. Běží z „' + (location.origin || '?') + location.pathname + '", ale oficiální umístění je „' + expected + '". Otevři generátor z oficiální adresy.');
     setGenUI('error');
     return;
   }
-  // Klasifikovaný (ostrý) test = secureOffline (přísný režim ho vždy vynutí). Z NEOVĚŘENÉHO
-  // umístění ho nepustíme jen „na jedno kliknutí" — tvrdý stop. Jediná výjimka: admin
-  // z místního souboru (file://, vývoj) smí jednou vědomě potvrdit pro vlastní testování.
-  if ((state.resultMode || 'instant') === 'secureOffline' && typeof Access !== 'undefined' && Access.warnLevel === 'block'){
+  // V místním vývojovém prostředí smí ostrý balíček vytvořit pouze správce a až po
+  // výslovném potvrzení. Neoficiální vzdálená kopie byla zastavena už výše.
+  if ((state.resultMode || 'instant') === 'secureOffline' && typeof Access !== 'undefined' && Access.envKind === 'local'){
     const isAdmin = !!(Access.profile && Access.profile.role === 'admin');
-    const isLocalFile = (Access.envKind === 'local'); // file:// — vývoj
-    if (isAdmin && isLocalFile){
-      const proceed = await uiConfirm('Vývojové spuštění z místního souboru (file://). Ostrý (klasifikovaný) test by se měl generovat jen z oficiální adresy. Jako admin můžeš pro účely testování pokračovat, ale vygenerovaný test NEPOUŽÍVEJ pro skutečné známkování. Pokračovat?', 'Vývojové spuštění — ostrý test', true);
-      if (!proceed) return;
-    } else {
-      const oficialni = (typeof OFFICIAL_ORIGINS!=='undefined'&&OFFICIAL_ORIGINS.length) ? OFFICIAL_ORIGINS.join(', ') : 'oficiální školní adresa';
-      setGenErr('Ostrý (klasifikovaný) test lze generovat jen z oficiální adresy (' + oficialni + '). Tahle kopie běží z neověřeného umístění (' + (location.origin && location.origin !== 'null' ? location.origin : 'místní soubor') + (location.pathname || '') + '), takže nelze ověřit aktuálnost přístupového seznamu ani odvolání přístupů. Otevři oficiální odkaz a spusť generování znovu. Pro neznámkovaný procvičovací test přepni „Režim výsledků" na okamžitou známku.');
+    if (!isAdmin){
+      setGenErr('Ostrý (klasifikovaný) test lze v místním vývojovém prostředí vytvořit pouze s centrálně ověřeným účtem správce. Pro skutečné známkování vždy použij oficiální adresu.');
       return;
     }
+    const proceed = await uiConfirm('Jde o místní vývojové spuštění (file:// nebo localhost). Pokračuj jen pro technický test; tento balíček NEPOUŽÍVEJ pro skutečné známkování. Pokračovat?', 'Vývojové spuštění — ostrý test', true);
+    if (!proceed) return;
   }
   // Když uživatel klíč napsal, ale nezvolil žádné tlačítko (relace/trvale), vezmeme ho
   // automaticky pro tuto relaci — ať generování nezačne padat jen kvůli nekliknutí.

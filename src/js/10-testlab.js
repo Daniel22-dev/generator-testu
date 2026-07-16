@@ -388,7 +388,6 @@ function tlChecks(){
     { name:'Banked cloze + Multiple matching alias', run:function(){
       // Tyto typy nemají vlastní scoring funkci — aliasují na existující
       if (typeof normalizeType !== 'function') return tlFail('Banked cloze + Multiple matching alias', 'Chybí normalizeType().');
-      var SCORE_ALIAS = typeof EXERCISE_SCORE_ALIAS !== 'undefined' ? EXERCISE_SCORE_ALIAS : null;
       // Ověř, že typy existují v systému a mají správný alias
       // Aliasy přes scoringTypeFor() — EXERCISE_PEDAGOGY mapuje na pedagogickou kategorii, ne score
       if (typeof scoringTypeFor !== 'function') return tlFail('Banked cloze + Multiple matching alias', 'Chybí scoringTypeFor().');

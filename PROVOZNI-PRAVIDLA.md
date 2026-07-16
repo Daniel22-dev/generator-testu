@@ -1,95 +1,68 @@
 # Provozní pravidla Generátoru interaktivních testů
 
-Tato pravidla platí pro oficiální řízené používání produkční serverless verze 7.0.2 učiteli. Technické hranice doplňuje `SECURITY.md`.
+Tato pravidla platí pro oficiální řízené používání technicky ověřené produkční serverless verze. Bezpečnostní hranice doplňuje `SECURITY.md`.
 
 ## 1. Účel a odpovědnost
 
-Generátor je pomůcka pro přípravu výuky. Nenahrazuje odborné ani klasifikační rozhodnutí učitele.
-
-Před použitím učitel vždy ověří:
-
-- věcnou a jazykovou správnost,
-- správné odpovědi a bodování,
-- přiměřenost obtížnosti,
-- srozumitelnost pokynů,
-- funkčnost na zařízení studentů,
-- soulad s cílem hodiny a pravidly hodnocení.
-
-AI kontrola klíče ani automatický self-test nenahrazují pedagogickou kontrolu člověkem.
+Generátor je pomocný nástroj učitele. Učitel odpovídá za obsah, správnost klíče, bodování, přiměřenost úloh, způsob známkování a náhradní postup při technickém problému.
 
 ## 2. Data a anonymizace
 
-Identity uvedené v diferenciačních skupinách generátor před AI požadavkem automaticky nahrazuje anonymními kódy. Ve studentském HTML používá pouze solené hashe identifikátorů.
-
-Pro ostré diferencované testy učitel používá náhodné jednorázové kódy. Běžná jména se nepoužívají, protože hashovaný seznam s veřejnou solí může být napadnutelný hádáním známých jmen.
-
-Do volných textů, URL, podmínek skupin ani příloh se nesmějí vkládat osobní nebo citlivé údaje. Zakázáno je zejména odesílat do AI:
-
-- zdravotní nebo psychologické informace a diagnózy,
-- kázeňské případy,
-- rodná čísla, adresy, telefonní čísla a soukromé kontakty,
-- individuální hodnocení propojené s identitou,
-- interní dokumenty bez oprávnění k externímu zpracování.
-
-Podpůrná opatření se popisují obecně pedagogickým jazykem. Před každým odesláním učitel zkontroluje text, URL i přílohy.
+- Skutečná jména v diferenciačních skupinách se před AI požadavkem nahrazují anonymními kódy.
+- Studentský HTML obsahuje jen SHA-256 `studentHashes` s náhodnou solí.
+- Pro ostrou diferenciaci se používají náhodné jednorázové kódy.
+- Do volného textu, URL, podmínek skupin ani příloh se nevkládají zdravotní údaje, diagnózy, kázeňské informace, adresy, rodná čísla, kontakty ani jiné citlivé údaje.
+- Podpůrná opatření se popisují obecným pedagogickým jazykem.
 
 ## 3. API klíč
 
 - Každý učitel používá vlastní oprávněný a omezený klíč.
-- API klíč se nesdílí se studenty ani mezi kolegy.
-- Klíč se nevkládá do repozitáře, e-mailu, zadání ani studentského HTML.
-- Na sdíleném počítači se ukládá jen pro aktuální relaci.
-- Po práci se použije vymazání citlivých údajů.
-- Při podezření na únik se klíč okamžitě zruší a nahradí.
+- Klíč se nesdílí se studenty ani kolegy.
+- Na sdíleném počítači se používá jen pro aktuální relaci.
+- Klíč se nikdy nevkládá do repozitáře, e-mailu, zadání ani studentského HTML.
+- Při podezření na únik se okamžitě zruší a nahradí.
 
 ## 4. Kontrola testu před výukou
 
-Minimální kontrola každého nového testu:
-
-1. zkontrolovat obsah, klíč a bodové součty,
-2. spustit interní self-test,
-3. u důležitého testu provést druhou kontrolu klíče,
-4. otevřít studentský výstup na desktopu i cílovém mobilním zařízení,
-5. projít všechny typy úloh a instrukce,
-6. vyzkoušet odevzdání a výsledkovou obrazovku,
-7. u secureOffline ověřit vytvoření a načtení `answers.txt`,
-8. u diferenciace vyzkoušet platný i neplatný jednorázový kód,
-9. ověřit, že student dostává pouze `student_test.html`,
-10. připravit náhradní postup pro technický problém.
+1. Zkontrolovat obsah, správné odpovědi a bodové součty.
+2. Spustit interní self-test.
+3. Otevřít studentský výstup na cílovém zařízení.
+4. Vyzkoušet všechny použité typy úloh.
+5. U secureOffline ověřit stažení a načtení `answers.txt`.
+6. U diferenciace vyzkoušet platný i neplatný jednorázový kód.
+7. Zkontrolovat, že student dostává pouze `student_test.html`.
+8. Připravit jednotný náhradní postup.
 
 ## 5. Známkované testy
 
-Pro důležité nebo klasifikované testy se používá bezpečný offline režim s odděleným učitelským verifierem. Studentům se předává pouze studentský test a pokyny k odevzdání.
+Pro důležité nebo klasifikované testy se používá secureOffline s odděleným verifierem a běžným učitelským dozorem. Přísný režim není neobejitelný proctoring.
 
-Přísný režim zvyšuje organizační kontrolu, ale není náhradou dozoru. Prohlížeč ani samostatný HTML soubor nemohou zaručit absolutní ochranu proti obcházení pravidel.
-
-Rozpracovaný pokus se po zavření nebo obnovení stránky plně neobnoví. Učitel předem stanoví jednotný postup pro reload, pád prohlížeče, vybití zařízení nebo poškozené odevzdání. Doporučuje se náhradní zařízení a záznam technického incidentu bez zbytečných osobních údajů.
+Časový limit běží podle skutečného času i při přepnutí aplikace nebo uspání zařízení. Rozpracovaný pokus se po reloadu nebo zavření stránky plně neobnoví. Učitel předem stanoví postup pro pád prohlížeče, vybití zařízení, poškozené odevzdání nebo nutnost nového pokusu.
 
 ## 6. Distribuce souborů
 
-- `student_test.html` lze dát studentům.
-- `teacher_verifier.html` se nikdy nedává studentům ani na veřejný web.
+- Studentům patří pouze `student_test.html`.
+- `teacher_verifier.html` se nikdy neposílá studentům ani nezveřejňuje.
 - Veřejný odkaz na ostrý test se zveřejní až těsně před použitím a po skončení se odstraní.
-- Lokální otevření `file://` se předem otestuje na stejném typu zařízení; preferuje se oficiální HTTPS adresa.
-- Již staženou kopii nelze vzdáleně zneplatnit.
+- Již stažený soubor nelze vzdáleně zneplatnit.
+- Ostré balíky se generují z oficiální HTTPS adresy. `file://` a `localhost` jsou pouze vývojové prostředí.
 
 ## 7. Výsledky studentů
 
-Výsledkové soubory se ukládají pouze na oprávněné školní úložiště nebo zařízení učitele. Nezveřejňují se na GitHubu ani veřejným odkazem a neodesílají se do AI bez anonymizace.
-
-Složka výsledků má obsahovat Test ID, datum a označení skupiny/třídy bez zbytečných osobních údajů. Doba uchování se řídí pravidly školy; data se neuchovávají automaticky navždy. Verifier je chráněn stejně přísně jako answer key.
+Výsledky se ukládají pouze na oprávněné školní úložiště nebo zařízení učitele. Nezveřejňují se na GitHubu ani veřejným odkazem a do AI se neposílají bez anonymizace. Verifier se chrání stejně jako answer key.
 
 ## 8. Přístupy
 
-- Aktivační kód je osobní a nepředává se dál.
-- Místní PIN ani aktivační kód nelze zpětně přečíst; ukládají se jen jejich otisky.
-- Při odchodu uživatele nebo podezření na sdílení správce přístup odvolá nebo otočí kód.
-- Změna platí až po exportu a nahrání nového `access-manifest.json`.
-- Access gate je organizační bariéra, nikoli serverová autentizace.
+- Přístup vydává správce v AI Studiu GHRAB jako podepsaný permit.
+- Generátor nemá vlastní aktivační kód, místní PIN ani export přístupového manifestu.
+- Odvolání oprávnění se provádí v AI Studiu revokací permitu.
+- Uživatel může na svém zařízení zvolit **Odebrat přístup z tohoto zařízení**; tím se smaže lokální permit a otevře centrální přístupová stránka.
+- Online se guard vždy načítá čerstvě. Offline může aplikace použít poslední známý permit do příštího připojení.
+- Centrální klientská brána je silná organizační kontrola, nikoli školní SSO ani neobejitelná serverová autorizace.
 
 ## 9. Vydávání aktualizací
 
-Každé nasazení musí splnit `RELEASE-CHECKLIST.md` a projít:
+Každé nasazení musí projít:
 
 ```bash
 npm ci
@@ -98,31 +71,30 @@ npm run test:headless
 npm audit --audit-level=high
 ```
 
-Nasazení se neprovádí, pokud některá povinná kontrola selže. Změny se zapisují do changelogu a verze se aktualizuje ve všech povinných souborech.
+GitHub Actions smí nasadit pouze build, který všechny kontroly dokončil bez chyby a bez neočekávaného varování. Lockfile nesmí obsahovat interní registry URL.
+
+Service worker neprovádí automatický reload otevřené aplikace. Nová verze se aktivuje po zavření starých karet; uživatel proto dokončí nebo bezpečně uloží práci a aplikaci následně znovu otevře.
 
 ## 10. Role správce aplikace
 
 Správce:
 
-- udržuje produkční repozitář,
+- udržuje repozitář a centrální přístup v AI Studiu,
 - schvaluje a nasazuje vydání,
-- řeší přístupový manifest,
-- vede dokumentaci změn,
+- řeší revokace permitů,
+- vede changelog a dokumentaci,
 - přijímá hlášení chyb a incidentů,
-- komunikuje technické změny uživatelům,
-- minimálně jednou za pololetí ověří aktuálnost modelů, API pravidel a provozní dokumentace.
+- minimálně jednou za pololetí ověří modely, API pravidla a provozní dokumentaci.
 
 ## 11. Incident nebo závažná chyba
 
-Při chybě, která může ovlivnit data, hodnocení nebo bezpečnost:
-
-1. přerušit používání dotčené funkce,
-2. uchovat anonymizovaný popis problému,
-3. informovat správce,
-4. podle typu incidentu otočit klíč/kód nebo vygenerovat nový test a verifier,
-5. opravu otestovat pomocí `npm test` a cíleného scénáře,
-6. vydat novou verzi a oznámit změnu uživatelům.
+1. Přerušit používání dotčené funkce.
+2. Uchovat anonymizovaný popis problému.
+3. Informovat správce.
+4. Podle incidentu revokovat permit, otočit API klíč nebo vytvořit nový test a verifier.
+5. Opravu ověřit automatickými testy a cíleným scénářem.
+6. Vydat novou verzi a oznámit význam změny.
 
 ## 12. Hranice aktuální verze
 
-Serverless verze nemá školní SSO, centrální databázi, serverovou ochranu API klíče ani neobejitelnou autorizaci. Tyto body jsou určeny k samostatnému projednání se školním IT a nejsou součástí tohoto serverless vydání.
+Serverless verze nemá školní SSO, databázi, serverovou ochranu API klíče, centrální archiv výsledků ani neobejitelnou autorizaci. Tyto části musí projít samostatným návrhem a kontrolou školního IT.

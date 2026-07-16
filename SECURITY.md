@@ -1,120 +1,92 @@
 # Bezpečnostní hranice serverless verze
 
-Generátor interaktivních testů 7.0.4 běží jako klientská PWA bez školního serveru. Je technicky připraven k řízenému oficiálnímu používání učiteli, ale jeho bezpečnostní model má jasné hranice.
+Generátor běží jako klientská PWA bez školního backendu. Je technicky připraven k řízenému používání, ale jeho bezpečnostní model má jasné hranice.
 
 ## Ochrany, které aplikace poskytuje
 
-- povinné nahrazování identit studentů v AI promptu anonymními kódy,
-- automatickou migraci starého nebezpečného nastavení anonymizace,
-- upozornění před prvním odesláním dat do Gemini v každé relaci,
+- povinnou pseudonymizaci identit před AI požadavkem,
 - hashovaný diferenciační roster ve studentském HTML,
-- odmítnutí neznámého identifikátoru místo přidělení výchozí varianty,
+- odmítnutí neznámého identifikátoru,
 - oddělení studentského výstupu a učitelského verifieru,
-- odstranění správných odpovědí ze studentské části bezpečného offline balíku,
-- hybridní šifrování odevzdání `answers.txt` pomocí AES-GCM a RSA-OAEP,
-- kryptografické hashe výstupních souborů,
-- lokální přístupovou bránu pro učitele,
-- verzovaný PWA cache systém,
-- automatické kontroly před nasazením.
+- odstranění answer key ze secure studentského balíku,
+- hybridní šifrování AES-GCM + RSA-OAEP,
+- fail-closed sestavení při chybě kryptografie,
+- deadline časovače odolné proti throttlingu karty,
+- centrálně podepsaný permit AI Studia,
+- verzovaný PWA cache systém bez automatického reloadu práce,
+- kompletní CI bránu před nasazením.
 
 ## Identity v diferenciaci
 
-Před odesláním do AI jsou identity nahrazeny kódy `Student A1`, `Student A2` atd. Skutečné hodnoty se neukládají do promptu, šablon ani historie.
-
-Při sestavení studentského souboru vznikne pro každý identifikátor SHA-256 otisk s náhodnou solí konkrétního testu. Veřejný soubor proto neobsahuje čitelný seznam studentů nebo kódů. Protože sůl musí být ve studentském souboru, běžná jména lze teoreticky zkoušet slovníkovým útokem. Pro ostré diferencované testy se proto používají náhodné jednorázové kódy, nikoli jména.
-
-Učitelský verifier může obsahovat privátní mapování a správné odpovědi. Nikdy se nezveřejňuje ani neposílá studentům.
+Do promptu se místo skutečných identit posílají kódy `Student A1…`. Studentský soubor obsahuje náhodnou sůl testu a SHA-256 `studentHashes`, nikoli čitelný roster. Protože je sůl veřejná, běžná jména lze teoreticky hádat slovníkovým útokem; pro ostré testy se proto používají náhodné jednorázové kódy.
 
 ## Data odesílaná do Gemini
 
-Při generování mohou být do externí AI služby odeslány:
+Do Gemini mohou být odeslány texty formuláře, pedagogické podmínky, zvolené URL a přílohy. Aplikace neumí spolehlivě odstranit osobní údaje vložené do volného textu nebo dokumentu. Učitel musí před odesláním odstranit zdravotní a psychologické údaje, kázeňské záznamy, rodná čísla, adresy, kontakty, individuální hodnocení propojené s identitou a neveřejné dokumenty bez oprávnění.
 
-- texty vyplněné v generátoru,
-- obsah promptu sestavený aplikací,
-- pedagogické podmínky skupin,
-- zvolené URL,
-- přiložené soubory nebo jejich zpracovaný obsah.
-
-Generátor neumí spolehlivě rozpoznat a odstranit osobní nebo citlivé údaje vložené do volného textu, URL, popisu podpůrných opatření či příloh.
-
-Proto je zakázáno odesílat zejména:
-
-- zdravotní a psychologické údaje nebo diagnózy,
-- kázeňské záznamy,
-- rodná čísla, adresy a kontaktní údaje,
-- individuální hodnocení propojené s identitou studenta,
-- neveřejné dokumenty školy bez oprávnění k externímu zpracování.
-
-Podmínky skupin se formulují obecně jako pedagogická potřeba, například „kratší instrukce“ nebo „více opory“, nikoli jako diagnóza.
+Gemini 3.x používá výchozí sampling. Aplikace záměrně nesnižuje `temperature`, protože to může u reasoning modelů zhoršit výstup. Maximální výstup je nastaven na 65 536 tokenů; validita JSON zůstává jištěna formátem odpovědi a opravnou vrstvou.
 
 ## API klíč
 
-API klíč pracuje v prohlížeči uživatele. V současné architektuře jej nelze chránit stejně jako klíč uložený na serveru.
+Klíč pracuje v prohlížeči a nelze jej chránit stejně jako serverové tajemství. Každý učitel používá vlastní omezený klíč, nesdílí jej, na sdíleném zařízení jej neukládá trvale a při podezření na únik jej okamžitě zneplatní.
 
-Provozní pravidla:
+## Centrální přístupová brána
 
-- každý učitel používá vlastní oprávněný a omezený klíč,
-- klíč se mezi kolegy nesdílí,
-- klíč se nikdy neukládá do GitHubu, testu ani studentského výstupu,
-- na sdíleném zařízení se používá pouze uložení pro relaci,
-- po práci se citlivé údaje vymažou,
-- při podezření na únik se klíč okamžitě zruší a nahradí,
-- API klíč se nikdy nepředává studentům.
+Veřejný build je inertní, dokud `app-guard.js` AI Studia neověří podpis, platnost, roli, povolenou aplikaci a revokaci permitu. Generátor nemá vlastní PIN ani `access-manifest.json`.
 
-## Přístupová brána
+Přesto jde stále o klientskou kontrolu. Není to:
 
-Lokální access gate omezuje běžný přístup a podporuje správu učitelských profilů. Aktivační kód a místní PIN se ukládají jen jako solené PBKDF2 otisky. Admin pracuje s lokální pracovní kopií manifestu; změna začne platit až po exportu a nasazení nového `access-manifest.json`.
-
-Protože je však brána implementována v klientském kódu, technicky zdatný uživatel ji může analyzovat nebo obejít. Access gate tedy není:
-
-- školní jednotné přihlášení,
+- školní SSO,
 - serverově ověřená identita,
-- neobejitelná autorizace rolí,
+- neobejitelná autorizace,
 - centrální auditní systém.
 
-Je vhodná jako organizační bariéra pro řízený okruh učitelů, nikoli jako ochrana vysoce citlivých informací.
+### Offline kompromis
+
+Service worker načítá `/AI-Studio-GHRAB/` strategií `networkFirst`. Online je guard vždy čerstvý. Offline se použije poslední známá cache, takže zařízení může do příštího připojení pracovat s dříve platným permitem. Jakmile se připojí, čerstvý guard a revokace se uplatní. Pro práci s vysokým rizikem se vyžaduje online ověření před začátkem.
+
+## PWA aktualizace
+
+Service worker nepoužívá `skipWaiting`; nová verze se aktivuje až po zavření starých karet. Tím se eliminuje automatický reload uprostřed generování, editoru nebo práce s hotovým testem. `check-sw-precache.mjs` ověřuje, že každá položka precache existuje v produkčním buildu.
+
+## Časový limit testu
+
+Časovač vychází z pevného deadline. Přepnutí do jiné aplikace, uspání telefonu nebo omezení JavaScriptových timerů čas nezastaví. Při návratu se zbytek okamžitě dopočítá a při vypršení se test odevzdá. Bezpečnostní události opuštění okna se evidují odděleně.
+
+## Bezpečný offline balík
+
+- Studentský soubor obsahuje veřejný RSA klíč, který slouží jen k šifrování.
+- Verifier obsahuje privátní klíč a správné odpovědi; jeho únik kompromituje konkrétní balík.
+- Selhání `crypto.subtle.generateKey` sestavení zastaví. Neexistuje plaintext fallback.
+- Serverless model neumí prokázat, že student neupravil vlastní soubor nebo nepoužil druhé zařízení. Pro klasifikaci je nutný dozor a provozní pravidla.
+
+## CSV export
+
+Všechny buňky procházejí neutralizací počátečních znaků `=`, `+`, `-`, `@`, tab a CR. Jméno nebo jiný textový vstup se po otevření v Excelu nesmí vyhodnotit jako vzorec.
+
+## Lokální úložiště
+
+Snapshot, šablony a historie jsou v `localStorage`. Při zaplnění nebo blokaci úložiště aplikace zobrazí výrazné upozornění a nesmí hlásit úspěšné uložení. Na sdíleném zařízení se citlivé hodnoty neukládají.
 
 ## Výsledky studentů
 
-`answers.txt` je v bezpečném režimu šifrovaný. Po dešifrování ve verifieru však obsahuje identitu nebo kód studenta, odpovědi, časy a bezpečnostní události. Učitel s ním zachází jako se školní dokumentací:
-
-- ukládá jej pouze na oprávněné místo,
-- nesdílí jej veřejným odkazem,
-- neodesílá jej do AI bez anonymizace,
-- chrání odpovídající `teacher_verifier.html`,
-- po uplynutí účelu jej odstraní podle pravidel školy.
-
-Rozpracované odpovědi se v aktuální verzi plně neobnovují po zavření nebo reloadu stránky. U klasifikovaného testu musí existovat předem oznámený náhradní postup.
+Po dešifrování obsahují identitu nebo kód, odpovědi, časy a bezpečnostní události. Ukládají se pouze na oprávněné školní místo, nesdílejí se veřejně a do AI se neposílají bez anonymizace. Rozpracované odpovědi se po reloadu plně neobnovují.
 
 ## Veřejný repozitář
 
-Repozitář může být veřejný kvůli GitHub Pages. Nesmí obsahovat:
-
-- skutečné API klíče nebo hesla,
-- osobní údaje studentů či zaměstnanců,
-- interní neveřejné dokumenty školy,
-- ostré seznamy uživatelů s identifikačními údaji,
-- vyplněné testy nebo výsledky studentů,
-- `teacher_verifier.html` z reálného testu.
-
-Kontrola veřejného manifestu probíhá příkazem:
+Repozitář nesmí obsahovat API klíče, hesla, osobní údaje, neveřejné dokumenty školy, ostré rostery, reálné verifier soubory ani výsledky studentů. Kontrola:
 
 ```bash
 npm run check:sensitive
+npm run check:lockfile
 ```
 
-## Bezpečnostní incident
+## Incident
 
-Při úniku:
-
-1. **student_test.html** – odstranit veřejný odkaz a vytvořit nový test/Test ID;
-2. **teacher_verifier.html** – považovat správné odpovědi a privátní klíč za kompromitované a vygenerovat nový pár souborů;
-3. **aktivačního kódu** – otočit kód, exportovat a nasadit nový manifest;
-4. **Gemini API klíče** – klíč okamžitě zneplatnit, vytvořit nový omezený klíč a zkontrolovat využití;
-5. **osobních údajů** – informovat správce a postupovat podle školních pravidel pro incidenty.
+1. Únik `student_test.html`: odstranit odkaz a vytvořit nový Test ID.
+2. Únik `teacher_verifier.html`: považovat klíč a answer key za kompromitované a vytvořit nový balík.
+3. Únik permitu nebo odchod uživatele: revokovat oprávnění v AI Studiu.
+4. Únik API klíče: okamžitě jej zneplatnit a zkontrolovat využití.
+5. Únik osobních údajů: postupovat podle školních pravidel pro incidenty.
 
 Již stažený serverless HTML soubor nelze vzdáleně zneplatnit.
-
-## Hranice tohoto auditu
-
-Audit verze 7.0.4 neposuzuje budoucí školní server, SSO, databázi ani serverovou proxy pro API. Tyto části musí projít samostatným návrhem a kontrolou školního IT.

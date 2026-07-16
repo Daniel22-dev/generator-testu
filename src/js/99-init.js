@@ -12,7 +12,7 @@ window.__ACCESS_INIT_REACHED__ = true;
 //     report s vlastní obsluhou Escape…) → neděláme NIC, aby Escape nezavřel
 //     modal schovaný POD blokujícím dialogem (uiModal si Escape řeší sám
 //     v uiModalKeyHandler jako cancel).
-const ESC_CLOSABLE_MODALS = ['changelogGate','secGuideGate','strictSitGate','usageGuideGate','apiKeyGuideGate','testLabModal','accAdminModal'];
+const ESC_CLOSABLE_MODALS = ['changelogGate','secGuideGate','strictSitGate','usageGuideGate','apiKeyGuideGate','testLabModal'];
 document.addEventListener('keydown', function(e){
   if (e.key !== 'Escape') return;
   const kids = document.body.children;

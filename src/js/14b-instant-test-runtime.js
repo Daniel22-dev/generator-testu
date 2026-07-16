@@ -3,7 +3,7 @@
 function getTestScript() {
   return String.raw`
 var ANSWERS={},EX_SUBMITTED={},started=false,submitted=false,locked=false,teacherLogged=false;
-var timerVal=CFG.cas*60,timerInterval=null,warningCount=0;
+var timerVal=CFG.cas*60,timerInterval=null,timerDeadline=0,warningCount=0;
 var A11Y=null;
 function applyA11yInstant(key){
   A11Y=null;var b=document.body;if(b)b.classList.remove('a11y-large','a11y-xlarge','a11y-dys');
@@ -80,7 +80,8 @@ async function startTest(){
   CFG.studentName=n;CFG.activeGroupKey=g?g.key:'';CFG.activeGroupName=g?g.name:'';
   activateVariant(variantKeyForGroup(g));
   applyA11yInstant(CFG.activeGroupKey);
-  timerVal=A11Y&&A11Y.noLimit?Infinity:(A11Y&&A11Y.timeMult>1?Math.round((Number(CFG.cas)||45)*60*A11Y.timeMult):timerVal);
+  var baseSeconds=Math.max(1,Number(CFG.cas)||45)*60;
+  timerVal=A11Y&&A11Y.noLimit?Infinity:(A11Y&&A11Y.timeMult>1?Math.round(baseSeconds*A11Y.timeMult):baseSeconds);
   applyRuntimeRandomization();
   hide('introScreen');show('testScreen');updateJokerWatermark();
   if(CFG.activeGroupKey){var note=(CFG.groupNotes||{})[CFG.activeGroupKey]||g.conditions||'';var hdr=document.querySelector('.t-header-title');if(hdr&&!document.querySelector('.group-pill')){hdr.insertAdjacentHTML('afterend','<span class="group-pill">'+esc(CFG.activeGroupName)+'</span>');}if(note){var area=I('exArea');if(area)area.insertAdjacentHTML('afterbegin','<div class="group-warning">'+esc(note)+'</div>');}}
@@ -91,14 +92,19 @@ async function startTest(){
   if(first)setTimeout(function(){first.focus();},120);
 }
 
-function startTimer(){
+function refreshInstantTimer(){
+  if(submitted)return false;
+  if(timerVal===Infinity){renderTimer();return true;}
+  timerVal=Math.max(0,Math.ceil((timerDeadline-Date.now())/1000));
   renderTimer();
-  timerInterval=setInterval(function(){
-    if(timerVal===Infinity){renderTimer();return;}
-    if(timerVal>0)timerVal--;
-    renderTimer();
-    if(timerVal<=0){clearInterval(timerInterval);doSubmit();}
-  },1000);
+  if(timerVal<=0){clearInterval(timerInterval);doSubmit();return false;}
+  return true;
+}
+function startTimer(){
+  clearInterval(timerInterval);
+  timerDeadline=timerVal===Infinity?0:(Date.now()+timerVal*1000);
+  refreshInstantTimer();
+  timerInterval=setInterval(refreshInstantTimer,1000);
 }
 function renderTimer(){
   var el=I('timerDisplay');if(!el)return;
@@ -408,11 +414,12 @@ function lockTest(reason){
   recordSecurityEvent('warning',reason);
 }
 function guardedBlurCheck(){clearTimeout(blurTimer);blurTimer=setTimeout(function(){if(!started||submitted||locked)return;if(activeEditable||isEditable(document.activeElement)||isModalOpen())return;if(document.visibilityState==='visible'&&!document.hasFocus())lockTest('Stránka ztratila fokus.');},1000);}
-function onVisibility(){if(!started||submitted||locked)return;if(document.visibilityState==='hidden')lockTest('Student opustil okno nebo přepnul aplikaci.');}
+function onVisibility(){if(!started||submitted)return;if(document.visibilityState==='visible')refreshInstantTimer();if(locked)return;if(document.visibilityState==='hidden')lockTest('Student opustil okno nebo přepnul aplikaci.');}
+function onWindowFocus(){if(started&&!submitted)refreshInstantTimer();}
 function onPageHide(){if(!started||submitted||locked)return;lockTest('Pokus o opuštění stránky.');}
 function onBeforeUnload(e){if(!started||submitted)return;recordSecurityEvent('warning','Pokus o reload nebo opuštění stránky.');if(CFG.lockOnLeave){e.preventDefault();e.returnValue='';return '';}}
-function setupLockDetection(){if(secInstalled)return;secInstalled=true;lastBeat=Date.now();document.addEventListener('visibilitychange',onVisibility);window.addEventListener('pagehide',onPageHide);window.addEventListener('blur',guardedBlurCheck);window.addEventListener('beforeunload',onBeforeUnload);document.addEventListener('focusin',function(e){activeEditable=isEditable(e.target);});document.addEventListener('focusout',function(){setTimeout(function(){activeEditable=isEditable(document.activeElement);},50);});setInterval(function(){if(started&&!submitted&&!locked){var now=Date.now();if(now-lastBeat>45000)lockTest('Podezřelá prodleva aktivity: '+String(now-lastBeat)+' ms.');lastBeat=now;}},15000);}
-function teardownLockDetection(){if(!secInstalled)return;secInstalled=false;document.removeEventListener('visibilitychange',onVisibility);window.removeEventListener('pagehide',onPageHide);window.removeEventListener('blur',guardedBlurCheck);window.removeEventListener('beforeunload',onBeforeUnload);}
+function setupLockDetection(){if(secInstalled)return;secInstalled=true;lastBeat=Date.now();document.addEventListener('visibilitychange',onVisibility);window.addEventListener('pagehide',onPageHide);window.addEventListener('blur',guardedBlurCheck);window.addEventListener('beforeunload',onBeforeUnload);window.addEventListener('focus',onWindowFocus);document.addEventListener('focusin',function(e){activeEditable=isEditable(e.target);});document.addEventListener('focusout',function(){setTimeout(function(){activeEditable=isEditable(document.activeElement);},50);});setInterval(function(){if(started&&!submitted&&!locked){var now=Date.now();if(now-lastBeat>45000)lockTest('Podezřelá prodleva aktivity: '+String(now-lastBeat)+' ms.');lastBeat=now;}},15000);}
+function teardownLockDetection(){if(!secInstalled)return;secInstalled=false;document.removeEventListener('visibilitychange',onVisibility);window.removeEventListener('pagehide',onPageHide);window.removeEventListener('blur',guardedBlurCheck);window.removeEventListener('beforeunload',onBeforeUnload);window.removeEventListener('focus',onWindowFocus);}
 var LOCK_TAPS=0,LOCK_TAP_TIMER=null;
 function lockTap(){LOCK_TAPS++;clearTimeout(LOCK_TAP_TIMER);LOCK_TAP_TIMER=setTimeout(function(){LOCK_TAPS=0;},2000);if(LOCK_TAPS>=5){LOCK_TAPS=0;show('unlockReveal');var inp=I('unlockInp');if(inp){try{inp.focus();}catch(_){}}}}
 async function tryUnlock(){var v=(I('unlockInp').value||'').trim();if(await secretMatches(v,'unlock-password',CFG.hesloHash)){locked=false;hide('lockScreen');hide('unlockReveal');LOCK_TAPS=0;I('unlockInp').value='';recordSecurityEvent('unlock','teacher password');}else{I('unlockInp').style.borderColor='#ef4444';setTimeout(function(){I('unlockInp').style.borderColor='';},800);}}

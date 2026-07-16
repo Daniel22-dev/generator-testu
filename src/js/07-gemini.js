@@ -174,7 +174,7 @@ function updateGeminiModelUI(){
 // PC takto detekovat nelze, proto u nich zůstává varování v textové poznámce.
 function isEmbeddedBrowserEnv(){
   const ua = navigator.userAgent || '';
-  return /FBAN|FBAV|Instagram|Line|wv|Documents|Teams|Outlook|GSA/i.test(ua);
+  return /FBAN|FBAV|Instagram|Line|(?:;\s?wv\))|Documents|Teams|Outlook|GSA/i.test(ua);
 }
 function applyKeyEnvUI(){
   if (!isEmbeddedBrowserEnv()) return;
@@ -340,7 +340,8 @@ async function downscaleImageForApi(file,maxDim,quality){try{if(!canDownscaleIma
 async function buildGeminiFilePartsForApi(){const parts=[],notes=[];if(state.zadaniTab!=='file'||!fileObjects.length)return{parts,notes};for(const obj of fileObjects){const f=obj.file;if(!f)continue;const ext=fileExt(f.name);if(obj.textContent&&(obj.embedStatus==='embedded'||obj.embedStatus==='embedded-partial'))continue;if((f.type||'').startsWith('image/')){const ds=await downscaleImageForApi(f,2000,0.82);if(ds){parts.push({inlineData:{mimeType:ds.mimeType,data:ds.base64}});notes.push(`${obj.displayName||f.name}: attached as image/jpeg (auto-zmenšeno)`);}else{const dataUrl=await readBlobAsDataUrl(f);parts.push({inlineData:{mimeType:apiMimeForFile(f),data:dataUrlToBase64(dataUrl)}});notes.push(`${obj.displayName||f.name}: attached as ${apiMimeForFile(f)}`);}continue;}if((f.type||'').startsWith('audio/')||(f.type||'').startsWith('video/')||ext==='pdf'){const dataUrl=await readBlobAsDataUrl(f);parts.push({inlineData:{mimeType:apiMimeForFile(f),data:dataUrlToBase64(dataUrl)}});notes.push(`${obj.displayName||f.name}: attached as ${apiMimeForFile(f)}`);continue;}if(ext==='docx'){const text=await extractDocxText(f);if(!text)throw new Error(`${obj.displayName||f.name}: DOCX neobsahuje čitelný text.`);parts.push({text:`\n\n[DOCX SOURCE: ${obj.displayName||f.name}]\n${text.slice(0,50000)}`});notes.push(`${obj.displayName||f.name}: DOCX converted to text`);continue;}if(ext==='doc')throw new Error(`${obj.displayName||f.name}: .doc není podporovaný. Ulož ho jako DOCX, PDF nebo TXT.`);throw new Error(`${obj.displayName||f.name}: tento typ souboru zatím nejde v API režimu zpracovat.`);}return{parts,notes};}
 function buildGeminiRequestBody(prompt, extraParts=[], opts={}) {
   const useTools = !!(opts && opts.urlContext);
-  const generationConfig = { temperature:0.45, maxOutputTokens:32000 };
+  // Gemini 3.x je laděný na výchozí sampling; nižší temperature může zhoršit reasoning.
+  const generationConfig = { maxOutputTokens:65536 };
   // POZOR: responseMimeType:'application/json' NELZE kombinovat s nástrojem
   // (url_context) — Gemini to odmítne (HTTP 400 INVALID_ARGUMENT: "Tool use with a
   // response mime type 'application/json' is unsupported"). Když je tedy zapnutý URL
@@ -472,6 +473,14 @@ function validateSecurePackageSmoke(pkg) {
   if(/PRIVATE_KEY|VARIANTS_FULL/i.test(pkg.studentHtml)) {
     throw new Error('Studentský HTML v bezpečném režimu obsahuje skutečná učitelská data.');
   }
+  const studentCfg = extractJsonConstFromHtml(pkg.studentHtml, 'CFG');
+  if(!studentCfg.publicKey || studentCfg.publicKey.kty !== 'RSA' || !studentCfg.publicKey.n || !studentCfg.publicKey.e) {
+    throw new Error('Studentský HTML nemá platný veřejný RSA klíč pro šifrované odevzdání.');
+  }
+  const teacherCfg = extractJsonConstFromHtml(pkg.teacherHtml, 'CONFIG');
+  if(!teacherCfg.privateKey || teacherCfg.privateKey.kty !== 'RSA' || !teacherCfg.privateKey.d) {
+    throw new Error('Učitelský verifier nemá platný soukromý RSA klíč.');
+  }
   const studentVariants = extractJsonConstFromHtml(pkg.studentHtml, 'STUDENT_VARIANTS');
   assertNoStudentAnswerKeys(studentVariants);
 
@@ -537,7 +546,7 @@ function geminiRetryAfterMs(res, data){
   const details = data && data.error && Array.isArray(data.error.details) ? data.error.details : [];
   for(const d of details){
     if(d && typeof d === 'object' && d.retryDelay){
-      best = Math.max(best, geminiParseDurationMs(String(d.retryDelay).replace(/s$/,'s')));
+      best = Math.max(best, geminiParseDurationMs(String(d.retryDelay)));
     }
   }
   const msg = data && data.error && data.error.message ? String(data.error.message) : '';
@@ -586,11 +595,8 @@ function geminiClearCooldown(){
 function geminiRetryDelayMs(attempt, res, data, reason){
   const retryAfter = geminiRetryAfterMs(res, data);
   if(retryAfter) return retryAfter;
-  const http = res && res.status ? Number(res.status) : 0;
-  const apiStatus = data && data.error && data.error.status ? String(data.error.status) : String(reason || '');
-  if([500,502,503,504].includes(http) || /UNAVAILABLE|INTERNAL|DEADLINE_EXCEEDED|timeout|síť/i.test(apiStatus)){
-    return GEMINI_RETRY_DELAYS_MS[Math.max(0, Math.min(GEMINI_RETRY_DELAYS_MS.length - 1, attempt - 1))];
-  }
+  // Stejný odstup používáme pro všechny retryable chyby; limit 503 se vyhodnocuje
+  // samostatně per model (po fallbacku začíná nový model s vlastním limitem).
   return GEMINI_RETRY_DELAYS_MS[Math.max(0, Math.min(GEMINI_RETRY_DELAYS_MS.length - 1, attempt - 1))];
 }
 function geminiIsRetryableStatus(httpStatus, apiStatus){

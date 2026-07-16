@@ -17,10 +17,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.0',
-  date:    '2026-07-13',
+  version: '7.1.1',
+  date:    '2026-07-16',
   status:  'production-serverless',
   changes: [
+    'AUDITNÍ OPRAVY (7.1.1): opraven service worker, izolace jeho cache a offline režim, odpočet času nyní vychází z pevného termínu, CI před nasazením spouští kompletní testy, lockfile používá veřejný npm registr, CSV export neutralizuje vzorce, kryptografie selhává bezpečně, plné úložiště je viditelně hlášeno a centrální app-guard se revaliduje ze sítě.',
     'ANONYMNÍ TECHNICKÉ METRIKY VÝSTUPŮ (7.1.0): po skutečném dokončení generování zapisuje Generátor do společného modulu AI Studia jedinou technickou událost test-package. Eviduje pouze počet úspěšných, chybných nebo zrušených generovacích běhů; prompt, téma, otázky, odpovědi ani jiné části testu se neukládají. Manuál je z měření používání výslovně vyloučen.',
     'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
     'SJEDNOCENÁ IDENTITA ŠKOLY (7.0.7): záhlaví nyní používá stejné oficiální logo a výrazný název GYMNÁZIUM, OSTRAVA-HRABŮVKA jako ostatní nástroje AI Studia. Autorský blok v zápatí byl sjednocen na společný dvouřádkový formát.',
@@ -30,7 +31,6 @@ const RELEASE = Object.freeze({
     'OPRAVA ZAMRZNUTÉ PŘÍSTUPOVÉ BRÁNY (7.0.3): načtení externího access-manifestu má pevný časový limit a při nedostupnosti automaticky přejde na vestavěný seznam. Přístupový boot se plánuje ještě před inicializací formuláře, takže poškozený starý snapshot nebo jiná chyba rozhraní už nemůže zabránit zobrazení PINu či aktivace. Přidán watchdog a nouzová obsluha neošetřené chyby; statická brána nabízí odkazy pro nové načtení a reset místního profilu. Regresní test ověřuje i nikdy nekončící síťový požadavek.',
     'OPRAVA PŘÍSTUPOVÉ BRÁNY (7.0.2): aplikace je nyní zamčená už v samotném HTML ještě před spuštěním JavaScriptu, takže při chybě načtení nezůstane generátor otevřený. Odemčení relace je navázané na konkrétní verzi aplikace; po nasazení nové verze se existující zařízení znovu zeptá na místní PIN. Přidány servisní adresy ?lock=1 pro okamžité uzamčení a ?reset-access=1 pro smazání místního přístupového profilu a novou aktivaci. Headless test nově ověřuje, že čerstvé zařízení vždy zobrazí aktivační bránu a že session token obsahuje aktuální verzi.',
     'KOMPLETNÍ AUDIT NÁVAZNOSTI PRŮVODCE (7.0.1): přidána vydávací workflow matice, která ověřuje křížové závislosti jednoduchého i pokročilého režimu, všechny šablony, 13 presetů českého modulu, všech 38 podporovaných typů cvičení samostatně a všech 703 dvojic, 315 kombinací CEFR napříč pěti cizími jazyky, aktivaci a skrytí polí, obnovu starých rozporných stavů, úplný průchod kroky a runtime jednorázových kódů v instant i secure režimu. Opraveno: karta Bez šablony skutečně otevírá pokročilý režim; procvičování vždy vynutí instantní učící zpětnou vazbu a vypne žolík; secure režim vynutí celkové odevzdání bez okamžité zpětné vazby; české procvičovací presety nyní nastavují skutečný procvičovací režim; český modul už mimo češtinu neodkrývá globální typy při detailním rozpisu; vlastní stupnice blokuje mezery a překryvy s přesným vysvětlením; listening bez zdroje, nepodporované vlastní typy, více typů než cvičení, duplicitní členové skupin a neúplné 1:1 přiřazení rosteru jsou zablokovány. Jednorázové kódy se kontrolují i bez diferenciace v obou výstupech.',
-    'PRODUKČNÍ SERVERLESS VYDÁNÍ (7.0.0): odstraněn rozpor mezi pilotní dokumentací a stavem aplikace; verze je nyní označena jako technicky ověřená produkční serverless varianta, nikoli jako formálně schválená školou. Kritická ochrana soukromí: jména studentů v diferenciaci se do AI promptu již nikdy neposílají a staré nastavení se automaticky převádí na bezpečný režim. Před prvním AI požadavkem v relaci se zobrazuje transparentní informace o přenosu zadání, URL a příloh do Gemini. Výchozí modely aktualizovány na stabilní gemini-3.5-flash a gemini-3.1-flash-lite, staré 2.5 volby se migrují. Odstraněny zastaralé pevné údaje o kvótách; aplikace odkazuje na aktivní limity projektu v AI Studiu. Opraveny ARIA role průvodce, kontrast pomocných textů, fokus klávesnice a mobilní hlavička. Doplněna produkční kontrola npm test, provozní pravidla, checklist vydání a auditní zpráva. Druhá kritická oprava soukromí odstranila čitelný seznam studentů z generovaných HTML: rozpis variant nyní používá náhodnou sůl a SHA-256 otisky, neznámý identifikátor je odmítnut místo přiřazení výchozí varianty. Interní poradce byl obsahově přepsán podle skutečného chování 7.0.0 a testy nově hlídají API kontrakt i soukromí výstupního rosteru.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -1154,9 +1154,18 @@ function isSimpleMode(){ return (state.appMode || 'simple') !== 'advanced'; }
 function randomChunk(chars){
   if (!(window.crypto && window.crypto.getRandomValues))
     throw new Error('WebCrypto není dostupné — generování bezpečného kódu/PINu selhalo.');
-  const arr = new Uint32Array(chars);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr).map(n => (n % 36).toString(36).toUpperCase()).join('');
+  const limit = 4294967292; // největší násobek 36 pod 2^32
+  let out = '';
+  while(out.length < chars){
+    const arr = new Uint32Array(Math.max(4, chars - out.length));
+    window.crypto.getRandomValues(arr);
+    for(const n of arr){
+      if(n >= limit) continue;
+      out += (n % 36).toString(36).toUpperCase();
+      if(out.length === chars) break;
+    }
+  }
+  return out;
 }
 function fillSimpleSecrets(){
   if (!trim('ucitelPin')) setVal('ucitelPin', 'PIN-' + randomChunk(8));   // ≥8 znaků, silné

@@ -277,6 +277,21 @@ function clearOldUnsafeStorage(){
 const LEGACY_TPL_KEYS = ['sestavovac_tpl_v5_12_0','sestavovac_tpl_v5_11_1','sestavovac_tpl_v5_11_0','sestavovac_tpl_v5_10_6','sestavovac_tpl_v5_9_6','sestavovac_tpl_v5_9_5','sestavovac_tpl_v5_9_4','sestavovac_tpl_v5_9_3','sestavovac_tpl_v5_9_1','sestavovac_tpl_v5_9_0','sestavovac_tpl_v5_8_6','sestavovac_tpl_v5_8_5','sestavovac_tpl_v5_8_4','sestavovac_tpl_v5_8_3','sestavovac_tpl_v5_8_2','sestavovac_tpl_v5_8_1','sestavovac_tpl_v5_8_0','sestavovac_tpl_v5_7_4','sestavovac_tpl_v5_7_3','sestavovac_tpl_v5_7_2','sestavovac_tpl_v5_7_1','sestavovac_tpl_v5_6','sestavovac_tpl_v5_4','sestavovac_tpl_v5'];
 const LEGACY_HIST_KEYS = ['sestavovac_hist_v5_12_0','sestavovac_hist_v5_11_1','sestavovac_hist_v5_11_0','sestavovac_hist_v5_10_6','sestavovac_hist_v5_9_6','sestavovac_hist_v5_9_5','sestavovac_hist_v5_9_4','sestavovac_hist_v5_9_3','sestavovac_hist_v5_9_1','sestavovac_hist_v5_9_0','sestavovac_hist_v5_8_6','sestavovac_hist_v5_8_5','sestavovac_hist_v5_8_4','sestavovac_hist_v5_8_3','sestavovac_hist_v5_8_2','sestavovac_hist_v5_8_1','sestavovac_hist_v5_8_0','sestavovac_hist_v5_7_4','sestavovac_hist_v5_7_3','sestavovac_hist_v5_7_2','sestavovac_hist_v5_7_1','sestavovac_hist_v5_7','sestavovac_hist_v5_6','sestavovac_hist_v5_4','sestavovac_hist_v5'];
 
+let storageWarnShown = false;
+function safeSetItem(key, value){
+  try { localStorage.setItem(key, value); return true; }
+  catch(e){
+    console.warn('Uložení do localStorage selhalo:', e);
+    if(!storageWarnShown){
+      storageWarnShown = true;
+      const msg = 'Úložiště prohlížeče je plné nebo blokované — poslední změny se NEULOŽILY. Smaž staré šablony/historii nebo použij „Vymazat citlivé údaje“.';
+      if(typeof uiToast === 'function') uiToast(msg, 'err', 9000);
+      else if(typeof uiAlert === 'function') uiAlert(msg, 'Uložení selhalo');
+    }
+    return false;
+  }
+}
+
 function readArr(key){
   try { const a = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(a) ? a : []; }
   catch(_){ return []; }
@@ -297,7 +312,7 @@ function migrateStorage(){
         mergedTpl.push(t);
       }
     }
-    if (mergedTpl.length) localStorage.setItem(TPL_KEY, JSON.stringify(mergedTpl));
+    if (mergedTpl.length) safeSetItem(TPL_KEY, JSON.stringify(mergedTpl));
 
     // HISTORIE: aktuální + všechny legacy, dedup podle hash (jinak ts), nejnovější nahoře, limit 50
     const seenHist = new Set();
@@ -312,7 +327,7 @@ function migrateStorage(){
     }
     if (mergedHist.length) {
       mergedHist.sort((a,b) => (b && b.ts || 0) - (a && a.ts || 0));
-      localStorage.setItem(HIST_KEY, JSON.stringify(mergedHist.slice(0, 50)));
+      safeSetItem(HIST_KEY, JSON.stringify(mergedHist.slice(0, 50)));
     }
   } catch(_){}
 }
@@ -339,9 +354,8 @@ function saveSnapshot() {
       const dom = {};
       DOM_FIELDS.forEach(id => { dom[id] = val(id); });
       const snap = { dom, state: getStoredState(), currentStep, maxStep, ts: Date.now() };
-      localStorage.setItem(SAVE_KEY, JSON.stringify(snap));
-      flashSave();
-    } catch(_){}
+      if (safeSetItem(SAVE_KEY, JSON.stringify(snap))) flashSave();
+    } catch(e){ console.warn('Sestavení snapshotu selhalo:', e); }
   }, 400);
 }
 
@@ -391,7 +405,7 @@ function loadTemplates() {
   return readArr(TPL_KEY);
 }
 function saveTemplates(tpls) {
-  try { localStorage.setItem(TPL_KEY, JSON.stringify(tpls)); } catch(_){}
+  return safeSetItem(TPL_KEY, JSON.stringify(tpls));
 }
 
 // Klíče pedagogického profilu — to jediné, co šablona ukládá.
@@ -428,7 +442,7 @@ async function saveTemplate() {
   const why = await uiPrompt('Logika šablony (nepovinné — krátký popis účelu šablony)', '');
   const tpls = loadTemplates();
   tpls.push({ id: Date.now(), name, why: why || '', format: 'profile_v1', profile: getTemplateProfile(), ts: Date.now() });
-  saveTemplates(tpls);
+  if (!saveTemplates(tpls)) return;
   renderTemplates();
   flashSave();
   uiToast('Šablona uložena — ukládá pedagogický profil (mód, zpětná vazba, hodnocení, diferenciace). Cvičení, čas a jazyk zůstávají na tobě.', 'ok', 5000);
@@ -612,7 +626,7 @@ function pushHistory(prompt) {
   } catch(_){ }
 }
 function saveHistory(hist) {
-  try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch(_){ }
+  return safeSetItem(HIST_KEY, JSON.stringify(hist));
 }
 async function clearHistory() {
   const ok = await uiConfirm('Vymazat historii promptů v tomto prohlížeči?', 'Vymazat historii?', true);

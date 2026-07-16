@@ -1,110 +1,87 @@
 # Architektura projektu
 
-Generátor interaktivních testů 7.0.4 je produkční serverless/PWA aplikace bez školního backendu. Zdroj je rozdělen do doménových souborů; build z něj vytváří jeden samostatný `dist/index.html` a související PWA soubory.
+Generátor interaktivních testů je produkční serverless/PWA aplikace bez školního backendu. Aktuální verze je určena v `package.json` a `RELEASE.version`; číslo verze se v tomto dokumentu záměrně neopakuje, aby nevznikal dokumentační rozpor.
 
-## Build
+## Build a dodávkový řetězec
 
 ```bash
 npm ci
 npm test
-npm run build
+npm run test:headless
+npm audit --audit-level=high
 ```
 
-Build skládá vlastní HTML, CSS a JavaScript. Nezavádí runtime framework ani externí balíček do výsledné aplikace.
+Build skládá vlastní HTML, CSS a JavaScript. Výsledná aplikace nepoužívá runtime framework ani externí JavaScriptovou knihovnu. GitHub Actions nasazuje pouze čerstvý `dist/`, který vznikl po úspěšném průchodu všech kontrol.
+
+`package-lock.json` smí obsahovat jen veřejné npm URL. `scripts/check-lockfile-registry.mjs` blokuje interní proxy adresy a `scripts/normalize-lockfile-registry.mjs` je umí deterministicky přepsat na `registry.npmjs.org`.
 
 ## Hlavní složky
 
-- `src/shell.html` – statická HTML kostra a placeholdery.
-- `src/styles.css` – kompletní vizuální vrstva.
+- `src/shell.html` – HTML kostra a placeholdery.
+- `src/styles.css` – vizuální vrstva.
 - `src/js/` – JavaScript skládaný podle názvu souboru.
-- `src/index.html` – informační ukazatel; není zdrojem aplikace.
-- `public/` – PWA manifest, service worker a ikony.
-- `scripts/build.mjs` – skládá produkční výstup a kopíruje PWA aktiva.
-- `scripts/check-versions.mjs` – hlídá shodu verzí.
-- `scripts/check-production-readiness.mjs` – hlídá produkční stav, modely, soukromí, nápovědu a klíčové prvky přístupnosti.
-- `scripts/check-source-structure.mjs` – hlídá rozdělení velkých bloků.
-- `scripts/check-sensitive-data.mjs` – kontroluje veřejný access manifest.
-- `tools/headless-check.mjs` – funkční regresní test v jsdom.
-- `.github/workflows/deploy.yml` – testovaný deploy na GitHub Pages.
+- `public/` – PWA manifest, service worker, manuál a ikony.
+- `scripts/build.mjs` – produkční build.
+- `scripts/check-production-readiness.mjs` – produkční, privacy, API a a11y invarianty.
+- `scripts/check-source-structure.mjs` – struktura split modulů.
+- `scripts/check-sensitive-data.mjs` – obecný sken veřejných zdrojů.
+- `scripts/check-sw-precache.mjs` – konzistence precache proti `dist/`.
+- `scripts/check-deadline-timers.mjs` – pojistka proti návratu tikových časovačů.
+- `scripts/generate-eslint-globals.mjs` – AST seznam top-level globálů pro ESLint.
+- `tools/headless-check.mjs` – funkční regrese v jsdom.
+- `.github/workflows/deploy.yml` – testovaný deploy na Pages.
 
 ## Kontrakt pořadí modulů
 
-JavaScriptové soubory nejsou ES moduly s `import/export`, ale každý se ve výsledném HTML spouští v samostatném classic `<script>` tagu. Sdílejí jednu globální stránku, proto je pořadí stále součástí architektury. Oddělené tagy zajišťují, že runtime chyba jednoho modulu nezastaví načtení následujících modulů ani přístupové brány.
+Soubory nejsou ES moduly. Každý se ve výsledném HTML spouští v samostatném classic `<script>` tagu a sdílí globální scope.
 
-1. Prefixy `01-` až `16-` určují pořadí hlavní aplikace.
+1. Prefixy `01-` až `17-` určují pořadí hlavní aplikace.
 2. Bezpečný export je rozdělen na `13a` až `13g`.
-3. Build HTML testů je rozdělen na `14a` až `14d`.
-4. `16-access.js` definuje přístupovou vrstvu; vlastní spuštění je oddělené v `99-init.js`.
-5. `99-init.js` musí následovat po všech hlavních aplikačních modulech.
-6. `50-cs-module.js` a `60-pwa.js` se načítají jako samostatné navazující skripty.
-7. Přejmenování nebo přesun souboru vyžaduje kompletní `npm test` a `npm run test:headless`.
+3. Build testů je rozdělen na `14a` až `14d`.
+4. `16-access.js` promítá ověřený permit AI Studia.
+5. `17-ai-studio-bridge.js` řeší krátkodobou předávku materiálu.
+6. `99-init.js` startuje aplikaci až po hlavních modulech.
+7. `50-cs-module.js` a `60-pwa.js` jsou navazující samostatné skripty.
+
+ESLint má `no-undef: error`. Protože jsou definice rozdělené mezi classic scripty, před lintem se přes Espree vygeneruje `eslint-globals.generated.mjs`. Překlep nebo odkaz na smazanou globální funkci už test zablokuje.
+
+## Centrální přístup
+
+Veřejný `dist/index.html` obsahuje inertní skripty typu `application/ghrab-protected`. Centrální `app-guard.js` AI Studia nejprve ověří podepsaný permit a teprve potom aplikační moduly aktivuje. Generátor už nemá vlastní aktivační kód, místní PIN ani `access-manifest.json`.
+
+Service worker používá pro `/AI-Studio-GHRAB/` strategii `networkFirst`: online je bezpečnostní komponenta vždy čerstvá, offline lze použít poslední známou cache. Důsledek je vědomý: offline zařízení může do nejbližšího připojení pracovat s dříve platným permitem. Po připojení se čerstvý guard a revokace uplatní okamžitě.
+
+## PWA aktualizace
+
+`CORE_ASSETS` musí odpovídat skutečným souborům v `dist/`; tuto vazbu hlídá `check-sw-precache.mjs`. Service worker nepoužívá `skipWaiting`, takže nová verze nepřevezme otevřenou kartu a sama nezahodí rozpracovanou práci. Aktivuje se po zavření starých klientů.
 
 ## Datový tok AI
 
-1. Učitel vyplní konfiguraci, zdroje a případné přílohy.
+1. Učitel vyplní konfiguraci, zdroje a přílohy.
 2. `buildPrompt()` sestaví strukturované zadání.
-3. Diferenciační identity jsou vždy nahrazeny kódy `Student A1`, `Student A2` atd.
-4. Před prvním požadavkem v relaci aplikace zobrazí upozornění na přenos dat.
-5. `callGeminiJSON()` odešle požadavek na zvolený model Gemini s klíčem v hlavičce `x-goog-api-key`.
-6. Odpověď je validována, opravena nebo odmítnuta podle očekávaného formátu.
-7. Generátor sestaví studentský HTML výstup a případně učitelský verifier.
-
-Volný text, podmínky skupin a přílohy mohou stále obsahovat osobní údaje; odpovědnost za jejich odstranění zůstává na uživateli.
-
-## Datový tok diferenciace
-
-1. V pracovní relaci má skupina název, pedagogické podmínky a seznam jmen nebo kódů.
-2. Do promptu pro AI jde pouze pseudonymizovaný seznam `Student A1…`.
-3. Při exportu `buildPublicDiffGroups()` vygeneruje náhodnou sůl testu a SHA-256 otisky normalizovaných identifikátorů.
-4. `student_test.html` obsahuje pouze `studentHashes`, sůl a veřejné vlastnosti skupiny; čitelný roster se nevkládá.
-5. Student zadá identifikátor, runtime vytvoří stejný hash a vybere odpovídající variantu.
-6. Neznámý identifikátor je odmítnut, nikoli přesměrován na výchozí variantu.
-7. U režimu jednorázových kódů může privátní mapování zůstat pouze v `teacher_verifier.html`.
+3. Diferenciační identity se nahradí kódy `Student A1…`.
+4. Před prvním požadavkem se zobrazí informace o přenosu dat.
+5. `callGeminiJSON()` odešle požadavek s klíčem v `x-goog-api-key`.
+6. Gemini 3.x používá výchozí sampling; aplikace nenastavuje sníženou `temperature`.
+7. Odpověď je validována, případně opravena nebo odmítnuta.
+8. Generátor sestaví instantní HTML nebo secureOffline balík.
 
 ## Bezpečný offline balík
 
-- `student_test.html` neobsahuje správné odpovědi ani privátní klíč.
-- `teacher_verifier.html` obsahuje answer key a privátní RSA klíč.
-- Po odevzdání student vytvoří `SECURE-ANSWERS-V1`.
-- Payload odpovědí je šifrován AES-GCM; symetrický klíč je zabalen RSA-OAEP veřejným klíčem verifieru.
-- Oba HTML soubory mají SHA-256 integritní otisky.
-- Serverless architektura neumí vzdáleně zneplatnit již staženou kopii.
+- `student_test.html` obsahuje veřejný RSA klíč, ale ne answer key ani privátní klíč.
+- `teacher_verifier.html` obsahuje privátní RSA klíč a správné odpovědi.
+- Každé odevzdání používá čerstvý AES-GCM klíč a IV; AES klíč je zabalen RSA-OAEP.
+- Selhání generování nebo exportu RSA klíče tvrdě zastaví sestavení balíku.
+- `validateSecurePackageSmoke()` ověřuje přítomnost platného veřejného i soukromého JWK.
 
-## Modely a limity
+## Časovače
 
-Výchozí stabilní model je definován jedinou konstantou v `src/js/07-gemini.js`. Záložní model je odlišný a použije se pouze v omezených situacích. Starší uložené názvy modelů se migrují na aktuální varianty.
+Oba studentské runtimy používají pevný deadline `Date.now() + limit`. Zobrazený zbytek se vždy dopočítá z reálného času, ne počtem tiků. Přepnutí karty, uspání telefonu ani throttling timerů proto čas nezastaví; při návratu přes `visibilitychange` nebo `focus` proběhne okamžitý přepočet a případné odevzdání.
 
-Aplikace nezobrazuje pevné univerzální hodnoty kvót. Aktivní limity závisejí na projektu, účtu, modelu a tarifu a uživatel je ověřuje v Google AI Studio.
+## Stav aplikace versus stav v katalogu
 
-## Testovací strategie
+`RELEASE.status = 'production-serverless'` znamená technicky ověřený stav kódu. Studio manifest záměrně používá opatrnější organizační formulaci do okamžiku formálního rozhodnutí školy. Build guard proto katalogu nedovolí předčasně deklarovat schválený produkční provoz. Tuto dvojici pravidel neměnit bez změny governance.
 
-`npm test` ověřuje statické, buildové a workflow invarianty:
+## Hranice
 
-- jednotnou verzi a PWA cache,
-- produkční status,
-- povinnou pseudonymizaci před AI,
-- hashovaný roster ve studentském výstupu,
-- nepřítomnost čitelného seznamu studentů v runtimu,
-- odmítnutí zastaralých bezpečnostních tvrzení v interní nápovědě,
-- aktuální výchozí a záložní model,
-- kontrakt URL a hlavičky Gemini požadavku,
-- klíčové ARIA role a popisky,
-- strukturu rozdělených modulů,
-- veřejný access manifest,
-- ESLint,
-- produkční build,
-- workflow matici: 576 režimových kombinací, všechny šablony, jazyky, české presety, typy cvičení, viditelnosti polí, obnovu starých stavů a runtime identit,
-- bezpečné vložení JSON.
-
-`npm run test:headless` samostatně ověřuje spuštění aplikace bez JS chyb, sestavení promptu a exportu, jazykové režimy, jednoduché šablony, interní Test Lab, PWA soubory a secureOffline balík bez answer key a čitelného rosteru.
-
-## Záměrně neřešené části
-
-- školní server a SSO,
-- serverová správa API klíče,
-- databáze a centrální výsledky,
-- neobejitelná serverová autorizace,
-- centrální auditní log,
-- úplné obnovení rozpracovaného studentského pokusu po reloadu nebo pádu.
-
-Tyto části nejsou součástí verze 7.0.2 a musí být řešeny provozními pravidly nebo budoucí serverovou etapou.
+Serverless verze neřeší školní SSO, databázi, serverovou proxy API klíče, centrální uchování výsledků ani neobejitelnou autorizaci. Již stažené soubory nelze vzdáleně zneplatnit a rozpracovaný test se po reloadu plně neobnoví.

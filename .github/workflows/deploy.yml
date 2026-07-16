@@ -27,9 +27,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
 
-      - name: Build
-        run: node scripts/build.mjs
+      - name: Install
+        run: npm ci
+
+      - name: Test (statické kontroly, lint, build, workflow matice)
+        run: npm test
+
+      - name: Headless regression
+        run: npm run test:headless
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -16,7 +16,7 @@ function centralPermit(){
 }
 function accessEnvironment(){
   if (location.protocol === 'file:') return 'local';
-  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return 'official';
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return 'local';
   return location.origin === OFFICIAL_ORIGIN && location.pathname.startsWith(OFFICIAL_PATH) ? 'official' : 'unofficialCopy';
 }
 function profileFromPermit(p){

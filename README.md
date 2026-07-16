@@ -1,52 +1,49 @@
 # Generátor interaktivních testů
 
-Produkční serverless aplikace pro učitele. Pomáhá připravovat interaktivní cvičení, procvičovací materiály a klasifikované testy, včetně diferencovaných variant a bezpečného offline odevzdání. Výstupem je samostatný HTML soubor; samotný generátor lze provozovat jako PWA na GitHub Pages bez školního serveru.
+Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i klasifikované interaktivní testy, diferencované varianty a bezpečný offline balík bez školního backendu.
 
 ## Stav vydání
 
-Verze 7.1.0 je technicky ověřená produkční serverless varianta. Je připravena k řízenému oficiálnímu používání školou za podmínek popsaných v `PROVOZNI-PRAVIDLA.md`, `SECURITY.md` a `RELEASE-CHECKLIST.md`.
+Verze **7.1.1** je technicky ověřená produkční serverless varianta. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
 
-Toto označení neznamená automatické formální schválení vedením školy ani bezpečnostní posouzení budoucího serverového řešení. Server, školní přihlášení a centrální správa API klíče jsou samostatná etapa.
+Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 
 ## Hlavní vlastnosti
 
-- tvorba testů pro cizí jazyky i český jazyk,
-- jednoduchý a pokročilý pracovní režim,
-- více než dvacet typů interaktivních úloh,
-- diferenciace pomocí jmen nebo jednorázových kódů,
-- náhodné pořadí a samostatné varianty podle skupin,
+- tvorba testů pro cizí jazyky a český jazyk,
+- jednoduchý i pokročilý režim,
+- 38 podporovaných typů úloh,
+- diferenciace pomocí jmen nebo doporučených jednorázových kódů,
+- náhodné pořadí a varianty podle skupin,
 - okamžitý procvičovací režim,
 - bezpečný offline balík `student_test.html` + `teacher_verifier.html`,
 - šifrované odevzdání `answers.txt`,
 - PWA instalace pro počítač a telefon,
 - lokální šablony, historie a export zadání,
-- automatizovaný build, lint, bezpečnostní kontroly a headless regresní testy.
+- automatizovaný build, lint, bezpečnostní kontroly, workflow matice a headless regrese.
 
 ## Ochrana dat
 
-Generátor chrání identity ve dvou samostatných vrstvách:
-
-1. **Před AI požadavkem** nahrazuje identity z diferenciačních skupin kódy `Student A1`, `Student A2` atd. Skutečná jména se do promptu Gemini nevkládají ani při načtení starého nastavení.
-2. **Ve studentském HTML** neukládá čitelný seznam jmen ani kódů. Pro přiřazení variant používá náhodnou sůl konkrétního testu a SHA-256 otisky identifikátorů.
-
-Pro diferencované testy se doporučují náhodné jednorázové kódy místo běžných jmen. Hash s veřejnou solí omezuje přímý únik seznamu, ale sám o sobě nebrání slovníkovému hádání známých jmen.
-
-Text zadání, zvolené URL, pedagogické podmínky skupin a přiložené soubory se při přímém generování odesílají do služby Google Gemini. Učitel musí před odesláním odstranit osobní, zdravotní, kázeňské a jiné citlivé údaje, které mohou být obsaženy ve volném textu nebo přílohách.
+1. Před AI požadavkem se identity studentů nahrazují kódy `Student A1`, `Student A2` atd.
+2. Ve studentském HTML není čitelný roster. Přiřazení variant používá náhodnou sůl konkrétního testu a SHA-256 `studentHashes`.
+3. Pro klasifikované diferencované testy se doporučují náhodné jednorázové kódy, nikoli běžná jména.
+4. Text zadání, zvolené URL, pedagogické podmínky a přílohy mohou být odeslány do Google Gemini. Učitel je musí předem anonymizovat.
 
 ## Struktura zdroje
 
 - `src/shell.html` – HTML kostra aplikace.
 - `src/styles.css` – kompletní CSS.
-- `src/js/01-core.js ... 16-access.js` – hlavní logika po doménách; každý soubor se ve výsledku spouští jako samostatný classic script.
-- `src/js/99-init.js` – samostatný závěrečný start přístupové brány a aplikace.
+- `src/js/01-core.js ... 17-ai-studio-bridge.js` – hlavní logika po doménách; každý soubor se ve výsledku spouští jako samostatný classic script.
 - `src/js/50-cs-module.js` – modul Český jazyk.
 - `src/js/60-pwa.js` – registrace service workeru.
-- `src/index.html` – pouze informační ukazatel na modulární zdroj.
-- `src/access-manifest.json` – veřejný přístupový manifest s obecnými identifikátory.
-- `public/` – PWA manifest, service worker a ikony.
-- `scripts/build.mjs` – build do `dist/`.
-- `tools/headless-check.mjs` – funkční regresní test v jsdom.
-- `tools/workflow-matrix-check.mjs` – úplná kontrola logických závislostí průvodce a kombinací režimů.
+- `src/js/99-init.js` – závěrečný start aplikace.
+- `public/` – PWA manifest, service worker, manuál a ikony.
+- `scripts/build.mjs` – build do lokálního `dist/`.
+- `scripts/check-sw-precache.mjs` – ověřuje, že každá položka PWA precache skutečně existuje v buildu.
+- `scripts/check-lockfile-registry.mjs` – blokuje lockfile s interními registry URL.
+- `scripts/generate-eslint-globals.mjs` – generuje sdílené globály pro `no-undef` v architektuře classic scriptů.
+- `tools/headless-check.mjs` – funkční regrese v jsdom.
+- `tools/workflow-matrix-check.mjs` – úplná kontrola návazností průvodce a kombinací režimů.
 
 ## Instalace a kontrola
 
@@ -57,75 +54,82 @@ npm run test:headless
 npm audit --audit-level=high
 ```
 
-`npm test` musí projít před každým nasazením. Kontroluje:
+`npm test` kontroluje:
 
-1. shodu verzí,
-2. produkční připravenost a povinné ochrany soukromí,
-3. strukturu zdrojových modulů,
-4. známé citlivé údaje ve veřejném manifestu,
-5. ESLint,
-6. produkční build,
-7. workflow matici všech zásadních návazností, presetů, jazyků, typů cvičení a runtime identit.
+1. shodu verze ve čtyřech zdrojích,
+2. veřejný npm registr v lockfile,
+3. produkční a privacy invarianty,
+4. strukturu zdrojů,
+5. obecný sken citlivých údajů,
+6. deadline časovače obou studentských runtime,
+7. ESLint včetně `no-undef`,
+8. produkční build,
+9. konzistenci service-worker precache,
+10. workflow matici 576 režimových kombinací, 38 typů a 703 dvojic typů.
 
-Samostatný `npm run test:headless` ověřuje spuštění aplikace, izolaci script tagů, pokračování přístupové brány po simulované chybě jiného modulu, nouzové vyčištění PWA cache, pseudonymizaci promptu, hashovaný roster, Gemini kontrakt, secureOffline balík, šablony a interní Test Lab.
+`npm run test:headless` skutečně spustí aplikaci po centrálním povolení, ověří fail-closed build, pseudonymizaci promptu, hashovaný roster, Gemini kontrakt, sestavení secureOffline balíku, jednorázové kódy, šablony, PWA soubory a interní Test Lab. Očekávané přeskočení self-testu bez právě vygenerovaného testu je v logu označeno zvlášť; jakýkoli jiný warn test zablokuje.
 
-Samostatné příkazy:
+Užitečné samostatné příkazy:
 
 ```bash
 npm run build
 npm run check:versions
+npm run check:lockfile
+npm run check:precache
+npm run check:timers
 npm run check:production
-npm run test:workflow
-npm run test:headless
 npm run check:structure
 npm run check:sensitive
+npm run test:workflow
+npm run test:headless
 npm run lint
 ```
 
-## Ověření přístupové brány
+Pokud práce v izolovaném vývojovém prostředí přepíše `resolved` URL v lockfile na interní proxy, spusť před commitem:
 
-- Nové zařízení musí zobrazit aktivační kód.
-- Již aktivované zařízení musí po novém vydání zobrazit místní PIN.
-- Adresa s `?lock=1` okamžitě uzamkne relaci a vyžádá PIN.
-- Adresa s `?reset-access=1` smaže místní přístupový profil a vyžádá novou aktivaci.
-- Přístupová vrstva je fail-closed: dokud JavaScript přístup neověří, obsah aplikace zůstává překrytý bránou.
+```bash
+npm run fix:lockfile-registry
+npm run check:lockfile
+```
+
+## Centrální přístup AI Studia
+
+- Veřejný build je fail-closed: aplikační skripty jsou inertní, dokud je centrální `app-guard.js` nepovolí.
+- Guard ověřuje podepsaný permit AI Studia, jeho platnost, roli, povolenou aplikaci a revokaci.
+- Uživatel aktivuje přístup ve Studiu; Generátor neobsahuje vlastní aktivační kód ani místní PIN bránu.
+- Lokální odebrání přístupu je dostupné v účtovém modalu tlačítkem **Odebrat přístup z tohoto zařízení**.
+- Neoficiální vzdálená kopie nesmí generovat. `file://` a `localhost` jsou vývojové prostředí; ostrý balík v nich může po výslovném potvrzení vytvořit pouze centrálně ověřený správce.
 
 ## Nasazení na GitHub Pages
 
-Workflow `.github/workflows/deploy.yml` používá `npm ci`, spustí `npm test` a v samostatném kroku `npm run test:headless`; teprve poté nasadí vytvořený `dist/`. Do repozitáře se nenahrává `node_modules/`, lokální `dist/`, screenshoty ani testovací výsledky.
+Workflow `.github/workflows/deploy.yml` provede `npm ci`, `npm test`, `npm run test:headless` a `npm audit --audit-level=high`. Teprve poté nahraje čerstvě vytvořený `dist/` na GitHub Pages.
 
-Zdroj se upravuje v `src/`; vygenerovaný `dist/index.html` se ručně neupravuje. Po nahrání ZIPu zkontroluj zelený běh GitHub Actions a následně proveď smoke test skutečné Pages URL.
+Do repozitáře se nenahrává `node_modules/` ani lokální `dist/`. Zdroj se upravuje v `src/` a `public/`; vygenerovaný `dist/index.html` se ručně neupravuje.
 
-## Verze a cache
+## Verze, PWA a aktualizace
 
-Jedna verze musí být shodná v:
+Verze musí být shodná v:
 
 - `package.json`,
 - `src/js/01-core.js`,
 - `public/sw.js`,
 - `public/manifest.webmanifest`.
 
-Kontrola `npm run check:versions` zabrání nasazení, pokud se verze rozcházejí. Changelog v `RELEASE.changes` obsahuje nejvýše deset posledních záznamů.
+Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření starých karet, takže rozpracovaná práce není přerušena automatickým reloadem. Centrální soubory pod `/AI-Studio-GHRAB/` používají `networkFirst`: online se vždy ověří čerstvý guard, offline je dostupná poslední známá cache.
 
 ## Dokumentace
 
-- `PROVOZNI-PRAVIDLA.md` – závazný praktický postup pro učitele a správce.
+- `PROVOZNI-PRAVIDLA.md` – praktická pravidla pro učitele a správce.
 - `SECURITY.md` – bezpečnostní hranice serverless verze.
-- `RELEASE-CHECKLIST.md` – kontrolní seznam před vydáním.
-- `AUDIT-V2.md` – hloubkový produkční audit verze 7.0.0.
-- `AUDIT-PRUVODCE-V7.0.1.md` – audit logiky kroků, závislostí a kombinací vydání 7.0.1, jehož opravy zůstávají součástí 7.0.6.
-- `ARCHITEKTURA.md` – technické uspořádání projektu.
+- `RELEASE-CHECKLIST.md` – kontrolní seznam vydání.
+- `ARCHITEKTURA.md` – technické uspořádání.
 - `CONTRIBUTING.md` – pravidla dalšího vývoje.
-- `PLAN-MODULARIZACE.md` – historický plán modularizace.
+- `docs/release-notes/` – historické jednorázové instrukce a komentáře vydání.
 
 ## Omezení rozsahu
 
-Verze 7.1.0 neřeší školní server, centrální identitu, databázi ani serverovou úschovu API klíče. Přístupová brána v klientském kódu je organizační opatření, nikoli neobejitelná autentizace. Rozpracovaný studentský pokus se po zavření nebo obnovení stránky plně neobnoví. Tyto body musí být zohledněny v provozních pravidlech a později posouzeny se školním IT.
+Verze 7.1.1 nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
 
 ## Napojení na AI Studio GHRAB
 
-Build vytváří veřejný soubor `dist/studio-manifest.json`. AI Studio z něj automaticky načítá aktuální verzi, stav, adresu a metadata aplikace.
-
-Po úspěšném nasazení workflow volitelně odešle událost do repozitáře `AI-Studio-GHRAB`. Pro okamžitou synchronizaci nastav repository secret `AI_STUDIO_DISPATCH_TOKEN`. Bez secretu Studio změnu zachytí při pravidelné hodinové kontrole.
-
-Verze 7.1.0 obsahuje Studio Bridge v1. Při otevření s `?studioHandoff=1` převezme krátkodobý anonymní `ghrab-material-v1`, vyplní základní údaje a zdrojový obsah a zobrazí návratový banner. Souborový export zůstává záložní cestou.
+Build vytváří `dist/studio-manifest.json`. Studio z něj načítá verzi, stav, adresu a metadata. Studio Bridge v1 umí přes krátkodobou lokální předávku `ghrab-material-v1` doplnit název, skupinu, předmět a zdrojový obsah bez serverového ukládání předávky.
