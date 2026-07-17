@@ -17,10 +17,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.2',
+  version: '7.1.3',
   date:    '2026-07-16',
   status:  'production-serverless',
   changes: [
+    'GHRAB QA CERTIFIKACE (7.1.3): Generátor byl začleněn do jednotné brány GHRAB QA 1.0.1. Zachovány byly jeho podrobné workflow a headless testy; nově se společně ověřuje technická konzistence, bezpečnost, PWA, pairwise kombinace, kritická workflow, skutečný Chromium vzhled a ruční galerie svázaná s otiskem buildu.',
     'CERTIFIKAČNÍ VIZUÁLNÍ OPRAVA (7.1.2): tlačítko Celá obrazovka v bezpečném studentském testu má vlastní plnou řádku a pevné svislé odsazení, takže se už na mobilu ani notebooku nepřekrývá s popiskem jména nebo kódu studenta. Přidána regresní pojistka pro toto rozložení.',
     'AUDITNÍ OPRAVY (7.1.1): opraven service worker, izolace jeho cache a offline režim, odpočet času nyní vychází z pevného termínu, CI před nasazením spouští kompletní testy, lockfile používá veřejný npm registr, CSV export neutralizuje vzorce, kryptografie selhává bezpečně, plné úložiště je viditelně hlášeno a centrální app-guard se revaliduje ze sítě.',
     'ANONYMNÍ TECHNICKÉ METRIKY VÝSTUPŮ (7.1.0): po skutečném dokončení generování zapisuje Generátor do společného modulu AI Studia jedinou technickou událost test-package. Eviduje pouze počet úspěšných, chybných nebo zrušených generovacích běhů; prompt, téma, otázky, odpovědi ani jiné části testu se neukládají. Manuál je z měření používání výslovně vyloučen.',
@@ -30,7 +31,6 @@ const RELEASE = Object.freeze({
     'NAPOJENÍ NA AI STUDIO GHRAB (7.0.5): Generátor umí bezpečně převzít krátkodobou lokální předávku GHRAB Material v1. Automaticky doplní název, skupinu/úroveň, předmět a látku i zdrojový obsah včetně strukturovaných úloh. Předávka má omezenou platnost, po načtení se smaže a nic se neposílá na server. Přidán viditelný návrat do AI Studia a anonymní místní záznam přínosu pro pilot.',
     'ODDĚLENÁ A NEZÁVISLÁ PŘÍSTUPOVÁ BRÁNA (7.0.4): zdrojové moduly se již neskládají do jediného obřího scriptu. Každý modul se spouští samostatně a závěrečný init je v samostatném modulu 99-init.js, takže chyba v jedné části formuláře už nezastaví spuštění PINu nebo aktivace. Statická nouzová tlačítka mají vlastní malý skript nezávislý na aplikaci; umějí odregistrovat service worker, smazat PWA cache, vynutit PIN nebo úplně obnovit místní profil. Přidán regresní test izolace modulů a funkčnosti nouzové obsluhy.',
     'OPRAVA ZAMRZNUTÉ PŘÍSTUPOVÉ BRÁNY (7.0.3): načtení externího access-manifestu má pevný časový limit a při nedostupnosti automaticky přejde na vestavěný seznam. Přístupový boot se plánuje ještě před inicializací formuláře, takže poškozený starý snapshot nebo jiná chyba rozhraní už nemůže zabránit zobrazení PINu či aktivace. Přidán watchdog a nouzová obsluha neošetřené chyby; statická brána nabízí odkazy pro nové načtení a reset místního profilu. Regresní test ověřuje i nikdy nekončící síťový požadavek.',
-    'OPRAVA PŘÍSTUPOVÉ BRÁNY (7.0.2): aplikace je nyní zamčená už v samotném HTML ještě před spuštěním JavaScriptu, takže při chybě načtení nezůstane generátor otevřený. Odemčení relace je navázané na konkrétní verzi aplikace; po nasazení nové verze se existující zařízení znovu zeptá na místní PIN. Přidány servisní adresy ?lock=1 pro okamžité uzamčení a ?reset-access=1 pro smazání místního přístupového profilu a novou aktivaci. Headless test nově ověřuje, že čerstvé zařízení vždy zobrazí aktivační bránu a že session token obsahuje aktuální verzi.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

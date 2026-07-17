@@ -1,0 +1,65 @@
+{
+  "parameters": {
+    "appMode": [
+      "simple",
+      "advanced"
+    ],
+    "language": [
+      "angličtina",
+      "němčina",
+      "španělština",
+      "francouzština",
+      "latina",
+      "čeština"
+    ],
+    "testMode": [
+      "procviceci",
+      "bezny",
+      "prisny"
+    ],
+    "resultMode": [
+      "instant",
+      "secureOffline"
+    ],
+    "identityMode": [
+      "name",
+      "oneTimeCode"
+    ],
+    "device": [
+      "mobile",
+      "desktop"
+    ]
+  },
+  "criticalTriples": [
+    {
+      "testMode": "procviceci",
+      "resultMode": "secureOffline",
+      "identityMode": "oneTimeCode"
+    },
+    {
+      "testMode": "prisny",
+      "resultMode": "secureOffline",
+      "identityMode": "oneTimeCode"
+    },
+    {
+      "appMode": "advanced",
+      "language": "čeština",
+      "resultMode": "secureOffline"
+    }
+  ],
+  "fixedScenarios": [
+    {
+      "appMode": "simple",
+      "language": "angličtina",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "identityMode": "name",
+      "device": "mobile"
+    }
+  ],
+  "validator": "qa/combinatorial-validator.mjs",
+  "timeoutMs": 15000,
+  "limitations": [
+    "Síťová odpověď Gemini se testuje pomocí deterministického mocku v původním headless testu; skutečný externí model je součástí deployed smoke testu."
+  ]
+}

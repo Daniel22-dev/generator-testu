@@ -1,0 +1,425 @@
+{
+  "scenarios": [
+    {
+      "id": "generator-mode-chooser",
+      "name": "Volba pracovního režimu",
+      "url": "/dist/index.html",
+      "expectedText": "PRACOVNÍ REŽIM",
+      "mustVisible": [
+        "#appModePanel"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');window.scrollTo(0,0);"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "generator-step-0",
+      "name": "Pracovní krok 1",
+      "url": "/dist/index.html",
+      "expectedText": "Název testu",
+      "mustVisible": [
+        "#step0"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');setAppMode('advanced');showOnlyStep(0);document.getElementById('step0').scrollIntoView({block:'start'});"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 412,
+          "height": 915
+        },
+        {
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "width": 1366,
+          "height": 768
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "id": "generator-step-1",
+      "name": "Pracovní krok 2",
+      "url": "/dist/index.html",
+      "expectedText": "Typy cvičení",
+      "mustVisible": [
+        "#step1"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');setAppMode('advanced');showOnlyStep(1);document.getElementById('step1').scrollIntoView({block:'start'});"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 412,
+          "height": 915
+        },
+        {
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "width": 1366,
+          "height": 768
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "id": "generator-step-2",
+      "name": "Pracovní krok 3",
+      "url": "/dist/index.html",
+      "expectedText": "Délka testu",
+      "mustVisible": [
+        "#step2"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');setAppMode('advanced');showOnlyStep(2);document.getElementById('step2').scrollIntoView({block:'start'});"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 412,
+          "height": 915
+        },
+        {
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "width": 1366,
+          "height": 768
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "id": "generator-step-3",
+      "name": "Pracovní krok 4",
+      "url": "/dist/index.html",
+      "expectedText": "Poznámky / speciální požadavky",
+      "mustVisible": [
+        "#step3"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');setAppMode('advanced');showOnlyStep(3);document.getElementById('step3').scrollIntoView({block:'start'});"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 412,
+          "height": 915
+        },
+        {
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "width": 1366,
+          "height": 768
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "id": "generator-step-4",
+      "name": "Pracovní krok 5",
+      "url": "/dist/index.html",
+      "expectedText": "Vytvořit test přímo",
+      "mustVisible": [
+        "#step4"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');setAppMode('advanced');showOnlyStep(4);renderResult();document.getElementById('step4').scrollIntoView({block:'start'});"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 412,
+          "height": 915
+        },
+        {
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "width": 1366,
+          "height": 768
+        },
+        {
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    {
+      "id": "generator-changelog",
+      "name": "Changelog konkrétní verze",
+      "url": "/dist/index.html",
+      "expectedText": "Generátor testů v7.1.3",
+      "mustVisible": [
+        "#changelogGate"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;showReleaseInfo();"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "generator-test-lab",
+      "name": "Administrátorský Test Lab",
+      "url": "/dist/index.html",
+      "expectedText": "Test Lab / admin diagnostika",
+      "mustVisible": [
+        "#testLabModal"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;Access.profile={role:'admin',userId:'QA',displayName:'QA správce',status:'active'};Access.granted=true;if(typeof accSyncHeader==='function')accSyncHeader();openTestLab();"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "generator-manual",
+      "name": "Interaktivní manuál",
+      "url": "/dist/manual/index.html",
+      "expectedText": "Generátor interaktivních testů",
+      "mustVisible": [
+        "body"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 900
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "generator-long-form",
+      "name": "Maximálně zaplněný formulář",
+      "url": "/dist/index.html",
+      "expectedText": "Typy cvičení",
+      "mustVisible": [
+        "#step1"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;document.getElementById('nazev').value='Velmi dlouhý název komplexního referenčního testu s více úrovněmi a podrobnými pokyny';document.getElementById('proKoho').value='1.A, 2.B a kombinovaná skupina se speciálními vzdělávacími potřebami';document.getElementById('latka').value='Komplexní opakování gramatiky, slovní zásoby, čtení, poslechu a písemného projevu';showOnlyStep(1);"
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "export-instant",
+      "name": "Exportovaný okamžitý studentský test",
+      "url": "/qa-results/qa-fixtures/instant_test.html",
+      "expectedText": "QA referenční test",
+      "mustVisible": [
+        "body"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 500
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "export-secure-student",
+      "name": "Exportovaný bezpečný studentský test",
+      "url": "/qa-results/qa-fixtures/student_test.html",
+      "expectedText": "QA bezpečný test",
+      "mustVisible": [
+        "body"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 500
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "export-teacher-verifier",
+      "name": "Exportovaný učitelský verifier",
+      "url": "/qa-results/qa-fixtures/teacher_verifier.html",
+      "expectedText": "Učitelský verifier",
+      "mustVisible": [
+        "body"
+      ],
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 500
+        }
+      ],
+      "viewports": [
+        {
+          "width": 360,
+          "height": 800
+        },
+        {
+          "width": 1366,
+          "height": 768
+        }
+      ]
+    }
+  ]
+}

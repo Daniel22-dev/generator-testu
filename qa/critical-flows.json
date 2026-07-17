@@ -1,0 +1,143 @@
+{
+  "flows": [
+    {
+      "id": "GEN-OPEN",
+      "name": "Učitel otevře Generátor",
+      "type": "browser",
+      "url": "/dist/index.html",
+      "expectedText": "Název testu",
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;setAppMode('advanced');showOnlyStep(0);"
+        },
+        {
+          "action": "assertVisible",
+          "selector": "#step0"
+        },
+        {
+          "action": "assertVisible",
+          "selector": "#nazev"
+        }
+      ]
+    },
+    {
+      "id": "GEN-PROMPT",
+      "name": "Učitel sestaví zadání pro AI",
+      "type": "browser",
+      "url": "/dist/index.html",
+      "expectedText": "Vytvořit test přímo",
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;setAppMode('advanced');document.getElementById('nazev').value='QA workflow test';document.getElementById('proKoho').value='2.A';document.getElementById('latka').value='Present Perfect';state.jazyk='angličtina';state.uroven=['B1'];state.typyCviceni=['multiple choice'];showOnlyStep(4);renderResult();;document.querySelector('#step4 details.step4-details').open=true;document.getElementById('promptText').scrollIntoView({block:'center'});"
+        },
+        {
+          "action": "assertVisible",
+          "selector": "#promptText"
+        },
+        {
+          "action": "assertVisible",
+          "selector": "#btnGenerate"
+        }
+      ]
+    },
+    {
+      "id": "GEN-TESTLAB",
+      "name": "Správce otevře interní Test Lab",
+      "type": "browser",
+      "url": "/dist/index.html",
+      "expectedText": "Test Lab / admin diagnostika",
+      "steps": [
+        {
+          "action": "wait",
+          "ms": 1200
+        },
+        {
+          "action": "evaluate",
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;Access.profile={role:'admin',userId:'QA',displayName:'QA správce',status:'active'};Access.granted=true;openTestLab();"
+        },
+        {
+          "action": "assertVisible",
+          "selector": "#testLabModal"
+        }
+      ]
+    },
+    {
+      "id": "GEN-INSTANT-EXPORT",
+      "name": "Exportovaný okamžitý test se otevře",
+      "type": "browser",
+      "url": "/qa-results/qa-fixtures/instant_test.html",
+      "expectedText": "QA referenční test",
+      "steps": [
+        {
+          "action": "assertVisible",
+          "selector": "body"
+        }
+      ]
+    },
+    {
+      "id": "GEN-SECURE-EXPORT",
+      "name": "Exportovaný bezpečný test se otevře",
+      "type": "browser",
+      "url": "/qa-results/qa-fixtures/student_test.html",
+      "expectedText": "QA bezpečný test",
+      "steps": [
+        {
+          "action": "assertVisible",
+          "selector": "body"
+        }
+      ]
+    },
+    {
+      "id": "GEN-VERIFIER",
+      "name": "Učitelský verifier se otevře",
+      "type": "browser",
+      "url": "/qa-results/qa-fixtures/teacher_verifier.html",
+      "expectedText": "Učitelský verifier",
+      "steps": [
+        {
+          "action": "assertVisible",
+          "selector": "body"
+        }
+      ]
+    },
+    {
+      "id": "GEN-GUARD",
+      "name": "Veřejný build je fail-closed",
+      "type": "static",
+      "assertions": [
+        {
+          "file": "dist/index.html",
+          "regex": "data-ghrab-access=\"checking\"",
+          "message": "Build nemá výchozí checking stav."
+        },
+        {
+          "file": "dist/index.html",
+          "regex": "app-guard\\.js",
+          "message": "Build nenačítá centrální guard."
+        }
+      ]
+    },
+    {
+      "id": "GEN-SW-ISOLATION",
+      "name": "Service worker spravuje jen vlastní cache",
+      "type": "static",
+      "assertions": [
+        {
+          "file": "public/sw.js",
+          "regex": "startsWith\\(CACHE_PREFIX\\)",
+          "message": "Aktivace service workeru není omezena vlastním prefixem."
+        }
+      ]
+    }
+  ]
+}

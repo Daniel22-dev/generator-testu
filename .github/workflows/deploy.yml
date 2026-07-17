@@ -1,9 +1,9 @@
-name: Build a nasazení na GitHub Pages
+name: Certifikace a nasazení Generátoru testů
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -12,40 +12,50 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: generator-testu-pages
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  qa-build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 22
           cache: npm
-
-      - name: Install
-        run: npm ci
-
-      - name: Test (statické kontroly, lint, build, workflow matice)
-        run: npm test
-
-      - name: Headless regression
-        run: npm run test:headless
-
-      - name: Audit dependencies
-        run: npm audit --audit-level=high
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+          registry-url: https://registry.npmjs.org
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci --no-audit --no-fund
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run GHRAB QA release gate
+        run: npm run qa:release
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          path: dist/
+          name: ghrab-qa-generator-${{ github.sha }}
+          path: qa-results
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
 
-      - name: Deploy to GitHub Pages
-        id: deployment
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: qa-build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
         uses: actions/deploy-pages@v4

@@ -102,7 +102,7 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
   let seen = null;
   try {
     w.sessionStorage.setItem('sestavovac_gemini_data_notice_v1', 'accepted');
-    w.eval("geminiApiKey='AIza_HEADLESS_FAKE_KEY'; geminiModel=GEMINI_MODEL_DEFAULT;");
+    w.eval("geminiApiKey='FAKE_GEMINI_KEY_12345678901234567890'; geminiModel=GEMINI_MODEL_DEFAULT;");
     w.fetch = async (url, options) => {
       seen = {url:String(url), options};
       return {ok:true,status:200,headers:{get(){return null;}},json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:'{\"ok\":true}'}]}}]})};
@@ -110,7 +110,7 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
     const result = await w.callGeminiJSON('Return JSON only.', [], {noRetry:true,noFallback:true});
     if (!result || result.ok !== true) throw new Error('odpověď se neparsovala');
     if (!seen || !seen.url.includes('/models/gemini-3.5-flash:generateContent')) throw new Error('neočekávaný model/URL');
-    if (seen.options?.headers?.['x-goog-api-key'] !== 'AIza_HEADLESS_FAKE_KEY') throw new Error('API klíč není v x-goog-api-key');
+    if (seen.options?.headers?.['x-goog-api-key'] !== 'FAKE_GEMINI_KEY_12345678901234567890') throw new Error('API klíč není v x-goog-api-key');
     const body = JSON.parse(seen.options.body);
     if (!Array.isArray(body.contents) || !body.contents.length) throw new Error('chybí contents');
     return 'gemini-3.5-flash + x-goog-api-key';
@@ -122,7 +122,7 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
 await checkAsync('secureOffline: student + teacher verifier se sestaví', async () => {
   const labels = w.getLabels('cs');
   const rosterSalt = 'fedcba9876543210fedcba9876543210';
-  w.eval("rosterEntries=[{email:'student@example.invalid',label:'student',code:'ABC234'}];");
+  w.eval("rosterEntries=[{email:'student@example.com',label:'student',code:'ABC234'}];");
   const identityCodeHashes = await w.buildPublicIdentityCodeHashes({identityMode:'oneTimeCode'}, rosterSalt);
   const cfg = {
     generatorVersion: 'headless', buildHash: 'testhash1', releaseDate: '2026-07-09', releaseStatus: 'test', generatedAt: '2026-07-09T00:00:00Z',

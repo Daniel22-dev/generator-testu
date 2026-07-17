@@ -130,7 +130,7 @@ function setGroups(groups,identity='name',roster=[]){resetBase();w.eval(`state.d
 const g1={id:1,nazev:'A',podminky:'Více opory',studenti:['STU-1']},g2={id:2,nazev:'B',podminky:'Vyšší náročnost',studenti:['STU-2']};
 ok('unikátní identifikátory skupin projdou',()=>{assert(setGroups([g1,g2]).enabled,'platné skupiny blokovány');});
 ok('duplicitní student ve skupinách je zablokován',()=>{const r=setGroups([g1,{...g2,studenti:['STU-1']}]);assert(!r.enabled,'duplicita prošla');assert(/více skupin/.test(r.hint),'chybí zpráva');});
-const roster=[{email:'a@school.cz',label:'a',code:'ABC234'},{email:'b@school.cz',label:'b',code:'DEF567'}];
+const roster=[{email:'a@example.com',label:'a',code:'ABC234'},{email:'b@example.com',label:'b',code:'DEF567'}];
 ok('oneTimeCode + přesná 1:1 vazba rosteru projde',()=>{assert(setGroups([{...g1,studenti:['ABC234']},{...g2,studenti:['DEF567']}],'oneTimeCode',roster).enabled,'platný roster blokován');});
 ok('oneTimeCode + neznámý nebo chybějící kód je zablokován',()=>{const r=setGroups([{...g1,studenti:['ABC234']},{...g2,studenti:['UNKNOWN']}],'oneTimeCode',roster);assert(!r.enabled,'nesoulad rosteru prošel');assert(/nejsou mezi|nejsou přiřazeny/.test(r.hint),'chybí zpráva');});
 
@@ -175,7 +175,7 @@ ok('všechny neprázdné kombinace CEFR ve všech cizích jazycích',()=>cefrCas
 let secondaryCases=0;
 for(const instrJazyk of ['target','mixed','czech'])for(const layout of ['tabs','scroll'])for(const randomizace of ['NE','ANO'])
 for(const identityMode of ['name','oneTimeCode'])for(const fuzzyTolerance of ['off','mild','strict']){
-  resetBase();w.eval(`Object.assign(state,${JSON.stringify({instrJazyk,layout,randomizace,identityMode,fuzzyTolerance})});if(state.identityMode==='oneTimeCode')rosterEntries=[{email:'a@school.cz',label:'a',code:'ABC234'}];enforceModeConstraints();`);
+  resetBase();w.eval(`Object.assign(state,${JSON.stringify({instrJazyk,layout,randomizace,identityMode,fuzzyTolerance})});if(state.identityMode==='oneTimeCode')rosterEntries=[{email:'a@example.com',label:'a',code:'ABC234'}];enforceModeConstraints();`);
   const prompt=w.buildPrompt();assert(prompt.length>500,'sekundární kombinace nevytvořila prompt');secondaryCases++;
 }
 ok('sekundární volby bez skrytých kolizí',()=>secondaryCases+' kombinací');
@@ -291,7 +291,7 @@ w.eval("deriveSecretHash=async function(kind,secret,testId){return 'pbkdf2-test$
 // 16) Public studentský HTML ověřuje jednorázový kód i bez diferenciace.
 await okAsync('instant runtime odmítne cizí jednorázový kód', async()=>{
   resetBase();
-  w.eval("Object.assign(state,{identityMode:'oneTimeCode',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});rosterEntries=[{email:'a@school.cz',label:'a',code:'ABC234'}];");
+  w.eval("Object.assign(state,{identityMode:'oneTimeCode',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});rosterEntries=[{email:'a@example.com',label:'a',code:'ABC234'}];");
   const gen={exercises:[{title:'MC',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q?',options:['A','B'],correct:0}]}]};
   const out=await w.assembleTestHtml(w.eval('state'),gen);
   assert(!/a@school\.cz/.test(out),'studentský HTML obsahuje e-mail');
@@ -312,14 +312,14 @@ await okAsync('instant runtime odmítne cizí jednorázový kód', async()=>{
 // 17) Secure veřejná konfigurace nese pouze solené hashe roster kódů.
 await okAsync('secure konfigurace používá pouze hashované jednorázové kódy', async()=>{
   resetBase();
-  w.eval("Object.assign(state,{identityMode:'oneTimeCode',testMode:'bezny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B'});rosterEntries=[{email:'a@school.cz',label:'a',code:'ABC234'}];enforceModeConstraints();");
+  w.eval("Object.assign(state,{identityMode:'oneTimeCode',testMode:'bezny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B'});rosterEntries=[{email:'a@example.com',label:'a',code:'ABC234'}];enforceModeConstraints();");
   const salt='0123456789abcdef0123456789abcdef';
   const hashes=await w.buildPublicIdentityCodeHashes(w.eval('state'),salt);
   assert(hashes.length===1&&/^[A-Za-z0-9_-]{43}$/.test(hashes[0]),'secure roster nemá SHA-256 hash');
   const publicCfg=w.securePublicCfg({identityMode:'oneTimeCode',identityCodeScheme:'sha256-v1',identityCodeHashes:hashes,diffGroups:[],diffRosterSalt:salt,uiLang:'cs',resultMode:'secureOffline'},{publicJwk:{kty:'RSA'},crypto:'RSA-OAEP-256'});
   const serialized=JSON.stringify(publicCfg);
   assert(publicCfg.identityMode==='oneTimeCode'&&publicCfg.identityCodeHashes.length===1,'secure config ztratil roster');
-  assert(!serialized.includes('ABC234')&&!serialized.includes('a@school.cz'),'secure config obsahuje čitelný kód/e-mail');
+  assert(!serialized.includes('ABC234')&&!serialized.includes('a@example.com'),'secure config obsahuje čitelný kód/e-mail');
   return '1 salted SHA-256 hash';
 });
 
