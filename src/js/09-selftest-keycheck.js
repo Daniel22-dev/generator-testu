@@ -347,7 +347,7 @@ async function aiVerifyKey(){
   var out=document.getElementById('keyCheckReport'), btn=document.getElementById('btnKeyCheck');
   var asm=lastAssembled;
   if(!asm||!asm.variants){ uiAlert('Nejdřív vygeneruj test, pak ověř klíč.'); return; }
-  if(!geminiApiKey){ uiAlert('Pro ověření klíče přidej Gemini API klíč ve žluté sekci.'); return; }
+  if(!genAiAvailable()){ uiAlert('AI služba není dostupná.'); return; }
   if(akvBusy)return;
   // vezmi první variantu (u diferencovaného testu základní); klíč je per-položka stejný princip
   var keys=Object.keys(asm.variants).length?Object.keys(asm.variants):['__default'];
@@ -369,7 +369,7 @@ async function aiVerifyKey(){
   if(btn){ btn.disabled=true; if(!btn.dataset.label)btn.dataset.label=btn.textContent; btn.textContent='🔑 Ověřuji klíč…'; }
   if(out){ out.classList.remove('hidden'); out.innerHTML='<div class="st-box st-warn">AI nezávisle řeší '+items.length+' úloh a porovnává s klíčem…</div>'; }
   try{
-    var data=await callGeminiJSON(akvBuildPrompt(items),[],{});
+    var data=await callGeminiJSON(akvBuildPrompt(items),[],{operation:'answer-key-verification'});
     var arr=(data&&Array.isArray(data.answers))?data.answers:[];
     var byI={}; arr.forEach(function(r){ if(r&&r.i!=null)byI[Number(r.i)]=(r.a!=null?r.a:r.answer); });
     var diffs=[], weaks=[], checked=0, missing=0;

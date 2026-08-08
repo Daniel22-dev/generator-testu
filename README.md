@@ -1,10 +1,14 @@
 # Generátor interaktivních testů
 
+**Aktuální verze:** 7.1.12  
+**Platforma:** GHRAB Platform 1.1.0 · etapa P3
+
+
 Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i klasifikované interaktivní testy, diferencované varianty a bezpečný offline balík bez školního backendu.
 
 ## Stav vydání
 
-Verze **7.1.4** je technicky ověřená produkční serverless varianta. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
+Verze **7.1.12** je technicky ověřená produkční serverless varianta. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
 
 Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 
@@ -128,7 +132,7 @@ Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření 
 
 ## Omezení rozsahu
 
-Verze 7.1.4 nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
+GitHub Pages profil 7.1.12 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
 
 ## Napojení na AI Studio GHRAB
 

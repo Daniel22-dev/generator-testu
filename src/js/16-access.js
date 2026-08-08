@@ -3,11 +3,16 @@
 // Zde se pouze promítne již ověřený permit do auditní stopy a stávajícího UI.
 'use strict';
 
-const STUDIO_ROOT = '/AI-Studio-GHRAB/';
+const GHRAB_DEPLOYMENT = window.__GHRAB_DEPLOYMENT_CONFIG__ || null;
+const STUDIO_ROOT = GHRAB_DEPLOYMENT?.studioBaseUrl || '/AI-Studio-GHRAB/';
 const STUDIO_ACCESS_KEY = 'ghrab.access.permit.v2';
-const OFFICIAL_ORIGIN = 'https://daniel22-dev.github.io';
-const OFFICIAL_ORIGINS = [OFFICIAL_ORIGIN];
-const OFFICIAL_PATH = '/generator-testu/';
+const CONFIGURED_APP_URL = new URL(GHRAB_DEPLOYMENT?.appBaseUrl || '/generator-testu/', location.href);
+const OFFICIAL_ORIGIN = CONFIGURED_APP_URL.origin;
+const OFFICIAL_ORIGINS = Array.from(new Set(
+  (GHRAB_DEPLOYMENT?.allowedOrigins || ['self', OFFICIAL_ORIGIN])
+    .map((value) => value === 'self' ? location.origin : value)
+));
+const OFFICIAL_PATH = CONFIGURED_APP_URL.pathname;
 const OFFICIAL_PATH_PREFIXES = [OFFICIAL_PATH];
 
 function centralPermit(){
@@ -17,7 +22,9 @@ function centralPermit(){
 function accessEnvironment(){
   if (location.protocol === 'file:') return 'local';
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return 'local';
-  return location.origin === OFFICIAL_ORIGIN && location.pathname.startsWith(OFFICIAL_PATH) ? 'official' : 'unofficialCopy';
+  const allowedOrigin = OFFICIAL_ORIGINS.includes(location.origin);
+  const configuredPath = location.pathname.startsWith(OFFICIAL_PATH);
+  return allowedOrigin && configuredPath ? 'official' : 'unofficialCopy';
 }
 function profileFromPermit(p){
   if (!p) return null;
@@ -127,7 +134,7 @@ function accOnGranted(){
   if (banner) {
     if (Access.envKind === 'unofficialCopy') {
       banner.className='banner red';
-      banner.textContent='⛔ Tato kopie Generátoru neběží na oficiální adrese. Generování je z bezpečnostních důvodů zablokováno.';
+      banner.textContent='⛔ Toto umístění Generátoru není povoleno deployment konfigurací. Generování je z bezpečnostních důvodů zablokováno.';
     } else if (Access.envKind === 'local') {
       banner.className='banner amber';
       banner.textContent='ℹ️ Místní vývojová kopie: centrální odvolání přístupu nemusí být dostupné.';

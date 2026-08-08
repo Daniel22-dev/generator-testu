@@ -1,111 +1,20 @@
-// scripts/build.mjs — v4 (centrálně chráněné izolované classic script tagy)
-// Složí dist/index.html ze src/shell.html + src/styles.css + src/js/*.js.
-// Pořadí JS modulů = abecední řazení názvů souborů. Každý modul je vložen do
-// samostatného classic <script> tagu; nejde o ES moduly ani import/export. Tím
-// runtime chyba jednoho modulu nezastaví následující přístupový/init modul.
-import fs from "node:fs";
-import path from "node:path";
+#!/usr/bin/env node
+import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
+const APP_ID='generator',CORE_VERSION='1.0.0',CORE_DIR=path.resolve('vendor',`ghrab-ai-core-${CORE_VERSION}`),CORE_FILE=`ghrab-ai-core-${CORE_VERSION}.js`,CORE_MANIFEST=`ghrab-ai-core-manifest-${CORE_VERSION}.json`;
+const readJson=file=>JSON.parse(fs.readFileSync(file,'utf8')),fail=message=>{console.error('❌ '+message);process.exit(1)},sha=file=>createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+function copyDir(src,dest){if(!fs.existsSync(src))return;fs.mkdirSync(dest,{recursive:true});for(const entry of fs.readdirSync(src,{withFileTypes:true})){const from=path.join(src,entry.name),to=path.join(dest,entry.name);entry.isDirectory()?copyDir(from,to):fs.copyFileSync(from,to)}}
+function assertVersionSync(){const pkg=readJson('package.json'),core=fs.readFileSync('src/js/01-core.js','utf8'),sw=fs.readFileSync('public/sw.js','utf8'),manifest=readJson('public/manifest.webmanifest');const versions={package:String(pkg.version||'').trim(),release:core.match(/version:\s*['"]([^'"]+)['"]/)?.[1]||'',sw:sw.match(/CACHE_NAME\s*=\s*['"][^'"]*v([^'"]+)['"]/)?.[1]||'',manifest:String(manifest.version||'').trim()};if(manifest.id!=='./'||manifest.start_url!=='./')fail('PWA manifest musí mít stabilní id a start_url');if(Object.values(versions).some(v=>!v)||new Set(Object.values(versions)).size!==1)fail('nesedí verze napříč projektem');return versions.package}
+for(const f of [CORE_FILE,CORE_MANIFEST])if(!fs.existsSync(path.join(CORE_DIR,f)))fail('chybí Core artefakt '+f);const coreManifest=readJson(path.join(CORE_DIR,CORE_MANIFEST));if(coreManifest.coreVersion!==CORE_VERSION||coreManifest.artifacts?.[CORE_FILE]?.sha256!==sha(path.join(CORE_DIR,CORE_FILE)))fail('GHRAB AI Core neprošel SHA-256 kontrolou');
+const DIST_DIR=path.resolve('dist'),DIST=path.join(DIST_DIR,'index.html'),PUBLIC_DIR=path.resolve('public'),appVersion=assertVersionSync();fs.rmSync(DIST_DIR,{recursive:true,force:true});fs.mkdirSync(DIST_DIR,{recursive:true});
+const shell=fs.readFileSync('src/shell.html','utf8'),styles=fs.readFileSync('src/styles.css','utf8'),jsDir='src/js',migrationTombstones=new Set(['13-secure-export.js','14-test-html-builders.js']);
+const jsFiles=fs.readdirSync(jsDir).filter(f=>f.endsWith('.js')&&!migrationTombstones.has(f)).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})),mainParts=jsFiles.filter(f=>!f.startsWith('50-')&&!f.startsWith('60-'));
+const inlineScriptTag=file=>`<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${fs.readFileSync(path.join(jsDir,file),'utf8')}\n</script>`;
+const coreTag=`<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR,CORE_FILE),'utf8')}\n</script>`;
+const jsMainTags=[coreTag,...mainParts.map(inlineScriptTag)].join('\n'),jsCsTag=inlineScriptTag('50-cs-module.js'),jsPwaTag=inlineScriptTag('60-pwa.js');
+let out=shell.replace('{{STYLES}}',()=>styles).replace('{{APP_VERSION}}',()=>appVersion).replace('{{JS_MAIN_TAGS}}',()=>jsMainTags).replace('{{JS_CS_TAG}}',()=>jsCsTag).replace('{{JS_PWA_TAG}}',()=>jsPwaTag);const buildTime=new Date().toISOString();out=out.replace(/(<html[^>]*>)/i,`$1\n<!-- BUILD: ${buildTime} -->`);fs.writeFileSync(DIST,out,'utf8');copyDir(PUBLIC_DIR,DIST_DIR);copyDir(path.resolve('src','features'),path.join(DIST_DIR,'features'));
+const operations=readJson(path.join(DIST_DIR,'ai-operations.json'));if(operations.appId!==APP_ID||operations.appVersion!==appVersion||operations.coreVersion!==CORE_VERSION||operations.operations.length!==10)fail('neplatný ai-operations.json');const appSource=mainParts.map(f=>fs.readFileSync(path.join(jsDir,f),'utf8')).join('\n');for(const op of operations.operations)if(!appSource.includes(`'${op.operation}'`)&&!appSource.includes(`"${op.operation}"`))fail('integrace neobsahuje operaci '+op.operation);
+const template=path.resolve('studio/app-manifest.template.json');if(fs.existsSync(template)){const text=fs.readFileSync(template,'utf8').replaceAll('__APP_VERSION__',appVersion).replaceAll('__BUILD_TIME__',buildTime);const manifest=JSON.parse(text);const status=`${manifest.status?.cs||''} ${manifest.status?.en||''}`.toLowerCase();if(/produk|production/.test(status))fail('manifest před schválením nesmí deklarovat produkci');if(manifest.aiCore?.coreVersion!==CORE_VERSION||manifest.aiCore?.serverReady!==true||manifest.aiCore?.conformancePassed!==true)fail('studio-manifest nemá P1 AI Core metadata');fs.writeFileSync(path.join(DIST_DIR,'studio-manifest.json'),text)}
+console.log(`✅ Generátor ${appVersion}: Core ${CORE_VERSION} SHA-256 OK · ${operations.operations.length} operací · ${mainParts.length+2} initial modulů + 2 lazy features · ${(fs.statSync(DIST).size/1024).toFixed(1)} kB`);
 
-
-function readJson(file) {
-  return JSON.parse(fs.readFileSync(file, "utf8"));
-}
-
-function assertVersionSync() {
-  const pkg = readJson("package.json");
-  const core = fs.readFileSync("src/js/01-core.js", "utf8");
-  const sw = fs.readFileSync("public/sw.js", "utf8");
-  const manifest = readJson("public/manifest.webmanifest");
-
-  const versions = {
-    "package.json version": String(pkg.version || "").trim(),
-    "src/js/01-core.js RELEASE.version": core.match(/version:\s*['\"]([^'\"]+)['\"]/)?.[1] || "",
-    "public/sw.js CACHE_NAME": sw.match(/CACHE_NAME\s*=\s*['\"][^'\"]*v([^'\"]+)['\"]/)?.[1] || "",
-    "public/manifest.webmanifest start_url": String(manifest.start_url || "").match(/[?&]v=([^&]+)/)?.[1] || "",
-  };
-
-  const values = Object.values(versions);
-  if (values.some(v => !v) || new Set(values).size !== 1) {
-    console.error("❌ Nesedi verze napric projektem:");
-    for (const [label, value] of Object.entries(versions)) {
-      console.error(`   - ${label}: ${value || "NENALEZENO"}`);
-    }
-    process.exit(1);
-  }
-  console.log(`✅  Verze sedi napric projektem: ${versions["package.json version"]}`);
-}
-
-const DIST_DIR = path.resolve("dist");
-const DIST = path.join(DIST_DIR, "index.html");
-const PUBLIC_DIR = path.resolve("public");
-
-function copyDir(src, dest) {
-  if (!fs.existsSync(src)) return;
-  fs.mkdirSync(dest, { recursive: true });
-  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const from = path.join(src, entry.name);
-    const to = path.join(dest, entry.name);
-    if (entry.isDirectory()) copyDir(from, to);
-    else fs.copyFileSync(from, to);
-  }
-}
-
-assertVersionSync();
-
-fs.mkdirSync(DIST_DIR, { recursive: true });
-
-const shell = fs.readFileSync("src/shell.html", "utf8");
-const styles = fs.readFileSync("src/styles.css", "utf8");
-const appVersion = String(readJson("package.json").version || "").trim();
-
-const jsDir = "src/js";
-const migrationTombstones = new Set(['13-secure-export.js','14-test-html-builders.js']);
-const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith(".js") && !migrationTombstones.has(f)).sort();
-const mainParts = jsFiles.filter(f => !f.startsWith("50-") && !f.startsWith("60-"));
-function inlineScriptTag(file) {
-  const code = fs.readFileSync(path.join(jsDir, file), "utf8");
-  // Každý zdrojový modul je samostatný classic script. Runtime chyba v jednom
-  // modulu tak nezastaví načtení přístupové brány ani závěrečného init modulu.
-  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${code}\n</script>`;
-}
-
-const jsMainTags = mainParts.map(inlineScriptTag).join("\n");
-const jsCsTag = inlineScriptTag("50-cs-module.js");
-const jsPwaTag = inlineScriptTag("60-pwa.js");
-
-// replace() s funkcí kvůli $-sekvencím v kódu (jinak by "$&" apod. rozbily obsah)
-let out = shell
-  .replace("{{STYLES}}", () => styles)
-  .replace("{{APP_VERSION}}", () => appVersion)
-  .replace("{{JS_MAIN_TAGS}}", () => jsMainTags)
-  .replace("{{JS_CS_TAG}}", () => jsCsTag)
-  .replace("{{JS_PWA_TAG}}", () => jsPwaTag);
-
-const buildTime = new Date().toISOString();
-out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
-
-fs.writeFileSync(DIST, out, "utf8");
-
-if (fs.existsSync(PUBLIC_DIR)) {
-  copyDir(PUBLIC_DIR, DIST_DIR);
-  console.log("✅  PWA soubory z public/ zkopírovány do dist/");
-}
-
-const studioManifestTemplate = path.resolve("studio/app-manifest.template.json");
-if (fs.existsSync(studioManifestTemplate)) {
-  const studioManifest = fs.readFileSync(studioManifestTemplate, "utf8")
-    .replaceAll("__APP_VERSION__", appVersion)
-    .replaceAll("__BUILD_TIME__", buildTime);
-  const parsedStudioManifest = JSON.parse(studioManifest);
-  const statusText = `${parsedStudioManifest.status?.cs || ''} ${parsedStudioManifest.status?.en || ''}`.toLowerCase();
-  if (/produk|production/.test(statusText)) {
-    console.error("❌ Manifest pro AI Studio nesmí před schválením školy deklarovat produkční provoz.");
-    process.exit(1);
-  }
-  fs.writeFileSync(path.join(DIST_DIR, "studio-manifest.json"), studioManifest, "utf8");
-  console.log("✅  studio-manifest.json vytvořen");
-}
-
-console.log("✅  Build dokončen z", mainParts.length + 2, "JS modulů");
-console.log(`   dist/index.html →  ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
-console.log(`   Čas: ${buildTime}`);
+// P2: canonical cross-application platform post-processing.
+await import("./apply-ghrab-platform.mjs");

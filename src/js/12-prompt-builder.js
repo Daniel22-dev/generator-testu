@@ -103,7 +103,7 @@ async function aiReadScale(){
   if(!pv) return;
   if(!raw){ pv.classList.remove('hidden'); pv.style.borderColor='rgba(239,68,68,.4)'; pv.style.background='rgba(239,68,68,.08)';
     pv.innerHTML='⚠️ Nejdřív napiš popis stupnice do pole výše (klidně větami).'; return; }
-  if(!geminiApiKey){ pv.classList.remove('hidden'); pv.style.borderColor='rgba(239,68,68,.4)'; pv.style.background='rgba(239,68,68,.08)';
+  if(!genAiAvailable()){ pv.classList.remove('hidden'); pv.style.borderColor='rgba(239,68,68,.4)'; pv.style.background='rgba(239,68,68,.08)';
     pv.innerHTML='⚠️ Pro čtení stupnice AI je potřeba Gemini API klíč. Zadej ho ve žluté sekci nahoře.'; return; }
   const total=effectiveTotalBodyForScale();
   if(btn){ btn.disabled=true; btn.textContent='⏳ Čtu stupnici…'; }
@@ -120,7 +120,7 @@ async function aiReadScale(){
     raw
   ].join('\n');
   try{
-    const data=await callGeminiJSON(prompt);
+    const data=await callGeminiJSON(prompt,[],{operation:'grading-scale-parse'});
     const arr=(data&&Array.isArray(data.scale))?data.scale:[];
     const scale=arr.map(x=>({
       g:String(x.label==null?'':x.label).trim(),

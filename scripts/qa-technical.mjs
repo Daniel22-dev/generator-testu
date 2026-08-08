@@ -121,7 +121,7 @@ for (const check of m.versionChecks || []) {
     );
 }
 const files = await walk(ROOT, {
-  skip: ["node_modules", "dist", "qa-results", ".git"],
+  skip: ["node_modules", "dist", "dist-school-server", "qa-results", ".git"],
 });
 for (const p of files) {
   const rel = path.relative(ROOT, p).split(path.sep).join("/");

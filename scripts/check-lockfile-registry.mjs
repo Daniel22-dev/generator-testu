@@ -21,7 +21,13 @@ if (forbidden.length) {
   process.exit(1);
 }
 if (!publicNpm.length) {
-  console.error('❌ package-lock.json neobsahuje žádné balíčky z veřejného registry.npmjs.org.');
-  process.exit(1);
+  const rootPackage = lock.packages?.[''] || {};
+  const dependencyCount = Object.keys(rootPackage.dependencies || {}).length + Object.keys(rootPackage.devDependencies || {}).length;
+  if (dependencyCount !== 0) {
+    console.error('❌ Lockfile nemá veřejné balíčky, ale package.json stále deklaruje závislosti.');
+    process.exit(1);
+  }
+  console.log('✅  Hermetický P4 lockfile nemá externí balíčky ani interní registry URL.');
+} else {
+  console.log(`✅  Lockfile používá veřejný npm registr (${publicNpm.length} resolved URL, 0 interních).`);
 }
-console.log(`✅  Lockfile používá veřejný npm registr (${publicNpm.length} resolved URL, 0 interních).`);

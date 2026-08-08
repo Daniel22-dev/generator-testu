@@ -23,7 +23,9 @@ const plan = await readJson(path.join(QA_DIR, "visual-plan.json"));
 const findings = [];
 const matrix = [];
 const serveRoot = path.join(ROOT, manifest.serveRoot || "dist");
-const { server, baseUrl } = await startStaticServer(serveRoot);
+const { server, baseUrl } = await startStaticServer(serveRoot, {
+  deploymentBasePath: manifest.deploymentBasePath || "",
+});
 const guardJs = `export async function protectApp(appId){document.documentElement.dataset.ghrabAccess='granted';document.dispatchEvent(new CustomEvent('ghrab:app-access-granted',{detail:{permit:{appId,qa:true}}}));return true}`;
 
 function blankStats(buffer) {

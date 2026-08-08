@@ -1,0 +1,174 @@
+{
+  "schema": "ghrab-platform-consumer-v1",
+  "appId": "generator",
+  "appName": "Generátor interaktivních testů",
+  "appVersion": "7.1.12",
+  "platform": {
+    "version": "1.1.0",
+    "contract": "ghrab-platform-v1",
+    "requiredRange": ">=1.1.0 <2.0.0",
+    "compatibilityWindow": [
+      "1.1.x",
+      "1.2.x"
+    ]
+  },
+  "brand": {
+    "version": "1.0.0",
+    "logo": "assets/brand/school-logo.png",
+    "footerContract": "ghrab-footer-v1"
+  },
+  "theme": {
+    "supported": [
+      "light",
+      "dark"
+    ],
+    "default": "dark"
+  },
+  "storageMigration": {
+    "id": "p2-storage-namespace-v1",
+    "backup": "full",
+    "mappings": [
+      {
+        "legacy": "sestavovac_v5_13_0",
+        "canonical": "ghrab.generator.state.v1"
+      },
+      {
+        "legacy": "sestavovac_tpl_v5_13_0",
+        "canonical": "ghrab.generator.templates.v1"
+      },
+      {
+        "legacy": "sestavovac_hist_v5_13_0",
+        "canonical": "ghrab.generator.history.v1"
+      },
+      {
+        "legacy": "sestavovac_mode",
+        "canonical": "ghrab.generator.theme.v1"
+      },
+      {
+        "legacy": "sestavovac_gemini_model",
+        "canonical": "ghrab.generator.ai.model.v1"
+      },
+      {
+        "legacy": "sestavovac_gemini_key",
+        "canonical": "ghrab.generator.ai.key.local.v1"
+      },
+      {
+        "legacy": "sestavovac_gemini_key_session",
+        "canonical": "ghrab.generator.ai.key.session.v1",
+        "store": "session"
+      },
+      {
+        "legacy": "sestavovac_gemini_data_notice_v1",
+        "canonical": "ghrab.generator.ai.data-notice.v1"
+      },
+      {
+        "legacy": "sestavovac_school_security_code_v1",
+        "canonical": "ghrab.generator.security-code.v1"
+      },
+      {
+        "legacy": "genOnboardingDone_v1",
+        "canonical": "ghrab.generator.onboarding-done.v1"
+      },
+      {
+        "legacy": "genWelcomeShown_session",
+        "canonical": "ghrab.generator.welcome-shown.v1",
+        "store": "session"
+      },
+      {
+        "legacyPrefix": "sestavovac_",
+        "canonicalPrefix": "ghrab.generator.legacy."
+      }
+    ]
+  },
+  "bridge": {
+    "contract": "ghrab-studio-handoff-v2",
+    "acceptsLegacy": "ghrab-handoff-v1",
+    "maxBytes": 500000
+  },
+  "artifact": {
+    "schema": "ghrab-artifact-envelope-v1",
+    "checksum": "SHA-256",
+    "exports": [],
+    "imports": [],
+    "acceptsLegacyJson": false,
+    "nativeFormats": [
+      "html",
+      "pdf",
+      "csv",
+      "zip"
+    ]
+  },
+  "cache": {
+    "name": "ghrab-generator-v7.1.12",
+    "updateMessage": "GHRAB_SKIP_WAITING"
+  },
+  "html": {
+    "exclude": [],
+    "noFooter": [
+      "tests/"
+    ]
+  },
+  "quality": {
+    "schema": "ghrab-quality-consumer-v1",
+    "accessibilityContract": "ghrab-a11y-v1",
+    "performanceContract": "ghrab-performance-v1",
+    "moduleContract": "ghrab-lazy-modules-v1",
+    "requireBudget": true,
+    "performanceBudget": {
+      "distBytes": 2200000,
+      "entryHtmlBytes": 1460000,
+      "entryCriticalBytes": 1640000,
+      "largestInlineScriptBytes": 170000,
+      "precacheBytes": 2120000,
+      "largestFileBytes": 1460000,
+      "duplicateLargeBytes": 20000
+    },
+    "modules": {
+      "required": [
+        "features/testlab.js",
+        "features/preview-editor.js"
+      ]
+    },
+    "referenceProfile": {
+      "cpuSlowdown": 4,
+      "viewport": "1366x768",
+      "memoryClassGb": 4,
+      "viewportWidths": [
+        1280,
+        390,
+        320
+      ]
+    },
+    "stage": "P5",
+    "a11yContract": "ghrab-a11y-v1",
+    "requireRuntimeBudget": true,
+    "runtimeBudget": {
+      "maxDomNodes": 1500,
+      "maxRenderReadyMs": 3500,
+      "maxJsHeapUsedBytes": 8000000,
+      "maxLayoutDurationMs": 2200,
+      "maxTaskDurationMs": 3400
+    },
+    "finalRelease": true,
+    "cleanInstallRequired": true,
+    "a11yGate": "ghrab-p5-runtime-a11y-v2",
+    "releaseGate": "ghrab-p5-release-v2",
+    "runtimeAudit": {
+      "scriptsExecuted": true,
+      "transport": "local-http",
+      "dialogStates": true,
+      "viewports": [
+        1280,
+        390,
+        320
+      ]
+    }
+  },
+  "performance": {
+    "stage": "P5",
+    "a11yGate": "ghrab-p5-accessibility-acceptance-v1",
+    "releaseGate": "ghrab-p5-acceptance-v1",
+    "finalRelease": false,
+    "preProductionAccepted": true
+  }
+}

@@ -33,12 +33,56 @@
     "assessment",
     "practice",
     "offline-submit",
-    "variants"
+    "variants",
+    "test-generation",
+    "interactive-tests",
+    "print",
+    "pdf",
+    "multi-step-ai-workflow",
+    "ghrab-platform-v1",
+    "canonical-branding",
+    "storage-namespace-v1",
+    "artifact-envelope-v1"
   ],
   "compatibility": {
     "studioMinVersion": "0.5.1",
     "materialSchema": "ghrab-material-v1",
-    "studioBridge": "1.1"
+    "studioBridge": "2.0",
+    "platformContract": "ghrab-platform-v1",
+    "platformRange": ">=1.0.0 <2.0.0"
   },
-  "publishedAt": "__BUILD_TIME__"
+  "publishedAt": "__BUILD_TIME__",
+  "aiCore": {
+    "schema": "ghrab-ai-app-integration-v1",
+    "status": "integrated-p1",
+    "coreVersion": "1.0.0",
+    "contractVersion": "1",
+    "serverReady": true,
+    "conformancePassed": true,
+    "operationsManifestUrl": "https://daniel22-dev.github.io/generator-testu/ai-operations.json",
+    "runtimeSchema": "ghrab-runtime-config-v1",
+    "gatewayContract": "ghrab-ai-request-v1",
+    "certificationStatus": "certified-p1",
+    "certificationEvidence": "evidence/p1-ai-conformance.json",
+    "certifiedOperations": 10
+  },
+  "slug": "generator-testu",
+  "paths": {
+    "app": "https://daniel22-dev.github.io/generator-testu/",
+    "manual": "https://daniel22-dev.github.io/generator-testu/manual/",
+    "manifest": "https://daniel22-dev.github.io/generator-testu/studio-manifest.json"
+  },
+  "platform": {
+    "schema": "ghrab-platform-app-integration-v1",
+    "contract": "ghrab-platform-v1",
+    "requiredPlatformRange": ">=1.0.0 <2.0.0",
+    "platformVersion": "1.0.0",
+    "brandVersion": "1.0.0",
+    "themeContract": 1,
+    "swContract": 1,
+    "studioBridge": 2,
+    "artifactEnvelope": 1,
+    "storagePrefix": "ghrab.generator.",
+    "cacheName": "ghrab-generator-v7.1.12"
+  }
 }

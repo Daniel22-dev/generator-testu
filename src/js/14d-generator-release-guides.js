@@ -273,7 +273,7 @@ function showSecurityGuide(){
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🚨</span> Co dělat při úniku</div>' +
         '<p class="sec-guide-p"><strong>Unikl verifier nebo answers.txt:</strong> Informujte admina aplikace, zneplatnění testu zvažte individuálně. Soubor okamžitě odstraňte ze všech sdílených umístění.</p>' +
-        '<p class="sec-guide-p"><strong>Unikl API klíč:</strong> Přihlaste se na <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style="color:var(--acc)">aistudio.google.com</a>, starý klíč smažte a vytvořte nový. Zkontrolujte historii požadavků — zda klíč někdo nezneužil.</p>' +
+        '<p class="sec-guide-p"><strong>Unikl API klíč:</strong> Přihlaste se na <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" style="color:var(--acc)">aistudio.google.com</a>, starý klíč smažte a vytvořte nový. Zkontrolujte historii požadavků — zda klíč někdo nezneužil.</p>' +
         '<div class="sec-guide-ok">✓ Rychlá akce (smazání klíče) zabrání dalšímu zneužití i tehdy, když k úniku skutečně došlo.</div>' +
       '</div>' +
 

@@ -1,0 +1,13 @@
+{
+  "schema": "ghrab-p5-xss-baseline-v1",
+  "appId": "generator",
+  "counts": {
+    "innerHTML": 161,
+    "insertAdjacentHTML": 8,
+    "outerHTML": 5,
+    "documentWrite": 2,
+    "eval": 0,
+    "newFunction": 12
+  },
+  "note": "P5 R2 baseline; increases fail. Existing sinks still require review and CSP hardening."
+}

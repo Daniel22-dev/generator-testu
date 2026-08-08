@@ -22,6 +22,7 @@ const findings = [];
 const matrix = [];
 const { server, baseUrl } = await startStaticServer(
   path.join(ROOT, manifest.serveRoot || "dist"),
+  { deploymentBasePath: manifest.deploymentBasePath || "" },
 );
 let browser;
 const guardJs = `export async function protectApp(appId){document.documentElement.dataset.ghrabAccess='granted';document.dispatchEvent(new CustomEvent('ghrab:app-access-granted',{detail:{permit:{appId,qa:true}}}));return true}`;

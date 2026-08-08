@@ -1,46 +1,77 @@
-const CACHE_PREFIX = 'generator-testu-pwa-v';
-const CACHE_NAME = 'generator-testu-pwa-v7.1.4';
+const GHRAB_SW_CONTRACT='ghrab-service-worker-v1';
+/* GHRAB service-worker contract v1 · update activation is user-controlled. */
+const CACHE_NAME = "ghrab-generator-v7.1.12";
+const CACHE_PREFIXES = ["ghrab-generator-v", "generator-testu-pwa-v"];
 const CORE_ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './manual/',
-  './manual/index.html',
-  './icons/icon-32.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png'
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./access/access-gate.css",
+  "./access/deployment-config.js",
+  "./access/reporter-bootstrap.js",
+  "./access/error-reporter.js",
+  "./access/error-reporter.css",
+  "./access/error-reporter-adapter.js",
+  "./config/deployment.json",
+  "./config/deployment.school-server-p0.json",
+  "./config/deployment.school-server.example.json",
+  "./manual/",
+  "./manual/index.html",
+  "./icons/icon-32.png",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-512.png",
+  "./icons/apple-touch-icon.png",
+  "./config/brand-manifest.json",
+  "./config/platform-manifest.json",
+  "./assets/brand/school-logo.png",
+  "./ghrab-platform.consumer.json",
+  "./features/testlab.js",
+  "./features/preview-editor.js"
 ];
 
-self.addEventListener('install', event => {
-  // Záměrně bez skipWaiting(): nová verze se aktivuje až po zavření starých karet,
-  // takže učiteli nikdy sama nereloaduje rozpracovaný test.
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS)));
+self.addEventListener('message', (event) => {
+  if (['GHRAB_SKIP_WAITING', 'SKIP_WAITING'].includes(event.data?.type)) self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map(key => caches.delete(key))
-    )).then(() => self.clients.claim())
-  );
+self.addEventListener('install', (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(CORE_ASSETS);
+    const optionalAssets = [];
+    if (optionalAssets.length) {
+      const results = await Promise.allSettled(optionalAssets.map((asset) => cache.add(asset)));
+      const failed = results.filter((item) => item.status === 'rejected').length;
+      if (failed) console.warn(`[GHRAB SW] ${failed} volitelných assetů nebylo uloženo do offline cache.`);
+    }
+  })());
 });
 
-async function networkFirst(request, fallbackToShell = false) {
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys
+      .filter((key) => CACHE_PREFIXES.some((prefix) => key.startsWith(prefix)) && key !== CACHE_NAME)
+      .map((key) => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+
+async function networkFirst(request, fallbackUrl = '') {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const fresh = await fetch(request);
-    if (fresh && fresh.ok) await cache.put(request, fresh.clone());
-    return fresh;
-  } catch (err) {
-    const cached = await cache.match(request);
+    const response = await fetch(request, { cache: 'no-store' });
+    if (!response || !response.ok) throw new Error(`HTTP ${response?.status || 0}`);
+    await cache.put(request, response.clone());
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request, { ignoreSearch: true });
     if (cached) return cached;
-    if (fallbackToShell) {
-      const shell = await cache.match('./index.html');
-      if (shell) return shell;
+    if (fallbackUrl) {
+      const fallback = await cache.match(fallbackUrl, { ignoreSearch: true });
+      if (fallback) return fallback;
     }
-    throw err;
+    throw error;
   }
 }
 
@@ -48,29 +79,35 @@ async function cacheFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
   if (cached) return cached;
-  const fresh = await fetch(request);
-  if (fresh && fresh.ok) await cache.put(request, fresh.clone());
-  return fresh;
+  const response = await fetch(request);
+  if (response?.ok) await cache.put(request, response.clone());
+  return response;
 }
 
-self.addEventListener('fetch', event => {
+function isRuntimeRequest(url, scopePath) {
+  const relative = url.pathname.slice(scopePath.length);
+  return relative === 'runtime-config.js' ||
+    relative === 'config/deployment.json' ||
+    relative === 'config/deployment.school-server-p0.json' ||
+    relative === 'config/deployment.school-server.example.json' ||
+    /^(?:api|auth|session|health)(?:\/|$)/.test(relative);
+}
+
+self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-
+  const scopePath = new URL('./', self.location.href).pathname;
+  if (!url.pathname.startsWith(scopePath) || request.cache === 'no-store' || isRuntimeRequest(url, scopePath)) return;
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request, true));
+    const fallback = url.pathname.includes('/manual/') ? './manual/index.html' : './index.html';
+    event.respondWith(networkFirst(request, fallback));
     return;
   }
-
-  // Bezpečnostní komponenty AI Studia musí být online vždy čerstvé; cache je pouze
-  // nouzový offline fallback. Generátor je tedy offline použitelný s posledním známým
-  // permitem, po připojení se ale revokace a opravy guardu ihned projeví.
-  if (url.pathname.startsWith('/AI-Studio-GHRAB/') || url.pathname.endsWith('/manifest.webmanifest')) {
+  if (url.pathname.endsWith('/manifest.webmanifest') || url.pathname.endsWith('/build-info.json')) {
     event.respondWith(networkFirst(request));
     return;
   }
-
   event.respondWith(cacheFirst(request));
 });

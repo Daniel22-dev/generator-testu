@@ -24,8 +24,10 @@ for (const asset of assets) {
   const target = path.resolve('dist', rel);
   if (!fs.existsSync(target)) missing.push(`${asset} -> ${path.relative(process.cwd(), target)}`);
 }
-if (!/key\.startsWith\(CACHE_PREFIX\)\s*&&\s*key\s*!==\s*CACHE_NAME/.test(sw)) {
-  console.error('❌ Service worker při aktivaci nemaže cache izolovaně podle vlastního prefixu.');
+const isolatedCleanup = /key\.startsWith\(CACHE_PREFIX\)\s*&&\s*key\s*!==\s*CACHE_NAME/.test(sw)
+  || /CACHE_PREFIXES\.some\(\(prefix\)\s*=>\s*key\.startsWith\(prefix\)\)\s*&&\s*key\s*!==\s*CACHE_NAME/.test(sw);
+if (!isolatedCleanup) {
+  console.error('❌ Service worker při aktivaci nemaže cache izolovaně podle vlastních prefixů.');
   process.exit(1);
 }
 if (/access-manifest\.json/.test(sw)) {

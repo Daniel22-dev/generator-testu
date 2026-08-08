@@ -1,8 +1,9 @@
 {
   "name": "Generátor interaktivních testů",
   "short_name": "Testy AI",
+  "id": "./",
   "description": "Školní generátor interaktivních testů pro učitele.",
-  "start_url": "./?v=7.1.4",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -32,5 +33,15 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "version": "7.1.12",
+  "ghrab_platform": {
+    "contract": "ghrab-platform-v1",
+    "version": "1.0.0",
+    "required_range": ">=1.0.0 <2.0.0",
+    "brand_version": "1.0.0",
+    "theme_contract": "ghrab-theme-v1",
+    "sw_contract": "ghrab-sw-v1",
+    "cache_name": "ghrab-generator-v7.1.12"
+  }
 }

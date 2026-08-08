@@ -8,10 +8,10 @@ const GEMINI_KEY_SESSION_SK = 'sestavovac_gemini_key_session';
 const GEMINI_MODEL_SK = 'sestavovac_gemini_model';
 // Produkční výchozí modely: pevné názvy stabilních (GA) modelů. Aktivní limity
 // nejsou v kódu napevno — liší se podle projektu, účtu, modelu a usage tieru.
-const GEMINI_MODEL_DEFAULT = 'gemini-3.5-flash';
+const GEMINI_MODEL_DEFAULT = 'gemini-3.6-flash';
 // Při 429 nebo dočasné nedostupnosti zkusíme jednou odlišný stabilní model.
 // Fallback může pomoci, ale neznamená garantovanou samostatnou nebo volnou kvótu.
-const GEMINI_FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-latest'];
+const GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite'];
 const GEMINI_DATA_NOTICE_SESSION_SK = 'sestavovac_gemini_data_notice_v1';
 let geminiApiKey = '';
 let geminiKeyScope = '';
@@ -31,8 +31,8 @@ function normalizeModelName(s){ return String(s||'').trim().replace(/^models\//i
 function isValidModelName(s){ return /^[A-Za-z0-9][A-Za-z0-9._-]{1,80}$/.test(normalizeModelName(s)); }
 function migrateLegacyModelName(s){
   const n = normalizeModelName(s);
-  if (n === 'gemini-2.5-flash') return GEMINI_MODEL_DEFAULT;
-  if (n === 'gemini-2.5-flash-lite') return GEMINI_FALLBACK_MODELS[0];
+  if (['gemini-2.5-flash','gemini-3.1-flash','gemini-3.5-flash','gemini-flash-latest'].includes(n)) return GEMINI_MODEL_DEFAULT;
+  if (['gemini-2.5-flash-lite','gemini-3.1-flash-lite'].includes(n)) return GEMINI_FALLBACK_MODELS[0];
   return n;
 }
 // Pořadí priority: živá hodnota v poli → uložený model → výchozí. Vždy vrátí platný název.
@@ -131,6 +131,7 @@ function buildTypeGuide(){
 }
 
 async function ensureGeminiDataNotice(){
+  if(window.GHRAB_PLATFORM?.isSchoolProfile?.()) return true;
   try { if (sessionStorage.getItem(GEMINI_DATA_NOTICE_SESSION_SK) === 'accepted') return true; } catch(_){}
   const ok = await uiConfirm(
     'Do služby Google Gemini budou odeslány text zadání, zvolené URL a přiložené soubory. Jména studentů v diferenciaci generátor vždy převádí na anonymní kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Potvrď, že jsi odstranil(a) osobní, zdravotní, kázeňské a jiné citlivé údaje. Pokračovat?',
@@ -183,7 +184,7 @@ function applyKeyEnvUI(){
   const btn = $('btnSaveKeyPermanent');
   if (btn) { btn.disabled = true; }
   const note = $('geminiNote');
-  if (note) note.innerHTML = 'Jsi pravděpodobně ve <strong>vestavěném prohlížeči aplikace</strong>, kde je trvalé uložení nespolehlivé — klíč proto použij <strong>jen pro relaci</strong>, nebo otevři generátor v běžném Chrome/Safari. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com</a> → Get API key.';
+  if (note) note.innerHTML = 'Jsi pravděpodobně ve <strong>vestavěném prohlížeči aplikace</strong>, kde je trvalé uložení nespolehlivé — klíč proto použij <strong>jen pro relaci</strong>, nebo otevři generátor v běžném Chrome/Safari. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a> → Get API key.';
 }
 
 function getGeminiInputKey() { return ($('geminiKeyInput')?.value || '').trim(); }
@@ -198,7 +199,14 @@ function loadGeminiKey() {
   let sessionKey = '', storedKey = '';
   try { sessionKey = sessionStorage.getItem(GEMINI_KEY_SESSION_SK) || ''; } catch(_){}
   try { storedKey = localStorage.getItem(GEMINI_KEY_SK) || ''; } catch(_){}
-  setGeminiKey(sessionKey || storedKey, sessionKey ? 'session' : (storedKey ? 'permanent' : ''));
+  // P1: provider klíč se nikdy nenechává trvale v browser storage. Starší uložený
+  // klíč jednorázově přesuneme do sessionStorage a z localStorage jej odstraníme.
+  if (!sessionKey && storedKey) {
+    sessionKey = storedKey;
+    try { sessionStorage.setItem(GEMINI_KEY_SESSION_SK, storedKey); } catch(_){}
+  }
+  try { localStorage.removeItem(GEMINI_KEY_SK); } catch(_){}
+  setGeminiKey(sessionKey, sessionKey ? 'session' : '');
 }
 function useGeminiKeyForSession() {
   const key = getGeminiInputKey();
@@ -209,33 +217,13 @@ function useGeminiKeyForSession() {
   setGeminiKey(key, key ? 'session' : '');
 }
 async function saveGeminiKeyPermanent() {
-  // Pojistka: ve vestavěném prohlížeči je trvalé uložení nespolehlivé → použij relaci.
-  if (isEmbeddedBrowserEnv()) { useGeminiKeyForSession(); return; }
-  const key = getGeminiInputKey();
-  if (key) {
-    // Trvalé uložení = klíč zůstane v localStorage tohoto prohlížeče i po zavření.
-    // Vědomá pojistka proti omylu na sdíleném/školním PC (který z prohlížeče nepoznáme):
-    // místo prostého „Ano" musí uživatel OPSAT větu. Porovnání je tolerantní k diakritice
-    // a velikosti písmen, ať jde opsání i na mobilní klávesnici.
-    const PHRASE = 'UKLÁDÁM NA OSOBNÍM ZAŘÍZENÍ';
-    const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/\s+/g,' ').trim();
-    const typed = await uiModal({
-      title: 'Trvalé uložení API klíče',
-      message: 'Klíč zůstane v tomto prohlížeči i po zavření a restartu — dokud ho ručně nesmažeš. Dělej to JEN na svém osobním zařízení; na školním nebo sdíleném zvol „Použít jen pro relaci“.\n\nPro potvrzení opiš přesně tuto větu:\n' + PHRASE,
-      input: true, defaultValue: '', okText: 'Uložit trvale', cancelText: 'Zrušit', danger: true
-    });
-    if (typed == null) return; // zrušeno
-    if (norm(typed) !== norm(PHRASE)) {
-      uiToast('Věta nesouhlasí — klíč NEbyl uložen trvale. Použij „Použít jen pro relaci“, nebo zkus opis znovu.', 'warn', 5200);
-      return;
-    }
-  }
-  try {
-    if (key) localStorage.setItem(GEMINI_KEY_SK, key);
-    else localStorage.removeItem(GEMINI_KEY_SK);
-  } catch(_){}
-  setGeminiKey(key, key ? 'permanent' : '');
+  // P1 bezpečnostní politika: i v GitHub profilu je provider klíč pouze pro relaci.
+  // Zachováváme původní veřejné API funkce kvůli kompatibilitě starších HTML/UI.
+  useGeminiKeyForSession();
+  try { localStorage.removeItem(GEMINI_KEY_SK); } catch(_){}
+  if (geminiApiKey) uiToast('Klíč byl uložen pouze pro tuto relaci. Trvalé ukládání je z bezpečnostních důvodů vypnuto.', 'ok', 4200);
 }
+
 function clearGeminiKey() {
   try { sessionStorage.removeItem(GEMINI_KEY_SESSION_SK); } catch(_){}
   try { localStorage.removeItem(GEMINI_KEY_SK); } catch(_){}
@@ -246,8 +234,8 @@ function updateGeminiStatus() {
   const b = $('geminiStatus');
   if (b) {
     if (geminiApiKey) {
-      b.textContent = geminiKeyScope === 'permanent' ? '✓ Klíč uložen trvale' : '✓ Klíč jen v této relaci';
-      b.style.color = geminiKeyScope === 'permanent' ? 'var(--acc)' : 'var(--ok)';
+      b.textContent = genSchoolMode() ? '✓ Klíč spravuje školní server' : '✓ Klíč jen v této relaci';
+      b.style.color = 'var(--ok)';
     } else {
       b.textContent = 'Klíč není nastaven'; b.style.color = 'var(--acc)';
     }
@@ -256,11 +244,11 @@ function updateGeminiStatus() {
   // Tím je vidět, která volba je aktivní — ne jen text statusu nahoře.
   const sBtn = $('btnUseKeySession'), pBtn = $('btnSaveKeyPermanent');
   if (sBtn) sBtn.classList.toggle('key-btn-active', !!geminiApiKey && geminiKeyScope === 'session');
-  if (pBtn) pBtn.classList.toggle('key-btn-active', !!geminiApiKey && geminiKeyScope === 'permanent');
+  if (pBtn) pBtn.classList.remove('key-btn-active');
   // Když je klíč skutečně uložený trvale, rozbal pokročilou sekci, ať je zvýrazněná
   // aktivní volba vidět (jinak by zůstala schovaná pod sbaleným „Pokročilé").
   const adv = $('keyAdvanced');
-  if (adv && !adv.classList.contains('hidden') && geminiApiKey && geminiKeyScope === 'permanent') adv.open = true;
+  if (adv) { adv.classList.add('hidden'); adv.open = false; }
 }
 
 function readBlobAsDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('Soubor se nepodařilo přečíst.'));r.readAsDataURL(blob);});}
@@ -649,7 +637,7 @@ function geminiApiErrorMessage(res, data, model, attempts, retryMs=0){
     action = 'Zkontroluj Gemini API klíč ve žluté sekci. Od 19. 6. 2026 Google vyžaduje, aby byl klíč omezený na Gemini API — neomezené klíče vrací chybu 403. Zkontroluj nastavení klíče na aistudio.google.com → API Keys nebo vytvoř nový omezený klíč.';
   } else if(modelGone){
     why = `Zvolený model „${model}" pravděpodobně není dostupný nebo není podporovaný pro tento endpoint.`;
-    action = `Změň název modelu v poli „Model" ve žluté sekci, např. na ${GEMINI_MODEL_DEFAULT} nebo gemini-flash-latest.`;
+    action = `Změň název modelu v poli „Model" ve žluté sekci, např. na ${GEMINI_MODEL_DEFAULT} nebo ${GEMINI_FALLBACK_MODELS[0]}.`;
   } else if(res.status === 429 || /RESOURCE_EXHAUSTED/i.test(apiStatus)){
     why = 'Byl překročen limit požadavků nebo kvóta pro API klíč / Google projekt.';
     action = retryMs

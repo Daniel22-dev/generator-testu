@@ -1,0 +1,171 @@
+{
+  "schema": "ghrab-ai-operations-v1",
+  "appId": "generator",
+  "appVersion": "7.1.12",
+  "registryVersion": "1.1.0",
+  "coreVersion": "1.0.0",
+  "contractVersion": "1",
+  "defaultStreaming": false,
+  "operations": [
+    {
+      "operation": "test-generation",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "quality",
+      "allowedModelProfiles": [
+        "balanced",
+        "quality"
+      ],
+      "inputTypes": [
+        "text",
+        "image",
+        "document"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 32768,
+      "maxProviderRequestsPerWorkflow": 6
+    },
+    {
+      "operation": "exercise-generation",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "balanced",
+      "allowedModelProfiles": [
+        "balanced",
+        "quality"
+      ],
+      "inputTypes": [
+        "text",
+        "image",
+        "document"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 32768,
+      "maxProviderRequestsPerWorkflow": 6
+    },
+    {
+      "operation": "generation-repair",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "balanced",
+      "allowedModelProfiles": [
+        "balanced",
+        "quality"
+      ],
+      "inputTypes": [
+        "text",
+        "image",
+        "document"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 32768,
+      "maxProviderRequestsPerWorkflow": 6
+    },
+    {
+      "operation": "listening-question-suggestions",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "balanced",
+      "allowedModelProfiles": [
+        "balanced",
+        "quality"
+      ],
+      "inputTypes": [
+        "text",
+        "document"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 16384
+    },
+    {
+      "operation": "reading-package-suggestion",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "balanced",
+      "allowedModelProfiles": [
+        "balanced",
+        "quality"
+      ],
+      "inputTypes": [
+        "text"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 16384
+    },
+    {
+      "operation": "grading-scale-parse",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "economy",
+      "allowedModelProfiles": [
+        "economy",
+        "balanced"
+      ],
+      "inputTypes": [
+        "text"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 4096
+    },
+    {
+      "operation": "answer-key-verification",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "economy",
+      "allowedModelProfiles": [
+        "economy",
+        "balanced"
+      ],
+      "inputTypes": [
+        "text"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 8192
+    },
+    {
+      "operation": "acceptable-answer-enrichment",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "economy",
+      "allowedModelProfiles": [
+        "economy",
+        "balanced"
+      ],
+      "inputTypes": [
+        "text"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 8192
+    },
+    {
+      "operation": "generator-help-answer",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "economy",
+      "allowedModelProfiles": [
+        "economy",
+        "balanced"
+      ],
+      "inputTypes": [
+        "text"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 8192
+    },
+    {
+      "operation": "diagnostic-ping",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "economy",
+      "allowedModelProfiles": [
+        "economy",
+        "balanced"
+      ],
+      "inputTypes": [
+        "text"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 1024
+    }
+  ]
+}

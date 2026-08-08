@@ -20,6 +20,7 @@ const requiredOrder = [
 ];
 const migrated = ['13-secure-export.js', '14-test-html-builders.js'];
 const maxSplitSize = 90 * 1024;
+const lazyFeatures = ['features/testlab.js', 'features/preview-editor.js'];
 
 let failed = 0;
 function fail(msg){ failed++; console.error('❌ ' + msg); }
@@ -44,6 +45,16 @@ for (const name of requiredOrder) {
   const size = fs.statSync(path.join(jsDir, name)).size;
   if (size > maxSplitSize) fail(`${name} je moc velky (${Math.round(size/1024)} kB); cil po deleni je pod 90 kB.`);
 }
+
+for (const rel of lazyFeatures) {
+  const target = path.resolve('src', rel);
+  if (!fs.existsSync(target)) fail(`Chybi lazy modul ${rel}.`);
+  else if (fs.statSync(target).size < 8 * 1024) fail(`Lazy modul ${rel} je podezrele maly.`);
+}
+const inlineTestLab = fs.readFileSync(path.join(jsDir, '10-testlab.js'), 'utf8');
+const inlineEditor = fs.readFileSync(path.join(jsDir, '11-preview-editor.js'), 'utf8');
+if (inlineTestLab.length > 24 * 1024) fail('Test Lab loader je prilis velky; admin diagnostika se vratila do initial payloadu.');
+if (inlineEditor.length > 12 * 1024) fail('Preview/editor loader je prilis velky; editor se vratil do initial payloadu.');
 
 if (!failed) {
   pass(`Zdrojova struktura OK: ${requiredOrder.length} split modulu, puvodni nazvy pouze jako migracni tombstones.`);

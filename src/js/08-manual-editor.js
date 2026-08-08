@@ -20,7 +20,7 @@ function showManualExerciseForm(exCfg, exIndex) {
     backdrop.id = 'manualEditorBackdrop';
 
     // ── Pomocné funkce pro práci s dynamickými řádky ──
-            
+
     // ── Generátory HTML formulářů podle typu ──
 // ── Pomocné formy pro dalších 5 typů ─────────────────────────────────────────
 
@@ -452,14 +452,14 @@ async function generateTestWithManual(state, filePack, useUrlContext) {
         setGenMsg('📦 Generuji cvičení ' + (idx + 1) + '/' + configs.length + ': ' + configs[idx].typ + '…');
         var singleState = Object.assign({}, state, { exerciseConfig: [configs[idx]] });
         var singlePrompt = buildContentPrompt(singleState, filePack.notes || []);
-        var sData = await callGeminiJSON(singlePrompt, filePack.parts, { urlContext: useUrlContext });
+        var sData = await callGeminiJSON(singlePrompt, filePack.parts, { urlContext: useUrlContext, operation:'exercise-generation' });
         if (sData.exercises && sData.exercises.length > 0) exerciseResults[idx] = sData.exercises[0];
       }
     } else {
       var aiState = Object.assign({}, state, { exerciseConfig: aiIndices.map(function(i) { return configs[i]; }) });
       var aiPrompt = buildContentPrompt(aiState, filePack.notes || []);
       setGenMsg('Volám Gemini AI pro ' + aiIndices.length + ' cvičení…');
-      var aiData = await callGeminiJSON(aiPrompt, filePack.parts, { urlContext: useUrlContext });
+      var aiData = await callGeminiJSON(aiPrompt, filePack.parts, { urlContext: useUrlContext, operation:'exercise-generation' });
       if (aiData.exercises) {
         aiData.exercises.forEach(function(ex, j) {
           if (j < aiIndices.length) exerciseResults[aiIndices[j]] = ex;
@@ -495,7 +495,7 @@ async function runSplitGeneration(state, filePack, useUrlContext) {
     const MAX_SINGLE = 2;
     for (let attempt = 1; ; attempt++) {
       if (attempt > 1) setGenMsg('📦 Cvičení ' + (i + 1) + '/' + total + ' — opravuji (pokus ' + attempt + '/' + MAX_SINGLE + ')…');
-      singleData = await callGeminiJSON(singlePrompt + correctiveNote, filePack.parts, { urlContext: useUrlContext });
+      singleData = await callGeminiJSON(singlePrompt + correctiveNote, filePack.parts, { urlContext: useUrlContext, operation:correctiveNote?'generation-repair':'exercise-generation' });
       // Validace jednoho cvičení: vezmi jen exercises[0] a validuj
       const testData = { exercises: singleData.exercises || [] };
       try {
@@ -549,7 +549,7 @@ async function runHybridGeneration(state, filePack, useUrlContext, complexIdxs, 
     let correctiveNote = '';
     for (let attempt = 1; ; attempt++) {
       if (attempt > 1) setGenMsg('⚡ Hybrid: cvičení ' + (idx + 1) + '/' + total + ' — opravuji (pokus ' + attempt + '/' + MAX_SINGLE + ')…');
-      singleData = await callGeminiJSON(singlePrompt + correctiveNote, filePack.parts, { urlContext: useUrlContext });
+      singleData = await callGeminiJSON(singlePrompt + correctiveNote, filePack.parts, { urlContext: useUrlContext, operation:correctiveNote?'generation-repair':'exercise-generation' });
       if (singleData.exercises && singleData.exercises.length > 0) {
         exerciseResults[idx] = singleData.exercises[0];
         break;
@@ -575,7 +575,7 @@ async function runHybridGeneration(state, filePack, useUrlContext, complexIdxs, 
     let batchData = null;
     for (let attempt = 1; ; attempt++) {
       if (attempt > 1) setGenMsg('⚡ Hybrid: jednoduchá cvičení — opravuji (pokus ' + attempt + '/' + MAX_BATCH + ')…');
-      batchData = await callGeminiJSON(batchPrompt + batchCorrectiveNote, filePack.parts, { urlContext: useUrlContext });
+      batchData = await callGeminiJSON(batchPrompt + batchCorrectiveNote, filePack.parts, { urlContext: useUrlContext, operation:batchCorrectiveNote?'generation-repair':'exercise-generation' });
       if (batchData.exercises && batchData.exercises.length > 0) break;
       if (attempt < MAX_BATCH) {
         batchCorrectiveNote = '\n\n--- OPRAVNÝ POKYN ---\nVrať KOMPLETNÍ JSON se VŠEMI ' + simpleIdxs.length + ' cvičeními ve struktuře {"exercises":[...]}.';
@@ -644,11 +644,11 @@ async function generateTest(){
   }
   // Když uživatel klíč napsal, ale nezvolil žádné tlačítko (relace/trvale), vezmeme ho
   // automaticky pro tuto relaci — ať generování nezačne padat jen kvůli nekliknutí.
-  if(!geminiApiKey){
+  if(!genAiAvailable()){
     const typed=getGeminiInputKey();
     if(typed){ useGeminiKeyForSession(); }
   }
-  if(!geminiApiKey){$('geminiKeyInput')?.focus();setGenErr('Nejdříve zadej Gemini API klíč do žluté sekce (a nech ho aspoň „jen pro relaci").');return;}
+  if(!genAiAvailable()){$('geminiKeyInput')?.focus();setGenErr('AI služba není dostupná. V GitHub režimu zadej Gemini API klíč jen pro relaci; ve školním režimu obnov serverovou relaci.');return;}
   const cooldownMs = geminiCooldownRemainingMs();
   if(cooldownMs > 0){
     setGenErr('Překročen limit Gemini API. Generování je dočasně pozastavené; zkus to znovu za ' + geminiFormatWait(cooldownMs) + '. Neklikej opakovaně, tím by se limit mohl dál pálit.');
@@ -657,6 +657,7 @@ async function generateTest(){
   } else {
     geminiClearCooldown();
   }
+  genBeginAiWorkflow();
   generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; lastSelfTest=null; secureGapsAcknowledged=false;
   resetKeyCheckState();
   resetVerificationReports();
@@ -689,7 +690,7 @@ async function generateTest(){
     let correctiveNote = '';
     for (let attempt = 1; ; attempt++) {
       if (attempt > 1) setGenMsg('Výstup neprošel validací — žádám AI o opravu (pokus ' + attempt + '/' + MAX_GEN_ATTEMPTS + ')…');
-      const data = await callGeminiJSON(prompt + correctiveNote, filePack.parts, {urlContext:useUrlContext});
+      const data = await callGeminiJSON(prompt + correctiveNote, filePack.parts, {urlContext:useUrlContext,operation:correctiveNote?'generation-repair':'test-generation'});
       lastGenData = data;
       setGenMsg('Tvrdě kontroluji strukturu, počty položek a body…');
       try {
@@ -771,7 +772,7 @@ async function generateTest(){
     const cancelled=geminiCancelRequested||/zrušeno|cancelled|canceled|abort/i.test(String(e?.message||e));
     recordGeneratorTelemetry(cancelled?'cancelled':'error');
     setGenErr(e?.message||String(e));
-  }
+  } finally { genEndAiWorkflow(); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════

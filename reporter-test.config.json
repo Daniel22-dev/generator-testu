@@ -1,0 +1,35 @@
+{
+  "distEntry": "dist/index.html",
+  "appId": "generator",
+  "appName": "Generátor testů",
+  "version": "7.1.12",
+  "reporterPath": "public/access/error-reporter.js",
+  "stylePath": "public/access/error-reporter.css",
+  "adapterPath": "public/access/error-reporter-adapter.js",
+  "bootstrapPaths": [
+    "src/shell.html"
+  ],
+  "manualPath": "public/manual/index.html",
+  "serviceWorkerPaths": [
+    "public/sw.js"
+  ],
+  "versionPaths": [
+    "src/js/01-core.js",
+    "public/manifest.webmanifest",
+    "public/sw.js",
+    "public/manual/index.html",
+    "README.md",
+    "RELEASE-NOTES-7.1.12.md"
+  ],
+  "distCachePaths": [
+    "dist/access/error-reporter.js",
+    "dist/access/error-reporter.css",
+    "dist/access/error-reporter-adapter.js",
+    "dist/sw.js"
+  ],
+  "theme": {
+    "initial": "document.body.classList.add('light');",
+    "light": "document.body.classList.add('light');",
+    "dark": "document.body.classList.remove('light');"
+  }
+}

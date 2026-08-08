@@ -109,11 +109,11 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
     };
     const result = await w.callGeminiJSON('Return JSON only.', [], {noRetry:true,noFallback:true});
     if (!result || result.ok !== true) throw new Error('odpověď se neparsovala');
-    if (!seen || !seen.url.includes('/models/gemini-3.5-flash:generateContent')) throw new Error('neočekávaný model/URL');
+    if (!seen || !seen.url.includes('/models/gemini-3.6-flash:generateContent')) throw new Error('neočekávaný model/URL');
     if (seen.options?.headers?.['x-goog-api-key'] !== 'FAKE_GEMINI_KEY_12345678901234567890') throw new Error('API klíč není v x-goog-api-key');
     const body = JSON.parse(seen.options.body);
     if (!Array.isArray(body.contents) || !body.contents.length) throw new Error('chybí contents');
-    return 'gemini-3.5-flash + x-goog-api-key';
+    return 'gemini-3.6-flash + x-goog-api-key';
   } finally {
     w.fetch = oldFetch;
     w.eval("geminiApiKey='';");

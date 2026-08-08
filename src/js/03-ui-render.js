@@ -388,7 +388,7 @@ function buildReadingUserBlock(){
 let _liAiDraft = null;
 async function aiSuggestListeningQuestions(){
   const btn = document.getElementById('liAiBtn');
-  if (!(typeof geminiApiKey !== 'undefined' && geminiApiKey)){
+  if(!genAiAvailable()){
     renderLiAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho ve žluté sekci a zkus to znovu.' });
     return;
   }
@@ -413,7 +413,7 @@ async function aiSuggestListeningQuestions(){
     'Otázky musí být auto-opravitelné (krátká, jednoznačná odpověď), přiměřené úrovni a vhodné pro školu. Piš je v jazyce ' + jazyk + '.\n' +
     'Vrať POUZE JSON: {"questions":[{"q":"...","a":"..."}]} bez dalšího textu.';
   try {
-    const out = await callGeminiJSON(prompt, fileParts);
+    const out = await callGeminiJSON(prompt, fileParts, {operation:'listening-question-suggestions'});
     const qs = (out && Array.isArray(out.questions))
       ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)
       : [];
@@ -458,7 +458,7 @@ function liAiDismiss(){ const b = document.getElementById('liAiPreview'); if (b)
 let _rcAiDraft = null;
 async function aiSuggestReading(){
   const btn = document.getElementById('rcAiBtn');
-  if (!(typeof geminiApiKey !== 'undefined' && geminiApiKey)){
+  if(!genAiAvailable()){
     renderRcAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho ve žluté sekci a zkus to znovu.' });
     return;
   }
@@ -481,7 +481,7 @@ async function aiSuggestReading(){
     'Text musí být originální, přiměřený úrovni a vhodný pro školu (žádná nevhodná témata).\n' +
     'Vrať POUZE JSON: {"passage":"...","questions":[{"q":"...","a":"..."}]} bez dalšího textu.';
   try {
-    const out = await callGeminiJSON(prompt);
+    const out = await callGeminiJSON(prompt, [], {operation:'reading-package-suggestion'});
     const passage = String(out && out.passage || '').trim();
     const qs = (out && Array.isArray(out.questions))
       ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)

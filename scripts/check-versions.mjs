@@ -22,14 +22,19 @@ const manifest = JSON.parse(read('public/manifest.webmanifest'));
 
 const coreMatch = core.match(/version:\s*['"]([^'"]+)['"]/);
 const cacheMatch = sw.match(/CACHE_NAME\s*=\s*['"][^'"]*v([^'"]+)['"]/);
-const manifestMatch = String(manifest.start_url || '').match(/[?&]v=([^&]+)/);
+const manifestMatch = String(manifest.version || '').trim();
 
 const found = {
   'package.json version': packageVersion,
   'src/js/01-core.js RELEASE.version': coreMatch?.[1] || null,
   'public/sw.js CACHE_NAME': cacheMatch?.[1] || null,
-  'public/manifest.webmanifest start_url': manifestMatch?.[1] || null,
+  'public/manifest.webmanifest version': manifestMatch || null,
 };
+
+
+if (manifest.id !== './' || manifest.start_url !== './') {
+  fail('PWA manifest musí mít stabilní relativní id a start_url bez verzního parametru.');
+}
 
 for (const [label, value] of Object.entries(found)) {
   if (!value) fail(`${label} nebyla nalezena.`);

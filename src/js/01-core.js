@@ -17,10 +17,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.4',
-  date:    '2026-07-17',
+  version: '7.1.12',
+  date:    '2026-08-04',
   status:  'production-serverless',
   changes: [
+    'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.12): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
+    'SJEDNOCENÝ REPORTÉR CHYB (7.1.12): Generátor používá právě jednu lokální instanci společného reportéru AI Studia a centrální kopii vypíná přes errorReporter:false. Otevřený dialog živě sleduje body.light, podporuje pět screenshotů, bezpečné zachování nebo úplné smazání konceptu, anonymizovaný ZIP a nativní odkaz do Gmailu. Reportér je v PWA cache a manuál odkazuje na centrální návod.',
     'MANUÁL UVNITŘ AI STUDIA (7.1.4): interaktivní manuál je aktualizovaný pro současné funkce a při otevření z aplikace zůstává ve stejném pracovním rámci místo nové karty. Opravná verze zároveň mění PWA cache, aby se změna spolehlivě načetla i ve dříve nainstalované aplikaci.',
     'GHRAB QA CERTIFIKACE (7.1.3): Generátor byl začleněn do jednotné brány GHRAB QA 1.0.1. Zachovány byly jeho podrobné workflow a headless testy; nově se společně ověřuje technická konzistence, bezpečnost, PWA, pairwise kombinace, kritická workflow, skutečný Chromium vzhled a ruční galerie svázaná s otiskem buildu.',
     'CERTIFIKAČNÍ VIZUÁLNÍ OPRAVA (7.1.2): tlačítko Celá obrazovka v bezpečném studentském testu má vlastní plnou řádku a pevné svislé odsazení, takže se už na mobilu ani notebooku nepřekrývá s popiskem jména nebo kódu studenta. Přidána regresní pojistka pro toto rozložení.',
@@ -29,8 +31,6 @@ const RELEASE = Object.freeze({
     'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
     'SJEDNOCENÁ IDENTITA ŠKOLY (7.0.7): záhlaví nyní používá stejné oficiální logo a výrazný název GYMNÁZIUM, OSTRAVA-HRABŮVKA jako ostatní nástroje AI Studia. Autorský blok v zápatí byl sjednocen na společný dvouřádkový formát.',
     'CENTRÁLNÍ PŘÍSTUP AI STUDIO GHRAB (7.0.6): původní lokální aktivační kódy a PIN brána byly nahrazeny kryptograficky podepsaným oprávněním vydávaným v AI Studiu. Generátor se nespustí před ověřením podpisu, platnosti, role, povolení aplikace a revokačního seznamu. Správce aktivuje přístup pouze jednou ve Studiu a stejná relace otevře všechny povolené aplikace; auditní Creator ID a role zůstávají ve výstupech zachované. Přímá adresa bez oprávnění zobrazí jednotnou zamykací obrazovku.',
-    'NAPOJENÍ NA AI STUDIO GHRAB (7.0.5): Generátor umí bezpečně převzít krátkodobou lokální předávku GHRAB Material v1. Automaticky doplní název, skupinu/úroveň, předmět a látku i zdrojový obsah včetně strukturovaných úloh. Předávka má omezenou platnost, po načtení se smaže a nic se neposílá na server. Přidán viditelný návrat do AI Studia a anonymní místní záznam přínosu pro pilot.',
-    'ODDĚLENÁ A NEZÁVISLÁ PŘÍSTUPOVÁ BRÁNA (7.0.4): zdrojové moduly se již neskládají do jediného obřího scriptu. Každý modul se spouští samostatně a závěrečný init je v samostatném modulu 99-init.js, takže chyba v jedné části formuláře už nezastaví spuštění PINu nebo aktivace. Statická nouzová tlačítka mají vlastní malý skript nezávislý na aplikaci; umějí odregistrovat service worker, smazat PWA cache, vynutit PIN nebo úplně obnovit místní profil. Přidán regresní test izolace modulů a funkčnosti nouzové obsluhy.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -434,7 +434,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'ukladani-api-klice',title:'Ukládání API klíče (relace vs trvale)',status:'reseno',
   keywords:['ukladani klice','kam se uklada klic','sessionstorage klic','localstorage klic','zapamatovat klic','relace klic','trvale klic','uchovani klice'],
   simple:'Klíč můžeš použít jen pro tuto relaci (po zavření prohlížeče se zapomene), nebo ho uložit trvale v tomto prohlížeči. Trvalé uložení je pohodlnější, ale klíč zůstává na zařízení.',
-  detailed:'„Relace" (useGeminiKeyForSession) drží klíč jen do zavření prohlížeče. „Uložit trvale" (saveGeminiKeyPermanent) zapíše klíč do úložiště prohlížeče, takže ho příště nemusíš zadávat — vhodné jen na vlastním zařízení. Klíč se odesílá výhradně do Google API v hlavičce, nikdy do žádné jiné služby ani do tohoto poradce.',
+  detailed:'„Relace" (useGeminiKeyForSession) drží klíč jen do zavření prohlížeče. Tlačítko saveGeminiKeyPermanent je od P1 bezpečnostní alias pro uložení pouze do relace; trvalé browserové uložení je vypnuto. Klíč se odesílá výhradně do Google API v hlavičce, nikdy do žádné jiné služby ani do tohoto poradce.',
   evidence:['useGeminiKeyForSession() (btnUseKeySession)','saveGeminiKeyPermanent() (btnSaveKeyPermanent)','geminiNote: „Relace = po zavření se zapomene"']},
 
  {id:"pristupove-kody",title:"Přístup z AI Studia",status:"reseno",
@@ -627,7 +627,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'chyba-400',title:'Chyba 400 / INVALID_ARGUMENT při generování',status:'reseno',
   keywords:['400','invalid argument','invalid_argument','neplatny klic','neplatný klíč','api key not valid','spatny klic','špatný klíč','klic nefunguje','klíč nefunguje','neplatny pozadavek','neplatný požadavek'],
   simple:'Chyba 400 nejčastěji znamená neplatný API klíč. Zkontroluj klíč ve žluté sekci — zkopíruj ho znovu z aistudio.google.com → API Keys.',
-  detailed:'HTTP 400 INVALID_ARGUMENT znamená neplatný tvar požadavku, nepodporovanou kombinaci modelu/příloh nebo jiný chybný parametr. Neplatný či neoprávněný klíč se častěji projeví jako 401/403. Zkontroluj model, URL a přílohy; pro návrat k ověřené volbě použij Výchozí (gemini-3.5-flash).',
+  detailed:'HTTP 400 INVALID_ARGUMENT znamená neplatný tvar požadavku, nepodporovanou kombinaci modelu/příloh nebo jiný chybný parametr. Neplatný či neoprávněný klíč se častěji projeví jako 401/403. Zkontroluj model, URL a přílohy; pro návrat k ověřené volbě použij Výchozí (gemini-3.6-flash).',
   evidence:['geminiApiErrorMessage()','HTTP 400','INVALID_ARGUMENT','getGeminiInputKey()','useGeminiKeyForSession()']},
 
  {id:'chyba-401-403',title:'Chyba 401 / 403 / PERMISSION_DENIED při generování',status:'reseno',
@@ -639,7 +639,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'chyba-504',title:'Chyba 504 / DEADLINE_EXCEEDED — timeout',status:'reseno',
   keywords:['504','deadline exceeded','deadline_exceeded','timeout','vyprselo','vypršelo','cas vyprsel','čas vypršel','prilis dlouhy test','příliš dlouhý','nestihlo','nestihlo se vygenerovat'],
   simple:'Chyba 504 znamená, že Gemini nestihlo vygenerovat odpověď v časovém limitu. Zkus zmenšit test — méně cvičení nebo méně položek.',
-  detailed:'HTTP 504 DEADLINE_EXCEEDED znamená, že služba požadavek nestihla dokončit. Typické příčiny: mnoho cvičení, velké přílohy nebo náročná kombinace typů. Zmenši test, použij hybridní generování, zkrať podklady nebo při použití Lite přepni na výchozí gemini-3.5-flash.',
+  detailed:'HTTP 504 DEADLINE_EXCEEDED znamená, že služba požadavek nestihla dokončit. Typické příčiny: mnoho cvičení, velké přílohy nebo náročná kombinace typů. Zmenši test, použij hybridní generování, zkrať podklady nebo při použití Lite přepni na výchozí gemini-3.6-flash.',
   evidence:['geminiApiErrorMessage()','HTTP 504','DEADLINE_EXCEEDED','GEMINI_TIMEOUT_MS','hybridní generování']},
 
  {id:'chyba-poskozeny-json',title:'Poškozený JSON — generátor nemůže sestavit test',status:'reseno',
@@ -662,8 +662,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'chyba-model-nenalezen',title:'Chyba: model nenalezen / není podporován',status:'reseno',
   keywords:['model nenalezen','model nenalezeny','model not found','not found','not supported','unsupported','404','model nefunguje','spatny model','špatný model','neexistujici model','neexistující model'],
-  simple:'Název modelu ve žluté sekci neexistuje nebo již není dostupný. Přepni přes Výchozí nebo ⚡ Silný na gemini-3.5-flash.',
-  detailed:'HTTP 404 nebo odpověď not found znamená, že zadaný model není dostupný. ⚡ Silný nastaví stabilní gemini-3.5-flash, 🪶 Lite stabilní gemini-3.1-flash-lite a Výchozí obnoví doporučenou volbu. Dostupnost modelů ověř v oficiální dokumentaci Gemini API.',
+  simple:'Název modelu ve žluté sekci neexistuje nebo již není dostupný. Přepni přes Výchozí nebo ⚡ Silný na gemini-3.6-flash.',
+  detailed:'HTTP 404 nebo odpověď not found znamená, že zadaný model není dostupný. ⚡ Silný nastaví stabilní gemini-3.6-flash, 🪶 Lite stabilní gemini-3.5-flash-lite a Výchozí obnoví doporučenou volbu. Dostupnost modelů ověř v oficiální dokumentaci Gemini API.',
   evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']},
 
  {id:'typy-cviceni-prehled',title:'Přehled typů cvičení — co který typ dělá',status:'reseno',
@@ -796,7 +796,7 @@ const GENERATOR_ASSISTANT_KB = [
   keywords:['flash vs lite','flash lite','ktery model','který model','lepsi model','lepší model','horsi model','horší model','kdy pouzit lite','kdy použít lite','rychlejsi model','rychlejší model','kvalita modelu','model doporuceni','model doporučení'],
   simple:'Gemini 3.5 Flash je výchozí volba pro kvalitní a složitější testy. Gemini 3.1 Flash-Lite je rychlejší a úspornější pro jednodušší, dobře vymezené úlohy. Aktivní limity se liší podle projektu.',
   detailed:'Gemini 3.5 Flash je stabilní výchozí model s podporou strukturovaných výstupů, URL contextu a multimodálních vstupů; hodí se pro složité typy a delší testy. Gemini 3.1 Flash-Lite je stabilní nízkolatenční a nákladově úspornější model pro jednoduché, dobře vymezené úlohy. Přepíná se tlačítky 🪶 Lite a ⚡ Silný. Konkrétní rychlost a aktivní limity závisí na projektu, modelu a zatížení služby.',
-  evidence:['GEMINI_MODEL_DEFAULT','gemini-3.5-flash','gemini-3.1-flash-lite','quickModel()','Rate limits']},
+  evidence:['GEMINI_MODEL_DEFAULT','gemini-3.6-flash','gemini-3.5-flash-lite','quickModel()','Rate limits']},
 
  {id:"pristup-kolega",title:"Jak dát přístup kolegovi",status:"reseno",
   keywords:["pristup kolega","pridat ucitele","novy ucitel","vydat pristup","skoleni"],
@@ -977,7 +977,7 @@ async function gaRunSearch(){
   const q=ta.value.trim();
   if(!q){ gaState.ai=null; gaState.query=''; gaState.loading=false; renderGeneratorAssistantAnswer(); return; }
   gaState.query=q;
-  if(!(typeof geminiApiKey!=='undefined' && geminiApiKey)){
+  if(!genAiAvailable()){
     gaState.ai=null; gaState.loading=false;
     const box=document.getElementById('gaResult');
     if(box) box.innerHTML='<div class="ga-card"><span class="ga-status ga-st-mid">⚠ Potřebuješ AI klíč</span>'
@@ -998,7 +998,7 @@ async function gaRunSearch(){
     +'Vrať POUZE JSON: {"status":"reseno|castecne|ne","simple":"...","detailed":"...","evidence":["..."]} bez dalšího textu. '
     +'Dotaz učitele: '+JSON.stringify(q)+'\npodklady: '+JSON.stringify(podklady);
   try{
-    const out=await callGeminiJSON(prompt);
+    const out=await callGeminiJSON(prompt,[],{operation:'generator-help-answer'});
     if(ta.value.trim()!==q){
       gaState.loading=false;
       if(btn){ btn.disabled=false; btn.textContent=old; }

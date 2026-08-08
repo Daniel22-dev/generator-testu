@@ -41,8 +41,8 @@ const assistantKb = assistantKbStart >= 0 && assistantKbEnd > assistantKbStart
   : '';
 
 requireText(core, /status:\s*['"]production-serverless['"]/, 'RELEASE.status musi byt production-serverless.');
-requireText(gemini, /const GEMINI_MODEL_DEFAULT\s*=\s*['"]gemini-3\.5-flash['"]/, 'Vychozi Gemini model neni gemini-3.5-flash.');
-requireText(gemini, /const GEMINI_FALLBACK_MODELS\s*=\s*\[\s*['"]gemini-3\.1-flash-lite['"]/, 'Prvni zalozni model neni gemini-3.1-flash-lite.');
+requireText(gemini, /const GEMINI_MODEL_DEFAULT\s*=\s*['"]gemini-3\.6-flash['"]/, 'Vychozi Gemini model neni gemini-3.6-flash.');
+requireText(gemini, /const GEMINI_FALLBACK_MODELS\s*=\s*\[\s*['"]gemini-3\.5-flash-lite['"]/, 'Prvni zalozni model neni gemini-3.5-flash-lite.');
 requireText(gemini, /ensureGeminiDataNotice\(\)/, 'Pred AI pozadavkem chybi transparentni datove upozorneni.');
 requireText(gemini, /if \(!\(await ensureGeminiDataNotice\(\)\)\)/, 'AI volani neni blokovano datovym upozornenim.');
 requireText(persistence, /state\.anonymizace\s*=\s*['"]ANO['"]/, 'Stare ulozene nastaveni se neprevadi na povinnou anonymizaci.');
@@ -63,9 +63,9 @@ requireText(assistantKb, /SHA-256 otisk|SHA-256 hash/, 'Interni poradce nevysvet
 requireText(assistantKb, /rozpracované odpovědi[^.]*neobnov|rozpracovaný pokus[^.]*neobnov/i, 'Interni poradce neuvadi omezeni obnovy rozpracovaneho testu.');
 forbidText(shell, /Poslat jména do promptu|data-val=['"]NE['"][^>]*onclick=['"][^'"]*anonymizace/is, 'UI stale nabizi odeslani skutecnych jmen do AI.');
 requireText(shell, /data-ghrab-access=['"]checking['"]/, 'HTML neni fail-closed pred centralnim overenim.');
-requireText(shell, /AI-Studio-GHRAB\/access\/app-guard\.js/, 'Chybi centralni app-guard AI Studia.');
+requireText(shell, /deployment-config\.js[\s\S]*urls\.guardUrl/, 'Chybi konfigurovatelny centralni app-guard AI Studia.');
 requireText(shell, /protectApp\(APP_ID/, 'Bootstrap nevola protectApp.');
-requireText(shell, /application\/ghrab-protected/, 'Aplikacni skripty nejsou pred overenim inertni.');
+if (!/application\/ghrab-protected/.test(shell) && !(shell.includes('{{JS_MAIN_TAGS}}') && buildScript.includes('application/ghrab-protected'))) fail('Aplikacni skripty nejsou pred overenim inertni.');
 requireText(init, /window\.__ACCESS_INIT_REACHED__\s*=\s*true/, 'Samostatny init modul nema boot marker.');
 requireText(init, /accOnGranted/, 'Init nepromita centralni profil do UI.');
 requireText(buildScript, /data-source=\"\$\{file\}\"/, 'Build nesklada zdrojove moduly do samostatnych script tagu.');

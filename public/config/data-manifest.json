@@ -1,0 +1,117 @@
+{
+  "schema": "ghrab-data-manifest-v1",
+  "appId": "generator",
+  "appVersion": "7.1.12",
+  "manifestVersion": 3,
+  "dataCategories": [
+    "settings",
+    "application-content",
+    "diagnostics",
+    "ai-prompts-and-results"
+  ],
+  "privacy": {
+    "studentContentMayOccur": true,
+    "telemetryContainsContent": false,
+    "diagnosticsContainContentByDefault": false,
+    "pseudonymisationIsNotAnonymisation": true
+  },
+  "stores": [
+    {
+      "kind": "localStorage",
+      "category": "application-data",
+      "patterns": [
+        "ghrab.generator.*",
+        "ghrab.generator.onboarding.done"
+      ],
+      "sensitivity": "potentially-personal",
+      "authority": "client",
+      "clearOnEndWork": true
+    },
+    {
+      "kind": "sessionStorage",
+      "category": "session-data",
+      "patterns": [
+        "ghrab.generator.gemini_key_session",
+        "ghrab.generator.gemini_data_notice_v1",
+        "ghrab.generator.welcome.shown"
+      ],
+      "sensitivity": "confidential",
+      "authority": "client",
+      "clearOnEndWork": true
+    },
+    {
+      "kind": "localStorage",
+      "category": "credential",
+      "patterns": [
+        "ghrab.generator.gemini_key",
+        "ghrab.generator.gemini_key_session"
+      ],
+      "sensitivity": "secret",
+      "authority": "client-direct-mode-only",
+      "clearOnEndWork": true
+    },
+    {
+      "kind": "sessionStorage",
+      "category": "credential",
+      "patterns": [
+        "ghrab.generator.gemini_key",
+        "ghrab.generator.gemini_key_session"
+      ],
+      "sensitivity": "secret",
+      "authority": "client-direct-mode-only",
+      "clearOnEndWork": true
+    },
+    {
+      "kind": "cacheStorage",
+      "category": "application-cache",
+      "patterns": [
+        "ghrab-generator-v*",
+        "generator*"
+      ],
+      "sensitivity": "non-content-cache",
+      "authority": "client",
+      "clearOnEndWork": false
+    }
+  ],
+  "retention": {
+    "defaultDays": 30,
+    "sessionEndsOnLogout": true,
+    "serverLogsDays": 30
+  },
+  "export": {
+    "supported": true,
+    "requiresExplicitUserAction": true,
+    "includesSecrets": false,
+    "envelopeSchema": "ghrab-artifact-envelope-v1",
+    "artifactTypes": [],
+    "nativeFormats": [
+      "html",
+      "pdf",
+      "csv",
+      "zip"
+    ]
+  },
+  "deletion": {
+    "supported": true,
+    "clientVerified": true,
+    "serverEndpoint": "data/generator"
+  },
+  "sharedDevice": {
+    "supported": true,
+    "defaultInSchoolProfile": true,
+    "control": "GHRABPlatform.endWork()"
+  },
+  "storageNamespace": {
+    "schema": "ghrab-storage-namespace-v1",
+    "prefix": "ghrab.generator.",
+    "migrationId": "p2-storage-namespace-v1",
+    "backup": "full",
+    "rollbackSupported": true
+  },
+  "import": {
+    "supported": false,
+    "artifactTypes": [],
+    "acceptsLegacyJson": false,
+    "checksumRequiredForEnvelope": true
+  }
+}

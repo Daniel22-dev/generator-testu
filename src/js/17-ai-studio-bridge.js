@@ -1,4 +1,4 @@
-/* AI Studio GHRAB — přímé převzetí GHRAB Material v1 (v7.0.5, bridge 1.1) */
+/* AI Studio GHRAB — přímé převzetí GHRAB Material v1 (v7.0.5, bridge 2.0) */
 (function(){
   'use strict';
   const HANDOFF_KEY='ghrab.handoff.v1', EVENTS_KEY='ghrab.pilot.events.v2';
@@ -9,6 +9,7 @@
   function remove(k){try{localStorage.removeItem(k)}catch(e){console.warn('AI Studio bridge: odstranění z úložiště selhalo',e)}}
   function validMaterial(m){return !!(m&&m.schema==='ghrab-material-v1'&&m.id&&m.title&&m.subject&&m.content&&typeof m.content==='object')}
   function take(){
+    const v2=window.GHRAB_PLATFORM?.bridge?.take?.({target:'generator',maxBytes:500000});if(v2)return v2;
     const p=parse(HANDOFF_KEY,null);
     if(!p||p.schema!=='ghrab-handoff-v1'||p.target!=='generator'||!validMaterial(p.material))return null;
     if(Date.parse(p.expiresAt||'')<Date.now()){remove(HANDOFF_KEY);return null}
@@ -18,8 +19,9 @@
   function taskText(tasks){return (tasks||[]).map((t,i)=>`${i+1}. ${t.prompt||''}${Array.isArray(t.options)&&t.options.length?'\n   Možnosti: '+t.options.join(' | '):''}${t.answer!==undefined&&t.answer!==''?'\n   Klíč: '+(typeof t.answer==='number'?t.answer+1:t.answer):''}${t.explanation?'\n   Vysvětlení: '+t.explanation:''}`).join('\n\n')}
   function record(material){const list=parse(EVENTS_KEY,[]);list.push({at:new Date().toISOString(),type:'handoff-consumed',appId:'generator',materialId:material.id,estimatedMinutes:5});set(EVENTS_KEY,JSON.stringify(list.slice(-500)))}
   function studioUrl(payload){
-    try{const u=new URL(payload&&payload.studioUrl||'',location.href);if(/^https?:$/.test(u.protocol))return u.href}catch(_){}
-    return `${location.origin}/AI-Studio-GHRAB/`;
+    const configured=window.__GHRAB_DEPLOYMENT_CONFIG__?.studioBaseUrl||window.__GHRAB_STUDIO_URL__||'/AI-Studio-GHRAB/';
+    try{const u=new URL(payload&&payload.studioUrl||configured,location.href);if(/^https?:$/.test(u.protocol))return u.href}catch(_){}
+    return new URL(configured,location.href).href;
   }
   function banner(material,payload){
     const el=document.createElement('div');el.className='studio-import-banner';

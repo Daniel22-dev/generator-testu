@@ -25,6 +25,25 @@ const dom = new JSDOM(html, {
 });
 const w = dom.window;
 await new Promise(r => setTimeout(r, 1200));
+async function createGeneratedDom(generatedHtml) {
+  const generated = new JSDOM(generatedHtml, {
+    runScripts: 'dangerously',
+    url: 'https://school.example/test.html',
+    pretendToBeVisual: true,
+    beforeParse(x) {
+      if (!x.crypto || !x.crypto.subtle) Object.defineProperty(x, 'crypto', { value: webcrypto });
+      x.matchMedia = x.matchMedia || (() => ({ matches:false, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
+      x.scrollTo = () => {};
+      x.HTMLElement.prototype.scrollIntoView = () => {};
+      if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
+      x.URL.createObjectURL = () => 'blob:generated-test';
+      x.URL.revokeObjectURL = () => {};
+    }
+  });
+  await new Promise(r => setTimeout(r, 80));
+  return { window: generated.window, close: () => generated.window.close() };
+}
+// WORKFLOW-CHECKS-BEGIN
 let failed = 0, passed = 0;
 function ok(name, fn){
   try { const detail=fn(); passed++; console.log('PASS', name, detail===undefined?'':'→ '+detail); }
@@ -296,8 +315,7 @@ await okAsync('instant runtime odmítne cizí jednorázový kód', async()=>{
   const out=await w.assembleTestHtml(w.eval('state'),gen);
   assert(!/a@school\.cz/.test(out),'studentský HTML obsahuje e-mail');
   assert(!/ABC234/.test(out),'studentský HTML obsahuje čitelný kód');
-  const sd=new JSDOM(out,{runScripts:'dangerously',url:'https://school.example/test.html',pretendToBeVisual:true,beforeParse(x){if(!x.crypto||!x.crypto.subtle)Object.defineProperty(x,'crypto',{value:webcrypto});x.matchMedia=()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});x.scrollTo=()=>{};x.HTMLElement.prototype.scrollIntoView=()=>{};}});
-  await new Promise(r=>setTimeout(r,60));
+  const sd=await createGeneratedDom(out);
   try{
     sd.window.document.getElementById('studentName').value='WRONG1';
     await sd.window.startTest();
@@ -305,7 +323,7 @@ await okAsync('instant runtime odmítne cizí jednorázový kód', async()=>{
     sd.window.document.getElementById('studentName').value='ABC234';
     await sd.window.startTest();
     assert(sd.window.document.getElementById('introScreen').classList.contains('hidden'),'platný kód neodemkl test');
-  }finally{sd.window.close();}
+  }finally{sd.close();}
   return 'invalid blocked / valid accepted';
 });
 
@@ -341,6 +359,8 @@ for(const layout of ['tabs','scroll'])for(const odevzdavani of ['A','B'])for(con
   outputCases++;
 }
 ok('reprezentativní výstupová matice instant HTML',()=>outputCases+' sestavených testů');
+
+// WORKFLOW-CHECKS-END
 
 console.log(`\nWorkflow audit: ${passed} PASS / ${failed} FAIL`);
 dom.window.close();

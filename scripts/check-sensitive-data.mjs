@@ -13,6 +13,7 @@ function collect(dir) {
   }
 }
 roots.forEach(collect);
+const allowedPublicEmails = new Set(['balaz@ghrabuvka.cz']);
 const rules = [
   {label:'reálný Gemini API klíč', re:/AIza[0-9A-Za-z_-]{30,}/g},
   {label:'e-mailová adresa', re:/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g},
@@ -22,7 +23,9 @@ let failed = 0;
 for (const file of files) {
   const txt = fs.readFileSync(file, 'utf8');
   for (const rule of rules) {
-    const hits = [...txt.matchAll(rule.re)];
+    const hits = [...txt.matchAll(rule.re)].filter((hit) =>
+      rule.label !== 'e-mailová adresa' || !allowedPublicEmails.has(hit[0].toLowerCase())
+    );
     if (hits.length) {
       console.error(`❌ ${file}: nalezen ${rule.label} (${hits[0][0].slice(0, 18)}…).`);
       failed++;

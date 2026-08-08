@@ -162,11 +162,16 @@ export function mimeFor(file) {
     }[ext] || "application/octet-stream"
   );
 }
-export async function startStaticServer(rootDir) {
+export async function startStaticServer(rootDir, { deploymentBasePath = "" } = {}) {
+  const normalizedBasePath = String(deploymentBasePath || "")
+    .replace(/^\/+|\/+$/g, "");
   const server = createServer(async (req, res) => {
     try {
       const u = new URL(req.url, "http://localhost");
       let rel = decodeURIComponent(u.pathname).replace(/^\/+/, "");
+      if (normalizedBasePath && (rel === normalizedBasePath || rel.startsWith(`${normalizedBasePath}/`))) {
+        rel = rel.slice(normalizedBasePath.length).replace(/^\/+/, "");
+      }
       if (!rel) rel = "index.html";
       let target = path.resolve(rootDir, rel);
       if (!target.startsWith(path.resolve(rootDir))) {
@@ -184,8 +189,15 @@ export async function startStaticServer(rootDir) {
       res.writeHead(200, {
         "content-type": mimeFor(target),
         "cache-control": "no-store",
-        "access-control-allow-origin": "*",
       });
+      if (path.extname(target).toLowerCase() === ".html") {
+        let html = await readFile(target, "utf8");
+        html = html.replace(
+          /<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>/gi,
+          "",
+        );
+        return res.end(html);
+      }
       res.end(await readFile(target));
     } catch (e) {
       res.writeHead(500);
@@ -198,71 +210,46 @@ export async function startStaticServer(rootDir) {
 }
 
 export async function setLocalDocument(page, rootDir, urlPath, baseUrl) {
-  const clean =
-    String(urlPath || "/index.html")
-      .split("?")[0]
-      .replace(/^\/+/, "") || "index.html";
-  let target = path.join(rootDir, clean);
-  if ((await stat(target)).isDirectory())
-    target = path.join(target, "index.html");
-  let html = await readFile(target, "utf8");
-  html = html.replace(
-    /<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*>/gi,
-    "",
-  );
-  const basePath = path.posix.dirname("/" + clean).replace(/\/$/, "") + "/";
-  const base = `<base href="${baseUrl}${basePath}">`;
-  html = /<head[^>]*>/i.test(html)
-    ? html.replace(/<head([^>]*)>/i, `<head$1>${base}`)
-    : base + html;
+  const raw = String(urlPath || "/index.html");
+  const hashAt = raw.indexOf("#");
+  const hash = hashAt >= 0 ? raw.slice(hashAt) : "";
+  const beforeHash = hashAt >= 0 ? raw.slice(0, hashAt) : raw;
+  const queryAt = beforeHash.indexOf("?");
+  const search = queryAt >= 0 ? beforeHash.slice(queryAt) : "";
+  const pathPart = queryAt >= 0 ? beforeHash.slice(0, queryAt) : beforeHash;
+  const clean = pathPart.replace(/^\/+/, "") || "index.html";
+  const resolvedRoot = path.resolve(rootDir);
+  let target = path.resolve(resolvedRoot, clean);
+  if (target !== resolvedRoot && !target.startsWith(resolvedRoot + path.sep)) {
+    throw new Error(`Local document path escapes serve root: ${urlPath}`);
+  }
+  if ((await stat(target)).isDirectory()) target = path.join(target, "index.html");
+  if (!(await exists(target))) throw new Error(`Chybí lokální dokument ${clean}`);
   await page.addInitScript(() => {
     const makeStorage = () => {
       const values = new Map();
       return {
-        get length() {
-          return values.size;
-        },
-        key(i) {
-          return [...values.keys()][i] ?? null;
-        },
-        getItem(k) {
-          return values.has(String(k)) ? values.get(String(k)) : null;
-        },
-        setItem(k, v) {
-          values.set(String(k), String(v));
-        },
-        removeItem(k) {
-          values.delete(String(k));
-        },
-        clear() {
-          values.clear();
-        },
+        get length() { return values.size; },
+        key(i) { return [...values.keys()][i] ?? null; },
+        getItem(k) { return values.has(String(k)) ? values.get(String(k)) : null; },
+        setItem(k, v) { values.set(String(k), String(v)); },
+        removeItem(k) { values.delete(String(k)); },
+        clear() { values.clear(); },
       };
     };
-    try {
-      Object.defineProperty(window, "localStorage", {
-        configurable: true,
-        value: makeStorage(),
-      });
-    } catch {}
-    try {
-      Object.defineProperty(window, "sessionStorage", {
-        configurable: true,
-        value: makeStorage(),
-      });
-    } catch {}
+    try { Object.defineProperty(window, "localStorage", { configurable: true, value: makeStorage() }); } catch {}
+    try { Object.defineProperty(window, "sessionStorage", { configurable: true, value: makeStorage() }); } catch {}
     if (!navigator.serviceWorker) {
       Object.defineProperty(navigator, "serviceWorker", {
         configurable: true,
-        value: {
-          register: async () => ({ update: async () => {} }),
-          addEventListener() {},
-          ready: Promise.resolve({}),
-        },
+        value: { register: async () => ({ update: async () => {} }), addEventListener() {}, ready: Promise.resolve({}) },
       });
     }
   });
-  await page.setContent(html, { waitUntil: "load", timeout: 20000 });
+  const url = new URL(`/${clean}`, baseUrl);
+  url.search = search;
+  url.hash = hash;
+  await page.goto(url.href, { waitUntil: "load", timeout: 20000 });
   return target;
 }
 
