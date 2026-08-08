@@ -239,11 +239,15 @@ export async function setLocalDocument(page, rootDir, urlPath, baseUrl) {
     };
     try { Object.defineProperty(window, "localStorage", { configurable: true, value: makeStorage() }); } catch {}
     try { Object.defineProperty(window, "sessionStorage", { configurable: true, value: makeStorage() }); } catch {}
-    if (!navigator.serviceWorker) {
-      Object.defineProperty(navigator, "serviceWorker", {
-        configurable: true,
-        value: { register: async () => ({ update: async () => {} }), addEventListener() {}, ready: Promise.resolve({}) },
-      });
+    let serviceWorkerAvailable = false;
+    try { serviceWorkerAvailable = Boolean(navigator.serviceWorker); } catch {}
+    if (!serviceWorkerAvailable) {
+      try {
+        Object.defineProperty(navigator, "serviceWorker", {
+          configurable: true,
+          value: { register: async () => ({ update: async () => {} }), addEventListener() {}, ready: Promise.resolve({}) },
+        });
+      } catch {}
     }
   });
   const url = new URL(`/${clean}`, baseUrl);

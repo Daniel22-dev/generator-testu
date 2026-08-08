@@ -1,5 +1,6 @@
 // tools/headless-check.mjs — central access edition
 import fs from 'node:fs';
+import path from 'node:path';
 import { JSDOM } from 'jsdom';
 import { webcrypto } from 'node:crypto';
 
@@ -107,7 +108,7 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
       seen = {url:String(url), options};
       return {ok:true,status:200,headers:{get(){return null;}},json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:'{\"ok\":true}'}]}}]})};
     };
-    const result = await w.callGeminiJSON('Return JSON only.', [], {noRetry:true,noFallback:true});
+    const result = await w.callGeminiJSON('Return JSON only.', [], {noRetry:true,noFallback:true,__legacyTest:true});
     if (!result || result.ok !== true) throw new Error('odpověď se neparsovala');
     if (!seen || !seen.url.includes('/models/gemini-3.6-flash:generateContent')) throw new Error('neočekávaný model/URL');
     if (seen.options?.headers?.['x-goog-api-key'] !== 'FAKE_GEMINI_KEY_12345678901234567890') throw new Error('API klíč není v x-goog-api-key');
@@ -182,9 +183,12 @@ for (const [lang, ids] of [['angličtina', ['fl_practice','fl_homework','fl_grad
   for (const id of ids) check('šablona ' + id, () => { w.eval(`chooseSimpleTemplate('${id}')`); return w.eval('state.testMode+"/"+state.resultMode+"/"+state.feedbackMode'); });
 }
 
-// Test Lab jako admin
+// Test Lab jako admin: lazy feature se v JSDOM nenačte přes dynamický import automaticky.
+const testLabFeature = path.join(path.dirname(target), 'features', 'testlab.js');
+w.eval(fs.readFileSync(testLabFeature, 'utf8'));
 w.eval("Access.profile={role:'admin',userId:'BALAZ',displayName:'Admin',status:'active'};Access.granted=true;");
-const checks = w.tlChecks();
+const checks = w.GHRABGeneratorFeatures?.testLab?.checks?.();
+if (!Array.isArray(checks)) throw new Error('Test Lab QA API není dostupné');
 let pass = 0, fail = 0, expectedWarn = 0, unexpectedWarn = 0;
 for (const c of checks) {
   let r;

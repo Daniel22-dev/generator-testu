@@ -340,6 +340,24 @@ try {
         await page.route("**/AI-Studio-GHRAB/access/access-gate.css", (route) =>
           route.fulfill({ status: 200, contentType: "text/css", body: "" }),
         );
+        await page.route("**/AI-Studio-GHRAB/config/support.json", (route) =>
+          route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ administratorEmail: "balaz@ghrabuvka.cz" }),
+          }),
+        );
+        await page.route("**/AI-Studio-GHRAB/config/apps.generated.json", (route) =>
+          route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify([{
+              id: "generator",
+              version: manifest.appVersion,
+              name: { cs: manifest.appName, en: manifest.appName },
+            }]),
+          }),
+        );
 
         let status = "PASS";
         let message = "";

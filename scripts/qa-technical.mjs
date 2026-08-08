@@ -162,9 +162,13 @@ for (const p of files.filter(
     );
   }
   const text = await readFile(p, "utf8");
-  for (const match of text.matchAll(
+  const generatedBrowserHarness = new Set([
+    "scripts/qa-p5-axe-runtime.mjs",
+    "scripts/qa-p5-runtime.mjs",
+  ]).has(rel);
+  for (const match of (generatedBrowserHarness ? [] : text.matchAll(
     /(?:import\s+(?:[^"']+?\s+from\s+)?|import\()(["'])(\.\.?\/[^"']+)\1/g,
-  )) {
+  ))) {
     if (rel.startsWith("tests/") || rel.startsWith("test/")) continue;
     let target = path.resolve(path.dirname(p), match[2]);
     if (!path.extname(target)) target += ".js";

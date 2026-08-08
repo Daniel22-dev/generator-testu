@@ -752,6 +752,7 @@ function downloadE2EStarter(){
     open: openTestLab,
     runAll: testLabRunAll,
     ping: testLabPingGemini,
+    checks: tlChecks,
     downloadE2EStarter: downloadE2EStarter
   });
 })(window);
