@@ -2,7 +2,7 @@
   "standard": "GHRAB-QA-1.0.2",
   "appId": "generator-testu",
   "appName": "Generátor interaktivních testů",
-  "appVersion": "7.1.12",
+  "appVersion": "7.1.13",
   "entryPoint": "dist/index.html",
   "serveRoot": ".",
   "buildRoot": "dist",
@@ -47,17 +47,17 @@
     {
       "file": "src/js/01-core.js",
       "regex": "version:\\s*['\\\"]([0-9.]+)['\\\"]",
-      "expected": "7.1.12"
+      "expected": "7.1.13"
     },
     {
       "file": "public/sw.js",
       "regex": "ghrab-generator-v([0-9.]+)",
-      "expected": "7.1.12"
+      "expected": "7.1.13"
     },
     {
       "file": "dist/studio-manifest.json",
       "regex": "\"version\"\\s*:\\s*\"([0-9.]+)\"",
-      "expected": "7.1.12"
+      "expected": "7.1.13"
     }
   ],
   "pwaTargets": [

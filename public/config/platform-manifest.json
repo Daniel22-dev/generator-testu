@@ -1,7 +1,7 @@
 {
   "schema": "ghrab-platform-app-integration-v1",
   "appId": "generator",
-  "appVersion": "7.1.12",
+  "appVersion": "7.1.13",
   "contract": "ghrab-platform-v1",
   "requiredPlatformRange": ">=1.0.0 <2.0.0",
   "platformVersion": "1.0.0",
@@ -24,7 +24,7 @@
     ]
   },
   "storagePrefix": "ghrab.generator.",
-  "cacheName": "ghrab-generator-v7.1.12",
+  "cacheName": "ghrab-generator-v7.1.13",
   "capabilities": [
     "artifact-envelope-v1",
     "canonical-branding",

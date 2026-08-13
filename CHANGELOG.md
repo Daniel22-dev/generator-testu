@@ -1,3 +1,10 @@
+## 7.1.13 — sjednocení reportéru (2026-08-13)
+
+- Reportér používá dvoukrokové vytvoření a skutečné stažení diagnostického ZIPu; Gmail je dostupný až po kliknutí na stažení.
+- Rozhraní i e-mail vyžadují ruční přiložení ZIPu a pomocné video je bezpečně skryté uvnitř reportéru i při scrollování.
+- Regresní sada fyzicky ověřuje stažený ZIP, jeho snímky a diagnostiku, jednu instanci reportéru, motivy, mobilní zobrazení a klávesnici.
+- Generování testů ani bezpečný žákovský režim nebyly změněny; PWA cache je `ghrab-generator-v7.1.13`.
+
 ## 7.1.12 — P5 (2026-08-05)
 
 

@@ -17,12 +17,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.12',
+  version: '7.1.13',
   date:    '2026-08-04',
   status:  'production-serverless',
   changes: [
-    'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.12): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
-    'SJEDNOCENÝ REPORTÉR CHYB (7.1.12): Generátor používá právě jednu lokální instanci společného reportéru AI Studia a centrální kopii vypíná přes errorReporter:false. Otevřený dialog živě sleduje body.light, podporuje pět screenshotů, bezpečné zachování nebo úplné smazání konceptu, anonymizovaný ZIP a nativní odkaz do Gmailu. Reportér je v PWA cache a manuál odkazuje na centrální návod.',
+    'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.13): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
+    'SJEDNOCENÝ REPORTÉR CHYB (7.1.13): Generátor používá právě jednu lokální instanci společného reportéru AI Studia a centrální kopii vypíná přes errorReporter:false. Otevřený dialog živě sleduje body.light, podporuje pět screenshotů, bezpečné zachování nebo úplné smazání konceptu, anonymizovaný ZIP a nativní odkaz do Gmailu. Reportér je v PWA cache a manuál odkazuje na centrální návod.',
     'MANUÁL UVNITŘ AI STUDIA (7.1.4): interaktivní manuál je aktualizovaný pro současné funkce a při otevření z aplikace zůstává ve stejném pracovním rámci místo nové karty. Opravná verze zároveň mění PWA cache, aby se změna spolehlivě načetla i ve dříve nainstalované aplikaci.',
     'GHRAB QA CERTIFIKACE (7.1.3): Generátor byl začleněn do jednotné brány GHRAB QA 1.0.1. Zachovány byly jeho podrobné workflow a headless testy; nově se společně ověřuje technická konzistence, bezpečnost, PWA, pairwise kombinace, kritická workflow, skutečný Chromium vzhled a ruční galerie svázaná s otiskem buildu.',
     'CERTIFIKAČNÍ VIZUÁLNÍ OPRAVA (7.1.2): tlačítko Celá obrazovka v bezpečném studentském testu má vlastní plnou řádku a pevné svislé odsazení, takže se už na mobilu ani notebooku nepřekrývá s popiskem jména nebo kódu studenta. Přidána regresní pojistka pro toto rozložení.',
