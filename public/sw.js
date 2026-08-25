@@ -1,6 +1,6 @@
 const GHRAB_SW_CONTRACT='ghrab-service-worker-v1';
 /* GHRAB service-worker contract v1 · update activation is user-controlled. */
-const CACHE_NAME = "ghrab-generator-v7.1.13";
+const CACHE_NAME = "ghrab-generator-v7.1.15";
 const CACHE_PREFIXES = ["ghrab-generator-v", "generator-testu-pwa-v"];
 const CORE_ASSETS = [
   "./",
@@ -12,9 +12,7 @@ const CORE_ASSETS = [
   "./access/error-reporter.js",
   "./access/error-reporter.css",
   "./access/error-reporter-adapter.js",
-  "./config/deployment.json",
-  "./config/deployment.school-server-p0.json",
-  "./config/deployment.school-server.example.json",
+  "./vendor/acorn.js",
   "./manual/",
   "./manual/index.html",
   "./icons/icon-32.png",

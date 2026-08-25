@@ -49,7 +49,7 @@ ESLint má `no-undef: error`. Protože jsou definice rozdělené mezi classic sc
 
 Veřejný `dist/index.html` obsahuje inertní skripty typu `application/ghrab-protected`. Centrální `app-guard.js` AI Studia nejprve ověří podepsaný permit a teprve potom aplikační moduly aktivuje. Generátor už nemá vlastní aktivační kód, místní PIN ani `access-manifest.json`.
 
-Service worker používá pro `/AI-Studio-GHRAB/` strategii `networkFirst`: online je bezpečnostní komponenta vždy čerstvá, offline lze použít poslední známou cache. Důsledek je vědomý: offline zařízení může do nejbližšího připojení pracovat s dříve platným permitem. Po připojení se čerstvý guard a revokace uplatní okamžitě.
+Service worker Generátoru obsluhuje pouze vlastní scope a ukládá jen statický app-shell. Deployment konfiguraci ani centrální `app-guard.js` do běžné cache neukládá. Případný podepsaný offline LKG režim, jeho stáří a revokaci řídí centrální brána AI Studia mimo tento repozitář. Chybějící nebo neplatná konfigurace či oprávnění proto ponechá aplikační skripty inertní a Generátor uzamčený.
 
 ## PWA aktualizace
 

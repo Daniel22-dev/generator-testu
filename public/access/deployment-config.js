@@ -76,30 +76,6 @@ function validate(raw) {
   return raw;
 }
 
-function fallbackConfig() {
-  return {
-    schema: CONFIG_SCHEMA,
-    version: CONFIG_VERSION,
-    environmentId: "github-pages-fallback",
-    profile: "github-pages",
-    studioBaseUrl: DEFAULT_STUDIO_BASE_URL,
-    appBaseUrls: { ...DEFAULT_APP_BASE_URLS },
-    assetBaseUrl: "./",
-    apiBaseUrl: "",
-    allowedOrigins: ["self", "https://daniel22-dev.github.io"],
-    sharedAccessVersion: "p0-fallback",
-    authMode: "signed-permit",
-    aiTransport: "direct-provider",
-    telemetryMode: "local",
-    features: {
-      schoolServerReady: true,
-      allowLocalProviderKeys: true,
-      serverSessionReady: false,
-      schoolGatewayReady: false,
-    },
-  };
-}
-
 function normalise(raw, appId) {
   const originBase = new URL("/", location.href);
   const studioBaseUrl = resolveUrl(
@@ -203,12 +179,13 @@ export async function loadDeploymentConfig({
             );
           }
           return validate(await response.json());
-        } catch (error) {
-          console.warn(
-            "GHRAB deployment konfigurace není dostupná; používám bezpečný GitHub fallback.",
-            error,
+        } catch (cause) {
+          const error = new Error(
+            "Deployment konfigurace není dostupná nebo je neplatná; aplikace zůstává uzamčená.",
+            { cause },
           );
-          return fallbackConfig();
+          error.name = "DeploymentConfigUnavailableError";
+          throw error;
         }
       })(),
     );

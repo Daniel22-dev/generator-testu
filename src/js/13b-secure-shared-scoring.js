@@ -3,16 +3,18 @@
 // Vkládá se do učitelského verifieru i do instant testu, takže neexistuje trojí
 // ručně udržovaná kopie → mizí třída chyb „opravil jsem to v instant, ale ne ve
 // verifieru". Host-specifický rozdíl (CONFIG vs CFG pro španělštinu) se řeší přes
-// __isSpanish(), který si každý host nadefinuje sám PŘED vložením tohoto bloku.
+// Host-specifické hooky se předávají factory funkci. Stejná factory se používá
+// jak v emitovaném testu/verifieru, tak v interních diagnostikách bez eval/new Function.
 // Pozn.: ověřeno Node testem, že tyto funkce dávají identické výsledky jako původní
 // kopie napříč norm/textScore/correctIndex/itemPoint (88/88). correctIndex je vědomě
 // sjednoceno na verifierovou variantu (shoda textu přes norm) + obranná pojistka
 // (bez options → -1); v reálu se volá jen u položek s polem options.
-const SHARED_SCORING_JS = String.raw`
+function createSharedScoringApi(hooks){
+hooks=hooks||{};
+var GRAMMAR_SENSITIVE_TYPES={'error correction':1,'error-tagging':1,'sentence transformation':1,'word formation':1};
 function norm(s){return String(s==null?'':s).toLowerCase().normalize('NFC').replace(/[.!?,;:"'()\[\]{}]/g,' ').replace(/\s+/g,' ').trim();}
 function stripDia(s){return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
 function lev(a,b){if(a===b)return 0;var m=a.length,n=b.length,dp=[];for(var i=0;i<=m;i++){dp[i]=[];for(var j=0;j<=n;j++)dp[i][j]=i===0?j:j===0?i:0;}for(var i=1;i<=m;i++)for(var j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);return dp[m][n];}
-var GRAMMAR_SENSITIVE_TYPES={'error correction':1,'error-tagging':1,'sentence transformation':1,'word formation':1};
 /* Tolerance překlepů (Levenshtein ≤ 1). Řídí ji učitel přepínačem; každý host
    (instant test, secure student, verifier) si PŘED vložením tohoto bloku nadefinuje
    __fuzzyMode() vracející 'off' | 'mild' | 'strict'. Stejný vzor jako __isSpanish().
@@ -28,12 +30,13 @@ var GRAMMAR_SENSITIVE_TYPES={'error correction':1,'error-tagging':1,'sentence tr
    fuzzy přiznala body za zjevně jiné slovo. Od délky 6+ jsou tyto sousedské oblasti
    řídké a shoda na vzdálenost 1 je drtivě překlep, ne jiné slovo. Práh 6 je striktně
    bezpečnější než původní >4 (nikdy nepřijme nic navíc, jen ubere krátká slova). */
-function __fuzzyModeSafe(){try{var m=__fuzzyMode();return (m==='mild'||m==='strict')?m:'off';}catch(_){return 'off';}}
+function __fuzzyModeSafe(){try{var m=typeof hooks.fuzzyMode==='function'?hooks.fuzzyMode():'off';return (m==='mild'||m==='strict')?m:'off';}catch(_){return 'off';}}
 function fuzzyCredit(type){var m=__fuzzyModeSafe();if(m==='off')return 0;if(m==='strict')return 0.5;return GRAMMAR_SENSITIVE_TYPES[type]?0.5:0.85;}
-function __isCzechSafe(){try{return !!__isCzech();}catch(_){return false;}}
-function __csPolicySafe(){try{var p=__csScoringPolicy();return (p&&typeof p==='object')?p:{};}catch(_){return {};}}
+function __isSpanishSafe(){try{return typeof hooks.isSpanish==='function'&&!!hooks.isSpanish();}catch(_){return false;}}
+function __isCzechSafe(){try{return typeof hooks.isCzech==='function'&&!!hooks.isCzech();}catch(_){return false;}}
+function __csPolicySafe(){try{var p=typeof hooks.csScoringPolicy==='function'?hooks.csScoringPolicy():{};return (p&&typeof p==='object')?p:{};}catch(_){return {};}}
 function normForScore(s,type){var p=__csPolicySafe();if(__isCzechSafe()&&p.enabled){var v=String(s==null?'':s).normalize('NFC');if(p.diacritics===false)v=stripDia(v);if(!p.capitalization)v=v.toLowerCase();if(!p.punctuation)v=v.replace(/[.!?,;:"'()\[\]{}„“‚‘–—-]/g,' ');v=v.replace(/\s+/g,' ').trim();return v;}return norm(s);}
-function textScore(given,correct,alts,type){var g=normForScore(given,type);if(!g)return 0;var all=[normForScore(correct,type)].concat((alts||[]).map(function(x){return normForScore(x,type);})).filter(Boolean);if(!all.length)return 0;var isEs=!!__isSpanish(),isCs=__isCzechSafe(),gNo=stripDia(g),best=0,fuzzy=isCs?0:fuzzyCredit(type);for(var i=0;i<all.length;i++){var c=all[i];if(g===c)return 1;if(isEs&&gNo===stripDia(c)){best=Math.max(best,0.5);continue;}if(fuzzy>0&&c.length>=6&&lev(g,c)<=1)best=Math.max(best,fuzzy);}return best;}
+function textScore(given,correct,alts,type){var g=normForScore(given,type);if(!g)return 0;var all=[normForScore(correct,type)].concat((alts||[]).map(function(x){return normForScore(x,type);})).filter(Boolean);if(!all.length)return 0;var isEs=__isSpanishSafe(),isCs=__isCzechSafe(),gNo=stripDia(g),best=0,fuzzy=isCs?0:fuzzyCredit(type);for(var i=0;i<all.length;i++){var c=all[i];if(g===c)return 1;if(isEs&&gNo===stripDia(c)){best=Math.max(best,0.5);continue;}if(fuzzy>0&&c.length>=6&&lev(g,c)<=1)best=Math.max(best,fuzzy);}return best;}
 function indexNorm(s){return (__isCzechSafe()&&__csPolicySafe().enabled)?normForScore(s,'multiple choice'):norm(s);}
 function correctIndex(it){if(!it||!Array.isArray(it.options))return -1;if(typeof it.correct==='number'){if(it.correct<0||it.correct>=it.options.length)return -1;return it.correct;}var c=String(it.correct==null?'':it.correct).trim();if(/^\d+$/.test(c)){var ni=Number(c);return (ni>=0&&ni<it.options.length)?ni:-1;}var byText=it.options.map(String).findIndex(function(x){return indexNorm(x)===indexNorm(c);});if(byText>=0)return byText;if(c.length===1){var letter=c.toUpperCase().charCodeAt(0)-65;if(letter>=0&&it.options[letter]!=null)return letter;}return -1;}
 function accepted(it,fields){var vals=[];fields.forEach(function(k){if(Array.isArray(it[k]))vals=vals.concat(it[k]);else if(it[k]!=null)vals.push(it[k]);});return vals.map(function(x){return String(x);}).filter(Boolean);}
@@ -74,7 +77,29 @@ function transformationChainScore(val,transformations,pts,type){var st=transform
    textScore, tedy stejnou normalizaci jako ostatní textové odpovědi. */
 function errorTaggingStats(val,item,type){var v=(val&&typeof val==='object'&&!Array.isArray(val))?val:{};var gotToken=(v.token!=null)?v.token:((v.tokenIndex!=null)?v.tokenIndex:v.error_token_index);var tokenOk=Number(gotToken)===Number(item&&item.error_token_index);var gotType=(v.etype!=null)?v.etype:((v.errorType!=null)?v.errorType:v.error_type);var typeOk=norm(gotType)===norm(item&&item.error_type);var gotCorr=(v.corr!=null)?v.corr:((v.correction!=null)?v.correction:v.answer);var corrScore=textScore(gotCorr,item&&item.correction,Array.isArray(item&&item.alt_answers)?item.alt_answers:[],type||'error-tagging');return {token:tokenOk?1:0,etype:typeOk?1:0,corr:corrScore,total:3};}
 function errorTaggingScore(val,item,pts,type){var st=errorTaggingStats(val,item,type);return pts*((st.token+st.etype+st.corr)/st.total);}
-`;
+return {norm:norm,stripDia:stripDia,lev:lev,fuzzyCredit:fuzzyCredit,normForScore:normForScore,textScore:textScore,indexNorm:indexNorm,correctIndex:correctIndex,accepted:accepted,itemPoint:itemPoint,scoreBlanks:scoreBlanks,multiSelectStats:multiSelectStats,multiSelectScore:multiSelectScore,orderingStats:orderingStats,orderingScore:orderingScore,highlightEvidenceScore:highlightEvidenceScore,categoryBoardStats:categoryBoardStats,categoryBoardScore:categoryBoardScore,tableCompletionStats:tableCompletionStats,tableCompletionScore:tableCompletionScore,transformationChainStats:transformationChainStats,transformationChainScore:transformationChainScore,errorTaggingStats:errorTaggingStats,errorTaggingScore:errorTaggingScore};
+}
+
+const SHARED_SCORING_EXPORTS=Object.freeze(['norm','stripDia','lev','fuzzyCredit','normForScore','textScore','indexNorm','correctIndex','accepted','itemPoint','scoreBlanks','multiSelectStats','multiSelectScore','orderingStats','orderingScore','highlightEvidenceScore','categoryBoardStats','categoryBoardScore','tableCompletionStats','tableCompletionScore','transformationChainStats','transformationChainScore','errorTaggingStats','errorTaggingScore']);
+const SHARED_SCORING_JS=[
+  'var __ghrabSharedScoringApi=('+createSharedScoringApi.toString()+')({',
+  'isSpanish:function(){try{return !!__isSpanish();}catch(_){return false;}},',
+  'isCzech:function(){try{return !!__isCzech();}catch(_){return false;}},',
+  'csScoringPolicy:function(){try{return __csScoringPolicy();}catch(_){return {};}},',
+  'fuzzyMode:function(){try{return __fuzzyMode();}catch(_){return "off";}}',
+  '});',
+  SHARED_SCORING_EXPORTS.map(function(name){return 'var '+name+'=__ghrabSharedScoringApi.'+name+';';}).join('\n')
+].join('\n');
+
+function createSharedScoringDiagnosticApi(options){
+  options=options||{};
+  return createSharedScoringApi({
+    isSpanish:function(){return !!options.isSpanish;},
+    isCzech:function(){return !!options.isCzech;},
+    csScoringPolicy:function(){return options.csScoringPolicy||{};},
+    fuzzyMode:function(){return options.fuzzyMode||'off';}
+  });
+}
 
 function buildVariantHtmls(cfg,variants){
   const out={};
@@ -87,5 +112,4 @@ function buildVariantHtmls(cfg,variants){
   });
   return out;
 }
-
 

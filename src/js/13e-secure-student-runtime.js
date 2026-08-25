@@ -195,7 +195,7 @@ async function currentStudentHtmlSha256(){
 // 'pbkdf2-v1$' je součástí uložené hodnoty v CFG; tady počítáme stejně a porovnáváme.
 async function deriveSecretHash(kind, secret, testId){
   const norm = (kind==='teacher-pin') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
-  if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) return 'fnv$'+seedHash(kind+'|'+norm+'|'+testId).toString(36);
+  if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) throw new Error('Ověření hesla/PINu vyžaduje moderní prohlížeč s WebCrypto.');
   const enc=new TextEncoder();
   const key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);
   const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(kind+'|'+String(testId)),iterations:120000,hash:'SHA-256'},key,256);
@@ -281,4 +281,3 @@ function downloadAnswers(){if(!ANSWER_TXT)return;const name=($('studentName').va
 async function shareAnswers(){if(!ANSWER_TXT)return;const name=($('studentName').value.trim()||'student').replace(/[^a-z0-9_-]+/gi,'-');const att=(ATTEMPT_ID||'').replace(/[^a-z0-9_-]+/gi,'-');try{if(navigator.share&&typeof File!=='undefined'){const file=new File([ANSWER_TXT],'answers_'+CFG.testId+'_'+name+(att?'_'+att:'')+'.txt',{type:'text/plain'});if(!navigator.canShare||navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'answers.txt'});return;}}}catch(e){}copyAnswers();}
 function copyAnswers(){const ta=$('answerBackup');ta.select();try{navigator.clipboard.writeText(ta.value);}catch(_){document.execCommand('copy');}}
 `;}
-

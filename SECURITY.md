@@ -11,6 +11,7 @@ Generátor běží jako klientská PWA bez školního backendu. Je technicky př
 - odstranění answer key ze secure studentského balíku,
 - hybridní šifrování AES-GCM + RSA-OAEP,
 - fail-closed sestavení při chybě kryptografie,
+- aktivní CSP v aplikaci i manuálu bez `unsafe-eval`,
 - deadline časovače odolné proti throttlingu karty,
 - centrálně podepsaný permit AI Studia,
 - verzovaný PWA cache systém bez automatického reloadu práce,
@@ -29,6 +30,12 @@ Gemini 3.x používá výchozí sampling. Aplikace záměrně nesnižuje `temper
 ## API klíč
 
 Klíč pracuje v prohlížeči a nelze jej chránit stejně jako serverové tajemství. Každý učitel používá vlastní omezený klíč, nesdílí jej, na sdíleném zařízení jej neukládá trvale a při podezření na únik jej okamžitě zneplatní.
+
+## Content Security Policy
+
+GitHub Pages build i interaktivní manuál obsahují aktivní meta CSP. Politika blokuje cizí skripty, pluginové objekty, změnu základní adresy a dynamické vyhodnocování kódu přes `eval`/`new Function`. Syntaktická kontrola generovaných testů používá lokální parser Acorn, takže `unsafe-eval` není potřeba.
+
+Současná single-file architektura stále vyžaduje kompatibilitní výjimku `unsafe-inline` pro inline skripty, styly a HTML handlery. CSP proto není úplnou druhou obranou proti každé DOM XSS; hlavní pojistkou zůstává bezpečné skládání DOM, escapování a sledovaný baseline rizikových sinků. Odstranění `unsafe-inline` je samostatná navazující modularizace.
 
 ## Centrální přístupová brána
 
@@ -57,7 +64,7 @@ Service worker nepoužívá `skipWaiting`; nová verze se aktivuje až po zavře
 
 - Studentský soubor obsahuje veřejný RSA klíč, který slouží jen k šifrování.
 - Verifier obsahuje privátní klíč a správné odpovědi; jeho únik kompromituje konkrétní balík.
-- Selhání `crypto.subtle.generateKey` sestavení zastaví. Neexistuje plaintext fallback.
+- Chybějící WebCrypto nebo selhání `crypto.subtle` zastaví sestavení každého exportovaného testu. Neexistuje plaintext ani tichý FNV fallback.
 - Serverless model neumí prokázat, že student neupravil vlastní soubor nebo nepoužil druhé zařízení. Pro klasifikaci je nutný dozor a provozní pravidla.
 
 ## CSV export

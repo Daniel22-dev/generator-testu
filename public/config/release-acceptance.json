@@ -2,13 +2,13 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.13",
-  "releaseStatus": "pre-production-accepted",
+  "appVersion": "7.1.15",
+  "releaseStatus": "security-candidate-pending-claude-k1",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
     "offlineCapable": true,
-    "currentUseApproved": true
+    "currentUseApproved": false
   },
   "github": {
     "status": "not-yet-uploaded",
@@ -33,11 +33,12 @@
     "screenReaderPilot": "manual-post-upload-checklist"
   },
   "handoff": {
-    "runtimeOnlyPackageIncluded": true,
+    "runtimeOnlyPackageIncluded": false,
+    "sourceCandidateIncluded": true,
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "P5-R2",
+  "revision": "GARP-K1",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,

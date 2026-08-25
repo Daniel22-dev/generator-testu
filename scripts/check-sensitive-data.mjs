@@ -16,6 +16,9 @@ roots.forEach(collect);
 const allowedPublicEmails = new Set(['balaz@ghrabuvka.cz']);
 const rules = [
   {label:'reálný Gemini API klíč', re:/AIza[0-9A-Za-z_-]{30,}/g},
+  {label:'privátní PEM klíč', re:/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----\s+[A-Za-z0-9+/=\r\n]{64,}\s+-----END (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g},
+  {label:'privátní parametr JWK', re:/["']d["']\s*:\s*["'][A-Za-z0-9_-]{16,}["']/g},
+  {label:'GitHub access token', re:/gh[pousr]_[A-Za-z0-9]{30,}/g},
   {label:'e-mailová adresa', re:/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g},
   {label:'české rodné číslo', re:/(?<!\d)(?:\d{2})(?:0[1-9]|1[0-2]|2[1-9]|3[0-2]|5[1-9]|6[0-2]|7[1-9]|8[0-2])(?:0[1-9]|[12]\d|3[01])\/?\d{3,4}(?!\d)/g},
 ];

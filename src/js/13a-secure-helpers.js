@@ -16,10 +16,9 @@ function safeJsonForScript(obj){
 function b64UrlFromBuffer(buf){let bin='';const bytes=new Uint8Array(buf);for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 // ── Tvrdá brána pro ostrý (klasifikovaný) režim ──────────────────────────────
 // Bezpečnostní kryptografie (manifest hash, per-test secret, PIN/heslo, přístupový kód,
-// RSA klíč verifieru) NESMÍ tiše spadnout na slabý fallback (FNV / Math.random). Když
-// WebCrypto chybí, ostrý režim se zastaví s jasnou hláškou. Slabé fallbacky níž zůstávají
-// jen pro neostré/dekorativní použití (instant režim, lokální demo ID), kam se přes tuhle
-// bránu nelze dostat. (Pravidlo: WebCrypto dostupné → pokračuj; nedostupné → stop.)
+// RSA klíč verifieru) NESMÍ tiše spadnout na slabý fallback (FNV / Math.random).
+// Pravidlo platí pro všechny exportované testy včetně instant režimu: bez WebCrypto
+// se generování zastaví s jasnou hláškou.
 function requireWebCrypto(feature){
   if(!(window.crypto && crypto.subtle && crypto.getRandomValues && window.TextEncoder)){
     throw new Error((feature||'Bezpečný režim')+': prohlížeč nemá dostupné WebCrypto (crypto.subtle / getRandomValues). '
@@ -28,9 +27,9 @@ function requireWebCrypto(feature){
       +'náhledu/WebView, kde WebCrypto někdy chybí.');
   }
 }
-async function sha256Text(txt){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return 'fnv-'+shortHash(String(txt||''));const enc=new TextEncoder();const dig=await crypto.subtle.digest('SHA-256',enc.encode(String(txt||'')));return b64UrlFromBuffer(dig);}
+async function sha256Text(txt){requireWebCrypto('Výpočet SHA-256');const enc=new TextEncoder();const dig=await crypto.subtle.digest('SHA-256',enc.encode(String(txt||'')));return b64UrlFromBuffer(dig);}
 function hexFromBuffer(buf){return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
-async function sha256HexText(txt){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return 'fnv-'+shortHash(String(txt||''));const enc=new TextEncoder();const dig=await crypto.subtle.digest('SHA-256',enc.encode(String(txt||'')));return hexFromBuffer(dig);}
+async function sha256HexText(txt){requireWebCrypto('Výpočet SHA-256');const enc=new TextEncoder();const dig=await crypto.subtle.digest('SHA-256',enc.encode(String(txt||'')));return hexFromBuffer(dig);}
 function normalizeStudentIdentity(value){
   const raw=String(value==null?'':value);
   const unicode=(typeof raw.normalize==='function')?raw.normalize('NFKD'):raw;
@@ -70,14 +69,14 @@ async function buildPublicDiffGroups(groups,salt){
   }
   return out;
 }
-async function derivePerTestSecret(master,salt,manifestHash){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return 'fallback-'+shortHash(String(master)+'|'+String(salt)+'|'+String(manifestHash));const enc=new TextEncoder();const key=await crypto.subtle.importKey('raw',enc.encode(String(master||'')),{name:'PBKDF2'},false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode('GIT-v1|'+String(salt)+'|'+String(manifestHash)),iterations:120000,hash:'SHA-256'},key,256);return b64UrlFromBuffer(bits);}
+async function derivePerTestSecret(master,salt,manifestHash){requireWebCrypto('Odvození tajemství testu');const enc=new TextEncoder();const key=await crypto.subtle.importKey('raw',enc.encode(String(master||'')),{name:'PBKDF2'},false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode('GIT-v1|'+String(salt)+'|'+String(manifestHash)),iterations:120000,hash:'SHA-256'},key,256);return b64UrlFromBuffer(bits);}
 // Hash PINu/hesla studentského zámku přes PBKDF2 (pomalé, anti-brute-force). DŘÍV se
 // používal jen jednoprůchodový SHA-256 — ten jde zkoušet stovkami milionů pokusů/s na GPU,
 // takže slabší PIN šel offline uhádnout. Stejná funkce je i v emitovaném studentu/verifieru,
 // aby hash sedl. Prefix 'pbkdf2-v1$' odlišuje formát od starého SHA-256 hashe.
 async function deriveSecretHash(kind, secret, testId){
   const norm = (kind==='teacher-pin') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
-  if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) return 'fnv$'+shortHash(kind+'|'+norm+'|'+testId);
+  requireWebCrypto('Hash hesla/PINu');
   const enc=new TextEncoder();
   const key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);
   const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(kind+'|'+String(testId)),iterations:120000,hash:'SHA-256'},key,256);
@@ -404,4 +403,3 @@ function variantSummary(exercises){
     exCount: exercises.length
   };
 }
-

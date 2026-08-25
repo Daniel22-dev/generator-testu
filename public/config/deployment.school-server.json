@@ -42,23 +42,24 @@
     "aiHealth": "ai/health"
   },
   "features": {
-    "schoolServerReady": true,
+    "schoolServerReady": false,
+    "schoolServerPrepared": true,
     "allowLocalProviderKeys": false,
-    "serverSessionReady": true,
-    "schoolGatewayReady": true,
+    "serverSessionReady": false,
+    "schoolGatewayReady": false,
     "sharedDeviceControls": true,
     "dataDeletion": true,
     "schoolServerConnected": false,
-    "liveServerValidationRequired": false
+    "liveServerValidationRequired": true
   },
   "appId": "generator",
   "appBaseUrl": "/apps/generator-testu/",
   "releaseAcceptance": {
-    "stage": "P5",
-    "primaryMode": "standalone-github-pages",
-    "serverConnection": "prepared-not-connected",
-    "serverRequired": false,
-    "githubUpload": "pending",
+    "stage": "P0-template",
+    "primaryMode": "school-server-template",
+    "serverConnection": "not-connected",
+    "serverRequired": true,
+    "githubUpload": "not-applicable",
     "postUploadValidationRequired": true
   }
 }

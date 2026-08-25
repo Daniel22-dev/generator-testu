@@ -17,10 +17,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.13',
-  date:    '2026-08-04',
+  version: '7.1.15',
+  date:    '2026-08-25',
   status:  'production-serverless',
   changes: [
+    'BEZPEČNOSTNÍ KANDIDÁT GARP K2 (7.1.15): GitHub Pages build i manuál mají aktivní CSP. unsafe-eval není povolen; validace generovaného JavaScriptu používá lokální parser Acorn a diagnostické bodování společnou CSP-safe factory místo new Function. Všechny exporty nyní bez WebCrypto selžou uzamčeně, takže instant režim už nemůže tiše vytvořit slabý FNV hash.',
+    'BEZPEČNOSTNÍ KANDIDÁT GARP K1 (7.1.14): start aplikace nyní selže uzamčeně při chybě konfigurace, nepovolené adrese nebo chybějícím permitu; AI profily jsou pevně oddělené na veřejný direct Gemini a školní same-origin gateway bez automatického fallbacku. Importy a lokálně uložené stavy mají schéma, velikostní limity a ochranu proti prototypovým klíčům; CI Actions jsou připnuté SHA a zranitelné nepřímé závislosti aktualizované.',
     'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.13): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
     'SJEDNOCENÝ REPORTÉR CHYB (7.1.13): Generátor používá právě jednu lokální instanci společného reportéru AI Studia a centrální kopii vypíná přes errorReporter:false. Otevřený dialog živě sleduje body.light, podporuje pět screenshotů, bezpečné zachování nebo úplné smazání konceptu, anonymizovaný ZIP a nativní odkaz do Gmailu. Reportér je v PWA cache a manuál odkazuje na centrální návod.',
     'MANUÁL UVNITŘ AI STUDIA (7.1.4): interaktivní manuál je aktualizovaný pro současné funkce a při otevření z aplikace zůstává ve stejném pracovním rámci místo nové karty. Opravná verze zároveň mění PWA cache, aby se změna spolehlivě načetla i ve dříve nainstalované aplikaci.',
@@ -29,8 +31,6 @@ const RELEASE = Object.freeze({
     'AUDITNÍ OPRAVY (7.1.1): opraven service worker, izolace jeho cache a offline režim, odpočet času nyní vychází z pevného termínu, CI před nasazením spouští kompletní testy, lockfile používá veřejný npm registr, CSV export neutralizuje vzorce, kryptografie selhává bezpečně, plné úložiště je viditelně hlášeno a centrální app-guard se revaliduje ze sítě.',
     'ANONYMNÍ TECHNICKÉ METRIKY VÝSTUPŮ (7.1.3): po skutečném dokončení generování zapisuje Generátor do společného modulu AI Studia jedinou technickou událost test-package. Eviduje pouze počet úspěšných, chybných nebo zrušených generovacích běhů; prompt, téma, otázky, odpovědi ani jiné části testu se neukládají. Manuál je z měření používání výslovně vyloučen.',
     'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
-    'SJEDNOCENÁ IDENTITA ŠKOLY (7.0.7): záhlaví nyní používá stejné oficiální logo a výrazný název GYMNÁZIUM, OSTRAVA-HRABŮVKA jako ostatní nástroje AI Studia. Autorský blok v zápatí byl sjednocen na společný dvouřádkový formát.',
-    'CENTRÁLNÍ PŘÍSTUP AI STUDIO GHRAB (7.0.6): původní lokální aktivační kódy a PIN brána byly nahrazeny kryptograficky podepsaným oprávněním vydávaným v AI Studiu. Generátor se nespustí před ověřením podpisu, platnosti, role, povolení aplikace a revokačního seznamu. Správce aktivuje přístup pouze jednou ve Studiu a stejná relace otevře všechny povolené aplikace; auditní Creator ID a role zůstávají ve výstupech zachované. Přímá adresa bez oprávnění zobrazí jednotnou zamykací obrazovku.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -1249,4 +1249,3 @@ function setAppMode(mode){
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
 }
-

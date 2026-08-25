@@ -7,7 +7,7 @@
     "outerHTML": 5,
     "documentWrite": 2,
     "eval": 0,
-    "newFunction": 12
+    "newFunction": 0
   },
-  "note": "P5 R2 baseline; increases fail. Existing sinks still require review and CSP hardening."
+  "note": "GARP K2 baseline; eval a Function konstruktor jsou ratchetovány na nulu. Existující HTML sinky se nesmí zvýšit a stále vyžadují postupnou revizi."
 }

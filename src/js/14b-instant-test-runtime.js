@@ -342,7 +342,7 @@ function b64Url(buf){var bin='';var bytes=new Uint8Array(buf);for(var i=0;i<byte
 function jsonB64(obj){return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));}
 function hasSubtle(){return !!(window.crypto&&crypto.subtle&&window.TextEncoder);}
 function shortHashClient(str){var h=2166136261;str=String(str||'');for(var i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36);}
-async function deriveSecretHashClient(kind,secret,testId){var norm=(kind==='teacher-pin')?String(secret||'').trim().toUpperCase():String(secret||'').trim();if(!(window.crypto&&crypto.subtle&&window.TextEncoder))return 'fnv$'+shortHashClient(kind+'|'+norm+'|'+testId);var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);var bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(kind+'|'+String(testId)),iterations:120000,hash:'SHA-256'},key,256);return 'pbkdf2-v1$'+b64Url(bits);}
+async function deriveSecretHashClient(kind,secret,testId){var norm=(kind==='teacher-pin')?String(secret||'').trim().toUpperCase():String(secret||'').trim();if(!(window.crypto&&crypto.subtle&&window.TextEncoder))throw new Error('WebCrypto není dostupné — bezpečné ověření hesla/PINu nelze provést.');var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);var bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(kind+'|'+String(testId)),iterations:120000,hash:'SHA-256'},key,256);return 'pbkdf2-v1$'+b64Url(bits);}
 async function secretMatches(raw,prefix,expectedHash){if(!expectedHash)return false;return await deriveSecretHashClient(prefix,raw,CFG.testId)===expectedHash;}
 function verifyKey(){return String(CFG.verifySecret||CFG.testId||'');}
 async function hmac256(payload,tag){var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(verifyKey()),{name:'HMAC',hash:'SHA-256'},false,['sign','verify']);var msg=enc.encode(tag+'|'+payload);var sig=await crypto.subtle.sign('HMAC',key,msg);return b64Url(sig);}
@@ -425,4 +425,3 @@ function lockTap(){LOCK_TAPS++;clearTimeout(LOCK_TAP_TIMER);LOCK_TAP_TIMER=setTi
 async function tryUnlock(){var v=(I('unlockInp').value||'').trim();if(await secretMatches(v,'unlock-password',CFG.hesloHash)){locked=false;hide('lockScreen');hide('unlockReveal');LOCK_TAPS=0;I('unlockInp').value='';recordSecurityEvent('unlock','teacher password');}else{I('unlockInp').style.borderColor='#ef4444';setTimeout(function(){I('unlockInp').style.borderColor='';},800);}}
 `;
 }
-

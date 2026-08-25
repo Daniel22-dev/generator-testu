@@ -41,16 +41,16 @@ function profileFromPermit(p){
 }
 
 var Access = {
-  granted: true,
+  granted: Boolean(centralPermit()),
   profile: profileFromPermit(centralPermit()),
   envKind: accessEnvironment(),
   envOfficial: location.protocol === 'http:' || location.protocol === 'https:',
   manifestSource: 'ai-studio-signed-permit',
   workingManifest: null,
-  blockAllGeneration: false,
+  blockAllGeneration: !centralPermit(),
   warnLevel: 'none'
 };
-Access.blockAllGeneration = Access.envKind === 'unofficialCopy';
+Access.blockAllGeneration = !Access.granted || Access.envKind === 'unofficialCopy';
 Access.warnLevel = Access.envKind === 'unofficialCopy' ? 'block' : (Access.envKind === 'local' ? 'soft' : 'none');
 
 function accIsAdmin(){ return !!(Access.profile && Access.profile.role === 'admin'); }

@@ -49,7 +49,7 @@ if (!appBaseUrl.startsWith("/")) throw new Error("School-server appBaseUrl musí
 for (const manifestPath of files.filter((file) => file.endsWith(`${path.sep}studio-manifest.json`))) {
   const manifest = readJson(manifestPath);
   manifest.deploymentProfile = "school-server";
-  manifest.serverReadyPhase = "P3";
+  manifest.serverReadyPhase = "P0-template";
   manifest.launchUrl = appBaseUrl;
   manifest.manualUrl = `${appBaseUrl}manual/`;
   if (manifest.aiCore?.status === "integrated-p1" || manifest.aiCore?.coreVersion) {
@@ -70,7 +70,7 @@ writeJson(path.join(targetDist, "server-ready-build-info.json"), {
   app: pkg.name,
   appId: deployment.appId,
   version: pkg.version,
-  phase: "P3",
+  phase: "P0-template",
   profile: "school-server",
   builtAt: new Date().toISOString(),
   activeAuthMode: deployment.authMode,
@@ -85,4 +85,4 @@ writeJson(path.join(targetDist, "server-ready-build-info.json"), {
   aiCoreVersion: deployment.aiTransport === "school-gateway" ? "1.0.0" : null,
   contractVersion: deployment.aiTransport === "school-gateway" ? "1" : null,
 });
-console.log(`${pkg.name} ${pkg.version}: dist-school-server/ sestaven jako same-origin P3 school-server profil.`);
+console.log(`${pkg.name} ${pkg.version}: dist-school-server/ sestaven jako fail-closed same-origin P0 template; živý server zatím není potvrzen.`);

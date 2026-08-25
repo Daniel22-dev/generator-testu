@@ -1,9 +1,7 @@
 async function assembleTestHtml(st, genData) {
-  // Ostrý (klasifikovaný) balíček = secureOffline. Veškerá jeho kryptografie (salt, manifest
-  // hash, per-test secret, PIN/heslo, RSA klíč verifieru) se počítá níž; tvrdou bránou hned na
-  // vstupu zajistíme, že nic z toho nespadne na slabý fallback. Instant režim (neostrý) tady
-  // záměrně neblokujeme — používá orientační ověření, kde je fallback přijatelný.
-  if((st.resultMode||'instant')==='secureOffline') requireWebCrypto('Bezpečný offline test');
+  // Všechny exporty obsahují kryptografické hashe integrity a případně hesel/PINů.
+  // Bez WebCrypto proto selžou uzamčeně ještě před sestavením, i v instant režimu.
+  requireWebCrypto((st.resultMode||'instant')==='secureOffline'?'Bezpečný offline test':'Vytvoření interaktivního testu');
   const diffGroups=getApiDiffGroups(st);
   const variants=normalizeAllVariants(st,genData,diffGroups);
   // Randomizace se aplikuje až při startu testu podle studenta/attemptId; všichni tak nemají stejný pořádek.

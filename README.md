@@ -1,6 +1,6 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.13  
+**Aktuální verze:** 7.1.15  
 **Platforma:** GHRAB Platform 1.1.0 · etapa P3
 
 
@@ -8,7 +8,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.13** je technicky ověřená produkční serverless varianta. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
+Verze **7.1.15** je bezpečnostní kandidát produkční serverless varianty. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
 
 Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 
@@ -25,6 +25,7 @@ Katalog AI Studia může současně zobrazovat opatrnější organizační stav 
 - PWA instalace pro počítač a telefon,
 - lokální šablony, historie a export zadání,
 - automatizovaný build, lint, bezpečnostní kontroly, workflow matice a headless regrese.
+- aktivní CSP bez `unsafe-eval`; lokální Acorn parser ověřuje syntaxi generovaných skriptů bez jejich spuštění.
 
 ## Ochrana dat
 
@@ -45,6 +46,7 @@ Katalog AI Studia může současně zobrazovat opatrnější organizační stav 
 - `scripts/build.mjs` – build do lokálního `dist/`.
 - `scripts/check-sw-precache.mjs` – ověřuje, že každá položka PWA precache skutečně existuje v buildu.
 - `scripts/check-lockfile-registry.mjs` – blokuje lockfile s interními registry URL.
+- `scripts/check-csp.mjs` – ověřuje aktivní a synchronní CSP, zákaz `unsafe-eval` a absenci runtime `eval`/`new Function`.
 - `scripts/generate-eslint-globals.mjs` – generuje sdílené globály pro `no-undef` v architektuře classic scriptů.
 - `tools/headless-check.mjs` – funkční regrese v jsdom.
 - `tools/workflow-matrix-check.mjs` – úplná kontrola návazností průvodce a kombinací režimů.
@@ -63,13 +65,14 @@ npm audit --audit-level=high
 1. shodu verze ve čtyřech zdrojích,
 2. veřejný npm registr v lockfile,
 3. produkční a privacy invarianty,
-4. strukturu zdrojů,
-5. obecný sken citlivých údajů,
-6. deadline časovače obou studentských runtime,
-7. ESLint včetně `no-undef`,
-8. produkční build,
-9. konzistenci service-worker precache,
-10. workflow matici 576 režimových kombinací, 38 typů a 703 dvojic typů.
+4. aktivní CSP, zákaz `unsafe-eval` a runtime dynamického vyhodnocování,
+5. strukturu zdrojů,
+6. obecný sken citlivých údajů,
+7. deadline časovače obou studentských runtime,
+8. ESLint včetně `no-undef`,
+9. produkční build,
+10. konzistenci service-worker precache,
+11. workflow matici 576 režimových kombinací, 38 typů a 703 dvojic typů.
 
 `npm run test:headless` skutečně spustí aplikaci po centrálním povolení, ověří fail-closed build, pseudonymizaci promptu, hashovaný roster, Gemini kontrakt, sestavení secureOffline balíku, jednorázové kódy, šablony, PWA soubory a interní Test Lab. Očekávané přeskočení self-testu bez právě vygenerovaného testu je v logu označeno zvlášť; jakýkoli jiný warn test zablokuje.
 
@@ -82,6 +85,7 @@ npm run check:lockfile
 npm run check:precache
 npm run check:timers
 npm run check:production
+npm run check:csp
 npm run check:structure
 npm run check:sensitive
 npm run test:workflow
@@ -119,7 +123,7 @@ Verze musí být shodná v:
 - `public/sw.js`,
 - `public/manifest.webmanifest`.
 
-Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření starých karet, takže rozpracovaná práce není přerušena automatickým reloadem. Centrální soubory pod `/AI-Studio-GHRAB/` používají `networkFirst`: online se vždy ověří čerstvý guard, offline je dostupná poslední známá cache.
+Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření starých karet, takže rozpracovaná práce není přerušena automatickým reloadem. Service worker Generátoru ukládá jen vlastní statický app-shell; deployment konfiguraci ani centrální `app-guard.js` do běžné cache neukládá. Podepsaný offline LKG režim spravuje centrální brána AI Studia. Pokud konfiguraci nebo platné oprávnění nelze ověřit, Generátor zůstane uzamčený.
 
 ## Dokumentace
 
@@ -132,7 +136,7 @@ Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření 
 
 ## Omezení rozsahu
 
-GitHub Pages profil 7.1.13 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
+GitHub Pages profil 7.1.15 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
 
 ## Napojení na AI Studio GHRAB
 

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { webcrypto } from 'node:crypto';
+import * as acorn from 'acorn';
 
 const target = process.argv[2] || 'dist/index.html';
 let html = fs.readFileSync(target, 'utf8');
@@ -13,6 +14,7 @@ const dom = new JSDOM(html, {
   url: 'https://daniel22-dev.github.io/generator-testu/',
   pretendToBeVisual: true,
   beforeParse(w) {
+    w.acorn = acorn;
     if (!w.crypto || !w.crypto.subtle) Object.defineProperty(w, 'crypto', { value: webcrypto });
     w.matchMedia = w.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
     w.scrollTo = () => {};

@@ -372,6 +372,22 @@ function smokeHasExternalDep(text){
   return smokeExtractScripts(t).some(code => { const s=smokeStripCode(code); return /\bfetch\s*\(/.test(s)||/\bXMLHttpRequest\b/.test(s)||/\bimportScripts\s*\(/.test(s)||/\bnavigator\.sendBeacon\s*\(/.test(s); });
 }
 
+// CSP-safe syntaktická kontrola vygenerovaných skriptů. Dřívější Function konstruktor
+// vyžadoval v CSP nebezpečné 'unsafe-eval'. Acorn pouze parsuje zdrojový text a
+// nikdy jej nespouští; validátor tak funguje i při aktivní CSP bez unsafe-eval.
+function parseGeneratedJavascriptSyntax(code){
+  const parser=window.acorn;
+  if(!parser||typeof parser.parse!=='function'){
+    throw new Error('Lokální JavaScript parser Acorn není dostupný; build je neúplný.');
+  }
+  return parser.parse(String(code||''),{
+    ecmaVersion:'latest',
+    sourceType:'script',
+    allowHashBang:true,
+    allowReturnOutsideFunction:true
+  });
+}
+
 function validateGeneratedHtmlSmoke(html) {
   const text = String(html || '');
   const errors = [];
@@ -388,7 +404,7 @@ function validateGeneratedHtmlSmoke(html) {
   text.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, (_, code) => { scripts.push(code); return ''; });
   if (!scripts.length) errors.push('chybí <script> s logikou testu');
   scripts.forEach((code, i) => {
-    try { new Function(code); }
+    try { parseGeneratedJavascriptSyntax(code); }
     catch (e) { errors.push('JavaScript syntax error ve scriptu #' + (i + 1) + ': ' + (e && e.message ? e.message : e)); }
   });
   if (errors.length) throw new Error('Vygenerované HTML neprošlo interním smoke testem:\n- ' + errors.join('\n- '));
@@ -407,7 +423,7 @@ function validateHtmlSyntaxOnly(html, label) {
   const scripts=[];
   text.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi,(_,code)=>{scripts.push(code);return '';});
   if(!scripts.length) errors.push(label+': chybí <script>');
-  scripts.forEach((code,i)=>{try{new Function(code);}catch(e){errors.push(label+': JavaScript syntax error ve scriptu #'+(i+1)+': '+(e&&e.message?e.message:e));}});
+  scripts.forEach((code,i)=>{try{parseGeneratedJavascriptSyntax(code);}catch(e){errors.push(label+': JavaScript syntax error ve scriptu #'+(i+1)+': '+(e&&e.message?e.message:e));}});
   if(errors.length) throw new Error('Secure offline balíček neprošel smoke testem:\n- '+errors.join('\n- '));
   return true;
 }
@@ -941,4 +957,3 @@ function cancelGeneration(){
 
 function setGenMsg(msg) { const el = $('genProgressMsg'); if (el) el.textContent = msg; }
 function setGenErr(msg) { const el = $('genError'); if (el) el.textContent = '❌ ' + msg; setGenUI('error'); }
-

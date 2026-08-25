@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { JSDOM } from 'jsdom';
 import { webcrypto } from 'node:crypto';
+import * as acorn from 'acorn';
 
 const target = process.argv[2] || 'dist/index.html';
 const protectedHtml = fs.readFileSync(target, 'utf8');
@@ -10,7 +11,7 @@ function executableHtml(html = protectedHtml){
   return html
     .replace(/<script type="module" data-ghrab-access-bootstrap>[\s\S]*?<\/script>/, '')
     .replace(/type="application\/ghrab-protected"\s+data-ghrab-protected\s*/g, '')
-    .replace('<body>', '<body><script>window.__GHRAB_STUDIO_ACCESS__={appId:"generator",permit:{sub:"HEADLESS",displayName:"Headless Admin",role:"admin",apps:["*"],iat:1,exp:4102444800,jti:"headless"}};<\/script>');
+    .replace('<body>', '<body><script>window.__GHRAB_STUDIO_ACCESS__={appId:"generator",permit:{sub:"HEADLESS",displayName:"Headless Admin",role:"admin",apps:["*"],iat:1,exp:4102444800,jti:"headless"}};window.__GHRAB_DEPLOYMENT_CONFIG__={profile:"github-pages",authMode:"signed-permit",aiTransport:"direct-gemini",telemetryMode:"local",apiBaseUrl:"",endpoints:{aiGenerate:"ai/generate",aiHealth:"ai/health"},features:{allowLocalProviderKeys:true,serverSessionReady:false,schoolGatewayReady:false,schoolServerConnected:false}};<\/script>');
 }
 const html = executableHtml();
 const dom = new JSDOM(html, {
@@ -18,6 +19,7 @@ const dom = new JSDOM(html, {
   url: 'https://daniel22-dev.github.io/generator-testu/',
   pretendToBeVisual: true,
   beforeParse(w) {
+    w.acorn = acorn;
     if (!w.crypto || !w.crypto.subtle) Object.defineProperty(w, 'crypto', { value: webcrypto });
     w.matchMedia = w.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
     w.scrollTo = () => {};
@@ -97,6 +99,52 @@ check('safeJsonForScript neutralizuje </script>', () => {
   if (out.toLowerCase().includes('</script')) throw new Error('obsahuje literal </script>');
   if (!out.includes('\\u003C')) throw new Error('neočekávaný escape formát');
   return 'OK';
+});
+check('importované a lokálně uložené stavy jsou omezené schématem', () => {
+  const original = w.eval('JSON.stringify(state)');
+  try {
+    w.eval("replaceStateFromUntrusted({jazyk:'angličtina',neznamyKlic:'nesmí projít'})");
+    if (w.eval("Object.hasOwn(state,'neznamyKlic')")) throw new Error('neznámý klíč prošel do stavu');
+    if (w.eval('Object.getPrototypeOf(state) !== Object.prototype')) throw new Error('stav nemá čistý prototyp');
+    let rejected = false;
+    try { w.eval("replaceStateFromUntrusted(JSON.parse('{\"__proto__\":{\"polluted\":true}}'))"); } catch { rejected = true; }
+    if (!rejected) throw new Error('zakázaný prototypový klíč nebyl odmítnut');
+    if (w.eval('({}).polluted === true')) throw new Error('došlo ke znečištění prototypu');
+    return 'allowlist + limity + zákaz prototypových klíčů';
+  } finally {
+    w.eval(`replaceStateFromUntrusted(JSON.parse(${JSON.stringify(original)}))`);
+  }
+});
+check('AI runtime mapuje veřejný a školní profil bez automatického fallbacku', () => {
+  const publicConfig = w.__GHRAB_DEPLOYMENT_CONFIG__;
+  try {
+    const direct = w.genCreateAiRuntimeConfig({models:{balanced:'gemini-balanced',economy:'gemini-economy',quality:'gemini-quality'}});
+    if (direct.ai.defaultMode !== 'direct-gemini' || direct.ai.allowedModes.join(',') !== 'direct-gemini' || direct.ai.automaticFallback !== false) throw new Error('veřejný profil není direct-only');
+    w.__GHRAB_DEPLOYMENT_CONFIG__ = {profile:'school-server',authMode:'server-session',aiTransport:'school-gateway',apiBaseUrl:'https://daniel22-dev.github.io/api/v1/',endpoints:{aiGenerate:'ai/generate',aiHealth:'ai/health'},features:{allowLocalProviderKeys:false,serverSessionReady:true,schoolGatewayReady:true,schoolServerConnected:true}};
+    const school = w.genCreateAiRuntimeConfig();
+    if (school.ai.defaultMode !== 'school-gateway' || school.ai.allowedModes.join(',') !== 'school-gateway' || school.ai.automaticFallback !== false) throw new Error('školní profil není gateway-only');
+    if (new URL(school.ai.gatewayUrl).origin !== w.location.origin) throw new Error('gateway není same-origin');
+    w.__GHRAB_DEPLOYMENT_CONFIG__ = {...publicConfig,authMode:'server-session'};
+    let rejected = false;
+    try { w.genCreateAiRuntimeConfig(); } catch (error) { rejected = error?.code === 'CONFIGURATION_ERROR'; }
+    if (!rejected) throw new Error('hybridní konfigurace nebyla odmítnuta');
+    return 'direct-only / gateway-only / hybrid fail-closed';
+  } finally {
+    w.__GHRAB_DEPLOYMENT_CONFIG__ = publicConfig;
+  }
+});
+check('školní profil odstraní lokální provider klíče', () => {
+  const publicConfig = w.__GHRAB_DEPLOYMENT_CONFIG__;
+  try {
+    w.localStorage.setItem('sestavovac_gemini_key','LOCAL_SECRET');
+    w.sessionStorage.setItem('sestavovac_gemini_key_session','SESSION_SECRET');
+    w.__GHRAB_DEPLOYMENT_CONFIG__ = {profile:'school-server',authMode:'server-session',aiTransport:'school-gateway',apiBaseUrl:'https://daniel22-dev.github.io/api/v1/',features:{allowLocalProviderKeys:false,serverSessionReady:false,schoolGatewayReady:false,schoolServerConnected:false}};
+    w.genApplyServerKeyPolicy();
+    if (w.localStorage.getItem('sestavovac_gemini_key') || w.sessionStorage.getItem('sestavovac_gemini_key_session')) throw new Error('provider klíč zůstal v úložišti');
+    return 'localStorage + sessionStorage vyčištěny';
+  } finally {
+    w.__GHRAB_DEPLOYMENT_CONFIG__ = publicConfig;
+  }
 });
 await checkAsync('Gemini request contract: stabilní model, API key header a validní JSON', async () => {
   const oldFetch = w.fetch;

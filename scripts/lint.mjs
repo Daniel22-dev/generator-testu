@@ -37,7 +37,10 @@ function walk(dir, out = []) {
   return out;
 }
 
-const eslintBin = resolveOptional('eslint/bin/eslint.js');
+const eslintBin = resolveOptional('eslint/bin/eslint.js')
+  || (fs.existsSync(path.join(root, 'node_modules', 'eslint', 'bin', 'eslint.js'))
+    ? path.join(root, 'node_modules', 'eslint', 'bin', 'eslint.js')
+    : null);
 const espree = resolveOptional('espree');
 const globals = resolveOptional('globals');
 

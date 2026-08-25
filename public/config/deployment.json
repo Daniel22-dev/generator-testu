@@ -43,10 +43,11 @@
     "aiHealth": "ai/health"
   },
   "features": {
-    "schoolServerReady": true,
+    "schoolServerReady": false,
+    "schoolServerPrepared": true,
     "allowLocalProviderKeys": true,
-    "serverSessionReady": true,
-    "schoolGatewayReady": true,
+    "serverSessionReady": false,
+    "schoolGatewayReady": false,
     "sharedDeviceControls": true,
     "dataDeletion": true,
     "schoolServerConnected": false,

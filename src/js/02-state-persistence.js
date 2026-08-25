@@ -250,6 +250,67 @@ function getStoredState(){
   // V prohlížeči nikdy neukládáme reálné přílohy, hesla/PINy ani skutečná jména studentů.
   return clean;
 }
+const MAX_ZADANI_IMPORT_BYTES = 512 * 1024;
+const MAX_STORED_STRING_CHARS = 300 * 1024;
+const MAX_STORED_ARRAY_ITEMS = 5000;
+const MAX_STORED_OBJECT_KEYS = 1000;
+const MAX_STORED_NODES = 10000;
+const MAX_STORED_DEPTH = 10;
+const FORBIDDEN_DATA_KEYS = new Set(['__proto__','prototype','constructor']);
+const LOADABLE_STATE_KEYS = new Set([
+  ...Object.keys(DEFAULT),
+  'csModule','csDifficulty','csDifficultyLabel','splitGenerate','manualMode',
+  '__csGenericBackup','__csSplitForced'
+]);
+function cloneSafeStoredValue(value, depth=0, budget={nodes:0}){
+  budget.nodes++;
+  if (budget.nodes > MAX_STORED_NODES) throw new TypeError('Uložená data jsou příliš složitá.');
+  if (depth > MAX_STORED_DEPTH) throw new TypeError('Uložená data jsou příliš hluboce vnořená.');
+  if (value === null || typeof value === 'boolean') return value;
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) throw new TypeError('Uložená data obsahují neplatné číslo.');
+    return value;
+  }
+  if (typeof value === 'string') {
+    if (value.length > MAX_STORED_STRING_CHARS) throw new TypeError('Uložený text překračuje bezpečný limit.');
+    return value;
+  }
+  if (Array.isArray(value)) {
+    if (value.length > MAX_STORED_ARRAY_ITEMS) throw new TypeError('Uložené pole překračuje bezpečný limit.');
+    return value.map(item => cloneSafeStoredValue(item, depth + 1, budget));
+  }
+  if (typeof value !== 'object') throw new TypeError('Uložená data obsahují nepodporovanou hodnotu.');
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== Object.prototype && proto !== null) throw new TypeError('Uložená data nemají bezpečný objektový tvar.');
+  const entries = Object.entries(value);
+  if (entries.length > MAX_STORED_OBJECT_KEYS) throw new TypeError('Uložený objekt překračuje bezpečný limit.');
+  const out = {};
+  for (const [key, item] of entries) {
+    if (FORBIDDEN_DATA_KEYS.has(key)) throw new TypeError('Uložená data obsahují zakázaný klíč.');
+    out[key] = cloneSafeStoredValue(item, depth + 1, budget);
+  }
+  return out;
+}
+function sanitizeStateForLoad(raw){
+  const source = cloneSafeStoredValue(raw);
+  if (!source || Array.isArray(source) || typeof source !== 'object') throw new TypeError('Uložený stav musí být objekt.');
+  const clean = {};
+  for (const [key, value] of Object.entries(source)) if (LOADABLE_STATE_KEYS.has(key)) clean[key] = value;
+  return clean;
+}
+function replaceStateFromUntrusted(raw){
+  state = Object.assign(JSON.parse(JSON.stringify(DEFAULT)), sanitizeStateForLoad(raw));
+  return state;
+}
+function safeDomEntries(raw){
+  const source = cloneSafeStoredValue(raw || {});
+  if (!source || Array.isArray(source) || typeof source !== 'object') throw new TypeError('Uložená pole formuláře musí být objekt.');
+  return DOM_FIELDS.filter(id => Object.hasOwn(source, id)).map(id => {
+    const value = source[id];
+    if (value !== null && !['string','number','boolean'].includes(typeof value)) throw new TypeError('Uložené pole formuláře má neplatný tvar.');
+    return [id, value];
+  });
+}
 function sanitizePromptForStorage(prompt){
   let out = String(prompt || '');
   // Starší i nové názvy polí; historie nikdy nesmí obsahovat odemykací heslo ani učitelský PIN.
@@ -365,7 +426,7 @@ function loadSnapshot() {
     if (!raw) return false;
     const snap = JSON.parse(raw);
     if (!snap?.state) return false;
-    Object.assign(state, snap.state);
+    replaceStateFromUntrusted(snap.state);
     if (!state.urls?.length) state.urls = [''];
     normalizeLoadedState(state);
     if (!state.exerciseConfig) state.exerciseConfig = [];
@@ -383,7 +444,7 @@ function loadSnapshot() {
     maxStep = Math.max(0, Math.min(4, snap.maxStep || snap.currentStep || 0));
     currentStep = Math.max(0, Math.min(4, snap.currentStep || 0)); // 4 = výsledek/generování; smí se obnovit
     if (state.skupiny?.length) groupIdCounter = Math.max(...state.skupiny.map(g => Number(g.id)||0)) + 1;
-    Object.entries(snap.dom || {}).forEach(([id, v]) => setVal(id, v));
+    safeDomEntries(snap.dom).forEach(([id, v]) => setVal(id, v));
     SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
     enforceModeConstraints();
     return true;
@@ -454,7 +515,7 @@ function loadTemplate(id) {
   if (!tpl) return;
   if (tpl.format === 'profile_v1') {
     // Nový selektivní formát — aplikuje jen pedagogický profil, nedotkne se cvičení, času ani jazyka.
-    applyTemplateProfile(tpl.profile);
+    applyTemplateProfile(cloneSafeStoredValue(tpl.profile));
     enforceModeConstraints();
     normalizeLoadedState(state);
     applyVisualState();
@@ -465,7 +526,7 @@ function loadTemplate(id) {
     uiToast('Šablona „' + esc(tpl.name) + '“ aplikována — cvičení, čas a jazyk jsou beze změny.', 'ok', 3500);
   } else {
     // Starý plný formát — zpětná kompatibilita: obnoví vše jako dřív.
-    Object.assign(state, tpl.state);
+    replaceStateFromUntrusted(tpl.state);
     if (!state.urls?.length) state.urls = [''];
     fileObjects = [];
     fileReadPromises = [];
@@ -476,7 +537,7 @@ function loadTemplate(id) {
     if (!state.resultMode) state.resultMode = 'instant';
     normalizeLoadedState(state);
     enforceModeConstraints();
-    Object.entries(tpl.dom || {}).forEach(([k,v]) => setVal(k, v));
+    safeDomEntries(tpl.dom).forEach(([k,v]) => setVal(k, v));
     SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
     maxStep = 0;
     goTo(0);
@@ -520,9 +581,10 @@ async function importZadaniFile(inp){
   const f = inp && inp.files && inp.files[0];
   if (!f){ return; }
   try{
+    if (f.size > MAX_ZADANI_IMPORT_BYTES) throw new Error('Soubor zadání je větší než povolených 512 kB.');
     const raw = await readBlobAsText(f);
     const data = JSON.parse(raw);
-    if (!data || data.__type !== 'generator-testu-zadani' || !data.state){
+    if (!data || data.__type !== 'generator-testu-zadani' || data.formatVersion !== 1 || !data.state){
       uiToast('Tento soubor není exportované zadání generátoru (.json). Zkontroluj, že posíláš správný soubor.', 'warn', 6000);
       return;
     }
@@ -537,7 +599,7 @@ async function importZadaniFile(inp){
   }
 }
 function applyImportedZadani(data){
-  Object.assign(state, data.state || {});
+  replaceStateFromUntrusted(data.state);
   if (!state.urls || !state.urls.length) state.urls = [''];
   fileObjects = [];
   fileReadPromises = [];
@@ -550,7 +612,7 @@ function applyImportedZadani(data){
   if (!state.layout) state.layout = 'tabs';
   normalizeLoadedState(state);
   enforceModeConstraints();
-  Object.entries(data.dom || {}).forEach(([k,v]) => setVal(k, v));
+  safeDomEntries(data.dom).forEach(([k,v]) => setVal(k, v));
   SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
   autoApplyStoredSecurityCode();   // na vlastním zařízení vrať uložený týmový kód
   if (typeof showFileError === 'function') showFileError('');
@@ -687,7 +749,7 @@ async function loadFromHistory(i) {
   }
   const ok = await uiConfirm('Načíst toto nastavení do generátoru? Aktuální rozpracovaný test bude přepsán.', 'Načíst z historie?', true);
   if (!ok) return;
-  Object.assign(state, h.state);
+  replaceStateFromUntrusted(h.state);
   if (!state.urls?.length) state.urls = [''];
   // Historie neukládá přílohy ani hesla/PIN — vyčistíme runtime stav i UI.
   fileObjects = [];
@@ -699,7 +761,7 @@ async function loadFromHistory(i) {
   if (!state.resultMode) state.resultMode = 'instant';
   normalizeLoadedState(state);
   enforceModeConstraints();
-  Object.entries(h.dom || {}).forEach(([k, v]) => setVal(k, v));
+  safeDomEntries(h.dom).forEach(([k, v]) => setVal(k, v));
   SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
   maxStep = 4;            // vše už vyplněné → povol skákání po krocích nahoře
   goTo(1);               // rovnou do úprav (zadání / cvičení)
@@ -707,4 +769,3 @@ async function loadFromHistory(i) {
   validate();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-

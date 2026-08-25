@@ -1,3 +1,20 @@
+## 7.1.15 — bezpečnostní kandidát GARP K2 (2026-08-25)
+
+- Aktivní meta CSP v aplikaci i interaktivním manuálu; statický profil nyní odpovídá skutečně nasazené politice.
+- `unsafe-eval` není povolen. `new Function` byl odstraněn z validátoru generovaných testů, Test Labu i modulu Český jazyk.
+- Syntaxi generovaných skriptů kontroluje lokální Acorn 8.17.0, který build přibalí jako same-origin PWA asset.
+- Sdílené bodování používá jednu factory pro emitovaný kód i interní diagnostiku, takže CSP-safe testy neudržují druhou kopii algoritmů.
+- Chybějící WebCrypto zastaví každý export včetně instant režimu; tiché FNV/fallback hashe byly odstraněny také z vložených studentských runtime.
+- Přidána automatická CSP brána, kontrola shody meta politiky s nasazovací konfigurací a AST zákaz runtime `eval`/`new Function`; P5 baseline je pro obě konstrukce ratchetován na nulu.
+
+## 7.1.14 — bezpečnostní kandidát GARP K1 (2026-08-25)
+
+- Fail-closed bootstrap: bez platné deployment konfigurace, povolené adresy a skutečného permitu se chráněné skripty neodemknou.
+- Opravena vazba na GHRAB AI Core: veřejný profil je pouze `direct-gemini`, školní profil pouze same-origin `school-gateway`, bez automatického fallbacku; nepřipojený školní server zůstává blokovaný.
+- Import zadání, snapshoty, staré šablony a historie procházejí allowlistem, limity a ochranou proti prototypovým klíčům.
+- Deployment konfigurace se neukládá do běžné service-worker cache; dokumentace přesně odděluje lokální app-shell a centrální podepsaný LKG režim.
+- GitHub Actions jsou připnuté plným commit SHA, zranitelné nepřímé závislosti jsou aktualizované a plný ESLint je skutečně aktivní.
+
 ## 7.1.13 — sjednocení reportéru (2026-08-13)
 
 - Reportér používá dvoukrokové vytvoření a skutečné stažení diagnostického ZIPu; Gmail je dostupný až po kliknutí na stažení.

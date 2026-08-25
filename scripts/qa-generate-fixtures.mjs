@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { JSDOM } from "jsdom";
 import { webcrypto } from "node:crypto";
+import * as acorn from "acorn";
 
 const source = fs.readFileSync("dist/index.html", "utf8");
 const executable = source
@@ -20,6 +21,7 @@ const dom = new JSDOM(executable, {
   url: "https://qa.local/generator-testu/",
   pretendToBeVisual: true,
   beforeParse(w) {
+    w.acorn = acorn;
     if (!w.crypto || !w.crypto.subtle)
       Object.defineProperty(w, "crypto", { value: webcrypto });
     w.matchMedia =

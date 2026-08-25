@@ -38,6 +38,10 @@ function tlFixtureGeneratedHtml(){
     + '<script>function buildVerify(){return true;}function buildReportSeal(){return "ok";}function parseVerifyText(t){return {text:t};}function doTeacherLogin(){return true;}function closeTeacherModal(){return true;}<\/script>'
     + '</body></html>';
 }
+function tlScoringApi(options){
+  if(typeof createSharedScoringDiagnosticApi!=='function') throw new Error('CSP-safe scoring factory není dostupná.');
+  return createSharedScoringDiagnosticApi(options||{});
+}
 function tlChecks(){
   return [
     { name:'Admin gate', run:function(){
@@ -166,8 +170,8 @@ function tlChecks(){
       // 1) Načti SKUTEČNOU multiSelectScore přímo ze sdíleného bodovacího zdroje (stejný kód, jaký se vkládá do studenta i verifieru).
       if (typeof SHARED_SCORING_JS !== 'string' || SHARED_SCORING_JS.indexOf('function multiSelectScore') < 0) return tlFail('Multi-select bodování', 'SHARED_SCORING_JS neobsahuje multiSelectScore — sdílené bodování typu chybí.');
       var ms;
-      try { ms = (new Function(SHARED_SCORING_JS + '\nreturn multiSelectScore;'))(); }
-      catch (e) { return tlFail('Multi-select bodování', 'multiSelectScore nejde načíst ze SHARED_SCORING_JS.', e && e.message ? e.message : String(e)); }
+      try { ms = tlScoringApi().multiSelectScore; }
+      catch (e) { return tlFail('Multi-select bodování', 'multiSelectScore nejde načíst z CSP-safe scoring factory.', e && e.message ? e.message : String(e)); }
       if (typeof ms !== 'function') return tlFail('Multi-select bodování', 'multiSelectScore není funkce.');
       // 2) Přísné bodování: 4 scénáře proti správné množině [0,2,3], pts=3.
       var cor=[0,2,3], P=3;
@@ -199,8 +203,8 @@ function tlChecks(){
     { name:'Ordering bodování', run:function(){
       if (typeof SHARED_SCORING_JS !== 'string' || SHARED_SCORING_JS.indexOf('function orderingScore') < 0) return tlFail('Ordering bodování', 'SHARED_SCORING_JS neobsahuje orderingScore — sdílené bodování typu chybí.');
       var os;
-      try { os = (new Function(SHARED_SCORING_JS + '\nreturn orderingScore;'))(); }
-      catch (e) { return tlFail('Ordering bodování', 'orderingScore nejde načíst ze SHARED_SCORING_JS.', e && e.message ? e.message : String(e)); }
+      try { os = tlScoringApi().orderingScore; }
+      catch (e) { return tlFail('Ordering bodování', 'orderingScore nejde načíst z CSP-safe scoring factory.', e && e.message ? e.message : String(e)); }
       if (typeof os !== 'function') return tlFail('Ordering bodování', 'orderingScore není funkce.');
       var co=[1,3,0,2], P=2;
       var cases=[
@@ -233,7 +237,7 @@ function tlChecks(){
     { name:'Table-completion bodování', run:function(){
       if (typeof SHARED_SCORING_JS !== 'string' || SHARED_SCORING_JS.indexOf('function tableCompletionScore') < 0) return tlFail('Table-completion bodování', 'SHARED_SCORING_JS neobsahuje tableCompletionScore.');
       var tc;
-      try { tc = (new Function('function __isSpanish(){return false;}function __fuzzyMode(){return "off";}\n' + SHARED_SCORING_JS + '\nreturn tableCompletionScore;'))(); }
+      try { tc = tlScoringApi({isSpanish:false,fuzzyMode:'off'}).tableCompletionScore; }
       catch (e) { return tlFail('Table-completion bodování', 'tableCompletionScore nejde načíst.', e && e.message ? e.message : String(e)); }
       if (typeof tc !== 'function') return tlFail('Table-completion bodování', 'tableCompletionScore není funkce.');
       var rows=[['go','went',{answer:'gone',alt_answers:['been gone']}],['see',{answer:'saw',alt_answers:[]},'seen'],['write','wrote',{answer:'written',alt_answers:[]}]], P=3;
@@ -268,7 +272,7 @@ function tlChecks(){
         {instruction:'Make it a question.',answer:'Does she go to school by bus?',alt_answers:[]},
         {instruction:'Change it into the past simple.',answer:'She went to school by bus.',alt_answers:[]}
       ];
-      try { tc = (new Function('function __isSpanish(){return false;}function __fuzzyMode(){return "off";}\n' + SHARED_SCORING_JS + '\nreturn transformationChainScore;'))(); }
+      try { tc = tlScoringApi({isSpanish:false,fuzzyMode:'off'}).transformationChainScore; }
       catch (e) { return tlFail('Transformation-chain bodování', 'transformationChainScore nejde načíst.', e && e.message ? e.message : String(e)); }
       if (typeof tc !== 'function') return tlFail('Transformation-chain bodování', 'transformationChainScore není funkce.');
       var allOk=tc(['She does not go to school by bus.','Does she go to school by bus?','She went to school by bus.'],trs,P,'transformation-chain');
@@ -297,7 +301,7 @@ function tlChecks(){
     { name:'Highlight-evidence bodování', run:function(){
       if (typeof SHARED_SCORING_JS !== 'string' || SHARED_SCORING_JS.indexOf('function highlightEvidenceScore') < 0) return tlFail('Highlight-evidence bodování', 'SHARED_SCORING_JS neobsahuje highlightEvidenceScore.');
       var he;
-      try { he = (new Function(SHARED_SCORING_JS + '\nreturn highlightEvidenceScore;'))(); }
+      try { he = tlScoringApi().highlightEvidenceScore; }
       catch (e) { return tlFail('Highlight-evidence bodování', 'highlightEvidenceScore nejde načíst.', e && e.message ? e.message : String(e)); }
       if (typeof he !== 'function') return tlFail('Highlight-evidence bodování', 'highlightEvidenceScore není funkce.');
       var P=2;
@@ -323,7 +327,7 @@ function tlChecks(){
     { name:'Error-tagging bodování', run:function(){
       if (typeof SHARED_SCORING_JS !== 'string' || SHARED_SCORING_JS.indexOf('function errorTaggingScore') < 0) return tlFail('Error-tagging bodování', 'SHARED_SCORING_JS neobsahuje errorTaggingScore.');
       var et,item={sentence:'She go to school every day.',tokens:['She','go','to','school','every','day.'],error_token_index:1,error_type:'verb form',error_type_options:['word order','verb form','spelling','article'],correction:'goes'},P=3;
-      try { et = (new Function('function __isSpanish(){return false;}function __fuzzyMode(){return "off";}\n' + SHARED_SCORING_JS + '\nreturn errorTaggingScore;'))(); }
+      try { et = tlScoringApi({isSpanish:false,fuzzyMode:'off'}).errorTaggingScore; }
       catch (e) { return tlFail('Error-tagging bodování', 'errorTaggingScore nejde načíst.', e && e.message ? e.message : String(e)); }
       if (typeof et !== 'function') return tlFail('Error-tagging bodování', 'errorTaggingScore není funkce.');
       var allOk=et({token:1,etype:'verb form',corr:'goes'},item,P,'error-tagging');
@@ -354,7 +358,7 @@ function tlChecks(){
     { name:'Categorisation-board bodování', run:function(){
       if (typeof SHARED_SCORING_JS !== 'string' || SHARED_SCORING_JS.indexOf('function categoryBoardScore') < 0) return tlFail('Categorisation-board bodování', 'SHARED_SCORING_JS neobsahuje categoryBoardScore.');
       var cb;
-      try { cb = (new Function(SHARED_SCORING_JS + '\nreturn categoryBoardScore;'))(); }
+      try { cb = tlScoringApi().categoryBoardScore; }
       catch (e) { return tlFail('Categorisation-board bodování', 'categoryBoardScore nejde načíst.', e && e.message ? e.message : String(e)); }
       if (typeof cb !== 'function') return tlFail('Categorisation-board bodování', 'categoryBoardScore není funkce.');
       var entries=[{text:'a',category:'X'},{text:'b',category:'Y'},{text:'c',category:'X'},{text:'d',category:'Y'}], P=4;

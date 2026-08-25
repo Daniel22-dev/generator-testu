@@ -29,21 +29,22 @@
   "targetTelemetryMode": "server",
   "requiresPhase": "P1",
   "features": {
-    "schoolServerReady": true,
+    "schoolServerReady": false,
+    "schoolServerPrepared": true,
     "allowLocalProviderKeys": true,
     "serverSessionReady": false,
     "schoolGatewayReady": false,
     "schoolServerConnected": false,
-    "liveServerValidationRequired": false
+    "liveServerValidationRequired": true
   },
   "appId": "generator",
   "appBaseUrl": "/apps/generator-testu/",
   "releaseAcceptance": {
-    "stage": "P5",
-    "primaryMode": "standalone-github-pages",
-    "serverConnection": "prepared-not-connected",
-    "serverRequired": false,
-    "githubUpload": "pending",
+    "stage": "P0-template",
+    "primaryMode": "school-server-template",
+    "serverConnection": "not-connected",
+    "serverRequired": true,
+    "githubUpload": "not-applicable",
     "postUploadValidationRequired": true
   }
 }

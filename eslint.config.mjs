@@ -12,7 +12,12 @@ export default [
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'script',
-      globals: { ...globals.browser, ...projectGlobals },
+      globals: {
+        ...globals.browser,
+        ...projectGlobals,
+        enDeterministicAlts: 'writable',
+        enBuildPrompt: 'writable',
+      },
     },
     rules: {
       'no-dupe-args': 'error',
@@ -20,11 +25,21 @@ export default [
       'no-duplicate-case': 'error',
       'no-unreachable': 'error',
       'no-unsafe-finally': 'error',
+      'no-eval': 'error',
+      'no-new-func': 'error',
       'no-redeclare': 'off',
       'no-unused-vars': 'off',
       'no-undef': 'error',
       'no-empty': ['warn', { allowEmptyCatch: true }],
       'no-console': 'off',
+    },
+  },
+  {
+    files: ['public/access/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: { ...globals.browser },
     },
   },
   {
