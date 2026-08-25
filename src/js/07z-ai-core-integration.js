@@ -1,5 +1,5 @@
 /* ===================== GHRAB AI CORE 1.0.0 · GENERÁTOR P1 ===================== */
-const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.15'});
+const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.16'});
 const GEN_AI_SCHEMA_ID='generator.object.v1';
 const GEN_AI_SCHEMAS=Object.freeze({[GEN_AI_SCHEMA_ID]:{type:'object',additionalProperties:true}});
 const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN_AI_APP.id,operations:Object.freeze({

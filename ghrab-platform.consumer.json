@@ -2,7 +2,7 @@
   "schema": "ghrab-platform-consumer-v1",
   "appId": "generator",
   "appName": "Generátor interaktivních testů",
-  "appVersion": "7.1.15",
+  "appVersion": "7.1.16",
   "platform": {
     "version": "1.1.0",
     "contract": "ghrab-platform-v1",
@@ -99,7 +99,7 @@
     ]
   },
   "cache": {
-    "name": "ghrab-generator-v7.1.15",
+    "name": "ghrab-generator-v7.1.16",
     "updateMessage": "GHRAB_SKIP_WAITING"
   },
   "html": {
@@ -115,7 +115,7 @@
     "moduleContract": "ghrab-lazy-modules-v1",
     "requireBudget": true,
     "performanceBudget": {
-      "distBytes": 2200000,
+      "distBytes": 2450000,
       "entryHtmlBytes": 1460000,
       "entryCriticalBytes": 1640000,
       "largestInlineScriptBytes": 170000,

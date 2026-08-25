@@ -60,10 +60,11 @@ for(const [label,policy] of [['aplikace',shellCsp],['manuál',manualCsp],['stati
   }
 }
 if(shell.indexOf('http-equiv="Content-Security-Policy"')>shell.indexOf('<script'))fail('Meta CSP musí být před prvním skriptem.');
-if(!/src=["']\.\/vendor\/acorn\.js["']/.test(shell))fail('Shell nenačítá lokální Acorn parser.');
-if(!sw.includes('"./vendor/acorn.js"'))fail('Acorn parser není v PWA precache.');
+if(/src=["']\.\/vendor\/acorn\.js["']/.test(shell))fail('Acorn parser se nesmí načítat při startu aplikace.');
+if(sw.includes('"./vendor/acorn.js"'))fail('Acorn parser nesmí zvětšovat povinnou PWA precache.');
 if(!build.includes("node_modules','acorn")||!build.includes("'vendor','acorn.js'"))fail('Build nekopíruje lokální Acorn parser do dist.');
-if(!/function\s+parseGeneratedJavascriptSyntax\s*\(/.test(gemini)||!/parser\.parse\(/.test(gemini))fail('Smoke validátor nepoužívá CSP-safe parser.');
+if(!/function\s+ensureJavascriptParser\s*\(/.test(gemini)||!/["']\.\/vendor\/acorn\.js["']/.test(gemini))fail('Smoke validátor nemá lokální lazy loader Acorn parseru.');
+if(!/async\s+function\s+parseGeneratedJavascriptSyntax\s*\(/.test(gemini)||!/parser\.parse\(/.test(gemini))fail('Smoke validátor nepoužívá asynchronní CSP-safe parser.');
 
 for(const file of collectJs('src')){
   try{walk(parse(read(file),{ecmaVersion:'latest',sourceType:'script',allowHashBang:true}),file);}
@@ -74,5 +75,5 @@ for(const file of collectJs('public')){
   catch(error){fail(`${file}: zdroj nelze analyzovat pro CSP (${error.message}).`);}
 }
 
-if(!failed)pass('Aktivní CSP je synchronní, bez unsafe-eval a runtime neobsahuje eval/new Function.');
+if(!failed)pass('Aktivní CSP je synchronní, bez unsafe-eval; Acorn je lazy a runtime neobsahuje eval/new Function.');
 process.exit(failed?1:0);

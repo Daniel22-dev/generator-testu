@@ -372,14 +372,30 @@ function smokeHasExternalDep(text){
   return smokeExtractScripts(t).some(code => { const s=smokeStripCode(code); return /\bfetch\s*\(/.test(s)||/\bXMLHttpRequest\b/.test(s)||/\bimportScripts\s*\(/.test(s)||/\bnavigator\.sendBeacon\s*\(/.test(s); });
 }
 
-// CSP-safe syntaktická kontrola vygenerovaných skriptů. Dřívější Function konstruktor
-// vyžadoval v CSP nebezpečné 'unsafe-eval'. Acorn pouze parsuje zdrojový text a
-// nikdy jej nespouští; validátor tak funguje i při aktivní CSP bez unsafe-eval.
-function parseGeneratedJavascriptSyntax(code){
-  const parser=window.acorn;
-  if(!parser||typeof parser.parse!=='function'){
-    throw new Error('Lokální JavaScript parser Acorn není dostupný; build je neúplný.');
-  }
+// CSP-safe syntaktická kontrola vygenerovaných skriptů. Parser je větší pomocný
+// asset, proto se načte až při prvním sestavení/ověření testu. Nezvětšuje start
+// aplikace ani povinnou PWA precache; service worker jej po prvním online použití
+// uloží běžnou cache-first strategií. Zdroj pouze parsuje, nikdy se nespouští.
+let javascriptParserPromise=null;
+function ensureJavascriptParser(){
+  if(window.acorn&&typeof window.acorn.parse==='function')return Promise.resolve(window.acorn);
+  if(javascriptParserPromise)return javascriptParserPromise;
+  javascriptParserPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='./vendor/acorn.js';
+    script.async=true;
+    script.dataset.ghrabAcornParser='lazy';
+    script.onload=()=>{
+      if(window.acorn&&typeof window.acorn.parse==='function')resolve(window.acorn);
+      else{script.remove();reject(new Error('Lokální parser Acorn se načetl bez očekávaného API.'));}
+    };
+    script.onerror=()=>{script.remove();reject(new Error('Lokální parser Acorn se nepodařilo načíst. Připoj se k internetu a zkus test sestavit znovu.'));};
+    document.head.appendChild(script);
+  }).catch(error=>{javascriptParserPromise=null;throw error;});
+  return javascriptParserPromise;
+}
+async function parseGeneratedJavascriptSyntax(code){
+  const parser=await ensureJavascriptParser();
   return parser.parse(String(code||''),{
     ecmaVersion:'latest',
     sourceType:'script',
@@ -388,7 +404,7 @@ function parseGeneratedJavascriptSyntax(code){
   });
 }
 
-function validateGeneratedHtmlSmoke(html) {
+async function validateGeneratedHtmlSmoke(html) {
   const text = String(html || '');
   const errors = [];
   if (!/^<!DOCTYPE html>/i.test(text.trim())) errors.push('chybí <!DOCTYPE html>');
@@ -403,15 +419,16 @@ function validateGeneratedHtmlSmoke(html) {
   const scripts = [];
   text.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, (_, code) => { scripts.push(code); return ''; });
   if (!scripts.length) errors.push('chybí <script> s logikou testu');
-  scripts.forEach((code, i) => {
-    try { parseGeneratedJavascriptSyntax(code); }
+  for(let i=0;i<scripts.length;i++){
+    const code=scripts[i];
+    try { await parseGeneratedJavascriptSyntax(code); }
     catch (e) { errors.push('JavaScript syntax error ve scriptu #' + (i + 1) + ': ' + (e && e.message ? e.message : e)); }
-  });
+  }
   if (errors.length) throw new Error('Vygenerované HTML neprošlo interním smoke testem:\n- ' + errors.join('\n- '));
   return true;
 }
 
-function validateHtmlSyntaxOnly(html, label) {
+async function validateHtmlSyntaxOnly(html, label) {
   const errors=[];
   const text=String(html||'');
   if(!/^<!DOCTYPE html>/i.test(text.trim())) errors.push(label+': chybí <!DOCTYPE html>');
@@ -423,7 +440,7 @@ function validateHtmlSyntaxOnly(html, label) {
   const scripts=[];
   text.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi,(_,code)=>{scripts.push(code);return '';});
   if(!scripts.length) errors.push(label+': chybí <script>');
-  scripts.forEach((code,i)=>{try{parseGeneratedJavascriptSyntax(code);}catch(e){errors.push(label+': JavaScript syntax error ve scriptu #'+(i+1)+': '+(e&&e.message?e.message:e));}});
+  for(let i=0;i<scripts.length;i++){try{await parseGeneratedJavascriptSyntax(scripts[i]);}catch(e){errors.push(label+': JavaScript syntax error ve scriptu #'+(i+1)+': '+(e&&e.message?e.message:e));}}
   if(errors.length) throw new Error('Secure offline balíček neprošel smoke testem:\n- '+errors.join('\n- '));
   return true;
 }
@@ -464,7 +481,7 @@ function assertNoStudentAnswerKeys(obj, path='STUDENT_VARIANTS') {
     });
   }
 }
-function validateSecurePackageSmoke(pkg) {
+async function validateSecurePackageSmoke(pkg) {
   if(!pkg || pkg.mode !== 'secureOffline') throw new Error('Chybí bezpečný offline balíček.');
   if(!pkg.studentHtml || !pkg.teacherHtml) throw new Error('Secure offline režim musí obsahovat studentHtml i teacherHtml.');
 
@@ -496,8 +513,8 @@ function validateSecurePackageSmoke(pkg) {
   if(!/<html\s+lang=["']cs["']/.test(pkg.teacherHtml) || !/Učitelský verifier/.test(pkg.teacherHtml)) {
     throw new Error('Učitelský verifier musí zůstat česky bez ohledu na jazyk studentského testu.');
   }
-  validateHtmlSyntaxOnly(pkg.studentHtml,'studentský test');
-  validateHtmlSyntaxOnly(pkg.teacherHtml,'učitelský verifier');
+  await validateHtmlSyntaxOnly(pkg.studentHtml,'studentský test');
+  await validateHtmlSyntaxOnly(pkg.teacherHtml,'učitelský verifier');
   return true;
 }
 

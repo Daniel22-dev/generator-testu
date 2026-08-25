@@ -1,6 +1,6 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.15  
+**Aktuální verze:** 7.1.16  
 **Platforma:** GHRAB Platform 1.1.0 · etapa P3
 
 
@@ -8,7 +8,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.15** je bezpečnostní kandidát produkční serverless varianty. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
+Verze **7.1.16** je bezpečnostní kandidát produkční serverless varianty. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
 
 Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 
@@ -25,7 +25,7 @@ Katalog AI Studia může současně zobrazovat opatrnější organizační stav 
 - PWA instalace pro počítač a telefon,
 - lokální šablony, historie a export zadání,
 - automatizovaný build, lint, bezpečnostní kontroly, workflow matice a headless regrese.
-- aktivní CSP bez `unsafe-eval`; lokální Acorn parser ověřuje syntaxi generovaných skriptů bez jejich spuštění.
+- aktivní CSP bez `unsafe-eval`; lokální Acorn parser se načte až při prvním sestavení testu a ověří syntaxi generovaných skriptů bez jejich spuštění.
 
 ## Ochrana dat
 
@@ -136,7 +136,7 @@ Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření 
 
 ## Omezení rozsahu
 
-GitHub Pages profil 7.1.15 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
+GitHub Pages profil 7.1.16 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
 
 ## Napojení na AI Studio GHRAB
 

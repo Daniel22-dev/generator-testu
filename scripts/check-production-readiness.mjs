@@ -74,8 +74,10 @@ requireText(shell, /data-ghrab-access=['"]checking['"]/, 'HTML neni fail-closed 
 requireText(shell, /http-equiv=['"]Content-Security-Policy['"]/, 'Aplikace nema aktivni meta CSP pro GitHub Pages.');
 requireText(read('public/manual/index.html'), /http-equiv=['"]Content-Security-Policy['"]/, 'Interaktivni manual nema aktivni meta CSP.');
 if (/['"]unsafe-eval['"]/.test(securityHeaders.staticProfile?.contentSecurityPolicy || '')) fail('Staticky CSP profil nesmi povolit unsafe-eval.');
-requireText(gemini, /function\s+parseGeneratedJavascriptSyntax\s*\([\s\S]*?parser\.parse\(/, 'Syntakticka kontrola generovaneho HTML nepouziva CSP-safe parser.');
-requireText(shell, /\.\/vendor\/acorn\.js/, 'Aplikace nenacita lokalni CSP-safe JavaScript parser.');
+requireText(gemini, /function\s+ensureJavascriptParser\s*\([\s\S]*?\.\/vendor\/acorn\.js/, 'Syntakticka kontrola nema lazy loader lokalniho Acorn parseru.');
+requireText(gemini, /async\s+function\s+parseGeneratedJavascriptSyntax\s*\([\s\S]*?await\s+ensureJavascriptParser\([\s\S]*?parser\.parse\(/, 'Syntakticka kontrola generovaneho HTML nepouziva CSP-safe parser.');
+forbidText(shell, /src=['"]\.\/vendor\/acorn\.js['"]/, 'Acorn parser se zbytecne nacita pri startu aplikace.');
+forbidText(serviceWorker, /['"]\.\/vendor\/acorn\.js['"]/, 'Acorn parser zbytecne zvetsuje povinnou PWA precache.');
 forbidText(secureHelpers, /return\s+['"](?:fnv-|fallback-)/, 'Bezpecnostni helper stale muze tise vratit slaby kryptograficky fallback.');
 forbidText(instantRuntime, /return\s+['"]fnv\$/, 'Instant runtime stale muze tise vratit slaby hash hesla/PINu.');
 forbidText(secureStudentRuntime, /return\s+['"]fnv\$/, 'Secure student runtime stale muze tise vratit slaby hash hesla/PINu.');

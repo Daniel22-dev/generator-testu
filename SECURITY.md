@@ -33,7 +33,7 @@ Klíč pracuje v prohlížeči a nelze jej chránit stejně jako serverové taje
 
 ## Content Security Policy
 
-GitHub Pages build i interaktivní manuál obsahují aktivní meta CSP. Politika blokuje cizí skripty, pluginové objekty, změnu základní adresy a dynamické vyhodnocování kódu přes `eval`/`new Function`. Syntaktická kontrola generovaných testů používá lokální parser Acorn, takže `unsafe-eval` není potřeba.
+GitHub Pages build i interaktivní manuál obsahují aktivní meta CSP. Politika blokuje cizí skripty, pluginové objekty, změnu základní adresy a dynamické vyhodnocování kódu přes `eval`/`new Function`. Syntaktická kontrola generovaných testů používá lokální parser Acorn, takže `unsafe-eval` není potřeba. Parser se načítá až při prvním sestavení či ověření testu; není součástí kritického startu ani povinné PWA precache a service worker jej po prvním online použití uloží běžnou runtime cache.
 
 Současná single-file architektura stále vyžaduje kompatibilitní výjimku `unsafe-inline` pro inline skripty, styly a HTML handlery. CSP proto není úplnou druhou obranou proti každé DOM XSS; hlavní pojistkou zůstává bezpečné skládání DOM, escapování a sledovaný baseline rizikových sinků. Odstranění `unsafe-inline` je samostatná navazující modularizace.
 

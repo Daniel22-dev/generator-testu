@@ -17,10 +17,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.15',
+  version: '7.1.16',
   date:    '2026-08-25',
   status:  'production-serverless',
   changes: [
+    'OPRAVA P5 ROZPOČTŮ PO GARP K2 (7.1.16): lokální CSP-safe parser Acorn se načítá až při prvním sestavení nebo ověření testu, ne při startu aplikace ani v povinné PWA precache. Smoke validátory na něj asynchronně čekají a při chybě načtení selžou uzamčeně; kritický start i precache se vrátily pod původní limity.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP K2 (7.1.15): GitHub Pages build i manuál mají aktivní CSP. unsafe-eval není povolen; validace generovaného JavaScriptu používá lokální parser Acorn a diagnostické bodování společnou CSP-safe factory místo new Function. Všechny exporty nyní bez WebCrypto selžou uzamčeně, takže instant režim už nemůže tiše vytvořit slabý FNV hash.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP K1 (7.1.14): start aplikace nyní selže uzamčeně při chybě konfigurace, nepovolené adrese nebo chybějícím permitu; AI profily jsou pevně oddělené na veřejný direct Gemini a školní same-origin gateway bez automatického fallbacku. Importy a lokálně uložené stavy mají schéma, velikostní limity a ochranu proti prototypovým klíčům; CI Actions jsou připnuté SHA a zranitelné nepřímé závislosti aktualizované.',
     'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.13): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
@@ -30,7 +31,6 @@ const RELEASE = Object.freeze({
     'CERTIFIKAČNÍ VIZUÁLNÍ OPRAVA (7.1.2): tlačítko Celá obrazovka v bezpečném studentském testu má vlastní plnou řádku a pevné svislé odsazení, takže se už na mobilu ani notebooku nepřekrývá s popiskem jména nebo kódu studenta. Přidána regresní pojistka pro toto rozložení.',
     'AUDITNÍ OPRAVY (7.1.1): opraven service worker, izolace jeho cache a offline režim, odpočet času nyní vychází z pevného termínu, CI před nasazením spouští kompletní testy, lockfile používá veřejný npm registr, CSV export neutralizuje vzorce, kryptografie selhává bezpečně, plné úložiště je viditelně hlášeno a centrální app-guard se revaliduje ze sítě.',
     'ANONYMNÍ TECHNICKÉ METRIKY VÝSTUPŮ (7.1.3): po skutečném dokončení generování zapisuje Generátor do společného modulu AI Studia jedinou technickou událost test-package. Eviduje pouze počet úspěšných, chybných nebo zrušených generovacích běhů; prompt, téma, otázky, odpovědi ani jiné části testu se neukládají. Manuál je z měření používání výslovně vyloučen.',
-    'INTEGROVANÝ INTERAKTIVNÍ MANUÁL (7.0.8): v pravém horním rohu přibylo samostatné tlačítko knihy. Otevírá úplný interaktivní manuál v nové kartě, takže nerozbíjí rozpracovaný test ani stávající rychlé návody, bezpečnostní pravidla a poradce. Manuál používá stejné oprávnění AI Studia jako aplikace a je součástí PWA balíčku.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

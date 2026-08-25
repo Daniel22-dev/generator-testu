@@ -386,11 +386,11 @@ async function applyEditorChanges(){
     try{ built=await assembleTestHtml(state, edited); }
     catch(e){ state.exerciseDetail=prevDetail; state.exerciseConfig=prevCfg; state.pocet=prevPocet; throw e; }
     if (built && typeof built === 'object' && built.mode === 'secureOffline') {
-      validateSecurePackageSmoke(built);
+      await validateSecurePackageSmoke(built);
       generatedPackage=built; generatedTestHtml='';
     } else {
       const html=String(built||'');
-      validateGeneratedHtmlSmoke(html);
+      await validateGeneratedHtmlSmoke(html);
       generatedTestHtml=html; generatedPackage=null;
     }
     lastGenData = edited;

@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.15",
+  "appVersion": "7.1.16",
   "releaseStatus": "security-candidate-pending-claude-k1",
   "primaryRuntime": {
     "mode": "standalone-github-pages",

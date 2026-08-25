@@ -1,3 +1,10 @@
+## 7.1.16 — oprava P5 rozpočtů po GARP K2 (2026-08-25)
+
+- Acorn se načítá lazy až při prvním sestavení/ověření testu, nikoli při startu aplikace.
+- Parser byl odstraněn z povinné PWA precache; po prvním online použití jej uloží runtime cache.
+- Smoke validátory jsou asynchronní a při chybě parseru selžou uzamčeně.
+- Kritický a precache limit nebyl zvýšen; pouze celkový dist limit zohledňuje distribuovaný lazy bezpečnostní parser.
+
 ## 7.1.15 — bezpečnostní kandidát GARP K2 (2026-08-25)
 
 - Aktivní meta CSP v aplikaci i interaktivním manuálu; statický profil nyní odpovídá skutečně nasazené politice.

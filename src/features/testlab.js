@@ -84,9 +84,9 @@ function tlChecks(){
       if (!good.ok) return tlFail('Export guard', 'Scanner má false positive na bezpečné instrukci pro studenta.', JSON.stringify(good.findings || [], null, 2));
       return tlPass('Export guard', 'Studentský export blokuje citlivá data a zároveň nepadá na bezpečné instrukci.');
     }},
-    { name:'Smoke validator HTML', run:function(){
+    { name:'Smoke validator HTML', run:async function(){
       if (typeof validateGeneratedHtmlSmoke !== 'function') return tlFail('Smoke validator HTML', 'Chybí validateGeneratedHtmlSmoke().');
-      validateGeneratedHtmlSmoke(tlFixtureGeneratedHtml());
+      await validateGeneratedHtmlSmoke(tlFixtureGeneratedHtml());
       return tlPass('Smoke validator HTML', 'Fixture studentského HTML prošla povinnou strukturou, offline pravidly i JS syntaxí.');
     }},
     { name:'Answer-key guard', run:function(){
@@ -156,12 +156,12 @@ function tlChecks(){
       if (res.hasGaps) return tlWarn('Self-test bodování (spuštění)', 'Self-test prošel, ale s mezerami (např. nepokrytá pásma stupnice). Zkontroluj panel self-testu.');
       return tlPass('Self-test bodování (spuštění)', 'Self-test bodování proběhl proti vygenerovanému testu a prošel bez nesrovnalostí.');
     }},
-    { name:'Offline guard (negativní)', run:function(){
+    { name:'Offline guard (negativní)', run:async function(){
       if (typeof validateGeneratedHtmlSmoke !== 'function') return tlFail('Offline guard (negativní)', 'Chybí validateGeneratedHtmlSmoke().');
       // Vezmi strukturně platný fixture a vlož do něj externí závislost (CDN). Guard ji MUSÍ odmítnout.
       var badHtml = tlFixtureGeneratedHtml().replace('</body>', '<script src="https://cdn.example.com/lib.js"><\/script></body>');
       var threw = false, msg = '';
-      try { validateGeneratedHtmlSmoke(badHtml); } catch (e) { threw = true; msg = String(e && e.message ? e.message : e); }
+      try { await validateGeneratedHtmlSmoke(badHtml); } catch (e) { threw = true; msg = String(e && e.message ? e.message : e); }
       if (!threw) return tlFail('Offline guard (negativní)', 'Smoke validátor NEodmítl HTML s externí závislostí (CDN) — offline strážce nemá účinek. Studentský test by mohl tiše záviset na síti.');
       if (!/extern|offline|cdn/i.test(msg)) return tlWarn('Offline guard (negativní)', 'HTML s CDN bylo odmítnuto, ale zřejmě z jiného důvodu než kvůli offline pravidlu.', msg);
       return tlPass('Offline guard (negativní)', 'Smoke validátor správně odmítá HTML s externí závislostí (CDN/síť) — offline strážce funguje.');

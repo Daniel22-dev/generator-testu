@@ -109,8 +109,8 @@ async function makeVariantForNextGroup(){
   if(note){ note.classList.remove('hidden'); note.innerHTML='Připravuji variantu pro skupinu '+letter+'…'; }
   try{
     var built=await assembleTestHtml(state, lastGenData);
-    if(built && typeof built==='object' && built.mode==='secureOffline'){ validateSecurePackageSmoke(built); generatedPackage=built; generatedTestHtml=''; }
-    else { var html=String(built||''); validateGeneratedHtmlSmoke(html); generatedTestHtml=html; generatedPackage=null; }
+    if(built && typeof built==='object' && built.mode==='secureOffline'){ await validateSecurePackageSmoke(built); generatedPackage=built; generatedTestHtml=''; }
+    else { var html=String(built||''); await validateGeneratedHtmlSmoke(html); generatedTestHtml=html; generatedPackage=null; }
     lastSelfTest=null; secureGapsAcknowledged=false; keyDiffsAcknowledged=false;
     if(typeof renderQualityDiagnostics==='function') renderQualityDiagnostics();
     if(typeof updateSecureDownloadGate==='function') updateSecureDownloadGate();
@@ -138,4 +138,3 @@ async function downloadGeneratedTeacherVerifier() {
   try { downloadBlobFile(generatedPackage.teacherHtml, teacherVerifierFileName()); }
   catch(e){ setGenErr('Stažení učitelského verifieru se nezdařilo: '+(e&&e.message?e.message:e)); }
 }
-

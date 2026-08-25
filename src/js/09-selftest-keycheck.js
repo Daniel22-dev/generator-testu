@@ -515,8 +515,8 @@ async function akvApplySelected(){
   if(status){ status.textContent='Přidávám '+applied+' a přesestavuji test…'; status.className='akv-apply-status'; }
   try{
     var built=await assembleTestHtml(state, lastGenData);
-    if(built && typeof built==='object' && built.mode==='secureOffline'){ validateSecurePackageSmoke(built); generatedPackage=built; generatedTestHtml=''; }
-    else { var html=String(built||''); validateGeneratedHtmlSmoke(html); generatedTestHtml=html; generatedPackage=null; }
+    if(built && typeof built==='object' && built.mode==='secureOffline'){ await validateSecurePackageSmoke(built); generatedPackage=built; generatedTestHtml=''; }
+    else { var html=String(built||''); await validateGeneratedHtmlSmoke(html); generatedTestHtml=html; generatedPackage=null; }
     // obsah se změnil → vynuť nový self-test před stažením (ověření klíče necháme zobrazené).
     // Přidání alternativ se týká jen OTEVŘENÝCH úloh, ne klíče uzavřených — případný
     // uzavřený rozdíl tedy pořád platí; jen znovu vyžádáme vědomé potvrzení.
@@ -788,4 +788,3 @@ async function guardExport(fileName, content, target, targetLabel){
   }
   return true;
 }
-

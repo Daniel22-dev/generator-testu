@@ -712,13 +712,13 @@ async function generateTest(){
       generatedPackage=built;
       generatedIntegrity=integrityDataForCurrentOutput();
       setGenMsg('Spouštím interní smoke test studentského souboru i verifieru…');
-      validateSecurePackageSmoke(generatedPackage);
+      await validateSecurePackageSmoke(generatedPackage);
     } else {
       generatedTestHtml=String(built||'');
       const cfg=lastAssembled&&lastAssembled.cfg;
       generatedIntegrity={mode:'instant',testId:cfg&&cfg.testId||'',manifestHash:cfg&&cfg.manifestHash||'',buildHash:cfg&&cfg.buildHash||BUILD_HASH,generatorVersion:cfg&&cfg.generatorVersion||RELEASE.version,generatedAt:cfg&&cfg.generatedAt||'',creatorId:cfg&&cfg.creatorId||'',creatorName:cfg&&cfg.creatorName||'',creatorRole:cfg&&cfg.creatorRole||'',studentHtmlSha256:await sha256HexText(generatedTestHtml),teacherHtmlSha256:''};
       setGenMsg('Spouštím interní smoke test HTML a JavaScriptu…');
-      validateGeneratedHtmlSmoke(generatedTestHtml);
+      await validateGeneratedHtmlSmoke(generatedTestHtml);
     }
     exportChecklist = {};
     resetVerificationReports();
@@ -974,4 +974,3 @@ function stVerdict(label,details,wantPct,gotPct,earned,total,grade,gapSet){
   }
   return {label,wantPct,gotPct,earned,total,grade,issues};
 }
-
