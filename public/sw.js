@@ -1,6 +1,6 @@
 const GHRAB_SW_CONTRACT='ghrab-service-worker-v1';
 /* GHRAB service-worker contract v1 · update activation is user-controlled. */
-const CACHE_NAME = "ghrab-generator-v7.1.16";
+const CACHE_NAME = "ghrab-generator-v7.1.17";
 const CACHE_PREFIXES = ["ghrab-generator-v", "generator-testu-pwa-v"];
 const CORE_ASSETS = [
   "./",

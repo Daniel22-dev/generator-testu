@@ -1,6 +1,6 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.16  
+**Aktuální verze:** 7.1.17  
 **Platforma:** GHRAB Platform 1.1.0 · etapa P3
 
 
@@ -8,7 +8,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.16** je bezpečnostní kandidát produkční serverless varianty. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
+Verze **7.1.17** je bezpečnostní kandidát produkční serverless varianty. Oproti 7.1.16 navíc sjednocuje podepsanou přístupovou konfiguraci s aktuálním AI Studiem. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
 
 Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 

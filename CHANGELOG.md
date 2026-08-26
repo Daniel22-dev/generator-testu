@@ -1,3 +1,9 @@
+## 7.1.17 — integrační hotfix AI Studia (2026-08-26)
+
+- Veřejný i připravený školní deployment používají stejnou podepsanou přístupovou verzi jako aktuální AI Studio.
+- Odstraněno zamítnutí platného správcovského permitu způsobené rozdílnou verzí bezpečnostního bundle.
+- Produkční kontrola nově hlídá tuto synchronizaci jako blokující invariant.
+
 ## 7.1.16 — oprava P5 rozpočtů po GARP K2 (2026-08-25)
 
 - Acorn se načítá lazy až při prvním sestavení/ověření testu, nikoli při startu aplikace.

@@ -37,6 +37,7 @@ const serviceWorkerCoreAssets = serviceWorker.match(/const\s+CORE_ASSETS\s*=\s*\
 const publicDeployment = JSON.parse(read('public/config/deployment.json'));
 const schoolDeployment = JSON.parse(read('public/config/deployment.school-server.json'));
 const schoolDeploymentExample = JSON.parse(read('public/config/deployment.school-server.example.json'));
+const EXPECTED_ACCESS_VERSION = 'access-p1-20260824175535Z-k_wtm7Zj';
 const readme = read('README.md');
 const security = read('SECURITY.md');
 const operations = read('PROVOZNI-PRAVIDLA.md');
@@ -96,6 +97,7 @@ requireText(aiIntegration, /schoolServerConnected===true/, 'Školní AI brána n
 requireText(persistence, /MAX_ZADANI_IMPORT_BYTES[\s\S]*formatVersion\s*!==\s*1/, 'Import zadání nekontroluje velikost a verzi formátu.');
 requireText(persistence, /FORBIDDEN_DATA_KEYS[\s\S]*replaceStateFromUntrusted/, 'Načítání stavu nemá ochranu proti nebezpečným objektovým klíčům.');
 if (publicDeployment.features?.schoolServerConnected !== false || publicDeployment.features?.serverSessionReady !== false || publicDeployment.features?.schoolGatewayReady !== false) fail('Veřejný deployment nepravdivě tvrdí připravenost školního serveru.');
+if (publicDeployment.sharedAccessVersion !== EXPECTED_ACCESS_VERSION || schoolDeployment.sharedAccessVersion !== EXPECTED_ACCESS_VERSION) fail('Deployment Generátoru není synchronizován s aktuální podepsanou přístupovou vrstvou AI Studia.');
 if (schoolDeployment.features?.schoolServerConnected !== false || schoolDeployment.features?.serverSessionReady !== false || schoolDeployment.features?.schoolGatewayReady !== false || schoolDeployment.features?.liveServerValidationRequired !== true) fail('Školní deployment šablona neoznačuje nepřipojený server a povinnou živou validaci.');
 if (schoolDeploymentExample.features?.schoolServerConnected !== false || schoolDeploymentExample.features?.serverSessionReady !== false || schoolDeploymentExample.features?.schoolGatewayReady !== false || schoolDeploymentExample.features?.liveServerValidationRequired !== true) fail('Příklad školního deploymentu nesmí před živou validací tvrdit připravenost serveru.');
 if (!/application\/ghrab-protected/.test(shell) && !(shell.includes('{{JS_MAIN_TAGS}}') && buildScript.includes('application/ghrab-protected'))) fail('Aplikacni skripty nejsou pred overenim inertni.');

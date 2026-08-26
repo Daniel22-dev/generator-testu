@@ -1,7 +1,7 @@
 {
   "schema": "ghrab-security-headers-v1",
   "appId": "generator",
-  "version": "7.1.16",
+  "version": "7.1.17",
   "staticProfile": {
     "contentSecurityPolicy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'",
     "note": "Tato politika je aktivní také jako meta CSP v GitHub Pages buildu. unsafe-inline zůstává zdokumentovanou kompatibilitní výjimkou pro současné inline handlery a styly; unsafe-eval není povolen a runtime jej nevyžaduje. Odstranění unsafe-inline vyžaduje navazující modularizaci."
