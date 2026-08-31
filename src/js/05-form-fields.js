@@ -385,6 +385,7 @@ function renderGroups() {
       </div>
       <div class="group-cond"><label>Podmínky / instrukce pro tuto skupinu</label>
         <textarea rows="3" placeholder="Co má tato skupina dělat jinak?" oninput="updateGroupField(${g.id},'podminky',this.value)">${esc(g.podminky)}</textarea>
+        <div class="student-hint">Kvůli ochraně soukromí sem nepiš jména ani e-maily. Pokud použiješ identifikátor uvedený níže v seznamu studentů/kódů, Generátor jej před odesláním AI automaticky nahradí pseudonymem.</div>
       </div>
       <div class="students-area"><label>Studenti / kódy</label>
         <div class="student-tags" id="tags_${g.id}"></div>
@@ -1324,9 +1325,9 @@ function buildListeningUserBlock() {
     '• Audio/video/link/transkript slouží jako zdroj pro Gemini a učitele; audio ve třídě pouští učitel.',
     '• Studentský test nesmí obsahovat audio přehrávač, URL zdroje ani transkript; zobrazí jen pokyn, že poslech pustí učitel.'
   ];
-  if (focus) lines.push('• Zaměření otázek: ' + focus);
-  if (questions) lines.push('• Vlastní/hotové otázky nebo cvičení od učitele:\n' + questions);
-  if (transcript) lines.push('• Transkript / audio script / poznámka ke zdroji pro teacher verifier:\n' + transcript);
+  if (focus) lines.push('• Zaměření otázek (nižší důvěra):\n' + wrapUntrustedField('LISTENING FOCUS', focus));
+  if (questions) lines.push('• Vlastní/hotové otázky nebo cvičení od učitele — zdrojová data:\n' + wrapUntrustedSource('TEACHER-PROVIDED LISTENING QUESTIONS', questions));
+  if (transcript) lines.push('• Transkript / audio script / poznámka ke zdroji pro teacher verifier — zdrojová data:\n' + wrapUntrustedSource('LISTENING TRANSCRIPT / AUDIO SCRIPT', transcript));
   if (!focus && !questions && !transcript) lines.push('• Učitel nedodal zvláštní zaměření; vytvoř otázky k hlavní myšlence, důležitým detailům a postojům mluvčích, ne k nepodstatným detailům.');
   return lines.join('\n');
 }

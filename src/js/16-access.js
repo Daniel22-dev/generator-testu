@@ -106,12 +106,21 @@ function openAccountModal(){
     + '<p class="muted">Přístup byl aktivován jednou v AI Studiu a je sdílen se všemi dílčími aplikacemi na této doméně.</p>'
     + '<div class="actions"><a class="btn-primary" href="'+STUDIO_ROOT+'">Otevřít AI Studio</a>'
     + (accIsAdmin()?'<a class="btn-outline" href="'+STUDIO_ROOT+'tools/access-issuer/">Vydat přístup</a>':'')
-    + '<button type="button" class="btn-outline" data-lock>Odebrat přístup z tohoto zařízení</button></div></div></div>';
+    + '<button type="button" class="btn-outline" data-lock>Odebrat přístup z tohoto zařízení</button>'
+    + '<button type="button" class="btn-outline" data-end-work>Ukončit práci a smazat místní data</button></div>'
+    + '<p class="muted" style="margin-top:10px">Na sdíleném zařízení použij po práci druhé tlačítko. Smaže data Generátoru, lokální/session AI klíč a centrální permit; nesmaže data jiných aplikací AI Studia.</p></div></div>';
   document.body.appendChild(modal);
-  modal.addEventListener('click', function(e){
-    if (e.target === modal || e.target.closest('[data-close]')) closeCentralAccountModal();
+  modal.addEventListener('click', async function(e){
+    if (e.target === modal || e.target.closest('[data-close]')) { closeCentralAccountModal(); return; }
     const lock = e.target.closest('[data-lock]');
-    if (lock) accLockNow();
+    if (lock) { accLockNow(); return; }
+    const endWork = e.target.closest('[data-end-work]');
+    if (endWork) {
+      const ok = typeof uiConfirm === 'function'
+        ? await uiConfirm('Smazat z tohoto prohlížeče rozpracovaný stav, šablony, historii, lokální bezpečnostní hodnoty, AI klíč pro tuto relaci a centrální permit? Data jiných aplikací AI Studia se nesmažou.', 'Ukončit práci na sdíleném zařízení?', true)
+        : window.confirm('Ukončit práci a smazat místní data Generátoru?');
+      if (ok) generatorEndWork();
+    }
   });
 }
 function openAdminPanel(){
@@ -121,6 +130,47 @@ function openAdminPanel(){
 function accLockNow(){
   try { localStorage.removeItem(STUDIO_ACCESS_KEY); } catch (_e) {}
   location.href = STUDIO_ROOT + 'access/';
+}
+
+// Privacy/shared-device control. Deliberately clears only Generator-owned keys plus
+// the shared access permit; it must not call storage.clear(), which would wipe data
+// belonging to other AI Studio applications on the same origin.
+const GENERATOR_LEGACY_EXACT_KEYS = new Set(['genOnboardingDone_v1','genWelcomeShown_session']);
+function generatorOwnsStorageKey(key){
+  const k=String(key||'');
+  return k.startsWith('ghrab.generator.') || k.startsWith('sestavovac_') || GENERATOR_LEGACY_EXACT_KEYS.has(k);
+}
+function generatorClearOwnedStorage(store){
+  const removed=[]; const failures=[];
+  if(!store) return {removed,failures};
+  let keys=[];
+  try { for(let i=0;i<store.length;i++){ const key=store.key(i); if(key) keys.push(String(key)); } }
+  catch(e){ failures.push('enumeration'); return {removed,failures}; }
+  for(const key of keys){
+    if(!generatorOwnsStorageKey(key) && key!==STUDIO_ACCESS_KEY) continue;
+    try { store.removeItem(key); removed.push(key); }
+    catch(_e){ failures.push(key); }
+  }
+  return {removed,failures};
+}
+function generatorEndWork(options={}){
+  const local=generatorClearOwnedStorage(typeof localStorage!=='undefined'?localStorage:null);
+  const session=generatorClearOwnedStorage(typeof sessionStorage!=='undefined'?sessionStorage:null);
+  // In-memory copies disappear on navigation; clear them immediately as defence in depth
+  // and to make non-navigating regression tests truthful.
+  try { geminiApiKey=''; } catch(_e) {}
+  try { geminiKeyScope='none'; } catch(_e) {}
+  try { lastGeminiRawResponse=null; } catch(_e) {}
+  try { lastGeminiJsonRepaired=false; } catch(_e) {}
+  try { fileObjects=[]; } catch(_e) {}
+  try { fileReadPromises=[]; } catch(_e) {}
+  try { generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; } catch(_e) {}
+  try { rosterEntries=[]; variantSeq=0; variantSlug=''; } catch(_e) {}
+  try { state=JSON.parse(JSON.stringify(DEFAULT)); groupIdCounter=0; } catch(_e) {}
+  try { if(typeof Access==='object'&&Access) Access.profile=null; } catch(_e) {}
+  const report={localRemoved:local.removed.length,sessionRemoved:session.removed.length,failures:[...local.failures,...session.failures]};
+  if(options.navigate!==false) location.href=STUDIO_ROOT+'access/';
+  return report;
 }
 function accOnGranted(){
   Access.profile = profileFromPermit(centralPermit());

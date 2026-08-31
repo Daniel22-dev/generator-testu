@@ -83,11 +83,7 @@ async function downloadGeneratedTest() {
   // I instant test projde scannerem (nesmí v něm být private key/master key/externí token).
   if (!(await guardExport(outputSlug()+'.html', generatedTestHtml, 'student-instant', 'studentský test'))) return;
   try { downloadBlobFile(generatedTestHtml, outputSlug()+'.html'); }
-  catch(_) {
-    const w = window.open('', '_blank');
-    if (w) { w.document.write(generatedTestHtml); w.document.close(); }
-    else setGenErr('Stažení se nezdařilo. Zkus otevřít stránku v aktuálním Chrome/Edge/Safari.');
-  }
+  catch(_) { setGenErr('Stažení se nezdařilo. Zkus otevřít stránku v aktuálním Chrome/Edge/Safari. Generátor z bezpečnostních důvodů nespouští vygenerované HTML jako same-origin náhradní náhled.'); }
 }
 async function downloadGeneratedStudentTest() {
   if (!generatedPackage || !generatedPackage.studentHtml) return;

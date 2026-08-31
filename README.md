@@ -1,14 +1,14 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.17  
-**Platforma:** GHRAB Platform 1.1.0 · etapa P3
+**Aktuální verze:** 7.1.19  
+**Platforma:** GHRAB Platform 1.1.0 · QA etapa P5
 
 
 Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i klasifikované interaktivní testy, diferencované varianty a bezpečný offline balík bez školního backendu.
 
 ## Stav vydání
 
-Verze **7.1.17** je bezpečnostní kandidát produkční serverless varianty. Oproti 7.1.16 navíc sjednocuje podepsanou přístupovou konfiguraci s aktuálním AI Studiem. Označení popisuje stav kódu a automatických kontrol; samo o sobě nenahrazuje formální schválení školy ani posouzení budoucího serverového provozu.
+Verze **7.1.19** je bezpečnostní kandidát GARP 2.3 K2 po první nezávislé kontrole Claude. Oproti K1 uzavírá nalezenou neošetřenou AI cestu acceptable-answer enrichment, automatizuje inventář AI call sites, zpřísňuje privacy mazání a pseudonymizaci diferenciace a odstraňuje dva same-origin sinky generovaného HTML. Kandidát čeká na druhou nezávislou kontrolu; není schválen pro reálná studentská data.
 
 Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
 
@@ -105,7 +105,7 @@ npm run check:lockfile
 - Veřejný build je fail-closed: aplikační skripty jsou inertní, dokud je centrální `app-guard.js` nepovolí.
 - Guard ověřuje podepsaný permit AI Studia, jeho platnost, roli, povolenou aplikaci a revokaci.
 - Uživatel aktivuje přístup ve Studiu; Generátor neobsahuje vlastní aktivační kód ani místní PIN bránu.
-- Lokální odebrání přístupu je dostupné v účtovém modalu tlačítkem **Odebrat přístup z tohoto zařízení**.
+- Lokální odebrání přístupu je dostupné v účtovém modalu tlačítkem **Odebrat přístup z tohoto zařízení**. Na sdíleném zařízení použij **Ukončit práci a smazat místní data**, které odstraní stav, historii, šablony, lokální/session AI klíče a permit Generátoru, nikoli data jiných aplikací AI Studia.
 - Neoficiální vzdálená kopie nesmí generovat. `file://` a `localhost` jsou vývojové prostředí; ostrý balík v nich může po výslovném potvrzení vytvořit pouze centrálně ověřený správce.
 
 ## Nasazení na GitHub Pages
@@ -123,7 +123,7 @@ Verze musí být shodná v:
 - `public/sw.js`,
 - `public/manifest.webmanifest`.
 
-Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření starých karet, takže rozpracovaná práce není přerušena automatickým reloadem. Service worker Generátoru ukládá jen vlastní statický app-shell; deployment konfiguraci ani centrální `app-guard.js` do běžné cache neukládá. Podepsaný offline LKG režim spravuje centrální brána AI Studia. Pokud konfiguraci nebo platné oprávnění nelze ověřit, Generátor zůstane uzamčený.
+Service worker nespouští `skipWaiting` automaticky při instalaci. Přechod čekající verze lze vyvolat pouze explicitní zprávou `GHRAB_SKIP_WAITING`/`SKIP_WAITING` z aktualizačního toku; jinak se nová verze aktivuje po zavření starých karet, takže rozpracovaná práce není přerušena automatickým reloadem. Service worker Generátoru ukládá jen vlastní statický app-shell; deployment konfiguraci ani centrální `app-guard.js` do běžné cache neukládá. Podepsaný offline LKG režim spravuje centrální brána AI Studia. Pokud konfiguraci nebo platné oprávnění nelze ověřit, Generátor zůstane uzamčený.
 
 ## Dokumentace
 
@@ -136,7 +136,7 @@ Service worker nepoužívá `skipWaiting`. Nová verze se aktivuje po zavření 
 
 ## Omezení rozsahu
 
-GitHub Pages profil 7.1.16 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
+GitHub Pages profil 7.1.19 sám o sobě nemá školní SSO, databázi, serverovou úschovu API klíče ani neobejitelnou serverovou autorizaci. Rozpracovaný studentský pokus se po reloadu nebo zavření stránky plně neobnoví. Již stažený HTML test nelze vzdáleně zneplatnit. Tyto hranice řeší `PROVOZNI-PRAVIDLA.md` a `SECURITY.md`.
 
 ## Napojení na AI Studio GHRAB
 

@@ -5,9 +5,9 @@
     "innerHTML": 161,
     "insertAdjacentHTML": 8,
     "outerHTML": 5,
-    "documentWrite": 2,
+    "documentWrite": 0,
     "eval": 0,
     "newFunction": 0
   },
-  "note": "GARP K2 baseline; eval a Function konstruktor jsou ratchetovány na nulu. Existující HTML sinky se nesmí zvýšit a stále vyžadují postupnou revizi."
+  "note": "GARP post-second-Claude repair baseline; document.write, eval a Function konstruktor jsou ratchetovány na nulu. Existující HTML sinky se nesmí zvýšit a stále vyžadují postupnou revizi."
 }

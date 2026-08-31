@@ -1,5 +1,5 @@
 /* ===================== GHRAB AI CORE 1.0.0 · GENERÁTOR P1 ===================== */
-const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.17'});
+const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.20'});
 const GEN_AI_SCHEMA_ID='generator.object.v1';
 const GEN_AI_SCHEMAS=Object.freeze({[GEN_AI_SCHEMA_ID]:{type:'object',additionalProperties:true}});
 const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN_AI_APP.id,operations:Object.freeze({
@@ -38,7 +38,7 @@ async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   if(genSchoolMode()&&mediaParts.some(part=>{const inline=part?.inline_data||part?.inlineData;const mime=String(inline?.mime_type||inline?.mimeType||'');return mime.startsWith('audio/')||mime.startsWith('video/')}))throw Object.assign(new Error('Školní AI brána v P1 nepřijímá zvuk ani video. Použij přepis, PDF, dokument nebo obrázek.'),{code:'FEATURE_UNSUPPORTED'});
   genEnsureAiCore();const operation=opts.operation||'test-generation';const registration=GEN_AI_OPERATIONS.operations[operation];if(!registration)throw Object.assign(new Error('Neznámá AI operace: '+operation),{code:'UNREGISTERED_OPERATION'});
   const inputParts=genCoreParts(prompt,extraParts);genPreflight(inputParts);geminiCancelRequested=false;
-  const response=await window.GHRAB_AI.generate({operation,modelProfile:genModelProfile(operation),instructions:'Vrať pouze validní JSON bez markdownu. Dodrž přesně strukturu, názvy polí a omezení uvedené v zadání.',inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal:currentGeminiAbortController?.signal});
+  const response=await window.GHRAB_AI.generate({operation,modelProfile:genModelProfile(operation),instructions:aiTrustedSystemInstruction(),inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal:currentGeminiAbortController?.signal});
   lastGeminiRawResponse=JSON.stringify(response.result);lastGeminiJsonRepaired=false;return response.result;
 }
 const genLegacyCallGeminiJSON=callGeminiJSON;

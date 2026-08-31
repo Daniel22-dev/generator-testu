@@ -1,3 +1,29 @@
+## 7.1.20 — post-second-Claude repair candidate GARP 2.3 (2026-08-30)
+
+- Opraven HIGH release-integrity regresní nález C2-01: inlinovaný verifier už neobsahuje souvislé `</script>` uvnitř emitovaného JS zdroje; přidán fail-closed source guard a negativní kontrola.
+- Sjednocen artifact import contract (`generator-testu-zadani`) mezi consumer, platform a data manifestem; platformní konformita po buildové regeneraci musí být 114/114.
+- Povinný `npm test` používá standardní `npm run build` včetně postbuild konformity a následně kontroluje přesný `dist` headless cestou.
+- XSS ratchet zamyká `documentWrite` na 0; performance budgety dostaly pouze malý (<1 %) headroom po bezpečnostním hardeningu.
+- PC-01 navíc vyžaduje u každé přezkoumané AI cesty wrapper evidence nebo explicitně povolenou fixed-literal výjimku.
+- Stav není release-approved: po změně distribuovaného kódu po druhém Claude kole vyžaduje GARP nový, uživatelem výslovně zahájený nezávislý review cyklus.
+
+## 7.1.19 — bezpečnostní kandidát GARP 2.3 K2 (2026-08-30)
+
+- Uzavřen C-01: acceptable-answer enrichment nyní fencuje předchozí AI výstup a klíč odpovědí jako nedůvěryhodný zdroj.
+- PC-01 enumeruje všech 13 aplikačních callGeminiJSON cest včetně lazy features a má negativní kontrolu nové neošetřené cesty.
+- Oficiální GARP 2.3 AI-RED corpus je povinný, hashovaný QA artefakt; harness bez něj neprojde.
+- Diferenciační podmínky před AI egress pseudonymizují známé identifikátory studentů; end-work čistí další runtime data.
+- Generované HTML už nemá dva same-origin execution sinky; studentský secure balík má regresi proti úniku answer key.
+
+## 7.1.18 — bezpečnostní kandidát GARP 2.3 K1 (2026-08-30)
+
+- AI vstupy používají společnou trust policy a explicitní hranice pro volný text, dokumenty, reading/listening obsah, metadata, přílohy i předchozí AI výstup při druhém průchodu/repair retry.
+- Diferenciace posílá do AI pouze pseudonymy `Student A1…`, nikoli skutečné hodnoty `students/codes`.
+- Self-testovací iframe už nekombinuje `allow-scripts` a `allow-same-origin`; skutečné emitované funkce ověřuje přes nonce-scoped allowlist RPC v opaque sandboxu.
+- Návratový URL z AI Studio handoffu je omezen na nakonfigurovaný Studio origin a cestu.
+- Přidáno skutečné `generatorEndWork()` pro sdílená zařízení a opraven datový manifest retence/mazání/importu; veřejná kopie platform consumer manifestu je synchronizována s P5 zdrojem.
+- Přidán `qa:garp23` s 24 AIR strukturálními mutacemi ve 4 rodinách, privacy preflight canary, scoped deletion regresí a negativními kontrolami.
+
 ## 7.1.17 — integrační hotfix AI Studia (2026-08-26)
 
 - Veřejný i připravený školní deployment používají stejnou podepsanou přístupovou verzi jako aktuální AI Studio.

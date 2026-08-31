@@ -32,7 +32,9 @@
   },
   "privacy": {
     "sharedDeviceDefault": false,
-    "retentionDays": 30
+    "retentionDays": null,
+    "retentionMode": "explicit-client-end-work",
+    "retentionNote": "Serverless profile has no automatic 30-day client purge; use generatorEndWork() on shared devices."
   },
   "endpoints": {
     "session": "session",

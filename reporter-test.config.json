@@ -2,7 +2,7 @@
   "distEntry": "dist/index.html",
   "appId": "generator",
   "appName": "Generátor testů",
-  "version": "7.1.17",
+  "version": "7.1.20",
   "reporterPath": "public/access/error-reporter.js",
   "stylePath": "public/access/error-reporter.css",
   "adapterPath": "public/access/error-reporter-adapter.js",
@@ -19,7 +19,7 @@
     "public/sw.js",
     "public/manual/index.html",
     "README.md",
-    "RELEASE-NOTES-7.1.17.md"
+    "RELEASE-NOTES-7.1.20.md"
   ],
   "distCachePaths": [
     "dist/access/error-reporter.js",

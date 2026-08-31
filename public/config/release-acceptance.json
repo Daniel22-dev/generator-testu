@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.17",
-  "releaseStatus": "security-candidate-pending-claude-k1",
+  "appVersion": "7.1.20",
+  "releaseStatus": "security-candidate-post-second-claude-fix-pending-explicit-review",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -38,10 +38,13 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "GARP-K1",
+  "revision": "GARP-2.3-POST2-FIX",
   "runtimeAudit": {
     "required": true,
-    "scriptsExecuted": true,
-    "transport": "local-http"
+    "scriptsExecuted": false,
+    "partialStaticVmExecuted": true,
+    "browserRuntimeExecuted": false,
+    "transport": "post-second-claude-fix-source-vm-local",
+    "note": "GARP 2.3 post-second-Claude repair candidate. A HIGH release-integrity regression was confirmed in K2 and distributed code/configuration changed. This candidate is not release-approved; a new explicitly initiated independent review cycle is required before deployment."
   }
 }

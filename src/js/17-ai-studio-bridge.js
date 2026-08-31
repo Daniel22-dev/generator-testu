@@ -20,8 +20,19 @@
   function record(material){const list=parse(EVENTS_KEY,[]);list.push({at:new Date().toISOString(),type:'handoff-consumed',appId:'generator',materialId:material.id,estimatedMinutes:5});set(EVENTS_KEY,JSON.stringify(list.slice(-500)))}
   function studioUrl(payload){
     const configured=window.__GHRAB_DEPLOYMENT_CONFIG__?.studioBaseUrl||window.__GHRAB_STUDIO_URL__||'/AI-Studio-GHRAB/';
-    try{const u=new URL(payload&&payload.studioUrl||configured,location.href);if(/^https?:$/.test(u.protocol))return u.href}catch(_){}
-    return new URL(configured,location.href).href;
+    let base;
+    try{base=new URL(configured,location.href);if(!/^https?:$/.test(base.protocol))throw new Error('unsupported studio URL')}
+    catch(_){base=new URL('/AI-Studio-GHRAB/',location.href)}
+    try{
+      const raw=payload&&typeof payload.studioUrl==='string'?payload.studioUrl:'';
+      if(raw){
+        const u=new URL(raw,location.href);
+        const basePath=base.pathname.endsWith('/')?base.pathname:(base.pathname+'/');
+        const samePath=u.pathname===base.pathname||u.pathname.startsWith(basePath);
+        if(/^https?:$/.test(u.protocol)&&u.origin===base.origin&&samePath)return u.href;
+      }
+    }catch(_){}
+    return base.href;
   }
   function banner(material,payload){
     const el=document.createElement('div');el.className='studio-import-banner';

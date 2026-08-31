@@ -54,7 +54,7 @@ Service worker načítá `/AI-Studio-GHRAB/` strategií `networkFirst`. Online j
 
 ## PWA aktualizace
 
-Service worker nepoužívá `skipWaiting`; nová verze se aktivuje až po zavření starých karet. Tím se eliminuje automatický reload uprostřed generování, editoru nebo práce s hotovým testem. `check-sw-precache.mjs` ověřuje, že každá položka precache existuje v produkčním buildu.
+Service worker nespouští `skipWaiting` automaticky při instalaci; čekající verze jej provede jen po explicitní aktualizační zprávě `GHRAB_SKIP_WAITING`/`SKIP_WAITING`. Bez této zprávy se nová verze aktivuje až po zavření starých karet, takže se automatický reload uprostřed práce neprovádí. `check-sw-precache.mjs` ověřuje, že každá položka precache existuje v produkčním buildu.
 
 ## Časový limit testu
 
@@ -73,7 +73,7 @@ Všechny buňky procházejí neutralizací počátečních znaků `=`, `+`, `-`,
 
 ## Lokální úložiště
 
-Snapshot, šablony a historie jsou v `localStorage`. Při zaplnění nebo blokaci úložiště aplikace zobrazí výrazné upozornění a nesmí hlásit úspěšné uložení. Na sdíleném zařízení se citlivé hodnoty neukládají.
+Snapshot, šablony a historie jsou v `localStorage`. Při zaplnění nebo blokaci úložiště aplikace zobrazí výrazné upozornění a nesmí hlásit úspěšné uložení. Na sdíleném zařízení po práci použij **Ukončit práci a smazat místní data**; scoped cleanup odstraní úložiště Generátoru, lokální/session AI klíče a centrální permit, ale nesmaže data ostatních aplikací AI Studia ani neobsahový PWA cache.
 
 ## Výsledky studentů
 
