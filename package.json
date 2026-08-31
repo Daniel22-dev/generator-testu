@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "check:versions": "node scripts/check-versions.mjs",
-    "test": "node scripts/check-versions.mjs && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && node scripts/check-production-readiness.mjs && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run test:headless:dist && npm run check:precache && npm run test:workflow",
+    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && node scripts/check-production-readiness.mjs && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run test:headless:dist && npm run check:precache && npm run test:workflow",
     "lint": "node scripts/lint.mjs",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
@@ -56,8 +56,9 @@
     "pretest:reporter": "npm run build",
     "qa:garp23": "node scripts/qa-garp23-security.mjs",
     "check:embedded-script-terminators": "node scripts/check-embedded-script-terminators.mjs",
-    "prebuild": "npm run check:embedded-script-terminators",
-    "test:headless:dist": "node tools/headless-check.mjs dist/index.html"
+    "prebuild": "npm run check:embedded-script-terminators && npm run check:studio-manifest",
+    "test:headless:dist": "node tools/headless-check.mjs dist/index.html",
+    "check:studio-manifest": "node scripts/check-studio-manifest-template.mjs"
   },
   "engines": {
     "node": ">=18"
