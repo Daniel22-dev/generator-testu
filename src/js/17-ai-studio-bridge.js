@@ -5,7 +5,7 @@
   const q=new URLSearchParams(location.search);
   function get(k){try{return localStorage.getItem(k)}catch(e){console.warn('AI Studio bridge: čtení úložiště selhalo',e);return null}}
   function parse(key,fallback){try{return JSON.parse(get(key)||JSON.stringify(fallback))}catch(_){return fallback}}
-  function set(k,v){try{localStorage.setItem(k,v);return true}catch(e){console.warn('AI Studio bridge: zápis do úložiště selhal',e);return false}}
+  function set(k,v){if(!generatorPersistenceAllowed())return false;try{localStorage.setItem(k,v);return true}catch(e){console.warn('AI Studio bridge: zápis do úložiště selhal',e);return false}}
   function remove(k){try{localStorage.removeItem(k)}catch(e){console.warn('AI Studio bridge: odstranění z úložiště selhalo',e)}}
   function validMaterial(m){return !!(m&&m.schema==='ghrab-material-v1'&&m.id&&m.title&&m.subject&&m.content&&typeof m.content==='object')}
   function take(){

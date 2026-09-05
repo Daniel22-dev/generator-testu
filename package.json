@@ -1,6 +1,6 @@
 {
   "name": "generator-testu",
-  "version": "7.1.20",
+  "version": "7.1.21",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
@@ -54,11 +54,12 @@
     "qa:xss": "node scripts/qa-p5-xss-sinks.mjs",
     "qa:lock": "node scripts/qa-p5-lock.mjs",
     "pretest:reporter": "npm run build",
-    "qa:garp23": "node scripts/qa-garp23-security.mjs",
+    "qa:garp23": "npm run test:suite-session && node scripts/qa-garp23-security.mjs",
     "check:embedded-script-terminators": "node scripts/check-embedded-script-terminators.mjs",
     "prebuild": "npm run check:embedded-script-terminators && npm run check:studio-manifest",
     "test:headless:dist": "node tools/headless-check.mjs dist/index.html",
-    "check:studio-manifest": "node scripts/check-studio-manifest-template.mjs"
+    "check:studio-manifest": "node scripts/check-studio-manifest-template.mjs",
+    "test:suite-session": "node scripts/test-suite-session-lifecycle.mjs"
   },
   "engines": {
     "node": ">=18"

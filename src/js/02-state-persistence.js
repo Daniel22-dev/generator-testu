@@ -205,7 +205,7 @@ async function saveSecurityCodeLocal(){
   if (!code) { await uiAlert('Nejdřív vygeneruj nebo napiš bezpečnostní kód.'); return; }
   const ok = await uiConfirm('Uložit bezpečnostní kód do tohoto prohlížeče? Používej pouze na vlastním učitelském zařízení. Na sdíleném školním počítači neukládej.', 'Uložit lokálně?', true);
   if (!ok) return;
-  try { localStorage.setItem(SCHOOL_SECURITY_CODE_KEY, code); uiToast('Bezpečnostní kód je uložen lokálně v tomto prohlížeči. Na sdíleném školním počítači tento postup nepoužívej.', 'warn', 5200); }
+  try { if(!generatorPersistenceAllowed()) return; localStorage.setItem(SCHOOL_SECURITY_CODE_KEY, code); uiToast('Bezpečnostní kód je uložen lokálně v tomto prohlížeči. Na sdíleném školním počítači tento postup nepoužívej.', 'warn', 5200); }
   catch(_) { await uiAlert('Kód se nepodařilo uložit. Prohlížeč možná blokuje localStorage.'); }
 }
 async function loadSecurityCodeLocal(){
@@ -340,6 +340,7 @@ const LEGACY_HIST_KEYS = ['sestavovac_hist_v5_12_0','sestavovac_hist_v5_11_1','s
 
 let storageWarnShown = false;
 function safeSetItem(key, value){
+  if(!generatorPersistenceAllowed()) return false;
   try { localStorage.setItem(key, value); return true; }
   catch(e){
     console.warn('Uložení do localStorage selhalo:', e);
@@ -398,7 +399,7 @@ function toggleMode() {
   document.body.classList.toggle('light');
   const isLight = document.body.classList.contains('light');
   $('btnMode').textContent = isLight ? '🌙' : '☀️';
-  try { localStorage.setItem('sestavovac_mode', isLight ? 'light' : 'dark'); } catch(_){}
+  try { if(generatorPersistenceAllowed()) localStorage.setItem('sestavovac_mode', isLight ? 'light' : 'dark'); } catch(_){}
 }
 function applyMode() {
   try {

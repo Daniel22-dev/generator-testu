@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.20">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.21">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="stylesheet" href="./access/access-gate.css">
+<script defer src="./access/suite-session-cleanup.js" data-ghrab-suite-session-bootstrap></script>
 <style>html[data-ghrab-access="checking"] body{visibility:hidden}</style>
 <style>{{STYLES}}</style>
 </head>
@@ -1060,6 +1060,8 @@ async function boot() {
     }
     const urls = deploymentModule.deploymentUrls(deployment);
     studioUrl = urls.studioUrl;
+    const suiteLifecycle = window.__GHRAB_GENERATOR_SUITE_SESSION__;
+    if (suiteLifecycle?.isLocked?.()) { location.replace(new URL('access/', new URL(studioUrl, location.href)).href); return; }
     const { protectApp } = await import(urls.guardUrl);
     let grantedPermit = null;
     document.addEventListener('ghrab:app-access-granted', (event) => {
@@ -1070,6 +1072,7 @@ async function boot() {
     if (!grantedPermit || typeof grantedPermit !== 'object') {
       throw new Error('Centrální brána nevrátila ověřené oprávnění.');
     }
+    if (suiteLifecycle?.isLocked?.()) { location.replace(new URL('access/', new URL(studioUrl, location.href)).href); return; }
     window.__GHRAB_STUDIO_ACCESS__ = Object.freeze({ appId: APP_ID, permit: grantedPermit });
     void startLocalReporter('generator:granted');
     unlockProtectedScripts();

@@ -132,32 +132,42 @@ function accLockNow(){
   location.href = STUDIO_ROOT + 'access/';
 }
 
-// Privacy/shared-device control. Deliberately clears only Generator-owned keys plus
-// the shared access permit; it must not call storage.clear(), which would wipe data
-// belonging to other AI Studio applications on the same origin.
+// Privacy/shared-device control. Suite cleanup is owned by the unprotected
+// lifecycle bootstrap, which runs even when the central Studio permit has already
+// been revoked. Manual local end-work reuses the same ownership rules.
 const GENERATOR_LEGACY_EXACT_KEYS = new Set(['genOnboardingDone_v1','genWelcomeShown_session']);
+const GENERATOR_LIFECYCLE_RESERVED_KEYS = new Set(['ghrab.generator.suite-session-seen.v1','ghrab.generator.suite-session-status.v1']);
+function generatorSuiteSessionApi(){ return window.__GHRAB_GENERATOR_SUITE_SESSION__ || null; }
 function generatorOwnsStorageKey(key){
+  const api=generatorSuiteSessionApi();
+  if(api&&typeof api.ownsStorageKey==='function') return api.ownsStorageKey(key);
   const k=String(key||'');
+  if(GENERATOR_LIFECYCLE_RESERVED_KEYS.has(k)) return false;
   return k.startsWith('ghrab.generator.') || k.startsWith('sestavovac_') || GENERATOR_LEGACY_EXACT_KEYS.has(k);
 }
-function generatorClearOwnedStorage(store){
+function generatorClearOwnedStorage(store, options={}){
   const removed=[]; const failures=[];
   if(!store) return {removed,failures};
   let keys=[];
   try { for(let i=0;i<store.length;i++){ const key=store.key(i); if(key) keys.push(String(key)); } }
-  catch(e){ failures.push('enumeration'); return {removed,failures}; }
+  catch(_e){ failures.push('enumeration'); return {removed,failures}; }
   for(const key of keys){
-    if(!generatorOwnsStorageKey(key) && key!==STUDIO_ACCESS_KEY) continue;
-    try { store.removeItem(key); removed.push(key); }
+    const permit=options.includeSharedPermit===true && key===STUDIO_ACCESS_KEY;
+    if(!generatorOwnsStorageKey(key) && !permit) continue;
+    try { store.removeItem(key); if(store.getItem(key)===null) removed.push(key); else failures.push(key); }
     catch(_e){ failures.push(key); }
   }
   return {removed,failures};
 }
-function generatorEndWork(options={}){
-  const local=generatorClearOwnedStorage(typeof localStorage!=='undefined'?localStorage:null);
-  const session=generatorClearOwnedStorage(typeof sessionStorage!=='undefined'?sessionStorage:null);
-  // In-memory copies disappear on navigation; clear them immediately as defence in depth
-  // and to make non-navigating regression tests truthful.
+function generatorClearRuntimeState(){
+  // Stop late asynchronous work before clearing references so an in-flight AI
+  // response cannot repopulate the just-ended shared-device session.
+  try { geminiCancelRequested=true; } catch(_e) {}
+  try { if(currentGeminiAbortController) currentGeminiAbortController.abort(); } catch(_e) {}
+  try { currentGeminiAbortController=null; } catch(_e) {}
+  try { clearTimeout(geminiCooldownTimer); geminiCooldownTimer=null; geminiCooldownUntil=0; } catch(_e) {}
+  try { clearTimeout(saveTimer); saveTimer=null; } catch(_e) {}
+  try { clearTimeout(indicatorTimer); indicatorTimer=null; } catch(_e) {}
   try { geminiApiKey=''; } catch(_e) {}
   try { geminiKeyScope='none'; } catch(_e) {}
   try { lastGeminiRawResponse=null; } catch(_e) {}
@@ -166,11 +176,55 @@ function generatorEndWork(options={}){
   try { fileReadPromises=[]; } catch(_e) {}
   try { generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; } catch(_e) {}
   try { rosterEntries=[]; variantSeq=0; variantSlug=''; } catch(_e) {}
-  try { state=JSON.parse(JSON.stringify(DEFAULT)); groupIdCounter=0; } catch(_e) {}
+  try { lastSelfTest=null; secureGapsAcknowledged=false; } catch(_e) {}
+  try { akvWeakRows=[]; lastKeyCheck=null; keyDiffsAcknowledged=false; } catch(_e) {}
+  try { _liAiDraft=null; _rcAiDraft=null; } catch(_e) {}
+  try { exportChecklist={}; } catch(_e) {}
+  try { if(typeof gaState==='object'&&gaState){ gaState.ai=null; gaState.loading=false; gaState.query=''; } } catch(_e) {}
+  try { state=JSON.parse(JSON.stringify(DEFAULT)); currentStep=0; maxStep=0; groupIdCounter=0; } catch(_e) {}
   try { if(typeof Access==='object'&&Access) Access.profile=null; } catch(_e) {}
-  const report={localRemoved:local.removed.length,sessionRemoved:session.removed.length,failures:[...local.failures,...session.failures]};
-  if(options.navigate!==false) location.href=STUDIO_ROOT+'access/';
+
+  // Fail closed visually as well. No stale form, preview, answer-key or roster DOM
+  // remains available while the suite acknowledgement is being completed.
+  try {
+    if(document.body){
+      const main=document.createElement('main');
+      main.className='ghrab-access-gate';
+      const h=document.createElement('h1'); h.textContent='Práce na tomto zařízení byla ukončena';
+      const p=document.createElement('p'); p.className='ghrab-access-gate-message'; p.textContent='Místní data Generátoru byla uzamčena pro úklid společné relace. Pro další práci otevři aplikaci znovu přes AI Studio.';
+      main.append(h,p); document.body.replaceChildren(main); document.body.style.visibility='visible';
+    }
+  } catch(_e) {}
+  return {ok:true};
+}
+function generatorEndWork(options={}){
+  const suite=generatorSuiteSessionApi();
+  let report;
+  if(suite&&typeof suite.manualEndWork==='function'){
+    const result=suite.manualEndWork({includeSharedPermit:true});
+    report={localRemoved:result.localRemoved?.length||0,sessionRemoved:result.sessionRemoved?.length||0,sharedHandoffRemoved:result.sharedHandoffRemoved?.length||0,failures:result.failures||[]};
+  }else{
+    const local=generatorClearOwnedStorage(typeof localStorage!=='undefined'?localStorage:null,{includeSharedPermit:true});
+    const session=generatorClearOwnedStorage(typeof sessionStorage!=='undefined'?sessionStorage:null);
+    report={localRemoved:local.removed.length,sessionRemoved:session.removed.length,sharedHandoffRemoved:0,failures:[...local.failures,...session.failures]};
+  }
+  generatorClearRuntimeState();
+  if(options.navigate!==false){
+    try { location.replace(STUDIO_ROOT+'access/'); } catch(_e) { location.href=STUDIO_ROOT+'access/'; }
+  }
   return report;
+}
+
+const _generatorSuiteLifecycle=generatorSuiteSessionApi();
+if(_generatorSuiteLifecycle&&typeof _generatorSuiteLifecycle.registerRuntimeCleanup==='function'){
+  _generatorSuiteLifecycle.registerRuntimeCleanup(generatorClearRuntimeState);
+  document.addEventListener('ghrab:generator-suite-session-acknowledged',function(){
+    try { location.replace(STUDIO_ROOT+'access/'); } catch(_e) { location.href=STUDIO_ROOT+'access/'; }
+  });
+  if(_generatorSuiteLifecycle.isLocked?.()){
+    generatorClearRuntimeState();
+    setTimeout(function(){ try { location.replace(STUDIO_ROOT+'access/'); } catch(_e) {} },0);
+  }
 }
 function accOnGranted(){
   Access.profile = profileFromPermit(centralPermit());

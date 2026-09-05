@@ -257,7 +257,7 @@ function showFirstRunFlow(profile) {
         '</div>' +
       '</div>';
     bd.querySelector('#frFinishBtn').addEventListener('click', function(){
-      try { localStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch(_){}
+      try { if(generatorPersistenceAllowed()) localStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch(_){}
       document.body.classList.remove('onboarding-locked');
       bd.remove();
     });
@@ -270,7 +270,7 @@ function showFirstRunFlow(profile) {
 function showWelcomeModal(profile) {
   // Zobrazit jen jednou za relaci (ne při každém reloadu po "Sestavit nový test")
   try { if (sessionStorage.getItem(WELCOME_SESSION_KEY) === '1') return; } catch(_){}
-  try { sessionStorage.setItem(WELCOME_SESSION_KEY, '1'); } catch(_){}
+  try { if(generatorPersistenceAllowed()) sessionStorage.setItem(WELCOME_SESSION_KEY, '1'); } catch(_){}
 
   var done = false;
   try { done = localStorage.getItem(ONBOARDING_DONE_KEY) === '1'; } catch(_){}

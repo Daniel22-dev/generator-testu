@@ -45,7 +45,7 @@ function setGeminiModel(m){
   const norm = normalizeModelName(m);
   if (norm && isValidModelName(norm)) {
     geminiModel = norm;
-    try { localStorage.setItem(GEMINI_MODEL_SK, geminiModel); } catch(_){}
+    try { if(generatorPersistenceAllowed()) localStorage.setItem(GEMINI_MODEL_SK, geminiModel); } catch(_){}
     const inp = $('geminiModelInput'); if (inp && norm !== inp.value.trim()) inp.value = norm;
   }
   // Při neplatném vstupu necháme text v poli (ať ho uživatel vidí a opraví) a
@@ -59,7 +59,7 @@ function loadGeminiModel(){
   try { stored = localStorage.getItem(GEMINI_MODEL_SK) || ''; } catch(_){}
   const migrated = migrateLegacyModelName(stored);
   geminiModel = (migrated && isValidModelName(migrated)) ? migrated : GEMINI_MODEL_DEFAULT;
-  if (stored && geminiModel !== normalizeModelName(stored)) { try { localStorage.setItem(GEMINI_MODEL_SK, geminiModel); } catch(_){} }
+  if (stored && geminiModel !== normalizeModelName(stored)) { try { if(generatorPersistenceAllowed()) localStorage.setItem(GEMINI_MODEL_SK, geminiModel); } catch(_){} }
   const inp = $('geminiModelInput'); if (inp) inp.value = geminiModel;
   updateGeminiModelUI();
 }
@@ -138,7 +138,7 @@ async function ensureGeminiDataNotice(){
     'Kontrola dat před odesláním do AI',
     true
   );
-  if (ok) { try { sessionStorage.setItem(GEMINI_DATA_NOTICE_SESSION_SK, 'accepted'); } catch(_){} }
+  if (ok) { try { if(generatorPersistenceAllowed()) sessionStorage.setItem(GEMINI_DATA_NOTICE_SESSION_SK, 'accepted'); } catch(_){} }
   return ok;
 }
 
@@ -203,7 +203,7 @@ function loadGeminiKey() {
   // klíč jednorázově přesuneme do sessionStorage a z localStorage jej odstraníme.
   if (!sessionKey && storedKey) {
     sessionKey = storedKey;
-    try { sessionStorage.setItem(GEMINI_KEY_SESSION_SK, storedKey); } catch(_){}
+    try { if(generatorPersistenceAllowed()) sessionStorage.setItem(GEMINI_KEY_SESSION_SK, storedKey); } catch(_){}
   }
   try { localStorage.removeItem(GEMINI_KEY_SK); } catch(_){}
   setGeminiKey(sessionKey, sessionKey ? 'session' : '');
@@ -211,7 +211,7 @@ function loadGeminiKey() {
 function useGeminiKeyForSession() {
   const key = getGeminiInputKey();
   try {
-    if (key) sessionStorage.setItem(GEMINI_KEY_SESSION_SK, key);
+    if (key && generatorPersistenceAllowed()) sessionStorage.setItem(GEMINI_KEY_SESSION_SK, key);
     else sessionStorage.removeItem(GEMINI_KEY_SESSION_SK);
   } catch(_){}
   setGeminiKey(key, key ? 'session' : '');

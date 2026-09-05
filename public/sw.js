@@ -1,12 +1,13 @@
 const GHRAB_SW_CONTRACT='ghrab-service-worker-v1';
 /* GHRAB service-worker contract v1 · update activation is user-controlled. */
-const CACHE_NAME = "ghrab-generator-v7.1.20";
+const CACHE_NAME = "ghrab-generator-v7.1.21";
 const CACHE_PREFIXES = ["ghrab-generator-v", "generator-testu-pwa-v"];
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./access/access-gate.css",
+  "./access/suite-session-cleanup.js",
   "./access/deployment-config.js",
   "./access/reporter-bootstrap.js",
   "./access/error-reporter.js",
@@ -17,7 +18,6 @@ const CORE_ASSETS = [
   "./icons/icon-32.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
-  "./icons/icon-maskable-512.png",
   "./icons/apple-touch-icon.png",
   "./config/brand-manifest.json",
   "./config/platform-manifest.json",

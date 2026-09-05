@@ -1,8 +1,8 @@
 {
   "schema": "ghrab-data-manifest-v1",
   "appId": "generator",
-  "appVersion": "7.1.20",
-  "manifestVersion": 3,
+  "appVersion": "7.1.21",
+  "manifestVersion": 4,
   "dataCategories": [
     "settings",
     "application-content",
@@ -21,27 +21,35 @@
       "kind": "localStorage",
       "category": "application-data",
       "patterns": [
-        "ghrab.generator.*",
+        "ghrab.generator.state.v1",
+        "ghrab.generator.templates.v1",
+        "ghrab.generator.history.v1",
+        "ghrab.generator.theme.v1",
+        "ghrab.generator.ai.model.v1",
+        "ghrab.generator.ai.data-notice.v1",
+        "ghrab.generator.onboarding-done.v1",
+        "ghrab.generator.migration.p2-storage-namespace-v1.backup",
+        "ghrab.generator.migration.p2-storage-namespace-v1.done",
+        "ghrab.generator.legacy.*",
         "sestavovac_*",
         "genOnboardingDone_v1"
       ],
       "sensitivity": "potentially-personal",
-      "authority": "client",
+      "authority": "generator-client",
       "clearOnEndWork": true,
-      "note": "GHRAB Platform aliases legacy sestavovac_* keys to canonical ghrab.generator.* keys after migration."
+      "note": "PC-01 verified. The full migration backup may contain the same work content/credentials as legacy storage and is therefore deleted. Lifecycle acknowledgement/status keys are reserved separately and are not content."
     },
     {
       "kind": "sessionStorage",
       "category": "session-data",
       "patterns": [
-        "ghrab.generator.ai.key.session.v1",
         "ghrab.generator.ai.data-notice.v1",
         "ghrab.generator.welcome-shown.v1",
         "sestavovac_*",
         "genWelcomeShown_session"
       ],
-      "sensitivity": "confidential",
-      "authority": "client",
+      "sensitivity": "potentially-personal-session",
+      "authority": "generator-client",
       "clearOnEndWork": true
     },
     {
@@ -54,8 +62,9 @@
         "sestavovac_school_security_code_v1"
       ],
       "sensitivity": "secret",
-      "authority": "client-direct-mode-only",
-      "clearOnEndWork": true
+      "authority": "generator-client",
+      "clearOnEndWork": true,
+      "note": "Current P1 policy removes a legacy persistent Gemini key on load, but suite cleanup still treats any surviving canonical/legacy copy as secret."
     },
     {
       "kind": "sessionStorage",
@@ -65,7 +74,7 @@
         "sestavovac_gemini_key_session"
       ],
       "sensitivity": "secret",
-      "authority": "client-direct-mode-only",
+      "authority": "generator-client",
       "clearOnEndWork": true
     },
     {
@@ -76,22 +85,66 @@
         "ghrab-manual-theme"
       ],
       "sensitivity": "non-personal-settings",
-      "authority": "manual-page",
+      "authority": "manual-client",
       "clearOnEndWork": false,
-      "note": "Manual progress/theme are not student-content stores and are outside Generator scoped end-work cleanup."
+      "note": "Interactive-manual progress/theme only; no test/student content."
     },
     {
       "kind": "localStorage",
-      "category": "shared-platform-handoff-telemetry",
+      "category": "suite-session-lifecycle",
       "patterns": [
-        "ghrab.handoff.v1",
-        "ghrab.pilot.events.v2",
+        "ghrab.generator.suite-session-seen.v1",
+        "ghrab.generator.suite-session-status.v1"
+      ],
+      "sensitivity": "non-content-security-state",
+      "authority": "generator-and-platform-lifecycle",
+      "clearOnEndWork": false,
+      "note": "Persistent lifecycle tombstones. Reserved from content deletion so replay is idempotent and F-02 states remain auditable."
+    },
+    {
+      "kind": "localStorage",
+      "category": "shared-suite-session-generation",
+      "patterns": [
+        "ghrab.platform.suite-session-generation.v1"
+      ],
+      "sensitivity": "non-content-security-state",
+      "authority": "shared-platform-coordinator",
+      "clearOnEndWork": false,
+      "note": "Global Platform 1.1.2 generation tombstone. Generator reads it but never owns/rotates/deletes it."
+    },
+    {
+      "kind": "localStorage",
+      "category": "transient-handoff",
+      "patterns": [
+        "ghrab.platform.handoff.v2",
+        "ghrab.handoff.v1"
+      ],
+      "sensitivity": "potentially-personal",
+      "authority": "shared-platform-target-scoped",
+      "clearOnEndWork": true,
+      "note": "Generator cleanup deletes only a valid handoff whose target is generator; it never blindly removes a packet for another child."
+    },
+    {
+      "kind": "localStorage",
+      "category": "operational-telemetry",
+      "patterns": [
+        "ghrab.pilot.events.v2"
+      ],
+      "sensitivity": "non-content-operational-telemetry",
+      "authority": "shared-platform",
+      "clearOnEndWork": false,
+      "note": "PC-01 verified current bridge records only allow-listed handoff metadata, not material content."
+    },
+    {
+      "kind": "localStorage",
+      "category": "shared-access-permit",
+      "patterns": [
         "ghrab.access.permit.v2"
       ],
-      "sensitivity": "mixed-shared-platform",
-      "authority": "AI-Studio/shared-platform",
-      "clearOnEndWork": "permit-only",
-      "note": "Legacy handoff is removed when consumed/expired. Pilot events contain handoff metadata, not material content. The shared access permit is removed by generatorEndWork()."
+      "sensitivity": "credential-session",
+      "authority": "AI-Studio/shared-access",
+      "clearOnEndWork": false,
+      "note": "Suite coordinator owns permit invalidation. Manual Generator end-work also removes it as a local convenience, but suite child cleanup does not claim ownership of this shared key."
     },
     {
       "kind": "cacheStorage",
@@ -101,8 +154,9 @@
         "generator*"
       ],
       "sensitivity": "non-content-cache",
-      "authority": "client",
-      "clearOnEndWork": false
+      "authority": "generator-client",
+      "clearOnEndWork": false,
+      "note": "Service worker caches static/runtime assets only; PC-01 found no student/test content writer into Cache Storage."
     }
   ],
   "retention": {
@@ -129,14 +183,14 @@
   "deletion": {
     "supported": true,
     "clientVerified": true,
-    "clientControl": "generatorEndWork()",
+    "clientControl": "ghrab-suite-session-v1 handler + generatorEndWork()",
     "serverEndpoint": null,
-    "scope": "generator-owned localStorage/sessionStorage plus central access permit and current-page in-memory Generator test/file/roster state; excludes other AI Studio app data and non-content PWA cache"
+    "scope": "Generator-owned localStorage/sessionStorage, target=generator handoff packets and current-page in-memory test/file/roster/AI state; manual generatorEndWork additionally removes the shared access permit. Excludes other child namespaces, global suite generation tombstone, lifecycle acknowledgement/status, non-content telemetry and PWA cache."
   },
   "sharedDevice": {
     "supported": true,
     "defaultInSchoolProfile": true,
-    "control": "generatorEndWork()"
+    "control": "GHRABPlatform.session.onEnd(...) via public/access/suite-session-cleanup.js; manual fallback generatorEndWork()"
   },
   "storageNamespace": {
     "schema": "ghrab-storage-namespace-v1",
@@ -158,5 +212,53 @@
     "maxBytes": 524288,
     "validation": "exact __type/formatVersion plus allowlisted state/DOM sanitization; uploaded binary source files are not embedded in this transfer format",
     "note": "This describes the teacher-to-teacher assignment-configuration JSON import. Other generated HTML/ZIP/result exports are not reimported through this path."
+  },
+  "ownership": {
+    "localStorageRule": {
+      "prefix": "ghrab.generator.",
+      "legacyPrefixes": [
+        "sestavovac_"
+      ],
+      "legacyExact": [
+        "genOnboardingDone_v1"
+      ],
+      "reserved": [
+        "ghrab.generator.suite-session-seen.v1",
+        "ghrab.generator.suite-session-status.v1"
+      ]
+    },
+    "sessionStorageRule": {
+      "prefix": "ghrab.generator.",
+      "legacyPrefixes": [
+        "sestavovac_"
+      ],
+      "legacyExact": [
+        "genWelcomeShown_session"
+      ],
+      "reserved": []
+    },
+    "sharedTargetScoped": [
+      "ghrab.platform.handoff.v2",
+      "ghrab.handoff.v1"
+    ],
+    "notOwned": [
+      "ghrab.platform.suite-session-generation.v1",
+      "ghrab.pilot.events.v2",
+      "ghrab.access.permit.v2",
+      "ghrab-manual-progress-test-generator-*",
+      "ghrab-manual-theme"
+    ],
+    "note": "Runtime deletion uses the same Generator prefix/legacy rule with explicit lifecycle reservations. Shared handoff deletion is target-scoped."
+  },
+  "suiteSession": {
+    "schema": "ghrab-suite-session-v1",
+    "platformVersion": "1.1.2",
+    "generationKey": "ghrab.platform.suite-session-generation.v1",
+    "seenKey": "ghrab.generator.suite-session-seen.v1",
+    "statusKey": "ghrab.generator.suite-session-status.v1",
+    "handler": "public/access/suite-session-cleanup.js",
+    "replay": true,
+    "acknowledgement": "Platform seen key advances only after verified local cleanup; status distinguishes signal seen, cleanup complete and acknowledgement. Failed cleanup returns ok:false and must not advance seen.",
+    "staleDocumentGuard": "per-document generation baseline plus persistence guards and pageshow/focus/visibility checks"
   }
 }

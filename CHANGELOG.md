@@ -1,3 +1,12 @@
+## 7.1.21 — GHRAB Platform 1.1.2 suite-session migration candidate (2026-09-05)
+
+- Přesná vendor vrstva GHRAB Platform 1.1.2 z referenčního AI Studia 0.21.40.
+- `ghrab-suite-session-v1` cleanup pro otevřenou, delayed-open, multi-tab a stale/BFCache instanci.
+- F-02 lokální acknowledgement: signal → seen status → verified cleanup → platform seen ack; při chybě se ack neposune.
+- PC-01 aktualizován včetně plné migration backup kopie, target-scoped handoffu, AI klíčů a in-memory AI/test/roster stavu.
+- Persistence writery mají fail-closed generation guard; suite end abortuje probíhající AI request a znemožní starému dokumentu obnovit data.
+- Kandidát není automaticky produkční release; E-01 zůstává otevřený na úrovni ekosystému do migrace a společného testu všech relevantních child aplikací.
+
 ## 7.1.20 — post-second-Claude repair candidate GARP 2.3 (2026-08-30)
 
 - Opraven HIGH release-integrity regresní nález C2-01: inlinovaný verifier už neobsahuje souvislé `</script>` uvnitř emitovaného JS zdroje; přidán fail-closed source guard a negativní kontrola.

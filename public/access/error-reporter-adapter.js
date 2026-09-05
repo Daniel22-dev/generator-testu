@@ -8,7 +8,7 @@ const reporterGuideUrl = deployment?.access?.guideUrl || new URL('manualy/error-
 const reporter = setupErrorReporter({
   appId: 'generator',
   appName: 'Generátor testů',
-  appVersion: '7.1.20',
+  appVersion: '7.1.21',
   studioUrl: reporterStudioUrl,
   supportEmail: 'balaz@ghrabuvka.cz',
   guideUrl: reporterGuideUrl,

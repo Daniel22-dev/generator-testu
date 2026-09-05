@@ -1,6 +1,14 @@
 
 'use strict';
 
+// Suite-session fail-closed persistence guard. The unprotected lifecycle bootstrap
+// is loaded before GHRAB Platform 1.1.2 and remains authoritative even for stale
+// BFCache/history documents. Writers must not recreate data after suite end.
+function generatorPersistenceAllowed(){
+  const lifecycle = window.__GHRAB_GENERATOR_SUITE_SESSION__;
+  return !lifecycle || typeof lifecycle.persistenceAllowed !== 'function' || lifecycle.persistenceAllowed() !== false;
+}
+
 // ═══ Constants ════════════════════════════════════════════════════════════════
 const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
@@ -17,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.20',
-  date:    '2026-08-30',
+  version: '7.1.21',
+  date:    '2026-09-05',
   status:  'production-serverless',
   changes: [
+    'MIGRACE GHRAB PLATFORM 1.1.2 (7.1.21): Generátor je napojen na suite-level lifecycle ghrab-suite-session-v1. Otevřená, zavřená i stale/BFCache instance uklízí pouze Generator-owned obsah, target-scoped handoff a in-memory AI/test/roster data; persistence je po suite end uzamčena, cleanup je fail-closed a acknowledgement vzniká až po ověřeném úklidu. Kandidát je součást ecosystem release wave a není samostatně release-approved.',
     'OPRAVNÝ KANDIDÁT GARP 2.3 PO DRUHÉM CLAUDE KOLE (7.1.20): opraven release-blocking terminátor inline skriptu ve verifieru, sjednocen importní kontrakt manifestů, standardní testovací řetěz nyní používá plný build a povinný headless krok, document.write baseline je zamčena na nule a GARP/PC-01 regrese byly dále zpřísněny. Tento post-second-review build není release-approved a před nasazením vyžaduje výslovně zahájenou novou nezávislou kontrolu.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP 2.3 K1 (7.1.18): sjednocena AI trust boundary pro všechny vstupy a přílohy, diferenciace už neposílá skutečné identity do AI, self-test běží v opaque iframe přes omezené RPC, návratový odkaz AI Studia je omezen na nakonfigurovaný origin/cestu a sdílené zařízení má skutečné scoped ukončení práce s mazáním místních dat. Přidán GARP 2.3 regresní harness s negativními kontrolami.',
     'INTEGRAČNÍ HOTFIX AI STUDIA (7.1.18): deployment Generátoru používá stejnou podepsanou přístupovou konfiguraci jako aktuální AI Studio. Správcovské oprávnění se proto již nezamítne kvůli rozdílné verzi bezpečnostního bundle.',
@@ -30,7 +39,6 @@ const RELEASE = Object.freeze({
     'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.13): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
     'SJEDNOCENÝ REPORTÉR CHYB (7.1.13): Generátor používá právě jednu lokální instanci společného reportéru AI Studia a centrální kopii vypíná přes errorReporter:false. Otevřený dialog živě sleduje body.light, podporuje pět screenshotů, bezpečné zachování nebo úplné smazání konceptu, anonymizovaný ZIP a nativní odkaz do Gmailu. Reportér je v PWA cache a manuál odkazuje na centrální návod.',
     'MANUÁL UVNITŘ AI STUDIA (7.1.4): interaktivní manuál je aktualizovaný pro současné funkce a při otevření z aplikace zůstává ve stejném pracovním rámci místo nové karty. Opravná verze zároveň mění PWA cache, aby se změna spolehlivě načetla i ve dříve nainstalované aplikaci.',
-    'GHRAB QA CERTIFIKACE (7.1.3): Generátor byl začleněn do jednotné brány GHRAB QA 1.0.1. Zachovány byly jeho podrobné workflow a headless testy; nově se společně ověřuje technická konzistence, bezpečnost, PWA, pairwise kombinace, kritická workflow, skutečný Chromium vzhled a ruční galerie svázaná s otiskem buildu.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

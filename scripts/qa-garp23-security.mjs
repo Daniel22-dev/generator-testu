@@ -167,7 +167,7 @@ const transportJson = JSON.stringify(transportParts);
 check(!/Jana/i.test(transportJson) && !/code\s+A1\b/i.test(transportJson) && transportJson.includes('Student A1') && transportJson.includes('Student A2'), 'RT-19 sanitized differentiation identifiers remain pseudonymized in assembled AI inputParts');
 check(transportFns.genPreflight(transportParts) === true, 'RT-19 pseudonymized synthetic payload passes production preflight');
 let transportContactBlocked = false;
-try { transportFns.genPreflight(transportFns.genCoreParts('Contact synthetic.student@example.invalid before answering.', [])); } catch (e) { transportContactBlocked = e?.code === 'PREFLIGHT_BLOCKED'; }
+try { transportFns.genPreflight(transportFns.genCoreParts('Contact synthetic.student@example.com before answering.', [])); } catch (e) { transportContactBlocked = e?.code === 'PREFLIGHT_BLOCKED'; }
 check(transportContactBlocked, 'RT-19 production transport preflight blocks synthetic contact data before AI.generate');
 
 // PC-01: enumerate real application call sites with a hermetic lexical code scan.
@@ -258,7 +258,7 @@ const expectedAiCalls = [
   ['src/js/08-manual-editor.js',"batchCorrectiveNote?'generation-repair':'exercise-generation'"],
   ['src/js/08-manual-editor.js',"correctiveNote?'generation-repair':'test-generation'"]
 ].map(([file,operation])=>`${file}|${operation}`).sort();
-const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|473','src/js/01-core.js|702'].sort();
+const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|481','src/js/01-core.js|710'].sort();
 const aiInventory=aiCallInventory();
 const actualAiCalls=aiInventory.rows;
 const actualAiKeys=actualAiCalls.map(invKey).sort();
@@ -321,59 +321,27 @@ try { preflight([{ type: 'text', text: `Synthetic learner marker ${privacyCanary
 check(emailBlocked, 'RT-19 synthetic @example.invalid privacy canary is blocked before AI egress');
 check(preflight([{ type: 'text', text: 'Synthetic lesson about irregular verbs, Student A1.' }]) === true, 'RT-19 negative control allows benign pseudonymous prompt');
 
-// --- RT-20 shared-device deletion: run the real source functions in a fake Storage realm ---
+// --- RT-20 shared-device deletion / Platform 1.1.2 suite-session integration ---
+// Dynamic open/replay/multi-tab/BFCache/fail-closed/canary/negative-control scenarios
+// are executed by scripts/test-suite-session-lifecycle.mjs before this harness.
 const access = read('src/js/16-access.js');
-const clearStart = access.indexOf('const GENERATOR_LEGACY_EXACT_KEYS');
-const clearEnd = access.indexOf('function accOnGranted()', clearStart);
-if (clearStart < 0 || clearEnd < 0) throw new Error('generatorEndWork block not found.');
-const clearBlock = access.slice(clearStart, clearEnd);
-class FakeStorage {
-  constructor(entries = {}) { this.map = new Map(Object.entries(entries)); }
-  get length() { return this.map.size; }
-  key(i) { return [...this.map.keys()][i] ?? null; }
-  getItem(k) { return this.map.has(String(k)) ? this.map.get(String(k)) : null; }
-  setItem(k, v) { this.map.set(String(k), String(v)); }
-  removeItem(k) { this.map.delete(String(k)); }
-}
-const geminiLocalKey = gemini.match(/const GEMINI_KEY_SK\s*=\s*'([^']+)'/)?.[1];
-const geminiSessionKey = gemini.match(/const GEMINI_KEY_SESSION_SK\s*=\s*'([^']+)'/)?.[1];
-check(!!geminiLocalKey && !!geminiSessionKey, 'RT-20 storage fixtures derive Gemini key names from production constants');
-const local = new FakeStorage({
-  'ghrab.generator.state.v1': `state-${studentCanary}`,
-  'ghrab.generator.migration.p2-storage-namespace-v1.backup': `backup-${studentCanary}`,
-  'sestavovac_hist_v5_13_0': `legacy-${studentCanary}`,
-  'genOnboardingDone_v1': '1',
-  [geminiLocalKey]: 'synthetic-not-a-real-key',
-  'ghrab.access.permit.v2': 'synthetic-permit',
-  'ghrab.other-app.state': 'must-survive'
-});
-const session = new FakeStorage({
-  [geminiSessionKey]: 'synthetic-not-a-real-key',
-  'genWelcomeShown_session': '1',
-  'ghrab.other-app.session': 'must-survive'
-});
-const deletionFactory = vm.runInNewContext(`(function(localStorage,sessionStorage,location){const STUDIO_ACCESS_KEY='ghrab.access.permit.v2';const STUDIO_ROOT='/AI-Studio-GHRAB/';const DEFAULT={tema:'synthetic-default',skupiny:[]};let state={tema:'${studentCanary}',skupiny:[{studenti:['${studentCanary}']}]};let groupIdCounter=7;const Access={profile:{displayName:'${studentCanary}'}};let geminiApiKey='synthetic',geminiKeyScope='session',lastGeminiRawResponse='${studentCanary}',lastGeminiJsonRepaired=true,fileObjects=[{textContent:'${studentCanary}'}],fileReadPromises=[Promise.resolve('${studentCanary}')],generatedTestHtml='${studentCanary}',generatedPackage={x:'${studentCanary}'},generatedIntegrity={x:'${studentCanary}'},lastGenData={answer:'${studentCanary}'},lastAssembled={x:'${studentCanary}'},rosterEntries=[{email:'synthetic@example.invalid',label:'${studentCanary}'}],variantSeq=2,variantSlug='${studentCanary}';${clearBlock};return {generatorEndWork,getMemory:()=>({state,groupIdCounter,profile:Access.profile,geminiApiKey,geminiKeyScope,lastGeminiRawResponse,lastGeminiJsonRepaired,fileObjects,fileReadPromises,generatedTestHtml,generatedPackage,generatedIntegrity,lastGenData,lastAssembled,rosterEntries,variantSeq,variantSlug})};})`, {});
-const deletion = deletionFactory(local, session, { href: 'https://example.invalid/generator/' });
-const deletionReport = deletion.generatorEndWork({ navigate: false });
-const deletionMemory = deletion.getMemory();
-check(deletionReport.failures.length === 0, 'RT-20 end-work deletion reports no storage failures');
-check([...local.map.keys()].every(k => !k.startsWith('ghrab.generator.') && !k.startsWith('sestavovac_') && k !== 'genOnboardingDone_v1' && k !== 'ghrab.access.permit.v2'), 'RT-20 all Generator local/legacy/permit keys removed');
-check([...session.map.keys()].every(k => !k.startsWith('ghrab.generator.') && !k.startsWith('sestavovac_') && k !== 'genWelcomeShown_session'), 'RT-20 all Generator session/legacy keys removed');
-check(local.getItem('ghrab.other-app.state') === 'must-survive' && session.getItem('ghrab.other-app.session') === 'must-survive', 'RT-20 negative control preserves other AI Studio app storage');
-check(!JSON.stringify(deletionMemory).includes(studentCanary) && deletionMemory.lastGenData===null && deletionMemory.generatedIntegrity===null && deletionMemory.fileReadPromises.length===0 && deletionMemory.rosterEntries.length===0, 'RT-20 end-work clears in-memory test data, answer-key state, file promises and roster identifiers');
-const weakenedClearBlock = clearBlock.replace("k.startsWith('ghrab.generator.')", 'false');
-const weakLocal = new FakeStorage({'ghrab.generator.state.v1':'synthetic-private','ghrab.other-app.state':'must-survive'});
-const weakSession = new FakeStorage({[geminiSessionKey]:'synthetic-not-a-real-key'});
-const weakenedDeletionFactory = vm.runInNewContext(`(function(localStorage,sessionStorage,location){const STUDIO_ACCESS_KEY='ghrab.access.permit.v2';const STUDIO_ROOT='/AI-Studio-GHRAB/';const DEFAULT={};let state={};let groupIdCounter=0;const Access={profile:null};let geminiApiKey='',geminiKeyScope='session',lastGeminiRawResponse=null,lastGeminiJsonRepaired=false,fileObjects=[],fileReadPromises=[],generatedTestHtml='',generatedPackage=null,generatedIntegrity=null,lastGenData=null,lastAssembled=null,rosterEntries=[],variantSeq=0,variantSlug='';${weakenedClearBlock};return {generatorEndWork};})`, {});
-weakenedDeletionFactory(weakLocal, weakSession, {href:'https://example.invalid/generator/'}).generatorEndWork({navigate:false});
-check(weakLocal.getItem('ghrab.generator.state.v1') === 'synthetic-private', 'RT-20 negative control proves weakened Generator-prefix deletion would be detected');
+const suiteLifecycle = read('public/access/suite-session-cleanup.js');
+check(/GHRABPlatform|GHRAB_PLATFORM/.test(suiteLifecycle) && /session\.onEnd|sessionApi\.onEnd/.test(suiteLifecycle), 'RT-20 suite-session handler uses Platform 1.1.2 onEnd contract');
+check(/ghrab\.platform\.suite-session-generation\.v1/.test(suiteLifecycle) && /ghrab\.generator\.suite-session-seen\.v1/.test(suiteLifecycle), 'RT-20 suite generation and Generator acknowledgement keys are explicit');
+check(/RESERVED_GENERATOR_KEYS/.test(suiteLifecycle) && /suite-session-status\.v1/.test(suiteLifecycle), 'RT-20 lifecycle tombstones are reserved from content cleanup');
+check(/persistenceAllowed/.test(suiteLifecycle) && /pageshow/.test(suiteLifecycle) && /visibilitychange/.test(suiteLifecycle), 'SIM-03/04 stale-document persistence guard is wired');
+check(/currentGeminiAbortController/.test(access) && /geminiCancelRequested=true/.test(access), 'RT-20 suite runtime cleanup aborts in-flight AI and clears late-write path');
+check(/migration\.p2-storage-namespace-v1\.backup/.test(read('public/config/data-manifest.json')), 'PC-01 full migration backup is explicitly classified for cleanup');
 
 const manifest = JSON.parse(read('public/config/data-manifest.json'));
-check(manifest.sharedDevice?.control === 'generatorEndWork()', 'Data manifest points to the real shared-device control');
-check(manifest.deletion?.clientControl === 'generatorEndWork()' && manifest.deletion?.serverEndpoint === null, 'Data manifest does not claim a nonexistent server deletion endpoint');
+check(String(manifest.sharedDevice?.control||'').includes('session.onEnd'), 'Data manifest points to suite-session shared-device control');
+check(String(manifest.deletion?.clientControl||'').includes('ghrab-suite-session-v1') && manifest.deletion?.serverEndpoint === null, 'Data manifest truthfully declares client suite cleanup and no nonexistent server deletion endpoint');
+check(manifest.suiteSession?.schema === 'ghrab-suite-session-v1' && manifest.suiteSession?.platformVersion === '1.1.2', 'Data manifest declares Platform 1.1.2 suite-session contract');
+check(manifest.ownership?.localStorageRule?.reserved?.includes('ghrab.generator.suite-session-seen.v1') && manifest.ownership?.localStorageRule?.reserved?.includes('ghrab.generator.suite-session-status.v1'), 'PC-01 ownership reserves lifecycle acknowledgements');
 check(manifest.retention?.defaultDays === null && typeof manifest.retention?.clientPolicy === 'string', 'Data manifest does not claim an unimplemented automatic client retention period');
 check(manifest.import?.supported === true && manifest.import?.artifactTypes?.includes('generator-testu-zadani') && manifest.import?.maxBytes === 524288, 'Data manifest truthfully declares the validated 512 kB assignment-configuration JSON import');
 const consumerManifest=JSON.parse(read('ghrab-platform.consumer.json'));
+check(consumerManifest.platform?.version === '1.1.2' && consumerManifest.platform?.requiredRange === '>=1.1.2 <2.0.0', 'Platform consumer requires GHRAB Platform 1.1.2');
 check(JSON.stringify(consumerManifest.artifact?.imports||[])===JSON.stringify(manifest.import?.artifactTypes||[]), 'RT-08 source consumer artifact imports match the data-manifest import contract');
 
 // --- RT-06 / RT-17 student package: answer-key canary must be absent for every canonical exercise type ---
@@ -430,9 +398,9 @@ const report = {
   airStructural: { attempts: mutations.length, mutationFamilies: Object.keys(mutationFamilies).length, boundaryEscapes: structuralEscapes, officialCorpus: officialCorpusEvidence, behavioralLiveModel: 'NOT TESTED' },
   privacyCanary: { type: 'example.invalid', preflightBlocked: emailBlocked },
   pc01: { reviewedApplicationCallSites: actualAiCalls.length, callSites: actualAiCalls },
-  endWork: { localRemoved: deletionReport.localRemoved, sessionRemoved: deletionReport.sessionRemoved, failures: deletionReport.failures.length, inMemoryCleared: !JSON.stringify(deletionMemory).includes(studentCanary) },
+  endWork: { lifecycleHarness: 'scripts/test-suite-session-lifecycle.mjs', platformVersion: consumerManifest.platform.version, contract: manifest.suiteSession?.schema || null },
   studentPackage: { canonicalTypesChecked: canonicalTypes.length, answerKeyCanaryAbsent: !JSON.stringify(strippedVariants).includes(answerKeyCanary) },
-  negativeControls: ['weakened-production-boundary-detected', 'new-unreviewed-ai-call-detected', 'same-line-multiple-ai-calls-detected', 'template-context-ai-call-flagged-for-review', 'raw-differentiation-egress-detected', 'weakened-deletion-detected', 'answer-key-strip-leak-detected', 'same-origin-selftest-sandbox-weakening-detected', 'same-origin-print-sandbox-weakening-detected', 'benign-pseudonymous-preflight-allowed', 'other-app-storage-preserved'],
+  negativeControls: ['weakened-production-boundary-detected', 'new-unreviewed-ai-call-detected', 'same-line-multiple-ai-calls-detected', 'template-context-ai-call-flagged-for-review', 'raw-differentiation-egress-detected', 'suite-session-negative-control-detected-by-lifecycle-harness', 'answer-key-strip-leak-detected', 'same-origin-selftest-sandbox-weakening-detected', 'same-origin-print-sandbox-weakening-detected', 'benign-pseudonymous-preflight-allowed', 'other-app-storage-preserved'],
   passed: passes.length,
   failed: failures.length,
   failures
