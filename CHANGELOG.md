@@ -1,3 +1,12 @@
+## 7.1.25 — hotfix self-testu bodování (2026-09-10)
+
+- Opraveno falešné selhání `Self-test RPC timeout: __has__` v bezpečném offline režimu.
+- Příčina: RPC bridge se vkládal před první textový `</body>`; teacher verifier ale obsahuje další `</body></html>` uvnitř JavaScriptových šablon pro feedback, archiv a tisk. Bridge proto mohl skončit uvnitř JS řetězce a nikdy se nespustil.
+- Nově se bridge vkládá před poslední uzavírací `</body>` výsledného dokumentu.
+- Přidána regresní kontrola `scripts/check-selftest-rpc-injection.mjs` a čitelnější diagnostická zpráva bootstrap timeoutu.
+- Zachycený 180s `AbortError` Gemini v uživatelském reportu byl starší síťový timeout a není příčinou selhání self-testu.
+- Bezpečnostní evidence 7.1.24 se tímto hotfixem automaticky nepřenáší na 7.1.25; nový kandidát vyžaduje revalidaci.
+
 ## 7.1.24 — Service Worker offline privacy hardening (2026-09-08)
 
 - Uzavřen auditní nález N3-01: `suite-session-cleanup.js` a `ghrab-platform.js` používají network-first s `cache: no-store` pokusem a install-cache fallbackem, takže online se aktualizují a offline zůstává zachována cleanup/platform vrstva.

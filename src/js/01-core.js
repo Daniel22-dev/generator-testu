@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.24',
-  date:    '2026-09-08',
+  version: '7.1.25',
+  date:    '2026-09-10',
   status:  'production-serverless',
   changes: [
+    'HOTFIX SELF-TESTU BODOVÁNÍ (7.1.25): opraven RPC bootstrap skrytého verifieru. Bridge se nyní vkládá před poslední uzavírací </body> dokumentu, nikoli před první textový výskyt, který mohl ležet uvnitř JavaScriptové HTML šablony pro feedback/archiv/tisk. Tím se odstraňuje falešné selhání „RPC __has__ timeout“ a zbytečné blokování stažení testu. Přidána je regresní kontrola tohoto scénáře.',
     'RUNTIME HARDENING PO CLAUDE KOLE 3 (7.1.24): Service Worker rozlišuje skutečný autorizační/revokační stav, který zůstává network-only/no-store, od podpůrných vrstev suite-session cleanup a GHRAB Platform. Ty se online vždy načítají čerstvě, ale při výpadku použijí poslední nainstalovanou kopii, aby na sdíleném zařízení tiše nezmizel úklid dat. Přidány jsou mutační a offline regresní kontroly; kandidát vyžaduje nezávislou revalidaci.',
     'MIGRACE GHRAB PLATFORM 1.1.2 (7.1.23): Generátor je napojen na suite-level lifecycle ghrab-suite-session-v1. Otevřená, zavřená i stale/BFCache instance uklízí pouze Generator-owned obsah, target-scoped handoff a in-memory AI/test/roster data; persistence je po suite end uzamčena, cleanup je fail-closed a acknowledgement vzniká až po ověřeném úklidu. Kandidát je součást ecosystem release wave a není samostatně release-approved.',
     'OPRAVNÝ KANDIDÁT GARP 2.3 PO DRUHÉM CLAUDE KOLE (7.1.20): opraven release-blocking terminátor inline skriptu ve verifieru, sjednocen importní kontrakt manifestů, standardní testovací řetěz nyní používá plný build a povinný headless krok, document.write baseline je zamčena na nule a GARP/PC-01 regrese byly dále zpřísněny. Tento post-second-review build není release-approved a před nasazením vyžaduje výslovně zahájenou novou nezávislou kontrolu.',
@@ -37,9 +38,7 @@ const RELEASE = Object.freeze({
     'OPRAVA P5 ROZPOČTŮ PO GARP K2 (7.1.16): lokální CSP-safe parser Acorn se načítá až při prvním sestavení nebo ověření testu, ne při startu aplikace ani v povinné PWA precache. Smoke validátory na něj asynchronně čekají a při chybě načtení selžou uzamčeně; kritický start i precache se vrátily pod původní limity.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP K2 (7.1.15): GitHub Pages build i manuál mají aktivní CSP. unsafe-eval není povolen; validace generovaného JavaScriptu používá lokální parser Acorn a diagnostické bodování společnou CSP-safe factory místo new Function. Všechny exporty nyní bez WebCrypto selžou uzamčeně, takže instant režim už nemůže tiše vytvořit slabý FNV hash.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP K1 (7.1.14): start aplikace nyní selže uzamčeně při chybě konfigurace, nepovolené adrese nebo chybějícím permitu; AI profily jsou pevně oddělené na veřejný direct Gemini a školní same-origin gateway bez automatického fallbacku. Importy a lokálně uložené stavy mají schéma, velikostní limity a ochranu proti prototypovým klíčům; CI Actions jsou připnuté SHA a zranitelné nepřímé závislosti aktualizované.',
-    'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.13): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',
-    'SJEDNOCENÝ REPORTÉR CHYB (7.1.13): Generátor používá právě jednu lokální instanci společného reportéru AI Studia a centrální kopii vypíná přes errorReporter:false. Otevřený dialog živě sleduje body.light, podporuje pět screenshotů, bezpečné zachování nebo úplné smazání konceptu, anonymizovaný ZIP a nativní odkaz do Gmailu. Reportér je v PWA cache a manuál odkazuje na centrální návod.',
-  ]
+    'PLATFORMNÍ P1 A ŠKOLNÍ AI GATEWAY (7.1.13): šest AI aplikací sdílí GHRAB AI Core 1.0.0; Generátor registruje deset operací a propojuje až šest interních požadavků pod jedno workflow. GitHub profil zachovává přímý Gemini režim, školní profil používá serverovou relaci a OpenAI gateway bez provider klíče v prohlížeči.',  ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
 // hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který

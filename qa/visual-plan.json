@@ -238,7 +238,7 @@
       "id": "generator-changelog",
       "name": "Changelog konkrétní verze",
       "url": "/dist/index.html",
-      "expectedText": "Generátor testů v7.1.24",
+      "expectedText": "Generátor testů v7.1.25",
       "mustVisible": [
         "#changelogGate"
       ],

@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.24  
+**Aktuální verze:** 7.1.25  
+
+> **7.1.25 hotfix (2026-09-10):** opravuje produkční regresi self-testu bodování v bezpečném offline režimu (`RPC __has__ timeout`). Jde o změnu distribuovaného kódu po 7.1.24, takže bezpečnostní evidence 7.1.24 zůstává historickým podkladem a 7.1.25 vyžaduje nový regresní/GARP průchod před tvrzením, že je znovu auditně schválena.
 **Platforma:** GHRAB Platform 1.1.2 · QA etapa P5
 
 

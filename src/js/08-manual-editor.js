@@ -807,7 +807,16 @@ function stRpcBridgeHtml(html, nonce){
     +'else{if(!A.has(d.name)||typeof window[d.name]!=="function")throw new Error("RPC function is not allowed");result=await window[d.name].apply(window,Array.isArray(d.args)?d.args:[]);}}'
     +'catch(e){ok=false;error=String(e&&e.message?e.message:e);}parent.postMessage({__ghrabSelfTestRpc:C.nonce,id:d.id,ok:ok,result:result,error:error},"*");});})();<\/script>';
   const source=String(html||'');
-  return /<\/body\s*>/i.test(source) ? source.replace(/<\/body\s*>/i,bridge+'</body>') : source+bridge;
+  // Emitovaný verifier obsahuje vlastní HTML šablony pro feedback, archiv a tisk.
+  // Ty mají textové "</body>" uvnitř JavaScriptových řetězců. První výskyt proto
+  // NENÍ spolehlivě konec dokumentu; RPC bridge musí být vložen před poslední
+  // uzavírací </body>, jinak skončí uvnitř JS řetězce a iframe neodpoví.
+  const bodyCloseRe=/<\/body\s*>/ig;
+  let match,lastBodyIndex=-1;
+  while((match=bodyCloseRe.exec(source))) lastBodyIndex=match.index;
+  return lastBodyIndex>=0
+    ? source.slice(0,lastBodyIndex)+bridge+source.slice(lastBodyIndex)
+    : source+bridge;
 }
 function stMakeHiddenFrame(html, readyNames){
   // Self-test spouští skutečný emitovaný kód, ale v OPAQUE sandbox originu. Rodič
@@ -821,7 +830,13 @@ function stMakeHiddenFrame(html, readyNames){
     const cleanup=()=>{ window.removeEventListener('message',onMessage); if(hardCap)clearTimeout(hardCap); pending.forEach(p=>p.reject(new Error('Self-test iframe byl ukončen.'))); pending.clear(); };
     const remove=()=>{ cleanup(); try{f.remove();}catch(_e){} };
     const call=(name,args=[])=>new Promise((res,rej)=>{
-      const id=nonce+':'+(++seq); const timer=setTimeout(()=>{pending.delete(id);rej(new Error('Self-test RPC timeout: '+name));},4500);
+      const id=nonce+':'+(++seq); const timer=setTimeout(()=>{
+        pending.delete(id);
+        const msg=name==='__has__'
+          ? 'Self-testovací iframe neodpověděl při inicializaci (RPC __has__ timeout).'
+          : 'Self-test RPC timeout: '+name;
+        rej(new Error(msg));
+      },4500);
       pending.set(id,{resolve:v=>{clearTimeout(timer);res(v);},reject:e=>{clearTimeout(timer);rej(e);}});
       try{ f.contentWindow.postMessage({__ghrabSelfTestRpc:nonce,id,name,args},'*'); }
       catch(e){ pending.delete(id); clearTimeout(timer); rej(e); }
