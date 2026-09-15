@@ -49,11 +49,13 @@ function buildTestScreenHtml(cfg, exercises) {
     '<div class="ex-area" id="exArea">' +
     exercises.map((ex,ei) => buildExerciseHtml(ex, ei, cfg, exercises.length)).join('') +
     '</div>' +
-    '<div class="submit-row">' +
-    (cfg.odevzdavani === 'A'
-      ? '<button class="btn-submit" id="btnFinalSubmit" onclick="finishVariantA()">' + H(L.showResult) + ' &#8594;</button>'
-      : '<button class="btn-submit" onclick="confirmSubmit()">' + H(L.submitTest) + ' &#8594;</button>') +
-    '</div>' +
+    (cfg.layout === 'tabs' ? '' : (
+      '<div class="submit-row">' +
+      (cfg.odevzdavani === 'A'
+        ? '<button class="btn-submit" id="btnFinalSubmit" onclick="finishVariantA()">' + H(L.showResult) + ' &#8594;</button>'
+        : '<button class="btn-submit" onclick="confirmSubmit()">' + H(L.submitTest) + ' &#8594;</button>') +
+      '</div>'
+    )) +
     '</div>';
 }
 

@@ -156,31 +156,15 @@ function renderDidacticReview(){
 }
 function exportChecklistItems(){
   const secure = !!(generatedPackage && generatedPackage.mode === 'secureOffline');
-  // Třetí pole `required` (jen u secure): true = blokující pro stažení, false = doporučující.
-  // Smysl: self-test ověří, že stroj boduje konzistentně podle KLÍČE, ale jestli ten KLÍČ
-  // sám obsahově sedí, musí potvrdit učitel. Tohle je obsahová vrstva nad technickou.
+  // U okamžitého/cvičného testu checklist nic neblokuje a jen zahlcoval UI, proto se
+  // vůbec nezobrazuje. U klasifikovaného secure testu ponecháváme pouze čtyři
+  // skutečně důležité lidské kontroly. Technické věci hlídá self-test a SecretScanner.
+  if (!secure) return [];
   return [
-    ['zadani','Přečetl/a jsem zadání — je srozumitelné a odpovídá probírané látce. (Pomůže panel „🎯 Didaktická kontrola".)', secure],
-    ['preview','Otevřel/a jsem náhled testu a zkusil/a aspoň první cvičení.', secure],
-    ['answers','Prošel/a jsem všechny správné odpovědi a přijatelné varianty v editoru nebo teacher verifieru — AI může vyrobit krásný test s chybnou správnou odpovědí.', secure],
-    ['grade','Ověřil/a jsem celkový počet bodů a bodování položek.', secure],
-    ['scale','Zkontroloval/a jsem stupnici hodnocení (kdy je 1, kdy 5).', secure],
-    ...(secure ? [
-      ['aikey','Spustil/a jsem 🔑 AI ověření klíče (druhý nezávislý průchod) — doporučeno hlavně u prvního ostrého nasazení. Najde-li rozdíl u uzavřených úloh, vyřeším ho nebo vědomě potvrdím.', false]
-    ] : []),
-    ...((state.jazyk === 'čeština' && state.csModule && (state.csModule.correctionMode === 'semi' || state.csModule.correctionMode === 'manual' || state.csModule.domain === 'stylistika' || state.csModule.domain === 'literatura')) ? [
-      ['csReview','ČJ: test obsahuje položky se schválením učitele (poloautomatické nebo ruční hodnocení). Prošel/a jsem navržené alternativy, schválil/a jsem, co se uznává, a vím, které položky hodnotím ručně.', secure]
-    ] : []),
-    ...((state.fuzzyTolerance==='mild'||state.fuzzyTolerance==='strict') ? [
-      ['fuzzy', 'VĚDOMĚ jsem zapnul/a toleranci překlepů ('+(state.fuzzyTolerance==='mild'?'Mírná — překlep = 0,85 b':'Přísná — překlep = 0,5 b')+') a vím, že u psaných odpovědí se za drobný překlep přidávají body. U testu, kde hodnotím pravopis, má být Vypnuto.', secure]
-    ] : []),
-    ['security', secure ? 'Pro klasifikovaný test používám bezpečný offline režim a vím, že oprava proběhne ve verifieru.' : 'Vím, že okamžitá známka je hlavně pohodlný režim; u důležitější klasifikace bych měl/a zvážit bezpečný offline verifier.', false],
-    ['submit', secure ? 'Vím, co mají studenti po dokončení poslat: zakódovaný answers.txt nebo záložní kód.' : 'Vím, co mají studenti po dokončení poslat: screenshot výsledku.', false],
-    ...(secure ? [
-      ['publish','Studentský test jsem zveřejnil/a jako HTTPS webový odkaz (např. GitHub Pages, Netlify nebo Tiiny.host), neposílám HTML jako přílohu.', false],
-      ['onlyStudent','Studentům posílám POUZE student_test.html (resp. odkaz na něj). Učitelský verifier nikdy.', true],
-      ['noVerifierShared','Ověřil/a jsem, že ve sdílené složce / odkazu pro studenty NENÍ soubor teacher_verifier.html (obsahuje správné odpovědi a soukromý klíč).', true]
-    ] : [])
+    ['content','Prošel/a jsem náhled a zadání odpovídá probírané látce.', true],
+    ['answers','Prošel/a jsem správné odpovědi a přijatelné varianty (včetně ručně hodnocených položek a případné tolerance překlepů).', true],
+    ['grading','Zkontroloval/a jsem bodování a klasifikační stupnici.', true],
+    ['distribution','Studentům zpřístupním pouze student_test.html / jeho HTTPS odkaz; teacher_verifier.html zůstává jen učiteli.', true]
   ];
 }
 function toggleChecklistItem(key, checked){ exportChecklist[key] = !!checked; renderExportChecklist(); updateSecureDownloadGate(); }
@@ -191,6 +175,13 @@ function teacherReviewSatisfied(){
 function renderExportChecklist(collapse){
   const box = $('exportChecklist'); if (!box) return;
   const items = exportChecklistItems();
+  if (!items.length) {
+    box.classList.add('hidden');
+    box.removeAttribute('open');
+    box.innerHTML = '';
+    return;
+  }
+  box.classList.remove('hidden');
   const done = items.filter(([k]) => exportChecklist[k]).length;
   const ready = done === items.length;
   const reqCount = items.filter(it => it[2]).length;
@@ -200,7 +191,7 @@ function renderExportChecklist(collapse){
   // `open` na elementu details, takže stav rozbalení zůstane zachovaný. Sbalíme jen tehdy,
   // když to volající výslovně chce (čerstvě vygenerovaný / přesestavený test).
   if (collapse) box.removeAttribute('open');
-  box.innerHTML = `<summary><div class="check-title">✅ Checklist před stažením / odesláním studentům</div><div class="check-status ${ready?'ready':''}">${done}/${items.length} hotovo</div></summary>` +
+  box.innerHTML = `<summary><div class="check-title">✅ Krátká učitelská kontrola</div><div class="check-status ${ready?'ready':''}">${done}/${items.length} hotovo</div></summary>` +
     reqNote +
     `<div class="check-list">${items.map(([k,t,req]) => `<label class="check-item ${req?'check-item-req':''}"><input type="checkbox" ${exportChecklist[k]?'checked':''} onchange="toggleChecklistItem('${esc(k)}', this.checked)"><span>${esc(t)}${req?' <span class="check-req-tag" title="Povinné pro klasifikovaný test: stroj umí ověřit, že bodování počítá podle klíče správně, ale jestli klíč obsahově sedí, musí potvrdit učitel (AI může vyrobit hezký test s chybnou správnou odpovědí).">povinné</span>':''}</span></label>`).join('')}</div>`;
 }

@@ -307,6 +307,7 @@ ok('souvislý průchod krok 1 → finální prompt',()=>{assert(w.document.getEl
 // testuje logiku a přenos konfigurace opakovaně, proto zde nahrazuje pouze nákladný
 // generátorový KDF deterministickou testovací hodnotou. Hashování rosteru, RSA secure
 // balík a oba studentské runtime zůstávají skutečné.
+const realGeneratorDeriveSecretHash = w.deriveSecretHash;
 w.eval("deriveSecretHash=async function(kind,secret,testId){return 'pbkdf2-test$'+kind+'$'+testId;};");
 
 // 16) Public studentský HTML ověřuje jednorázový kód i bez diferenciace.
@@ -361,6 +362,119 @@ for(const layout of ['tabs','scroll'])for(const odevzdavani of ['A','B'])for(con
   outputCases++;
 }
 ok('reprezentativní výstupová matice instant HTML',()=>outputCases+' sestavených testů');
+
+// 19) Simple + strict nesmí schovat týmový bezpečnostní kód, který validace vyžaduje.
+resetBase();
+w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimpleTemplate('fl_strict');updateAppModeUI();");
+ok('simple ostrý test zobrazuje týmový bezpečnostní kód',()=>{
+  const field=w.document.getElementById('bezpKod').closest('.field');
+  assert(!field.classList.contains('advanced-only'),'povinný týmový kód je v simple strict stále schovaný');
+});
+w.eval("chooseSimpleTemplate('fl_practice');updateAppModeUI();");
+ok('simple cvičný test zbytečně neukazuje týmový kód',()=>{
+  const field=w.document.getElementById('bezpKod').closest('.field');
+  assert(field.classList.contains('advanced-only'),'nepotřebný týmový kód zůstal v simple practice viditelný');
+});
+
+// 20) Přísný secure test musí přenést lockOnLeave až do veřejné studentské konfigurace.
+ok('secure public config zachová lockOnLeave pro přísný test',()=>{
+  const pc=w.securePublicCfg({uiLang:'cs',testMode:'prisny',screenGuard:false,lockOnLeave:true,resultMode:'secureOffline',diffGroups:[]},{publicJwk:{kty:'RSA'}});
+  assert(pc.lockOnLeave===true,'lockOnLeave se do student cfg nepřenesl');
+  assert(pc.screenGuard===false,'screenGuard se přenesl chybně');
+});
+
+// 21) V záložkovém instant testu smí existovat jen jedno finální odevzdání — u posledního cvičení.
+ok('tabs instant má finální odevzdání jen v posledním cvičení',()=>{
+  const labels=w.getLabels('cs');
+  const cfg={labels,nazev:'Tabs',cas:30,totalBody:2,layout:'tabs',odevzdavani:'B',testMode:'bezny',overeni:false,zolicek:false};
+  const exs=[
+    {title:'První',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q1',options:['A','B'],correct:0}]},
+    {title:'Druhé',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q2',options:['A','B'],correct:0}]}
+  ];
+  const d=new JSDOM(w.buildTestScreenHtml(cfg,exs)).window.document;
+  assert(d.querySelectorAll('[onclick="confirmSubmit()"]')?.length===1,'záložkový test obsahuje více finálních odevzdání');
+  assert(!d.querySelector('#exPanel0 [onclick="confirmSubmit()"]'),'odevzdání je už v prvním cvičení');
+  assert(!!d.querySelector('#exPanel1 [onclick="confirmSubmit()"]'),'odevzdání chybí v posledním cvičení');
+});
+
+// 22) Procvičovací test po výsledku automaticky otevře chyby a ukáže správnou odpověď.
+await okAsync('practice po výsledku automaticky ukáže chybu i správné řešení', async()=>{
+  resetBase();
+  w.eval("Object.assign(state,{testMode:'procviceci',resultMode:'instant',feedbackMode:'learning',layout:'tabs',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
+  const gen={exercises:[{title:'Practice',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Vyber správně',options:['RIGHT_ANSWER','WRONG_ANSWER'],correct:0,explanation:'Krátké vysvětlení.'}]}]};
+  const out=await w.assembleTestHtml(w.eval('state'),gen);
+  const gd=await createGeneratedDom(out);
+  try{
+    gd.window.document.getElementById('studentName').value='Student';
+    await gd.window.startTest();
+    gd.window.selectChoice('0_0',1);
+    gd.window.doSubmit();
+    const panel=gd.window.document.getElementById('answersPanel');
+    assert(panel&&!panel.classList.contains('hidden'),'detail chyb zůstal po practice výsledku schovaný');
+    const txt=panel.textContent||'';
+    assert(txt.includes('Chyba'),'chybí označení chybné odpovědi');
+    assert(txt.includes('RIGHT_ANSWER'),'chybí správná odpověď');
+  }finally{gd.close();}
+});
+
+// 23) Secure tabs: submit se ukáže až u posledního cvičení a strict skutečně zamkne pagehide.
+await okAsync('secure tabs: submit až na konci a strict odchod zamkne test', async()=>{
+  resetBase();setVal('bezpKod','TEAM-CODE-0123456789-SECURE');
+  w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B',layout:'tabs',screenGuard:false,exerciseDetail:true,pocet:2,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1},{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
+  const gen={exercises:[
+    {title:'První',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q1',options:['A','B'],correct:0}]},
+    {title:'Druhé',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q2',options:['A','B'],correct:0}]}
+  ]};
+  const pkg=await w.assembleTestHtml(w.eval('state'),gen);
+  assert(pkg&&pkg.mode==='secureOffline','nevznikl secure balík');
+  const gd=await createGeneratedDom(pkg.studentHtml);
+  try{
+    gd.window.document.getElementById('studentName').value='Student';
+    await gd.window.startTest();
+    const submit=gd.window.document.getElementById('secureSubmitCard');
+    assert(submit&&submit.classList.contains('hidden'),'secure submit je vidět už u prvního cvičení');
+    gd.window.switchExercise(1);
+    assert(!submit.classList.contains('hidden'),'secure submit se nezobrazil u posledního cvičení');
+    gd.window.dispatchEvent(new gd.window.Event('pagehide'));
+    assert(!gd.window.document.getElementById('lockScreen').classList.contains('hidden'),'přísný test se po pagehide nezamkl');
+  }finally{gd.close();}
+});
+
+// 24) Checklist: bez secure režimu žádné klikání, secure režim přesně čtyři lidské kontroly.
+ok('export checklist je zkrácen na 0 / 4 položky podle režimu',()=>{
+  w.eval("generatedPackage={mode:'instant'}");
+  assert(w.exportChecklistItems().length===0,'instant test stále zobrazuje checklist');
+  w.eval("generatedPackage={mode:'secureOffline'}");
+  const items=w.exportChecklistItems();
+  assert(items.length===4,'secure checklist nemá přesně 4 položky');
+  assert(items.every(x=>x[2]===true),'secure checklist obsahuje nepovinné klikání');
+  w.eval("generatedPackage=null");
+});
+
+// 25) Jednorázový device lock lze znovu povolit učitelským PINem bez nové verze testu.
+await okAsync('učitelský PIN odemkne další spuštění na stejném zařízení', async()=>{
+  resetBase();setVal('bezpKod','TEAM-CODE-0123456789-SECURE');
+  w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B',layout:'tabs',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
+  const fakeDerive=w.deriveSecretHash;w.deriveSecretHash=realGeneratorDeriveSecretHash;
+  let pkg;
+  try{
+    pkg=await w.assembleTestHtml(w.eval('state'),{exercises:[{title:'Retry',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q',options:['A','B'],correct:0}]}]});
+  }finally{w.deriveSecretHash=fakeDerive;}
+  const gd=await createGeneratedDom(pkg.studentHtml);
+  try{
+    gd.window.storageSet('submitted','1');
+    gd.window.document.getElementById('studentName').value='Student';
+    await gd.window.startTest();
+    const modal=gd.window.document.querySelector('.s-modal-bd');
+    assert(modal,'po device locku se neotevřelo učitelské odemčení');
+    modal.querySelector('[data-retry-code]').value='X8p!Teacher';
+    modal.querySelector('[data-retry-ok]').click();
+    const deadline=Date.now()+4000;
+    while(Date.now()<deadline&&!gd.window.document.getElementById('intro').classList.contains('hidden'))await new Promise(r=>setTimeout(r,50));
+    assert(gd.window.storageGet('submitted')!=='1','device lock zůstal uložen');
+    assert(gd.window.document.getElementById('intro').classList.contains('hidden'),'test se po učitelském odemčení znovu nespustil');
+  }finally{gd.close();}
+});
 
 // WORKFLOW-CHECKS-END
 

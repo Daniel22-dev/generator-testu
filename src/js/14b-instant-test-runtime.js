@@ -270,6 +270,10 @@ function itemFeedbackStatusHtml(ex,item,ans,pts){
   var got=Math.round(raw*100)/100;
   var good=got>=pts-1e-9;
   var html='<div class="ap-feedback '+(good?'ap-ok':'ap-bad')+'"><b>'+(good?'✓ Správně':'✕ Chyba')+'</b> <span class="small">('+got+'/'+pts+' b)</span></div>';
+  if(!good&&CFG.testMode==='procviceci'){
+    var correct=correctTextForTeacher(ex,item);
+    if(correct)html+='<div class="small"><b>'+esc(T('correctAnswers'))+':</b> '+esc(correct)+'</div>';
+  }
   if((CFG.feedbackMode||'brief')==='learning')html+=csItemFeedbackHtml(item,good,true)||(item.explanation?'<div class="small"><b>Vysvětlení:</b> '+esc(item.explanation)+'</div>':'');
   return html;
 }
@@ -317,6 +321,14 @@ function showResult(res){
   I('resultBreakdown').innerHTML=res.breakdown.map(function(b){return '<div class="bdown-row"><span>'+esc(b.title)+'</span><span>'+b.earned+'/'+b.total+' b</span></div>';}).join('');
   var locks=securityEvents.filter(function(e){return e.type==='lock';}).length,unlocks=securityEvents.filter(function(e){return e.type==='unlock';}).length,warns=securityEvents.filter(function(e){return e.type==='warning'||e.type==='heartbeat-gap';}).length;
   if(securityEvents.length){I('resultBreakdown').insertAdjacentHTML('afterend','<div class="security-summary">Bezpečnostní záznam: '+warns+' varování, '+locks+' zámek/zámky, '+unlocks+' odemčení.</div>');}
+  // U procvičovacího testu je smyslem okamžitě se z chyby poučit. Detail odpovědí
+  // proto po vyhodnocení otevřeme automaticky; u běžného/ostrého testu zůstává
+  // chování beze změny a student si panel případně otevře tlačítkem.
+  if(CFG.testMode==='procviceci'){
+    var ap=I('answersPanel'),ab=document.querySelector('.btn-toggle-ans');
+    if(ap){ap.innerHTML=buildAnswersHtml();ap.classList.remove('hidden');}
+    if(ab)ab.textContent=T('hideAnswers');
+  }
   buildReportSeal(res).then(function(code){var el=I('reportSeal');if(el)el.textContent=code;res.reportSeal=code;if(CFG.overeni&&!jokerUsed){var ta=I('verifyTa');if(ta)ta.value='Připravuji ověřovací .txt…';buildVerify(res);}else if(jokerUsed){var vs=I('verifySection');if(vs)vs.classList.add('hidden');}}).catch(function(){var el=I('reportSeal');if(el)el.textContent='RPT-NELZE-VYTVOŘIT';var vs=I('verifySection');if(vs&&jokerUsed)vs.classList.add('hidden');});
 }
 function toggleAnswersPanel(){var p=I('answersPanel'),btn=document.querySelector('.btn-toggle-ans');if(p.classList.contains('hidden')){p.innerHTML=buildAnswersHtml();p.classList.remove('hidden');if(btn)btn.textContent=T('hideAnswers');}else{p.classList.add('hidden');if(btn)btn.textContent=T('resultAnswers');}}
@@ -333,7 +345,7 @@ function answerText(ex,item,ans){
 }
 function buildAnswersHtml(){
   var h='';EXS.forEach(function(ex,ei){h+='<div class="ap-sec"><div class="ap-ex-title">'+esc(ex.title||ex.type)+'</div>';
-    if(ex.type==='matching'){var pairs=(ANSWERS['match_'+ei]||{}).pairs||{};(ex.items||[]).forEach(function(item,li){var right=EXS[ei].items[pairs[li]]||{};var good=(pairs[li]!==undefined&&parseInt(pairs[li],10)===li);var fb=((CFG.feedbackMode||'brief')!=='none'?'<div class="ap-feedback '+(good?'ap-ok':'ap-bad')+'"><b>'+(good?'✓ Správně':'✕ Chyba')+'</b></div>'+(((CFG.feedbackMode||'brief')==='learning')?csItemFeedbackHtml(item,good,true):''):'');h+='<div class="ap-item"><span class="ap-q">'+(li+1)+'. '+esc(item.left)+'</span><span class="ap-a">'+(right.right?esc(right.right):'—')+'</span>'+fb+'</div>';});}
+    if(ex.type==='matching'){var pairs=(ANSWERS['match_'+ei]||{}).pairs||{};(ex.items||[]).forEach(function(item,li){var right=EXS[ei].items[pairs[li]]||{};var good=(pairs[li]!==undefined&&parseInt(pairs[li],10)===li);var corr=(!good&&CFG.testMode==='procviceci')?'<div class="small"><b>'+esc(T('correctAnswers'))+':</b> '+esc(item.right||'')+'</div>':'';var fb=((CFG.feedbackMode||'brief')!=='none'?'<div class="ap-feedback '+(good?'ap-ok':'ap-bad')+'"><b>'+(good?'✓ Správně':'✕ Chyba')+'</b></div>'+corr+(((CFG.feedbackMode||'brief')==='learning')?csItemFeedbackHtml(item,good,true):''):'');h+='<div class="ap-item"><span class="ap-q">'+(li+1)+'. '+esc(item.left)+'</span><span class="ap-a">'+(right.right?esc(right.right):'—')+'</span>'+fb+'</div>';});}
     else{(ex.items||[]).forEach(function(item,qi){var ans=ANSWERS[ei+'_'+qi];h+='<div class="ap-item"><span class="ap-q">'+(qi+1)+'.</span><span class="ap-a">'+answerText(ex,item,ans)+'</span>'+itemFeedbackStatusHtml(ex,item,ans,itemPoint(ex,qi))+'</div>';});}
     h+='</div>';});return h;
 }
@@ -380,7 +392,25 @@ function closeTeacherModal(){logoutTeacher();hide('teacherModal');}
 async function doTeacherLogin(){var n=(I('t-name').value||'').trim().replace(/\s+/g,' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');var p=(I('t-pin').value||'').trim().toUpperCase();var cn=(CFG.ucitelJmeno||'').trim().replace(/\s+/g,' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');var err=I('t-err');if(n===cn&&await secretMatches(p,'teacher-pin',CFG.ucitelPinHash)){teacherLogged=true;I('t-pin').value='';hide('t-login');show('t-panel');I('t-body').innerHTML=buildTeacherBody();}else{if(err){err.textContent=T('incorrectLogin');err.classList.remove('hidden');}}}
 function logoutTeacher(){teacherLogged=false;hide('t-panel');show('t-login');I('t-pin').value='';var e=I('t-err');if(e)e.classList.add('hidden');}
 function csTeacherFeedbackHtml(item){var fb=(item&&item.csFeedback&&typeof item.csFeedback==='object')?item.csFeedback:null;if(!fb)return '';var rows=[];if(fb.phenomenon)rows.push('<div><b>Jev:</b> '+esc(fb.phenomenon)+'</div>');if(fb.rule)rows.push('<div><b>Pravidlo:</b> '+esc(fb.rule)+'</div>');if(fb.whyCorrect)rows.push('<div><b>Proč:</b> '+esc(fb.whyCorrect)+'</div>');if(fb.reviewTip)rows.push('<div><b>Co zopakovat:</b> '+esc(fb.reviewTip)+'</div>');if(fb.errorFocus)rows.push('<div><b>Typ chyby:</b> '+esc(fb.errorFocus)+'</div>');return rows.length?'<div class="t-expl cs-fb">'+rows.join('')+'</div>':'';}
-function correctTextForTeacher(ex,item){if(ex.type==='matching')return item.right||'';if(ex.type==='multiple choice'||ex.type==='reading comprehension'||ex.type==='dialogue completion'||ex.type==='listening comprehension')return (item.options||[])[correctIndex(item)]||item.answer||'';if(ex.type==='true/false')return item.correct?T('true'):T('false');if(ex.type==='fill-in-the-blank'||ex.type==='word formation'||ex.type==='translation'||ex.type==='sentence transformation')return item.answer||'';if(ex.type==='error correction')return item.correction||'';if(ex.type==='error-tagging'){var toks=Array.isArray(item.tokens)?item.tokens:[];var ix=Number(item.error_token_index);return 'token: '+(toks[ix]!=null?toks[ix]:('#'+ix))+'; typ: '+(item.error_type||'')+'; oprava: '+(item.correction||'');}if(ex.type==='word order')return item.correct_sentence||item.answer||'';if(ex.type==='cloze text')return (item.answers||[]).join(', ');if(ex.type==='categorization')return item.correct_category||item.category||item.answer||'';return '['+T('manualReview')+'] '+(item.model_answer||'');}
+function correctTextForTeacher(ex,item){
+  if(ex.type==='matching')return item.right||'';
+  if(ex.type==='multiple choice'||ex.type==='reading comprehension'||ex.type==='dialogue completion'||ex.type==='listening comprehension')return (item.options||[])[correctIndex(item)]||item.answer||'';
+  if(ex.type==='true/false')return item.correct?T('true'):T('false');
+  if(ex.type==='multi-select'){var mo=Array.isArray(item.options)?item.options:[];return (Array.isArray(item.correct)?item.correct:[]).map(function(ix){var n=Number(ix);return mo[n]!=null?String(mo[n]):('#'+n);}).join(' | ');}
+  if(ex.type==='ordering'){var oi=Array.isArray(item.items)?item.items:[];return (Array.isArray(item.correct_order)?item.correct_order:[]).map(function(ix){var n=Number(ix);return oi[n]!=null?String(oi[n]):('#'+n);}).join(' → ');}
+  if(ex.type==='highlight-evidence'){var hs=Array.isArray(item.sentences)?item.sentences:[];var hi=Number(item.correct);return Number.isInteger(hi)&&hs[hi]!=null?String(hs[hi]):'';}
+  if(ex.type==='fill-in-the-blank')return (Array.isArray(item.answers)?item.answers:[item.answer]).filter(function(x){return x!=null;}).map(String).join(' | ');
+  if(ex.type==='word formation'||ex.type==='translation'||ex.type==='sentence transformation')return item.answer||item.translation||'';
+  if(ex.type==='error correction')return item.correction||item.answer||'';
+  if(ex.type==='error-tagging'){var toks=Array.isArray(item.tokens)?item.tokens:[];var ix=Number(item.error_token_index);return 'token: '+(toks[ix]!=null?toks[ix]:('#'+ix))+'; typ: '+(item.error_type||'')+'; oprava: '+(item.correction||'');}
+  if(ex.type==='word order')return item.correct_sentence||item.answer||'';
+  if(ex.type==='cloze text')return (Array.isArray(item.answers)?item.answers:[item.answer]).filter(function(x){return x!=null;}).map(String).join(' | ');
+  if(ex.type==='categorization')return item.correct_category||item.category||item.answer||'';
+  if(ex.type==='table-completion'){var rows=Array.isArray(item.rows)?item.rows:[],out=[];rows.forEach(function(row,ri){if(!Array.isArray(row))return;row.forEach(function(cell,ci){if(cell&&typeof cell==='object'&&!Array.isArray(cell)&&cell.answer!=null){var col=(Array.isArray(item.columns)&&item.columns[ci]!=null)?item.columns[ci]:('sloupec '+(ci+1));out.push((ri+1)+'. '+col+' = '+cell.answer);}});});return out.join('; ');}
+  if(ex.type==='transformation-chain'){var trs=Array.isArray(item.transformations)?item.transformations:[];return trs.map(function(tr,i){return (i+1)+'. '+(tr&&tr.answer!=null?tr.answer:'');}).join('; ');}
+  if(ex.type==='categorisation-board'){var entries=Array.isArray(item.entries)?item.entries:[];return entries.map(function(e){return (e&&e.text!=null?e.text:'')+' → '+(e&&e.category!=null?e.category:'');}).join('; ');}
+  return '['+T('manualReview')+'] '+(item.model_answer||'');
+}
 function questionTextForTeacher(item){return item.question||item.statement||item.sentence||item.prompt||item.text||item.dialogue||item.passage||item.transcript||item.audio_prompt||item.image_description||'';}
 function listeningTranscriptForTeacher(ex,item){if(!ex||ex.type!=='listening comprehension')return '';var tr=item.transcript||item.audio_prompt||item.audio_source_note||'';return tr?'<div class="t-expl"><b>Transkript / audio script:</b> '+esc(tr)+'</div>':'';}
 function buildTeacherBody(){

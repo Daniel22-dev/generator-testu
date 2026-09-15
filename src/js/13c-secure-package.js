@@ -113,6 +113,11 @@ function securePublicCfg(cfg, keyInfo) {
     cas:cfg.cas,
     tema:cfg.tema,
     testMode:cfg.testMode,
+    screenGuard:!!cfg.screenGuard,
+    // Přísný test se musí zamknout při opuštění okna i tehdy, kdy starší volající
+    // neposlal explicitní lockOnLeave. Tím se zároveň opravuje stav, kdy verifier
+    // odchod zaznamenal, ale studentský test se nezamkl.
+    lockOnLeave:!!cfg.lockOnLeave || cfg.testMode === 'prisny' || !!cfg.screenGuard,
     layout:cfg.layout,
     odevzdavani:'B',
     fuzzyTolerance:cfg.fuzzyTolerance||'off',

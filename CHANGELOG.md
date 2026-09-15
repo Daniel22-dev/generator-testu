@@ -1,3 +1,14 @@
+## 7.1.26 — workflow a UX opravy po učitelském testování (2026-09-15)
+
+- Jednoduchý režim / ostrý test nyní zobrazuje povinný týmový bezpečnostní kód, který už validace vyžadovala.
+- U testů v záložkách je finální odevzdání dostupné až u posledního cvičení (instant i secure workflow).
+- Procvičovací test po vyhodnocení automaticky otevře rozbor odpovědí a u chyb ukáže správné řešení; rozšířena podpora typů úloh.
+- Device lock po odevzdání lze na stejném zařízení znovu povolit existujícím učitelským PINem nebo odemykacím heslem konkrétního testu.
+- Přísný secure test nyní přenáší `lockOnLeave` do studentské konfigurace, takže odchod (např. pagehide/visibility/blur) vede k zamknutí místo pouhého logu.
+- Exportní checklist se u instant/procvičovacích testů nezobrazuje; u secure režimu zůstávají 4 povinné lidské kontroly.
+- Přidány regresní kontroly všech výše uvedených scénářů; cílený průchod v Chromium: 9/9 PASS.
+- Verze 7.1.26 je nový kandidát a nepřebírá automaticky dřívější GARP schválení/evidence.
+
 ## 7.1.25 — hotfix self-testu bodování (2026-09-10)
 
 - Opraveno falešné selhání `Self-test RPC timeout: __has__` v bezpečném offline režimu.

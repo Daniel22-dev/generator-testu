@@ -7,10 +7,10 @@ GARP 2.5.1 GHRAB – PRŮVODNÍ LIST APLIKACE
 appId:                    generator
 Název:                    Generátor testů
 Repozitář:                generator-testu (snapshot předaný jako ZIP; vzdálený repo stav nebyl v tomto kole dotazován)
-Aktuální source verze:    7.1.25 (hotfix self-test RPC, 2026-09-10)
-GARP evidence baseline:   7.1.24; hotfix 7.1.25 mění distribuovaný runtime a před produkčním
-                          označením vyžaduje opakovanou nezávislou revalidaci. Níže uvedené
-                          historické auditní výsledky 7.1.24 se tímto nepřepisují ani nepřenášejí.
+Aktuální source verze:    7.1.26 (workflow/UX regression candidate, 2026-09-15)
+GARP evidence baseline:   Historické výsledky 7.1.24/7.1.25 se na 7.1.26 automaticky nepřenášejí.
+                          Kandidát 7.1.26 mění distribuovaný runtime a před produkčním označením
+                          vyžaduje nový nezávislý GARP/regresní průchod.
 Verze standardu:          GARP 2.5.1 GHRAB / TOOLING-R2
 SHA-256 SHA256SUMS balíčku, podle kterého se audituje:
                           1a0cc54c16bbebd215c3955d352db3f9d12513f5cebd4cc5a6815d2b5fe0a792

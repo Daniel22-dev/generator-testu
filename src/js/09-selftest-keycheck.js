@@ -587,7 +587,7 @@ function enforceSecureGate(){
   if(!lastSelfTest) uiAlert('Před stažením klasifikovaného testu spusť self-test bodování (tlačítko 🧪). Ověří, že se body počítají správně.','Self-test je povinný');
   else if(lastSelfTest.hasErrors) uiAlert('Self-test našel chybu v bodování. Stažení je zablokované, dokud ji neopravíš a self-test znovu neproběhne bez chyb.','Bodování má chybu');
   else if(lastSelfTest.hasGaps && !secureGapsAcknowledged) uiAlert('Self-test našel položky bez klíče správné odpovědi. Doplň je v editoru, nebo potvrď, že je budeš opravovat ručně.','Potvrď mezery');
-  else if(!teacherReviewSatisfied()) uiAlert('Stroj ověřil bodování, ale obsahová správnost je na tobě. AI může vyrobit krásný test s chybnou správnou odpovědí. Zaškrtni povinné položky v checklistu (správné odpovědi, bodování, stupnice, nesdílení verifieru).','Teacher review je povinný');
+  else if(!teacherReviewSatisfied()) uiAlert('Stroj ověřil technické bodování, ale obsahovou správnost musí potvrdit učitel. Dokonči čtyři krátké body v učitelské kontrole (obsah, klíč, bodování a bezpečné sdílení).','Učitelská kontrola je povinná');
   else if(lastKeyCheck && lastKeyCheck.closedDiffs>0 && !keyDiffsAcknowledged) uiAlert('AI ověření klíče našlo '+lastKeyCheck.closedDiffs+' rozdíl(y) v uzavřených úlohách — tam, kde je jen jedna správná odpověď, odpověděla AI jinak než tvůj klíč. Projdi je a oprav v editoru, nebo (pokud je tvůj klíč správný) potvrď „klíč ponechávám".','Zkontroluj rozdíly v klíči');
   return false;
 }

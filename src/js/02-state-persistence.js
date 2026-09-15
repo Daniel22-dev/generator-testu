@@ -134,6 +134,15 @@ function updateAppModeUI(){
   const simple = isSimpleMode();
   document.body.classList.toggle('simple-mode', simple);
   document.body.classList.toggle('advanced-mode', !simple);
+  // Bezpečný offline režim (včetně jednoduché šablony „ostrý test“) týmový
+  // bezpečnostní kód opravdu potřebuje. Pole je jinak označeno advanced-only,
+  // takže by v jednoduchém režimu bylo skryté a validace by uživatele nepustila dál.
+  const secCode = $('bezpKod');
+  const secField = secCode && secCode.closest ? secCode.closest('.field') : null;
+  if (secField) {
+    const requiredInSimple = simple && (((state.resultMode || 'instant') === 'secureOffline') || state.zolicek === 'ANO');
+    secField.classList.toggle('advanced-only', !requiredInSimple);
+  }
   document.querySelectorAll('#appModeBtns .mode-pill').forEach(b => b.classList.toggle('active', b.dataset.val === (simple ? 'simple' : 'advanced')));
   const summary = $('appModeSummary');
   if (summary) {
