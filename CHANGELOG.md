@@ -1,3 +1,10 @@
+## 7.1.36 — Etapa 5 QA hotfix (2026-09-15)
+
+- Opravena pouze chybná headless assertion Etapy 5: test nyní ověřuje skutečný text secure-offline ochrany opakovaného pokusu místo neexistující fráze „Jeden pokus na tomto zařízení“.
+- Assertion dál fail-closed kontroluje, že informační blok neobsahuje žádný nový `input`, `select`, `textarea` ani `button`.
+- Produkční chování Advanced UI, studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.
+- Pád 7.1.35 předčasně ukončil `test:headless`; následné visual/critical ENOENT nálezy byly kaskáda nevygenerovaných QA fixtures, nikoli porucha exportu.
+
 ## 7.1.35 — Etapa 5: přehlednější Pokročilá nastavení (2026-09-15)
 
 - Pokročilý režim seskupuje existující volby do pěti sekcí: **Test / Student / Zpětná vazba / Bezpečnost / Vzhled**.

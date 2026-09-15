@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.35",
-  "releaseStatus": "stage5-advanced-ui-cleanup-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.36",
+  "releaseStatus": "stage5-qa-hotfix-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -45,7 +45,7 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "local-build-plus-targeted-system-chromium; exact-lockfile GitHub CI pending",
-    "note": "7.1.35 Stage 5 reorganizes only the Advanced-mode teacher UI into five sections: Test, Student, Feedback, Security and Appearance. Existing field nodes are moved without changing their IDs, values, handlers or validation semantics; Simple mode restores the original DOM placement. The retry-protection item is explanatory only and explicitly describes the existing secure-offline same-device lock. Secure/student runtimes, teacher verifier, SECURE-ANSWERS-V1, Google Forms submission/import, cryptography, scoring, PIN/unlock and server profile are unchanged. Targeted local Chromium DOM regression verifies 5/5 group membership, state purity and Simple/Advanced round trips; full exact-lockfile headless/runtime regression remains pending clean GitHub CI."
+    "note": "7.1.36 is a QA-only hotfix over Stage 5. Production behavior is unchanged apart from release-version strings. The Stage-5 headless assertion now matches the actual secure-offline retry-protection explanation and still verifies that no new retry control exists. The previous 7.1.35 certification failed before fixture generation, causing cascading visual/critical ENOENT findings. Exact-lockfile GitHub CI is required for promotion."
   },
-  "note": "7.1.35 Stage 5 Advanced UI Cleanup candidate built on the confirmed green 7.1.34 baseline. Requires clean exact-lockfile GitHub CI before promotion."
+  "note": "7.1.36 QA-only hotfix over the 7.1.35 Stage 5 candidate; requires clean exact-lockfile GitHub CI before Stage 5 closure."
 }

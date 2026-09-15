@@ -1,7 +1,7 @@
 {
   "schema": "ghrab-data-manifest-v1",
   "appId": "generator",
-  "appVersion": "7.1.35",
+  "appVersion": "7.1.36",
   "manifestVersion": 4,
   "dataCategories": [
     "settings",

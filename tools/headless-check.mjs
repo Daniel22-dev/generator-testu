@@ -365,9 +365,10 @@ check('stage5 simple: původní kroky se obnoví', () => {
 });
 check('stage5 security: jeden pokus je pouze vysvětlení existujícího chování', () => {
   const el=w.document.getElementById('attemptProtectionInfo');
-  if(!el||!/Jeden pokus na tomto zařízení/.test(el.textContent)) throw new Error('chybí vysvětlení opakovaného pokusu');
+  const text=String(el?.textContent||'');
+  if(!el||!/bezpečném offline režimu/i.test(text)||!/další pokus na tomto zařízení automaticky uzamčen/i.test(text)) throw new Error('chybí přesné vysvětlení secure-offline ochrany opakovaného pokusu');
   if(el.querySelector('input,select,textarea,button')) throw new Error('Etapa 5 přidala nový ovladač pokusu');
-  return 'read-only';
+  return 'read-only secure-offline explanation';
 });
 check('stage1 advanced: původní šablony zůstaly dostupné', () => {
   const cards=[...w.document.querySelectorAll('#simpleTemplateBtns .simple-tpl-card')];

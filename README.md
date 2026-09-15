@@ -1,8 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.35  
+**Aktuální verze:** 7.1.36  
 
-> **7.1.35 Etapa 5 – přehlednější Pokročilá nastavení (2026-09-15):** Pokročilý režim nově seskupuje stávající volby do pěti sekcí **Test / Student / Zpětná vazba / Bezpečnost / Vzhled**. Jde pouze o informační architekturu: používají se stejné ovladače se stejnými ID, hodnotami a validacemi. Simple režim zůstává beze změny; secure/student runtime, verifier, Google Forms, kryptografie, scoring a PIN/odemčení se nemění.
+> **7.1.36 Etapa 5 – přehlednější Pokročilá nastavení (2026-09-15):** Pokročilý režim nově seskupuje stávající volby do pěti sekcí **Test / Student / Zpětná vazba / Bezpečnost / Vzhled**. Jde pouze o informační architekturu: používají se stejné ovladače se stejnými ID, hodnotami a validacemi. Simple režim zůstává beze změny; secure/student runtime, verifier, Google Forms, kryptografie, scoring a PIN/odemčení se nemění.
 
 > **7.1.34 Etapa 4 – studentské odevzdání přes Google Forms (2026-09-15):** nově generovaný secure studentský test může po odevzdání nabídnout zkopírování celého `SECURE-ANSWERS-V1` payloadu a otevření školního Google Formuláře. Responder URL se nastavuje lokálně v Nastavení Generátoru, je validována fail-closed a zahrnuta do integrity-bound konfigurace konkrétního testu. `answers.txt` zůstává nouzový fallback a jediná cesta bez nakonfigurovaného formuláře nebo při neobvykle dlouhém payloadu. Stage 3 CSV import ve verifieru zůstává beze změny.
 
@@ -26,7 +26,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.35** je kandidát Etapy 5 postavený nad potvrzeným zeleným GitHub CI baseline **7.1.34**. Etapy 3 a 4 (Forms import + studentské Forms odevzdání) jsou součástí baseline. Etapa 5 mění pouze informační architekturu Pokročilého režimu; studentský runtime, verifier, `SECURE-ANSWERS-V1`, RSA/AES kryptografie, scoring, PIN/odemčení a serverový profil se nemění. **7.1.35 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
+Verze **7.1.36** je kandidát Etapy 5 postavený nad potvrzeným zeleným GitHub CI baseline **7.1.34**. Etapy 3 a 4 (Forms import + studentské Forms odevzdání) jsou součástí baseline. Etapa 5 mění pouze informační architekturu Pokročilého režimu; studentský runtime, verifier, `SECURE-ANSWERS-V1`, RSA/AES kryptografie, scoring, PIN/odemčení a serverový profil se nemění. **7.1.36 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 
