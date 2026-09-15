@@ -1,3 +1,11 @@
+## 7.1.35 — Etapa 5: přehlednější Pokročilá nastavení (2026-09-15)
+
+- Pokročilý režim seskupuje existující volby do pěti sekcí: **Test / Student / Zpětná vazba / Bezpečnost / Vzhled**.
+- Reorganizace přesouvá původní DOM prvky; nemění jejich ID, hodnoty, event handlery ani validační význam.
+- Simple režim obnovuje původní rozmístění prvků, takže jeho workflow se nemění.
+- Sekce Bezpečnost pouze vysvětluje existující same-device zámek dalšího pokusu v secure-offline režimu; nepřidává nový bezpečnostní mechanismus.
+- Studentský runtime, teacher verifier, Google Forms, `SECURE-ANSWERS-V1`, kryptografie, scoring, PIN/odemčení a serverový profil jsou mimo rozsah Etapy 5.
+
 ## 7.1.34 — Etapa 4: studentské odevzdání přes Google Forms (2026-09-15)
 
 - V Nastavení Generátoru lze uložit pouze validovaný HTTPS responder odkaz Google Forms (`docs.google.com/forms/.../viewform` nebo `forms.gle/...`).

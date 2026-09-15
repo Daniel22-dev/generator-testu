@@ -1700,3 +1700,33 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 a.manual-launch-btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;position:relative}
 a.manual-launch-btn::after{content:"";position:absolute;inset:-3px;border-radius:inherit;border:1px solid color-mix(in srgb,var(--acc, var(--accent, #65d9ff)) 44%,transparent);pointer-events:none;opacity:.75}
 a.manual-launch-btn:hover::after,a.manual-launch-btn:focus-visible::after{opacity:1;box-shadow:0 0 0 3px color-mix(in srgb,var(--acc, var(--accent, #65d9ff)) 12%,transparent)}
+
+/* ── Etapa 5: informační architektura Pokročilého režimu ─────────────── */
+.advanced-settings-groups { display:flex; flex-direction:column; gap:14px; margin-bottom:18px; }
+.advanced-settings-intro {
+  border:1px solid var(--acc-b); background:var(--acc-d); border-radius:12px;
+  padding:13px 14px; margin-bottom:2px;
+}
+.advanced-settings-intro-title { color:var(--t1); font-weight:800; font-size:16px; }
+.advanced-settings-intro-text { color:var(--t3); font-size:13px; line-height:1.5; margin-top:3px; }
+.advanced-settings-nav { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.advanced-settings-nav-btn {
+  border:1px solid var(--bdr); background:var(--bg2); color:var(--t3); border-radius:999px;
+  padding:6px 10px; min-height:32px; font-family:Georgia,serif; font-size:12.5px; font-weight:700; cursor:pointer;
+}
+.advanced-settings-nav-btn:hover { border-color:var(--acc-b); color:var(--acc); }
+.advanced-config-group {
+  border:1px solid var(--bdr); background:var(--bg3); border-radius:13px;
+  padding:0 14px 2px; scroll-margin-top:16px;
+}
+.advanced-config-group-head { margin:0 -14px 16px; padding:12px 14px 11px; border-bottom:1px solid var(--bdr2); background:var(--bg2); border-radius:13px 13px 0 0; }
+.advanced-config-group-title { color:var(--t1); font-size:15px; font-weight:800; }
+.advanced-config-group-desc { color:var(--t4); font-size:12.5px; line-height:1.45; margin-top:3px; }
+.advanced-config-group > .field:last-child { margin-bottom:14px; }
+.simple-mode #advancedSettingsGroups { display:none !important; }
+@media(max-width:560px){
+  .advanced-settings-nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .advanced-settings-nav-btn { border-radius:8px; text-align:left; }
+  .advanced-config-group { padding-left:11px; padding-right:11px; }
+  .advanced-config-group-head { margin-left:-11px; margin-right:-11px; padding-left:11px; padding-right:11px; }
+}

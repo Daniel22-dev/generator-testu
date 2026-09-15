@@ -128,11 +128,87 @@ function markAdvancedSections(){
   const btnEx = $('btnExDetail'); if (btnEx) btnEx.classList.add('advanced-only');
 }
 
+// Etapa 5 — pouze informační architektura Pokročilého režimu.
+// Existující .field uzly se PŘESOUVAJÍ, nekopírují: zůstávají jim stejná ID,
+// inline handlery, hodnoty i validační vazby. V Simple režimu se vrátí na původní
+// místa pomocí inertních placeholderů, takže Etapa 5 nemění jednoduchý workflow.
+const ADVANCED_SETTINGS_GROUPS = [
+  { id:'advancedGroupTest', icon:'🧪', title:'Test', desc:'Režim, čas, odevzdávání, body a stupnice hodnocení.', fields:['timeField','testModeField','strictRiskField','submissionModeField','globalBodyField','gradeField'] },
+  { id:'advancedGroupStudent', icon:'🧑‍🎓', title:'Student', desc:'Identita, roster, diferenciace a pořadí otázek.', fields:['identityModeField','rosterField','diffLevelField','diffField','randomField'] },
+  { id:'advancedGroupFeedback', icon:'💬', title:'Zpětná vazba', desc:'Kolik student uvidí po odevzdání a jak přísně se hodnotí překlepy.', fields:['feedbackModeField','fuzzyField'] },
+  { id:'advancedGroupSecurity', icon:'🛡️', title:'Bezpečnost', desc:'Zpracování výsledků, hlídání obrazovky a ochrana opakovaného pokusu.', fields:['resultModeField','screenGuardField','attemptProtectionInfo'] },
+  { id:'advancedGroupAppearance', icon:'🎨', title:'Vzhled', desc:'Rozložení a vizuální téma výsledného studentského testu.', fields:['layoutField','themeField'] }
+];
+
+function ensureAdvancedLayoutPlaceholders(){
+  ADVANCED_SETTINGS_GROUPS.forEach(group => group.fields.forEach(id => {
+    const el=$(id); if(!el || el.dataset.advancedLayoutBound==='1') return;
+    const ph=document.createElement('span');
+    ph.hidden=true;
+    ph.dataset.advancedLayoutPlaceholder=id;
+    ph.setAttribute('aria-hidden','true');
+    el.parentNode.insertBefore(ph,el);
+    el.dataset.advancedLayoutBound='1';
+  }));
+}
+
+function ensureAdvancedSettingsRoot(){
+  let root=$('advancedSettingsGroups');
+  if(root) return root;
+  const step2=$('step2'); if(!step2) return null;
+  root=document.createElement('div');
+  root.id='advancedSettingsGroups';
+  root.className='advanced-settings-groups';
+
+  const intro=document.createElement('div');
+  intro.className='advanced-settings-intro';
+  const title=document.createElement('div'); title.className='advanced-settings-intro-title'; title.textContent='Pokročilá nastavení';
+  const text=document.createElement('div'); text.className='advanced-settings-intro-text'; text.textContent='Stejné volby jako dosud, jen seskupené podle toho, co skutečně řídí.';
+  const nav=document.createElement('div'); nav.className='advanced-settings-nav'; nav.setAttribute('aria-label','Sekce pokročilých nastavení');
+  intro.appendChild(title); intro.appendChild(text); intro.appendChild(nav); root.appendChild(intro);
+
+  ADVANCED_SETTINGS_GROUPS.forEach(group => {
+    const section=document.createElement('section'); section.id=group.id; section.className='advanced-config-group';
+    const head=document.createElement('div'); head.className='advanced-config-group-head';
+    const label=document.createElement('div'); label.className='advanced-config-group-title'; label.textContent=group.icon+' '+group.title;
+    const desc=document.createElement('div'); desc.className='advanced-config-group-desc'; desc.textContent=group.desc;
+    head.appendChild(label); head.appendChild(desc); section.appendChild(head); root.appendChild(section);
+
+    const btn=document.createElement('button'); btn.type='button'; btn.className='advanced-settings-nav-btn'; btn.textContent=group.icon+' '+group.title;
+    btn.addEventListener('click',()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
+    nav.appendChild(btn);
+  });
+  const stepNav=step2.querySelector(':scope > .nav');
+  if(stepNav) step2.insertBefore(root,stepNav); else step2.appendChild(root);
+  return root;
+}
+
+function restoreSimpleSettingsLayout(){
+  ADVANCED_SETTINGS_GROUPS.forEach(group => group.fields.forEach(id => {
+    const el=$(id); if(!el) return;
+    const ph=document.querySelector('[data-advanced-layout-placeholder="'+id+'"]');
+    if(ph && ph.parentNode) ph.parentNode.insertBefore(el,ph.nextSibling);
+  }));
+  const root=$('advancedSettingsGroups'); if(root) root.classList.add('hidden');
+}
+
+function organizeAdvancedSettings(){
+  ensureAdvancedLayoutPlaceholders();
+  const root=ensureAdvancedSettingsRoot(); if(!root) return;
+  if(isSimpleMode()){ restoreSimpleSettingsLayout(); return; }
+  root.classList.remove('hidden');
+  ADVANCED_SETTINGS_GROUPS.forEach(group => {
+    const section=$(group.id); if(!section) return;
+    group.fields.forEach(id => { const el=$(id); if(el) section.appendChild(el); });
+  });
+}
+
 function updateAppModeUI(){
   // markAdvancedSections() se volá jednou při startu v init() — DOM prvky se nemění.
   const simple = isSimpleMode();
   document.body.classList.toggle('simple-mode', simple);
   document.body.classList.toggle('advanced-mode', !simple);
+  organizeAdvancedSettings();
   document.querySelectorAll('#appModeBtns .mode-pill').forEach(b => b.classList.toggle('active', b.dataset.val === (simple ? 'simple' : 'advanced')));
   const summary = $('appModeSummary');
   if (summary) {

@@ -332,6 +332,43 @@ check('stage1 simple: účely nastavují deterministické profily', () => {
 });
 w.setAppMode('advanced');
 w.renderSimpleTemplates();
+check('stage5 advanced: pět skupin a přesné členství', () => {
+  const expected={
+    advancedGroupTest:['timeField','testModeField','strictRiskField','submissionModeField','globalBodyField','gradeField'],
+    advancedGroupStudent:['identityModeField','rosterField','diffLevelField','diffField','randomField'],
+    advancedGroupFeedback:['feedbackModeField','fuzzyField'],
+    advancedGroupSecurity:['resultModeField','screenGuardField','attemptProtectionInfo'],
+    advancedGroupAppearance:['layoutField','themeField']
+  };
+  const root=w.document.getElementById('advancedSettingsGroups');
+  if(!root||root.classList.contains('hidden')) throw new Error('advanced root není viditelný');
+  for(const [groupId,ids] of Object.entries(expected)){
+    const group=w.document.getElementById(groupId); if(!group) throw new Error('chybí '+groupId);
+    for(const id of ids){ const el=w.document.getElementById(id); if(!el||el.parentElement!==group) throw new Error(id+' není v '+groupId); }
+  }
+  return Object.keys(expected).length+' skupin';
+});
+check('stage5 advanced: reorganizace nemění state', () => {
+  const before=w.eval('JSON.stringify(state)');
+  w.organizeAdvancedSettings();
+  const after=w.eval('JSON.stringify(state)');
+  if(before!==after) throw new Error('layout změnil aplikační state');
+  return 'state byte-for-byte shodný';
+});
+check('stage5 simple: původní kroky se obnoví', () => {
+  w.setAppMode('simple');
+  if(w.document.getElementById('timeField').parentElement.id!=='step2') throw new Error('Délka testu se nevrátila do step2');
+  if(w.document.getElementById('diffField').parentElement.id!=='step3') throw new Error('Diferenciace se nevrátila do step3');
+  if(!w.document.getElementById('advancedSettingsGroups').classList.contains('hidden')) throw new Error('advanced skupiny zůstaly v Simple viditelné');
+  w.setAppMode('advanced');
+  return 'restore → advanced OK';
+});
+check('stage5 security: jeden pokus je pouze vysvětlení existujícího chování', () => {
+  const el=w.document.getElementById('attemptProtectionInfo');
+  if(!el||!/Jeden pokus na tomto zařízení/.test(el.textContent)) throw new Error('chybí vysvětlení opakovaného pokusu');
+  if(el.querySelector('input,select,textarea,button')) throw new Error('Etapa 5 přidala nový ovladač pokusu');
+  return 'read-only';
+});
 check('stage1 advanced: původní šablony zůstaly dostupné', () => {
   const cards=[...w.document.querySelectorAll('#simpleTemplateBtns .simple-tpl-card')];
   if(cards.length!==5) throw new Error('angličtina má mít 4 šablony + Bez šablony, nalezeno '+cards.length);

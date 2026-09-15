@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.34">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.35">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -408,7 +408,7 @@
 
     <!-- ═══════════════════════════ STEP 2 ═══════════════════════════ -->
     <div id="step2" class="hidden">
-      <div class="field">
+      <div class="field" id="timeField">
         <div class="field-label">Délka testu <button class="tt-icon" data-tip="Doporučený čas se automaticky spočítá podle počtu a typů cvičení.">?</button></div>
         <div class="btn-row choice-card-grid compact centered four-col" id="timeBtns">
           <button class="tag-btn simple-card" data-val="15" onclick="pickNum('cas',15)"><span class="choice-card-title">15 min</span></button>
@@ -430,7 +430,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="testModeField">
         <div class="field-label">🧭 Režim testu <button class="tt-icon" data-tip="Volba určuje, jak má výsledný HTML test působit: běžný = standardní známkovaný test, přísný = test pod kontrolou s minimem nápověd, procvičovací = učení s vysvětlením a měkčími pravidly. Nejde jen o vzhled, ale o chování testu, feedback a bezpečnostní omezení.">?</button></div>
         <div class="field-hint">Zvol, jestli má výsledný test sloužit hlavně ke klasifikaci, přísné kontrole, nebo procvičování.</div>
         <div class="btn-row preset-card-grid mode-preset-grid" id="testModeBtns">
@@ -472,7 +472,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="identityModeField">
         <div class="field-label">🪪 Identita studenta <button class="tt-icon" data-tip="Jméno = student zadá jméno, vhodné pro procvičování. Jednorázový kód = student zadá kód od učitele; vhodné pro ostrý test. Kódy se generují pokaždé nové (co student, to nový kód). Seznam kódů a jejich rozeslání řeší další krok.">?</button></div>
         <div class="field-hint">Pro ostrý test doporučujeme jednorázový kód. Pro procvičování stačí jméno.</div>
         <div class="btn-row choice-card-grid two-col" id="identityModeBtns">
@@ -492,7 +492,7 @@
         <div id="rosterResult" class="small-muted" style="margin-top:8px">Zatím žádné kódy. Vlep e-maily a klikni na „Vygenerovat kódy".</div>
       </div>
 
-      <div class="field">
+      <div class="field" id="layoutField">
         <div class="field-label">🧩 Rozložení výsledného testu <button class="tt-icon" data-tip="Určuje, jestli bude výsledný test jeden dlouhý scroll, nebo přehledné panely s horní lištou Ex 1, Ex 2… a tlačítkem Next. Panelové rozložení je vhodnější pro mobil a delší testy.">?</button></div>
         <div class="field-hint">Doporučeno: horní lišta cvičení + jedno aktivní cvičení najednou.</div>
         <div class="btn-row choice-card-grid two-col" id="layoutBtns">
@@ -502,7 +502,7 @@
         <div class="small-muted">V panelovém režimu se student může pohybovat přes horní lištu libovolně a tlačítko Next ho posune na další cvičení v řadě.</div>
       </div>
 
-      <div class="field">
+      <div class="field" id="submissionModeField">
         <div class="field-label">Způsob odevzdávání <button class="tt-icon" data-tip="Varianta A: student dostává zpětnou vazbu po každém cvičení zvlášť. Varianta B: vyplní vše a odevzdá najednou — vhodné, pokud chceš, aby si mohl rozmyslet.">?</button></div>
         <div class="btn-row choice-card-grid two-col variant-card-grid" id="submissionModeBtns">
           <button class="tag-btn variant-btn" id="varA" data-val="A" onclick="pickVariant('A')"><span class="choice-card-title">Varianta A — Průběžné odevzdávání</span><span class="choice-card-desc">Student odevzdává cvičení jedno po druhém a ihned vidí zpětnou vazbu.</span></button>
@@ -522,7 +522,7 @@
         <div class="secure-mode-box" id="feedbackModeNote"></div>
       </div>
 
-      <div class="field">
+      <div class="field" id="resultModeField">
         <div class="field-label">🔐 Režim výsledků <button class="tt-icon" data-tip="Nejrychlejší je okamžitá známka se screenshotem. Pro klasifikovaný test je nejbezpečnější bezpečný offline režim: student_test.html neobsahuje správné odpovědi a učitel opravuje answers.txt v teacher_verifier.html.">?</button></div>
         <div class="field-hint">Vyber podle účelu testu: procvičení = okamžitá známka, klasifikace = bezpečný offline verifier. <strong>V přísném testu se okamžitá známka vypne a použije se bezpečný offline verifier.</strong></div>
         <div class="btn-row choice-card-grid two-col" id="resultModeBtns">
@@ -546,7 +546,12 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field advanced-only" id="attemptProtectionInfo">
+        <div class="field-label">🔁 Opakovaný pokus</div>
+        <div class="secure-mode-box"><strong>V bezpečném offline režimu je po odevzdání další pokus na tomto zařízení automaticky uzamčen.</strong> Pokud má student legitimně psát znovu, učitel může na stejném zařízení povolit další pokus svým učitelským PINem nebo odemykacím heslem. Nejde o globální serverový zákaz — jiné zařízení nebo profil bez serveru nelze spolehlivě zablokovat.</div>
+      </div>
+
+      <div class="field" id="randomField">
         <div class="field-label">🔀 Promíchání otázek <button class="tt-icon" data-tip="Náhodné pořadí: každý student vidí otázky v jiném pořadí — ztěžuje opisování. Pevné pořadí: všichni mají stejné pořadí — vhodné pro krokované testy.">?</button></div>
         <div class="btn-row choice-card-grid two-col" id="randomBtns">
           <button class="tag-btn active" data-val="NE" onclick="pick('randomizace','NE')"><span class="choice-card-title">🔒 Pevné pořadí</span><span class="choice-card-desc">Všichni studenti uvidí otázky ve stejném pořadí.</span></button>
@@ -570,7 +575,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="gradeField">
         <div class="field-label">📊 Stupnice hodnocení <button class="tt-icon" data-tip="Školní: standardní česká stupnice 1–5. Vlastní: napiš libovolné prahové hodnoty nebo systém (např. A/B/C/D/F, procentuální pásma, slovní hodnocení).">?</button></div>
         <div class="grade-options" id="gradeOptions">
           <div class="grade-opt active" id="gradeSkola" onclick="pickGrade('skola')">
@@ -600,7 +605,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="fuzzyField">
         <div class="field-label">✍️ Tolerance překlepů u psaných odpovědí <button class="tt-icon" data-tip="Týká se jen otevřených psaných typů (překlad, slovotvorba, oprava chyb, transformace vět, doplňování). Posuzuje drobnou odchylku od správné odpovědi (Levenshtein ≤ 1 znak). Výběr možností, true/false ani párování to neovlivňuje. Přesná shoda je vždy plný počet bodů bez ohledu na nastavení.">?</button></div>
         <div class="field-hint">Pro klasifikované a maturitní testy je doporučeno <strong>Vypnuto</strong>: u jazyka bývá pravopis součástí hodnocené dovednosti a tiché přidávání bodů za překlep je hůř obhajitelné. Zapni jen tam, kde pravopis nehodnotíš (např. obsahový překlad).</div>
         <div class="btn-row choice-card-grid three-col" id="fuzzyBtns">
@@ -612,7 +617,7 @@
         <div class="small-muted" id="fuzzyNote" style="margin-top:8px"></div>
       </div>
 
-      <div class="field">
+      <div class="field" id="themeField">
         <div class="theme-grid" id="themeGrid">
 
 
@@ -783,7 +788,7 @@
         <div class="secure-mode-box" id="diffLevelNote"></div>
       </div>
 
-      <div class="field">
+      <div class="field" id="diffField">
         <div class="field-label">📊 Diferenciace <button class="tt-icon" data-tip="Diferenciovaný test = jeden soubor, ale různé skupiny dostanou různě těžký nebo jiný OBSAH otázek podle podmínek, které skupině napíšeš. Přiřazení ke skupině probíhá automaticky podle jména/kódu zadaného v intro okně. POZOR na tři věci: 1) Liší se jen obsah otázek — počet cvičení, typy cvičení i bodování zůstávají pro všechny skupiny STEJNÉ (kvůli férovému srovnání a společné stupnici). 2) Nahrané přílohy (obrázky, PDF) se posílají AI společně pro všechny skupiny; když chceš, aby konkrétní obrázek patřil jen jedné skupině, napiš to výslovně do jejích podmínek a pojmenuj soubory výmluvně. 3) Fajfky/známky se přidělují podle BODŮ v testu, ne podle skupiny — skupina neurčuje hodnocení, jen obtížnost zadání.">?</button></div>
         <div class="btn-row choice-card-grid two-col centered-cards" id="diffBtns" style="margin-bottom:10px">
           <button class="tag-btn active" data-val="NE" onclick="pickDiff('NE')"><span class="choice-card-title">NE — jeden test pro všechny</span><span class="choice-card-desc">Stejný obsah pro celou třídu nebo skupinu.</span></button>
