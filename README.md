@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.31  
+**Aktuální verze:** 7.1.32  
+
+> **7.1.32 Stage 1/2 state-transition hotfix (2026-09-15):** opravuje reálnou regresi při přepnutí cizí jazyk → čeština v Simple režimu: český modul už nepřepne aktivní `cs_practice` / `cs_strict` preset do Advanced. Současně opravuje dva chybné QA assertiony stavu „Bezpečnost pracoviště“ a dělá changelog visual check nezávislý na konkrétním patch čísle; přesnou verzi dál kontroluje `check-versions`. Verifier, kryptografie, PIN/odemčení, Google Forms ani serverový profil se nemění.
 
 > **7.1.31 QA certifikační hotfix (2026-09-15):** produkční logika Etapy 1/2 se nemění. Opraven je pouze headless regresní test, který četl `state` přes neexistující `window.state`, a zastaralé očekávání textu ve visual QA plánu. Tím se znovu umožní generovat QA exportní fixtures pro instant/student/verifier. 7.1.31 je nový kandidát do čistého GitHub CI.
 
@@ -20,7 +22,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.31** je QA-only hotfix nad kandidátem **7.1.30**. GitHub CI pro 7.1.30 potvrdil P5 R2, axe a legacy quality/P4 workflow, ale hlavní certifikační workflow skončilo NOT_READY kvůli chybě QA harnessu: headless regresní test použil `window.state` místo lexikálního `state`, takže se nespustilo generování exportních fixtures; visual plán navíc čekal starý nadpis. Produkční logika, verifier, kryptografie, PIN/odemykání, Google Forms a serverový profil se v 7.1.31 nemění. Poslední kompletně zelený baseline před tímto kandidátem zůstává **7.1.28**.
+Verze **7.1.32** je cílený hotfix Etap 1/2 po GitHub CI 7.1.31. CI 7.1.31 potvrdil P5 R2, axe a legacy quality/P4 workflow, ale hlavní certifikační workflow odhalilo jednu skutečnou stavovou regresi: český modul po správném přemapování `fl_strict → cs_strict` vynutil `appMode=advanced`. Oprava sjednocuje ČJ modul s již platným pravidlem `enforceModeConstraints`: Simple režim smí u češtiny zůstat aktivní, pokud ho řídí platný Simple preset. Dva další workflow nálezy byly chybné textové assertiony („nastaveno“ vs. správné „nastavena“); produkční stav kódu se synchronizoval správně. Visual kontrola changelogu už neduplikuje exact version gate. **7.1.32 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 

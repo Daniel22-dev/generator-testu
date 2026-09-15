@@ -238,7 +238,11 @@
     state.csDifficulty = m.difficulty || 'standardni';
     state.csDifficultyLabel = csDifficultyLabel(m);
     state.fuzzyTolerance = 'off';
-    if (typeof isSimpleMode === 'function' && isSimpleMode()) { state.appMode = 'advanced'; state.workPreset = 'advanced'; }
+    // Čeština bez řízeného Simple presetu potřebuje plný ČJ modul v Advanced režimu.
+    // Aktivní Simple preset (cs_practice/cs_strict) ale smí zůstat v Simple; stejné
+    // pravidlo už drží enforceModeConstraints(). Bez této výjimky změna FL → ČJ
+    // správně přemapovala preset, ale ČJ modul vzápětí appMode shodil na Advanced.
+    if (typeof isSimpleMode === 'function' && isSimpleMode() && !state.simpleTemplate) { state.appMode = 'advanced'; state.workPreset = 'advanced'; }
     if (m.correctionMode !== 'auto') { state.splitGenerate = true; state.__csSplitForced = true; }
     else if (state.__csSplitForced) { state.splitGenerate = false; delete state.__csSplitForced; }
     state.typyCviceni = csTechTypes(m);

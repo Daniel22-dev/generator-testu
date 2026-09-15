@@ -7,12 +7,14 @@ GARP 2.5.1 GHRAB – PRŮVODNÍ LIST APLIKACE
 appId:                    generator
 Název:                    Generátor testů
 Repozitář:                generator-testu (snapshot předaný jako ZIP; vzdálený repo stav nebyl v tomto kole dotazován)
-Aktuální source verze:    7.1.31 (QA certifikační hotfix nad Etapou 2, 2026-09-15)
+Aktuální source verze:    7.1.32 (Stage 1/2 state-transition hotfix, 2026-09-15)
 GARP evidence baseline:   7.1.28 je poslední čistě zelený GitHub CI baseline (5/5 workflow SUCCESS).
                           GitHub 7.1.30: P5 R2 / axe / legacy quality / legacy P4 SUCCESS; hlavní deploy QA NOT_READY
                           kvůli QA harnessu (window.state v headless regresi -> nevytvořené fixtures + zastaralý visual text).
-                          7.1.31 opravuje pouze QA harness/plán; produkční logika, verifier, kryptografie, PINy, Forms
-                          a serverový profil zůstávají beze změny. Vyžaduje nový čistý CI průchod.
+                          GitHub 7.1.31: P5 R2 / axe / legacy quality / legacy P4 SUCCESS; hlavní deploy QA odhalil
+                          jednu reálnou stavovou regresi FL→ČJ Simple a dva chybné QA textové assertiony.
+                          7.1.32 opravuje pouze tuto stavovou hranici v ČJ modulu a QA očekávání; verifier, kryptografie,
+                          PINy, Forms a serverový profil zůstávají beze změny. Vyžaduje nový čistý CI průchod.
 Verze standardu:          GARP 2.5.1 GHRAB / TOOLING-R2
 SHA-256 SHA256SUMS balíčku, podle kterého se audituje:
                           1a0cc54c16bbebd215c3955d352db3f9d12513f5cebd4cc5a6815d2b5fe0a792

@@ -415,7 +415,7 @@ ok('simple přísný ukáže jen stav Bezpečnosti pracoviště',()=>{
   const field=w.document.getElementById('securityWorkplaceField');
   const status=w.document.getElementById('securityWorkplaceStatus');
   assert(!field.classList.contains('hidden'),'povinný stav Bezpečnosti pracoviště je schovaný');
-  assert(status.textContent.includes('není nastaveno'),'chybí srozumitelný stav nenastaveného pracoviště');
+  assert(status.textContent.includes('není nastavena'),'chybí srozumitelný stav nenastaveného pracoviště');
 });
 w.openGeneratorSettings();
 ok('Nastavení bezpečnosti synchronizuje týmový kód do runtime',()=>{
@@ -425,7 +425,7 @@ ok('Nastavení bezpečnosti synchronizuje týmový kód do runtime',()=>{
   input.value='TEAM-CODE-0123456789-SECURE';
   w.onGeneratorSettingsSecurityInput();
   assert(w.document.getElementById('bezpKod').value==='TEAM-CODE-0123456789-SECURE','kód z Nastavení se nepřenesl do runtime');
-  assert(w.document.getElementById('securityWorkplaceStatus').textContent.includes('nastaveno'),'workflow stav se po nastavení neaktualizoval');
+  assert(w.document.getElementById('securityWorkplaceStatus').textContent.includes('je nastavena'),'workflow stav se po nastavení neaktualizoval');
   w.closeGeneratorSettings();
 });
 ok('uložený týmový kód se po startu načte automaticky',()=>{

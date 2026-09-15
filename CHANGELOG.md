@@ -1,3 +1,11 @@
+## 7.1.32 — Stage 1/2 state-transition hotfix (2026-09-15)
+
+- Opravena skutečná regrese Etapy 1 při změně cizí jazyk → čeština: `csApplyCoreState()` už nevynucuje Advanced režim, pokud je aktivní řízený Simple preset (`cs_practice` / `cs_strict`).
+- Zachováno původní pravidlo pro češtinu bez Simple presetu: plný ČJ modul dál vyžaduje Advanced režim.
+- Workflow testy stavu Bezpečnosti pracoviště očekávají správné české texty „není nastavena“ / „je nastavena“; samotná runtime synchronizace kódu byla v 7.1.31 funkční.
+- Visual QA changelogu kontroluje stabilní text `Generátor testů v`; přesné patch číslo je samostatně fail-closed ověřeno `check-versions.mjs`, takže visual plán už nezastará při každém bumpu.
+- Verifier, secure/student runtime, kryptografický kontrakt, výsledkový formát, PIN/odemknutí, Google Forms a serverový profil nejsou měněny.
+
 ## 7.1.31 — QA certifikační hotfix (2026-09-15)
 
 - Produkční logika Generátoru se nemění; jde pouze o opravu QA infrastruktury po CI 7.1.30.

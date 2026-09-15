@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.31",
-  "releaseStatus": "stage2-qa-certification-hotfix-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.32",
+  "releaseStatus": "stage2-state-transition-hotfix-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -45,7 +45,7 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "pending-clean-build-full-regression-and-github-ci",
-    "note": "7.1.31 QA-only certification hotfix over Stage 2: fixes the headless QA harness access to lexical state and updates the visual-plan expected heading. Production generator logic, verifier, cryptography, PIN mechanism, Forms and server profile are unchanged. Full exact-lockfile browser/runtime regression remains pending clean GitHub CI."
+    "note": "7.1.32 targeted Stage 1/2 hotfix: Czech module no longer forces Advanced mode when an active Simple purpose preset controls the workflow; QA assertions use the correct Czech workplace-status wording and the changelog visual check is version-agnostic because exact version consistency is enforced separately. Verifier, cryptography, PIN mechanism, Forms and server profile are unchanged. Full exact-lockfile browser/runtime regression remains pending clean GitHub CI."
   },
-  "note": "7.1.31 QA-only certification hotfix over Stage 2. No product behavior change; requires clean GitHub CI before promotion."
+  "note": "7.1.32 targeted Stage 1/2 state-transition hotfix. Requires clean GitHub CI before promotion."
 }

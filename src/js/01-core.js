@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.31',
+  version: '7.1.32',
   date:    '2026-09-15',
   status:  'production-serverless',
   changes: [
+    'STAGE 1/2 STATE-TRANSITION HOTFIX (7.1.32): český modul už nepřepíná řízený Simple preset automaticky do Advanced režimu. Přepnutí cizí jazyk ↔ čeština tak zachová Procvičování/Přísný test i odpovídající cs/fl interní preset. QA kontroly Bezpečnosti pracoviště používají správné texty je nastavena / není nastavena a visual changelog kontroluje stabilní nadpis; přesnou verzi nadále vynucuje samostatný version gate. Verifier, secure runtime, kryptografie, PINy, Forms a serverový profil se nemění.',
     'QA CERTIFIKAČNÍ HOTFIX (7.1.31): bez změny produkční logiky. Opraven regresní headless test Etapy 1, který chybně četl lexikální state přes window.state a tím zastavil následné generování QA exportních fixtures; visual plán nyní očekává aktuální nadpis Způsob nastavení místo historického PRACOVNÍ REŽIM. Verifier, secure runtime, kryptografie, výsledkový formát i Etapa 2 zůstávají funkčně beze změny.',
     'ETAPA 2 – BEZPEČNOST PRACOVIŠTĚ (7.1.30): týmový bezpečnostní kód byl odstraněn z běžného průvodce a přesunut do samostatného Nastavení Generátoru. U secure workflow se v kroku Doplňky zobrazuje pouze stav pracoviště a odkaz do Nastavení; uložený kód se po startu, importu, staré šabloně a načtení historie automaticky obnoví. Kryptografická funkce kódu, verifier, formát výsledků, PINy, Google Forms a serverový profil se nemění.',
     'ETAPA 1 – SIMPLE WORKFLOW (7.1.29): jednoduchý režim je redukován na tři pedagogické účely Procvičování / Běžný test / Přísný test. Technické volby se odvozují deterministicky z účelu, při změně jazykové sady se účel zachová a pokročilý režim ponechává původní plnou sadu šablon. Verifier, kryptografie, PIN mechanismus, Forms a serverový profil se nemění.',
@@ -38,7 +39,6 @@ const RELEASE = Object.freeze({
     'HOTFIX SELF-TESTU BODOVÁNÍ (7.1.25): opraven RPC bootstrap skrytého verifieru. Bridge se nyní vkládá před poslední uzavírací </body> dokumentu, nikoli před první textový výskyt, který mohl ležet uvnitř JavaScriptové HTML šablony pro feedback/archiv/tisk. Tím se odstraňuje falešné selhání „RPC __has__ timeout“ a zbytečné blokování stažení testu. Přidána je regresní kontrola tohoto scénáře.',
     'RUNTIME HARDENING PO CLAUDE KOLE 3 (7.1.24): Service Worker rozlišuje skutečný autorizační/revokační stav, který zůstává network-only/no-store, od podpůrných vrstev suite-session cleanup a GHRAB Platform. Ty se online vždy načítají čerstvě, ale při výpadku použijí poslední nainstalovanou kopii, aby na sdíleném zařízení tiše nezmizel úklid dat. Přidány jsou mutační a offline regresní kontroly; kandidát vyžaduje nezávislou revalidaci.',
     'MIGRACE GHRAB PLATFORM 1.1.2 (7.1.23): Generátor je napojen na suite-level lifecycle ghrab-suite-session-v1. Otevřená, zavřená i stale/BFCache instance uklízí pouze Generator-owned obsah, target-scoped handoff a in-memory AI/test/roster data; persistence je po suite end uzamčena, cleanup je fail-closed a acknowledgement vzniká až po ověřeném úklidu. Kandidát je součást ecosystem release wave a není samostatně release-approved.',
-    'OPRAVNÝ KANDIDÁT GARP 2.3 PO DRUHÉM CLAUDE KOLE (7.1.20): opraven release-blocking terminátor inline skriptu ve verifieru, sjednocen importní kontrakt manifestů, standardní testovací řetěz nyní používá plný build a povinný headless krok, document.write baseline je zamčena na nule a GARP/PC-01 regrese byly dále zpřísněny. Tento post-second-review build není release-approved a před nasazením vyžaduje výslovně zahájenou novou nezávislou kontrolu.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
