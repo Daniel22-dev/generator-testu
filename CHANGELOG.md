@@ -1,3 +1,10 @@
+## 7.1.27 — CI/performance hotfix (2026-09-15)
+
+- Opraven pád GitHub `qa:p5:ci`: 7.1.26 překročila `entryHtmlBytes` / `largestFileBytes` o 4 558 B.
+- Performance budget se nezvyšuje. Build používá Acorn k odstranění pouze skutečných JS komentářů z embedovaných aplikačních skriptů; zdrojové soubory a jejich dokumentační komentáře zůstávají čitelné.
+- Funkční změny 7.1.26 (team code, finální submit, practice feedback, teacher re-run, lockOnLeave, checklist) nejsou měněny.
+- Lokální kontrola po optimalizaci: `entryHtmlBytes` 1 395 618 / 1 470 000 B, `largestFileBytes` 1 395 618 / 1 470 000 B; GHRAB Platform conformance 115/115 a quality budget 35/35 PASS.
+
 ## 7.1.26 — workflow a UX opravy po učitelském testování (2026-09-15)
 
 - Jednoduchý režim / ostrý test nyní zobrazuje povinný týmový bezpečnostní kód, který už validace vyžadovala.

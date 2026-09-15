@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.26',
+  version: '7.1.27',
   date:    '2026-09-15',
   status:  'production-serverless',
   changes: [
+    'CI/PERFORMANCE HOTFIX (7.1.27): build před vložením aplikačních JS do výsledného index.html bezpečně odstraňuje pouze syntakticky rozpoznané JavaScriptové komentáře pomocí Acorn parseru. Zdrojové komentáře v repozitáři zůstávají beze změny; funkce 7.1.26 se nemění a performance budget se nezvyšuje.',
     'UX A REGRESNÍ OPRAVY STUDENTSKÉHO WORKFLOW (7.1.26): jednoduchý ostrý test zobrazuje povinný týmový bezpečnostní kód; v záložkovém testu je finální odevzdání až u posledního cvičení; procvičovací režim po vyhodnocení automaticky ukazuje chyby i správná řešení; jednorázový device lock lze znovu povolit učitelským PINem nebo odemykacím heslem; přísný secure test skutečně přenáší lockOnLeave a zamyká se při odchodu; exportní checklist je odstraněn z instant/practice a zkrácen na čtyři nezbytné učitelské kontroly v secure režimu. Přidány regresní kontroly těchto scénářů.',
     'HOTFIX SELF-TESTU BODOVÁNÍ (7.1.25): opraven RPC bootstrap skrytého verifieru. Bridge se nyní vkládá před poslední uzavírací </body> dokumentu, nikoli před první textový výskyt, který mohl ležet uvnitř JavaScriptové HTML šablony pro feedback/archiv/tisk. Tím se odstraňuje falešné selhání „RPC __has__ timeout“ a zbytečné blokování stažení testu. Přidána je regresní kontrola tohoto scénáře.',
     'RUNTIME HARDENING PO CLAUDE KOLE 3 (7.1.24): Service Worker rozlišuje skutečný autorizační/revokační stav, který zůstává network-only/no-store, od podpůrných vrstev suite-session cleanup a GHRAB Platform. Ty se online vždy načítají čerstvě, ale při výpadku použijí poslední nainstalovanou kopii, aby na sdíleném zařízení tiše nezmizel úklid dat. Přidány jsou mutační a offline regresní kontroly; kandidát vyžaduje nezávislou revalidaci.',
@@ -38,7 +39,6 @@ const RELEASE = Object.freeze({
     'INTEGRAČNÍ HOTFIX AI STUDIA (7.1.18): deployment Generátoru používá stejnou podepsanou přístupovou konfiguraci jako aktuální AI Studio. Správcovské oprávnění se proto již nezamítne kvůli rozdílné verzi bezpečnostního bundle.',
     'OPRAVA P5 ROZPOČTŮ PO GARP K2 (7.1.16): lokální CSP-safe parser Acorn se načítá až při prvním sestavení nebo ověření testu, ne při startu aplikace ani v povinné PWA precache. Smoke validátory na něj asynchronně čekají a při chybě načtení selžou uzamčeně; kritický start i precache se vrátily pod původní limity.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP K2 (7.1.15): GitHub Pages build i manuál mají aktivní CSP. unsafe-eval není povolen; validace generovaného JavaScriptu používá lokální parser Acorn a diagnostické bodování společnou CSP-safe factory místo new Function. Všechny exporty nyní bez WebCrypto selžou uzamčeně, takže instant režim už nemůže tiše vytvořit slabý FNV hash.',
-    'BEZPEČNOSTNÍ KANDIDÁT GARP K1 (7.1.14): start aplikace nyní selže uzamčeně při chybě konfigurace, nepovolené adrese nebo chybějícím permitu; AI profily jsou pevně oddělené na veřejný direct Gemini a školní same-origin gateway bez automatického fallbacku. Importy a lokálně uložené stavy mají schéma, velikostní limity a ochranu proti prototypovým klíčům; CI Actions jsou připnuté SHA a zranitelné nepřímé závislosti aktualizované.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

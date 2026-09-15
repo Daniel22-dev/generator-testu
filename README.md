@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.26  
+**Aktuální verze:** 7.1.27  
+
+> **7.1.27 CI/performance hotfix (2026-09-15):** nemění funkční opravy 7.1.26. Build před vložením aplikačních JS do `index.html` odstraňuje pouze skutečné JavaScriptové komentáře přes parser Acorn; komentáře ve zdrojových souborech zůstávají. Cílem je vrátit release pod existující GHRAB performance budget bez jeho navyšování.
 
 > **7.1.26 kandidát (2026-09-15):** opravuje šest workflow/UX problémů z učitelského testování (simple strict team code, finální odevzdání až na konci, učící zpětná vazba, opakovaný pokus přes učitelský kód, skutečný lock při opuštění přísného testu a zkrácený checklist). Jde o změnu distribuovaného kódu; před produkčním označením vyžaduje nový nezávislý GARP/regresní průchod.
 
