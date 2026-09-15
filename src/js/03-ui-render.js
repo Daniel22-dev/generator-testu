@@ -307,16 +307,24 @@ function pickNum(key, value) {
 
 function pickJazyk(v) {
   const wasCzech = String(state.jazyk||'').toLowerCase()==='čeština';
+  // V jednoduchém workflow zachovej pedagogický účel i při přepnutí jazykové sady.
+  // Učitel nemá po změně jazyka znovu řešit, zda šlo o procvičení / běžný / přísný test.
+  const simplePurposeBefore = isSimpleMode() ? getSimplePurposeKey() : '';
   state.jazyk = v;
   const isCzech = String(v||'').toLowerCase()==='čeština';
   // Výchozí chování: test v cílovém jazyce = i pokyny/UI v cílovém jazyce.
   // Češtinu pro pokyny lze stále ručně zvolit v druhém panelu.
   if (!state.instrJazyk || state.instrJazyk === 'cs') state.instrJazyk = 'target';
-  // Šablony mají oddělené sady pro češtinu (cs) a cizí jazyky (fl). Při přepnutí
-  // mezi skupinami zruším aktivní šablonu, aby nezůstala viset šablona z druhé sady.
-  if (wasCzech !== isCzech && state.simpleTemplate){
-    const stillValid = isCzech ? !!SIMPLE_TEMPLATES.cs[state.simpleTemplate] : !!SIMPLE_TEMPLATES.fl[state.simpleTemplate];
-    if (!stillValid) state.simpleTemplate = '';
+  // Šablony mají oddělené sady pro češtinu (cs) a cizí jazyky (fl). V jednoduchém
+  // režimu přemapujeme stejný účel na odpovídající interní preset; v pokročilém
+  // zachováme původní chování a neplatnou šablonu pouze odepněme.
+  if (wasCzech !== isCzech){
+    if (isSimpleMode()) {
+      state.simpleTemplate = simplePurposeTemplateId(simplePurposeBefore);
+    } else if (state.simpleTemplate) {
+      const stillValid = isCzech ? !!SIMPLE_TEMPLATES.cs[state.simpleTemplate] : !!SIMPLE_TEMPLATES.fl[state.simpleTemplate];
+      if (!stillValid) state.simpleTemplate = '';
+    }
   }
   applyVisualState();
   validate(); saveSnapshot();

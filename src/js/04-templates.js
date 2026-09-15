@@ -134,34 +134,97 @@ function simpleTemplateLockList(t){
 }
 // Vykreslí karty jednoduchých šablon podle aktuálního jazyka. Volá se při změně
 // jazyka i při výběru šablony (kvůli zvýraznění aktivní karty).
+function getSimplePurposeKey(){
+  if (state.testMode === 'prisny') return 'strict';
+  if (state.testMode === 'procviceci') return 'practice';
+  return 'standard';
+}
+function simplePurposeTemplateId(key){
+  const cs = String(state.jazyk || '').toLowerCase() === 'čeština';
+  if (key === 'practice') return cs ? 'cs_practice' : 'fl_practice';
+  if (key === 'strict') return cs ? 'cs_strict' : 'fl_strict';
+  return '';
+}
+function chooseSimplePurpose(key){
+  if (!isSimpleMode()) return;
+  if (key === 'standard') {
+    // „Běžný test“ odpovídá přesně dosavadním bezpečným defaultům jednoduchého
+    // režimu. Nezavádíme nový preset ani neměníme generátor výsledného testu.
+    state.simpleTemplate = '';
+    applySimpleDefaults();
+  } else {
+    const id = simplePurposeTemplateId(key);
+    const t = simpleTemplateById(id);
+    if (!t) return;
+    state.simpleTemplate = id;
+    applyTemplateValues(id);
+  }
+  enforceModeConstraints();
+  applyVisualState(); validate(); saveSnapshot();
+  const labels = {practice:'Procvičování', standard:'Běžný test', strict:'Přísný test'};
+  try { uiToast('Účel nastaven: ' + (labels[key] || key) + '. Technické volby nastavil Generátor automaticky.', 'ok', 3600); } catch(_){}
+}
 function renderSimpleTemplates(){
   const wrap = $('simpleTemplateBtns');
   if (!wrap) return;
-  const set = simpleTemplateSet();
-  const active = state.simpleTemplate || '';
   let html = '';
-  for (const id in set){
-    if (!Object.prototype.hasOwnProperty.call(set,id)) continue;
-    const t = set[id];
-    const isActive = (active === id);
-    html += '<button type="button" class="tag-btn preset-card simple-tpl-card' + (isActive?' active':'') + '" '
-      + 'data-val="' + id + '" onclick="chooseSimpleTemplate(\'' + id + '\')">'
-      + '<span class="preset-card-top"><span class="preset-card-emoji">' + t.icon + '</span>'
-      + '<span class="preset-card-text"><span class="preset-card-title">' + esc(t.label) + '</span>'
-      + '<span class="preset-card-desc">' + esc(t.desc) + '</span></span></span>'
-      + '<span class="simple-tpl-detaillink">' + (isActive ? 'Klikni znovu pro detail ▸' : (isSimpleMode() ? 'Co šablona zapne ▸' : 'Detail ▸')) + '</span>'
-      + '</button>';
+
+  // Etapa 1 workflow simplification: v jednoduchém režimu učitel neřeší technické
+  // šablony. Vybere jen pedagogický účel. Interně používáme stejné již auditované
+  // hodnoty/presety jako dříve; pokročilý režim zůstává beze změny.
+  if (isSimpleMode()) {
+    const active = getSimplePurposeKey();
+    const cards = [
+      {
+        key:'practice', icon:'💬', title:'Procvičování',
+        desc:'Student dostane výsledek a učící zpětnou vazbu hned. Pro nácvik, opakování a domácí přípravu.',
+        badge:'Výsledek hned'
+      },
+      {
+        key:'standard', icon:'✅', title:'Běžný test',
+        desc:'Standardní test s okamžitým výsledkem. Opuštění stránky se zaznamená, ale pokus se nezamkne.',
+        badge:'Běžné použití'
+      },
+      {
+        key:'strict', icon:'🔒', title:'Přísný test',
+        desc:'Test pod dohledem. Opuštění stránky pokus uzamkne a výsledek se zpracuje v učitelském verifieru.',
+        badge:'Zámek + verifier'
+      }
+    ];
+    cards.forEach(function(c){
+      const isActive = active === c.key;
+      html += '<button type="button" class="tag-btn preset-card simple-purpose-card' + (isActive?' active':'') + '" '
+        + 'data-purpose="' + c.key + '" onclick="chooseSimplePurpose(\'' + c.key + '\')">'
+        + '<span class="preset-card-top"><span class="preset-card-emoji">' + c.icon + '</span>'
+        + '<span class="preset-card-text"><span class="preset-card-title">' + esc(c.title) + '</span>'
+        + '<span class="preset-card-desc">' + esc(c.desc) + '</span></span></span>'
+        + '<span class="preset-card-mode ' + (c.key === 'strict' ? 'strict' : (c.key === 'practice' ? 'instant' : 'flex')) + '">' + esc(c.badge) + '</span>'
+        + '</button>';
+    });
+    html += '<button type="button" class="simple-advanced-link" onclick="clearSimpleTemplate()">⚙️ Potřebuji vlastní nastavení</button>';
+  } else {
+    // Pokročilý režim: původní plná sada šablon zůstává zachována 1:1.
+    const set = simpleTemplateSet();
+    const active = state.simpleTemplate || '';
+    for (const id in set){
+      if (!Object.prototype.hasOwnProperty.call(set,id)) continue;
+      const t = set[id];
+      const isActive = (active === id);
+      html += '<button type="button" class="tag-btn preset-card simple-tpl-card' + (isActive?' active':'') + '" '
+        + 'data-val="' + id + '" onclick="chooseSimpleTemplate(\'' + id + '\')">'
+        + '<span class="preset-card-top"><span class="preset-card-emoji">' + t.icon + '</span>'
+        + '<span class="preset-card-text"><span class="preset-card-title">' + esc(t.label) + '</span>'
+        + '<span class="preset-card-desc">' + esc(t.desc) + '</span></span></span>'
+        + '<span class="simple-tpl-detaillink">' + (isActive ? 'Klikni znovu pro detail ▸' : 'Detail ▸') + '</span>'
+        + '</button>';
+    }
+    html += '<button type="button" class="tag-btn preset-card clear-card simple-tpl-card' + (active===''?' active':'') + '" '
+      + 'data-val="" onclick="clearSimpleTemplate()">'
+      + '<span class="preset-card-top"><span class="preset-card-text">'
+      + '<span class="preset-card-title">✖ Bez šablony</span>'
+      + '<span class="preset-card-desc">Zruší označení šablony, tvoje ruční nastavení ale ponechá.</span>'
+      + '</span></span></button>';
   }
-  // Karta „bez šablony" — popis závisí na režimu
-  const clearDesc = isSimpleMode()
-    ? 'Nastav si režim i hodnocení ručně (přepne do pokročilého režimu).'
-    : 'Zruší označení šablony, tvoje ruční nastavení ale ponechá.';
-  html += '<button type="button" class="tag-btn preset-card clear-card simple-tpl-card' + (active===''?' active':'') + '" '
-    + 'data-val="" onclick="clearSimpleTemplate()">'
-    + '<span class="preset-card-top"><span class="preset-card-text">'
-    + '<span class="preset-card-title">✖ Bez šablony</span>'
-    + '<span class="preset-card-desc">' + clearDesc + '</span>'
-    + '</span></span></button>';
   wrap.innerHTML = html;
 }
 function openSimpleTemplateDetail(id){

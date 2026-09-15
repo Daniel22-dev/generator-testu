@@ -1,6 +1,10 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.28  
+**Aktuální verze:** 7.1.30  
+
+> **7.1.30 Etapa 2 – Bezpečnost pracoviště (2026-09-15):** týmový bezpečnostní kód už není součástí běžného průvodce. Nastavuje se jednou přes ⚙️ Nastavení Generátoru → Bezpečnost pracoviště a při secure/joker workflow se v Doplňcích zobrazuje jen stav nastavení. Kryptografie, verifier, PIN/odemknutí, Forms a serverový profil se nemění. 7.1.30 je kandidát do čistého CI; GitHub main byl při přípravě stále na posledním zeleném baseline 7.1.28.
+
+> **7.1.29 Etapa 1 – Simple workflow (2026-09-15):** jednoduché nastavení nabízí jen tři pedagogické účely (Procvičování / Běžný test / Přísný test) a technické volby odvozuje deterministicky. Pokročilý režim zachovává původní plnou konfiguraci. Verifier, kryptografie, PIN/odemčení, Google Forms ani serverový profil se v této etapě nemění. 7.1.29 je kandidát do nového čistého CI; poslední zelený baseline je 7.1.28.
 
 > **7.1.28 XSS sink-ratchet + QA harness hotfix (2026-09-15):** opravuje CI regresi z 7.1.26/7.1.27 bez zvyšování bezpečnostního baseline. Tři nově přidaná použití `innerHTML` (schování checklistu, učitelský re-run modal a automatické otevření practice feedbacku) jsou nahrazena bezpečnějšími existujícími/DOM cestami; XSS inventář je zpět na 161/161. Současně je opraven teardown race practice workflow testu, který po PASS zavřel JSDOM před dokončením asynchronního report seal. Funkční UX změny 7.1.26 zůstávají zachovány.
 
@@ -16,9 +20,9 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.24** je runtime-hardening kandidát navazující na nezávisle auditovanou 7.1.23. Reaguje na N3-01 (offline dostupnost suite cleanup/platform vrstvy při zachování fail-closed revokace) a současně uzavírá levné tooling mezery N3-02/N3-03. Změna vyžaduje nový nezávislý regresní review cyklus, protože `public/sw.js` je distribuovaný runtime. Lokální Node regresní a negativní kontroly jsou součástí repozitáře; plný `npm ci`/browser řetězec musí zopakovat nezávislý auditor. Současný strop zůstává **OVERALL AMBER**, dokud neproběhne behaviorální live-model AI-RED a SHIELD-LIVE/RI-LIVE na školním serveru. Verze není schválena pro reálná studentská data.
+Verze **7.1.30** je kandidát Etapy 2 postavený nad source kandidátem **7.1.29**; poslední samostatně potvrzený GitHub baseline zůstává **7.1.28**. Etapa 1 zjednodušuje Simple workflow a Etapa 2 přesouvá týmový bezpečnostní kód do Nastavení zařízení. Verifier, kryptografie, PIN/odemykání, Google Forms a serverový profil se nemění. Čistý GitHub CI průchod 7.1.30 z exact lockfile je podmínkou, než se tento stav označí za nový produkční baseline.
 
-Katalog AI Studia může současně zobrazovat opatrnější organizační stav „Připraveno k řízenému ověřování“. Nejde o rozpor: aplikace je technicky produkční, ale katalog nesmí před rozhodnutím školy tvrdit, že je formálně schválena pro plošný provoz.
+GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 
 ## Hlavní vlastnosti
 

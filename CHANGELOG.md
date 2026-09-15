@@ -1,3 +1,21 @@
+## 7.1.30 — Etapa 2: Bezpečnost pracoviště (2026-09-15)
+
+- Týmový bezpečnostní kód je odstraněn z běžného kroku Doplňky a přesunut do **⚙️ Nastavení Generátoru → Bezpečnost pracoviště**.
+- Secure/joker workflow ukazuje pouze stav pracoviště a odkaz do Nastavení; validace už po učiteli nechce hledat technické pole v průvodci.
+- Uložený týmový kód se automaticky obnovuje po startu, importu zadání, staré plné šabloně a historii.
+- Admin může nadále kód vygenerovat/kopírovat; běžný učitel jej pouze vloží a může jej vědomě uložit na vlastním zařízení.
+- Kryptografický význam kódu, verifier, formát výsledků, PIN/odemknutí, Google Forms a serverový profil se nemění.
+- XSS a performance baseline se nezvyšují; přidány cílené regresní kontroly nastavení a automatického obnovení kódu.
+
+## 7.1.29 — Etapa 1: Simple workflow (2026-09-15)
+
+- Jednoduchý režim je redukován na tři pedagogické účely: **Procvičování / Běžný test / Přísný test**; technické volby se nastavují automaticky.
+- Opraven skrytý stavový drift: návrat z procvičování do Běžného testu vždy vrátí `feedbackMode=brief`, takže výsledek nezávisí na historii klikání.
+- Přepnutí mezi cizím jazykem a češtinou zachovává zvolený účel a mapuje odpovídající interní preset.
+- Pokročilý režim ponechává původní plnou sadu šablon a ruční nastavení.
+- Verifier, kryptografie, PIN/odemčení, Google Forms a serverový profil nejsou v této etapě měněny.
+- Přidány regresní kontroly Simple účelů a zachování Advanced workflow; bezpečnostní a performance baseline se nezvyšují.
+
 ## 7.1.28 — XSS sink-ratchet + QA harness CI hotfix (2026-09-15)
 
 - Opraven pád tří CI workflow na `qa:p5-xss-sinks`: 7.1.26/7.1.27 zvýšily počet `innerHTML` sinků z bezpečnostního baseline 161 na 164.

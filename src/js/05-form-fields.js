@@ -681,8 +681,9 @@ function validate() {
   }
 
   const baseSecretOk = trim('heslo') && trim('ucitelJmeno') && trim('ucitelPin') && trim('heslo') !== trim('ucitelPin');
-  const needsSecurityCode = state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline');
+  const needsSecurityCode = typeof securityCodeRequiredForCurrentWorkflow === 'function' ? securityCodeRequiredForCurrentWorkflow() : (state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline'));
   const securityCode = trim('bezpKod');
+  if (typeof updateSecurityWorkplaceStatus === 'function') updateSecurityWorkplaceStatus();
   const securityCodeOk = !needsSecurityCode || (securityCode.length >= 16 && securityCode !== trim('ucitelPin') && securityCode !== trim('heslo'));
   // Minimální síla tajemství. Důvod: hash chrání jen částečně — slabý PIN jde offline
   // uhádnout. Délkové minimum + zákaz běžných hodnot zvedají laťku útoku.
@@ -705,7 +706,7 @@ function validate() {
   else if (pinVal && isWeakSecret(pinVal)) msg.push('Učitelský PIN je příliš běžný (např. 12345678, heslo, jméno) — zvol méně odhadnutelný.');
   if (hesloVal && hesloVal.length < 12) msg.push('Odemykací heslo musí mít aspoň 12 znaků.');
   else if (hesloVal && isWeakSecret(hesloVal)) msg.push('Odemykací heslo je příliš běžné — zvol méně odhadnutelné.');
-  if (needsSecurityCode && securityCode.length < 16) msg.push((typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline') ? 'Bezpečnostní kód výsledků je u klasifikovaného (bezpečného offline) testu povinný — vlož týmový kód od správce (alespoň 16 znaků).' : 'Doplň bezpečnostní kód výsledků alespoň o 16 znacích; u žolíka slouží pro kontrolní kód reportu.');
+  if (needsSecurityCode && securityCode.length < 16) msg.push((typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline') ? 'Bezpečnost pracoviště není nastavena — otevři ⚙️ Nastavení → Bezpečnost pracoviště a vlož týmový kód od správce (alespoň 16 znaků).' : 'Bezpečnost pracoviště není nastavena — otevři ⚙️ Nastavení → Bezpečnost pracoviště a doplň týmový kód alespoň o 16 znacích.');
   if (securityCode && (securityCode === trim('ucitelPin') || securityCode === trim('heslo'))) msg.push('Bezpečnostní kód výsledků musí být jiný než PIN i odemykací heslo.');
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
   if(!groupLogic.ok) msg.push(...groupLogic.messages);

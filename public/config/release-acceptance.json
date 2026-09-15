@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.28",
-  "releaseStatus": "garp-2.5.1-shield-prep-source-candidate-pending-independent-review",
+  "appVersion": "7.1.30",
+  "releaseStatus": "stage1-simple-workflow-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -44,7 +44,7 @@
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
-    "transport": "pending-clean-build-full-regression-and-independent-review",
-    "note": "GARP 2.5.1 SHIELD source candidate. Static inherited GARP 2.3 controls were re-run locally; clean npm build/full browser chain and school-server LIVE remain NOT TESTED. Synthetic test data only."
+    "transport": "pending-clean-build-full-regression-and-github-ci",
+    "note": "7.1.30 Stage 1 workflow simplification candidate. UX/preset layer only; verifier, cryptography, PIN mechanism, Forms and server profile unchanged. Local static/security/platform browser harness gates executed where available; full app P5 runtime and exact-lockfile full regression remain pending clean GitHub CI."
   }
 }

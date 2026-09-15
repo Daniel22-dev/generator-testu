@@ -25,10 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.28',
+  version: '7.1.30',
   date:    '2026-09-15',
   status:  'production-serverless',
   changes: [
+    'ETAPA 2 – BEZPEČNOST PRACOVIŠTĚ (7.1.30): týmový bezpečnostní kód byl odstraněn z běžného průvodce a přesunut do samostatného Nastavení Generátoru. U secure workflow se v kroku Doplňky zobrazuje pouze stav pracoviště a odkaz do Nastavení; uložený kód se po startu, importu, staré šabloně a načtení historie automaticky obnoví. Kryptografická funkce kódu, verifier, formát výsledků, PINy, Google Forms a serverový profil se nemění.',
+    'ETAPA 1 – SIMPLE WORKFLOW (7.1.29): jednoduchý režim je redukován na tři pedagogické účely Procvičování / Běžný test / Přísný test. Technické volby se odvozují deterministicky z účelu, při změně jazykové sady se účel zachová a pokročilý režim ponechává původní plnou sadu šablon. Verifier, kryptografie, PIN mechanismus, Forms a serverový profil se nemění.',
     'XSS SINK-RATCHET HOTFIX (7.1.28): bezpečnostní baseline nebyl zvýšen. Tři nové innerHTML sinky z UX oprav 7.1.26 byly odstraněny: checklist se čistí přes textContent, modal pro další pokus se skládá přes DOM API a practice feedback znovu používá auditovanou toggleAnswersPanel cestu. Funkční chování 7.1.26 a performance optimalizace 7.1.27 zůstávají zachovány.',
     'CI/PERFORMANCE HOTFIX (7.1.27): build před vložením aplikačních JS do výsledného index.html bezpečně odstraňuje pouze syntakticky rozpoznané JavaScriptové komentáře pomocí Acorn parseru. Zdrojové komentáře v repozitáři zůstávají beze změny; funkce 7.1.26 se nemění a performance budget se nezvyšuje.',
     'UX A REGRESNÍ OPRAVY STUDENTSKÉHO WORKFLOW (7.1.26): jednoduchý ostrý test zobrazuje povinný týmový bezpečnostní kód; v záložkovém testu je finální odevzdání až u posledního cvičení; procvičovací režim po vyhodnocení automaticky ukazuje chyby i správná řešení; jednorázový device lock lze znovu povolit učitelským PINem nebo odemykacím heslem; přísný secure test skutečně přenáší lockOnLeave a zamyká se při odchodu; exportní checklist je odstraněn z instant/practice a zkrácen na čtyři nezbytné učitelské kontroly v secure režimu. Přidány regresní kontroly těchto scénářů.',
@@ -37,8 +39,6 @@ const RELEASE = Object.freeze({
     'MIGRACE GHRAB PLATFORM 1.1.2 (7.1.23): Generátor je napojen na suite-level lifecycle ghrab-suite-session-v1. Otevřená, zavřená i stale/BFCache instance uklízí pouze Generator-owned obsah, target-scoped handoff a in-memory AI/test/roster data; persistence je po suite end uzamčena, cleanup je fail-closed a acknowledgement vzniká až po ověřeném úklidu. Kandidát je součást ecosystem release wave a není samostatně release-approved.',
     'OPRAVNÝ KANDIDÁT GARP 2.3 PO DRUHÉM CLAUDE KOLE (7.1.20): opraven release-blocking terminátor inline skriptu ve verifieru, sjednocen importní kontrakt manifestů, standardní testovací řetěz nyní používá plný build a povinný headless krok, document.write baseline je zamčena na nule a GARP/PC-01 regrese byly dále zpřísněny. Tento post-second-review build není release-approved a před nasazením vyžaduje výslovně zahájenou novou nezávislou kontrolu.',
     'BEZPEČNOSTNÍ KANDIDÁT GARP 2.3 K1 (7.1.18): sjednocena AI trust boundary pro všechny vstupy a přílohy, diferenciace už neposílá skutečné identity do AI, self-test běží v opaque iframe přes omezené RPC, návratový odkaz AI Studia je omezen na nakonfigurovaný origin/cestu a sdílené zařízení má skutečné scoped ukončení práce s mazáním místních dat. Přidán GARP 2.3 regresní harness s negativními kontrolami.',
-    'INTEGRAČNÍ HOTFIX AI STUDIA (7.1.18): deployment Generátoru používá stejnou podepsanou přístupovou konfiguraci jako aktuální AI Studio. Správcovské oprávnění se proto již nezamítne kvůli rozdílné verzi bezpečnostního bundle.',
-    'OPRAVA P5 ROZPOČTŮ PO GARP K2 (7.1.16): lokální CSP-safe parser Acorn se načítá až při prvním sestavení nebo ověření testu, ne při startu aplikace ani v povinné PWA precache. Smoke validátory na něj asynchronně čekají a při chybě načtení selžou uzamčeně; kritický start i precache se vrátily pod původní limity.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -1227,6 +1227,7 @@ function applySimpleDefaults(){
   state.testMode = 'bezny';
   state.layout = state.layout || 'tabs';
   state.resultMode = 'instant';
+  state.feedbackMode = 'brief';
   state.odevzdavani = 'B';
   state.randomizace = 'NE';
   state.gradeTyp = 'skola';

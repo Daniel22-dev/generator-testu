@@ -225,6 +225,32 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
   return `${Math.round(pkg.studentHtml.length/1024)} kB student / ${Math.round(pkg.teacherHtml.length/1024)} kB verifier + runtime oneTimeCode roster OK`;
 });
 
+// Etapa 1 — jednoduchý workflow musí být redukovaný na tři pedagogické účely.
+w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',simpleTemplate:'',jazyk:'angličtina'});enforceModeConstraints();renderSimpleTemplates();");
+check('stage1 simple: právě tři účely', () => {
+  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns [data-purpose]')];
+  if(cards.length!==3) throw new Error('nalezeno '+cards.length);
+  if(cards.map(x=>x.dataset.purpose).join(',')!=='practice,standard,strict') throw new Error('špatné účely');
+  if(w.document.querySelector('#simpleTemplateBtns .clear-card')) throw new Error('v simple zůstala technická karta Bez šablony');
+  return cards.map(x=>x.textContent.trim().replace(/\s+/g,' ')).join(' | ');
+});
+check('stage1 simple: účely nastavují deterministické profily', () => {
+  w.chooseSimplePurpose('practice');
+  if(w.state.testMode!=='procviceci'||w.state.resultMode!=='instant'||w.state.feedbackMode!=='learning') throw new Error('practice profil');
+  w.chooseSimplePurpose('standard');
+  if(w.state.testMode!=='bezny'||w.state.resultMode!=='instant'||w.state.feedbackMode!=='brief'||w.state.screenGuard!==false) throw new Error('standard profil');
+  w.chooseSimplePurpose('strict');
+  if(w.state.testMode!=='prisny'||w.state.resultMode!=='secureOffline'||w.state.feedbackMode!=='none'||w.state.odevzdavani!=='B') throw new Error('strict profil');
+  return 'practice / standard / strict';
+});
+w.setAppMode('advanced');
+w.renderSimpleTemplates();
+check('stage1 advanced: původní šablony zůstaly dostupné', () => {
+  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns .simple-tpl-card')];
+  if(cards.length!==5) throw new Error('angličtina má mít 4 šablony + Bez šablony, nalezeno '+cards.length);
+  return cards.length;
+});
+
 // všech 7 jednoduchých šablon
 for (const [lang, ids] of [['angličtina', ['fl_practice','fl_homework','fl_graded_quick','fl_strict']], ['čeština', ['cs_practice','cs_text','cs_strict']]]) {
   w.eval(`pickJazyk('${lang}')`);

@@ -126,7 +126,6 @@ function markAdvancedSections(){
   ids.forEach(id => { const el = $(id); const f = el && el.closest ? el.closest('.field') : null; if (f) f.classList.add('advanced-only'); });
   const varA = $('varA'); const subField = varA && varA.closest ? varA.closest('.field') : null; if (subField) subField.classList.add('advanced-only');
   const btnEx = $('btnExDetail'); if (btnEx) btnEx.classList.add('advanced-only');
-  const secCode = $('bezpKod'); const secField = secCode && secCode.closest ? secCode.closest('.field') : null; if (secField) secField.classList.add('advanced-only');
 }
 
 function updateAppModeUI(){
@@ -134,29 +133,26 @@ function updateAppModeUI(){
   const simple = isSimpleMode();
   document.body.classList.toggle('simple-mode', simple);
   document.body.classList.toggle('advanced-mode', !simple);
-  // Bezpečný offline režim (včetně jednoduché šablony „ostrý test“) týmový
-  // bezpečnostní kód opravdu potřebuje. Pole je jinak označeno advanced-only,
-  // takže by v jednoduchém režimu bylo skryté a validace by uživatele nepustila dál.
-  const secCode = $('bezpKod');
-  const secField = secCode && secCode.closest ? secCode.closest('.field') : null;
-  if (secField) {
-    const requiredInSimple = simple && (((state.resultMode || 'instant') === 'secureOffline') || state.zolicek === 'ANO');
-    secField.classList.toggle('advanced-only', !requiredInSimple);
-  }
   document.querySelectorAll('#appModeBtns .mode-pill').forEach(b => b.classList.toggle('active', b.dataset.val === (simple ? 'simple' : 'advanced')));
   const summary = $('appModeSummary');
   if (summary) {
-    if (simple) {
-      const t = simpleTemplateById(state.simpleTemplate || '');
-      summary.textContent = t
-        ? ('Jednoduchý režim se šablonou „' + t.label + '“: režim testu a hodnocení nastavuje šablona. Doplň jen látku, typy a počet.')
-        : 'Jednoduchý režim: vyber šablonu podle cíle, nebo nech výchozí (běžný test, okamžitá známka). Šablona umí nastavit i offline/přísný test.';
-    } else {
-      summary.textContent = 'Pokročilý režim: zvol doporučené nastavení pro známkování, nebo si všechny volby nastav ručně.';
-    }
+    summary.textContent = simple
+      ? 'Vyber jen účel testu. Režim, zpětnou vazbu a bezpečnostní chování nastaví Generátor automaticky.'
+      : 'Pokročilá nastavení: technické volby jsou viditelné a můžeš je řídit ručně.';
   }
+  const tplLabel = $('simpleTemplateLabelText');
+  const tplHint = $('simpleTemplateHint');
+  const tplTip = $('simpleTemplateTip');
+  if (tplLabel) tplLabel.textContent = simple ? 'K čemu má test sloužit?' : 'Šablona testu';
+  if (tplHint) tplHint.textContent = simple
+    ? 'Vyber jednu ze tří možností. Ostatní technické nastavení udělá Generátor za tebe.'
+    : 'Šablona přednastaví režim a hodnocení. Pro úplně ruční nastavení zvol „Bez šablony“.';
+  if (tplTip) tplTip.dataset.tip = simple
+    ? 'V jednoduchém režimu vybíráš jen účel: procvičování, běžný test nebo přísný test. Generátor podle toho automaticky nastaví technické volby, které se zde nezobrazují.'
+    : 'Šablona nastaví režim testu, zpětnou vazbu a hodnocení. V pokročilém režimu jsou řízené volby viditelné; pro úplně ruční konfiguraci zvol Bez šablony.';
   const helper = $('simpleSecretsHelper'); if (helper) helper.classList.toggle('hidden', !simple);
   renderSimpleTemplates();
+  updateSecurityWorkplaceStatus();
 }
 
 function getInstructionLanguageLabel() {
@@ -174,6 +170,74 @@ function makeVerifySecret(){
   return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 function toggleSecret(id, btn){ const el=$(id); if(!el) return; const show = el.type === 'password'; el.type = show ? 'text' : 'password'; if(btn) btn.textContent = show ? '🙈' : '👁'; }
+function securityCodeRequiredForCurrentWorkflow(){
+  // Preserve the 7.1.29 security contract exactly: secureOffline requires the
+  // shared code for non-admin teachers; joker reports require it for everyone.
+  return state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline');
+}
+function storedSecurityCodeValue(){
+  try { return localStorage.getItem(SCHOOL_SECURITY_CODE_KEY) || ''; }
+  catch(_) { return ''; }
+}
+function securityCodeStoredLocally(){ return Boolean(storedSecurityCodeValue()); }
+function updateGeneratorSettingsSecurityStatus(){
+  const status = $('generatorSettingsSecurityStatus');
+  if (!status) return;
+  const code = trim('bezpKod');
+  const storedCode = storedSecurityCodeValue();
+  if (code.length >= 16 && storedCode === code) {
+    status.textContent = '🟢 Týmový bezpečnostní kód je nastaven a uložen na tomto zařízení.';
+  } else if (code.length >= 16 && storedCode) {
+    status.textContent = '🟡 Pro tuto relaci je načten jiný týmový kód než ten uložený v prohlížeči. Ulož aktuální kód jen pokud je změna záměrná.';
+  } else if (code.length >= 16) {
+    status.textContent = '🟡 Týmový bezpečnostní kód je načten jen pro tuto relaci. Pokud je zařízení tvoje, můžeš ho uložit.';
+  } else if (storedCode) {
+    status.textContent = '🟡 V prohlížeči je uložen kód, ale ještě není načten do této relace.';
+  } else {
+    status.textContent = '🔴 Týmový bezpečnostní kód na tomto zařízení není nastaven.';
+  }
+}
+function updateSecurityWorkplaceStatus(){
+  const relevant = state.zolicek === 'ANO' || state.resultMode === 'secureOffline';
+  const field = $('securityWorkplaceField');
+  if (field) field.classList.toggle('hidden', !relevant);
+  const status = $('securityWorkplaceStatus');
+  if (status) {
+    const code = trim('bezpKod');
+    status.textContent = code.length >= 16
+      ? '🟢 Bezpečnost pracoviště je nastavena. Týmový kód použije Generátor automaticky.'
+      : '🔴 Bezpečnost pracoviště není nastavena. Otevři ⚙️ Nastavení a vlož týmový bezpečnostní kód od správce.';
+  }
+  updateGeneratorSettingsSecurityStatus();
+}
+function syncGeneratorSettingsInputFromCanonical(){
+  const input = $('generatorSettingsSecurityInput');
+  if (input) input.value = trim('bezpKod');
+}
+function onGeneratorSettingsSecurityInput(){
+  const input = $('generatorSettingsSecurityInput');
+  if (!input) return;
+  setSecurityCodeAndRefresh(input.value);
+}
+function openGeneratorSettings(){
+  const modal = $('generatorSettingsModal');
+  if (!modal) return;
+  syncGeneratorSettingsInputFromCanonical();
+  updateGeneratorSettingsSecurityStatus();
+  const gen = $('btnGenSecCode'); if (gen) gen.classList.toggle('hidden', !(typeof accIsAdmin === 'function' && accIsAdmin()));
+  const copy = $('btnCopySecCode'); if (copy) copy.classList.toggle('hidden', !(typeof accIsAdmin === 'function' && accIsAdmin()));
+  modal.classList.remove('hidden');
+  const input = $('generatorSettingsSecurityInput');
+  if (input) setTimeout(() => input.focus(), 0);
+}
+function closeGeneratorSettings(){
+  const modal = $('generatorSettingsModal');
+  if (modal) modal.classList.add('hidden');
+}
+function generatorSettingsBackdropClick(event){
+  const modal = $('generatorSettingsModal');
+  if (modal && event && event.target === modal) closeGeneratorSettings();
+}
 function makeHumanSecurityCode(len=36){
   if (!(window.crypto && window.crypto.getRandomValues))
     throw new Error('WebCrypto není dostupné — generování přístupového kódu selhalo.');
@@ -186,6 +250,8 @@ function makeHumanSecurityCode(len=36){
 }
 function setSecurityCodeAndRefresh(code){
   setVal('bezpKod', code || '');
+  syncGeneratorSettingsInputFromCanonical();
+  updateSecurityWorkplaceStatus();
   validate();
   saveSnapshot();
 }
@@ -214,7 +280,7 @@ async function saveSecurityCodeLocal(){
   if (!code) { await uiAlert('Nejdřív vygeneruj nebo napiš bezpečnostní kód.'); return; }
   const ok = await uiConfirm('Uložit bezpečnostní kód do tohoto prohlížeče? Používej pouze na vlastním učitelském zařízení. Na sdíleném školním počítači neukládej.', 'Uložit lokálně?', true);
   if (!ok) return;
-  try { if(!generatorPersistenceAllowed()) return; localStorage.setItem(SCHOOL_SECURITY_CODE_KEY, code); uiToast('Bezpečnostní kód je uložen lokálně v tomto prohlížeči. Na sdíleném školním počítači tento postup nepoužívej.', 'warn', 5200); }
+  try { if(!generatorPersistenceAllowed()) return; localStorage.setItem(SCHOOL_SECURITY_CODE_KEY, code); updateSecurityWorkplaceStatus(); uiToast('Bezpečnostní kód je uložen lokálně v tomto prohlížeči. Na sdíleném školním počítači tento postup nepoužívej.', 'warn', 5200); }
   catch(_) { await uiAlert('Kód se nepodařilo uložit. Prohlížeč možná blokuje localStorage.'); }
 }
 async function loadSecurityCodeLocal(){
@@ -228,7 +294,7 @@ async function loadSecurityCodeLocal(){
 async function forgetSecurityCodeLocal(){
   const ok = await uiConfirm('Smazat lokálně uložený bezpečnostní kód z tohoto prohlížeče?', 'Smazat lokální kód?', true);
   if (!ok) return;
-  try { localStorage.removeItem(SCHOOL_SECURITY_CODE_KEY); uiToast('Lokálně uložený bezpečnostní kód byl z tohoto zařízení smazán. Samotný týmový kód v bezpečném školním úložišti tím smazán není.', 'warn', 5200); }
+  try { localStorage.removeItem(SCHOOL_SECURITY_CODE_KEY); updateSecurityWorkplaceStatus(); uiToast('Lokálně uložený bezpečnostní kód byl z tohoto zařízení smazán. Pro aktuální relaci zůstává načtený, dokud ho v Nastavení nesmažeš nebo aplikaci nezavřeš.', 'warn', 6200); }
   catch(_) { await uiAlert('Lokální kód se nepodařilo smazat.'); }
 }
 // Na vlastním (důvěryhodném) zařízení: pokud je týmový bezpečnostní kód lokálně uložen,
@@ -241,6 +307,8 @@ function autoApplyStoredSecurityCode(){
     const code = localStorage.getItem(SCHOOL_SECURITY_CODE_KEY) || '';
     if (!code) return;
     setVal('bezpKod', code);
+    syncGeneratorSettingsInputFromCanonical();
+    updateSecurityWorkplaceStatus();
     if (typeof validate === 'function') validate();
   } catch(_){}
 }
@@ -549,6 +617,7 @@ function loadTemplate(id) {
     enforceModeConstraints();
     safeDomEntries(tpl.dom).forEach(([k,v]) => setVal(k, v));
     SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
+    autoApplyStoredSecurityCode();
     maxStep = 0;
     goTo(0);
     applyVisualState();
@@ -773,6 +842,7 @@ async function loadFromHistory(i) {
   enforceModeConstraints();
   safeDomEntries(h.dom).forEach(([k, v]) => setVal(k, v));
   SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
+  autoApplyStoredSecurityCode();
   maxStep = 4;            // vše už vyplněné → povol skákání po krocích nahoře
   goTo(1);               // rovnou do úprav (zadání / cvičení)
   applyVisualState();

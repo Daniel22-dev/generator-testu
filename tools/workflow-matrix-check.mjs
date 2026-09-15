@@ -115,6 +115,45 @@ w.eval("state.appMode='simple';state.workPreset='quick';state.simpleTemplate='fl
 w.clearSimpleTemplate();
 ok('Bez šablony přepne simple → advanced',()=>{assert(w.eval("state.appMode==='advanced'&&state.simpleTemplate===''"),'nepřepnuto');});
 
+// 3b) Etapa 1: jednoduchý režim nabízí právě tři účely a každý je deterministický.
+resetBase();
+w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',simpleTemplate:'',jazyk:'angličtina',feedbackMode:'learning'});enforceModeConstraints();renderSimpleTemplates();");
+ok('simple UI má právě 3 účely bez technické šablony',()=>{
+  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns [data-purpose]')];
+  assert(cards.length===3,'očekávány 3 karty účelu, nalezeno '+cards.length);
+  assert(cards.map(x=>x.dataset.purpose).join(',')==='practice,standard,strict','neočekávané pořadí/účely');
+  assert(!w.document.querySelector('#simpleTemplateBtns .clear-card'),'v simple zůstala karta Bez šablony');
+});
+w.eval("chooseSimplePurpose('practice')");
+ok('simple Procvičování nastaví stabilní formativní profil',()=>{
+  const s=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(s.appMode==='simple','režim se změnil');
+  assert(s.testMode==='procviceci'&&s.resultMode==='instant'&&s.feedbackMode==='learning','nesedí practice profil');
+});
+w.eval("chooseSimplePurpose('standard')");
+ok('simple Běžný test resetuje historii klikání na standardní profil',()=>{
+  const s=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(s.simpleTemplate==='','běžný test má zůstat bez interní šablony');
+  assert(s.testMode==='bezny'&&s.resultMode==='instant'&&s.feedbackMode==='brief','nesedí standard profil');
+  assert(s.screenGuard===false,'běžný test zdědil screenGuard');
+});
+w.eval("chooseSimplePurpose('strict')");
+ok('simple Přísný test nastaví secure profil',()=>{
+  const s=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(s.testMode==='prisny'&&s.resultMode==='secureOffline'&&s.feedbackMode==='none'&&s.odevzdavani==='B','nesedí strict profil');
+});
+w.eval("pickJazyk('čeština')");
+ok('simple účel se zachová při změně jazykové sady',()=>{
+  const s=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(s.appMode==='simple'&&s.testMode==='prisny'&&s.simpleTemplate==='cs_strict','přísný účel se při změně jazyka ztratil');
+});
+w.eval("setAppMode('advanced');renderSimpleTemplates();");
+ok('advanced UI zachovává původní plnou sadu šablon',()=>{
+  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns .simple-tpl-card')];
+  assert(cards.length===4,'čeština advanced má mít 3 šablony + Bez šablony');
+  assert(!!w.document.querySelector('#simpleTemplateBtns .clear-card'),'advanced přišel o Bez šablony');
+});
+
 // 4) Vizuální aktivace/deaktivace pro všechny zásadní závislosti.
 let uiCases=0;
 for(const testMode of domains.testMode)for(const resultMode of domains.resultMode)for(const feedbackMode of domains.feedbackMode){
@@ -363,17 +402,44 @@ for(const layout of ['tabs','scroll'])for(const odevzdavani of ['A','B'])for(con
 }
 ok('reprezentativní výstupová matice instant HTML',()=>outputCases+' sestavených testů');
 
-// 19) Simple + strict nesmí schovat týmový bezpečnostní kód, který validace vyžaduje.
+// 19) Etapa 2: týmový bezpečnostní kód není součástí generovacího workflow.
 resetBase();
-w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimpleTemplate('fl_strict');updateAppModeUI();");
-ok('simple ostrý test zobrazuje týmový bezpečnostní kód',()=>{
-  const field=w.document.getElementById('bezpKod').closest('.field');
-  assert(!field.classList.contains('advanced-only'),'povinný týmový kód je v simple strict stále schovaný');
+w.eval("Access.profile={role:'trainedTeacher',userId:'TEACHER',displayName:'Teacher',status:'active'};Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimpleTemplate('fl_strict');updateAppModeUI();validate();");
+ok('týmový bezpečnostní kód je mimo formulář testu',()=>{
+  const input=w.document.getElementById('bezpKod');
+  assert(input && input.type==='hidden','kanonický bezpečnostní kód není skrytý runtime input');
+  assert(!input.closest('#step3'),'bezpečnostní kód zůstal uvnitř kroku Doplňky');
+  assert(w.document.getElementById('generatorSettingsModal'),'chybí Nastavení Generátoru');
+});
+ok('simple přísný ukáže jen stav Bezpečnosti pracoviště',()=>{
+  const field=w.document.getElementById('securityWorkplaceField');
+  const status=w.document.getElementById('securityWorkplaceStatus');
+  assert(!field.classList.contains('hidden'),'povinný stav Bezpečnosti pracoviště je schovaný');
+  assert(status.textContent.includes('není nastaveno'),'chybí srozumitelný stav nenastaveného pracoviště');
+});
+w.openGeneratorSettings();
+ok('Nastavení bezpečnosti synchronizuje týmový kód do runtime',()=>{
+  const modal=w.document.getElementById('generatorSettingsModal');
+  const input=w.document.getElementById('generatorSettingsSecurityInput');
+  assert(!modal.classList.contains('hidden'),'Nastavení se neotevřelo');
+  input.value='TEAM-CODE-0123456789-SECURE';
+  w.onGeneratorSettingsSecurityInput();
+  assert(w.document.getElementById('bezpKod').value==='TEAM-CODE-0123456789-SECURE','kód z Nastavení se nepřenesl do runtime');
+  assert(w.document.getElementById('securityWorkplaceStatus').textContent.includes('nastaveno'),'workflow stav se po nastavení neaktualizoval');
+  w.closeGeneratorSettings();
+});
+ok('uložený týmový kód se po startu načte automaticky',()=>{
+  w.localStorage.setItem('sestavovac_school_security_code_v1','STORED-TEAM-CODE-0123456789');
+  setVal('bezpKod','');
+  w.autoApplyStoredSecurityCode();
+  const loaded=w.document.getElementById('bezpKod').value;
+  w.localStorage.removeItem('sestavovac_school_security_code_v1');
+  assert(loaded==='STORED-TEAM-CODE-0123456789','uložený týmový kód se automaticky nenačetl');
 });
 w.eval("chooseSimpleTemplate('fl_practice');updateAppModeUI();");
-ok('simple cvičný test zbytečně neukazuje týmový kód',()=>{
-  const field=w.document.getElementById('bezpKod').closest('.field');
-  assert(field.classList.contains('advanced-only'),'nepotřebný týmový kód zůstal v simple practice viditelný');
+ok('simple cvičný test stav Bezpečnosti pracoviště nezobrazuje',()=>{
+  const field=w.document.getElementById('securityWorkplaceField');
+  assert(field.classList.contains('hidden'),'nepotřebný stav Bezpečnosti pracoviště zůstal v practice viditelný');
 });
 
 // 20) Přísný secure test musí přenést lockOnLeave až do veřejné studentské konfigurace.

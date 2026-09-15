@@ -20,6 +20,11 @@ document.addEventListener('keydown', function(e){
     const el = kids[i];
     if (!el || !el.classList || !el.classList.contains('ui-modal-backdrop')) continue;
     if (el.classList.contains('hidden')) continue; // perzistentní skryté backdropy ignoruj
+    if (el.id === 'generatorSettingsModal') {
+      if (typeof closeGeneratorSettings === 'function') closeGeneratorSettings();
+      e.stopPropagation();
+      return;
+    }
     if (el.id && ESC_CLOSABLE_MODALS.indexOf(el.id) !== -1) {
       el.remove();
       e.stopPropagation();
@@ -48,6 +53,7 @@ function safeInitStep(name, fn){
   safeInitStep('setupDragDrop', setupDragDrop);
   const restored = safeInitStep('loadSnapshot', loadSnapshot);
   if (restored) safeInitStep('restoredBanner', function(){ $('restoredBanner').classList.remove('hidden'); });
+  safeInitStep('autoApplyStoredSecurityCode', autoApplyStoredSecurityCode);
   safeInitStep('showOnlyStep', function(){ showOnlyStep(currentStep); });
   if (currentStep === 4) safeInitStep('renderResult', renderResult);
   safeInitStep('renderTemplates', renderTemplates);

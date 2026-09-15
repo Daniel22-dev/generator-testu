@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.28">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.30">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -36,6 +36,7 @@
       <button class="hdr-btn" id="btnGuide" onclick="showUsageGuide()" aria-label="Návod k používání" title="Jak používat ostře (návod pro kolegy)">📋</button>
       <button class="hdr-btn" id="btnSecGuide" onclick="showSecurityGuide()" aria-label="Bezpečný provoz ve škole" title="Bezpečný provoz ve škole">🏫</button>
       <button class="hdr-btn" id="btnStrict" onclick="showStrictSituations()" aria-label="Situace a meze přísného testu" title="Co čekat od přísného testu — situace a meze">🔒</button>
+      <button class="hdr-btn" id="btnSettings" onclick="openGeneratorSettings()" aria-label="Nastavení Generátoru" title="Nastavení Generátoru">⚙️</button>
       <button class="hdr-btn" id="btnMode" onclick="toggleMode()" aria-label="Přepnout světlý nebo tmavý režim" title="Světlý/tmavý režim">☀️</button>
       <button class="hdr-btn" id="btnAssistant" onclick="openGeneratorAssistant()" aria-label="Otevřít poradce generátoru" title="Zeptat se na funkce, bezpečnost a ovládání generátoru">💬</button>
       <a class="hdr-btn manual-launch-btn" id="btnManual" href="./manual/" target="_self" aria-label="Otevřít interaktivní manuál celé aplikace" title="Interaktivní manuál celé aplikace">📖</a>
@@ -58,6 +59,9 @@
     </div>
   </div>
 
+  <!-- Runtime security value. The visible editor lives in Settings > Bezpečnost pracoviště. -->
+  <input type="hidden" id="bezpKod" value="">
+
   <!-- Banners -->
   <div id="restoredBanner" class="banner green hidden"><span>✓ Obnoveno z předchozí relace</span><button onclick="discardSaved()">Začít znovu</button></div>
   <div id="accessEnvBanner" class="banner red hidden"></div>
@@ -66,12 +70,12 @@
   <!-- Work mode -->
   <div class="mode-switch-panel" id="appModePanel">
     <div class="mode-switch-head">
-      <div class="mode-switch-title">Pracovní režim</div>
+      <div class="mode-switch-title">Způsob nastavení</div>
       <div class="mode-switch-note" id="appModeSummary"></div>
     </div>
     <div class="mode-switch-actions" id="appModeBtns">
-      <button class="mode-pill active" type="button" data-val="simple" onclick="setAppMode('simple')"><span class="mode-pill-title">⚡ Jednoduchý režim</span><span class="mode-pill-desc">Rychlá cesta pro běžné použití: minimum voleb, výchozí je běžný test s okamžitou známkou a screenshotem výsledku. Šablona podle cíle umí zapnout i bezpečný offline nebo ostrý test — bez ručního nastavování. Bez diferenciace.</span><span class="mode-pill-badge">Doporučeno pro rychlé testy</span></button>
-      <button class="mode-pill" type="button" data-val="advanced" onclick="setAppMode('advanced')"><span class="mode-pill-title">🛠️ Pokročilý režim</span><span class="mode-pill-desc">Odemkne všechny volby bez automatického přednastavení: verifier, bezpečný offline režim, přísný test, žolíka, diferenciaci, stupnici i exporty nastavíš ručně.</span><span class="mode-pill-badge">Pro klasifikaci a ladění</span></button>
+      <button class="mode-pill active" type="button" data-val="simple" onclick="setAppMode('simple')"><span class="mode-pill-title">⚡ Jednoduché nastavení</span><span class="mode-pill-desc">Pro většinu testů. Vybereš jen účel a obsah; Generátor sám nastaví režim, zpětnou vazbu a bezpečnostní chování.</span><span class="mode-pill-badge">Doporučeno pro většinu kolegů</span></button>
+      <button class="mode-pill" type="button" data-val="advanced" onclick="setAppMode('advanced')"><span class="mode-pill-title">⚙️ Pokročilá nastavení</span><span class="mode-pill-desc">Pro vlastní workflow a detailní ladění. Zpřístupní ruční nastavení režimu, verifieru, diferenciace, hodnocení a dalších voleb.</span><span class="mode-pill-badge">Volitelné</span></button>
     </div>
   </div>
 
@@ -158,8 +162,8 @@
     <!-- ═══════════════════════════ STEP 1 ═══════════════════════════ -->
     <div id="step1" class="hidden">
       <div class="field" id="simpleTemplateField">
-        <div class="field-label">Šablona testu <button class="tt-icon" data-tip="Vyber, k čemu test je. Šablona nastaví režim testu, zpětnou vazbu a hodnocení podle cíle. V jednoduchém režimu tyto volby skryje (nemusíš je řešit), v pokročilém je nastaví a zamkne (viditelné, ale zašedlé — pro ruční úpravu šablonu odepni). Látku, typy a počet doplňuješ vždy sám. Klikni na šablonu znovu pro detail.">?</button></div>
-        <div class="field-hint" id="simpleTemplateHint">Vyber podle cíle. Šablona nastaví režim a hodnocení; ty doplníš látku, typy a počet. Klikni znovu na vybranou šablonu pro detail.</div>
+        <div class="field-label"><span id="simpleTemplateLabelText">K čemu má test sloužit?</span> <button class="tt-icon" id="simpleTemplateTip" data-tip="V jednoduchém režimu vybíráš jen účel testu. Generátor automaticky nastaví technické volby; v pokročilém režimu můžeš šablony a nastavení řídit ručně.">?</button></div>
+        <div class="field-hint" id="simpleTemplateHint">Vyber jednu ze tří možností. Ostatní technické nastavení udělá Generátor za tebe.</div>
         <div class="btn-row preset-card-grid" id="simpleTemplateBtns"></div>
         <div class="tpl-lock-banner hidden" id="tplLockBanner">
           <span class="tpl-lock-banner-text">🔒 Režim testu a bezpečnost níže určuje šablona <strong id="tplLockBannerName"></strong> — volby jsou zamčené (zašedlé). Chceš-li je měnit ručně, odepni šablonu.</span>
@@ -728,7 +732,7 @@
     <!-- ═══════════════════════════ STEP 3 ═══════════════════════════ -->
     <div id="step3" class="hidden">
       <div class="simple-helper" id="simpleSecretsHelper">
-        <b>Jednoduchý režim:</b> režim výsledků a bezpečnost řídí zvolená šablona. Doplň silný PIN a odemykací heslo; u bezpečného offline testu také týmový bezpečnostní kód. Potom vznikne studentský soubor a samostatný učitelský verifier.
+        <b>Jednoduché nastavení:</b> účel testu už nastavil potřebné technické volby. Tady doplň jen údaje pro učitelský režim; můžeš je nechat bezpečně vygenerovat tlačítkem níže. Týmový kód se nastavuje jednou v ⚙️ Nastavení → Bezpečnost pracoviště.
         <div class="simple-quick-row">
           <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Rychle vygenerovat PIN a heslo</button>
         </div>
@@ -753,18 +757,11 @@
         </div>
         <div class="small-muted">Použij jiné heslo než učitelský PIN.</div>
       </div>
-      <div class="field">
-        <div class="field-label">🛡️ Bezpečnostní kód výsledků <button class="tt-icon" data-tip="Týmový bezpečnostní kód učitelů. Z něj se odvozuje pečeť (kontrolní kód) reportu, takže celý tým musí používat STEJNÝ kód — jen tak jdou výsledky napříč týmem konzistentně ověřit a nelze podvrhnout cizí report. Kód generuje a bezpečně rozesílá správce; ty ho jen vlož. U klasifikovaného (bezpečného offline) testu je povinný. Není to učitelský PIN ani odemykací heslo a studentům se nikdy neposílá.">?</button></div>
-        <div class="input-wrap">
-          <input type="password" id="bezpKod" placeholder="Vlož týmový bezpečnostní kód od správce..." autocomplete="new-password" oninput="onInput()">
-          <button type="button" class="btn-eye" onclick="toggleSecret('bezpKod', this)" aria-label="Zobrazit nebo skrýt bezpečnostní kód">👁</button>
-        </div>
+      <div class="field hidden" id="securityWorkplaceField">
+        <div class="field-label">🛡️ Bezpečnost pracoviště</div>
+        <div class="secure-mode-box" id="securityWorkplaceStatus" role="status"></div>
         <div class="ex-action" style="margin-top:7px">
-          <button type="button" class="btn-mini hidden" id="btnGenSecCode" onclick="generateSchoolSecurityCode()">🎲 Vygenerovat nový týmový kód</button>
-          <button type="button" class="btn-mini hidden" id="btnCopySecCode" onclick="copySecurityCode()">📋 Kopírovat pro kolegy</button>
-          <button type="button" class="btn-mini" onclick="saveSecurityCodeLocal()">💾 Uložit lokálně na tomto zařízení</button>
-          <button type="button" class="btn-mini" onclick="loadSecurityCodeLocal()">↩ Načíst uložený kód</button>
-          <button type="button" class="btn-mini" onclick="forgetSecurityCodeLocal()">🧹 Zapomenout z tohoto zařízení</button>
+          <button type="button" class="btn-mini" onclick="openGeneratorSettings()">⚙️ Otevřít nastavení</button>
         </div>
       </div>
       <!-- overeni bylo odstraněno z UI; state.overeni=NE vynucuje normalizeLoadedState() -->
@@ -1010,6 +1007,34 @@
       <button class="btn-ed-apply" id="btnEditorApply" onclick="applyEditorChanges()">✅ Uložit změny a přesestavit</button>
       <button class="btn-ed-cancel" onclick="closeTestEditor()">Zrušit změny</button>
       <span class="grow"></span>
+    </div>
+  </div>
+</div>
+
+<div class="ui-modal-backdrop hidden" id="generatorSettingsModal" role="dialog" aria-modal="true" aria-labelledby="generatorSettingsTitle" onclick="generatorSettingsBackdropClick(event)">
+  <div class="ui-modal" style="max-width:660px">
+    <div class="ui-modal-head">
+      <div><b id="generatorSettingsTitle">⚙️ Nastavení Generátoru</b><div class="muted" style="font-size:12px">Nastavení tohoto zařízení</div></div>
+      <button type="button" class="ui-modal-x" onclick="closeGeneratorSettings()" aria-label="Zavřít">✕</button>
+    </div>
+    <div class="ui-modal-body">
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">🛡️ Bezpečnost pracoviště</div>
+        <div class="field-hint">Týmový bezpečnostní kód se nastavuje jednou na vlastním učitelském zařízení. Generátor ho potom používá automaticky tam, kde je potřeba. Na sdíleném školním počítači ho neukládej.</div>
+        <div class="secure-mode-box" id="generatorSettingsSecurityStatus" role="status"></div>
+        <div class="input-wrap" style="margin-top:10px">
+          <input type="password" id="generatorSettingsSecurityInput" placeholder="Vlož týmový bezpečnostní kód od správce..." autocomplete="new-password" oninput="onGeneratorSettingsSecurityInput()">
+          <button type="button" class="btn-eye" onclick="toggleSecret('generatorSettingsSecurityInput', this)" aria-label="Zobrazit nebo skrýt bezpečnostní kód">👁</button>
+        </div>
+        <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn-mini hidden" id="btnGenSecCode" onclick="generateSchoolSecurityCode()">🎲 Vygenerovat nový týmový kód</button>
+          <button type="button" class="btn-mini hidden" id="btnCopySecCode" onclick="copySecurityCode()">📋 Kopírovat pro kolegy</button>
+          <button type="button" class="btn-mini" onclick="saveSecurityCodeLocal()">💾 Uložit na tomto zařízení</button>
+          <button type="button" class="btn-mini" onclick="loadSecurityCodeLocal()">↩ Načíst uložený kód</button>
+          <button type="button" class="btn-mini" onclick="forgetSecurityCodeLocal()">🧹 Zapomenout z tohoto zařízení</button>
+        </div>
+        <div class="small-muted" style="margin-top:10px">Kód není součástí zadání, šablon ani historie. Studentům se nikdy neposílá. Správce může vytvořit nový týmový kód; ostatní učitelé pouze vloží kód, který jim správce předal bezpečnou cestou.</div>
+      </div>
     </div>
   </div>
 </div>
