@@ -178,7 +178,7 @@ function renderExportChecklist(collapse){
   if (!items.length) {
     box.classList.add('hidden');
     box.removeAttribute('open');
-    box.innerHTML = '';
+    box.textContent = '';
     return;
   }
   box.classList.remove('hidden');
@@ -187,7 +187,7 @@ function renderExportChecklist(collapse){
   const reqCount = items.filter(it => it[2]).length;
   const reqDone = items.filter(it => it[2] && exportChecklist[it[0]]).length;
   const reqNote = reqCount ? `<div class="check-required-note">Položky označené <span class="check-req-tag">povinné</span> jsou potřeba zaškrtnout pro odemčení stažení klasifikovaného testu (${reqDone}/${reqCount}).</div>` : '';
-  // Zaškrtnutí položky NESMÍ sbalit checklist. Nastavení innerHTML nemění atribut
+  // Zaškrtnutí položky NESMÍ sbalit checklist. Překreslení obsahu nemění atribut
   // `open` na elementu details, takže stav rozbalení zůstane zachovaný. Sbalíme jen tehdy,
   // když to volající výslovně chce (čerstvě vygenerovaný / přesestavený test).
   if (collapse) box.removeAttribute('open');

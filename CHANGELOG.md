@@ -1,3 +1,11 @@
+## 7.1.28 — XSS sink-ratchet + QA harness CI hotfix (2026-09-15)
+
+- Opraven pád tří CI workflow na `qa:p5-xss-sinks`: 7.1.26/7.1.27 zvýšily počet `innerHTML` sinků z bezpečnostního baseline 161 na 164.
+- Baseline se nezvyšuje. Schování checklistu používá `textContent`, učitelský re-run modal je sestaven přes DOM API a automatické otevření cvičného rozboru znovu používá již auditovanou `toggleAnswersPanel()` cestu.
+- Funkční opravy 7.1.26 i performance optimalizace 7.1.27 zůstávají zachovány.
+- Opraven QA teardown race v practice workflow testu: harness před zavřením JSDOM čeká na asynchronní report seal, takže po úspěšném testu nevzniká falešný `document` TypeError.
+- Cílový XSS sink inventář: `innerHTML` 161/161, `insertAdjacentHTML` 8/8, `outerHTML` 5/5, `document.write` 0, `eval` 0, `new Function` 0.
+
 ## 7.1.27 — CI/performance hotfix (2026-09-15)
 
 - Opraven pád GitHub `qa:p5:ci`: 7.1.26 překročila `entryHtmlBytes` / `largestFileBytes` o 4 558 B.

@@ -326,8 +326,8 @@ function showResult(res){
   // chování beze změny a student si panel případně otevře tlačítkem.
   if(CFG.testMode==='procviceci'){
     var ap=I('answersPanel'),ab=document.querySelector('.btn-toggle-ans');
-    if(ap){ap.innerHTML=buildAnswersHtml();ap.classList.remove('hidden');}
-    if(ab)ab.textContent=T('hideAnswers');
+    if(ap&&ap.classList.contains('hidden'))toggleAnswersPanel();
+    else if(ab)ab.textContent=T('hideAnswers');
   }
   buildReportSeal(res).then(function(code){var el=I('reportSeal');if(el)el.textContent=code;res.reportSeal=code;if(CFG.overeni&&!jokerUsed){var ta=I('verifyTa');if(ta)ta.value='Připravuji ověřovací .txt…';buildVerify(res);}else if(jokerUsed){var vs=I('verifySection');if(vs)vs.classList.add('hidden');}}).catch(function(){var el=I('reportSeal');if(el)el.textContent='RPT-NELZE-VYTVOŘIT';var vs=I('verifySection');if(vs&&jokerUsed)vs.classList.add('hidden');});
 }

@@ -110,9 +110,17 @@ function clearSubmittedLocked(){storageRemove('submitted');}
 function showSubmittedLocked(){
   var bd=document.createElement('div');
   bd.className='s-modal-bd';bd.setAttribute('role','dialog');bd.setAttribute('aria-modal','true');
-  bd.innerHTML='<div class="s-modal-box"><div class="s-modal-head">'+esc(t('retryTitle','Test already submitted'))+'</div><div class="s-modal-body">'+esc(t('retryHint','A teacher can allow another attempt on this device.'))+'</div><input type="password" data-retry-code autocomplete="off" placeholder="'+esc(t('retryCode','Teacher PIN / unlock password'))+'"><div class="danger small hidden" data-retry-error></div><div class="s-modal-act"><button type="button" class="s-modal-btn primary" data-retry-ok>'+esc(t('retryAllow','Allow another attempt'))+'</button><button type="button" class="s-modal-btn" data-retry-cancel>'+esc(t('close','Close'))+'</button></div></div>';
+  var box=document.createElement('div');box.className='s-modal-box';
+  var head=document.createElement('div');head.className='s-modal-head';head.textContent=t('retryTitle','Test already submitted');
+  var body=document.createElement('div');body.className='s-modal-body';body.textContent=t('retryHint','A teacher can allow another attempt on this device.');
+  var inp=document.createElement('input');inp.type='password';inp.setAttribute('data-retry-code','');inp.autocomplete='off';inp.placeholder=t('retryCode','Teacher PIN / unlock password');
+  var err=document.createElement('div');err.className='danger small hidden';err.setAttribute('data-retry-error','');
+  var act=document.createElement('div');act.className='s-modal-act';
+  var okBtn=document.createElement('button');okBtn.type='button';okBtn.className='s-modal-btn primary';okBtn.setAttribute('data-retry-ok','');okBtn.textContent=t('retryAllow','Allow another attempt');
+  var cancelBtn=document.createElement('button');cancelBtn.type='button';cancelBtn.className='s-modal-btn';cancelBtn.setAttribute('data-retry-cancel','');cancelBtn.textContent=t('close','Close');
+  act.appendChild(okBtn);act.appendChild(cancelBtn);box.appendChild(head);box.appendChild(body);box.appendChild(inp);box.appendChild(err);box.appendChild(act);bd.appendChild(box);
   document.body.appendChild(bd);
-  var inp=bd.querySelector('[data-retry-code]'),err=bd.querySelector('[data-retry-error]'),busy=false;
+  var busy=false;
   function done(){document.removeEventListener('keydown',onkey);bd.remove();}
   async function authorize(){
     if(busy)return;var v=(inp&&inp.value||'').trim();if(!v){if(inp)inp.focus();return;}busy=true;
@@ -126,7 +134,7 @@ function showSubmittedLocked(){
     finally{busy=false;}
   }
   function onkey(e){if(e.key==='Escape')done();else if(e.key==='Enter'){e.preventDefault();authorize();}}
-  bd.querySelector('[data-retry-ok]').addEventListener('click',authorize);bd.querySelector('[data-retry-cancel]').addEventListener('click',done);document.addEventListener('keydown',onkey);setTimeout(function(){if(inp)inp.focus();},0);
+  okBtn.addEventListener('click',authorize);cancelBtn.addEventListener('click',done);document.addEventListener('keydown',onkey);setTimeout(function(){if(inp)inp.focus();},0);
 }
 function normRosterIdentity(value){var raw=String(value==null?'':value);try{raw=raw.normalize('NFKD');}catch(_){}return raw.toLowerCase().replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();}
 function b64UrlRoster(buf){var bin='',bytes=new Uint8Array(buf);for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}

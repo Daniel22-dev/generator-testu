@@ -414,6 +414,15 @@ await okAsync('practice po výsledku automaticky ukáže chybu i správné řeš
     const txt=panel.textContent||'';
     assert(txt.includes('Chyba'),'chybí označení chybné odpovědi');
     assert(txt.includes('RIGHT_ANSWER'),'chybí správná odpověď');
+    // showResult() dopočítává report seal asynchronně přes WebCrypto. Nezavírat JSDOM,
+    // dokud tato větev neskončí; jinak pending Promise po window.close() sáhne na
+    // zrušený document a vytvoří falešný teardown crash v QA harnessu.
+    const seal=gd.window.document.getElementById('reportSeal');
+    const deadline=Date.now()+5000;
+    while(Date.now()<deadline&&seal&&/^Připravuji/.test(seal.textContent||''))
+      await new Promise(r=>setTimeout(r,20));
+    assert(seal&&!/^Připravuji/.test(seal.textContent||''),'report seal nedoběhl před teardownem practice testu');
+    await new Promise(r=>setTimeout(r,0));
   }finally{gd.close();}
 });
 

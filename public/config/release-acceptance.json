@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.27",
+  "appVersion": "7.1.28",
   "releaseStatus": "garp-2.5.1-shield-prep-source-candidate-pending-independent-review",
   "primaryRuntime": {
     "mode": "standalone-github-pages",

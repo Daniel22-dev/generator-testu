@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.27  
+**Aktuální verze:** 7.1.28  
+
+> **7.1.28 XSS sink-ratchet + QA harness hotfix (2026-09-15):** opravuje CI regresi z 7.1.26/7.1.27 bez zvyšování bezpečnostního baseline. Tři nově přidaná použití `innerHTML` (schování checklistu, učitelský re-run modal a automatické otevření practice feedbacku) jsou nahrazena bezpečnějšími existujícími/DOM cestami; XSS inventář je zpět na 161/161. Současně je opraven teardown race practice workflow testu, který po PASS zavřel JSDOM před dokončením asynchronního report seal. Funkční UX změny 7.1.26 zůstávají zachovány.
 
 > **7.1.27 CI/performance hotfix (2026-09-15):** nemění funkční opravy 7.1.26. Build před vložením aplikačních JS do `index.html` odstraňuje pouze skutečné JavaScriptové komentáře přes parser Acorn; komentáře ve zdrojových souborech zůstávají. Cílem je vrátit release pod existující GHRAB performance budget bez jeho navyšování.
 
