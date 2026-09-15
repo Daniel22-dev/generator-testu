@@ -1,3 +1,11 @@
+## 7.1.31 — QA certifikační hotfix (2026-09-15)
+
+- Produkční logika Generátoru se nemění; jde pouze o opravu QA infrastruktury po CI 7.1.30.
+- Headless regresní test Etapy 1 už nečte lexikální `state` přes neexistující `window.state`; používá stejný přístup přes `eval('state')` jako ostatní harness kontroly.
+- Tím se `headlessCommand` znovu dokončí a navazující `qa-generate-fixtures.mjs` může vytvořit `instant_test.html`, `student_test.html` a `teacher_verifier.html` pro visual/critical gate.
+- Visual scénář volby režimu očekává aktuální text **„Způsob nastavení“** místo historického **„PRACOVNÍ REŽIM“**.
+- Verifier, secure/student runtime, kryptografický kontrakt, výsledkový formát a změny Etapy 2 jsou funkčně beze změny.
+
 ## 7.1.30 — Etapa 2: Bezpečnost pracoviště (2026-09-15)
 
 - Týmový bezpečnostní kód je odstraněn z běžného kroku Doplňky a přesunut do **⚙️ Nastavení Generátoru → Bezpečnost pracoviště**.

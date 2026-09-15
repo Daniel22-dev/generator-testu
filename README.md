@@ -1,8 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.30  
+**Aktuální verze:** 7.1.31  
 
-> **7.1.30 Etapa 2 – Bezpečnost pracoviště (2026-09-15):** týmový bezpečnostní kód už není součástí běžného průvodce. Nastavuje se jednou přes ⚙️ Nastavení Generátoru → Bezpečnost pracoviště a při secure/joker workflow se v Doplňcích zobrazuje jen stav nastavení. Kryptografie, verifier, PIN/odemknutí, Forms a serverový profil se nemění. 7.1.30 je kandidát do čistého CI; GitHub main byl při přípravě stále na posledním zeleném baseline 7.1.28.
+> **7.1.31 QA certifikační hotfix (2026-09-15):** produkční logika Etapy 1/2 se nemění. Opraven je pouze headless regresní test, který četl `state` přes neexistující `window.state`, a zastaralé očekávání textu ve visual QA plánu. Tím se znovu umožní generovat QA exportní fixtures pro instant/student/verifier. 7.1.31 je nový kandidát do čistého GitHub CI.
 
 > **7.1.29 Etapa 1 – Simple workflow (2026-09-15):** jednoduché nastavení nabízí jen tři pedagogické účely (Procvičování / Běžný test / Přísný test) a technické volby odvozuje deterministicky. Pokročilý režim zachovává původní plnou konfiguraci. Verifier, kryptografie, PIN/odemčení, Google Forms ani serverový profil se v této etapě nemění. 7.1.29 je kandidát do nového čistého CI; poslední zelený baseline je 7.1.28.
 
@@ -20,7 +20,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.30** je kandidát Etapy 2 postavený nad source kandidátem **7.1.29**; poslední samostatně potvrzený GitHub baseline zůstává **7.1.28**. Etapa 1 zjednodušuje Simple workflow a Etapa 2 přesouvá týmový bezpečnostní kód do Nastavení zařízení. Verifier, kryptografie, PIN/odemykání, Google Forms a serverový profil se nemění. Čistý GitHub CI průchod 7.1.30 z exact lockfile je podmínkou, než se tento stav označí za nový produkční baseline.
+Verze **7.1.31** je QA-only hotfix nad kandidátem **7.1.30**. GitHub CI pro 7.1.30 potvrdil P5 R2, axe a legacy quality/P4 workflow, ale hlavní certifikační workflow skončilo NOT_READY kvůli chybě QA harnessu: headless regresní test použil `window.state` místo lexikálního `state`, takže se nespustilo generování exportních fixtures; visual plán navíc čekal starý nadpis. Produkční logika, verifier, kryptografie, PIN/odemykání, Google Forms a serverový profil se v 7.1.31 nemění. Poslední kompletně zelený baseline před tímto kandidátem zůstává **7.1.28**.
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 

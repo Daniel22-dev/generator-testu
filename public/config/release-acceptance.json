@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.30",
-  "releaseStatus": "stage1-simple-workflow-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.31",
+  "releaseStatus": "stage2-qa-certification-hotfix-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -45,6 +45,7 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "pending-clean-build-full-regression-and-github-ci",
-    "note": "7.1.30 Stage 1 workflow simplification candidate. UX/preset layer only; verifier, cryptography, PIN mechanism, Forms and server profile unchanged. Local static/security/platform browser harness gates executed where available; full app P5 runtime and exact-lockfile full regression remain pending clean GitHub CI."
-  }
+    "note": "7.1.31 QA-only certification hotfix over Stage 2: fixes the headless QA harness access to lexical state and updates the visual-plan expected heading. Production generator logic, verifier, cryptography, PIN mechanism, Forms and server profile are unchanged. Full exact-lockfile browser/runtime regression remains pending clean GitHub CI."
+  },
+  "note": "7.1.31 QA-only certification hotfix over Stage 2. No product behavior change; requires clean GitHub CI before promotion."
 }

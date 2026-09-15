@@ -4,7 +4,7 @@
       "id": "generator-mode-chooser",
       "name": "Volba pracovního režimu",
       "url": "/dist/index.html",
-      "expectedText": "PRACOVNÍ REŽIM",
+      "expectedText": "Způsob nastavení",
       "mustVisible": [
         "#appModePanel"
       ],

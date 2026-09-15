@@ -236,11 +236,14 @@ check('stage1 simple: právě tři účely', () => {
 });
 check('stage1 simple: účely nastavují deterministické profily', () => {
   w.chooseSimplePurpose('practice');
-  if(w.state.testMode!=='procviceci'||w.state.resultMode!=='instant'||w.state.feedbackMode!=='learning') throw new Error('practice profil');
+  let st=w.eval('state');
+  if(st.testMode!=='procviceci'||st.resultMode!=='instant'||st.feedbackMode!=='learning') throw new Error('practice profil');
   w.chooseSimplePurpose('standard');
-  if(w.state.testMode!=='bezny'||w.state.resultMode!=='instant'||w.state.feedbackMode!=='brief'||w.state.screenGuard!==false) throw new Error('standard profil');
+  st=w.eval('state');
+  if(st.testMode!=='bezny'||st.resultMode!=='instant'||st.feedbackMode!=='brief'||st.screenGuard!==false) throw new Error('standard profil');
   w.chooseSimplePurpose('strict');
-  if(w.state.testMode!=='prisny'||w.state.resultMode!=='secureOffline'||w.state.feedbackMode!=='none'||w.state.odevzdavani!=='B') throw new Error('strict profil');
+  st=w.eval('state');
+  if(st.testMode!=='prisny'||st.resultMode!=='secureOffline'||st.feedbackMode!=='none'||st.odevzdavani!=='B') throw new Error('strict profil');
   return 'practice / standard / strict';
 });
 w.setAppMode('advanced');
