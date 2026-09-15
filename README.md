@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.32  
+**Aktuální verze:** 7.1.34  
+
+> **7.1.34 Etapa 4 – studentské odevzdání přes Google Forms (2026-09-15):** nově generovaný secure studentský test může po odevzdání nabídnout zkopírování celého `SECURE-ANSWERS-V1` payloadu a otevření školního Google Formuláře. Responder URL se nastavuje lokálně v Nastavení Generátoru, je validována fail-closed a zahrnuta do integrity-bound konfigurace konkrétního testu. `answers.txt` zůstává nouzový fallback a jediná cesta bez nakonfigurovaného formuláře nebo při neobvykle dlouhém payloadu. Stage 3 CSV import ve verifieru zůstává beze změny.
 
 > **7.1.32 Stage 1/2 state-transition hotfix (2026-09-15):** opravuje reálnou regresi při přepnutí cizí jazyk → čeština v Simple režimu: český modul už nepřepne aktivní `cs_practice` / `cs_strict` preset do Advanced. Současně opravuje dva chybné QA assertiony stavu „Bezpečnost pracoviště“ a dělá changelog visual check nezávislý na konkrétním patch čísle; přesnou verzi dál kontroluje `check-versions`. Verifier, kryptografie, PIN/odemčení, Google Forms ani serverový profil se nemění.
 
@@ -22,7 +24,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.32** je cílený hotfix Etap 1/2 po GitHub CI 7.1.31. CI 7.1.31 potvrdil P5 R2, axe a legacy quality/P4 workflow, ale hlavní certifikační workflow odhalilo jednu skutečnou stavovou regresi: český modul po správném přemapování `fl_strict → cs_strict` vynutil `appMode=advanced`. Oprava sjednocuje ČJ modul s již platným pravidlem `enforceModeConstraints`: Simple režim smí u češtiny zůstat aktivní, pokud ho řídí platný Simple preset. Dva další workflow nálezy byly chybné textové assertiony („nastaveno“ vs. správné „nastavena“); produkční stav kódu se synchronizoval správně. Visual kontrola changelogu už neduplikuje exact version gate. **7.1.32 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
+Verze **7.1.34** je kumulativní kandidát Etap 3+4 postavený nad posledním potvrzeným zeleným baseline 7.1.32. Etapa 3 přidává CSV import do učitelského verifieru; Etapa 4 přidává studentské odevzdání přes validovaný Google Forms responder odkaz se zachovaným `answers.txt` fallbackem. Formát `SECURE-ANSWERS-V1`, RSA/AES kryptografie, scoring, PIN/odemčení a serverový profil se nemění. **7.1.34 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 
@@ -36,6 +38,7 @@ GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají
 - okamžitý procvičovací režim,
 - bezpečný offline balík `student_test.html` + `teacher_verifier.html`,
 - šifrované odevzdání `answers.txt`,
+- učitelský import Google Forms CSV s plnými `SECURE-ANSWERS-V1` payloady,
 - PWA instalace pro počítač a telefon,
 - lokální šablony, historie a export zadání,
 - automatizovaný build, lint, bezpečnostní kontroly, workflow matice a headless regrese.

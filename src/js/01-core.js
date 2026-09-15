@@ -25,10 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.32',
+  version: '7.1.34',
   date:    '2026-09-15',
   status:  'production-serverless',
   changes: [
+    'ETAPA 4 – STUDENTSKÉ ODEVZDÁNÍ PŘES GOOGLE FORMS (7.1.34): v Nastavení Generátoru lze uložit pouze validovaný responder odkaz Google Forms. Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého SECURE-ANSWERS-V1 payloadu a otevření školního formuláře; answers.txt zůstává nouzová záloha a automatický fallback při chybějícím formuláři nebo neobvykle dlouhém payloadu. URL formuláře je součástí integrity-bound konfigurace. Formát šifrovaného výsledku, RSA/AES kryptografie, scoring, PIN/odemčení a Stage 3 verifier CSV import se nemění.',
+    'ETAPA 3 – GOOGLE FORMS CSV IMPORT (7.1.33): učitelský secure verifier umí načíst CSV export odpovědí z Google Forms. Automaticky detekuje čárku/středník/tabulátor, najde celý SECURE-ANSWERS-V1 payload, volitelně připojí e-mail a čas formuláře, ignoruje ostatní sloupce a každý payload ověřuje stejnou kryptografickou a bodovací cestou jako answers.txt. Chybějící, nejednoznačné, poškozené nebo cizí payloady jsou fail-closed a viditelné po řádcích; duplicity zůstávají pod stávající kontrolou verifieru. Studentský runtime, formát secure balíku, kryptografie, PIN/odemčení a serverový profil se nemění.',
     'STAGE 1/2 STATE-TRANSITION HOTFIX (7.1.32): český modul už nepřepíná řízený Simple preset automaticky do Advanced režimu. Přepnutí cizí jazyk ↔ čeština tak zachová Procvičování/Přísný test i odpovídající cs/fl interní preset. QA kontroly Bezpečnosti pracoviště používají správné texty je nastavena / není nastavena a visual changelog kontroluje stabilní nadpis; přesnou verzi nadále vynucuje samostatný version gate. Verifier, secure runtime, kryptografie, PINy, Forms a serverový profil se nemění.',
     'QA CERTIFIKAČNÍ HOTFIX (7.1.31): bez změny produkční logiky. Opraven regresní headless test Etapy 1, který chybně četl lexikální state přes window.state a tím zastavil následné generování QA exportních fixtures; visual plán nyní očekává aktuální nadpis Způsob nastavení místo historického PRACOVNÍ REŽIM. Verifier, secure runtime, kryptografie, výsledkový formát i Etapa 2 zůstávají funkčně beze změny.',
     'ETAPA 2 – BEZPEČNOST PRACOVIŠTĚ (7.1.30): týmový bezpečnostní kód byl odstraněn z běžného průvodce a přesunut do samostatného Nastavení Generátoru. U secure workflow se v kroku Doplňky zobrazuje pouze stav pracoviště a odkaz do Nastavení; uložený kód se po startu, importu, staré šabloně a načtení historie automaticky obnoví. Kryptografická funkce kódu, verifier, formát výsledků, PINy, Google Forms a serverový profil se nemění.',
@@ -37,8 +39,6 @@ const RELEASE = Object.freeze({
     'CI/PERFORMANCE HOTFIX (7.1.27): build před vložením aplikačních JS do výsledného index.html bezpečně odstraňuje pouze syntakticky rozpoznané JavaScriptové komentáře pomocí Acorn parseru. Zdrojové komentáře v repozitáři zůstávají beze změny; funkce 7.1.26 se nemění a performance budget se nezvyšuje.',
     'UX A REGRESNÍ OPRAVY STUDENTSKÉHO WORKFLOW (7.1.26): jednoduchý ostrý test zobrazuje povinný týmový bezpečnostní kód; v záložkovém testu je finální odevzdání až u posledního cvičení; procvičovací režim po vyhodnocení automaticky ukazuje chyby i správná řešení; jednorázový device lock lze znovu povolit učitelským PINem nebo odemykacím heslem; přísný secure test skutečně přenáší lockOnLeave a zamyká se při odchodu; exportní checklist je odstraněn z instant/practice a zkrácen na čtyři nezbytné učitelské kontroly v secure režimu. Přidány regresní kontroly těchto scénářů.',
     'HOTFIX SELF-TESTU BODOVÁNÍ (7.1.25): opraven RPC bootstrap skrytého verifieru. Bridge se nyní vkládá před poslední uzavírací </body> dokumentu, nikoli před první textový výskyt, který mohl ležet uvnitř JavaScriptové HTML šablony pro feedback/archiv/tisk. Tím se odstraňuje falešné selhání „RPC __has__ timeout“ a zbytečné blokování stažení testu. Přidána je regresní kontrola tohoto scénáře.',
-    'RUNTIME HARDENING PO CLAUDE KOLE 3 (7.1.24): Service Worker rozlišuje skutečný autorizační/revokační stav, který zůstává network-only/no-store, od podpůrných vrstev suite-session cleanup a GHRAB Platform. Ty se online vždy načítají čerstvě, ale při výpadku použijí poslední nainstalovanou kopii, aby na sdíleném zařízení tiše nezmizel úklid dat. Přidány jsou mutační a offline regresní kontroly; kandidát vyžaduje nezávislou revalidaci.',
-    'MIGRACE GHRAB PLATFORM 1.1.2 (7.1.23): Generátor je napojen na suite-level lifecycle ghrab-suite-session-v1. Otevřená, zavřená i stale/BFCache instance uklízí pouze Generator-owned obsah, target-scoped handoff a in-memory AI/test/roster data; persistence je po suite end uzamčena, cleanup je fail-closed a acknowledgement vzniká až po ověřeném úklidu. Kandidát je součást ecosystem release wave a není samostatně release-approved.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -252,6 +252,7 @@ const DOM_FIELDS = ['nazev','proKoho','latka','vlastniTyp','zadaniText',
   'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
 const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin','bezpKod'];
 const SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
+const GOOGLE_FORMS_SUBMISSION_URL_KEY = 'sestavovac_google_forms_submission_url_v1';
 const MAX_FILES = 12;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const MAX_IMAGE_PREVIEW_SIZE = 4 * 1024 * 1024;

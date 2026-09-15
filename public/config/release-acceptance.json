@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.32",
-  "releaseStatus": "stage2-state-transition-hotfix-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.34",
+  "releaseStatus": "stage4-forms-student-submission-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -41,11 +41,11 @@
   "revision": "GARP-2.5.1-SHIELD-TOOLING-R2",
   "runtimeAudit": {
     "required": true,
-    "scriptsExecuted": false,
+    "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
-    "browserRuntimeExecuted": false,
-    "transport": "pending-clean-build-full-regression-and-github-ci",
-    "note": "7.1.32 targeted Stage 1/2 hotfix: Czech module no longer forces Advanced mode when an active Simple purpose preset controls the workflow; QA assertions use the correct Czech workplace-status wording and the changelog visual check is version-agnostic because exact version consistency is enforced separately. Verifier, cryptography, PIN mechanism, Forms and server profile are unchanged. Full exact-lockfile browser/runtime regression remains pending clean GitHub CI."
+    "browserRuntimeExecuted": true,
+    "transport": "local-build-plus-targeted-system-chromium; exact-lockfile GitHub CI pending",
+    "note": "7.1.34 Stage 4 adds student-side Google Forms submission on top of the Stage 3 teacher-side CSV importer. Only validated HTTPS responder URLs on docs.google.com/forms ... /viewform or forms.gle are accepted; the URL is a local generator setting and becomes integrity-bound only in newly generated secure student packages. After secure submission the student copies the complete SECURE-ANSWERS-V1 payload and opens the school form. answers.txt remains an emergency fallback and is automatic when no form is configured or the payload exceeds the conservative 24000-character threshold. The secure result format, RSA-OAEP/AES-GCM cryptography, scoring, PIN/unlock and Stage 3 verifier are unchanged. Targeted local Chromium regression is executed; full exact-lockfile browser/runtime regression remains pending clean GitHub CI."
   },
-  "note": "7.1.32 targeted Stage 1/2 state-transition hotfix. Requires clean GitHub CI before promotion."
+  "note": "7.1.34 Stage 4 student Forms submission candidate, cumulative with Stage 3. Requires clean exact-lockfile GitHub CI before promotion."
 }

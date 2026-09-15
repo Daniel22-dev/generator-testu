@@ -168,6 +168,7 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
     w.eval("geminiApiKey='';");
   }
 });
+let stage3Fixture = null;
 await checkAsync('secureOffline: student + teacher verifier se sestaví', async () => {
   const labels = w.getLabels('cs');
   const rosterSalt = 'fedcba9876543210fedcba9876543210';
@@ -177,7 +178,7 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
     generatorVersion: 'headless', buildHash: 'testhash1', releaseDate: '2026-07-09', releaseStatus: 'test', generatedAt: '2026-07-09T00:00:00Z',
     creatorId: 'TEST', creatorName: 'Test', creatorRole: 'admin', appMode: 'headless', testId: 'HEADLESS-1', manifestHash: 'manifest-hash',
     nazev: 'Headless test', proKoho: '1.A', jazyk: 'angličtina', uiLang: 'cs', cefr: 'B1', cefrLevels: ['B1'], cefrCombined: false,
-    cas: 15, tema: 'default', testMode: 'prisny', layout: 'classic', odevzdavani: 'B', resultMode: 'secureOffline',
+    cas: 15, tema: 'default', testMode: 'prisny', layout: 'classic', odevzdavani: 'B', resultMode: 'secureOffline', formsSubmissionUrl: 'https://docs.google.com/forms/d/e/TESTFORM/viewform',
     fuzzyTolerance: 'off', randomizace: false, zolicek: false, ucitelJmeno: 'Teacher',
     ucitelPinHash: await w.deriveSecretHash('teacher-pin', '123456', 'HEADLESS-1'),
     hesloHash: await w.deriveSecretHash('unlock-password', 'LOCK-TEST', 'HEADLESS-1'),
@@ -219,10 +220,93 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
     const invalidKey = await studentDom.window.chooseVariant('UNKNOWN1');
     if (validKey !== 'g1') throw new Error('platný roster kód nevybral variantu g1');
     if (invalidKey !== '') throw new Error('neplatný roster kód nebyl odmítnut');
+    const payload = {v:1,testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:pkg.studentHtmlSha256,attemptId:'ATT-STAGE3-001',student:'ABC234',identityMode:'oneTimeCode',code:'ABC234',groupKey:'g1',startedAt:'2026-09-15T17:00:00Z',submittedAt:'2026-09-15T17:05:00Z',jokerUsed:false,jokerSelectedAt:'',resp:{'0_0':1},answerChangeStats:{},totalAnswerChanges:0,securityEvents:[],userAgent:'headless-stage3'};
+    const packed = await studentDom.window.encryptPayloadForTeacher(payload);
+    const answerTxt = 'SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:pkg.studentHtmlSha256,payload:packed},null,2);
+    let copied='';
+    Object.defineProperty(studentDom.window.navigator,'clipboard',{configurable:true,value:{writeText:async value=>{copied=String(value||'');}}});
+    let opened='';
+    studentDom.window.open=(url)=>{opened=String(url||'');return {opener:null};};
+    studentDom.window.eval('ANSWER_TXT='+JSON.stringify(answerTxt));
+    if(studentDom.window.formsSubmissionReady()!==true) throw new Error('Stage 4 Forms cesta není připravená pro platný payload');
+    if(studentDom.window.refreshSubmissionOptions()!==true) throw new Error('Stage 4 Forms UI se neaktivovalo');
+    const formsBox=studentDom.window.document.getElementById('formsSubmissionBox');
+    const fallback=studentDom.window.document.getElementById('answersFallback');
+    if(!formsBox||formsBox.classList.contains('hidden')) throw new Error('Stage 4 Forms panel není viditelný');
+    if(!fallback||fallback.open) throw new Error('Stage 4 nouzová answers.txt záloha je při běžném Forms workflow otevřená');
+    await studentDom.window.copySubmissionPayload();
+    if(copied!==answerTxt) throw new Error('Stage 4 nekopíruje přesný SECURE-ANSWERS-V1 payload');
+    studentDom.window.openSubmissionForm();
+    if(opened!=='https://docs.google.com/forms/d/e/TESTFORM/viewform') throw new Error('Stage 4 neotevřel očekávaný responder URL');
+    studentDom.window.eval("CFG.formsSubmissionUrl='https://forms.gle/TestShortLink'");
+    if(!/^https:\/\/forms\.gle\//.test(studentDom.window.safeFormsSubmissionUrl())) throw new Error('Stage 4 odmítl platný forms.gle responder URL');
+    studentDom.window.eval("CFG.formsSubmissionUrl='https://evil.example/forms/d/e/TESTFORM/viewform'");
+    if(studentDom.window.safeFormsSubmissionUrl()!=='') throw new Error('Stage 4 propustil nepovolenou doménu');
+    studentDom.window.eval("CFG.formsSubmissionUrl='https://docs.google.com/forms/d/e/TESTFORM/viewform';ANSWER_TXT='X'.repeat(24001)");
+    if(studentDom.window.refreshSubmissionOptions()!==false) throw new Error('Stage 4 neaktivoval fallback nad limitem');
+    if(!fallback.open) throw new Error('Stage 4 nad limitem neotevřel answers.txt fallback');
+    const warning=studentDom.window.document.getElementById('formsPayloadWarning');
+    if(!warning||warning.classList.contains('hidden')) throw new Error('Stage 4 nad limitem nezobrazil varování');
+    stage3Fixture={teacherHtml:pkg.teacherHtml,studentHtml:pkg.studentHtml,answerTxt};
   } finally {
     studentDom.window.close();
   }
-  return `${Math.round(pkg.studentHtml.length/1024)} kB student / ${Math.round(pkg.teacherHtml.length/1024)} kB verifier + runtime oneTimeCode roster OK`;
+  const legacyCfg={...cfg,testId:'HEADLESS-LEGACY-NOFORMS',formsSubmissionUrl:''};
+  const legacyPkg=await w.assembleSecureOfflinePackage({},legacyCfg,variants);
+  if(/id=\"formsSubmissionBox\"/.test(legacyPkg.studentHtml)) throw new Error('Stage 4 Forms UI pronikl do legacy testu bez konfigurace');
+  if(!/Odevzdat a vytvořit answers\.txt/.test(legacyPkg.studentHtml)) throw new Error('Stage 4 změnil legacy answers.txt primární workflow');
+  return `${Math.round(pkg.studentHtml.length/1024)} kB student / ${Math.round(pkg.teacherHtml.length/1024)} kB verifier + roster + Stage 4 Forms/fallback OK`;
+});
+check('stage4 settings: Google Forms responder URL fail-closed validace', () => {
+  const ok1=w.normalizeGoogleFormsResponderUrl('https://docs.google.com/forms/d/e/TESTFORM/viewform');
+  const ok2=w.normalizeGoogleFormsResponderUrl('https://forms.gle/TestShortLink');
+  if(!/^https:\/\/docs\.google\.com\/forms\//.test(ok1)||!/^https:\/\/forms\.gle\//.test(ok2)) throw new Error('platný responder URL odmítnut');
+  for(const bad of ['http://docs.google.com/forms/d/e/TESTFORM/viewform','https://docs.google.com/forms/d/e/TESTFORM/edit','https://evil.example/forms/d/e/TESTFORM/viewform']){
+    let rejected=false;try{w.normalizeGoogleFormsResponderUrl(bad);}catch(_){rejected=true;}if(!rejected)throw new Error('neplatný URL nebyl odmítnut: '+bad);
+  }
+  return 'docs.google.com/viewform + forms.gle accepted; http/edit/cizí doména rejected';
+});
+await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlásí chyby/duplicity', async () => {
+  if(!stage3Fixture) throw new Error('chybí secure fixture');
+  const teacherDom = new JSDOM(stage3Fixture.teacherHtml, {
+    runScripts:'dangerously',
+    url:'https://school.example/test/teacher_verifier.html',
+    pretendToBeVisual:true,
+    beforeParse(tw){
+      if (!tw.crypto || !tw.crypto.subtle) Object.defineProperty(tw, 'crypto', { value: webcrypto });
+      tw.matchMedia = tw.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
+      tw.scrollTo=()=>{};
+      tw.HTMLElement.prototype.scrollIntoView=()=>{};
+      if(tw.HTMLAnchorElement)tw.HTMLAnchorElement.prototype.click=()=>{};
+      tw.URL.createObjectURL=()=> 'blob:teacher-verifier';
+      tw.URL.revokeObjectURL=()=>{};
+    }
+  });
+  await new Promise(r=>setTimeout(r,80));
+  try{
+    const tw=teacherDom.window;
+    if(!tw.document.getElementById('formsCsvFile')) throw new Error('chybí CSV import ovladač');
+    const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+    const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:'WRONG',manifestHash:'WRONG',payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
+    const csv=['Časové razítko,E-mailová adresa,Odevzdávací kód,Poznámka',
+      [q('15. 9. 2026 19:20:00'),q('student-one'),q(stage3Fixture.answerTxt),q('valid')].join(','),
+      [q('15. 9. 2026 19:21:00'),q('student-one'),q(stage3Fixture.answerTxt),q('duplicate')].join(','),
+      [q('15. 9. 2026 19:22:00'),q('missing-one'),q(''),q('missing')].join(','),
+      [q('15. 9. 2026 19:23:00'),q('bad-one'),q(bad),q('bad')].join(',')].join('\r\n');
+    const parsed=tw.parseFormsCsvText(csv);
+    if(parsed.delimiter!==','||parsed.identityIndex!==1||parsed.timestampIndex!==0||parsed.payloadIndex!==2) throw new Error('detekce Google Forms CSV');
+    const summary=await tw.importFormsCsvText(csv,'forms-export.csv');
+    const results=tw.eval('RESULTS');
+    if(summary.rows!==4||summary.ok!==2||summary.missing!==1||summary.invalid!==1||summary.ambiguous!==0) throw new Error('špatný import summary '+JSON.stringify(summary));
+    if(summary.duplicates.students!==1||summary.duplicates.attempts!==1) throw new Error('duplicity nebyly zachyceny');
+    if(results.length!==4||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student-one'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
+    if(results[2].status!=='CHYBA'||!/chybí celý odevzdávací blok/.test(results[2].error||'')) throw new Error('chybějící payload není explicitně označen');
+    if(results[3].status!=='CHYBA') throw new Error('poškozený/cizí payload nebyl odmítnut');
+    const semi='Timestamp;Email Address;Result\n'+[q('x'),q('student-two'),q(stage3Fixture.answerTxt)].join(';')+'\n';
+    const p2=tw.parseFormsCsvText(semi);
+    if(p2.delimiter!==';'||p2.identityIndex!==1||p2.payloadIndex!==2) throw new Error('středníkový CSV export');
+    return '4 řádky: 2 OK / 1 chybí / 1 neplatný + duplicity + CSV ,/;';
+  } finally { teacherDom.window.close(); }
 });
 
 // Etapa 1 — jednoduchý workflow musí být redukovaný na tři pedagogické účely.

@@ -257,7 +257,7 @@ const expectedAiCalls = [
   ['src/js/08-manual-editor.js',"batchCorrectiveNote?'generation-repair':'exercise-generation'"],
   ['src/js/08-manual-editor.js',"correctiveNote?'generation-repair':'test-generation'"]
 ].map(([file,operation])=>`${file}|${operation}`).sort();
-const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|481','src/js/01-core.js|710'].sort();
+const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|482','src/js/01-core.js|711'].sort();
 const aiInventory=aiCallInventory();
 const actualAiCalls=aiInventory.rows;
 const actualAiKeys=actualAiCalls.map(invKey).sort();

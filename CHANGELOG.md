@@ -1,3 +1,21 @@
+## 7.1.34 — Etapa 4: studentské odevzdání přes Google Forms (2026-09-15)
+
+- V Nastavení Generátoru lze uložit pouze validovaný HTTPS responder odkaz Google Forms (`docs.google.com/forms/.../viewform` nebo `forms.gle/...`).
+- Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého `SECURE-ANSWERS-V1` payloadu a otevření školního formuláře.
+- `answers.txt` zůstává nouzová záloha a automatický fallback bez formuláře nebo nad konzervativním limitem 24 000 znaků.
+- Forms URL je součástí integrity-bound konfigurace konkrétního testu; editor URL, HTTP a jiné domény jsou odmítnuty fail-closed.
+- Stage 3 verifier CSV import, RSA-OAEP/AES-GCM formát výsledků, scoring, PIN/odemčení a instant runtime zůstávají beze změny.
+
+## 7.1.33 — Etapa 3: Google Forms CSV import (2026-09-15)
+
+- `teacher_verifier.html` umí načíst CSV export odpovědí z Google Forms; XLSX je v této etapě záměrně nepodporovaný.
+- CSV parser podporuje čárku, středník i tabulátor, quoted multiline buňky a české/anglické e-mailové a časové hlavičky.
+- Verifier nehledá krátký studentský kód, ale celý `SECURE-ANSWERS-V1` payload; každý nalezený payload jde přes nezměněnou dešifrovací, Test ID/manifest/SHA a scoring cestu jako `answers.txt`.
+- E-mail a čas formuláře jsou pouze doplňková metadata výsledku; nemění kryptografickou identitu ani skóre.
+- Chybějící, nejednoznačný, poškozený nebo cizí payload je fail-closed jako `CHYBA`; existující detekce duplicit student/kód a `attemptId` zůstává aktivní.
+- Přidána headless regrese se skutečným RSA-OAEP + AES-GCM payloadem vloženým do multiline CSV.
+- Studentský runtime, secure package format, PIN/odemčení a serverový profil beze změny.
+
 ## 7.1.32 — Stage 1/2 state-transition hotfix (2026-09-15)
 
 - Opravena skutečná regrese Etapy 1 při změně cizí jazyk → čeština: `csApplyCoreState()` už nevynucuje Advanced režim, pokud je aktivní řízený Simple preset (`cs_practice` / `cs_strict`).

@@ -180,6 +180,81 @@ function storedSecurityCodeValue(){
   catch(_) { return ''; }
 }
 function securityCodeStoredLocally(){ return Boolean(storedSecurityCodeValue()); }
+function normalizeGoogleFormsResponderUrl(raw){
+  const text = String(raw || '').trim();
+  if (!text) return '';
+  let u;
+  try { u = new URL(text); }
+  catch(_) { throw new TypeError('Odkaz na Google Form není platná URL.'); }
+  if (u.protocol !== 'https:') throw new TypeError('Google Form musí používat zabezpečený odkaz https://.');
+  const host = String(u.hostname || '').toLowerCase();
+  if (host === 'forms.gle') {
+    if (!u.pathname || u.pathname === '/') throw new TypeError('Zkrácený odkaz forms.gle není úplný.');
+    return u.toString();
+  }
+  if (host === 'docs.google.com') {
+    if (!/^\/forms\/(?:u\/\d+\/)?d(?:\/e)?\/[^/]+\/viewform\/?$/i.test(u.pathname || '')) {
+      if (/\/forms\/.*\/edit\/?$/i.test(u.pathname || '')) throw new TypeError('Tohle je editor formuláře. V Google Forms zkopíruj odkaz určený respondentům (viewform / Odeslat → Odkaz).');
+      throw new TypeError('Použij responder odkaz Google Forms končící /viewform.');
+    }
+    return u.toString();
+  }
+  throw new TypeError('Z bezpečnostních důvodů lze použít pouze docs.google.com/forms nebo forms.gle.');
+}
+function storedGoogleFormsUrlValue(){
+  try { return localStorage.getItem(GOOGLE_FORMS_SUBMISSION_URL_KEY) || ''; }
+  catch(_) { return ''; }
+}
+function configuredGoogleFormsUrl(){
+  try { return normalizeGoogleFormsResponderUrl(storedGoogleFormsUrlValue()); }
+  catch(_) { return ''; }
+}
+function syncGeneratorSettingsFormsInput(){
+  const input = $('generatorSettingsFormsInput');
+  if (input) input.value = storedGoogleFormsUrlValue();
+}
+function updateGeneratorSettingsFormsStatus(){
+  const status = $('generatorSettingsFormsStatus');
+  if (!status) return;
+  const input = $('generatorSettingsFormsInput');
+  const raw = input ? input.value : storedGoogleFormsUrlValue();
+  if (!String(raw || '').trim()) {
+    status.textContent = '⚪ Google Forms odevzdání není nastaveno. Secure test použije answers.txt.';
+    return;
+  }
+  try {
+    const clean = normalizeGoogleFormsResponderUrl(raw);
+    const stored = storedGoogleFormsUrlValue();
+    status.textContent = stored && clean === configuredGoogleFormsUrl()
+      ? '🟢 Google Forms odevzdání je nastaveno pro nově generované secure testy.'
+      : '🟡 Odkaz je platný, ale změna ještě není uložena.';
+  } catch(e) {
+    status.textContent = '🔴 ' + String(e && e.message ? e.message : e);
+  }
+}
+async function saveGoogleFormsUrlLocal(){
+  const input = $('generatorSettingsFormsInput');
+  const raw = input ? input.value : '';
+  let clean;
+  try { clean = normalizeGoogleFormsResponderUrl(raw); }
+  catch(e) { await uiAlert(String(e && e.message ? e.message : e), 'Neplatný Google Forms odkaz'); updateGeneratorSettingsFormsStatus(); return; }
+  if (!clean) { await uiAlert('Vlož responder odkaz na Google Form, nebo použij Odebrat odkaz.', 'Chybí odkaz'); return; }
+  try {
+    if(!generatorPersistenceAllowed()) return;
+    localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY, clean);
+    if (input) input.value = clean;
+    updateGeneratorSettingsFormsStatus();
+    uiToast('Google Forms odkaz byl uložen. Použije se pouze u nově vygenerovaných secure testů.', 'ok', 4800);
+  } catch(_) { await uiAlert('Odkaz se nepodařilo uložit. Prohlížeč možná blokuje localStorage.'); }
+}
+async function forgetGoogleFormsUrlLocal(){
+  try {
+    localStorage.removeItem(GOOGLE_FORMS_SUBMISSION_URL_KEY);
+    syncGeneratorSettingsFormsInput();
+    updateGeneratorSettingsFormsStatus();
+    uiToast('Google Forms odevzdání bylo na tomto zařízení vypnuto.', 'ok', 4200);
+  } catch(_) { await uiAlert('Odkaz se nepodařilo odebrat.'); }
+}
 function updateGeneratorSettingsSecurityStatus(){
   const status = $('generatorSettingsSecurityStatus');
   if (!status) return;
@@ -223,7 +298,9 @@ function openGeneratorSettings(){
   const modal = $('generatorSettingsModal');
   if (!modal) return;
   syncGeneratorSettingsInputFromCanonical();
+  syncGeneratorSettingsFormsInput();
   updateGeneratorSettingsSecurityStatus();
+  updateGeneratorSettingsFormsStatus();
   const gen = $('btnGenSecCode'); if (gen) gen.classList.toggle('hidden', !(typeof accIsAdmin === 'function' && accIsAdmin()));
   const copy = $('btnCopySecCode'); if (copy) copy.classList.toggle('hidden', !(typeof accIsAdmin === 'function' && accIsAdmin()));
   modal.classList.remove('hidden');

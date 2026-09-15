@@ -91,6 +91,8 @@ function securePublicCfg(cfg, keyInfo) {
     releaseDate:cfg.releaseDate,
     releaseStatus:cfg.releaseStatus,
     resultMode:'secureOffline',
+    formsSubmissionUrl:cfg.formsSubmissionUrl||'',
+    formsPayloadSafeChars:24000,
     creatorId:cfg.creatorId,
     creatorRole:cfg.creatorRole,
     appMode:cfg.appMode||'',

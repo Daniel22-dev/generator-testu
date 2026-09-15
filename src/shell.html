@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.32">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.34">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -1034,6 +1034,17 @@
           <button type="button" class="btn-mini" onclick="forgetSecurityCodeLocal()">🧹 Zapomenout z tohoto zařízení</button>
         </div>
         <div class="small-muted" style="margin-top:10px">Kód není součástí zadání, šablon ani historie. Studentům se nikdy neposílá. Správce může vytvořit nový týmový kód; ostatní učitelé pouze vloží kód, který jim správce předal bezpečnou cestou.</div>
+      </div>
+      <div class="field" style="margin-top:18px;margin-bottom:0;padding-top:16px;border-top:1px solid var(--line)">
+        <div class="field-label">🟣 Odevzdání přes Google Forms</div>
+        <div class="field-hint">Volitelné nastavení pro bezpečný offline test. Vlož responder odkaz na školní Google Form. Formulář doporučujeme nastavit tak, aby sbíral školní e-mail a obsahoval povinnou otázku typu <b>Odstavec</b> pro celý odevzdávací blok <code>SECURE-ANSWERS-V1</code>.</div>
+        <div class="secure-mode-box" id="generatorSettingsFormsStatus" role="status"></div>
+        <input type="url" id="generatorSettingsFormsInput" style="margin-top:10px" placeholder="https://docs.google.com/forms/.../viewform nebo https://forms.gle/..." autocomplete="off" oninput="updateGeneratorSettingsFormsStatus()">
+        <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn-mini" onclick="saveGoogleFormsUrlLocal()">💾 Uložit odkaz</button>
+          <button type="button" class="btn-mini" onclick="forgetGoogleFormsUrlLocal()">🧹 Odebrat odkaz</button>
+        </div>
+        <div class="small-muted" style="margin-top:10px">Do testu se vloží jen responder URL na doméně Google Forms. Odkaz se ukládá pouze na tomto zařízení a není součástí historie zadání. Pokud není nastaven, secure test zachová klasické odevzdání přes <code>answers.txt</code>.</div>
       </div>
     </div>
   </div>
