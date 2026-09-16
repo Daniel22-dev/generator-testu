@@ -1,0 +1,35 @@
+{
+  "schema": "ghrab-security-evidence-manifest-v1",
+  "appId": "generator",
+  "version": "7.1.39",
+  "sourceRevision": null,
+  "sourcePackageSha256": null,
+  "createdAt": "2026-09-16T09:33:51.054Z",
+  "files": [
+    {
+      "path": "garp25-prep-static-exact-artifact.txt",
+      "size": 6551,
+      "sha256": "cef831011912baf8f08663ab3bae0ea32b2a0334ab5d2b906308b28b24f0d99f"
+    },
+    {
+      "path": "github-p5-baseline.txt",
+      "size": 767,
+      "sha256": "2bc1dd42f2fa3d285d0ae2bb0bfe884c5a3056cf059aaf1fae45a9b818aefbcd"
+    },
+    {
+      "path": "n5-targeted-probes.txt",
+      "size": 717,
+      "sha256": "e4061029cb8ad0896b41fe58f6ef88923c3b5b817611164fd2a49543f20b04bc"
+    },
+    {
+      "path": "scope.txt",
+      "size": 616,
+      "sha256": "bdd4a34d7ed526508b7ab739a3b6f67c7cd4647e3b0a1af320fd4290bf3732c8"
+    },
+    {
+      "path": "source-sensitive-scan.txt",
+      "size": 88,
+      "sha256": "a212250d5d3b58bfd47517e6a6fa43bbadef65325a54144c46b52dbe237866de"
+    }
+  ]
+}

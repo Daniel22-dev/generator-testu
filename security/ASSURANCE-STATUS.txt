@@ -1,56 +1,77 @@
 GARP 2.5.1 – ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.24
-Date: 2026-09-08
+Application: generator 7.1.40
+Date: 2026-09-16
+Scope: Stage 3 GARP 2.5 / N5 auto-patch baseline candidate
 
-LAST INDEPENDENT AUDIT: 7.1.23 ROUND 3 (Claude, 2026-09-08)
-- OVERALL: AMBER; no gate RED.
-- SHIELD-PREP: PASS; unified PREP gate GREEN.
-- RI-PREP: PASS; deterministic rebuild PASS.
-- npm ci / npm test / qa:p5:ci / browser / axe / reporter: PASS in auditor environment.
-- N2-01, N2-02, N2-03: independently CLOSED.
-- Baseline diff 7.1.22 -> 7.1.23: unexpected/undocumented changes NONE IDENTIFIED.
-- New audit findings: N3-01 MEDIUM (offline loss of cleanup/platform under network-only), N3-02 LOW, N3-03 INFO.
-- Auditor recommended ending the assurance-only series; AMBER ceiling is caused by live-model and school-server evidence.
+CURRENT LOCAL / STATIC STATUS
+VERSION CONSISTENCY          PASS (7.1.40 across runtime/PWA/QA sources)
+LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.40)
+GARP 2.5.1 PREP-STATIC       PASS
+N5 SECRET-SCAN               PASS
+GARP TOOLING SELFTEST        PASS 59/59
+SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components)
+AI ASSURANCE FINGERPRINT     PASS
+SW SECURITY FREEZE           PASS
+SW OFFLINE FAIL-SAFE         PASS 9/9
+VENDORED CONSISTENCY         PASS (drift 0 for built public profile)
+DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.40 dist
+GARP 2.3 SECURITY REGRESSION PASS 86/86
+SUITE SESSION REGRESSION     PASS 20/20
+PLATFORM CONFORMANCE         PASS 115/115
+QUALITY STATIC/BUDGET        PASS 35/35
+XSS INVENTORY REGRESSION     PASS (no new sink-count regression)
+EVIDENCE MANIFEST            PASS 8/8 files
 
-CURRENT 7.1.24 RUNTIME-HARDENING CANDIDATE
-N3-01 (runtime):
-- `access/suite-session-cleanup.js` and `ghrab/ghrab-platform.js` are install-cached and routed network-first with a no-store network attempt plus cache fallback.
-- authorization/revocation/integrity/runtime-config assets remain network-only/no-store with no cache fallback.
-- local behavioral SW regression PASS 9/9: online freshness, offline fallback, stale revocation/integrity cache rejection.
-- static SW checker uses explicit v2 two-class policy and fails if support layers lose install cache/networkFirst or strict assets enter cache paths.
+BASELINE PURPOSE
+7.1.40 intentionally adds no application feature or workflow change. It advances the closed 7.1.39 N5/GARP state to a clean patch release identity intended to become the one-time minimum baseline for AI Studio central patch promotion. The AI Studio enrollment itself is not part of this stage.
 
-N3-02 (tooling):
-- AI fingerprint scope scans src/ + public/, .js + .mjs, helper boundary tokens + direct Gemini transport tokens.
-- three disposable negative probes (public .js, src .mjs, direct provider path) all rejected; clean fingerprint check PASS.
+N5 CLOSURE RETAINED
+The deployment leak scanner blocks:
+- private JWK material,
+- encrypted/private-key PEM material,
+- PGP PRIVATE KEY BLOCK material.
+A public JWK without private `d` remains allowed. These controls remain pinned into the 59/59 tooling selftest.
 
-N3-03 (tooling):
-- vendored `whenRootExists` is fail-closed bound to the declared copy path prefix.
-- disposable root-mismatch negative control rejected; clean synthetic control PASS.
+INHERITED EXACT GITHUB RUNTIME BASELINE
+Repository: Daniel22-dev/generator-testu
+Commit: 42be10cd34ca830c8e310f25911cc770baec5ab5
+Application version: 7.1.39
+Deploy workflow run 35062405626: SUCCESS
+P5 workflow run 35062405546: SUCCESS
+This is historical evidence for the immediately preceding runtime baseline, not a 7.1.40 remote attestation.
 
-LOCAL EVIDENCE
-- suite-session lifecycle: PASS 20/20.
-- GARP 2.3 security harness: PASS 86/86.
-- GARP 2.5.1 selftest: PASS 55/55.
-- SBOM quality/drift: PASS 113 components.
-- AI fingerprint current: PASS.
-- evidence manifest: PASS.
-- security SHA256SUMS: PASS.
+IMPORTANT 7.1.40 VALIDATION BOUNDARY
+The 7.1.40 candidate has not yet been uploaded and therefore has no exact-lockfile GitHub browser/P5/deployment evidence. Locally unavailable/pending final CI artifacts are:
+- browser runtime report,
+- axe runtime report,
+- P5 release certification assembled from those runtime reports,
+- final P5 acceptance.
+The local acceptance gate correctly remains blocked until those reports exist.
 
-LOCAL LIMITATION
-- exact `npm ci --no-audit --no-fund` exceeded this environment execution window and left an unusable partial dependency tree; process was terminated and node_modules deleted.
-- therefore build/CSP/lint/full browser/DAST/RI-PREP for 7.1.24 are NOT TESTED locally and MUST be rerun independently from the exact package-lock.json.
+CURRENT EVIDENCE
+- security/evidence/autopatch-baseline-7.1.40-2026-09-16/
+- security/security-evidence-manifest-7.1.40-baseline.json
+- security/evidence/n5-closure-2026-09-16/ (historical 7.1.39 N5 closure)
+- security/security-evidence-manifest-7.1.39-n5.json (historical)
+- security/garp25/TOOLING-SOURCE.txt
 
-EXPECTED GATE CEILING AFTER INDEPENDENT 7.1.24 REVALIDATION
-SECURITY          AMBER
-PRIVACY           AMBER
-RED TEAM          AMBER
-RELEASE INTEGRITY AMBER
-SHIELD ASSURANCE  AMBER
+AUTO-PATCH STATUS
+SOURCE BASELINE CANDIDATE    7.1.40 READY FOR REMOTE CI
+STUDIO ENROLLMENT            NOT YET PERFORMED
+AUTOMATIC PATCH PROMOTION    NOT YET ENABLED FOR GENERATOR
+Required next condition: upload 7.1.40, obtain clean required GitHub Actions/deployment evidence, then enroll generator with minimumVersion 7.1.40 in AI Studio central release-promotion policy.
+
+ASSURANCE CEILING
+SECURITY          AMBER pending 7.1.40 remote CI + LIVE environment
+PRIVACY           AMBER pending live school-server evidence
+RED TEAM          AMBER pending live-model / production evidence
+RELEASE INTEGRITY AMBER pending signed LIVE deployment evidence
+SHIELD ASSURANCE  AMBER pending SHIELD-LIVE evidence
 OVERALL           AMBER
 
 SHIELD-LIVE        NOT TESTED
 RI-LIVE            NOT TESTED
-BEHAVIORAL AIR      NOT TESTED
-AGENTIC PROFILE     PARTIAL
-REAL STUDENT DATA   NOT APPROVED
-SCHOOL SERVER PROD  NOT APPROVED
+BEHAVIORAL AIR     NOT TESTED for live model in this stage
+AGENTIC PROFILE    PARTIAL
+REAL STUDENT DATA  NOT APPROVED BY THIS LOCAL STAGE
+SCHOOL SERVER PROD NOT TESTED BY THIS LOCAL STAGE

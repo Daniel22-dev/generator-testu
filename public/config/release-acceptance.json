@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.39",
-  "releaseStatus": "stage6-secure-unlock-normalization-hotfix-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.40",
+  "releaseStatus": "garp25-n5-auto-patch-baseline-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -38,14 +38,14 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "GARP-2.5.1-SHIELD-TOOLING-R2",
+  "revision": "GARP-2.5.1-N5-CUMULATIVE",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "local-build-plus-targeted-system-chromium-platform-gates; exact-lockfile GitHub CI pending",
-    "note": "7.1.39 is a narrowly scoped Stage 6 production hotfix. Exact GitHub CI for 7.1.38 proved the instant Stage 6 path and all visual/critical gates, but the secure workflow audit exposed one real inconsistency: the secure student runtime canonicalized teacher-pin case-insensitively while unlock-password remained case-sensitive. 7.1.39 makes the secure runtime canonicalize both teacher-pin and unlock-password, matching the generator helper and instant runtime while preserving domain-separated PBKDF2 salts. Exact GitHub CI remains required for promotion."
+    "transport": "local-rebuild-plus-garp25-static; exact-lockfile GitHub CI pending",
+    "note": "7.1.40 is a no-feature-change baseline release derived from the 7.1.39 runtime after the N5/GARP 2.5 closure. Versioned runtime/PWA/QA metadata, SBOM and assurance fingerprint are advanced to 7.1.40; secure runtime, teacher access, Forms, scoring, cryptography and AI behavior are intentionally unchanged. Exact-lockfile GitHub CI/deployment is required before accepting 7.1.40 as the Studio auto-patch baseline."
   },
-  "note": "7.1.39 Stage 6 secure unlock normalization hotfix; requires clean exact-lockfile GitHub CI before Stage 6 closure."
+  "note": "7.1.40 GARP 2.5 / N5 auto-patch baseline candidate; requires clean exact-lockfile GitHub CI/deployment before Studio enrollment."
 }

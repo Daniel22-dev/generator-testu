@@ -1,0 +1,1 @@
+✅  Obecná kontrola citlivých údajů prošla (58 veřejných zdrojových souborů).

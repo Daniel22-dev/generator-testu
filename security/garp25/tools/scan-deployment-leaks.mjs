@@ -20,6 +20,8 @@ const forbiddenNames = new Set([
 const forbiddenExt = new Set(['.map', '.pem', '.key', '.p12', '.pfx', '.p8', '.jks', '.keystore', '.kdb', '.ppk', '.asc', '.gpg', '.bak', '.orig']);
 const secretPatterns = [
   [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, 'private-key-block'],
+  [/-----BEGIN PGP PRIVATE KEY BLOC[K]-----/, 'pgp-private-key-block'],
+  [/[\"']kty[\"']\s*:\s*[\"'](?:EC|OKP|RSA)[\"'][\s\S]{0,2048}?[\"']d[\"']\s*:\s*[\"'][A-Za-z0-9_-]{20,}[\"']|[\"']d[\"']\s*:\s*[\"'][A-Za-z0-9_-]{20,}[\"'][\s\S]{0,2048}?[\"']kty[\"']\s*:\s*[\"'](?:EC|OKP|RSA)[\"']/, 'jwk-private-key'],
   [/\bAIza[A-Za-z0-9_-]{20,}\b/, 'google-api-key'],
   [/\bghp_[A-Za-z0-9]{20,}\b/, 'github-token'],
   [/\bgithub_pat_[A-Za-z0-9_]{20,}\b/, 'github-fine-grained-pat'],

@@ -1,0 +1,18 @@
+GitHub exact baseline before the local N5 tooling delta
+Repository: Daniel22-dev/generator-testu
+Commit: 42be10cd34ca830c8e310f25911cc770baec5ab5
+Deploy workflow run: 35062405626 - success
+P5 workflow run: 35062405546 - success
+GitHub Pages artifact id: 10432569478
+QA artifact id: 10432728784
+Application version: 7.1.39
+
+Embedded artifact reports:
+- qa-p5-runtime-report.json: passed, 0 blockers
+- qa-p5-axe-runtime-report.json: passed, 0 blockers
+- qa-p5-release-report.json: passed, 46/46
+- qa-p5-acceptance-report.json: passed, 19/19
+- qa-p5-xss-sinks-report.json: passed
+- release-verdict.txt: AUTOMATED_READY
+
+Important: these GitHub results predate the local N5 tooling delta. They establish the unchanged runtime baseline, not a post-delta GitHub CI result.

@@ -1,0 +1,46 @@
+CASE clean
+expected_exit=0 actual_exit=0
+{
+  "status": "PASS",
+  "root": "/tmp/tmp.CONFcDmbmq/case",
+  "info": []
+}
+
+CASE public-jwk
+expected_exit=0 actual_exit=0
+{
+  "status": "PASS",
+  "root": "/tmp/tmp.CONFcDmbmq/case",
+  "info": []
+}
+
+CASE private-jwk
+expected_exit=1 actual_exit=1
+{
+  "status": "FAIL",
+  "errors": [
+    "secret-pattern:sample.txt:jwk-private-key"
+  ],
+  "info": []
+}
+
+CASE encrypted-private-key
+expected_exit=1 actual_exit=1
+{
+  "status": "FAIL",
+  "errors": [
+    "secret-pattern:sample.txt:private-key-block"
+  ],
+  "info": []
+}
+
+CASE pgp-private-key
+expected_exit=1 actual_exit=1
+{
+  "status": "FAIL",
+  "errors": [
+    "secret-pattern:sample.txt:pgp-private-key-block"
+  ],
+  "info": []
+}
+

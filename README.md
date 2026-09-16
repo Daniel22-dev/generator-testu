@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.39  
+**Aktuální verze:** 7.1.40  
+
+> **7.1.40 GARP 2.5 / N5 auto-patch baseline (2026-09-16):** bez změny aplikační logiky. Verze pouze sjednocuje release metadata po uzavření N5 detekce a GARP 2.5 evidence a připravuje čistý patch baseline pro automatické přebírání dalších patch verzí AI Studiem. Před přijetím jako baseline musí projít čistým GitHub CI/deploymentem.
 
 > **7.1.39 Etapa 6 secure unlock hotfix (2026-09-16):** exact GitHub CI 7.1.38 odhalilo jednu skutečnou produkční nekonzistenci: secure studentský runtime kanonizoval velikost písmen pro `teacher-pin`, ale ne pro `unlock-password`. Secure zámek nyní používá stejnou case-insensitive kanonizaci jako teacher-login a instant runtime; PBKDF2 domény zůstávají oddělené. Verifier, Google Forms, scoring, RSA/AES a `SECURE-ANSWERS-V1` se nemění.
 
@@ -32,7 +34,9 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.39** je úzce zaměřený produkční hotfix Etapy 6 nad **7.1.38**. Opravuje pouze case-normalizaci `unlock-password` v secure studentském runtime; účelově oddělené PBKDF2 domény zůstávají zachované. **Etapa 6 zůstává otevřená, dokud 7.1.39 neprojde novým čistým GitHub CI.**
+Verze **7.1.40** je baseline release bez zamýšlené funkční změny nad 7.1.39. Jejím účelem je uzavřít N5/GARP 2.5 stav a vytvořit jednoznačný výchozí bod pro centrální auto-patch AI Studia. **Do zápisu jako auto-patch baseline zůstává podmínkou nový čistý GitHub CI/deployment.**
+
+Verze **7.1.39** byla úzce zaměřený produkční hotfix Etapy 6 nad **7.1.38**. Opravila pouze case-normalizaci `unlock-password` v secure studentském runtime; účelově oddělené PBKDF2 domény zůstaly zachované. Její exact GitHub runtime baseline následně prošel P5/deploymentem; pozdější lokální N5 tooling delta je evidována odděleně v bezpečnostních podkladech.
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 

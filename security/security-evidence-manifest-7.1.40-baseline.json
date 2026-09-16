@@ -1,0 +1,50 @@
+{
+  "schema": "ghrab-security-evidence-manifest-v1",
+  "appId": null,
+  "version": null,
+  "sourceRevision": null,
+  "sourcePackageSha256": null,
+  "createdAt": "2026-09-16T10:13:47.111Z",
+  "files": [
+    {
+      "path": "garp23-regression.txt",
+      "size": 5979,
+      "sha256": "78ce578efc9dbb648387af21c1effb99ff745cc7262e120ed342a017af4976e2"
+    },
+    {
+      "path": "garp25-prep-static.txt",
+      "size": 6551,
+      "sha256": "582134bbf9068b5c9a8e0bbc916c599c2b57000ca203b4036d5e0ca0a47ed124"
+    },
+    {
+      "path": "github-boundary.txt",
+      "size": 393,
+      "sha256": "ca6900d2bb9f04ab4971c7a100adf64a3a0d203a5fbc7d0d9eab031a1ad99c1c"
+    },
+    {
+      "path": "platform-conformance.txt",
+      "size": 12032,
+      "sha256": "66154c103051ad07d45f62c4c26951d00f474d881b813b05cca9609258134d9b"
+    },
+    {
+      "path": "quality.txt",
+      "size": 5445,
+      "sha256": "504b6d0bfb9772620200b651f52d98a547000de1a37cff701bccd5b6e53a3ff4"
+    },
+    {
+      "path": "scope.txt",
+      "size": 814,
+      "sha256": "8f5a59a5ba30658f9ef4dfb181a26b0a570a72c03182d11197b31636493ec1f5"
+    },
+    {
+      "path": "static-validation.txt",
+      "size": 1002,
+      "sha256": "9e9753db9abc586bf3c5e5671394c156c202178afefae525102c1ff7a35ea2c1"
+    },
+    {
+      "path": "xss-inventory.txt",
+      "size": 3475,
+      "sha256": "9a15917991160e16046d6145848ffca8cddd9a3b7623d0ed37778788e1879445"
+    }
+  ]
+}

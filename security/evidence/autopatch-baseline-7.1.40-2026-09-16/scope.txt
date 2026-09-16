@@ -1,0 +1,17 @@
+Generator testu 7.1.40 - Stage 3 auto-patch baseline candidate evidence
+Date: 2026-09-16
+
+Purpose:
+- advance the closed 7.1.39 N5/GARP 2.5 source state to a clean patch baseline 7.1.40,
+- make no intended application-behavior change,
+- prepare a future minimum baseline for AI Studio central patch promotion.
+
+Inherited historical evidence:
+- security/evidence/n5-closure-2026-09-16/
+- security/security-evidence-manifest-7.1.39-n5.json
+- last known exact GitHub runtime baseline: generator 7.1.39, commit 42be10cd34ca830c8e310f25911cc770baec5ab5, deploy run 35062405626.
+
+Current candidate boundary:
+- local source/build/static GARP validation: performed for 7.1.40,
+- exact-lockfile GitHub browser/P5/deploy validation for 7.1.40: PENDING upload,
+- AI Studio enrollment/promotion policy: NOT part of this stage.

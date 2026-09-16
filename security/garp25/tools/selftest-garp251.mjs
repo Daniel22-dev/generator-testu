@@ -186,6 +186,22 @@ try {
   r = run('scan-deployment-leaks.mjs', [leak]);
   expect('NC-sourcemap-detected', r.status !== 0);
   await rm(path.join(leak, 'app.js.map'));
+  await writeFile(path.join(leak, 'jwk-public.json'), JSON.stringify({ kty: 'EC', crv: 'P-256', x: 'A'.repeat(43), y: 'B'.repeat(43) }));
+  r = run('scan-deployment-leaks.mjs', [leak]);
+  expect('N5-public-jwk-does-not-false-positive', r.status === 0);
+  await rm(path.join(leak, 'jwk-public.json'));
+  await writeFile(path.join(leak, 'jwk.json'), JSON.stringify({ kty: 'EC', crv: 'P-256', x: 'A'.repeat(43), y: 'B'.repeat(43), d: 'C'.repeat(43) }));
+  r = run('scan-deployment-leaks.mjs', [leak]);
+  expect('NC-jwk-private-key-detected', r.status !== 0);
+  await rm(path.join(leak, 'jwk.json'));
+  await writeFile(path.join(leak, 'encrypted.txt'), '-----BEGIN ' + 'ENCRYPTED PRIVATE KEY-----\n' + 'A'.repeat(64) + '\n-----END ' + 'ENCRYPTED PRIVATE KEY-----\n');
+  r = run('scan-deployment-leaks.mjs', [leak]);
+  expect('NC-encrypted-private-key-detected', r.status !== 0);
+  await rm(path.join(leak, 'encrypted.txt'));
+  await writeFile(path.join(leak, 'pgp.txt'), '-----BEGIN ' + 'PGP PRIVATE KEY ' + 'BLOCK' + '-----\n' + 'A'.repeat(64) + '\n-----END ' + 'PGP PRIVATE KEY ' + 'BLOCK' + '-----\n');
+  r = run('scan-deployment-leaks.mjs', [leak]);
+  expect('NC-pgp-private-key-detected', r.status !== 0);
+  await rm(path.join(leak, 'pgp.txt'));
 
   // --- evidence
   const ev = path.join(t, 'evidence'); await mkdir(ev);

@@ -1,3 +1,11 @@
+## 7.1.40 — GARP 2.5 / N5 auto-patch baseline (2026-09-16)
+
+- Bez změny aplikační logiky nebo uživatelského workflow.
+- Přenáší uzavřenou N5 detekci privátního JWK a PGP private-key bloku do nového release baseline.
+- Sjednocuje runtime, PWA, QA, Studio manifest a bezpečnostní release metadata na 7.1.40.
+- Vytváří zamýšlený minimální baseline pro centrální auto-patch AI Studia; samotný enrollment Studia je až následující etapa.
+- Vyžaduje nový čistý GitHub CI/deployment před přijetím 7.1.40 jako schváleného baseline.
+
 ## 7.1.39 — Etapa 6 secure unlock hotfix (2026-09-16)
 
 - Opravena jedna skutečná produkční nekonzistence odhalená exact GitHub CI 7.1.38: secure studentský runtime kanonizoval velikost písmen pro `teacher-pin`, ale ne pro `unlock-password`.

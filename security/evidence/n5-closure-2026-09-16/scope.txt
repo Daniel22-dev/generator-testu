@@ -1,0 +1,8 @@
+Generator testu 7.1.39 - GARP 2.5.1 / N5 closure evidence
+Date: 2026-09-16
+
+Local source basis: Generator-7.1.39-ETAPA1-N5.zip.
+Runtime artifact basis for dist-dependent GARP checks: GitHub Pages artifact from successful deploy run 35062405626, commit 42be10cd34ca830c8e310f25911cc770baec5ab5, application version 7.1.39.
+
+The local delta changes only GARP deployment leak scanner + its selftest; application runtime sources are unchanged from the deployed 7.1.39 baseline.
+The exact GitHub baseline has P5/deploy PASS. The modified N5 delta itself is not claimed to have a post-change GitHub CI run until uploaded.

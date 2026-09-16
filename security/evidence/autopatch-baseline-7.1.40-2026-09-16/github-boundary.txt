@@ -1,0 +1,4 @@
+GitHub validation boundary for 7.1.40
+- A new exact-lockfile GitHub CI/deploy run for 7.1.40 has not yet been produced by this local stage.
+- Browser runtime, axe, P5 release report and final P5 acceptance therefore remain intentionally pending.
+- Do not enroll generator 7.1.40 into AI Studio auto-patch policy until the uploaded 7.1.40 commit has clean required Actions/deployment evidence.

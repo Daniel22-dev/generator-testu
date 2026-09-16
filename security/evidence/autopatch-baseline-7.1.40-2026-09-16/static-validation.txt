@@ -1,0 +1,34 @@
+=== VERSION CONSISTENCY ===
+✅  Verze sedi napric projektem: 7.1.40
+
+=== STUDIO MANIFEST TEMPLATE ===
+✅ Studio manifest template: generator 7.1.40, cache ghrab-generator-v7.1.40
+
+=== QA MANIFEST ===
+✅  QA manifest odpovídá GHRAB-QA-1.0.2 a verzi 7.1.40.
+
+=== PRODUCTION READINESS ===
+✅  Produkcni invariants jsou splneny.
+
+=== CSP ===
+✅  Aktivní CSP je synchronní, bez unsafe-eval; Acorn je lazy a runtime neobsahuje eval/new Function.
+
+=== SOURCE STRUCTURE ===
+✅  Zdrojova struktura OK: 11 split modulu, puvodni nazvy pouze jako migracni tombstones.
+
+=== SENSITIVE DATA ===
+✅  Obecná kontrola citlivých údajů prošla (58 veřejných zdrojových souborů).
+
+=== PRE-CACHE ===
+✅  Service worker precache je konzistentní (23/23 souborů existuje).
+
+=== LOCKFILE ===
+{
+  "schema": "ghrab-p5-lock-audit-v1",
+  "status": "passed",
+  "package": "generator-testu",
+  "version": "7.1.40",
+  "directDependencies": 7,
+  "lockedPackages": 113,
+  "registry": "https://registry.npmjs.org"
+}

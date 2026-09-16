@@ -1,6 +1,19 @@
 GARP 2.5.1 – SHIELD NEGATIVE CONTROLS
-Application: generator 7.1.24
-All mutations are synthetic/disposable. No mutation remains in the candidate.
+Application: generator 7.1.40
+Current delta date: 2026-09-16
+
+CURRENT N5 DELTA CONTROLS
+N5-01 PASS       clean deployment sample remains allowed.
+N5-02 PASS       public JWK without private `d` remains allowed (false-positive guard).
+N5-03 PASS       private JWK is rejected, including EC/OKP/RSA forms and reversed `d`/`kty` order covered by selftest.
+N5-04 PASS       encrypted private-key PEM is rejected.
+N5-05 PASS       PGP PRIVATE KEY BLOCK is rejected.
+N5-06 PASS       complete GARP 2.5.1 tooling selftest now passes 59/59.
+
+All N5 mutations are synthetic/disposable. No mutation remains in the candidate.
+
+HISTORICAL / CUMULATIVE CONTROLS
+The controls below are retained from earlier assurance rounds. They are not silently re-dated; controls included in the current 59/59 selftest or current prep-static path were re-exercised, while explicitly LIVE/NOT TESTED items remain unchanged.
 
 SHNC-01 PASS       synthetic secret -> source scanner nonzero; clean scanner PASS.
 SHNC-02 PASS       synthetic deployment byte tamper -> RI verifier FAIL (GARP selftest).
