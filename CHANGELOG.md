@@ -1,3 +1,11 @@
+## 7.1.41 — Etapa 5: auto-patch E2E (2026-09-16)
+
+- Bez změny aplikační logiky nebo uživatelského workflow.
+- Kontrolní patch nad schváleným 7.1.40 baseline pro ověření skutečného auto-patche AI Studia.
+- Runtime/PWA/QA identita, SBOM a AI assurance fingerprint jsou přegenerovány pro 7.1.41.
+- Po úspěšném GitHub Pages deployi Generátor odešle AI Studiu `repository_dispatch` typu `app-updated`.
+- AI Studio musí bez ruční změny své konfigurace ověřit live deployment, přijmout pouze patch 7.1.40 → 7.1.41 a persistovat 7.1.41 jako nový release-wave baseline.
+
 ## 7.1.40 — GARP 2.5 / N5 auto-patch baseline (2026-09-16)
 
 - Bez změny aplikační logiky nebo uživatelského workflow.

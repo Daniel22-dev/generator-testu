@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.40  
+**Aktuální verze:** 7.1.41
+
+> **7.1.41 Etapa 5 – auto-patch E2E (2026-09-16):** bez změny aplikační logiky. Jde o kontrolní patch nad schváleným baseline 7.1.40. Po úspěšném Pages deployi Generátor odešle AI Studiu událost `app-updated`; Studio musí samo ověřit live manifest, přijmout pouze patch změnu a persistovat 7.1.41 jako nový release-wave baseline.
 
 > **7.1.40 GARP 2.5 / N5 auto-patch baseline (2026-09-16):** bez změny aplikační logiky. Verze pouze sjednocuje release metadata po uzavření N5 detekce a GARP 2.5 evidence a připravuje čistý patch baseline pro automatické přebírání dalších patch verzí AI Studiem. Před přijetím jako baseline musí projít čistým GitHub CI/deploymentem.
 
@@ -34,7 +36,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.40** je baseline release bez zamýšlené funkční změny nad 7.1.39. Jejím účelem je uzavřít N5/GARP 2.5 stav a vytvořit jednoznačný výchozí bod pro centrální auto-patch AI Studia. **Do zápisu jako auto-patch baseline zůstává podmínkou nový čistý GitHub CI/deployment.**
+Verze **7.1.41** je kontrolní patch Etapy 5 bez zamýšlené funkční změny. **7.1.40 je již schválený a nasazený minimální baseline centrálního auto-patche AI Studia.** 7.1.41 ověřuje skutečný end-to-end tok: deploy Generátoru → `app-updated` → live ověření Studiem → patch-only promotion → persistence nového baseline.
 
 Verze **7.1.39** byla úzce zaměřený produkční hotfix Etapy 6 nad **7.1.38**. Opravila pouze case-normalizaci `unlock-password` v secure studentském runtime; účelově oddělené PBKDF2 domény zůstaly zachované. Její exact GitHub runtime baseline následně prošel P5/deploymentem; pozdější lokální N5 tooling delta je evidována odděleně v bezpečnostních podkladech.
 

@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.40",
-  "releaseStatus": "garp25-n5-auto-patch-baseline-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.41",
+  "releaseStatus": "auto-patch-e2e-candidate-pending-clean-github-ci-and-deployment",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -12,7 +12,7 @@
   },
   "github": {
     "status": "not-yet-uploaded",
-    "uploadDeferredUntilEcosystemComplete": true,
+    "uploadDeferredUntilEcosystemComplete": false,
     "postUploadValidationRequired": true,
     "requiredChecks": [
       "project-tests",
@@ -44,8 +44,8 @@
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "local-rebuild-plus-garp25-static; exact-lockfile GitHub CI pending",
-    "note": "7.1.40 is a no-feature-change baseline release derived from the 7.1.39 runtime after the N5/GARP 2.5 closure. Versioned runtime/PWA/QA metadata, SBOM and assurance fingerprint are advanced to 7.1.40; secure runtime, teacher access, Forms, scoring, cryptography and AI behavior are intentionally unchanged. Exact-lockfile GitHub CI/deployment is required before accepting 7.1.40 as the Studio auto-patch baseline."
+    "transport": "deterministic-version-bump-plus-garp25-static; exact-lockfile GitHub CI/deployment pending",
+    "note": "7.1.41 is a no-feature-change patch over the accepted 7.1.40 Studio auto-patch baseline. It exists solely to prove end-to-end automatic patch adoption. Runtime/PWA/QA metadata, SBOM and AI assurance fingerprint are regenerated; secure runtime, teacher access, Forms, scoring, cryptography, platform contract and AI behavior are intentionally unchanged."
   },
-  "note": "7.1.40 GARP 2.5 / N5 auto-patch baseline candidate; requires clean exact-lockfile GitHub CI/deployment before Studio enrollment."
+  "note": "7.1.41 auto-patch E2E candidate; 7.1.40 remains the accepted Studio baseline until the 7.1.41 Pages deployment is verified and promoted automatically."
 }

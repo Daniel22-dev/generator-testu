@@ -1,11 +1,11 @@
 GARP 2.5.1 – ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.40
+Application: generator 7.1.41
 Date: 2026-09-16
 Scope: Stage 3 GARP 2.5 / N5 auto-patch baseline candidate
 
 CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.40 across runtime/PWA/QA sources)
-LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.40)
+VERSION CONSISTENCY          PASS (7.1.41 across runtime/PWA/QA sources)
+LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.41)
 GARP 2.5.1 PREP-STATIC       PASS
 N5 SECRET-SCAN               PASS
 GARP TOOLING SELFTEST        PASS 59/59
@@ -14,7 +14,7 @@ AI ASSURANCE FINGERPRINT     PASS
 SW SECURITY FREEZE           PASS
 SW OFFLINE FAIL-SAFE         PASS 9/9
 VENDORED CONSISTENCY         PASS (drift 0 for built public profile)
-DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.40 dist
+DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.41 dist
 GARP 2.3 SECURITY REGRESSION PASS 86/86
 SUITE SESSION REGRESSION     PASS 20/20
 PLATFORM CONFORMANCE         PASS 115/115
@@ -23,7 +23,7 @@ XSS INVENTORY REGRESSION     PASS (no new sink-count regression)
 EVIDENCE MANIFEST            PASS 8/8 files
 
 BASELINE PURPOSE
-7.1.40 intentionally adds no application feature or workflow change. It advances the closed 7.1.39 N5/GARP state to a clean patch release identity intended to become the one-time minimum baseline for AI Studio central patch promotion. The AI Studio enrollment itself is not part of this stage.
+7.1.41 intentionally adds no application feature or workflow change. It is the first controlled patch above the accepted 7.1.40 AI Studio auto-patch minimum baseline and exists to prove the complete deployment-notification-promotion-persistence chain.
 
 N5 CLOSURE RETAINED
 The deployment leak scanner blocks:
@@ -40,8 +40,8 @@ Deploy workflow run 35062405626: SUCCESS
 P5 workflow run 35062405546: SUCCESS
 This is historical evidence for the immediately preceding runtime baseline, not a 7.1.40 remote attestation.
 
-IMPORTANT 7.1.40 VALIDATION BOUNDARY
-The 7.1.40 candidate has not yet been uploaded and therefore has no exact-lockfile GitHub browser/P5/deployment evidence. Locally unavailable/pending final CI artifacts are:
+IMPORTANT 7.1.41 VALIDATION BOUNDARY
+The 7.1.41 candidate has not yet been deployed and therefore has no exact-lockfile GitHub browser/P5/deployment evidence. Locally unavailable/pending final CI artifacts are:
 - browser runtime report,
 - axe runtime report,
 - P5 release certification assembled from those runtime reports,
@@ -56,13 +56,13 @@ CURRENT EVIDENCE
 - security/garp25/TOOLING-SOURCE.txt
 
 AUTO-PATCH STATUS
-SOURCE BASELINE CANDIDATE    7.1.40 READY FOR REMOTE CI
-STUDIO ENROLLMENT            NOT YET PERFORMED
-AUTOMATIC PATCH PROMOTION    NOT YET ENABLED FOR GENERATOR
-Required next condition: upload 7.1.40, obtain clean required GitHub Actions/deployment evidence, then enroll generator with minimumVersion 7.1.40 in AI Studio central release-promotion policy.
+SOURCE PATCH CANDIDATE       7.1.41 READY FOR REMOTE CI
+STUDIO ENROLLMENT            ACTIVE FROM ACCEPTED 7.1.40 BASELINE
+AUTOMATIC PATCH PROMOTION    ENABLED; 7.1.41 IS THE FIRST LIVE E2E PATCH TEST
+Required next condition: deploy 7.1.41; Generator must notify AI Studio automatically; Studio must verify and persist 7.1.41 without manual release-wave editing.
 
 ASSURANCE CEILING
-SECURITY          AMBER pending 7.1.40 remote CI + LIVE environment
+SECURITY          AMBER pending 7.1.41 remote CI/deployment + LIVE environment
 PRIVACY           AMBER pending live school-server evidence
 RED TEAM          AMBER pending live-model / production evidence
 RELEASE INTEGRITY AMBER pending signed LIVE deployment evidence
