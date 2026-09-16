@@ -60,6 +60,21 @@ jobs:
           p.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
 
+      - name: Stabilize Chromium page-target discovery
+        if: steps.release_state.outputs.needs_bump == 'true'
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/qa-p3-browser.mjs')
+          text = p.read_text(encoding='utf-8')
+          old = "try{await waitJson(`http://127.0.0.1:${port}/json/version`);const pages=await waitJson(`http://127.0.0.1:${port}/json`);client=new Cdp(pages.find(x=>x.type==='page').webSocketDebuggerUrl);await client.call('Runtime.enable');"
+          new = "try{await waitJson(`http://127.0.0.1:${port}/json/version`);let pageTarget;for(let i=0;i<180;i++){const pages=await waitJson(`http://127.0.0.1:${port}/json`);pageTarget=pages.find(x=>x.type==='page'&&x.webSocketDebuggerUrl);if(pageTarget)break;await sleep(50)}if(!pageTarget)throw new Error('Chromium page target timeout');client=new Cdp(pageTarget.webSocketDebuggerUrl);await client.call('Runtime.enable');"
+          if old not in text:
+              raise SystemExit('Expected qa-p3-browser page-target sequence not found')
+          p.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
       - name: Verify AI Studio dispatch credential before release
         if: steps.release_state.outputs.needs_bump == 'true' && github.event_name != 'pull_request'
         shell: bash
@@ -120,6 +135,7 @@ jobs:
             public/sw.js \
             qa/qa-manifest.json \
             reporter-test.config.json \
+            scripts/qa-p3-browser.mjs \
             scripts/test-suite-session-lifecycle.mjs \
             security/ASSURANCE-STATUS.txt \
             security/NEGATIVE-CONTROLS.txt \
