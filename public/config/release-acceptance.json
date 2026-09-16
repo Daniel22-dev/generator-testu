@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.37",
-  "releaseStatus": "stage6-teacher-access-code-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.38",
+  "releaseStatus": "stage6-qa-hotfix-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -45,7 +45,7 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "local-build-plus-targeted-system-chromium-platform-gates; exact-lockfile GitHub CI pending",
-    "note": "7.1.37 Stage 6 simplifies two teacher-facing secrets into one Teacher access code while retaining domain-separated PBKDF2 hashes for teacher authentication/retry authorization and lock-screen unlock. Cross-domain acceptance has been removed: teacher login/retry verify only the teacher-pin domain and lock-screen unlock verifies only unlock-password. Static/security/browser platform gates passed locally; exact jsdom workflow/runtime CI remains required for promotion."
+    "note": "7.1.38 is a QA-only hotfix over the Stage 6 implementation. Production authentication/runtime logic is unchanged from 7.1.37. The workflow harness now uses the actual instant-runtime teacher DOM IDs/functions and temporarily restores the real generator PBKDF2 KDF for the secure Stage 6 authentication scenario, preventing false mismatches against the real student runtime. Exact GitHub CI remains required for promotion."
   },
-  "note": "7.1.37 Stage 6 candidate over confirmed green 7.1.36 baseline; requires clean exact-lockfile GitHub CI before Stage 6 closure."
+  "note": "7.1.38 Stage 6 QA hotfix over 7.1.37; requires clean exact-lockfile GitHub CI before Stage 6 closure."
 }

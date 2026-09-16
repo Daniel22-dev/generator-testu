@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.37',
-  date:    '2026-09-15',
+  version: '7.1.38',
+  date:    '2026-09-16',
   status:  'production-serverless',
   changes: [
+    'ETAPA 6 QA HOTFIX (7.1.38): bez změny produkční logiky. Workflow test instant větve nyní používá skutečné instant DOM ID/funkci (t-name, t-pin, doTeacherLogin) a secure Stage 6 scénář generuje balík se skutečným PBKDF2 KDF místo záměrné rychlé testovací náhrady. Učitelský přístupový kód, doménově oddělené teacher-pin/unlock-password hashe, runtime, verifier, Forms, scoring a secure formát zůstávají funkčně beze změny.',
     'ETAPA 6 – JEDEN UČITELSKÝ PŘÍSTUPOVÝ KÓD (7.1.37): Generátor má místo samostatného učitelského PINu a odemykacího hesla jeden učitelský přístupový kód. Z jednoho kanonizovaného kódu se nadále odvozují dva různé PBKDF2 hashe s oddělenými doménami teacher-pin a unlock-password; teacher login a povolení dalšího pokusu ověřují pouze teacher-pin, zámková obrazovka pouze unlock-password. Skrytý legacy #heslo zůstává jen jako interní mirror pro kompatibilitu a neřídí kryptografii. Bezpečnost pracoviště, verifier, Google Forms, scoring, RSA/AES a formát SECURE-ANSWERS-V1 se nemění.',
     'ETAPA 5 – PŘEHLEDNĚJŠÍ POKROČILÁ NASTAVENÍ (7.1.36): Pokročilý režim nyní seskupuje stávající volby do pěti sekcí Test / Student / Zpětná vazba / Bezpečnost / Vzhled. Přesouvají se původní DOM prvky se stejnými ID, hodnotami, handlery a validacemi; Simple režim je vrací na původní místa. Ochrana opakovaného pokusu je pouze vysvětlující informace o existujícím secure-offline zámku, nikoli nový přepínač. Studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.',
     'ETAPA 4 – STUDENTSKÉ ODEVZDÁNÍ PŘES GOOGLE FORMS (7.1.34): v Nastavení Generátoru lze uložit pouze validovaný responder odkaz Google Forms. Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého SECURE-ANSWERS-V1 payloadu a otevření školního formuláře; answers.txt zůstává nouzová záloha a automatický fallback při chybějícím formuláři nebo neobvykle dlouhém payloadu. URL formuláře je součástí integrity-bound konfigurace. Formát šifrovaného výsledku, RSA/AES kryptografie, scoring, PIN/odemčení a Stage 3 verifier CSV import se nemění.',
@@ -38,7 +39,6 @@ const RELEASE = Object.freeze({
     'ETAPA 2 – BEZPEČNOST PRACOVIŠTĚ (7.1.30): týmový bezpečnostní kód byl odstraněn z běžného průvodce a přesunut do samostatného Nastavení Generátoru. U secure workflow se v kroku Doplňky zobrazuje pouze stav pracoviště a odkaz do Nastavení; uložený kód se po startu, importu, staré šabloně a načtení historie automaticky obnoví. Kryptografická funkce kódu, verifier, formát výsledků, PINy, Google Forms a serverový profil se nemění.',
     'ETAPA 1 – SIMPLE WORKFLOW (7.1.29): jednoduchý režim je redukován na tři pedagogické účely Procvičování / Běžný test / Přísný test. Technické volby se odvozují deterministicky z účelu, při změně jazykové sady se účel zachová a pokročilý režim ponechává původní plnou sadu šablon. Verifier, kryptografie, PIN mechanismus, Forms a serverový profil se nemění.',
     'XSS SINK-RATCHET HOTFIX (7.1.28): bezpečnostní baseline nebyl zvýšen. Tři nové innerHTML sinky z UX oprav 7.1.26 byly odstraněny: checklist se čistí přes textContent, modal pro další pokus se skládá přes DOM API a practice feedback znovu používá auditovanou toggleAnswersPanel cestu. Funkční chování 7.1.26 a performance optimalizace 7.1.27 zůstávají zachovány.',
-    'CI/PERFORMANCE HOTFIX (7.1.27): build před vložením aplikačních JS do výsledného index.html bezpečně odstraňuje pouze syntakticky rozpoznané JavaScriptové komentáře pomocí Acorn parseru. Zdrojové komentáře v repozitáři zůstávají beze změny; funkce 7.1.26 se nemění a performance budget se nezvyšuje.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

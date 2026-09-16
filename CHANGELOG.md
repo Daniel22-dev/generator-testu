@@ -1,3 +1,10 @@
+## 7.1.38 — Etapa 6 QA hotfix (2026-09-16)
+
+- Bez změny produkční Stage 6 logiky.
+- Instant workflow test používá skutečné DOM ID/funkci instant teacher runtime (`t-name`, `t-pin`, `doTeacherLogin`, `t-panel`) místo secure názvů.
+- Secure Stage 6 workflow test při generování dočasně obnovuje skutečný PBKDF2 `deriveSecretHash`, aby výsledné hashe odpovídaly reálnému studentskému runtime; rychlá testovací KDF náhrada zůstává jen tam, kde se neověřuje autentizační kompatibilita.
+- Runtime, verifier, Google Forms, scoring, RSA/AES a `SECURE-ANSWERS-V1` se nemění.
+
 ## 7.1.37 — Etapa 6: jeden učitelský přístupový kód (2026-09-15)
 
 - Učitel zadává jeden **Učitelský přístupový kód** místo samostatného PINu a odemykacího hesla.

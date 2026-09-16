@@ -439,10 +439,10 @@ await okAsync('Stage 6: instant teacher-login + screen-guard unlock jedním kód
     gd.window.document.getElementById('studentName').value='Student';
     await gd.window.startTest();
     gd.window.openTeacherModal();
-    gd.window.document.getElementById('teacherName').value='Daniel Teacher';
-    gd.window.document.getElementById('teacherPin').value='teach-abcdef-123456';
-    await gd.window.teacherLogin();
-    assert(!gd.window.document.getElementById('teacherPanel').classList.contains('hidden'),'instant teacher-login lowercase kódem selhal');
+    gd.window.document.getElementById('t-name').value='Daniel Teacher';
+    gd.window.document.getElementById('t-pin').value='teach-abcdef-123456';
+    await gd.window.doTeacherLogin();
+    assert(!gd.window.document.getElementById('t-panel').classList.contains('hidden'),'instant teacher-login lowercase kódem selhal');
     gd.window.closeTeacherModal();
     gd.window.dispatchEvent(new gd.window.Event('pagehide'));
     assert(!gd.window.document.getElementById('lockScreen').classList.contains('hidden'),'instant screenGuard po pagehide nezamkl');
@@ -550,7 +550,10 @@ await okAsync('secure tabs: submit až na konci a strict odchod zamkne test', as
     {title:'První',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q1',options:['A','B'],correct:0}]},
     {title:'Druhé',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q2',options:['A','B'],correct:0}]}
   ]};
-  const pkg=await w.assembleTestHtml(w.eval('state'),gen);
+  const fakeDerive=w.deriveSecretHash;w.deriveSecretHash=realGeneratorDeriveSecretHash;
+  let pkg;
+  try{ pkg=await w.assembleTestHtml(w.eval('state'),gen); }
+  finally{ w.deriveSecretHash=fakeDerive; }
   assert(pkg&&pkg.mode==='secureOffline','nevznikl secure balík');
   const gd=await createGeneratedDom(pkg.studentHtml);
   try{

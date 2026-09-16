@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.37  
+**Aktuální verze:** 7.1.38  
+
+> **7.1.38 Etapa 6 QA hotfix (2026-09-16):** bez změny produkční logiky. Opravuje dvě chyby workflow harnessu: instant Stage 6 scénář používá skutečné instant DOM ID/funkci a secure Stage 6 scénář při generování dočasně obnoví skutečný PBKDF2 KDF, aby se hash shodoval se studentským runtime. Samotný učitelský přístupový kód, secure/instant runtime, verifier, Google Forms, scoring i RSA/AES zůstávají funkčně stejné jako v 7.1.37.
 
 > **7.1.37 Etapa 6 – jeden učitelský přístupový kód (2026-09-15):** Učitel už nezadává zvlášť PIN a odemykací heslo. Jeden kanonizovaný přístupový kód se při exportu odvodí do dvou různých PBKDF2 hodnot s doménami `teacher-pin` a `unlock-password`. Teacher-login a povolení dalšího pokusu ověřují jen teacher doménu; zámková obrazovka jen unlock doménu. Google Forms, verifier, scoring, `SECURE-ANSWERS-V1`, RSA/AES a Bezpečnost pracoviště zůstávají beze změny.
 
@@ -28,7 +30,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.37** je kandidát Etapy 6 postavený nad uživatelem potvrzeným zeleným GitHub CI baseline **7.1.36**. Etapa 6 sjednocuje učitelské PIN/odemknutí do jednoho učitelského přístupového kódu, ale interně zachovává dva doménově oddělené PBKDF2 hashe a odstraňuje cross-domain akceptaci. **7.1.37 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
+Verze **7.1.38** je QA-only hotfix kandidáta Etapy 6 nad **7.1.37**. Produkční Stage 6 logika se nemění; opravují se pouze dvě chyby workflow harnessu odhalené exact GitHub CI. **Etapa 6 zůstává otevřená, dokud 7.1.38 neprojde novým čistým GitHub CI.**
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 
