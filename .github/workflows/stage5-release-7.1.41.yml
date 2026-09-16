@@ -45,6 +45,21 @@ jobs:
         if: steps.release_state.outputs.needs_bump == 'true'
         run: node scripts/stage5-release-7.1.41.mjs
 
+      - name: Normalize generated release header whitespace
+        if: steps.release_state.outputs.needs_bump == 'true'
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('README.md')
+          text = p.read_text(encoding='utf-8')
+          old = '**Aktuální verze:** 7.1.41  \n'
+          new = '**Aktuální verze:** 7.1.41\n'
+          if old not in text:
+              raise SystemExit('Expected generated 7.1.41 README header not found')
+          p.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
       - name: Verify AI Studio dispatch credential before release
         if: steps.release_state.outputs.needs_bump == 'true' && github.event_name != 'pull_request'
         shell: bash
