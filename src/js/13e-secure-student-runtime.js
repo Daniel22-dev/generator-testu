@@ -121,7 +121,7 @@ function showSubmittedLocked(){
   var box=document.createElement('div');box.className='s-modal-box';
   var head=document.createElement('div');head.className='s-modal-head';head.textContent=t('retryTitle','Test already submitted');
   var body=document.createElement('div');body.className='s-modal-body';body.textContent=t('retryHint','A teacher can allow another attempt on this device.');
-  var inp=document.createElement('input');inp.type='password';inp.setAttribute('data-retry-code','');inp.autocomplete='off';inp.placeholder=t('retryCode','Teacher PIN / unlock password');
+  var inp=document.createElement('input');inp.type='password';inp.setAttribute('data-retry-code','');inp.autocomplete='off';inp.placeholder=t('retryCode','Teacher access code');
   var err=document.createElement('div');err.className='danger small hidden';err.setAttribute('data-retry-error','');
   var act=document.createElement('div');act.className='s-modal-act';
   var okBtn=document.createElement('button');okBtn.type='button';okBtn.className='s-modal-btn primary';okBtn.setAttribute('data-retry-ok','');okBtn.textContent=t('retryAllow','Allow another attempt');
@@ -134,10 +134,9 @@ function showSubmittedLocked(){
     if(busy)return;var v=(inp&&inp.value||'').trim();if(!v){if(inp)inp.focus();return;}busy=true;
     try{
       var ok=false;
-      if(CFG.ucitelPinHash){var hp=await deriveSecretHash('teacher-pin',v,CFG.testId);ok=ok||hp===CFG.ucitelPinHash;}
-      if(CFG.hesloHash){var hu=await deriveSecretHash('unlock-password',v,CFG.testId);ok=ok||hu===CFG.hesloHash;}
+      if(CFG.ucitelPinHash){var hp=await deriveSecretHash('teacher-pin',v,CFG.testId);ok=hp===CFG.ucitelPinHash;}
       if(ok){clearSubmittedLocked();ATTEMPT_ID='';done();setTimeout(function(){startTest();},0);return;}
-      if(err){err.textContent=t('retryBad','Incorrect teacher PIN or unlock password.');err.classList.remove('hidden');}
+      if(err){err.textContent=t('retryBad','Incorrect teacher access code.');err.classList.remove('hidden');}
     }catch(e){if(err){err.textContent=String(e&&e.message?e.message:e);err.classList.remove('hidden');}}
     finally{busy=false;}
   }
@@ -244,7 +243,7 @@ async function tryUnlock(){const v=($('unlockInp').value||'').trim();if(!v)retur
 function openTeacherModal(){const m=$('teacherModal');if(m)m.classList.remove('hidden');renderTeacherRuntimeInfo();}
 function closeTeacherModal(){const m=$('teacherModal');if(m)m.classList.add('hidden');}
 function teacherLogout(){const l=$('teacherLoginBox'),p=$('teacherPanel');if(l)l.classList.remove('hidden');if(p)p.classList.add('hidden');const pin=$('teacherPin');if(pin)pin.value='';}
-async function teacherLogin(){const name=($('teacherName').value||'').trim();const pin=($('teacherPin').value||'').trim();const expected=normLoginName(CFG.ucitelJmeno||'');let okName=!expected||normLoginName(name)===expected;let okSecret=false;if(pin&&CFG.ucitelPinHash){const h=await deriveSecretHash('teacher-pin',pin,CFG.testId);okSecret=okSecret||h===CFG.ucitelPinHash;}if(pin&&CFG.hesloHash){const u=await deriveSecretHash('unlock-password',pin,CFG.testId);okSecret=okSecret||u===CFG.hesloHash;}if(okName&&okSecret){$('teacherErr').classList.add('hidden');$('teacherLoginBox').classList.add('hidden');$('teacherPanel').classList.remove('hidden');renderTeacherRuntimeInfo();}else{$('teacherErr').textContent=t('badLogin','Incorrect PIN, password or name.');$('teacherErr').classList.remove('hidden');}}
+async function teacherLogin(){const name=($('teacherName').value||'').trim();const pin=($('teacherPin').value||'').trim();const expected=normLoginName(CFG.ucitelJmeno||'');let okName=!expected||normLoginName(name)===expected;let okSecret=false;if(pin&&CFG.ucitelPinHash){const h=await deriveSecretHash('teacher-pin',pin,CFG.testId);okSecret=h===CFG.ucitelPinHash;}if(okName&&okSecret){$('teacherErr').classList.add('hidden');$('teacherLoginBox').classList.add('hidden');$('teacherPanel').classList.remove('hidden');renderTeacherRuntimeInfo();}else{$('teacherErr').textContent=t('badLogin','Incorrect name or teacher access code.');$('teacherErr').classList.remove('hidden');}}
 function renderTeacherRuntimeInfo(){const box=$('teacherRuntimeInfo');if(!box)return;box.innerHTML='<div><b>'+esc(t('teacherStatus','Test status'))+'</b></div><div>Creator ID — '+esc(CFG.creatorId||'—')+(CFG.creatorName?' · '+esc(CFG.creatorName):'')+' ('+esc(CFG.creatorRole||'trainedTeacher')+')</div><div>Generátor — v'+esc(CFG.generatorVersion||'')+' · '+esc(CFG.releaseStatus||'')+'</div><div>Test ID — '+esc(CFG.testId)+'</div><div>Manifest — '+esc(CFG.manifestHash||'')+'</div><div>Attempt ID — '+esc(ATTEMPT_ID||'—')+'</div><div>'+esc(t('student','Student'))+' — '+esc($('studentName')?$('studentName').value:'')+'</div><div>'+esc(t('group','Group'))+' — '+esc(ACTIVE_KEY)+'</div><div>'+esc(t('started','Started'))+' — '+esc(STARTED_AT||'—')+'</div><div>'+esc(t('submitted','Submitted'))+' — '+esc(SUBMITTED_AT||'—')+'</div><div>'+esc(t('teacherNoAnswers','Correct answers are only in the teacher verifier.'))+'</div>';}
 
 function qid(ei,qi){return ei+'_'+qi;}

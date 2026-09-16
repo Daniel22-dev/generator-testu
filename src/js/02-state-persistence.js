@@ -543,14 +543,14 @@ function safeDomEntries(raw){
 }
 function sanitizePromptForStorage(prompt){
   let out = String(prompt || '');
-  // Starší i nové názvy polí; historie nikdy nesmí obsahovat odemykací heslo ani učitelský PIN.
+  // Starší i nové názvy polí; historie nikdy nesmí obsahovat učitelský přístupový kód ani staré PIN/heslo.
   out = out.replace(
-    /(?:Heslo pro odemčení(?: bezpečnostního zámku)?|Odemykací heslo(?: zámkové obrazovky)?)\s*:\s*.*$/gm,
-    'Odemykací heslo zámkové obrazovky: [NEULOŽENO]'
+    /(?:Heslo pro odemčení(?: bezpečnostního zámku)?|Odemykací heslo(?: zámkové obrazovky)?|Učitelský přístupový kód)\s*:\s*.*$/gm,
+    'Učitelský přístupový kód: [NEULOŽENO]'
   );
   out = out.replace(
     /(?:PIN pro učitelský mód|PIN učitele)\s*:\s*.*$/gm,
-    'PIN učitele: [NEULOŽENO]'
+    'Učitelský přístupový kód: [NEULOŽENO]'
   );
   out = out.replace(/Učitelský přístup\s*:\s*.*$/gm, 'Učitelský přístup: [NEULOŽENO]');
   const secretValues = [trim('heslo'), trim('ucitelPin')].filter(v => v && v.length > 0);
@@ -823,7 +823,7 @@ async function importZadaniFile(inp){
     const ok = await uiConfirm('Načíst zadání ze souboru? Přepíše tvoje aktuální rozpracované nastavení formuláře.', 'Načíst zadání od kolegy?', true);
     if (!ok) return;
     applyImportedZadani(data);
-    uiToast('Zadání načteno' + (data.appVersion ? ' (verze ' + esc(String(data.appVersion)) + ')' : '') + '. Hesla a učitelský PIN se nepřenášejí — nastav je před generováním. Týmový bezpečnostní kód se na tomto zařízení doplnil sám, pokud ho tu máš uložený (jinak ho vlož / načti). Nahrané soubory případně přilož ručně.', 'ok', 8000);
+    uiToast('Zadání načteno' + (data.appVersion ? ' (verze ' + esc(String(data.appVersion)) + ')' : '') + '. Učitelský přístupový kód se nepřenáší — nastav ho před generováním. Týmový bezpečnostní kód se na tomto zařízení doplnil sám, pokud ho tu máš uložený (jinak ho vlož / načti). Nahrané soubory případně přilož ručně.', 'ok', 8000);
   }catch(err){
     uiToast('Soubor se nepodařilo načíst: ' + (err && err.message ? err.message : err), 'warn', 6000);
   }finally{

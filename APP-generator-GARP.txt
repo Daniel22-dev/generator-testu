@@ -7,13 +7,13 @@ GARP 2.5.1 GHRAB – PRŮVODNÍ LIST APLIKACE
 appId:                    generator
 Název:                    Generátor testů
 Repozitář:                generator-testu (snapshot předaný jako ZIP; vzdálený repo stav nebyl v tomto kole dotazován)
-Aktuální source verze:    7.1.36 (Etapa 5 – přehlednější Pokročilá nastavení, 2026-09-15)
-GARP evidence baseline:   7.1.34 je potvrzený zelený GitHub CI baseline po uzavření Etap 3/4.
-                          7.1.36 mění pouze informační architekturu Pokročilého režimu: stávající pole
-                          seskupuje do Test / Student / Zpětná vazba / Bezpečnost / Vzhled a v Simple
-                          režimu je vrací na původní místa. Studentský runtime, verifier, Forms, formát
-                          SECURE-ANSWERS-V1, RSA/AES kryptografie, scoring a PIN/odemčení se nemění.
-                          7.1.36 vyžaduje čistý exact-lockfile GitHub CI průchod.
+Aktuální source verze:    7.1.37 (Etapa 6 – jeden učitelský přístupový kód, 2026-09-15)
+GARP evidence baseline:   7.1.36 je uživatelem potvrzený zelený exact GitHub CI baseline po uzavření Etapy 5.
+                          7.1.37 sjednocuje učitelské PIN/odemknutí do jednoho UI kódu, ale kryptograficky
+                          zachovává oddělené PBKDF2 domény teacher-pin a unlock-password. Teacher login/retry
+                          ověřují jen teacher-pin; zámková obrazovka jen unlock-password. Verifier, Forms,
+                          SECURE-ANSWERS-V1, RSA/AES, scoring a týmový bezpečnostní kód se nemění.
+                          7.1.37 vyžaduje čistý exact-lockfile GitHub CI průchod.
 Verze standardu:          GARP 2.5.1 GHRAB / TOOLING-R2
 SHA-256 SHA256SUMS balíčku, podle kterého se audituje:
                           1a0cc54c16bbebd215c3955d352db3f9d12513f5cebd4cc5a6815d2b5fe0a792

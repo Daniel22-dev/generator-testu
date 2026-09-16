@@ -294,7 +294,7 @@ function showSecurityGuide(){
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">⚠️</span> Bezpečnostní signály v answers.txt</div>' +
         '<p class="sec-guide-p">Každý answers.txt obsahuje záznamy o bezpečnostních událostech: opuštění okna, přepnutí záložky, ztráta fokusu, zamčení testu. Nejde o důkaz podvádění — jde o <strong>podněty k rozhovoru se studentem</strong>.</p>' +
-        '<p class="sec-guide-p"><strong>Jedno opuštění okna</strong> — může být náhodné (notifikace, přepnutý kurzor). <strong>Opakované události těsně za sebou</strong> — stojí za zmínku při opravě. <strong>Zamčení testu</strong> (jen přísný režim) — student musel zadat odemykací heslo; záznam obsahuje čas a důvod.</p>' +
+        '<p class="sec-guide-p"><strong>Jedno opuštění okna</strong> — může být náhodné (notifikace, přepnutý kurzor). <strong>Opakované události těsně za sebou</strong> — stojí za zmínku při opravě. <strong>Zamčení testu</strong> (jen přísný režim) — student musel zadat učitelský přístupový kód; záznam obsahuje čas a důvod.</p>' +
         '<div class="sec-guide-ok">✓ Signály jsou kontextuální pomůcka, ne automatický verdikt. Výsledek vždy posuzujte jako celek.</div>' +
       '</div>' +
 

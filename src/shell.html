@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.36">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.37">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -464,7 +464,7 @@
       </div>
 
       <div class="field advanced-only" id="screenGuardField">
-        <div class="field-label">🛡️ Hlídání obrazovky <button class="tt-icon" data-tip="Nezávisle na režimu testu zapne zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí). Po porušení student vidí 🔒 a pokračuje až po zadání odemykacího hesla učitelem. Vhodné i pro méně důležité testy. Přísný režim toto má vždy zapnuté. Vyžaduje odemykací heslo — pokud žádné nezadáš, vygeneruje se automaticky a najdeš ho v pokynech pro učitele.">?</button></div>
+        <div class="field-label">🛡️ Hlídání obrazovky <button class="tt-icon" data-tip="Nezávisle na režimu testu zapne zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí). Po porušení student vidí 🔒 a pokračuje až po zadání učitelského přístupového kódu učitelem. Vhodné i pro méně důležité testy. Přísný režim toto má vždy zapnuté. Vyžaduje učitelský přístupový kód — pokud žádný nezadáš, vygeneruje se automaticky.">?</button></div>
         <div class="field-hint">Zámek při opuštění testu — funguje u běžného i procvičovacího režimu. Porušení vyhodnocuje učitel.</div>
         <div class="btn-row choice-card-grid two-col" id="screenGuardBtns">
           <button class="tag-btn active" data-val="off" onclick="setScreenGuard(false)"><span class="choice-card-title">Vypnuto</span><span class="choice-card-desc">Opuštění testu se jen zaznamená (běžný režim), nebo ignoruje (procvičování).</span></button>
@@ -548,7 +548,7 @@
 
       <div class="field advanced-only" id="attemptProtectionInfo">
         <div class="field-label">🔁 Opakovaný pokus</div>
-        <div class="secure-mode-box"><strong>V bezpečném offline režimu je po odevzdání další pokus na tomto zařízení automaticky uzamčen.</strong> Pokud má student legitimně psát znovu, učitel může na stejném zařízení povolit další pokus svým učitelským PINem nebo odemykacím heslem. Nejde o globální serverový zákaz — jiné zařízení nebo profil bez serveru nelze spolehlivě zablokovat.</div>
+        <div class="secure-mode-box"><strong>V bezpečném offline režimu je po odevzdání další pokus na tomto zařízení automaticky uzamčen.</strong> Pokud má student legitimně psát znovu, učitel může na stejném zařízení povolit další pokus svým učitelským přístupovým kódem. Nejde o globální serverový zákaz — jiné zařízení nebo profil bez serveru nelze spolehlivě zablokovat.</div>
       </div>
 
       <div class="field" id="randomField">
@@ -737,30 +737,23 @@
     <!-- ═══════════════════════════ STEP 3 ═══════════════════════════ -->
     <div id="step3" class="hidden">
       <div class="simple-helper" id="simpleSecretsHelper">
-        <b>Jednoduché nastavení:</b> účel testu už nastavil potřebné technické volby. Tady doplň jen údaje pro učitelský režim; můžeš je nechat bezpečně vygenerovat tlačítkem níže. Týmový kód se nastavuje jednou v ⚙️ Nastavení → Bezpečnost pracoviště.
+        <b>Jednoduché nastavení:</b> účel testu už nastavil potřebné technické volby. Tady doplň jen údaje pro učitelský přístup; jeden kód můžeš bezpečně vygenerovat tlačítkem níže. Týmový kód se nastavuje jednou v ⚙️ Nastavení → Bezpečnost pracoviště.
         <div class="simple-quick-row">
-          <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Rychle vygenerovat PIN a heslo</button>
+          <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Vygenerovat učitelský kód</button>
         </div>
       </div>
       <div class="field">
-        <div class="field-label">👤 Jméno pro učitelský mód <button class="tt-icon" data-tip="Učitelský mód se nově neaktivuje jen jménem. Vyžaduje jméno učitele + samostatný PIN, aby student nemohl snadno zobrazit správné odpovědi.">?</button></div>
+        <div class="field-label">👤 Jméno pro učitelský mód <button class="tt-icon" data-tip="Učitelský mód se nově neaktivuje jen jménem. Vyžaduje jméno učitele + učitelský přístupový kód, aby student nemohl snadno zobrazit správné odpovědi.">?</button></div>
         <input type="text" id="ucitelJmeno" value="Daniel Baláž" autocomplete="off" oninput="onInput()">
       </div>
-      <div class="field">
-        <div class="field-label">🔐 PIN pro učitelský mód <button class="tt-icon" data-tip="Samostatný PIN pro zobrazení učitelského náhledu a správných odpovědí. Neuloží se do historie, šablon ani rozpracované relace.">?</button></div>
+      <div class="field" id="teacherAccessCodeField">
+        <div class="field-label">🔐 Učitelský přístupový kód <button class="tt-icon" data-tip="Jediný kód pro učitelský mód, odemčení bezpečnostního zámku a povolení dalšího pokusu na stejném zařízení. Uvnitř testu se z něj pro jednotlivé účely odvozují oddělené PBKDF2 hashe, takže se nesdílí jeden hash. Kód se neukládá do historie, šablon ani rozpracované relace.">?</button></div>
         <div class="input-wrap">
-          <input type="password" id="ucitelPin" placeholder="Zadej učitelský PIN..." autocomplete="new-password" oninput="onInput()">
-          <button type="button" class="btn-eye" onclick="toggleSecret('ucitelPin', this)" aria-label="Zobrazit nebo skrýt PIN">👁</button>
+          <input type="password" id="ucitelPin" placeholder="Zadej učitelský přístupový kód..." autocomplete="new-password" oninput="onTeacherAccessCodeInput()">
+          <button type="button" class="btn-eye" onclick="toggleSecret('ucitelPin', this)" aria-label="Zobrazit nebo skrýt učitelský přístupový kód">👁</button>
         </div>
-        <div class="small-muted">PIN se z bezpečnostních důvodů neukládá do prohlížeče ani do šablon.</div>
-      </div>
-      <div class="field">
-        <div class="field-label">🔑 Heslo pro odemčení testu <button class="tt-icon" data-tip="Student o heslu neví. Po uzamčení vidí jen 🔒 a výzvu „Kontaktuj učitele“ — žádné pole pro heslo. Učitel ho odkryje skrytě: 5× poklepáním na ikonu zámku se objeví pole pro zadání odemykacího hesla. Heslo se neukládá do historie, šablon ani rozpracované relace.">?</button></div>
-        <div class="input-wrap">
-          <input type="password" id="heslo" placeholder="Zadej odemykací heslo..." autocomplete="new-password" oninput="onInput()">
-          <button type="button" class="btn-eye" onclick="toggleSecret('heslo', this)" aria-label="Zobrazit nebo skrýt heslo">👁</button>
-        </div>
-        <div class="small-muted">Použij jiné heslo než učitelský PIN.</div>
+        <input type="hidden" id="heslo" value="" aria-hidden="true">
+        <div class="small-muted">Používáš jeden kód. Generátor z něj interně vytvoří oddělený hash pro učitelský mód a oddělený hash pro odemčení.</div>
       </div>
       <div class="field hidden" id="securityWorkplaceField">
         <div class="field-label">🛡️ Bezpečnost pracoviště</div>

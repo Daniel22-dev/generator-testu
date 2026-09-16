@@ -54,8 +54,10 @@ async function assembleTestHtml(st, genData) {
   const verifySecret=teacherSecurityCode
     ? await derivePerTestSecret(teacherSecurityCode, securitySalt, manifestHash)
     : makeVerifySecret();
-  const teacherPinHash=await deriveSecretHash('teacher-pin', trim('ucitelPin')||'', testId);
-  const unlockHash=await deriveSecretHash('unlock-password', trim('heslo')||'', testId);
+  const teacherAccessCode=trim('ucitelPin')||'';
+  // Stage 6: jeden kód pro učitele, ale doménově oddělené PBKDF2 hashe podle účelu.
+  const teacherPinHash=await deriveSecretHash('teacher-pin', teacherAccessCode, testId);
+  const unlockHash=await deriveSecretHash('unlock-password', teacherAccessCode, testId);
   const cfg={
     nazev: configForHash.nazev,
     proKoho: configForHash.proKoho,
@@ -77,7 +79,7 @@ async function assembleTestHtml(st, genData) {
     ucitelJmeno: trim('ucitelJmeno')||'',
     ucitelPinHash: teacherPinHash,
     hesloHash: unlockHash,
-    hasUnlock: !!trim('heslo'),
+    hasUnlock: !!teacherAccessCode,
     verifySecret,
     securityMode: teacherSecurityCode ? 'teacher-code-derived' : 'random-per-test',
     securitySalt,

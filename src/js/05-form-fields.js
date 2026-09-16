@@ -680,17 +680,16 @@ function validate() {
     }
   }
 
-  const baseSecretOk = trim('heslo') && trim('ucitelJmeno') && trim('ucitelPin') && trim('heslo') !== trim('ucitelPin');
+  const accessCode = (typeof syncTeacherAccessCode === 'function') ? syncTeacherAccessCode() : trim('ucitelPin');
+  const baseSecretOk = trim('ucitelJmeno') && accessCode;
   const needsSecurityCode = typeof securityCodeRequiredForCurrentWorkflow === 'function' ? securityCodeRequiredForCurrentWorkflow() : (state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline'));
   const securityCode = trim('bezpKod');
   if (typeof updateSecurityWorkplaceStatus === 'function') updateSecurityWorkplaceStatus();
-  const securityCodeOk = !needsSecurityCode || (securityCode.length >= 16 && securityCode !== trim('ucitelPin') && securityCode !== trim('heslo'));
-  // Minimální síla tajemství. Důvod: hash chrání jen částečně — slabý PIN jde offline
-  // uhádnout. Délkové minimum + zákaz běžných hodnot zvedají laťku útoku.
-  const pinVal = trim('ucitelPin'), hesloVal = trim('heslo');
-  const pinStrongOk = !pinVal || (pinVal.length >= 8 && !isWeakSecret(pinVal));
-  const hesloStrongOk = !hesloVal || (hesloVal.length >= 12 && !isWeakSecret(hesloVal));
-  const secretOk = baseSecretOk && securityCodeOk && pinStrongOk && hesloStrongOk;
+  const securityCodeOk = !needsSecurityCode || (securityCode.length >= 16 && securityCode !== accessCode);
+  // Jeden učitelský přístupový kód musí být dost silný pro offline ověřování.
+  // V exportu se z něj odvozují dva doménově oddělené PBKDF2 hashe.
+  const accessCodeStrongOk = !accessCode || (accessCode.length >= 12 && !isWeakSecret(accessCode));
+  const secretOk = baseSecretOk && securityCodeOk && accessCodeStrongOk;
   const groupsOk = state.diferencovany==='NE' || (state.skupiny.length>0 && state.skupiny.every(g => plainText(g.nazev).length > 0 && plainText(g.podminky).length > 0 && Array.isArray(g.studenti) && g.studenti.length > 0));
   // Jednorázové kódy bez vygenerovaného rosteru = verifier nemá seznam a kontrola
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
@@ -700,14 +699,11 @@ function validate() {
   $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
   if (!rosterOk) msg.push('Identita „jednorázový kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
-  if (!trim('heslo') || !trim('ucitelPin')) msg.push('Doplň odemykací heslo i samostatný učitelský PIN.');
-  if (trim('heslo') && trim('ucitelPin') && trim('heslo') === trim('ucitelPin')) msg.push('Odemykací heslo a učitelský PIN musí být jiné.');
-  if (pinVal && pinVal.length < 8) msg.push('Učitelský PIN musí mít aspoň 8 znaků (slabý PIN jde offline uhádnout).');
-  else if (pinVal && isWeakSecret(pinVal)) msg.push('Učitelský PIN je příliš běžný (např. 12345678, heslo, jméno) — zvol méně odhadnutelný.');
-  if (hesloVal && hesloVal.length < 12) msg.push('Odemykací heslo musí mít aspoň 12 znaků.');
-  else if (hesloVal && isWeakSecret(hesloVal)) msg.push('Odemykací heslo je příliš běžné — zvol méně odhadnutelné.');
+  if (!accessCode) msg.push('Doplň učitelský přístupový kód.');
+  if (accessCode && accessCode.length < 12) msg.push('Učitelský přístupový kód musí mít aspoň 12 znaků (slabý kód jde offline uhádnout).');
+  else if (accessCode && isWeakSecret(accessCode)) msg.push('Učitelský přístupový kód je příliš běžný — zvol méně odhadnutelný.');
   if (needsSecurityCode && securityCode.length < 16) msg.push((typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline') ? 'Bezpečnost pracoviště není nastavena — otevři ⚙️ Nastavení → Bezpečnost pracoviště a vlož týmový kód od správce (alespoň 16 znaků).' : 'Bezpečnost pracoviště není nastavena — otevři ⚙️ Nastavení → Bezpečnost pracoviště a doplň týmový kód alespoň o 16 znacích.');
-  if (securityCode && (securityCode === trim('ucitelPin') || securityCode === trim('heslo'))) msg.push('Bezpečnostní kód výsledků musí být jiný než PIN i odemykací heslo.');
+  if (securityCode && securityCode === accessCode) msg.push('Bezpečnostní kód výsledků musí být jiný než učitelský přístupový kód.');
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
   if(!groupLogic.ok) msg.push(...groupLogic.messages);
   $('validHint3').textContent = Array.from(new Set(msg)).join(' ');
@@ -758,7 +754,7 @@ function getCompactResultModeBlock() {
   if ((state.resultMode || 'instant') === 'secureOffline') {
     return `REŽIM VÝSLEDKŮ: BEZPEČNÝ OFFLINE — DOPORUČENO PRO KLASIFIKOVANÝ TEST.
   • Výsledkem přímého generování musí být dvojice souborů: student_test.html a teacher_verifier.html. V generátoru i verifieru jasně připomeň, že studentům se posílá pouze student_test.html; teacher_verifier.html je pouze pro učitele a nesmí být sdílen se studenty.
-  • Studentský HTML nesmí obsahovat answer key, správné odpovědi, učitelský PIN, odemykací heslo ani verifySecret.
+  • Studentský HTML nesmí obsahovat answer key, správné odpovědi, učitelský přístupový kód ani verifySecret.
   • Student po odevzdání nevidí známku; stáhne zakódovaný answers.txt s odpověďmi a bezpečnostním záznamem.
   • Bezpečný offline režim vždy používá celkové odevzdání celého testu; průběžné odevzdávání cvičení je dostupné jen v okamžitém režimu.
   • Učitelský verifier musí být vždy česky bez ohledu na jazyk studentského testu. Volba „celý test v cílovém jazyce“ platí pouze pro studentský test, ne pro verifier.
@@ -1243,7 +1239,7 @@ function getCompactInstructionLanguageBlock(jazyk) {
 }
 
 function getCompactTestModeBlock() {
-  if (state.testMode === 'prisny') return `PŘÍSNÝ TEST: minimum nápověd, feedback až po finálním odevzdání, žádné opakované pokusy. Skutečné opuštění testu (přepnutí aplikace/karty, nové okno, visibility hidden, pagehide, reload) musí test okamžitě uzamknout a zároveň se zapsat do výsledku. Pokračování je možné pouze přes odemykací heslo učitele. Nezamykat při běžném psaní, výběru v selectu, otevření mobilní klávesnice, file pickeru nebo kliknutí do prvků testu. Cíl = férová známkovaná práce pod dohledem.`;
+  if (state.testMode === 'prisny') return `PŘÍSNÝ TEST: minimum nápověd, feedback až po finálním odevzdání, žádné opakované pokusy. Skutečné opuštění testu (přepnutí aplikace/karty, nové okno, visibility hidden, pagehide, reload) musí test okamžitě uzamknout a zároveň se zapsat do výsledku. Pokračování je možné pouze přes učitelský přístupový kód. Nezamykat při běžném psaní, výběru v selectu, otevření mobilní klávesnice, file pickeru nebo kliknutí do prvků testu. Cíl = férová známkovaná práce pod dohledem.`;
   if (state.testMode === 'procviceci') return `PROCVIČOVACÍ TEST: cílem je učení. Přidej přívětivější feedback, krátká vysvětlení a volitelné nápovědy, které ale přímo neprozradí odpověď. Bezpečnost ponech měkkou, bez represivních zámků; opuštění stránky můžeš nejvýš jemně zalogovat jako varování.`;
   return `BĚŽNÝ TEST: standardní školní test na známku. Jasná pravidla, standardní odevzdání, výsledek a feedback hlavně po dokončení. Interní chování: skutečné opuštění běžícího testu (přepnutí aplikace/karty, otevření jiného okna, reload) se pouze zapíše do bezpečnostního záznamu a zobrazí ve výsledku; test se v běžném režimu nezamyká. Student-facing pravidla ale formuluj jen jako zákaz opustit test nebo přepnout aplikaci/kartu; neprozrazuj studentovi, že běžný režim nezamyká. Nepravé focus/blur události mobilu nezaznamenávej ani nezamykej. Bez nápověd, pokud nejsou výslovně zadány.`;
 }
@@ -1254,7 +1250,7 @@ function getCompactIntroBlock(jazyk) {
     ? `stejný cílový jazyk jako test (${target})`
     : 'jazyk zvolený v poli Jazyk UI/pokynů';
   const securityLine = state.testMode === 'prisny'
-    ? 'V přísném režimu musí pravidla jasně říct, že skutečné opuštění testu nebo otevření jiné aplikace/karty test uzamkne a pokračování je možné jen přes učitelské odemykací heslo. Zámková obrazovka NESMÍ rovnou zobrazovat pole pro heslo: student vidí jen ikonu 🔒 a výzvu „Kontaktuj učitele“. Pole pro odemykací heslo se odkryje až skrytou akcí — 5× poklepáním (klik/tap) na ikonu zámku během ~2 s; teprve poté se zobrazí vstup hesla a tlačítko Odemknout. Při novém uzamčení se pole zase skryje.'
+    ? 'V přísném režimu musí pravidla jasně říct, že skutečné opuštění testu nebo otevření jiné aplikace/karty test uzamkne a pokračování je možné jen přes učitelský přístupový kód. Zámková obrazovka NESMÍ rovnou zobrazovat pole pro heslo: student vidí jen ikonu 🔒 a výzvu „Kontaktuj učitele“. Pole pro učitelský přístupový kód se odkryje až skrytou akcí — 5× poklepáním (klik/tap) na ikonu zámku během ~2 s; teprve poté se zobrazí vstup učitelského kódu a tlačítko Odemknout. Při novém uzamčení se pole zase skryje.'
     : (state.testMode === 'bezny'
       ? 'V běžném režimu musí studentská pravidla jasně říct pouze to, že student nesmí test opustit ani přepínat do jiné aplikace/karty. Neuváděj, že se test nezamyká; interní logování zůstává jen ve výsledku a učitelském ověření.'
       : 'V procvičovacím režimu pravidla nesmí strašit zámky; případné opuštění stránky jen jemně loguj jako varování.');
@@ -1350,17 +1346,17 @@ function getCompactSecurityBlock() {
   • Skutečné opuštění běžícího neodevzdaného testu (visibilitychange hidden, pagehide, reload, přepnutí aplikace/karty nebo otevření jiného okna) pouze zapiš do logs/securityEvents jako warning/security-warning. Nikdy kvůli tomu nenastavuj state.locked a nikdy nezobrazuj lock screen.
   • Student-facing texty formuluj jako zákaz opustit test; studentovi nepiš, že běžný režim nezamyká.
   • Student může po návratu pokračovat. Ve výsledku a v OVR4 payloadu zobraz počet bezpečnostních signálů a stručný záznam událostí, aby učitel viděl opuštění okna a další situace vyžadující kontrolu. Tyto signály formuluj jako „výsledek vyžaduje kontrolu", nikdy jako automatické obvinění z podvodu.
-  • beforeunload/reload může v běžném režimu událost zaznamenat, ale nesmí vyžadovat učitelské odemykací heslo.
+  • beforeunload/reload může v běžném režimu událost zaznamenat, ale nesmí vyžadovat učitelský přístupový kód.
   • Zámková obrazovka v běžném režimu nevzniká po opuštění okna/karty, fullscreenchange, heartbeat gapu ani hlídaném blur fallbacku.
   • Nezaznamenávej běžné mobilní jevy: otevření klávesnice, focus/blur inputu, select, file picker, vlastní submit/login modal ani kliknutí do prvků testu.
   • LocalStorage ukládá průběh a odpovědi, nikdy PIN. Secret pro ověření nezobrazuj v UI.`;
   return `ZÁMKY — přísný režim: lock screen napojený na state.locked.
   • Skutečné opuštění běžícího neodevzdaného testu (visibilitychange hidden, pagehide, reload, přepnutí aplikace/karty nebo otevření jiného okna) nastav state.locked = true + lockReason, zapiš do logs/securityEvents a ulož state. Po návratu/načtení zobraz lock screen, ne pokračování v testu.
   • Fullscreenchange smí buď zamknout, nebo zapsat samostatné varování; skutečné opuštění stránky ale vždy zamyká.
-  • Pokračování po zámku je možné jen přes odemykací heslo učitele; odemčení zapiš do logs. Ve výsledku zobraz počet varování, zámků i odemčení.
+  • Pokračování po zámku je možné jen přes učitelský přístupový kód; odemčení zapiš do logs. Ve výsledku zobraz počet varování, zámků i odemčení.
   • Zámková obrazovka smí vzniknout jen po jasné bezpečnostní události: v přísném režimu opuštění testu, vypršení času, ruční učitelský zámek nebo prokazatelné opakované porušení podle stabilního state.
   • Ikona/zámek 🔒 nesmí být v běžném headeru, intru ani dokončovací/výsledkové obrazovce; skrytý učitelský vstup přes zámeček nebo tečku je zakázaný.
-  • Odemykací heslo obnoví pouze zámkovou obrazovku, neotevírá učitelský režim.
+  • Interní unlock hash obnoví pouze zámkovou obrazovku; učitelský panel ověřuje oddělený teacher hash. Uživatel zadává stejný učitelský přístupový kód, ale účely mají oddělené hashe.
   • LocalStorage ukládá průběh a odpovědi, nikdy PIN. Secret pro ověření nezobrazuj v UI.
   • Detekce opuštění musí být vícevrstvá: visibilitychange hidden, pagehide, beforeunload/reload flag v sessionStorage/localStorage, heartbeat lastActiveAt a hlídaný blur fallback.
   • Guarded blur fallback použij jen tehdy, když běží test, není otevřený vlastní modal, student nepíše do inputu/textarea/selectu a stránka je bez fokusu déle než cca 800–1200 ms; pak zapiš událost a zamkni.
@@ -1376,19 +1372,19 @@ function getCompactTeacherBlock(ucitel, ucitelPin) {
     : `• U běžného nediferencovaného testu nedělej z „View as Student“ hlavní funkci. Učitel nepotřebuje simulaci studenta; stačí mu kontrolní přehled cvičení, zadání a správných odpovědí.
   • Pokud přesto přidáš studentský náhled, dej ho jen jako méně výraznou doplňkovou akci, ne jako hlavní tlačítko v horní liště.`;
   return `UČITELSKÝ MÓD:
-  • Aktivace: jméno učitele „${ucitel}“ + PIN „${ucitelPin}“. Samotné jméno nestačí.
+  • Aktivace: jméno učitele „${ucitel}“ + učitelský přístupový kód „${ucitelPin}“. Samotné jméno nestačí.
   • Login porovnávej robustně, ne křehkým přímým srovnáním raw hodnot. Před porovnáním proveď:
-    - trim() na jménu i PINu;
+    - trim() na jménu i učitelském kódu;
     - sjednocení vícenásobných mezer v jménu na jednu mezeru;
     - Unicode normalizaci jména přes normalize('NFC');
-    - u PINu trim().toUpperCase();
-    - volitelně toleruj i variantu jména bez diakritiky pouze pro jméno učitele, nikdy ne pro PIN.
+    - u učitelského kódu trim().toUpperCase();
+    - volitelně toleruj i variantu jména bez diakritiky pouze pro jméno učitele, nikdy ne pro učitelský kód.
   • Zakázaný křehký vzor: if (name === TEST.teacherName && pin === TEST.teacherPin) bez předchozí normalizace.
   • Login dialog vytvoř jako vlastní HTML modal s form submit nebo s obsluhou submit eventu, aby na mobilu fungovalo tlačítko „Vstoupit“ i klávesa Enter/Hotovo.
   • Tlačítko „Vstoupit“ musí vždy vyvolat viditelnou reakci: otevření panelu nebo jasnou chybovou hlášku v modalu. Nesmí působit mrtvě.
   • Po úspěšném loginu ihned vymaž hodnoty polí a otevři učitelský panel.
   • Viditelné tlačítko „Učitelský režim“ musí být na intro obrazovce i na dokončovací/výsledkové obrazovce.
-  • Login dialog nesmí nejdřív žádat odemykací heslo.
+  • Login dialog žádá pouze učitelský přístupový kód; interně ověřuje teacher-pin hash, nikoli unlock hash.
   • Učitelský panel je primárně KONTROLNÍ REŽIM. Po přihlášení musí jako první nabídnout kontrolu testu, ne jen ověření .txt.
   • Povinná sekce „Kontrola testu“: rychlý seznam cvičení, všechna zadání, správné odpovědi, přijatelné varianty, bodování za položku/cvičení, celkový počet bodů, stupnice a případné poznámky k hodnocení.
   • Povinná sekce „Ověření výsledku“: nahrát nebo vložit ověřovací .txt, ověřit OVR4M/OVR4/OVR4R přes HMAC-SHA-256, manifest a přepočet skóre, z OVR4R zobrazit studentovy odpovědi. Tato sekce nesmí nahradit kontrolní přehled testu.
@@ -1476,18 +1472,18 @@ POVINNÝ SMOKE TEST PŘED VÝSTUPEM — proveď mentálně pro Android Chrome i 
   4. Odevzdání neúplného testu funguje po potvrzení ve vlastním HTML modalu a prázdné odpovědi se počítají za 0.
   5. Výsledková karta jde otevřít i zavřít; při zapnutém ověření nabízí .txt download i kopírovatelnou technickou zálohu, bez QR.
   6. „Zobrazit / Skrýt moje odpovědi“ je skutečný toggle.
-  7. Učitelský mód jde otevřít, přijme normalizované jméno + PIN, funguje tlačítkem i klávesou Enter/Hotovo, jde zavřít a znovu vyžaduje login; neúspěšný login ukáže jasnou chybu a nepůsobí mrtvě.
+  7. Učitelský mód jde otevřít, přijme normalizované jméno + učitelský přístupový kód, funguje tlačítkem i klávesou Enter/Hotovo, jde zavřít a znovu vyžaduje login; neúspěšný login ukáže jasnou chybu a nepůsobí mrtvě.
   8. Po loginu je vidět Kontrola testu se správnými odpověďmi a bodováním.
   9. Nahrání ověřovacího .txt funguje, HMAC-SHA-256 odhalí úpravu obsahu a „Zobrazit odpovědi“ čte z teacherState podle attemptId.
 
 ROZŠÍŘENÝ E2E CHECKLIST PRO PILOT:
   10. Běžný režim: přepnutí karty pouze zapíše varování, nikdy nezamkne test.
-  11. Přísný režim: přepnutí karty/ztráta visibility zamkne test a odemčení funguje pouze odemykacím heslem.
+  11. Přísný režim: přepnutí karty/ztráta visibility zamkne test a odemčení funguje pouze učitelským přístupovým kódem.
   12. Žolík: po volbě žolíka se stále vyplňují úlohy, výsledek má watermark/report kód a nevyžaduje .txt.
   13. Diferenciace: student po zadání kódu vidí jen svou fyzickou variantu a učitel v panelu vidí všechny varianty.
   14. Randomizace: pořadí se po startu uloží a nemění se při kliknutí, psaní ani návratu z modalu.
-  15. Neúspěšný učitelský login i špatné odemykací heslo ukážou jasnou chybu; nezobrazí správné odpovědi.
-  16. Studentský HTML neobsahuje čitelný PIN ani odemykací heslo; v konfiguraci jsou jen hashe.`;
+  15. Neúspěšný učitelský login i špatný učitelský přístupový kód při odemykání ukážou jasnou chybu; nezobrazí správné odpovědi.
+  16. Studentský HTML neobsahuje čitelný učitelský přístupový kód; v konfiguraci jsou jen doménově oddělené hashe.`;
 }
 
 function getCompactResultReviewBlock() {
@@ -1522,9 +1518,8 @@ function buildPrompt() {
   const jazyk = state.jazyk;
   const vlastniTyp = trim('vlastniTyp');
   const typy = [...state.typyCviceni, ...(vlastniTyp?[vlastniTyp]:[])].filter(Boolean).join(', ');
-  const heslo = '__UNLOCK_PASSWORD_DOPLN_LOKALNE__';
   const ucitel = trim('ucitelJmeno');
-  const ucitelPin = '__TEACHER_PIN_DOPLN_LOKALNE__';
+  const ucitelPin = '__TEACHER_ACCESS_CODE_DOPLN_LOKALNE__';
   const poznamky = trim('poznamky');
   const body = (() => {
     if (state.exerciseDetail && state.exerciseConfig.length) {
@@ -1609,7 +1604,7 @@ ${promptSection('REŽIM VÝSLEDKŮ', getCompactResultModeBlock())}
 ${promptSection('ROZLOŽENÍ A NAVIGACE TESTU', getCompactLayoutBlock())}
 ${promptSection('ROBUSTNOST & MOBIL — ANDROID + APPLE', getCompactRobustnessBlock())}
 ${promptSection('AKTIVNÍ SPECIÁLNÍ PRAVIDLA', activeBlocks)}
-${promptSection('HESLA A PŘÍSTUPY', `Odemykací heslo zámkové obrazovky: ${heslo}\nJméno učitele: ${ucitel}\nPIN učitele: ${ucitelPin}\nOdemykací heslo a PIN jsou různé věci. Heslo pouze odemyká bezpečnostní zámek; PIN + jméno otevírají učitelský mód. V manuální cestě nevkládej skutečný PIN ani heslo do AI chatu; placeholdery doplň lokálně až ve výsledném HTML, nebo použij přímé generování v aplikaci.`)}
+${promptSection('HESLA A PŘÍSTUPY', `Jméno učitele: ${ucitel}\nUčitelský přístupový kód: ${ucitelPin}\nUživatel zadává jeden kód. Implementace z něj MUSÍ pro různé účely odvodit oddělené hodnoty (např. doménově oddělené PBKDF2): zvlášť pro učitelský mód/povolení dalšího pokusu a zvlášť pro odemčení bezpečnostního zámku. Nepoužívej jeden společný hash pro oba účely. V manuální cestě nevkládej skutečný kód do AI chatu; placeholder doplň lokálně až ve výsledném HTML, nebo použij přímé generování v aplikaci.`)}
 ${promptSection('BEZPEČNOST & ZÁMKY', getCompactSecurityBlock())}
 ${promptSection('VÝSLEDKY A ODPOVĚDI', getCompactResultReviewBlock())}
 ${promptSection('OVĚŘENÍ VÝSLEDKU', getCompactVerificationBlock())}

@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.36",
-  "releaseStatus": "stage5-qa-hotfix-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.37",
+  "releaseStatus": "stage6-teacher-access-code-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -44,8 +44,8 @@
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "local-build-plus-targeted-system-chromium; exact-lockfile GitHub CI pending",
-    "note": "7.1.36 is a QA-only hotfix over Stage 5. Production behavior is unchanged apart from release-version strings. The Stage-5 headless assertion now matches the actual secure-offline retry-protection explanation and still verifies that no new retry control exists. The previous 7.1.35 certification failed before fixture generation, causing cascading visual/critical ENOENT findings. Exact-lockfile GitHub CI is required for promotion."
+    "transport": "local-build-plus-targeted-system-chromium-platform-gates; exact-lockfile GitHub CI pending",
+    "note": "7.1.37 Stage 6 simplifies two teacher-facing secrets into one Teacher access code while retaining domain-separated PBKDF2 hashes for teacher authentication/retry authorization and lock-screen unlock. Cross-domain acceptance has been removed: teacher login/retry verify only the teacher-pin domain and lock-screen unlock verifies only unlock-password. Static/security/browser platform gates passed locally; exact jsdom workflow/runtime CI remains required for promotion."
   },
-  "note": "7.1.36 QA-only hotfix over the 7.1.35 Stage 5 candidate; requires clean exact-lockfile GitHub CI before Stage 5 closure."
+  "note": "7.1.37 Stage 6 candidate over confirmed green 7.1.36 baseline; requires clean exact-lockfile GitHub CI before Stage 6 closure."
 }

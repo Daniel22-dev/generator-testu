@@ -1,3 +1,13 @@
+## 7.1.37 — Etapa 6: jeden učitelský přístupový kód (2026-09-15)
+
+- Učitel zadává jeden **Učitelský přístupový kód** místo samostatného PINu a odemykacího hesla.
+- Z jednoho kanonizovaného kódu se při exportu odvozují dva různé PBKDF2 hashe: `teacher-pin|testId` pro učitelský mód/povolení dalšího pokusu a `unlock-password|testId` pro zámkovou obrazovku.
+- Secure runtime už nepřijímá unlock hash pro teacher-login ani retry autorizaci; každý účel ověřuje jen vlastní doménový hash.
+- Kód se kanonizuje bez ohledu na velikost písmen, aby jeden učitelský kód fungoval konzistentně ve všech třech učitelských akcích.
+- Skryté pole `#heslo` zůstává pouze jako kompatibilitní mirror a není zdrojem kryptografických hashů.
+- Bezpečnost pracoviště, teacher verifier, Google Forms, `SECURE-ANSWERS-V1`, RSA/AES, scoring a serverový profil se nemění.
+- Přidány regresní kontroly: jeden viditelný kód, dva rozdílné hashe, case-normalizace a zákaz cross-domain ověření.
+
 ## 7.1.36 — Etapa 5 QA hotfix (2026-09-15)
 
 - Opravena pouze chybná headless assertion Etapy 5: test nyní ověřuje skutečný text secure-offline ochrany opakovaného pokusu místo neexistující fráze „Jeden pokus na tomto zařízení“.

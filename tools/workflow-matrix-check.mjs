@@ -62,12 +62,34 @@ function resetBase(){
   setVal('nazev','Workflow test'); setVal('proKoho','1.A'); setVal('latka','Present simple');
   setVal('vlastniTyp',''); setVal('vlastniSkala','');
   setVal('listeningTranscript',''); setVal('ucitelJmeno','Daniel Teacher');
-  setVal('ucitelPin','X8p!Teacher'); setVal('heslo','Strong-Unlock-2026!'); setVal('bezpKod','');
+  setVal('ucitelPin','TEACH-ABCDEF-123456'); setVal('heslo',''); setVal('bezpKod','');
   w.eval("Access.profile={role:'admin',userId:'TEST',displayName:'Test',status:'active'}; Access.granted=true;");
   w.enforceModeConstraints(); w.applyVisualState(); w.validate();
 }
 
 console.log('=== workflow-matrix-check:', target, '===');
+
+// Stage 6: jeden učitelský kód v UI, interně dva doménově oddělené hashe.
+ok('Stage 6: UI má jeden učitelský přístupový kód a skrytý legacy mirror',()=>{
+  resetBase();
+  const pin=w.document.getElementById('ucitelPin'), legacy=w.document.getElementById('heslo');
+  assert(pin&&pin.type==='password','chybí viditelný učitelský kód');
+  assert(legacy&&legacy.type==='hidden','legacy #heslo není skrytý');
+  w.setTeacherAccessCode('teach-abcd-1234');
+  assert(pin.value==='TEACH-ABCD-1234','kód se nekanonizoval');
+  assert(legacy.value===pin.value,'legacy mirror není synchronní');
+});
+await okAsync('Stage 6: jeden kód vytváří dva různé PBKDF2 hashe',async()=>{
+  const code='TEACH-ABCDEF-123456', lower='teach-abcdef-123456', testId='STAGE6-HASH';
+  const a=await w.deriveSecretHash('teacher-pin',code,testId);
+  const b=await w.deriveSecretHash('unlock-password',code,testId);
+  const aLower=await w.deriveSecretHash('teacher-pin',lower,testId);
+  const bLower=await w.deriveSecretHash('unlock-password',lower,testId);
+  assert(a!==b,'teacher a unlock hash jsou stejné');
+  assert(a.startsWith('pbkdf2-v1$')&&b.startsWith('pbkdf2-v1$'),'neočekávaný hash formát');
+  assert(a===aLower,'teacher access code není case-insensitive');
+  assert(b===bLower,'unlock nepoužívá stejnou kanonizaci učitelského kódu');
+});
 
 // 1) Úplný kartézský součin režimových voleb. Každý vstup se normalizuje a musí splnit invarianty.
 const domains={
@@ -402,6 +424,34 @@ for(const layout of ['tabs','scroll'])for(const odevzdavani of ['A','B'])for(con
 }
 ok('reprezentativní výstupová matice instant HTML',()=>outputCases+' sestavených testů');
 
+// Stage 6: instant runtime používá stejný učitelský kód pro teacher-login i screen-guard unlock,
+// ale každý účel ověřuje vlastní doménový hash. Lowercase vstup musí projít v obou cestách.
+await okAsync('Stage 6: instant teacher-login + screen-guard unlock jedním kódem', async()=>{
+  resetBase();
+  w.eval("Object.assign(state,{testMode:'bezny',resultMode:'instant',feedbackMode:'brief',odevzdavani:'B',layout:'tabs',screenGuard:true,exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
+  const gen={exercises:[{title:'Instant',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q',options:['A','B'],correct:0}]}]};
+  const fakeDerive=w.deriveSecretHash;w.deriveSecretHash=realGeneratorDeriveSecretHash;
+  let out;
+  try{ out=await w.assembleTestHtml(w.eval('state'),gen); }
+  finally{ w.deriveSecretHash=fakeDerive; }
+  const gd=await createGeneratedDom(out);
+  try{
+    gd.window.document.getElementById('studentName').value='Student';
+    await gd.window.startTest();
+    gd.window.openTeacherModal();
+    gd.window.document.getElementById('teacherName').value='Daniel Teacher';
+    gd.window.document.getElementById('teacherPin').value='teach-abcdef-123456';
+    await gd.window.teacherLogin();
+    assert(!gd.window.document.getElementById('teacherPanel').classList.contains('hidden'),'instant teacher-login lowercase kódem selhal');
+    gd.window.closeTeacherModal();
+    gd.window.dispatchEvent(new gd.window.Event('pagehide'));
+    assert(!gd.window.document.getElementById('lockScreen').classList.contains('hidden'),'instant screenGuard po pagehide nezamkl');
+    gd.window.document.getElementById('unlockInp').value='teach-abcdef-123456';
+    await gd.window.tryUnlock();
+    assert(gd.window.document.getElementById('lockScreen').classList.contains('hidden'),'instant unlock lowercase kódem selhal');
+  }finally{gd.close();}
+});
+
 // 19) Etapa 2: týmový bezpečnostní kód není součástí generovacího workflow.
 resetBase();
 w.eval("Access.profile={role:'trainedTeacher',userId:'TEACHER',displayName:'Teacher',status:'active'};Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimpleTemplate('fl_strict');updateAppModeUI();validate();");
@@ -506,12 +556,25 @@ await okAsync('secure tabs: submit až na konci a strict odchod zamkne test', as
   try{
     gd.window.document.getElementById('studentName').value='Student';
     await gd.window.startTest();
+    // Stejný učitelský kód otevře teacher panel přes teacher-pin doménu.
+    gd.window.openTeacherModal();
+    gd.window.document.getElementById('teacherName').value='Daniel Teacher';
+    gd.window.document.getElementById('teacherPin').value='teach-abcdef-123456';
+    await gd.window.teacherLogin();
+    assert(!gd.window.document.getElementById('teacherPanel').classList.contains('hidden'),'učitelský kód neotevřel teacher panel');
+    gd.window.closeTeacherModal();
     const submit=gd.window.document.getElementById('secureSubmitCard');
     assert(submit&&submit.classList.contains('hidden'),'secure submit je vidět už u prvního cvičení');
     gd.window.switchExercise(1);
     assert(!submit.classList.contains('hidden'),'secure submit se nezobrazil u posledního cvičení');
     gd.window.dispatchEvent(new gd.window.Event('pagehide'));
     assert(!gd.window.document.getElementById('lockScreen').classList.contains('hidden'),'přísný test se po pagehide nezamkl');
+    gd.window.document.getElementById('unlockInp').value='teach-abcdef-123456';
+    await gd.window.tryUnlock();
+    assert(gd.window.document.getElementById('lockScreen').classList.contains('hidden'),'stejný učitelský kód test neodemkl přes unlock doménu');
+    // Cross-domain pojistka: unlock hash se v runtime smí ověřovat jen v tryUnlock().
+    const unlockVerifyHits=(pkg.studentHtml.match(/deriveSecretHash\('unlock-password',v,CFG\.testId\)/g)||[]).length;
+    assert(unlockVerifyHits===1,'unlock hash je přijímán i mimo odemčení zámku: '+unlockVerifyHits);
   }finally{gd.close();}
 });
 
@@ -526,8 +589,8 @@ ok('export checklist je zkrácen na 0 / 4 položky podle režimu',()=>{
   w.eval("generatedPackage=null");
 });
 
-// 25) Jednorázový device lock lze znovu povolit učitelským PINem bez nové verze testu.
-await okAsync('učitelský PIN odemkne další spuštění na stejném zařízení', async()=>{
+// 25) Jednorázový device lock lze znovu povolit stejným učitelským přístupovým kódem.
+await okAsync('učitelský přístupový kód odemkne další spuštění na stejném zařízení', async()=>{
   resetBase();setVal('bezpKod','TEAM-CODE-0123456789-SECURE');
   w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B',layout:'tabs',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
   const fakeDerive=w.deriveSecretHash;w.deriveSecretHash=realGeneratorDeriveSecretHash;
@@ -542,7 +605,7 @@ await okAsync('učitelský PIN odemkne další spuštění na stejném zařízen
     await gd.window.startTest();
     const modal=gd.window.document.querySelector('.s-modal-bd');
     assert(modal,'po device locku se neotevřelo učitelské odemčení');
-    modal.querySelector('[data-retry-code]').value='X8p!Teacher';
+    modal.querySelector('[data-retry-code]').value='teach-abcdef-123456';
     modal.querySelector('[data-retry-ok]').click();
     const deadline=Date.now()+4000;
     while(Date.now()<deadline&&!gd.window.document.getElementById('intro').classList.contains('hidden'))await new Promise(r=>setTimeout(r,50));

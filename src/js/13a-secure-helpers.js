@@ -70,12 +70,12 @@ async function buildPublicDiffGroups(groups,salt){
   return out;
 }
 async function derivePerTestSecret(master,salt,manifestHash){requireWebCrypto('Odvození tajemství testu');const enc=new TextEncoder();const key=await crypto.subtle.importKey('raw',enc.encode(String(master||'')),{name:'PBKDF2'},false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode('GIT-v1|'+String(salt)+'|'+String(manifestHash)),iterations:120000,hash:'SHA-256'},key,256);return b64UrlFromBuffer(bits);}
-// Hash PINu/hesla studentského zámku přes PBKDF2 (pomalé, anti-brute-force). DŘÍV se
+// Hash učitelského přístupového kódu přes PBKDF2 (pomalé, anti-brute-force). DŘÍV se
 // používal jen jednoprůchodový SHA-256 — ten jde zkoušet stovkami milionů pokusů/s na GPU,
 // takže slabší PIN šel offline uhádnout. Stejná funkce je i v emitovaném studentu/verifieru,
 // aby hash sedl. Prefix 'pbkdf2-v1$' odlišuje formát od starého SHA-256 hashe.
 async function deriveSecretHash(kind, secret, testId){
-  const norm = (kind==='teacher-pin') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
+  const norm = (kind==='teacher-pin'||kind==='unlock-password') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
   requireWebCrypto('Hash hesla/PINu');
   const enc=new TextEncoder();
   const key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);

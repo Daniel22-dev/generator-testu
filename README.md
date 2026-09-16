@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.36  
+**Aktuální verze:** 7.1.37  
+
+> **7.1.37 Etapa 6 – jeden učitelský přístupový kód (2026-09-15):** Učitel už nezadává zvlášť PIN a odemykací heslo. Jeden kanonizovaný přístupový kód se při exportu odvodí do dvou různých PBKDF2 hodnot s doménami `teacher-pin` a `unlock-password`. Teacher-login a povolení dalšího pokusu ověřují jen teacher doménu; zámková obrazovka jen unlock doménu. Google Forms, verifier, scoring, `SECURE-ANSWERS-V1`, RSA/AES a Bezpečnost pracoviště zůstávají beze změny.
 
 > **7.1.36 Etapa 5 – přehlednější Pokročilá nastavení (2026-09-15):** Pokročilý režim nově seskupuje stávající volby do pěti sekcí **Test / Student / Zpětná vazba / Bezpečnost / Vzhled**. Jde pouze o informační architekturu: používají se stejné ovladače se stejnými ID, hodnotami a validacemi. Simple režim zůstává beze změny; secure/student runtime, verifier, Google Forms, kryptografie, scoring a PIN/odemčení se nemění.
 
@@ -26,7 +28,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.36** je kandidát Etapy 5 postavený nad potvrzeným zeleným GitHub CI baseline **7.1.34**. Etapy 3 a 4 (Forms import + studentské Forms odevzdání) jsou součástí baseline. Etapa 5 mění pouze informační architekturu Pokročilého režimu; studentský runtime, verifier, `SECURE-ANSWERS-V1`, RSA/AES kryptografie, scoring, PIN/odemčení a serverový profil se nemění. **7.1.36 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
+Verze **7.1.37** je kandidát Etapy 6 postavený nad uživatelem potvrzeným zeleným GitHub CI baseline **7.1.36**. Etapa 6 sjednocuje učitelské PIN/odemknutí do jednoho učitelského přístupového kódu, ale interně zachovává dva doménově oddělené PBKDF2 hashe a odstraňuje cross-domain akceptaci. **7.1.37 zůstává kandidát, dokud neprojde novým čistým GitHub CI.**
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 

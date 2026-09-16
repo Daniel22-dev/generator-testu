@@ -180,8 +180,8 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
     nazev: 'Headless test', proKoho: '1.A', jazyk: 'angličtina', uiLang: 'cs', cefr: 'B1', cefrLevels: ['B1'], cefrCombined: false,
     cas: 15, tema: 'default', testMode: 'prisny', layout: 'classic', odevzdavani: 'B', resultMode: 'secureOffline', formsSubmissionUrl: 'https://docs.google.com/forms/d/e/TESTFORM/viewform',
     fuzzyTolerance: 'off', randomizace: false, zolicek: false, ucitelJmeno: 'Teacher',
-    ucitelPinHash: await w.deriveSecretHash('teacher-pin', '123456', 'HEADLESS-1'),
-    hesloHash: await w.deriveSecretHash('unlock-password', 'LOCK-TEST', 'HEADLESS-1'),
+    ucitelPinHash: await w.deriveSecretHash('teacher-pin', 'TEACH-ABCDEF-123456', 'HEADLESS-1'),
+    hesloHash: await w.deriveSecretHash('unlock-password', 'TEACH-ABCDEF-123456', 'HEADLESS-1'),
     hasUnlock: true, diffRosterSalt: rosterSalt, diffRosterScheme: 'sha256-v1',
     diffGroups: await w.buildPublicDiffGroups([{key:'g1',name:'Podpora',conditions:'Více opory',students:['ABC234'],a11y:null}], rosterSalt),
     labels, isCzech: false, csScoringPolicy: {}, identityMode: 'oneTimeCode', identityCodeScheme: 'sha256-v1', identityCodeHashes

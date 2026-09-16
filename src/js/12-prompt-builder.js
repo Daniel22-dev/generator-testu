@@ -271,8 +271,8 @@ function getLabels(lang) {
       writeAnswer:'Napiš svou odpověď...', writeTranslation:'Napiš překlad...', writeSentence:'Napiš správnou větu...', wordBank:'Slova k seřazení:',
       category:'Kategorie', passage:'Text', transcript:'Přepis poslechu', teacherAudio:'Poslech pustí učitel.', imagePrompt:'Popis / zadání',
       submitTitle:'Odevzdat test?', yesSubmit:'Ano, odevzdat', back:'Zpět', answered:'Zodpovězeno', unansweredZero:'otázek bude hodnoceno jako 0 bodů.',
-      enterName:'Zadej své jméno nebo kód.', ok:'OK', locked:'Test uzamčen', unlock:'Odemknout', unlockPh:'Odemykací heslo', lockContact:'Test je uzamčený. Kontaktuj učitele.',
-      incorrectLogin:'Nesprávné jméno nebo PIN.', login:'Přihlásit', close:'Zavřít', logout:'Odhlásit', overview:'Přehled testu', correctAnswers:'Správné odpovědi',
+      enterName:'Zadej své jméno nebo kód.', ok:'OK', locked:'Test uzamčen', unlock:'Odemknout', unlockPh:'Učitelský přístupový kód', lockContact:'Test je uzamčený. Kontaktuj učitele.',
+      incorrectLogin:'Nesprávné jméno nebo učitelský přístupový kód.', login:'Přihlásit', close:'Zavřít', logout:'Odhlásit', overview:'Přehled testu', correctAnswers:'Správné odpovědi',
       resultAnswers:'Zobrazit moje odpovědi', hideAnswers:'Skrýt moje odpovědi', verifyDownload:'Stáhnout ověřovací .txt', verifyHint:'Pošli učiteli screenshot výsledkové karty + tento .txt soubor.',
       copy:'Kopírovat', customGrade:'dle vlastní stupnice', manualReview:'hodnotí učitel', exerciseScore:'Skóre cvičení', notAllSubmitted:'Nejdřív odevzdej všechna cvičení.',
       jokerUse:'Použít žolíka', jokerPick:'Klikni na otázku pro přeskočení...', jokerUsed:'Žolík použit', jokerChoiceTitle:'Volba žolíka', jokerChoiceHint:'Vyber před začátkem testu. Volba je po spuštění nevratná.', jokerDoTest:'Dělám test', jokerTake:'Beru si žolíka', jokerReport:'ŽOLÍK POUŽIT', reportSeal:'Kontrolní kód reportu', reportSealHint:'Screenshot musí obsahovat celý report včetně tohoto kódu.', attempt:'Attempt', fullscreen:'Celá obrazovka'
@@ -287,8 +287,8 @@ function getLabels(lang) {
       writeAnswer:'Write your answer...', writeTranslation:'Write the translation...', writeSentence:'Write the correct sentence...', wordBank:'Word bank:',
       category:'Category', passage:'Text', transcript:'Listening transcript', teacherAudio:'The teacher will play the listening.', imagePrompt:'Description / prompt',
       submitTitle:'Submit test?', yesSubmit:'Yes, submit', back:'Back', answered:'Answered', unansweredZero:'questions will be marked as 0 points.',
-      enterName:'Enter your name or code.', ok:'OK', locked:'Test locked', unlock:'Unlock', unlockPh:'Unlock password', lockContact:'The test is locked. Contact your teacher.',
-      incorrectLogin:'Incorrect name or PIN.', login:'Log in', close:'Close', logout:'Log out', overview:'Test overview', correctAnswers:'Correct answers',
+      enterName:'Enter your name or code.', ok:'OK', locked:'Test locked', unlock:'Unlock', unlockPh:'Teacher access code', lockContact:'The test is locked. Contact your teacher.',
+      incorrectLogin:'Incorrect name or teacher access code.', login:'Log in', close:'Close', logout:'Log out', overview:'Test overview', correctAnswers:'Correct answers',
       resultAnswers:'Show my answers', hideAnswers:'Hide my answers', verifyDownload:'Download verification .txt', verifyHint:'Send your teacher a screenshot of the result card + this .txt file.',
       copy:'Copy', customGrade:'custom scale', manualReview:'teacher review', exerciseScore:'Exercise score', notAllSubmitted:'Submit all exercises first.',
       jokerUse:'Use joker', jokerPick:'Click a question to skip it...', jokerUsed:'Joker used', jokerChoiceTitle:'Joker choice', jokerChoiceHint:'Choose before starting. The choice cannot be changed after start.', jokerDoTest:'I am taking the test', jokerTake:'I am taking the joker', jokerReport:'JOKER USED', reportSeal:'Report control code', reportSealHint:'The screenshot must include the full report and this code.', attempt:'Attempt', fullscreen:'Fullscreen'
@@ -303,8 +303,8 @@ function getLabels(lang) {
       writeAnswer:'Escribe tu respuesta...', writeTranslation:'Escribe la traducción...', writeSentence:'Escribe la frase correcta...', wordBank:'Palabras:',
       category:'Categoría', passage:'Texto', transcript:'Transcripción', teacherAudio:'El profesor reproducirá el audio.', imagePrompt:'Descripción / tarea',
       submitTitle:'¿Enviar el test?', yesSubmit:'Sí, enviar', back:'Volver', answered:'Respondidas', unansweredZero:'preguntas se calificarán con 0 puntos.',
-      enterName:'Escribe tu nombre o código.', ok:'OK', locked:'Test bloqueado', unlock:'Desbloquear', unlockPh:'Contraseña de desbloqueo', lockContact:'El test está bloqueado. Avisa a tu profesor/a.',
-      incorrectLogin:'Nombre o PIN incorrecto.', login:'Entrar', close:'Cerrar', logout:'Salir', overview:'Resumen del test', correctAnswers:'Respuestas correctas',
+      enterName:'Escribe tu nombre o código.', ok:'OK', locked:'Test bloqueado', unlock:'Desbloquear', unlockPh:'Código de acceso del profesor', lockContact:'El test está bloqueado. Avisa a tu profesor/a.',
+      incorrectLogin:'Nombre o código de acceso del profesor incorrecto.', login:'Entrar', close:'Cerrar', logout:'Salir', overview:'Resumen del test', correctAnswers:'Respuestas correctas',
       resultAnswers:'Ver mis respuestas', hideAnswers:'Ocultar mis respuestas', verifyDownload:'Descargar .txt de verificación', verifyHint:'Envía al profesor una captura del resultado + este archivo .txt.',
       copy:'Copiar', customGrade:'escala propia', manualReview:'evalúa el profesor', exerciseScore:'Puntuación del ejercicio', notAllSubmitted:'Primero envía todos los ejercicios.',
       jokerUse:'Usar comodín', jokerPick:'Haz clic en una pregunta para saltarla...', jokerUsed:'Comodín usado', jokerChoiceTitle:'Elección del comodín', jokerChoiceHint:'Elige antes de empezar. La elección no se puede cambiar después.', jokerDoTest:'Hago el test', jokerTake:'Uso el comodín', jokerReport:'COMODÍN USADO', reportSeal:'Código de control del informe', reportSealHint:'La captura debe incluir todo el informe y este código.', attempt:'Intento', fullscreen:'Pantalla completa'
@@ -319,8 +319,8 @@ function getLabels(lang) {
       writeAnswer:'Schreibe deine Antwort...', writeTranslation:'Schreibe die Übersetzung...', writeSentence:'Schreibe den richtigen Satz...', wordBank:'Wortbank:',
       category:'Kategorie', passage:'Text', transcript:'Hörtext', teacherAudio:'Die Lehrkraft spielt den Hörtext ab.', imagePrompt:'Beschreibung / Aufgabe',
       submitTitle:'Test abgeben?', yesSubmit:'Ja, abgeben', back:'Zurück', answered:'Beantwortet', unansweredZero:'Fragen werden mit 0 Punkten bewertet.',
-      enterName:'Gib deinen Namen oder Code ein.', ok:'OK', locked:'Test gesperrt', unlock:'Entsperren', unlockPh:'Passwort zum Entsperren', lockContact:'Der Test ist gesperrt. Wende dich an die Lehrkraft.',
-      incorrectLogin:'Falscher Name oder PIN.', login:'Anmelden', close:'Schließen', logout:'Abmelden', overview:'Testübersicht', correctAnswers:'Richtige Antworten',
+      enterName:'Gib deinen Namen oder Code ein.', ok:'OK', locked:'Test gesperrt', unlock:'Entsperren', unlockPh:'Lehrer-Zugangscode', lockContact:'Der Test ist gesperrt. Wende dich an die Lehrkraft.',
+      incorrectLogin:'Falscher Name oder Lehrer-Zugangscode.', login:'Anmelden', close:'Schließen', logout:'Abmelden', overview:'Testübersicht', correctAnswers:'Richtige Antworten',
       resultAnswers:'Meine Antworten anzeigen', hideAnswers:'Meine Antworten ausblenden', verifyDownload:'Prüfdatei .txt herunterladen', verifyHint:'Sende der Lehrkraft einen Screenshot der Ergebniskarte + diese .txt-Datei.',
       copy:'Kopieren', customGrade:'eigene Skala', manualReview:'Lehrkraft bewertet', exerciseScore:'Punktzahl der Übung', notAllSubmitted:'Gib zuerst alle Übungen ab.',
       jokerUse:'Joker verwenden', jokerPick:'Klicke auf eine Frage, um sie zu überspringen...', jokerUsed:'Joker verwendet', jokerChoiceTitle:'Joker-Auswahl', jokerChoiceHint:'Vor dem Start wählen. Nach dem Start kann die Wahl nicht geändert werden.', jokerDoTest:'Ich schreibe den Test', jokerTake:'Ich nehme den Joker', jokerReport:'JOKER VERWENDET', reportSeal:'Kontrollcode des Berichts', reportSealHint:'Der Screenshot muss den ganzen Bericht mit diesem Code enthalten.', attempt:'Versuch', fullscreen:'Vollbild'
