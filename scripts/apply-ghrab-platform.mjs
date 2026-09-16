@@ -175,16 +175,41 @@ if (fs.existsSync(manifestPath)) {
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
+function assertStudioManifestPlatform(manifest, name) {
+  const platform = manifest?.platform || {};
+  const expectedStoragePrefix = `ghrab.${consumer.appId}.`;
+  const checks = [
+    [platform.schema === 'ghrab-platform-app-integration-v1', 'schema'],
+    [platform.contract === consumer.platform.contract, 'contract'],
+    [platform.platformVersion === consumer.platform.version, 'platformVersion'],
+    [platform.requiredPlatformRange === consumer.platform.requiredRange, 'requiredPlatformRange'],
+    [platform.brandVersion === consumer.brand.version, 'brandVersion'],
+    [platform.swContract === 1, 'swContract'],
+    [platform.studioBridge === consumer.bridge.contract, 'studioBridge'],
+    [platform.artifactEnvelope === consumer.artifact.schema, 'artifactEnvelope'],
+    [platform.storagePrefix === expectedStoragePrefix, 'storagePrefix'],
+    [platform.cacheName === consumer.cache.name, 'cacheName'],
+  ];
+  const missing = checks.filter(([ok]) => !ok).map(([, key]) => key);
+  if (missing.length) throw new Error(`P3 postprocessor: ${name} ztratil Studio kompatibilitu: ${missing.join(', ')}.`);
+}
+
 for (const name of ['studio-manifest.json', 'app-manifest.json']) {
   const target = path.join(dist, name);
   if (!fs.existsSync(target)) continue;
   const manifest = JSON.parse(fs.readFileSync(target, 'utf8'));
   manifest.platform = {
+    schema: 'ghrab-platform-app-integration-v1',
     contract: consumer.platform.contract,
     platformVersion: consumer.platform.version,
+    requiredPlatformRange: consumer.platform.requiredRange,
     requiredRange: consumer.platform.requiredRange,
     brandVersion: consumer.brand.version,
     themeContract: 'ghrab-theme-v1',
+    swContract: 1,
+    studioBridge: consumer.bridge.contract,
+    artifactEnvelope: consumer.artifact.schema,
+    storagePrefix: `ghrab.${consumer.appId}.`,
     storageContract: 'ghrab-storage-namespace-v1',
     bridgeContract: consumer.bridge.contract,
     artifactContract: consumer.artifact.schema,
@@ -193,6 +218,7 @@ for (const name of ['studio-manifest.json', 'app-manifest.json']) {
     moduleContract: consumer.quality.moduleContract,
     cacheName: consumer.cache.name,
   };
+  assertStudioManifestPlatform(manifest, name);
   fs.writeFileSync(target, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
