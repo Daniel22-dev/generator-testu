@@ -84,7 +84,7 @@ for (const file of [
   data.appVersion = TO;
   data.releaseStatus = 'auto-patch-e2e-candidate-pending-clean-github-ci-and-deployment';
   data.primaryRuntime.currentUseApproved = false;
-  data.github.status = 'not-yet-deployed';
+  data.github.status = 'not-yet-uploaded';
   data.github.uploadDeferredUntilEcosystemComplete = false;
   data.github.postUploadValidationRequired = true;
   data.runtimeAudit.transport = 'deterministic-version-bump-plus-garp25-static; exact-lockfile GitHub CI/deployment pending';
