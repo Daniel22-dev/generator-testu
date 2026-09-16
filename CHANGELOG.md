@@ -1,3 +1,10 @@
+## 7.1.39 — Etapa 6 secure unlock hotfix (2026-09-16)
+
+- Opravena jedna skutečná produkční nekonzistence odhalená exact GitHub CI 7.1.38: secure studentský runtime kanonizoval velikost písmen pro `teacher-pin`, ale ne pro `unlock-password`.
+- Stejný učitelský přístupový kód nyní funguje case-insensitive i při odemčení secure zámku, stejně jako v teacher-loginu a instant runtime.
+- PBKDF2 domény zůstávají oddělené (`teacher-pin|testId` vs. `unlock-password|testId`); nejde o sloučení hashů ani oslabení účelového oddělení.
+- Verifier, Google Forms, scoring, RSA/AES, `SECURE-ANSWERS-V1` a ostatní Stage 6 workflow se nemění.
+
 ## 7.1.38 — Etapa 6 QA hotfix (2026-09-16)
 
 - Bez změny produkční Stage 6 logiky.

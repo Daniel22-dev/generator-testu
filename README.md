@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.38  
+**Aktuální verze:** 7.1.39  
+
+> **7.1.39 Etapa 6 secure unlock hotfix (2026-09-16):** exact GitHub CI 7.1.38 odhalilo jednu skutečnou produkční nekonzistenci: secure studentský runtime kanonizoval velikost písmen pro `teacher-pin`, ale ne pro `unlock-password`. Secure zámek nyní používá stejnou case-insensitive kanonizaci jako teacher-login a instant runtime; PBKDF2 domény zůstávají oddělené. Verifier, Google Forms, scoring, RSA/AES a `SECURE-ANSWERS-V1` se nemění.
 
 > **7.1.38 Etapa 6 QA hotfix (2026-09-16):** bez změny produkční logiky. Opravuje dvě chyby workflow harnessu: instant Stage 6 scénář používá skutečné instant DOM ID/funkci a secure Stage 6 scénář při generování dočasně obnoví skutečný PBKDF2 KDF, aby se hash shodoval se studentským runtime. Samotný učitelský přístupový kód, secure/instant runtime, verifier, Google Forms, scoring i RSA/AES zůstávají funkčně stejné jako v 7.1.37.
 
@@ -30,7 +32,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.38** je QA-only hotfix kandidáta Etapy 6 nad **7.1.37**. Produkční Stage 6 logika se nemění; opravují se pouze dvě chyby workflow harnessu odhalené exact GitHub CI. **Etapa 6 zůstává otevřená, dokud 7.1.38 neprojde novým čistým GitHub CI.**
+Verze **7.1.39** je úzce zaměřený produkční hotfix Etapy 6 nad **7.1.38**. Opravuje pouze case-normalizaci `unlock-password` v secure studentském runtime; účelově oddělené PBKDF2 domény zůstávají zachované. **Etapa 6 zůstává otevřená, dokud 7.1.39 neprojde novým čistým GitHub CI.**
 
 GARP 2.5.1 SHIELD-LIVE / RI-LIVE a behaviorální live-model AI-RED zůstávají samostatnými serverovými/live kontrolami; tato UX etapa jejich stav nemění.
 

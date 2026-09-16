@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.38",
-  "releaseStatus": "stage6-qa-hotfix-source-candidate-pending-clean-github-ci",
+  "appVersion": "7.1.39",
+  "releaseStatus": "stage6-secure-unlock-normalization-hotfix-source-candidate-pending-clean-github-ci",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -45,7 +45,7 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "local-build-plus-targeted-system-chromium-platform-gates; exact-lockfile GitHub CI pending",
-    "note": "7.1.38 is a QA-only hotfix over the Stage 6 implementation. Production authentication/runtime logic is unchanged from 7.1.37. The workflow harness now uses the actual instant-runtime teacher DOM IDs/functions and temporarily restores the real generator PBKDF2 KDF for the secure Stage 6 authentication scenario, preventing false mismatches against the real student runtime. Exact GitHub CI remains required for promotion."
+    "note": "7.1.39 is a narrowly scoped Stage 6 production hotfix. Exact GitHub CI for 7.1.38 proved the instant Stage 6 path and all visual/critical gates, but the secure workflow audit exposed one real inconsistency: the secure student runtime canonicalized teacher-pin case-insensitively while unlock-password remained case-sensitive. 7.1.39 makes the secure runtime canonicalize both teacher-pin and unlock-password, matching the generator helper and instant runtime while preserving domain-separated PBKDF2 salts. Exact GitHub CI remains required for promotion."
   },
-  "note": "7.1.38 Stage 6 QA hotfix over 7.1.37; requires clean exact-lockfile GitHub CI before Stage 6 closure."
+  "note": "7.1.39 Stage 6 secure unlock normalization hotfix; requires clean exact-lockfile GitHub CI before Stage 6 closure."
 }

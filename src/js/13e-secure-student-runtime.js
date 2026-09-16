@@ -231,7 +231,7 @@ async function currentStudentHtmlSha256(){
 // Stejná PBKDF2 derivace jako v generátoru — hash PINu/hesla musí sednout. Prefix
 // 'pbkdf2-v1$' je součástí uložené hodnoty v CFG; tady počítáme stejně a porovnáváme.
 async function deriveSecretHash(kind, secret, testId){
-  const norm = (kind==='teacher-pin') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
+  const norm = (kind==='teacher-pin'||kind==='unlock-password') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
   if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) throw new Error('Ověření hesla/PINu vyžaduje moderní prohlížeč s WebCrypto.');
   const enc=new TextEncoder();
   const key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);

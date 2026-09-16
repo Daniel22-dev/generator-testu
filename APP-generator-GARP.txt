@@ -7,13 +7,13 @@ GARP 2.5.1 GHRAB – PRŮVODNÍ LIST APLIKACE
 appId:                    generator
 Název:                    Generátor testů
 Repozitář:                generator-testu (snapshot předaný jako ZIP; vzdálený repo stav nebyl v tomto kole dotazován)
-Aktuální source verze:    7.1.38 (Etapa 6 QA hotfix, 2026-09-16)
+Aktuální source verze:    7.1.39 (Etapa 6 secure unlock hotfix, 2026-09-16)
 GARP evidence baseline:   7.1.36 je uživatelem potvrzený zelený exact GitHub CI baseline po uzavření Etapy 5.
                           7.1.37 zavedla Stage 6 model jednoho učitelského přístupového kódu se dvěma
-                          doménově oddělenými PBKDF2 hashi. Exact CI odhalilo dvě chyby pouze v workflow
-                          harnessu: instant test používal secure DOM ID/funkci a secure scénář generoval hash
-                          přes záměrnou rychlou testovací KDF náhradu. 7.1.38 opravuje pouze QA harness;
-                          produkční Stage 6 runtime/verifier/Forms/scoring/RSA-AES se funkčně nemění.
+                          doménově oddělenými PBKDF2 hashi. 7.1.38 opravila QA harness; exact CI 7.1.38 pak
+                          odhalilo jednu skutečnou produkční nekonzistenci v secure runtime: unlock-password
+                          nebyl case-normalizován stejně jako teacher-pin. 7.1.39 opravuje pouze tuto podmínku;
+                          doménové oddělení PBKDF2, verifier, Forms, scoring a RSA/AES zůstávají beze změny.
 Verze standardu:          GARP 2.5.1 GHRAB / TOOLING-R2
 SHA-256 SHA256SUMS balíčku, podle kterého se audituje:
                           1a0cc54c16bbebd215c3955d352db3f9d12513f5cebd4cc5a6815d2b5fe0a792
