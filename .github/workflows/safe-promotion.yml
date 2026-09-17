@@ -19,7 +19,16 @@ jobs:
     name: candidate-gate
     if: github.ref == 'refs/heads/candidate'
     runs-on: ubuntu-latest
+    outputs:
+      certified_sha: ${{ steps.certified.outputs.sha }}
+      fresh: ${{ steps.freshness.outputs.fresh }}
+      pr_number: ${{ steps.pr.outputs.number }}
     steps:
+      - name: Record exact candidate SHA
+        id: certified
+        shell: bash
+        run: echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
       - name: Checkout exact candidate SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -98,60 +107,151 @@ jobs:
           fi
           pr_number="$(gh pr list --repo "$GITHUB_REPOSITORY" --head candidate --base main --state open --json number --jq '.[0].number // empty')"
           if [ -z "$pr_number" ]; then
-            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.5/N5, QA, P3 and P5 R2 may be promoted. The PR certification must also pass before merge.')"
+            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.5/N5, QA, P3 and P5 R2 may be promoted. A second independent PR-certification job must also pass before merge.')"
             pr_number="${pr_url##*/}"
+          fi
+          pr_head="$(gh pr view "$pr_number" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
+          if [ "$pr_head" != "$CERTIFIED_SHA" ]; then
+            echo "::error::Open promotion PR #$pr_number does not point to certified SHA $CERTIFIED_SHA (head=$pr_head)."
+            exit 1
           fi
           echo "number=$pr_number" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for pull request certification
-        if: steps.freshness.outputs.fresh == 'true'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
-        run: |
-          set -euo pipefail
-          run_id=""
-          for attempt in $(seq 1 60); do
-            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?event=pull_request&branch=candidate&per_page=20" --jq ".workflow_runs[] | select(.name == \"Certifikace a nasazení Generátoru testů\") | select(any(.pull_requests[]?; .number == ${PR_NUMBER})) | .id" | head -n 1)"
-            if [ -n "$run_id" ]; then
-              break
-            fi
-            sleep 5
-          done
-          if [ -z "$run_id" ]; then
-            echo "::error::No pull-request certification run appeared for PR #$PR_NUMBER."
-            exit 1
-          fi
-          echo "Waiting for PR certification run $run_id."
-          gh run watch "$run_id" --repo "$GITHUB_REPOSITORY" --exit-status
+  pr-certification:
+    name: pr-certification
+    needs: candidate-gate
+    if: needs.candidate-gate.outputs.fresh == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      eligible: ${{ steps.final_freshness.outputs.eligible }}
+    steps:
+      - name: Checkout exact certified PR head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.candidate-gate.outputs.certified_sha }}
+          fetch-depth: 0
 
-      - name: Recheck exact certified SHA before merge
-        if: steps.freshness.outputs.fresh == 'true'
-        id: premerge
+      - name: Verify PR and candidate still point to certified SHA
+        id: pr_freshness
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ github.sha }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
         run: |
           set -euo pipefail
           pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
           current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
           if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::notice::Certified SHA is no longer the PR/candidate HEAD. This run is superseded and will not merge."
+            echo "::notice::PR/candidate advanced before PR certification. This run is superseded and will be a no-op."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Node.js
+        if: steps.pr_freshness.outputs.current == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        if: steps.pr_freshness.outputs.current == 'true'
+        timeout-minutes: 5
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+
+      - name: Install pinned Playwright Chromium
+        if: steps.pr_freshness.outputs.current == 'true'
+        shell: bash
+        run: |
+          npx playwright install --with-deps chromium
+          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+
+      - name: Run PR unified error reporter regression
+        if: steps.pr_freshness.outputs.current == 'true'
+        run: npm run test:reporter
+
+      - name: Run PR GHRAB QA release gate
+        if: steps.pr_freshness.outputs.current == 'true'
+        run: npm run qa:release
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+
+      - name: Verify PR GHRAB Platform P3 conformance
+        if: steps.pr_freshness.outputs.current == 'true'
+        run: npm run qa:platform
+
+      - name: Enforce PR P5 R2 release gate including GARP 2.5 and N5
+        if: steps.pr_freshness.outputs.current == 'true'
+        run: npm run qa:p5:ci
+
+      - name: Upload PR certification evidence
+        if: always() && steps.pr_freshness.outputs.current == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-pr-certification-${{ needs.candidate-gate.outputs.certified_sha }}
+          path: qa-results
+
+      - name: Recheck exact PR head after certification
+        if: steps.pr_freshness.outputs.current == 'true'
+        id: final_freshness
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
+          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
+            echo "::notice::Candidate advanced during PR certification. Certified SHA will not be merged."
             echo "eligible=false" >> "$GITHUB_OUTPUT"
           else
             echo "eligible=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Merge verified candidate into main
+  promote:
+    name: promote-certified-pr
+    needs: [candidate-gate, pr-certification]
+    if: needs.candidate-gate.outputs.fresh == 'true' && needs.pr-certification.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact certified SHA
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.candidate-gate.outputs.certified_sha }}
+          fetch-depth: 0
+
+      - name: Final fail-closed freshness gate
+        id: premerge
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
+          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
+            echo "::notice::Certified SHA is no longer the PR/candidate HEAD. Promotion is superseded and will be a no-op."
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "eligible=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge certified pull request into main
         if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ github.sha }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
         run: |
           set -euo pipefail
           gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --merge --match-head-commit "$CERTIFIED_SHA"
@@ -161,7 +261,7 @@ jobs:
         id: merged
         shell: bash
         env:
-          CERTIFIED_SHA: ${{ github.sha }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
         run: |
           set -euo pipefail
           git fetch --no-tags origin main
@@ -212,3 +312,25 @@ jobs:
 
           echo "Waiting for production deployment run $deploy_run on main $MAIN_HEAD."
           gh run watch "$deploy_run" --repo "$GITHUB_REPOSITORY" --exit-status
+
+      - name: Synchronise candidate to promoted main when still safe
+        if: steps.premerge.outputs.eligible == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          MAIN_HEAD: ${{ steps.merged.outputs.main_head }}
+        run: |
+          set -euo pipefail
+          current_candidate="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/candidate" --jq '.object.sha')"
+          if [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
+            echo "::notice::Candidate advanced to $current_candidate after merge; refusing to overwrite newer candidate work."
+            exit 0
+          fi
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/candidate" -f sha="$MAIN_HEAD" -F force=true >/dev/null
+          synced_candidate="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/candidate" --jq '.object.sha')"
+          if [ "$synced_candidate" != "$MAIN_HEAD" ]; then
+            echo "::error::Candidate synchronisation failed ($synced_candidate != $MAIN_HEAD)."
+            exit 1
+          fi
+          echo "Candidate synchronised to promoted main $MAIN_HEAD."
