@@ -1,0 +1,139 @@
+name: Stage 2 bootstrap main protection
+
+on:
+  push:
+    branches: [stage2-main-protection]
+
+permissions:
+  contents: read
+
+jobs:
+  configure-and-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Configure exact main ruleset
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.SAFE_PROMOTION_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::Missing SAFE_PROMOTION_TOKEN. Cannot configure branch governance."
+            exit 1
+          fi
+
+          existing="$(gh api "repos/${REPOSITORY}/rulesets" --jq '[.[] | select(.name == "main" and .target == "branch")][0].id // empty')"
+          if [ -n "$existing" ]; then
+            echo "A main branch ruleset already exists: $existing"
+            ruleset_id="$existing"
+          else
+            cat > "$RUNNER_TEMP/main-ruleset.json" <<'JSON'
+          {
+            "name": "main",
+            "target": "branch",
+            "enforcement": "active",
+            "bypass_actors": [],
+            "conditions": {
+              "ref_name": {
+                "include": ["refs/heads/main"],
+                "exclude": []
+              }
+            },
+            "rules": [
+              {"type": "deletion"},
+              {"type": "non_fast_forward"},
+              {
+                "type": "pull_request",
+                "parameters": {
+                  "required_approving_review_count": 0,
+                  "dismiss_stale_reviews_on_push": false,
+                  "required_reviewers": [],
+                  "require_code_owner_review": false,
+                  "require_last_push_approval": false,
+                  "required_review_thread_resolution": false,
+                  "require_extra_approval_for_unattributed_changes": false,
+                  "allowed_merge_methods": ["merge", "squash", "rebase"]
+                }
+              },
+              {
+                "type": "required_status_checks",
+                "parameters": {
+                  "strict_required_status_checks_policy": false,
+                  "do_not_enforce_on_create": false,
+                  "required_status_checks": [
+                    {"context": "p5-release-gate", "integration_id": 15368}
+                  ]
+                }
+              }
+            ]
+          }
+          JSON
+            ruleset_id="$(gh api --method POST "repos/${REPOSITORY}/rulesets" --input "$RUNNER_TEMP/main-ruleset.json" --jq '.id')"
+            echo "Created main ruleset: $ruleset_id"
+          fi
+
+          gh api "repos/${REPOSITORY}/rulesets/${ruleset_id}" > "$RUNNER_TEMP/main-ruleset-live.json"
+          jq -e '
+            .name == "main" and
+            .target == "branch" and
+            .enforcement == "active" and
+            .conditions.ref_name.include == ["refs/heads/main"] and
+            .conditions.ref_name.exclude == [] and
+            (.bypass_actors | length) == 0 and
+            .current_user_can_bypass == "never" and
+            ([.rules[].type] | index("deletion")) != null and
+            ([.rules[].type] | index("non_fast_forward")) != null and
+            ([.rules[].type] | index("pull_request")) != null and
+            ([.rules[].type] | index("required_status_checks")) != null and
+            ([.rules[] | select(.type == "pull_request")][0].parameters.required_approving_review_count == 0) and
+            ([.rules[] | select(.type == "required_status_checks")][0].parameters.required_status_checks == [{"context":"p5-release-gate","integration_id":15368}])
+          ' "$RUNNER_TEMP/main-ruleset-live.json" >/dev/null
+          echo "Main ruleset matches the required fail-closed governance model."
+
+      - name: Prove direct main ref update is rejected
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.SAFE_PROMOTION_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          main_sha="$(gh api "repos/${REPOSITORY}/git/ref/heads/main" --jq '.object.sha')"
+          tree_sha="$(gh api "repos/${REPOSITORY}/git/commits/${main_sha}" --jq '.tree.sha')"
+
+          cat > "$RUNNER_TEMP/probe-commit.json" <<JSON
+          {
+            "message": "stage2 direct-write probe (expected blocked)",
+            "tree": "$tree_sha",
+            "parents": ["$main_sha"]
+          }
+          JSON
+          probe_sha="$(gh api --method POST "repos/${REPOSITORY}/git/commits" --input "$RUNNER_TEMP/probe-commit.json" --jq '.sha')"
+          echo "Created inert probe commit object $probe_sha with the exact same tree as main."
+
+          set +e
+          output="$(gh api --method PATCH "repos/${REPOSITORY}/git/refs/heads/main" -f sha="$probe_sha" -F force=false 2>&1)"
+          status=$?
+          set -e
+
+          current_main="$(gh api "repos/${REPOSITORY}/git/ref/heads/main" --jq '.object.sha')"
+          if [ "$status" -eq 0 ]; then
+            echo "::error::Direct main update unexpectedly succeeded. Attempting immediate restoration."
+            set +e
+            restore_output="$(gh api --method PATCH "repos/${REPOSITORY}/git/refs/heads/main" -f sha="$main_sha" -F force=true 2>&1)"
+            restore_status=$?
+            set -e
+            if [ "$restore_status" -ne 0 ]; then
+              echo "::error::Emergency restoration failed: $restore_output"
+            fi
+            exit 1
+          fi
+
+          if [ "$current_main" != "$main_sha" ]; then
+            echo "::error::Protected main moved despite rejected update ($main_sha -> $current_main)."
+            exit 1
+          fi
+
+          echo "$output"
+          echo "Direct main ref update was rejected and main remained at $main_sha."
