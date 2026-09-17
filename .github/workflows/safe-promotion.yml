@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 concurrency:
   group: generator-safe-promotion
@@ -16,9 +17,10 @@ concurrency:
 jobs:
   candidate-gate:
     name: candidate-gate
+    if: github.ref == 'refs/heads/candidate'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout certified candidate SHA
+      - name: Checkout exact candidate SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
@@ -64,7 +66,8 @@ jobs:
           name: generator-candidate-qa-${{ github.sha }}
           path: qa-results
 
-      - name: Refuse stale candidate promotion
+      - name: Check candidate is still the certified SHA
+        id: freshness
         shell: bash
         env:
           CERTIFIED_SHA: ${{ github.sha }}
@@ -73,11 +76,14 @@ jobs:
           git fetch --no-tags origin candidate
           current_candidate="$(git rev-parse origin/candidate)"
           if [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::error::candidate advanced during certification ($CERTIFIED_SHA -> $current_candidate); refusing stale promotion."
-            exit 1
+            echo "::notice::Candidate advanced during certification ($CERTIFIED_SHA -> $current_candidate). This run is superseded and will not promote anything."
+            echo "fresh=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "fresh=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create or reuse candidate pull request
+        if: steps.freshness.outputs.fresh == 'true'
         id: pr
         shell: bash
         env:
@@ -87,17 +93,42 @@ jobs:
           set -euo pipefail
           current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
           if [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::error::candidate changed before PR creation ($CERTIFIED_SHA -> $current_candidate)."
+            echo "::error::Candidate changed before PR creation ($CERTIFIED_SHA -> $current_candidate)."
             exit 1
           fi
           pr_number="$(gh pr list --repo "$GITHUB_REPOSITORY" --head candidate --base main --state open --json number --jq '.[0].number // empty')"
           if [ -z "$pr_number" ]; then
-            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.5/N5, QA, P3 and P5 R2 may be promoted.')"
+            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.5/N5, QA, P3 and P5 R2 may be promoted. The PR certification must also pass before merge.')"
             pr_number="${pr_url##*/}"
           fi
           echo "number=$pr_number" >> "$GITHUB_OUTPUT"
 
-      - name: Recheck certified SHA before merge
+      - name: Wait for pull request certification
+        if: steps.freshness.outputs.fresh == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          set -euo pipefail
+          run_id=""
+          for attempt in $(seq 1 60); do
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?event=pull_request&branch=candidate&per_page=20" --jq ".workflow_runs[] | select(.name == \"Certifikace a nasazení Generátoru testů\") | select(any(.pull_requests[]?; .number == ${PR_NUMBER})) | .id" | head -n 1)"
+            if [ -n "$run_id" ]; then
+              break
+            fi
+            sleep 5
+          done
+          if [ -z "$run_id" ]; then
+            echo "::error::No pull-request certification run appeared for PR #$PR_NUMBER."
+            exit 1
+          fi
+          echo "Waiting for PR certification run $run_id."
+          gh run watch "$run_id" --repo "$GITHUB_REPOSITORY" --exit-status
+
+      - name: Recheck exact certified SHA before merge
+        if: steps.freshness.outputs.fresh == 'true'
+        id: premerge
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -108,15 +139,76 @@ jobs:
           pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
           current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
           if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::error::certified SHA is no longer the PR/candidate HEAD; refusing merge."
-            exit 1
+            echo "::notice::Certified SHA is no longer the PR/candidate HEAD. This run is superseded and will not merge."
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "eligible=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Merge verified candidate into main
+        if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ github.sha }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
         run: |
           set -euo pipefail
-          gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --merge
+          gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --merge --match-head-commit "$CERTIFIED_SHA"
+
+      - name: Verify merged source is present on main
+        if: steps.premerge.outputs.eligible == 'true'
+        id: merged
+        shell: bash
+        env:
+          CERTIFIED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          main_head="$(git rev-parse origin/main)"
+          if ! git merge-base --is-ancestor "$CERTIFIED_SHA" origin/main; then
+            echo "::error::Certified SHA $CERTIFIED_SHA is not contained in main $main_head after merge."
+            exit 1
+          fi
+          echo "main_head=$main_head" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure production deployment runs on merged main
+        if: steps.premerge.outputs.eligible == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAIN_HEAD: ${{ steps.merged.outputs.main_head }}
+        run: |
+          set -euo pipefail
+          find_run() {
+            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/runs?branch=main&per_page=20" --jq ".workflow_runs[] | select(.head_sha == \"$MAIN_HEAD\") | select(.event == \"push\" or .event == \"workflow_dispatch\") | .id" | head -n 1
+          }
+
+          deploy_run=""
+          for attempt in $(seq 1 6); do
+            deploy_run="$(find_run)"
+            if [ -n "$deploy_run" ]; then
+              break
+            fi
+            sleep 5
+          done
+
+          if [ -z "$deploy_run" ]; then
+            echo "No automatic main deploy run detected; dispatching deploy.yml explicitly on main."
+            gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
+            for attempt in $(seq 1 60); do
+              deploy_run="$(find_run)"
+              if [ -n "$deploy_run" ]; then
+                break
+              fi
+              sleep 5
+            done
+          fi
+
+          if [ -z "$deploy_run" ]; then
+            echo "::error::Production deployment run did not appear for main SHA $MAIN_HEAD."
+            exit 1
+          fi
+
+          echo "Waiting for production deployment run $deploy_run on main $MAIN_HEAD."
+          gh run watch "$deploy_run" --repo "$GITHUB_REPOSITORY" --exit-status
