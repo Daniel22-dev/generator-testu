@@ -18,6 +18,12 @@ concurrency:
 jobs:
   qa-build:
     runs-on: ubuntu-latest
+    outputs:
+      release_version: ${{ steps.release_identity.outputs.version }}
+      source_commit: ${{ steps.release_identity.outputs.source_commit }}
+      artifact_digest: ${{ steps.release_identity.outputs.artifact_digest }}
+      manifest_sha256: ${{ steps.release_identity.outputs.manifest_sha256 }}
+      assurance_mode: ${{ steps.release_identity.outputs.assurance_mode }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -54,6 +60,37 @@ jobs:
       - name: Enforce P5 R2 release gate
         run: npm run qa:p5:ci
 
+      - name: Prepare release identity
+        env:
+          GHRAB_SOURCE_COMMIT: ${{ github.sha }}
+          GHRAB_SOURCE_REPOSITORY: ${{ github.repository }}
+          GHRAB_BUILD_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          GHRAB_WORKFLOW_REF: ${{ github.workflow_ref }}
+          GHRAB_BUILDER_ID: github-actions-hosted
+          GHRAB_BUILD_ENTRYPOINT: npm run qa:p5:ci
+          GHRAB_BUILD_PROFILE: github-pages-release
+        run: node scripts/prepare-release-identity.mjs
+
+      - name: Export release identity
+        id: release_identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs = require('node:fs');
+          const release = JSON.parse(fs.readFileSync('dist/release-integrity.json', 'utf8'));
+          for (const [key, value] of Object.entries({
+            version: release.version,
+            source_commit: release.sourceCommit,
+            artifact_digest: release.artifactDigest,
+            manifest_sha256: release.manifestSha256,
+            assurance_mode: release.assuranceMode,
+          })) {
+            if (!value) throw new Error(`Missing release identity output ${key}`);
+            console.log(`${key}=${value}`);
+          }
+          NODE
+
       - name: Verify AI Studio dispatch credential
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         shell: bash
@@ -87,19 +124,95 @@ jobs:
 
   notify-ai-studio:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: deploy
+    needs: [qa-build, deploy]
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - name: Notify AI Studio after successful Pages deployment
+      - name: Verify deployed release identity with bounded retry
+        shell: bash
+        env:
+          DEPLOYED_URL: ${{ needs.deploy.outputs.page_url }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          EXPECTED_VERSION: ${{ needs.qa-build.outputs.release_version }}
+          EXPECTED_SOURCE_SHA: ${{ needs.qa-build.outputs.source_commit }}
+          EXPECTED_ARTIFACT_DIGEST: ${{ needs.qa-build.outputs.artifact_digest }}
+          EXPECTED_MANIFEST_SHA256: ${{ needs.qa-build.outputs.manifest_sha256 }}
+          EXPECTED_ASSURANCE_MODE: ${{ needs.qa-build.outputs.assurance_mode }}
+        run: |
+          set -euo pipefail
+          base="${DEPLOYED_URL%/}/"
+          verified=0
+          for attempt in $(seq 1 10); do
+            nonce="${EXPECTED_SOURCE_SHA}-${attempt}"
+            rm -f live-studio-manifest.json live-release-integrity.json
+            if curl --fail --silent --show-error --max-time 15 -H 'Cache-Control: no-cache' "${base}studio-manifest.json?ghrab=${nonce}" -o live-studio-manifest.json \
+              && curl --fail --silent --show-error --max-time 15 -H 'Cache-Control: no-cache' "${base}release-integrity.json?ghrab=${nonce}" -o live-release-integrity.json; then
+              if node <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          const hash = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
+          const manifestBytes = fs.readFileSync('live-studio-manifest.json');
+          const manifest = JSON.parse(manifestBytes.toString('utf8'));
+          const release = JSON.parse(fs.readFileSync('live-release-integrity.json', 'utf8'));
+          const expected = {
+            repository: process.env.SOURCE_REPOSITORY.toLowerCase(),
+            version: process.env.EXPECTED_VERSION,
+            sourceSha: process.env.EXPECTED_SOURCE_SHA.toLowerCase(),
+            artifactDigest: process.env.EXPECTED_ARTIFACT_DIGEST,
+            manifestSha256: process.env.EXPECTED_MANIFEST_SHA256,
+            assuranceMode: process.env.EXPECTED_ASSURANCE_MODE,
+          };
+          const checks = [
+            [manifest.id === 'generator', 'manifest appId'],
+            [manifest.version === expected.version, 'manifest version'],
+            [String(manifest.repository || '').toLowerCase() === expected.repository, 'manifest repository'],
+            [manifest.releaseIdentity?.contract === 'ghrab-release-integrity-v2', 'manifest releaseIdentity contract'],
+            [manifest.releaseIdentity?.assuranceMode === expected.assuranceMode, 'manifest assurance mode'],
+            [release.schema === 'ghrab-release-integrity-v2', 'release schema'],
+            [release.appId === 'generator' && release.version === expected.version, 'release app/version'],
+            [String(release.sourceRepository || '').toLowerCase() === expected.repository, 'release repository'],
+            [String(release.sourceCommit || '').toLowerCase() === expected.sourceSha, 'release source commit'],
+            [release.artifactDigest === expected.artifactDigest, 'release artifact digest'],
+            [release.manifestSha256 === expected.manifestSha256, 'release manifest digest'],
+            [release.assuranceMode === expected.assuranceMode, 'release assurance mode'],
+            [hash(manifestBytes) === expected.manifestSha256, 'live manifest bytes'],
+          ];
+          const failed = checks.filter(([ok]) => !ok).map(([, label]) => label);
+          if (failed.length) {
+            console.error(`Live release identity not propagated yet: ${failed.join(', ')}`);
+            process.exit(1);
+          }
+          console.log(`Live release identity verified for generator ${expected.version} @ ${expected.sourceSha}`);
+          NODE
+              then
+                verified=1
+                break
+              fi
+            fi
+            echo "Live release identity not ready (attempt ${attempt}/10)."
+            sleep 6
+          done
+          if [ "$verified" -ne 1 ]; then
+            echo "::error::Live release identity did not converge after bounded retry. Refusing app-updated dispatch."
+            exit 1
+          fi
+
+      - name: Notify AI Studio after verified Pages deployment
         shell: bash
         env:
           AI_STUDIO_DISPATCH_TOKEN: ${{ secrets.AI_STUDIO_DISPATCH_TOKEN }}
           SOURCE_REPOSITORY: ${{ github.repository }}
-          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_SHA: ${{ needs.qa-build.outputs.source_commit }}
           DEPLOYED_URL: ${{ needs.deploy.outputs.page_url }}
+          RELEASE_VERSION: ${{ needs.qa-build.outputs.release_version }}
+          ARTIFACT_DIGEST: ${{ needs.qa-build.outputs.artifact_digest }}
+          MANIFEST_SHA256: ${{ needs.qa-build.outputs.manifest_sha256 }}
+          ASSURANCE_MODE: ${{ needs.qa-build.outputs.assurance_mode }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
+          set -euo pipefail
           node <<'NODE'
           const payload = {
             event_type: 'app-updated',
@@ -108,6 +221,13 @@ jobs:
               source_repository: process.env.SOURCE_REPOSITORY,
               source_sha: process.env.SOURCE_SHA,
               deployed_url: process.env.DEPLOYED_URL,
+              version: process.env.RELEASE_VERSION,
+              artifact_digest: process.env.ARTIFACT_DIGEST,
+              manifest_sha256: process.env.MANIFEST_SHA256,
+              assurance_mode: process.env.ASSURANCE_MODE,
+              release_identity_contract: 'ghrab-release-integrity-v2',
+              run_id: process.env.RUN_ID,
+              run_attempt: process.env.RUN_ATTEMPT,
             },
           };
           require('node:fs').writeFileSync('dispatch.json', JSON.stringify(payload));
