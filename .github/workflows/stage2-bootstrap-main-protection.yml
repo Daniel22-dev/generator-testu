@@ -15,12 +15,12 @@ jobs:
       - name: Configure exact main ruleset
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.SAFE_PROMOTION_TOKEN }}
+          GH_TOKEN: ${{ secrets.AI_STUDIO_DISPATCH_TOKEN }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           if [ -z "${GH_TOKEN:-}" ]; then
-            echo "::error::Missing SAFE_PROMOTION_TOKEN. Cannot configure branch governance."
+            echo "::error::Missing AI_STUDIO_DISPATCH_TOKEN. Cannot configure branch governance."
             exit 1
           fi
 
@@ -95,7 +95,7 @@ jobs:
       - name: Prove direct main ref update is rejected
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.SAFE_PROMOTION_TOKEN }}
+          GH_TOKEN: ${{ secrets.AI_STUDIO_DISPATCH_TOKEN }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
