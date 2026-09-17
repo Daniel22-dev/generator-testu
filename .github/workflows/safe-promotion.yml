@@ -220,6 +220,7 @@ jobs:
     needs: [candidate-gate, pr-certification]
     if: needs.candidate-gate.outputs.fresh == 'true' && needs.pr-certification.outputs.eligible == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout exact certified SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -243,6 +244,48 @@ jobs:
             echo "eligible=false" >> "$GITHUB_OUTPUT"
           else
             echo "eligible=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Require independent p5-release-gate for exact certified SHA
+        if: steps.premerge.outputs.eligible == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 80); do
+            checks="$(gh api -H 'Accept: application/vnd.github+json' "repos/$GITHUB_REPOSITORY/commits/$CERTIFIED_SHA/check-runs?per_page=100")"
+            success_count="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and .conclusion == "success")] | length' <<<"$checks")"
+            if [ "$success_count" -gt 0 ]; then
+              echo "Independent p5-release-gate is GREEN for exact SHA $CERTIFIED_SHA."
+              exit 0
+            fi
+            terminal_failure="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure"))] | length' <<<"$checks")"
+            if [ "$terminal_failure" -gt 0 ]; then
+              echo "::error::Independent p5-release-gate is terminal RED for exact SHA $CERTIFIED_SHA."
+              exit 1
+            fi
+            echo "Waiting for independent p5-release-gate on exact SHA $CERTIFIED_SHA (attempt $attempt/80)."
+            sleep 15
+          done
+          echo "::error::Independent p5-release-gate did not reach GREEN for exact SHA $CERTIFIED_SHA within the bounded wait."
+          exit 1
+
+      - name: Recheck candidate and PR after required P5
+        if: steps.premerge.outputs.eligible == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
+          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
+            echo "::error::Candidate or promotion PR moved while waiting for required P5; refusing merge."
+            exit 1
           fi
 
       - name: Merge certified pull request into main
