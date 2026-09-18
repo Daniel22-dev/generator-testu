@@ -306,7 +306,7 @@ function buildSecurityGuideBodyHtml() {
       '</div>' +
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Gemini API klíč</div>' +
-        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong>. Každý učitel má vlastní klíč — musí být omezený na Gemini API.</p>' +
+        '<p class="sec-guide-p">Klíč se používá <strong>jen pro aktuální relaci</strong> a po zavření prohlížeče se zapomene. Každý učitel má vlastní klíč — musí být omezený na Gemini API.</p>' +
         '<div class="sec-guide-warn">⚠️ Na sdíleném počítači nikdy neukládejte klíč trvale.</div>' +
       '</div>' +
       '<div class="sec-guide-section">' +
