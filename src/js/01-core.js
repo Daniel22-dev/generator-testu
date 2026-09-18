@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.43',
-  date:    '2026-09-16',
+  version: '7.1.44',
+  date:    '2026-09-18',
   status:  'production-serverless',
   changes: [
+    'UI/WORKFLOW AUDIT (7.1.44): sjednocena horní lišta do jedné řady, účet AI Studia přesunut do hlavičky a historická Správa přístupů odstraněna; API klíč/model přesunuty na první stránku; odstraněny duplicitní vlastní nastavení a vlastní typ cvičení; opraven světlý footer a nečitelná modální okna; aktualizovány bezpečnostní návody, realistická rizika přísného testu a poradce podle skutečného runtime.',
     'ETAPA 6 – MASTER CLEANUP (7.1.43): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.41): bez změny aplikační logiky. Patch ověřuje skutečné automatické převzetí nové verze AI Studiem. Release zachovává GARP 2.5/N5, platformní kontrakt 1.1.2, Studio Bridge v2, secure runtime, Forms, scoring, kryptografii i AI workflow; po úspěšném Pages deployi Generátor nově odešle AI Studiu repository_dispatch app-updated.',
@@ -38,7 +39,6 @@ const RELEASE = Object.freeze({
     'ETAPA 6 – JEDEN UČITELSKÝ PŘÍSTUPOVÝ KÓD (7.1.37): Generátor má místo samostatného učitelského PINu a odemykacího hesla jeden učitelský přístupový kód. Z jednoho kanonizovaného kódu se nadále odvozují dva různé PBKDF2 hashe s oddělenými doménami teacher-pin a unlock-password; teacher login a povolení dalšího pokusu ověřují pouze teacher-pin, zámková obrazovka pouze unlock-password. Skrytý legacy #heslo zůstává jen jako interní mirror pro kompatibilitu a neřídí kryptografii. Bezpečnost pracoviště, verifier, Google Forms, scoring, RSA/AES a formát SECURE-ANSWERS-V1 se nemění.',
     'ETAPA 5 – PŘEHLEDNĚJŠÍ POKROČILÁ NASTAVENÍ (7.1.36): Pokročilý režim nyní seskupuje stávající volby do pěti sekcí Test / Student / Zpětná vazba / Bezpečnost / Vzhled. Přesouvají se původní DOM prvky se stejnými ID, hodnotami, handlery a validacemi; Simple režim je vrací na původní místa. Ochrana opakovaného pokusu je pouze vysvětlující informace o existujícím secure-offline zámku, nikoli nový přepínač. Studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.',
     'ETAPA 4 – STUDENTSKÉ ODEVZDÁNÍ PŘES GOOGLE FORMS (7.1.34): v Nastavení Generátoru lze uložit pouze validovaný responder odkaz Google Forms. Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého SECURE-ANSWERS-V1 payloadu a otevření školního formuláře; answers.txt zůstává nouzová záloha a automatický fallback při chybějícím formuláři nebo neobvykle dlouhém payloadu. URL formuláře je součástí integrity-bound konfigurace. Formát šifrovaného výsledku, RSA/AES kryptografie, scoring, PIN/odemčení a Stage 3 verifier CSV import se nemění.',
-    'ETAPA 3 – GOOGLE FORMS CSV IMPORT (7.1.33): učitelský secure verifier umí načíst CSV export odpovědí z Google Forms. Automaticky detekuje čárku/středník/tabulátor, najde celý SECURE-ANSWERS-V1 payload, volitelně připojí e-mail a čas formuláře, ignoruje ostatní sloupce a každý payload ověřuje stejnou kryptografickou a bodovací cestou jako answers.txt. Chybějící, nejednoznačné, poškozené nebo cizí payloady jsou fail-closed a viditelné po řádcích; duplicity zůstávají pod stávající kontrolou verifieru. Studentský runtime, formát secure balíku, kryptografie, PIN/odemčení a serverový profil se nemění.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -477,15 +477,15 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'gemini-api-klic',title:'Gemini API klíč',status:'reseno',
   keywords:['gemini','api klic','apikey','klic gemini','ai generovani','primo generovat','vytvorit test primo','model gemini'],
-  simple:'Generátor umí volat Gemini a vytvořit test přímo. Klíč zadáš ve žluté sekci. Bez klíče zkopíruješ prompt do Claude/ChatGPT.',
-  detailed:'Ve žluté sekci zadáš Gemini API klíč; pak tlačítko „Vytvořit test přímo" pošle prompt (a multimodální přílohy) přes callGeminiJSON na Google API. Klíč se posílá jen v hlavičce požadavku na Google, nikam jinam. Bez klíče generátor funguje tak, že vygeneruje prompt k ručnímu zkopírování do jiného AI nástroje. Model lze změnit v poli „Model".',
+  simple:'Generátor umí volat Gemini a vytvořit test přímo. Klíč zadáš na první stránce v sekci AI připojení. Bez klíče zkopíruješ prompt do Claude/ChatGPT.',
+  detailed:'Na první stránce v sekci AI připojení zadáš Gemini API klíč; pak tlačítko „Vytvořit test přímo" pošle prompt (a multimodální přílohy) přes callGeminiJSON na Google API. Klíč se posílá jen v hlavičce požadavku na Google, nikam jinam. Bez klíče generátor funguje tak, že vygeneruje prompt k ručnímu zkopírování do jiného AI nástroje. Model lze změnit v poli „Model".',
   evidence:['callGeminiJSON()','x-goog-api-key (jen na Google API)','buildGeminiFilePartsForApi()','geminiApiKey','„Vytvořit test přímo"']},
 
- {id:'ukladani-api-klice',title:'Ukládání API klíče (relace vs trvale)',status:'reseno',
+ {id:'ukladani-api-klice',title:'Ukládání API klíče (jen relace)',status:'reseno',
   keywords:['ukladani klice','kam se uklada klic','sessionstorage klic','localstorage klic','zapamatovat klic','relace klic','trvale klic','uchovani klice'],
-  simple:'Klíč můžeš použít jen pro tuto relaci (po zavření prohlížeče se zapomene), nebo ho uložit trvale v tomto prohlížeči. Trvalé uložení je pohodlnější, ale klíč zůstává na zařízení.',
+  simple:'Klíč se používá jen pro tuto relaci a po zavření prohlížeče se zapomene. Trvalé ukládání provider klíče je z bezpečnostních důvodů vypnuté.',
   detailed:'„Relace" (useGeminiKeyForSession) drží klíč jen do zavření prohlížeče. Tlačítko saveGeminiKeyPermanent je od P1 bezpečnostní alias pro uložení pouze do relace; trvalé browserové uložení je vypnuto. Klíč se odesílá výhradně do Google API v hlavičce, nikdy do žádné jiné služby ani do tohoto poradce.',
-  evidence:['useGeminiKeyForSession() (btnUseKeySession)','saveGeminiKeyPermanent() (btnSaveKeyPermanent)','geminiNote: „Relace = po zavření se zapomene"']},
+  evidence:['useGeminiKeyForSession() (btnUseKeySession)','sessionStorage','geminiNote: „Klíč se ukládá pouze pro tuto relaci"']},
 
  {id:"pristupove-kody",title:"Přístup z AI Studia",status:"reseno",
   keywords:["pristupovy kod","pristupovy soubor","access code","prihlaseni","AI Studio","odemknout aplikaci"],
@@ -496,8 +496,8 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"admin-sprava",title:"Admin správa přístupů",status:"reseno",
   keywords:["admin","sprava pristupu","administrace","spravce","vydat pristup","odvolat pristup"],
   simple:"Admin spravuje přístupy centrálně v AI Studiu. Soukromým podpisovým klíčem vydává osobní oprávnění a pomocí JTI může konkrétní přístup zneplatnit.",
-  detailed:"Tlačítko Správa přístupů otevírá administrátorský nástroj AI Studia. Soukromý podpisový klíč se načítá pouze při vydávání přístupu a nesmí být v GitHubu. Kolegovi se posílá jen jeho .ghrab-access.json. Zneplatnění se provádí přidáním JTI do centrálního revokačního seznamu a novým nasazením Studia. Bez serveru jde o silnou organizační a kryptografickou bránu, nikoli o ověření skutečné identity uživatele.",
-  evidence:["openAdminPanel()","AI Studio access issuer","revoked-access.json","JTI","ECDSA P-256"]},
+  detailed:"Správa přístupů probíhá centrálně v AI Studiu, ne z hlavičky Generátoru. Soukromý podpisový klíč se načítá pouze při vydávání přístupu a nesmí být v GitHubu. Kolegovi se posílá jen jeho .ghrab-access.json. Zneplatnění se provádí přidáním JTI do centrálního revokačního seznamu a novým nasazením Studia. Bez serveru jde o silnou organizační a kryptografickou bránu, nikoli o ověření skutečné identity uživatele.",
+  evidence:["AI Studio access issuer","revoked-access.json","JTI","ECDSA P-256"]},
 
  {id:"storage",title:"localStorage / sessionStorage (co se ukládá)",status:"reseno",
   keywords:["localstorage","sessionstorage","uklada","co se uklada","data v prohlizeci","soukromi dat","kam se uklada"],
@@ -676,7 +676,7 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'chyba-400',title:'Chyba 400 / INVALID_ARGUMENT při generování',status:'reseno',
   keywords:['400','invalid argument','invalid_argument','neplatny klic','neplatný klíč','api key not valid','spatny klic','špatný klíč','klic nefunguje','klíč nefunguje','neplatny pozadavek','neplatný požadavek'],
-  simple:'Chyba 400 nejčastěji znamená neplatný API klíč. Zkontroluj klíč ve žluté sekci — zkopíruj ho znovu z aistudio.google.com → API Keys.',
+  simple:'Chyba 400 nejčastěji znamená neplatný API klíč. Zkontroluj klíč na první stránce v sekci AI připojení — zkopíruj ho znovu z aistudio.google.com → API Keys.',
   detailed:'HTTP 400 INVALID_ARGUMENT znamená neplatný tvar požadavku, nepodporovanou kombinaci modelu/příloh nebo jiný chybný parametr. Neplatný či neoprávněný klíč se častěji projeví jako 401/403. Zkontroluj model, URL a přílohy; pro návrat k ověřené volbě použij Výchozí (gemini-3.6-flash).',
   evidence:['geminiApiErrorMessage()','HTTP 400','INVALID_ARGUMENT','getGeminiInputKey()','useGeminiKeyForSession()']},
 
@@ -712,7 +712,7 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'chyba-model-nenalezen',title:'Chyba: model nenalezen / není podporován',status:'reseno',
   keywords:['model nenalezen','model nenalezeny','model not found','not found','not supported','unsupported','404','model nefunguje','spatny model','špatný model','neexistujici model','neexistující model'],
-  simple:'Název modelu ve žluté sekci neexistuje nebo již není dostupný. Přepni přes Výchozí nebo ⚡ Silný na gemini-3.6-flash.',
+  simple:'Název modelu v sekci AI připojení na první stránce neexistuje nebo již není dostupný. Přepni přes Výchozí nebo ⚡ Silný na gemini-3.6-flash.',
   detailed:'HTTP 404 nebo odpověď not found znamená, že zadaný model není dostupný. ⚡ Silný nastaví stabilní gemini-3.6-flash, 🪶 Lite stabilní gemini-3.5-flash-lite a Výchozí obnoví doporučenou volbu. Dostupnost modelů ověř v oficiální dokumentaci Gemini API.',
   evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']},
 
@@ -989,7 +989,7 @@ const GENERATOR_ASSISTANT_KB = [
   keywords:["admin","administrator","proskoleny ucitel","role","opravneni","co muze admin"],
   simple:"Proškolený učitel používá jen aplikace uvedené ve svém přístupu. Admin má automaticky otevřeny všechny aplikace a navíc správcovské nástroje AI Studia.",
   detailed:"Role admin obchází jednotlivý seznam aplikací, otevírá Test Lab a odkazy na centrální správu. Role trainedTeacher používá běžné funkce Generátoru, ale nevydává cizí přístupy. Rozsah oprávnění je součástí digitálně podepsaného permitu a nelze jej změnit prostou editací JSON bez zneplatnění podpisu.",
-  evidence:["accIsAdmin()","openAdminPanel()","role: admin","apps[]","digitální podpis"]},
+  evidence:["accIsAdmin()","role: admin","apps[]","digitální podpis"]},
 
  {id:"logo-skola",title:"Jak změnit logo nebo název aplikace",status:"reseno",
   keywords:["logo", "logo skoly", "logo školy", "nazev skoly", "název školy", "skola", "škola", "branding", "vlastni logo", "vlastní logo", "pridat logo", "přidat logo", "upravit generátor", "vzhled generátoru"],
@@ -1031,7 +1031,7 @@ async function gaRunSearch(){
     gaState.ai=null; gaState.loading=false;
     const box=document.getElementById('gaResult');
     if(box) box.innerHTML='<div class="ga-card"><span class="ga-status ga-st-mid">⚠ Potřebuješ AI klíč</span>'
-      +'<p class="ga-hint">Poradce odpovídá přes AI. Zadej prosím Gemini API klíč ve žluté sekci a zkus dotaz znovu.</p></div>';
+      +'<p class="ga-hint">Poradce odpovídá přes AI. Zadej prosím Gemini API klíč na první stránce v sekci AI připojení a zkus dotaz znovu.</p></div>';
     return;
   }
   gaState.ai=null; gaState.query=q; gaState.loading=true; renderGeneratorAssistantAnswer();
@@ -1152,7 +1152,7 @@ function openGeneratorAssistant(){
   bd.id='gaBackdrop'; bd.className='ui-modal-backdrop'; bd.setAttribute('role','dialog'); bd.setAttribute('aria-modal','true'); bd.setAttribute('aria-label','Poradce ke generátoru');
   bd.innerHTML='<div class="ui-modal-box ga-box">'
     + '<div class="ga-head"><span>💬 Poradce ke generátoru</span><button type="button" class="ga-x" id="gaClose" aria-label="Zavřít">✕</button></div>'
-    + '<div class="ga-desc">Zeptej se na cokoliv o funkcích, bezpečnosti nebo ovládání generátoru. Odpovídá AI, ale drží se jen toho, co generátor opravdu umí — když to v něm není, řekne to. (Vyžaduje Gemini klíč ve žluté sekci.)</div>'
+    + '<div class="ga-desc">Zeptej se na cokoliv o funkcích, bezpečnosti nebo ovládání generátoru. Odpovídá AI, ale drží se jen toho, co generátor opravdu umí — když to v něm není, řekne to. (Používá Gemini klíč nastavený na první stránce.)</div>'
     + '<textarea id="gaQuery" class="ga-input" rows="2" placeholder="Např. „Jak je řešen split screen?" nebo „Kde se ukládá API klíč?""></textarea>'
     + '<div class="ga-controls"><div class="ga-mode" role="group" aria-label="Úroveň odpovědi">'
       + '<button type="button" class="ga-mode-btn'+(gaState.mode==='simple'?' active':'')+'" data-mode="simple">Jednoduše</button>'

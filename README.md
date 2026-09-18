@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.43
+**Aktuální verze:** 7.1.44
+
+> **7.1.44 UI/workflow audit (2026-09-18):** API připojení je na první stránce, horní lišta je sjednocená, historické/duplicitní ovladače jsou odstraněné, opraven je světlý footer a modal Nastavení/Bezpečnosti pracoviště a bezpečnostní návody odpovídají aktuálnímu secure runtime. Secure formát, verifier, scoring a kryptografie se nemění.
 
 > **7.1.43 Etapa 6 – MASTER cleanup (2026-09-18):** metadata-only patch bez změny aplikační logiky. Interní pre-release `release-acceptance.json` je přesunut z `public/` do `src/config/`, takže se už nepublikuje do runtime `dist`. Živý stav releasu dokládá `release-integrity.json` a AI Studio release-wave.
 

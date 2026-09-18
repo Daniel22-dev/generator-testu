@@ -229,9 +229,12 @@ if(_generatorSuiteLifecycle&&typeof _generatorSuiteLifecycle.registerRuntimeClea
 function accOnGranted(){
   Access.profile = profileFromPermit(centralPermit());
   const chip = document.getElementById('accChip');
-  if (chip) { chip.classList.remove('hidden'); chip.textContent = '👤 ' + (Access.profile?.displayName || 'AI Studio'); chip.title = 'Centrální přístup AI Studio GHRAB'; }
-  const admin = document.getElementById('accAdminChip');
-  if (admin) admin.classList.toggle('hidden', !accIsAdmin());
+  if (chip) {
+    chip.classList.remove('hidden');
+    chip.textContent = '👤';
+    chip.title = 'Přístup AI Studia · ' + (Access.profile?.displayName || 'uživatel') + ' · ukončení práce';
+    chip.setAttribute('aria-label', chip.title);
+  }
   const lab = document.getElementById('accTestLabChip');
   if (lab) lab.classList.toggle('hidden', !accIsAdmin());
   const banner = document.getElementById('accessEnvBanner');
