@@ -1,0 +1,7 @@
+Generator 7.1.43 – MASTER Stage 6 cleanup candidate
+Date: 2026-09-18
+Base: accepted and deployed 7.1.42 auto-patch baseline
+Functional application changes: none
+Cleanup change: source-only pre-release release-acceptance metadata moved from public/config to src/config; P5 now fails if that file is present in runtime dist.
+Live deployment authority remains release-integrity.json plus AI Studio release-wave.
+Remote evidence boundary: exact-lockfile P5, protected promotion, Pages deployment and AI Studio auto-promotion must complete before Stage 6 closure.
