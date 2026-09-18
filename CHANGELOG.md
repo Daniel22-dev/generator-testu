@@ -1,3 +1,11 @@
+## 7.1.43 — Etapa 6: MASTER cleanup (2026-09-18)
+
+- Bez změny aplikační logiky nebo pedagogického workflow.
+- Interní P5 `release-acceptance.json` přesunut z `public/config/` do `src/config/`.
+- P5 nově fail-closed ověřuje, že pre-release acceptance metadata nejsou publikována v `dist`.
+- Živý deployment stav zůstává autoritativně doložen `release-integrity.json` a AI Studio `release-wave`.
+- Regenerována verze, SBOM, AI assurance fingerprint a bezpečnostní SHA256 evidence pro 7.1.43.
+
 ## 7.1.42 — Etapa 5: ostrý auto-patch E2E (2026-09-18)
 
 - Bez změny aplikační logiky nebo uživatelského workflow.

@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.42',
+  version: '7.1.43',
   date:    '2026-09-16',
   status:  'production-serverless',
   changes: [
+    'ETAPA 6 – MASTER CLEANUP (7.1.43): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.41): bez změny aplikační logiky. Patch ověřuje skutečné automatické převzetí nové verze AI Studiem. Release zachovává GARP 2.5/N5, platformní kontrakt 1.1.2, Studio Bridge v2, secure runtime, Forms, scoring, kryptografii i AI workflow; po úspěšném Pages deployi Generátor nově odešle AI Studiu repository_dispatch app-updated.',
     'GARP 2.5 / N5 AUTO-PATCH BASELINE (7.1.40): bez změny aplikační logiky. Release sjednocuje verzi po uzavření N5 detekce a GARP 2.5 evidence a vytváří čistý patch baseline pro budoucí automatické přebírání novějších patch verzí AI Studiem. Secure runtime, teacher access, Forms, scoring, AI workflow, RSA/AES, exporty i uživatelské workflow zůstávají funkčně beze změny.',
@@ -38,7 +39,6 @@ const RELEASE = Object.freeze({
     'ETAPA 5 – PŘEHLEDNĚJŠÍ POKROČILÁ NASTAVENÍ (7.1.36): Pokročilý režim nyní seskupuje stávající volby do pěti sekcí Test / Student / Zpětná vazba / Bezpečnost / Vzhled. Přesouvají se původní DOM prvky se stejnými ID, hodnotami, handlery a validacemi; Simple režim je vrací na původní místa. Ochrana opakovaného pokusu je pouze vysvětlující informace o existujícím secure-offline zámku, nikoli nový přepínač. Studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.',
     'ETAPA 4 – STUDENTSKÉ ODEVZDÁNÍ PŘES GOOGLE FORMS (7.1.34): v Nastavení Generátoru lze uložit pouze validovaný responder odkaz Google Forms. Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého SECURE-ANSWERS-V1 payloadu a otevření školního formuláře; answers.txt zůstává nouzová záloha a automatický fallback při chybějícím formuláři nebo neobvykle dlouhém payloadu. URL formuláře je součástí integrity-bound konfigurace. Formát šifrovaného výsledku, RSA/AES kryptografie, scoring, PIN/odemčení a Stage 3 verifier CSV import se nemění.',
     'ETAPA 3 – GOOGLE FORMS CSV IMPORT (7.1.33): učitelský secure verifier umí načíst CSV export odpovědí z Google Forms. Automaticky detekuje čárku/středník/tabulátor, najde celý SECURE-ANSWERS-V1 payload, volitelně připojí e-mail a čas formuláře, ignoruje ostatní sloupce a každý payload ověřuje stejnou kryptografickou a bodovací cestou jako answers.txt. Chybějící, nejednoznačné, poškozené nebo cizí payloady jsou fail-closed a viditelné po řádcích; duplicity zůstávají pod stávající kontrolou verifieru. Studentský runtime, formát secure balíku, kryptografie, PIN/odemčení a serverový profil se nemění.',
-    'STAGE 1/2 STATE-TRANSITION HOTFIX (7.1.32): český modul už nepřepíná řízený Simple preset automaticky do Advanced režimu. Přepnutí cizí jazyk ↔ čeština tak zachová Procvičování/Přísný test i odpovídající cs/fl interní preset. QA kontroly Bezpečnosti pracoviště používají správné texty je nastavena / není nastavena a visual changelog kontroluje stabilní nadpis; přesnou verzi nadále vynucuje samostatný version gate. Verifier, secure runtime, kryptografie, PINy, Forms a serverový profil se nemění.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

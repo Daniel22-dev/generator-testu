@@ -39,7 +39,7 @@ const found = {
   'public/ai-operations.json appVersion': jsonVersion('public/ai-operations.json'),
   'public/config/data-manifest.json appVersion': jsonVersion('public/config/data-manifest.json'),
   'public/config/platform-manifest.json appVersion': jsonVersion('public/config/platform-manifest.json'),
-  'public/config/release-acceptance.json appVersion': jsonVersion('public/config/release-acceptance.json'),
+  'src/config/release-acceptance.json appVersion': jsonVersion('src/config/release-acceptance.json'),
   'public/config/security-headers.json version': jsonVersion('public/config/security-headers.json'),
   'ghrab-platform.consumer.json appVersion': jsonVersion('ghrab-platform.consumer.json'),
   'public/ghrab-platform.consumer.json appVersion': jsonVersion('public/ghrab-platform.consumer.json'),

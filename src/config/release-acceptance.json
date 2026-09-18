@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.42",
-  "releaseStatus": "auto-patch-e2e-candidate-pending-clean-github-ci-and-deployment",
+  "appVersion": "7.1.43",
+  "releaseStatus": "pre-release-source-attestation",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -44,8 +44,15 @@
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "deterministic-version-bump-plus-garp25-static-artifact-refresh; exact-lockfile GitHub CI/deployment pending",
-    "note": "7.1.42 is a no-feature-change patch over the accepted 7.1.41 Studio auto-patch baseline. It exists solely to prove the full end-to-end automatic patch chain. Runtime/PWA/QA metadata, SBOM and AI assurance fingerprint are refreshed; secure runtime, teacher access, Forms, scoring, cryptography, platform contract and AI behavior are intentionally unchanged."
+    "transport": "source-only pre-release attestation; exact-lockfile GitHub CI/deployment pending",
+    "note": "7.1.43 is a metadata-only MASTER cleanup patch. This acceptance document is intentionally source-only and is not copied into the public runtime artifact. Live deployment state is attested by release-integrity.json and AI Studio release-wave evidence."
   },
-  "note": "7.1.42 auto-patch E2E candidate; 7.1.41 is the accepted Studio baseline until the 7.1.42 Pages deployment is verified and promoted automatically."
+  "note": "Source-only P5 acceptance input for Generator 7.1.43. It must not be interpreted as live deployment status.",
+  "publication": {
+    "runtimeDistributed": false,
+    "liveStatusAuthority": [
+      "dist/release-integrity.json",
+      "AI Studio release-wave"
+    ]
+  }
 }

@@ -1,11 +1,11 @@
 GARP 2.5.1 – ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.42
-Date: 2026-09-16
-Scope: Stage 3 GARP 2.5 / N5 auto-patch baseline candidate
+Application: generator 7.1.43
+Date: 2026-09-18
+Scope: Stage 6 MASTER cleanup candidate
 
 CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.42 across runtime/PWA/QA sources)
-LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.42)
+VERSION CONSISTENCY          PASS (7.1.43 across runtime/PWA/QA sources)
+LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.43)
 GARP 2.5.1 PREP-STATIC       PASS
 N5 SECRET-SCAN               PASS
 GARP TOOLING SELFTEST        PASS 59/59
@@ -14,7 +14,7 @@ AI ASSURANCE FINGERPRINT     PASS
 SW SECURITY FREEZE           PASS
 SW OFFLINE FAIL-SAFE         PASS 9/9
 VENDORED CONSISTENCY         PASS (drift 0 for built public profile)
-DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.42 dist
+DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.43 dist
 GARP 2.3 SECURITY REGRESSION PASS 86/86
 SUITE SESSION REGRESSION     PASS 20/20
 PLATFORM CONFORMANCE         PASS 115/115
@@ -23,7 +23,7 @@ XSS INVENTORY REGRESSION     PASS (no new sink-count regression)
 EVIDENCE MANIFEST            PASS 8/8 files
 
 BASELINE PURPOSE
-7.1.42 intentionally adds no application feature or workflow change. It is a controlled patch above the accepted 7.1.41 AI Studio baseline and exists to prove the complete deployment-notification-promotion-persistence chain.
+7.1.43 intentionally changes no application feature or workflow behavior. It is the MASTER cleanup patch that removes source-only pre-release acceptance metadata from the public runtime artifact while preserving the live release-integrity v2 and Studio release-wave authority.
 
 N5 CLOSURE RETAINED
 The deployment leak scanner blocks:
@@ -40,8 +40,8 @@ Deploy workflow run 35062405626: SUCCESS
 P5 workflow run 35062405546: SUCCESS
 This is historical evidence for the immediately preceding runtime baseline, not a 7.1.40 remote attestation.
 
-IMPORTANT 7.1.42 VALIDATION BOUNDARY
-The 7.1.42 candidate has not yet been deployed and therefore has no exact-lockfile GitHub browser/P5/deployment evidence. Locally unavailable/pending final CI artifacts are:
+IMPORTANT 7.1.43 VALIDATION BOUNDARY
+The 7.1.43 candidate has not yet been deployed and therefore has no exact-lockfile GitHub browser/P5/deployment evidence. Locally unavailable/pending final CI artifacts are:
 - browser runtime report,
 - axe runtime report,
 - P5 release certification assembled from those runtime reports,
@@ -54,15 +54,16 @@ CURRENT EVIDENCE
 - security/evidence/n5-closure-2026-09-16/ (historical 7.1.39 N5 closure)
 - security/security-evidence-manifest-7.1.39-n5.json (historical)
 - security/garp25/TOOLING-SOURCE.txt
+- security/evidence/master-cleanup-7.1.43-2026-09-18/
 
 AUTO-PATCH STATUS
-SOURCE PATCH CANDIDATE       7.1.42 READY FOR REMOTE CI
-STUDIO ENROLLMENT            ACTIVE FROM ACCEPTED 7.1.41 BASELINE
-AUTOMATIC PATCH PROMOTION    ENABLED; 7.1.42 IS THE CONTROLLED LIVE E2E PATCH TEST
-Required next condition: deploy 7.1.42; Generator must notify AI Studio automatically; Studio must verify and persist 7.1.42 without manual release-wave editing.
+SOURCE PATCH CANDIDATE       7.1.43 READY FOR REMOTE CI
+STUDIO ENROLLMENT            ACTIVE FROM ACCEPTED 7.1.42 BASELINE
+AUTOMATIC PATCH PROMOTION    ENABLED; 7.1.43 IS THE MASTER CLEANUP PATCH CANDIDATE
+Required next condition: deploy 7.1.43; Generator must notify AI Studio automatically; Studio must verify and persist 7.1.43 without manual release-wave editing.
 
 ASSURANCE CEILING
-SECURITY          AMBER pending 7.1.42 remote CI/deployment + LIVE environment
+SECURITY          AMBER pending 7.1.43 remote CI/deployment + LIVE environment
 PRIVACY           AMBER pending live school-server evidence
 RED TEAM          AMBER pending live-model / production evidence
 RELEASE INTEGRITY AMBER pending signed LIVE deployment evidence

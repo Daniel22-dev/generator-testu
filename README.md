@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.42
+**Aktuální verze:** 7.1.43
+
+> **7.1.43 Etapa 6 – MASTER cleanup (2026-09-18):** metadata-only patch bez změny aplikační logiky. Interní pre-release `release-acceptance.json` je přesunut z `public/` do `src/config/`, takže se už nepublikuje do runtime `dist`. Živý stav releasu dokládá `release-integrity.json` a AI Studio release-wave.
 
 > **7.1.42 Etapa 5 – ostrý auto-patch E2E (2026-09-18):** bez změny aplikační logiky. Jde o kontrolní patch nad přijatým 7.1.41 baseline. Akceptační podmínkou je celý automatický tok: chráněný release Generátoru → ověřený Pages deployment → `app-updated` → live release-integrity v2 kontrola v AI Studiu → patch-only změna `release-wave` → chráněná Safe Promotion a produkční deploy Studia.
 
