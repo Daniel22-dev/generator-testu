@@ -36,7 +36,6 @@
       <button class="hdr-btn" id="btnGuide" onclick="showUsageGuide()" aria-label="Návod k používání" title="Jak používat ostře (návod pro kolegy)">📋</button>
       <button class="hdr-btn" id="btnSecGuide" onclick="showSecurityGuide()" aria-label="Bezpečný provoz ve škole" title="Bezpečný provoz ve škole">🏫</button>
       <button class="hdr-btn" id="btnStrict" onclick="showStrictSituations()" aria-label="Situace a meze přísného testu" title="Co čekat od přísného testu — situace a meze">🔒</button>
-      <button type="button" class="hdr-btn hidden" id="accChip" onclick="openAccountModal()" aria-label="Přístup AI Studia a ukončení práce" title="Přístup AI Studia a ukončení práce">👤</button>
       <button class="hdr-btn" id="btnSettings" onclick="openGeneratorSettings()" aria-label="Nastavení Generátoru" title="Nastavení Generátoru">⚙️</button>
       <button class="hdr-btn" id="btnMode" onclick="toggleMode()" aria-label="Přepnout světlý nebo tmavý režim" title="Světlý/tmavý režim">☀️</button>
       <button class="hdr-btn" id="btnAssistant" onclick="openGeneratorAssistant()" aria-label="Otevřít poradce generátoru" title="Zeptat se na funkce, bezpečnost a ovládání generátoru">💬</button>
@@ -78,6 +77,35 @@
     </div>
   </div>
 
+  <!-- AI connection: available immediately, before the workflow steps. -->
+  <section class="first-page-api" aria-labelledby="apiSetupTitle">
+    <div class="gemini-panel">
+      <div class="gemini-ph">
+        <span class="gemini-ptitle" id="apiSetupTitle">🔑 AI připojení</span>
+        <span class="gemini-status" id="geminiStatus">Klíč není nastaven</span>
+      </div>
+      <div class="key-restrict-info">⚠️ Klíč musí být omezený na <strong>Gemini API</strong>; neomezené standardní klíče Google nepřijímá. <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">Jak omezit klíč →</button></div>
+      <div class="ai-data-notice" role="note">
+        <strong>🌐 Co se odesílá do Gemini:</strong> text zadání, zvolené URL a přiložené soubory. Jména studentů v diferenciaci generátor vždy nahrazuje kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Před odesláním odstraň osobní, zdravotní, kázeňské a jiné citlivé údaje. Při prvním AI požadavku v každé relaci se zobrazí potvrzení.
+      </div>
+      <div class="gemini-key-row">
+        <input type="password" id="geminiKeyInput" placeholder="Gemini API klíč (AIza…)" autocomplete="off" autocorrect="off">
+      </div>
+      <div class="gemini-key-actions">
+        <button type="button" id="btnUseKeySession" class="key-btn-recommended" onclick="useGeminiKeyForSession()" title="Klíč zůstane jen do zavření okna. Nejbezpečnější volba — vhodné i na sdíleném/školním zařízení.">Použít jen pro relaci <span class="key-rec-tag">doporučeno</span></button>
+        <button type="button" id="btnClearKey" onclick="clearGeminiKey()" title="Odstraní klíč z prohlížeče. Použij, když končíš práci na cizím zařízení.">Smazat klíč</button>
+      </div>
+      <details class="key-advanced" id="keyAdvanced">
+        <summary>Bezpečnost API klíče</summary>
+        <div class="key-advanced-body gemini-key-actions">
+          <button type="button" id="btnSaveKeyPermanent" onclick="saveGeminiKeyPermanent()" title="Z bezpečnostních důvodů se klíč ukládá pouze do této relace.">Použít bezpečně jen pro relaci</button>
+          <span class="key-advanced-hint">Klíč se v této verzi z bezpečnostních důvodů neukládá trvale. Na sdíleném zařízení ho po práci smaž.</span>
+        </div>
+      </details>
+      <div class="gemini-note" id="geminiNote"><strong>Relace</strong> = klíč se po zavření prohlížeče sám zapomene; nejbezpečnější volba pro školní i sdílená zařízení. Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">návod</button>. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a> → Get API key.</div>
+    </div>
+  </section>
+
   <!-- Templates -->
   <div id="templatesStrip" class="templates-strip hidden">
     <div class="tpl-header">💾 Moje šablony <span id="tplCount" style="color:var(--t4);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
@@ -118,40 +146,6 @@
 
     <!-- ═══════════════════════════ STEP 0 ═══════════════════════════ -->
     <div id="step0">
-      <div class="first-page-ai-panel">
-        <!-- AI CONNECTION — configured on the first page -->
-      <div class="gemini-panel">
-        <div class="gemini-ph">
-          <span class="gemini-ptitle">🔑 AI připojení (Gemini)</span>
-          <span class="gemini-status" id="geminiStatus">Klíč není nastaven</span>
-        </div>
-        <div class="key-restrict-info">⚠️ Klíč musí být omezený na <strong>Gemini API</strong>; neomezené standardní klíče Google nepřijímá. <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">Jak omezit klíč →</button></div>
-        <div class="ai-data-notice" role="note">
-          <strong>🌐 Co se odesílá do Gemini:</strong> text zadání, zvolené URL a přiložené soubory. Jména studentů v diferenciaci generátor vždy nahrazuje kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Před odesláním odstraň osobní, zdravotní, kázeňské a jiné citlivé údaje. Při prvním AI požadavku v každé relaci se zobrazí potvrzení.
-        </div>
-        <div class="gemini-key-row">
-          <input type="password" id="geminiKeyInput" placeholder="Gemini API klíč (AIza…)" autocomplete="off" autocorrect="off">
-        </div>
-        <div class="gemini-key-actions">
-          <button type="button" id="btnUseKeySession" class="key-btn-recommended" onclick="useGeminiKeyForSession()" title="Klíč zůstane jen do zavření prohlížeče. Provider klíč se trvale neukládá.">Použít jen pro relaci <span class="key-rec-tag">doporučeno</span></button>
-          <button type="button" id="btnClearKey" onclick="clearGeminiKey()" title="Odstraní klíč z aktivní relace. Použij, když končíš práci na cizím zařízení.">Smazat klíč</button>
-        </div>
-        <div class="gemini-note" id="geminiNote"><strong>Klíč se ukládá pouze pro tuto relaci</strong> a po zavření prohlížeče se zapomene. Trvalé ukládání provider klíče je z bezpečnostních důvodů vypnuté. Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">návod</button>. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a> → Get API key.</div>
-        <div class="gemini-model-row">
-          <label class="gemini-model-label" for="geminiModelInput">Model <span class="gemini-model-status" id="geminiModelStatus">výchozí</span></label>
-          <div class="gemini-model-inputwrap">
-            <input type="text" id="geminiModelInput" placeholder="gemini-3.6-flash" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onchange="setGeminiModel(this.value)" oninput="updateGeminiModelUI()">
-            <button type="button" class="gemini-model-reset" onclick="resetGeminiModel()">Výchozí</button>
-          </div>
-          <div class="gemini-model-quick" id="geminiModelQuick">
-            <button type="button" id="qmStrong" onclick="quickModel('strong')" title="Stabilní výchozí model pro kvalitní a složitější testy">⚡ Silný<span class="qm-sub">gemini-3.6-flash</span></button>
-            <button type="button" id="qmLite" onclick="quickModel('lite')" title="Rychlejší a úspornější stabilní model pro jednodušší úlohy">🪶 Lite<span class="qm-sub">gemini-3.5-flash-lite</span></button>
-          </div>
-          <div class="gemini-note">Měň jen když přestane fungovat generování s chybou o modelu. Modelová politika se ve školním režimu řídí serverem. V GitHub režimu lze při ukončení modelu zadat nový stabilní název podle <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener noreferrer">dokumentace Google</a>.</div>
-        </div>
-      </div>
-
-      </div>
       <div class="field">
         <div class="field-label">Název testu <button class="tt-icon" data-tip="Bude zobrazen studentům v úvodním okně testu. Doporučuji uvést i datum nebo číslo testu.">?</button></div>
         <input type="text" id="nazev" placeholder="např. Test 3 — Present Perfect Tense" oninput="onInput()">
@@ -480,17 +474,17 @@
             <span class="strict-risk-title">Realistická rizika přísného testu</span>
           </div>
           <div class="strict-risk-body">
-            <strong>Přísný režim chrání hlavně integritu pokusu na tomto zařízení a odděluje správné odpovědi do učitelského verifieru.</strong> Druhý mobil, hodinky, papírový tahák ani záměnu osoby webová stránka neodhalí — to řeší dozor. Bezpečnostní signály jsou vodítka, ne automatický důkaz podvádění.
+            <strong>Přísný režim chrání klíč odpovědí a reaguje na opuštění testu na tomto zařízení.</strong> Neověří ale, kdo skutečně sedí u zařízení, ani neodhalí druhý mobil, hodinky, papír nebo pomoc spolužáka. Bezpečnostní signál je podnět ke kontrole, ne automatický důkaz podvádění.
           </div>
-          <div class="strict-risk-sublabel">Před testem zkontroluj</div>
+          <div class="strict-risk-sublabel">Před ostrým testem zkontroluj</div>
           <div class="strict-risk-grid">
-            <div class="strict-risk-card"><span class="sri">📵</span><span>Telefony a další zařízení mimo dosah, případně školní zařízení pod dohledem</span></div>
-            <div class="strict-risk-card"><span class="sri">🔒</span><span>Teacher verifier zůstává jen učiteli — nikdy na veřejný web ani studentům</span></div>
-            <div class="strict-risk-card"><span class="sri">🔗</span><span>Studentům poslat jen HTTPS odkaz na studentský test</span></div>
-            <div class="strict-risk-card"><span class="sri">💾</span><span>Pro ostrý test použít Bezpečný offline + verifier</span></div>
-            <div class="strict-risk-card"><span class="sri">🪪</span><span>U přísného testu preferovat jednorázové kódy a ověřit, kdo pod kódem skutečně píše</span></div>
-            <div class="strict-risk-card"><span class="sri">⏱️</span><span>Odkaz zpřístupnit až těsně před začátkem testu</span></div>
-            <div class="strict-risk-card"><span class="sri">🔀</span><span>Pro další skupinu vytvořit novou variantu, pokud hrozí předání zadání</span></div>
+            <div class="strict-risk-card"><span class="sri">📵</span><span>Druhá zařízení a pomůcky řeší fyzický dozor</span></div>
+            <div class="strict-risk-card"><span class="sri">🔒</span><span>Teacher verifier, roster a CSV zůstávají jen učiteli</span></div>
+            <div class="strict-risk-card"><span class="sri">🔗</span><span>Studentům patří pouze publikovaný student_test odkaz</span></div>
+            <div class="strict-risk-card"><span class="sri">💾</span><span>Pro klasifikaci použij bezpečný offline + verifier</span></div>
+            <div class="strict-risk-card"><span class="sri">🪪</span><span>Jednorázový kód označuje pokus, neověřuje osobu</span></div>
+            <div class="strict-risk-card"><span class="sri">⏱️</span><span>Odkaz zveřejni až na začátku a pro další skupinu vytvoř novou variantu</span></div>
+            <div class="strict-risk-card"><span class="sri">📤</span><span>Odevzdání přes Forms je volitelné; answers.txt zůstává záloha</span></div>
           </div>
         </div>
       </div>
@@ -630,7 +624,7 @@
             <div class="hidden" id="aiScaleWrap" style="margin-top:10px" onclick="event.stopPropagation()">
               <button type="button" id="aiScaleBtn" class="ghost" style="width:100%" onclick="aiReadScale()">📖 Přečíst stupnici pomocí AI</button>
               <div class="req-note">Spotřebuje 1 AI požadavek z aktivního limitu projektu (volá Gemini, není to offline).</div>
-              <div class="go-desc" style="margin-top:6px">Stupnici můžeš napsat i slovně (věty, fajfky, body). AI ji převede a ukáže ti, jak ji pochopila — pak ji potvrdíš. Vyžaduje zadaný Gemini klíč na první stránce v sekci AI připojení.</div>
+              <div class="go-desc" style="margin-top:6px">Stupnici můžeš napsat i slovně (věty, fajfky, body). AI ji převede a ukáže ti, jak ji pochopila — pak ji potvrdíš. Vyžaduje zadaný Gemini klíč v panelu AI připojení na první stránce.</div>
               <div class="hidden" id="aiScalePreview" style="margin-top:10px;font-size:13px;line-height:1.5;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.4);border-radius:10px;padding:10px 12px"></div>
             </div>
           </div>
@@ -850,7 +844,26 @@
     <div id="step4" class="hidden">
       <div class="warn-box hidden" id="fileWarn"></div>
       <div class="chips" id="chips"></div>
-      <div class="gemini-step4-note">🔑 API klíč a model se nastavují na první stránce <strong>Základní info</strong>. Poradce vpravo nahoře používá stejné AI připojení.</div>
+
+      <!-- MODEL SETTINGS -->
+      <div class="gemini-panel gemini-model-only">
+        <div class="gemini-ph">
+          <span class="gemini-ptitle">🤖 Model pro generování</span>
+          <span class="gemini-status">API klíč se nastavuje v panelu AI připojení na první stránce</span>
+        </div>
+        <div class="gemini-model-row">
+          <label class="gemini-model-label" for="geminiModelInput">Model <span class="gemini-model-status" id="geminiModelStatus">výchozí</span></label>
+          <div class="gemini-model-inputwrap">
+            <input type="text" id="geminiModelInput" placeholder="gemini-3.6-flash" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onchange="setGeminiModel(this.value)" oninput="updateGeminiModelUI()">
+            <button type="button" class="gemini-model-reset" onclick="resetGeminiModel()">Výchozí</button>
+          </div>
+          <div class="gemini-model-quick" id="geminiModelQuick">
+            <button type="button" id="qmStrong" onclick="quickModel('strong')" title="Stabilní výchozí model pro kvalitní a složitější testy">⚡ Silný<span class="qm-sub">gemini-3.6-flash</span></button>
+            <button type="button" id="qmLite" onclick="quickModel('lite')" title="Rychlejší a úspornější stabilní model pro jednodušší úlohy">🪶 Lite<span class="qm-sub">gemini-3.5-flash-lite</span></button>
+          </div>
+          <div class="gemini-note">Měň jen když přestane fungovat generování s chybou o modelu. Modelová politika se ve školním režimu řídí serverem. V GitHub režimu lze při ukončení modelu zadat nový stabilní název podle <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener noreferrer">dokumentace Google</a>.</div>
+        </div>
+      </div>
 
       <!-- GENERATE BUTTON -->
       <button class="btn-generate" id="btnGenerate" onclick="generateTest()">✨ Vytvořit test přímo</button>
@@ -896,7 +909,7 @@
         </div>
         <div id="selfTestReport" class="hidden"></div>
         <div class="enrich-row">
-          <button class="btn-edit" id="btnKeyCheck" onclick="aiVerifyKey()" title="Druhý nezávislý klíč: požádá AI, aby sama vyřešila úlohy tohoto testu (NEgeneruje nový test), a porovná její odpovědi s uloženým klíčem. Položky, kde se AI a klíč liší, označí jako podezřelé — levný signál, kde nejspíš je chyba v klíči. Není to důkaz chyby; je to seznam míst k ruční kontrole. Vyžaduje Gemini klíč nastavený na první stránce v sekci AI připojení.">🔑 Ověřit klíč druhým průchodem (AI)</button>
+          <button class="btn-edit" id="btnKeyCheck" onclick="aiVerifyKey()" title="Druhý nezávislý klíč: požádá AI, aby sama vyřešila úlohy tohoto testu (NEgeneruje nový test), a porovná její odpovědi s uloženým klíčem. Položky, kde se AI a klíč liší, označí jako podezřelé — levný signál, kde nejspíš je chyba v klíči. Není to důkaz chyby; je to seznam míst k ruční kontrole. Vyžaduje Gemini klíč v panelu AI připojení na první stránce.">🔑 Ověřit klíč druhým průchodem (AI)</button>
           <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
           <button type="button" class="tt-icon enrich-help" data-tip="Self-test ověří, že STROJ počítá body podle klíče správně. Neumí ale poznat, jestli je sám KLÍČ obsahově správný (AI může vyrobit hezkou otázku se špatně označenou správnou odpovědí). Tahle funkce proto nechá AI nezávisle odpovědět na stejné otázky a ukáže položky, kde se její odpověď liší od uloženého klíče — přesně tam je nejvyšší šance na chybu v klíči. Funguje u uzavřených a krátkých typů (výběr, true/false, doplňování, slovotvorba…); u otevřených překladů/transformací je signál slabší a bere se jen jako upozornění.">?</button>
         </div>
@@ -1027,7 +1040,7 @@
         </div>
         <div class="small-muted" style="margin-top:10px">Kód není součástí zadání, šablon ani historie. Studentům se nikdy neposílá. Správce může vytvořit nový týmový kód; ostatní učitelé pouze vloží kód, který jim správce předal bezpečnou cestou.</div>
       </div>
-      <div class="field" style="margin-top:18px;margin-bottom:0;padding-top:16px;border-top:1px solid var(--bdr2)">
+      <div class="field" style="margin-top:18px;margin-bottom:0;padding-top:16px;border-top:1px solid var(--line)">
         <div class="field-label">🟣 Odevzdání přes Google Forms</div>
         <div class="field-hint">Volitelné nastavení pro bezpečný offline test. Vlož responder odkaz na školní Google Form. Formulář doporučujeme nastavit tak, aby sbíral školní e-mail a obsahoval povinnou otázku typu <b>Odstavec</b> pro celý odevzdávací blok <code>SECURE-ANSWERS-V1</code>.</div>
         <div class="secure-mode-box" id="generatorSettingsFormsStatus" role="status"></div>

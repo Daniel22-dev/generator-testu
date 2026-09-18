@@ -1,11 +1,12 @@
-## 7.1.44 — UI/workflow audit (2026-09-18)
+## 7.1.44 — UI/workflow konsolidace (2026-09-18)
 
-- API klíč a model přesunuty na první stránku; Poradce používá stejné připojení.
-- Horní akce sjednoceny do jedné řady a lokální Správa přístupů odstraněna z UI Generátoru; správa zůstává centrálně v AI Studiu.
-- Odstraněny duplicitní volby „Potřebuji vlastní nastavení“ a „Jiný podporovaný typ“.
-- Opraven světlý platformní footer a nečitelný modal Nastavení/Bezpečnosti pracoviště.
-- Aktualizovány provozní návody a rizika přísného testu podle aktuálního secure runtime a deadline timeru.
-- Secure runtime, verifier, Forms, scoring a kryptografie se nemění.
+- Sjednocena horní nástrojová lišta do jedné řady na desktopu; na úzkých displejích se bezpečně posouvá bez rozbití layoutu.
+- Odstraněny historické vstupy do centrální správy přístupů z hlavní obrazovky Generátoru; přístupový model zůstává řízen AI Studiem.
+- API klíč přesunut na první stránku a dokumentace upravena na session-only ukládání; výběr modelu zůstává ve finálním kroku.
+- Zpřesněn přechod do pokročilého nastavení a odstraněno volné pole pro neexplicitní typ cvičení.
+- Opraven light/dark footer a kompletní styl dialogu Bezpečnost pracoviště.
+- Aktualizovány tři provozní nápovědy, onboarding, realistická rizika přísného testu a interní databáze poradce funkcí.
+- Regenerována verze, SBOM a AI assurance evidence pro 7.1.44.
 
 ## 7.1.43 — Etapa 6: MASTER cleanup (2026-09-18)
 

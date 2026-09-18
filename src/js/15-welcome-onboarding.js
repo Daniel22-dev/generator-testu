@@ -289,7 +289,7 @@ function buildSecurityGuideBodyHtml() {
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">📁</span> Kdy použít který režim</div>' +
         '<p class="sec-guide-p"><strong>Procvičování a domácí úkoly</strong> — stačí jednoduchý (instant) režim.</p>' +
-        '<p class="sec-guide-p"><strong>Ostrý (známkovaný) test</strong> — vždy <strong>Bezpečný offline + verifier</strong>.</p>' +
+        '<p class="sec-guide-p"><strong>Ostrý (známkovaný) test</strong> — zvolte <strong>Přísný test</strong>; potřebné bezpečnostní volby nastaví šablona automaticky.</p>' +
       '</div>' +
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🚫</span> Co nikdy neposlat studentům</div>' +
@@ -298,7 +298,7 @@ function buildSecurityGuideBodyHtml() {
       '</div>' +
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">📂</span> Kam ukládat výsledky</div>' +
-        '<p class="sec-guide-p">Soubory <code>answers.txt</code> a verifier ukládejte pouze do <strong>zabezpečeného školního úložiště</strong>. Výsledky uchovávejte po dobu danou školním řádem, pak je smažte.</p>' +
+        '<p class="sec-guide-p">Soubory <code>answers.txt</code>, verifier, roster a výsledky ukládejte pouze do <strong>zabezpečeného školního úložiště</strong>. Uchovávejte je jen po dobu stanovenou pravidly školy a poté je bezpečně odstraňte.</p>' +
       '</div>' +
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">👤</span> Anonymizace studentů</div>' +
@@ -306,8 +306,8 @@ function buildSecurityGuideBodyHtml() {
       '</div>' +
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Gemini API klíč</div>' +
-        '<p class="sec-guide-p">Klíč se používá <strong>jen pro aktuální relaci</strong> a po zavření prohlížeče se zapomene. Každý učitel má vlastní klíč — musí být omezený na Gemini API.</p>' +
-        '<div class="sec-guide-warn">⚠️ Na sdíleném počítači nikdy neukládejte klíč trvale.</div>' +
+        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong>. Každý učitel má vlastní klíč — musí být omezený na Gemini API.</p>' +
+        '<div class="sec-guide-warn">⚠️ Klíč se používá pouze pro relaci. Na sdíleném počítači ho po práci smažte i ručně.</div>' +
       '</div>' +
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🚨</span> Co dělat při úniku</div>' +

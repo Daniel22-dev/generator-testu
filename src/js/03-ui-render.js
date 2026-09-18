@@ -397,7 +397,7 @@ let _liAiDraft = null;
 async function aiSuggestListeningQuestions(){
   const btn = document.getElementById('liAiBtn');
   if(!genAiAvailable()){
-    renderLiAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho na první stránce v sekci AI připojení a zkus to znovu.' });
+    renderLiAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho v panelu AI připojení na první stránce a zkus to znovu.' });
     return;
   }
   const focus = trim('listeningFocus');
@@ -467,7 +467,7 @@ let _rcAiDraft = null;
 async function aiSuggestReading(){
   const btn = document.getElementById('rcAiBtn');
   if(!genAiAvailable()){
-    renderRcAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho na první stránce v sekci AI připojení a zkus to znovu.' });
+    renderRcAiPreview({ err:'Potřebuješ Gemini API klíč — zadej ho v panelu AI připojení na první stránce a zkus to znovu.' });
     return;
   }
   const topic = rcEffectiveTopic();

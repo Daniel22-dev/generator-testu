@@ -6,17 +6,17 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "1565902c535b6d48f50bfa5dc38ac85f0d752719f4c4baf30e9a797c9a342f70",
+  "fingerprint": "d8e5aed9e911d596f25af24bc643a86bd5465c277af0ea7c27940fef15bbad54",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 155807,
-      "sha256": "09e15eb917b3f564ddf50bf05bf4af0f8f2b603bfe96ebe912dd52af3a7722bc"
+      "size": 156255,
+      "sha256": "d9fccbf1d4e3bdd561813d00d67a4684f41e5668d5ef1121aec2240b7a001736"
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 37620,
-      "sha256": "849581939d15fc1230de104829ee690331f47ccfc45d18567f5e25237ca42ba2"
+      "size": 37622,
+      "sha256": "f67b54e258b287f96c14f0f7b9202b602230de4e8735bfbf33047a62fb7e827e"
     },
     {
       "path": "src/js/05-form-fields.js",
@@ -25,8 +25,8 @@
     },
     {
       "path": "src/js/07-gemini.js",
-      "size": 67420,
-      "sha256": "ba6ebf6e2e8ee5f2960f655dc81874d2e1b76adec6a8f43cace3806aa7b44bbc"
+      "size": 67380,
+      "sha256": "57c3af4af4d64ad12359b7d0d2533920beee5f2eb799ba57006423bc98094edc"
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
@@ -45,8 +45,8 @@
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 51307,
-      "sha256": "553fd766f2f77973ab388fadf24d64a4e03b1c1771f849e0fabbf6dd9c103bfd"
+      "size": 51308,
+      "sha256": "37c609d3f351601554b4593151e293c66389cff3c8ea1adb2c7b6fb50337cf78"
     },
     {
       "path": "src/js/13a-secure-helpers.js",

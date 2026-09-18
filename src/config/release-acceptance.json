@@ -45,7 +45,7 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "source-only pre-release attestation; exact-lockfile GitHub CI/deployment pending",
-    "note": "7.1.44 is a UI/workflow maintenance patch. Local source/build checks cover the interface changes; exact-lockfile GitHub CI, protected candidate promotion and live deployment evidence remain required before production acceptance."
+    "note": "7.1.44 is a metadata-only MASTER cleanup patch. This acceptance document is intentionally source-only and is not copied into the public runtime artifact. Live deployment state is attested by release-integrity.json and AI Studio release-wave evidence."
   },
   "note": "Source-only P5 acceptance input for Generator 7.1.44. It must not be interpreted as live deployment status.",
   "publication": {
