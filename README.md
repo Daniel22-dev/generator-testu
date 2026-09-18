@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.41
+**Aktuální verze:** 7.1.42
+
+> **7.1.42 Etapa 5 – ostrý auto-patch E2E (2026-09-18):** bez změny aplikační logiky. Jde o kontrolní patch nad přijatým 7.1.41 baseline. Akceptační podmínkou je celý automatický tok: chráněný release Generátoru → ověřený Pages deployment → `app-updated` → live release-integrity v2 kontrola v AI Studiu → patch-only změna `release-wave` → chráněná Safe Promotion a produkční deploy Studia.
 
 > **7.1.41 Etapa 5 – auto-patch E2E (2026-09-16):** bez změny aplikační logiky. Jde o kontrolní patch nad schváleným baseline 7.1.40. Po úspěšném Pages deployi Generátor odešle AI Studiu událost `app-updated`; Studio musí samo ověřit live manifest, přijmout pouze patch změnu a persistovat 7.1.41 jako nový release-wave baseline.
 
@@ -36,7 +38,7 @@ Produkční serverless/PWA aplikace pro učitele. Připravuje procvičovací i k
 
 ## Stav vydání
 
-Verze **7.1.41** je kontrolní patch Etapy 5 bez zamýšlené funkční změny. **7.1.40 je již schválený a nasazený minimální baseline centrálního auto-patche AI Studia.** 7.1.41 ověřuje skutečný end-to-end tok: deploy Generátoru → `app-updated` → live ověření Studiem → patch-only promotion → persistence nového baseline.
+Verze **7.1.42** je čistý kontrolní patch bez zamýšlené funkční změny. **7.1.41 je aktuální přijatý baseline AI Studia.** 7.1.42 slouží jako ostrý test kompletního automatického toku: Generator candidate → bezpečnostní brány → chráněný main → Pages deployment + release identity → `app-updated` → AI Studio live verification → patch-only release-wave update → Studio Safe Promotion → produkční deploy.
 
 Verze **7.1.39** byla úzce zaměřený produkční hotfix Etapy 6 nad **7.1.38**. Opravila pouze case-normalizaci `unlock-password` v secure studentském runtime; účelově oddělené PBKDF2 domény zůstaly zachované. Její exact GitHub runtime baseline následně prošel P5/deploymentem; pozdější lokální N5 tooling delta je evidována odděleně v bezpečnostních podkladech.
 

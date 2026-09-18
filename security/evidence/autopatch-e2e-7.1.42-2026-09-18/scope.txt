@@ -1,0 +1,7 @@
+Generator 7.1.42 – Stage 5 auto-patch E2E candidate
+Date: 2026-09-18
+Base: accepted 7.1.41 AI Studio auto-patch baseline
+Functional application changes: none intended
+Release-only changes: version identity, regenerated SBOM/fingerprint, release documentation
+Existing deploy workflow already performs live release-integrity verification before repository_dispatch app-updated.
+Remote evidence boundary: GitHub P5, protected promotion, Pages deployment, repository_dispatch, AI Studio promotion and release-wave persistence must be observed after candidate release; they are not claimed by this source-preparation file.

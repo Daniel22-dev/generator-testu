@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.41",
+  "appVersion": "7.1.42",
   "releaseStatus": "auto-patch-e2e-candidate-pending-clean-github-ci-and-deployment",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -44,8 +44,8 @@
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "deterministic-version-bump-plus-garp25-static; exact-lockfile GitHub CI/deployment pending",
-    "note": "7.1.41 is a no-feature-change patch over the accepted 7.1.40 Studio auto-patch baseline. It exists solely to prove end-to-end automatic patch adoption. Runtime/PWA/QA metadata, SBOM and AI assurance fingerprint are regenerated; secure runtime, teacher access, Forms, scoring, cryptography, platform contract and AI behavior are intentionally unchanged."
+    "transport": "deterministic-version-bump-plus-garp25-static-artifact-refresh; exact-lockfile GitHub CI/deployment pending",
+    "note": "7.1.42 is a no-feature-change patch over the accepted 7.1.41 Studio auto-patch baseline. It exists solely to prove the full end-to-end automatic patch chain. Runtime/PWA/QA metadata, SBOM and AI assurance fingerprint are refreshed; secure runtime, teacher access, Forms, scoring, cryptography, platform contract and AI behavior are intentionally unchanged."
   },
-  "note": "7.1.41 auto-patch E2E candidate; 7.1.40 remains the accepted Studio baseline until the 7.1.41 Pages deployment is verified and promoted automatically."
+  "note": "7.1.42 auto-patch E2E candidate; 7.1.41 is the accepted Studio baseline until the 7.1.42 Pages deployment is verified and promoted automatically."
 }

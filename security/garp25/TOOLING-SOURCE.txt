@@ -1,6 +1,6 @@
 GARP 2.5.1 SHIELD TOOLING SOURCE
-Application: generator 7.1.41
-Updated: 2026-09-16
+Application: generator 7.1.42
+Updated: 2026-09-18
 
 BASE TOOLING
 Source package: GARP-2.5.1-ZAVEDENI-TOOLING-R2(2).zip
@@ -27,11 +27,11 @@ Current N5 tool hashes:
 - security/garp25/tools/selftest-garp251.mjs
   SHA-256: ef16dec6f32cf95244cb281242a2cc0b61b3a2d87df082a47252442cca8a5108
 
-CURRENT 7.1.41 LOCAL VALIDATION
+CURRENT 7.1.42 RELEASE VALIDATION SCOPE
 - version/source consistency: PASS.
-- local build: PASS, cache ghrab-generator-v7.1.41.
+- local build: PASS, cache ghrab-generator-v7.1.42.
 - GARP 2.5.1 tooling self-test: PASS 59/59.
-- `garp25:prep-static`: PASS on locally built 7.1.41 dist.
+- `garp25:prep-static`: PASS on 7.1.42 release candidate dist.
 - CycloneDX SBOM: PASS, 113 components.
 - AI assurance fingerprint: PASS.
 - SW offline fail-safe: PASS 9/9.
@@ -47,5 +47,5 @@ The immediately preceding exact remote baseline is 7.1.39:
 This historical evidence does not attest the new 7.1.40 package.
 
 LIMITS
-7.1.40 is the accepted AI Studio auto-patch minimum baseline. 7.1.41 is the first end-to-end patch candidate and requires exact-lockfile GitHub CI/deploy plus automatic Studio promotion evidence.
+7.1.41 is the accepted AI Studio auto-patch baseline. 7.1.42 is the controlled end-to-end patch candidate and requires exact-lockfile GitHub CI/deploy plus automatic Studio promotion evidence.
 This file is not a SHIELD-LIVE, RI-LIVE, school-server production or real-student-data attestation.
