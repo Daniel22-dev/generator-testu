@@ -104,7 +104,7 @@ async function aiReadScale(){
   if(!raw){ pv.classList.remove('hidden'); pv.style.borderColor='rgba(239,68,68,.4)'; pv.style.background='rgba(239,68,68,.08)';
     pv.innerHTML='⚠️ Nejdřív napiš popis stupnice do pole výše (klidně větami).'; return; }
   if(!genAiAvailable()){ pv.classList.remove('hidden'); pv.style.borderColor='rgba(239,68,68,.4)'; pv.style.background='rgba(239,68,68,.08)';
-    pv.innerHTML='⚠️ Pro čtení stupnice AI je potřeba Gemini API klíč. Zadej ho ve žluté sekci nahoře.'; return; }
+    pv.innerHTML='⚠️ Pro čtení stupnice AI je potřeba Gemini API klíč. Zadej ho na první stránce v sekci AI připojení.'; return; }
   const total=effectiveTotalBodyForScale();
   if(btn){ btn.disabled=true; btn.textContent='⏳ Čtu stupnici…'; }
   pv.classList.remove('hidden'); pv.style.borderColor='rgba(148,163,184,.4)'; pv.style.background='rgba(148,163,184,.08)';
