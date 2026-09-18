@@ -1770,3 +1770,9 @@ a.manual-launch-btn:hover::after,a.manual-launch-btn:focus-visible::after{opacit
   .hdr-btns { gap: 2px; }
   .hdr-btn { min-width: 33px; padding-left: 7px; padding-right: 7px; }
 }
+
+
+/* 7.1.44 P5 a11y: AI connection is now visible on the first step, so its links and
+   active model sublabel must satisfy WCAG contrast/distinguishability immediately. */
+.gemini-note a { text-decoration: underline; text-underline-offset: 2px; }
+.gemini-model-quick button.active .qm-sub { opacity: 1; }
