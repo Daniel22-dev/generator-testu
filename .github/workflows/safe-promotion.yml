@@ -22,6 +22,7 @@ jobs:
     outputs:
       certified_sha: ${{ steps.certified.outputs.sha }}
       fresh: ${{ steps.freshness.outputs.fresh }}
+      has_changes: ${{ steps.diff.outputs.has_changes }}
       pr_number: ${{ steps.pr.outputs.number }}
     steps:
       - name: Record exact candidate SHA
@@ -91,8 +92,24 @@ jobs:
             echo "fresh=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create or reuse candidate pull request
+      - name: Check whether candidate differs from main
         if: steps.freshness.outputs.fresh == 'true'
+        id: diff
+        shell: bash
+        env:
+          CERTIFIED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          if git diff --quiet origin/main "$CERTIFIED_SHA" --; then
+            echo "::notice::Candidate $CERTIFIED_SHA has no content diff against main; promotion is already satisfied."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or reuse candidate pull request
+        if: steps.freshness.outputs.fresh == 'true' && steps.diff.outputs.has_changes == 'true'
         id: pr
         shell: bash
         env:
@@ -120,7 +137,7 @@ jobs:
   pr-certification:
     name: pr-certification
     needs: candidate-gate
-    if: needs.candidate-gate.outputs.fresh == 'true'
+    if: needs.candidate-gate.outputs.fresh == 'true' && needs.candidate-gate.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     outputs:
       eligible: ${{ steps.final_freshness.outputs.eligible }}
