@@ -1,6 +1,6 @@
 GARP 2.5.1 – SHIELD NEGATIVE CONTROLS
-Application: generator 7.1.41
-Current delta date: 2026-09-16
+Application: generator 7.1.42
+Current delta date: 2026-09-18
 
 CURRENT N5 DELTA CONTROLS
 N5-01 PASS       clean deployment sample remains allowed.

@@ -1,3 +1,12 @@
+## 7.1.42 — Etapa 5: ostrý auto-patch E2E (2026-09-18)
+
+- Bez změny aplikační logiky nebo uživatelského workflow.
+- Kontrolní patch nad přijatým 7.1.41 baseline pro ověření kompletního automatického release řetězce.
+- Runtime/PWA/QA identita, CycloneDX SBOM a AI assurance fingerprint jsou aktualizovány pro 7.1.42.
+- Po úspěšném GitHub Pages deployi Generátor ověří live release identity a odešle AI Studiu `repository_dispatch: app-updated`.
+- AI Studio musí samo ověřit `ghrab-release-integrity-v2`, přijmout pouze patch 7.1.41 → 7.1.42, persistovat release-wave změnu přes `candidate` a projít vlastní P5/Safe Promotion/deploy cestou.
+- Duplicate/replay, rollback, minor/major a contract-regression scénáře jsou součástí následné akceptace Etapy 5.
+
 ## 7.1.41 — Etapa 5: auto-patch E2E (2026-09-16)
 
 - Bez změny aplikační logiky nebo uživatelského workflow.
