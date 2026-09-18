@@ -1763,3 +1763,10 @@ a.manual-launch-btn:hover::after,a.manual-launch-btn:focus-visible::after{opacit
   line-height:1;
 }
 .ui-modal-x:hover { border-color:var(--err); color:var(--err); }
+
+
+/* 7.1.44: keep the complete teacher action row on very narrow phones. */
+@media (max-width: 360px) {
+  .hdr-btns { gap: 2px; }
+  .hdr-btn { min-width: 33px; padding-left: 7px; padding-right: 7px; }
+}
