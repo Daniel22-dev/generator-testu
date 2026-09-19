@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.43",
+  "appVersion": "7.1.44",
   "releaseStatus": "pre-release-source-attestation",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -45,9 +45,9 @@
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "source-only pre-release attestation; exact-lockfile GitHub CI/deployment pending",
-    "note": "7.1.43 is a metadata-only MASTER cleanup patch. This acceptance document is intentionally source-only and is not copied into the public runtime artifact. Live deployment state is attested by release-integrity.json and AI Studio release-wave evidence."
+    "note": "7.1.44 is a metadata-only MASTER cleanup patch. This acceptance document is intentionally source-only and is not copied into the public runtime artifact. Live deployment state is attested by release-integrity.json and AI Studio release-wave evidence."
   },
-  "note": "Source-only P5 acceptance input for Generator 7.1.43. It must not be interpreted as live deployment status.",
+  "note": "Source-only P5 acceptance input for Generator 7.1.44. It must not be interpreted as live deployment status.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

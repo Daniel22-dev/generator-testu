@@ -201,7 +201,7 @@ function renderSimpleTemplates(){
         + '<span class="preset-card-mode ' + (c.key === 'strict' ? 'strict' : (c.key === 'practice' ? 'instant' : 'flex')) + '">' + esc(c.badge) + '</span>'
         + '</button>';
     });
-    html += '<button type="button" class="simple-advanced-link" onclick="clearSimpleTemplate()">⚙️ Potřebuji vlastní nastavení</button>';
+    html += '<button type="button" class="simple-advanced-link" onclick="clearSimpleTemplate()">⚙️ Přepnout do pokročilého nastavení</button>';
   } else {
     // Pokročilý režim: původní plná sada šablon zůstává zachována 1:1.
     const set = simpleTemplateSet();

@@ -11,6 +11,7 @@
   --card-shadow: 0 2px 16px rgba(0,0,0,0.4);
 }
 body.light {
+  color-scheme: light;
   --bg: #f0f2fa; --bg2: #ffffff; --bg3: #e8eaf6;
   --bdr: #c5cae9; --bdr2: #dde0f5;
   --t1: #14162a; --t2: #232842; --t3: #3a4163; --t4: #444b6e; --t5: #5c6482;
@@ -24,6 +25,7 @@ body.light {
   outline: 3px solid var(--acc);
   outline-offset: 2px;
 }
+body:not(.light) { color-scheme: dark; }
 body { background: var(--bg); color: var(--t2); font-family: Georgia, serif; min-height: 100vh; padding: 20px 14px; -webkit-tap-highlight-color: transparent; transition: background 0.2s, color 0.2s; }
 /* Šířka se přizpůsobí obrazovce: na mobilu pohodlný sloupec, na monitoru se využije
    víc plochy. Průvodce je svislý, takže nad ~1080px už je širší sloupec hůř čitelný —
@@ -832,7 +834,7 @@ body:not(.simple-mode) .simple-only { display: none !important; }
 .key-advanced-body { margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .key-advanced-hint { font-size:12px; color:var(--t4); line-height:1.4; }
 .gemini-note { font-size:12.5px; color:var(--t4); margin-top:6px; line-height:1.5; }
-.gemini-note a { color:var(--acc); text-decoration:none; }
+.gemini-note a { color:var(--acc); text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px; }
 .gemini-note code { font-family:monospace; font-size:12px; background:var(--bg2); border:1px solid var(--bdr); border-radius:4px; padding:0 4px; color:var(--t2); }
 .key-restrict-info { font-size:12.5px; color:var(--acc); background:var(--acc-d); border:1px solid var(--acc-b); border-radius:8px; padding:7px 10px; margin-bottom:8px; line-height:1.5; }
 .key-restrict-info a { color:var(--acc); font-weight:600; text-decoration:underline; text-underline-offset:2px; }
@@ -1001,6 +1003,11 @@ body:not(.simple-mode) .simple-only { display: none !important; }
 .ui-modal-backdrop { position: fixed; inset: 0; z-index: 30010; background: rgba(4,6,12,.78); display: flex; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .ui-modal-backdrop.hidden { display: none; }
 .ui-modal-box { width: min(440px, 100%); max-height: calc(100vh - 32px); margin: auto; display: flex; flex-direction: column; background: var(--bg2); border: 1px solid var(--bdr); border-radius: 14px; box-shadow: 0 24px 80px rgba(0,0,0,.55); overflow: hidden; }
+.ui-modal { width:min(660px,100%); max-height:calc(100vh - 32px); margin:auto; display:flex; flex-direction:column; background:var(--bg2); color:var(--t2); border:1px solid var(--bdr); border-radius:14px; box-shadow:0 24px 80px rgba(0,0,0,.55); overflow:hidden; }
+.ui-modal .ui-modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:14px 16px; border-bottom:1px solid var(--bdr2); }
+.ui-modal .ui-modal-body { padding:16px; white-space:normal; }
+.ui-modal-x { flex:0 0 auto; width:36px; height:36px; border:1px solid var(--bdr); border-radius:8px; background:var(--bg3); color:var(--t2); cursor:pointer; font:700 16px/1 system-ui,sans-serif; }
+.ui-modal-x:hover { border-color:var(--acc-b); color:var(--acc); }
 @media(min-width:600px){ .changelog-box { width: min(880px, 100%); } }
 .cl-tabs { display:flex; gap:6px; background:var(--bg); border:1px solid var(--bdr); border-radius:11px; padding:4px; margin:0 0 12px; }
 .cl-tab { flex:1; appearance:none; border:0; background:transparent; color:var(--t3); font-size:13px; font-weight:700; padding:8px 10px; border-radius:8px; cursor:pointer; transition:background .15s,color .15s; }
@@ -1690,9 +1697,9 @@ body.light .strict-risk-card { background: #ffffff; border-color: #c41e1e33; col
 .school-logo-wrap{position:static!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 78px!important;width:78px!important;height:78px!important;max-width:78px!important;max-height:78px!important;padding:6px!important;border-radius:18px!important;background:#fff!important;border:1px solid rgba(120,131,165,.28)!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important;overflow:hidden!important;pointer-events:none!important}
 .school-logo{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;border-radius:12px}
 .school-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:clamp(16px,2.1vw,23px);font-weight:850;line-height:1.15;letter-spacing:.075em;color:var(--t1);text-transform:uppercase;max-width:500px;text-wrap:balance}
-.hdr-btns{position:static!important;display:flex!important;justify-content:flex-end;flex-wrap:wrap;gap:6px;max-width:310px}
+.hdr-btns{position:static!important;display:flex!important;justify-content:flex-end;flex-wrap:nowrap;gap:6px;max-width:none;white-space:nowrap}
 .app-owner-footer strong{color:var(--t2)}
-@media(max-width:760px){.header-top{flex-direction:column;gap:10px}.school-brand-lockup{width:100%}.school-logo-wrap{flex-basis:60px!important;width:60px!important;height:60px!important;max-width:60px!important;max-height:60px!important;border-radius:15px!important}.school-name{font-size:clamp(14px,4vw,18px);letter-spacing:.055em}.hdr-btns{align-self:flex-end;max-width:100%}}
+@media(max-width:760px){.header-top{flex-direction:column;gap:10px}.school-brand-lockup{width:100%}.school-logo-wrap{flex-basis:60px!important;width:60px!important;height:60px!important;max-width:60px!important;max-height:60px!important;border-radius:15px!important}.school-name{font-size:clamp(14px,4vw,18px);letter-spacing:.055em}.hdr-btns{align-self:flex-end;max-width:100%;overflow-x:auto;padding-bottom:3px}}
 @media(max-width:430px){.school-logo-wrap{flex-basis:54px!important;width:54px!important;height:54px!important;max-width:54px!important;max-height:54px!important;padding:5px!important}.school-name{font-size:13px;line-height:1.18}.hdr-btns{width:100%;justify-content:flex-end}.hdr-btn{min-width:34px;padding:6px 8px}}
 
 
@@ -1730,3 +1737,11 @@ a.manual-launch-btn:hover::after,a.manual-launch-btn:focus-visible::after{opacit
   .advanced-config-group { padding-left:11px; padding-right:11px; }
   .advanced-config-group-head { margin-left:-11px; margin-right:-11px; padding-left:11px; padding-right:11px; }
 }
+
+/* v7.1.44 UI/workflow alignment */
+.first-page-api{margin:0 0 16px}
+.gemini-model-only{margin-top:0}
+body.light .ghrab-platform-footer{--ghrab-platform-surface:#fff;--ghrab-platform-border:#c5cae9;color:#232842;background:#fff;border-color:#c5cae9}
+body.light .ghrab-platform-footer__brand span,body.light .ghrab-platform-footer__meta span{color:#444b6e;opacity:1}
+body.light .ghrab-platform-footer__brand strong{color:#14162a}
+body:not(.light) .ghrab-platform-footer{--ghrab-platform-surface:#0f1120;--ghrab-platform-border:#2d3148;color:#c8cde8;background:#0f1120;border-color:#2d3148}

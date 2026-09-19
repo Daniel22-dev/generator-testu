@@ -60,7 +60,7 @@ function setVal(id,v){ const el=w.document.getElementById(id); if(!el) throw new
 function resetBase(){
   w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',jazyk:'angličtina',instrJazyk:'target',uroven:['B1'],kombinovat:false,pocet:3,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfig:[],body:30,gradeTyp:'skola',odevzdavani:'B',testMode:'bezny',resultMode:'instant',feedbackMode:'brief',identityMode:'name',randomizace:'NE',layout:'tabs',zolicek:'NE',diferencovany:'NE',skupiny:[],screenGuard:false,cas:30,fileNames:[],urls:[''],aiGradeScale:null,aiGradeRaw:''}); rosterEntries=[];`);
   setVal('nazev','Workflow test'); setVal('proKoho','1.A'); setVal('latka','Present simple');
-  setVal('vlastniTyp',''); setVal('vlastniSkala','');
+  setVal('vlastniSkala','');
   setVal('listeningTranscript',''); setVal('ucitelJmeno','Daniel Teacher');
   setVal('ucitelPin','TEACH-ABCDEF-123456'); setVal('heslo',''); setVal('bezpKod','');
   w.eval("Access.profile={role:'admin',userId:'TEST',displayName:'Test',status:'active'}; Access.granted=true;");
@@ -239,10 +239,14 @@ for(let i=0;i<supportedTypes.length;i++)for(let j=i+1;j<supportedTypes.length;j+
   pairTypes++;
 }
 ok('všechny typy a všechny jejich dvojice',()=>singleTypes+' samostatně / '+pairTypes+' dvojic');
-resetBase();setVal('vlastniTyp','esej s ručním hodnocením');w.eval('state.typyCviceni=[];state.pocet=1;');w.validate();
-ok('nepodporovaný vlastní typ je zablokován',()=>{assert(w.document.getElementById('next1').disabled,'nepodporovaný typ prošel');assert(/není technicky podporován/.test(w.document.getElementById('validHint1').textContent),'chybí vysvětlení');});
-resetBase();setVal('vlastniTyp','gap fill');w.eval('state.typyCviceni=[];state.pocet=1;');w.validate();
-ok('podporovaný synonymní typ projde',()=>{assert(!w.document.getElementById('next1').disabled,'alias gap fill byl blokován');});
+resetBase();
+ok('legacy vlastní typ cvičení není v UI dostupný',()=>{
+  assert(!w.document.getElementById('vlastniTyp'),'legacy #vlastniTyp stále existuje');
+});
+w.eval('state.typyCviceni=[];state.pocet=1;');w.validate();
+ok('bez výběru podporovaného typu je krok zablokován',()=>{
+  assert(w.document.getElementById('next1').disabled,'prázdný výběr typu prošel');
+});
 
 // 9) Všechny neprázdné kombinace CEFR ve všech pěti cizích jazycích a sekundární volby.
 let cefrCases=0;

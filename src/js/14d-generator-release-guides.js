@@ -151,15 +151,15 @@ function buildUsageGuideHtml() {
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">1️⃣</span> Zvol správný režim</div>' +
-        '<p class="sec-guide-p">Pro ostrý (známkovaný) test vždy zvol <strong>Bezpečný offline + verifier</strong>.</p>' +
+        '<p class="sec-guide-p">Pro ostrý (známkovaný) test použij <strong>Přísný test</strong> nebo v pokročilém režimu <strong>Bezpečný offline + verifier</strong>. Přísná šablona potřebné bezpečnostní volby nastaví sama.</p>' +
         '<div class="sec-guide-ok">✓ Vzniknou dva soubory: <strong>student_test.html</strong> (bez správných odpovědí) a <strong>učitelský verifier</strong> (s klíčem a hodnoticí logikou).</div>' +
         '<p class="sec-guide-p">Procvičování a domácí úkoly nevyžadují bezpečný režim — stačí jednoduchý (instant) mód.</p>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">2️⃣</span> Pošli studentům pouze odkaz</div>' +
-        '<p class="sec-guide-p">Studentům posílej jen <strong>HTTPS odkaz</strong> na <code>student_test.html</code> (např. GitHub Pages, Netlify nebo Tiiny.host).</p>' +
-        '<div class="sec-guide-warn">⚠️ Nikdy neposílej soubor jako přílohu e-mailu — studenti by mohli vidět zdrojový kód a zjistit strukturu testu.</div>' +
+        '<p class="sec-guide-p">Studentům posílej pouze <strong>HTTPS odkaz</strong> na publikovaný <code>student_test.html</code>. Umístění musí zpřístupnit studentský test, nikoli učitelský verifier, roster nebo jiné učitelské soubory.</p>' +
+        '<div class="sec-guide-warn">⚠️ Nespoléhej na utajení HTML zdroje — student si webový soubor může technicky prohlédnout nebo uložit. Bezpečnost stojí na tom, že <code>student_test.html</code> neobsahuje správné odpovědi ani privátní klíč.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
@@ -238,13 +238,13 @@ function showSecurityGuide(){
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">📁</span> Kdy použít který režim</div>' +
         '<p class="sec-guide-p"><strong>Procvičování a domácí úkoly</strong> — stačí jednoduchý (instant) režim. Výsledek vidí student okamžitě, klíč odpovědí je v souboru — to je v pořádku, protože oprava není tajná.</p>' +
-        '<p class="sec-guide-p"><strong>Ostrý (známkovaný) test</strong> — vždy zvolte <strong>Bezpečný offline + verifier</strong>. Studentský soubor neobsahuje správné odpovědi ani hodnoticí logiku; vše řeší učitelský verifier samostatně.</p>' +
+        '<p class="sec-guide-p"><strong>Ostrý (známkovaný) test</strong> — zvolte <strong>Přísný test</strong>; v pokročilém režimu tomu odpovídá bezpečný offline režim s verifierem. Studentský soubor neobsahuje správné odpovědi; vyhodnocení probíhá v učitelském verifieru.</p>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🚫</span> Co nikdy neposlat studentům</div>' +
         '<div class="sec-guide-warn">⚠️ Soubor <strong>DO_NOT_SEND_TEACHER_VERIFIER_…</strong> obsahuje správné odpovědi a privátní dešifrovací klíč. Nikdy ho neposílejte e-mailem, nenahrávejte na sdílené úložiště ani nevkládejte do skupinového chatu.</div>' +
-        '<p class="sec-guide-p">Studentům patří <strong>výhradně</strong> odkaz na <code>student_test.html</code> (ideálně přes GitHub Pages nebo Tiiny.host — ne jako příloha e-mailu).</p>' +
+        '<p class="sec-guide-p">Studentům patří <strong>výhradně</strong> publikovaný <code>student_test.html</code>. Verifier, roster, CSV s kódy a další učitelské soubory nesmí být ve veřejně dostupném umístění.</p>' +
         '<p class="sec-guide-p">Generátor sám blokuje export verifieru do studentského balíčku, ale technická pojistka nenahrazuje pozornost učitele.</p>' +
       '</div>' +
 
@@ -252,7 +252,7 @@ function showSecurityGuide(){
         '<div class="sec-guide-section-title"><span class="sg-ico">📂</span> Kam ukládat answers.txt a výsledky</div>' +
         '<p class="sec-guide-p">Soubory <code>answers.txt</code> od studentů a učitelský verifier ukládejte <strong>pouze do zabezpečeného školního úložiště</strong> (šifrovaný disk, školní cloud s přihlášením — ne Google Disk se sdílením „kdokoliv s odkazem").</p>' +
         '<div class="sec-guide-ok">✓ Doporučeno: složka s přístupem jen pro daného učitele, pojmenovaná třídou a datem testu.</div>' +
-        '<p class="sec-guide-p">Výsledky uchovávejte <strong>po dobu, kterou vyžaduje školní řád</strong> (obvykle do konce školního roku nebo do uzavření klasifikace). Pak soubory smažte.</p>' +
+        '<p class="sec-guide-p">Výsledky uchovávejte pouze po dobu stanovenou pravidly školy a příslušným režimem uchovávání dokumentace; poté je bezpečně odstraňte.</p>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
@@ -265,9 +265,9 @@ function showSecurityGuide(){
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🔑</span> Gemini API klíč</div>' +
-        '<p class="sec-guide-p">Klíč zadávejte <strong>jen pro relaci</strong> (výchozí volba) — po zavření prohlížeče se sám zapomene. Trvalé uložení používejte výhradně na vlastním zařízení, které nikomu nepůjčujete.</p>' +
-        '<p class="sec-guide-p">Každý učitel by měl mít <strong>vlastní klíč</strong> z Google AI Studio (zdarma). Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()" style="color:var(--acc)">návod zde</button>.</p>' +
-        '<div class="sec-guide-warn">⚠️ Na sdíleném počítači (sborovna, počítačová učebna) nikdy neukládejte klíč trvale — mohl by ho získat jiný uživatel.</div>' +
+        '<p class="sec-guide-p">Klíč se v této verzi používá <strong>jen pro relaci</strong> — po zavření prohlížeče se zapomene. Na sdíleném zařízení ho po práci smažte i ručně tlačítkem v panelu AI připojení.</p>' +
+        '<p class="sec-guide-p">V GitHub režimu potřebuje učitel platný klíč pro Gemini API. Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()" style="color:var(--acc)">návod zde</button>.</p>' +
+        '<div class="sec-guide-warn">⚠️ Na sdíleném počítači (sborovna, počítačová učebna) klíč po práci smažte tlačítkem „Smazat klíč“ a zavřete relaci.</div>' +
       '</div>' +
 
       '<div class="sec-guide-section">' +
@@ -346,7 +346,7 @@ function showStrictSituations(){
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🎯</span> Co přísný režim umí a co ne</div>' +
-        '<p class="sec-guide-p">Vycházíme z toho, že student dostane jen webový odkaz na test a k samotnému HTML souboru se nedostane. Tím odpadá čtení správných odpovědí ze zdrojového kódu i přepisování výsledku v prohlížeči. Přísný režim pak podvádění výrazně ztěžuje a spolehlivě chrání známku i klíč. Není to ale dozor a není 100% neprůstřelný — počítej s tím, na co se dá spolehnout, a zbytek pohlídej v učebně.</p>' +
+        '<p class="sec-guide-p">Student dostane webový odkaz a může si technicky prohlédnout nebo uložit HTML, proto bezpečnost nesmí stát na utajení zdrojového kódu. Přísný režim je navržen tak, aby studentský soubor neobsahoval správné odpovědi ani privátní klíč; zámek a bezpečnostní signály pak podvádění ztěžují. Není to ale dozor ani 100% neprůstřelná ochrana — zbytek musí pohlídat organizace testu.</p>' +
         '<div class="sec-guide-ok"><strong>Spolehni se:</strong> studentský test neobsahuje správné odpovědi ani klíč a známku nelze vylepšit — verifier ji počítá znovu z odevzdaných odpovědí, ne z toho, co student tvrdí. U ostrého testu navíc nedrží jména: student zadává jen jednorázový kód a to, kterému studentovi kód patří, ví pouze učitelský verifier.</div>' +
         '<div class="sec-guide-warn"><strong>Pomáhá, ale ne na 100 %:</strong> jednorázové kódy, promíchání otázek, zámek po opuštění testu a bezpečnostní signály (opuštění okna, krátký čas, duplicitní pokus, kód mimo seznam). Jsou to překážky a vodítka pro tvou kontrolu, ne neprůstřelné zábrany a ne důkazy.</div>' +
         '<div style="background:transparent;border:1px solid var(--err);border-radius:7px;padding:6px 10px;font-size:12.5px;color:var(--err);line-height:1.5;margin-bottom:6px"><strong>Tohle nezařídí soubor:</strong> telefon, papír, druhé zařízení, soused, sdílení kódu mezi studenty, kdo test reálně píše a kdy se odkaz dostane ke studentům. To řeší jedině dozor a organizace.</div>' +
@@ -368,7 +368,7 @@ function showStrictSituations(){
           '<span style="' + pNo + '">Neřeší</span></p>' +
         '<table style="width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5">' +
           '<tbody>' +
-            row(pOk, 'Spolehlivé', 'Student chce najít správné odpovědi', 'Ve studentském testu nejsou — klíč má jen učitelský verifier. A k HTML se student stejně nedostane. Nedělej nic.') +
+            row(pOk, 'Spolehlivé', 'Student chce najít správné odpovědi', 'Ve studentském testu nejsou — klíč má jen učitelský verifier. Student si může HTML prohlédnout, ale správné odpovědi ani privátní klíč v něm být nesmí.') +
             row(pOk, 'Spolehlivé', 'Student chce nahlásit lepší známku, než dosáhl', 'Verifier známku přepočítá sám z odevzdaných odpovědí. Student ji neovlivní.') +
             row(pOk, 'Spolehlivé', 'Student zadá vymyšlený nebo cizí kód', 'Verifier u kódu mimo roster zobrazí tvrdý signál „kód není v seznamu“. Hned vidíš, že něco nesedí.') +
             row(pOk, 'Spolehlivé', 'Z testu zjistit cizí kódy spolužáků', 'Nejde — kódy jsou jen ve verifieru, ne ve studentském souboru. Student vidí jen své prázdné políčko.') +
@@ -388,7 +388,7 @@ function showStrictSituations(){
 
       '<div class="sec-guide-section">' +
         '<div class="sec-guide-section-title"><span class="sg-ico">🛡️</span> Shrnutí</div>' +
-        '<div class="sec-guide-ok">Přísný režim + jednorázové kódy chrání známku a klíč spolehlivě, ohlídá použití cizího kódu i opakovaný pokus a podvádění ztěžuje. Zabránit fyzickému podvádění, záměně identity (kdo pod kódem reálně sedí) a úniku zadání ale musí dozor a organizace, ne soubor.</div>' +
+        '<div class="sec-guide-ok">Přísný režim + jednorázové kódy oddělují klíč od studentského souboru, upozorní na kód mimo roster, duplicitní pokusy a další bezpečnostní události a podvádění ztěžují. Fyzické podvádění, záměnu identity a únik zadání ale musí řešit dozor a organizace, ne samotný soubor.</div>' +
       '</div>' +
 
     '</div>' +
@@ -452,7 +452,7 @@ function showApiKeyGuide(){
         '<div class="sec-guide-section-title"><span class="sg-ico">5️⃣</span> Uložte a zkopírujte klíč</div>' +
         '<p class="sec-guide-p">Klikněte na tlačítko <strong>„Save"</strong> dole na stránce.</p>' +
         '<p class="sec-guide-p">Vraťte se zpět na <strong>aistudio.google.com/apikey</strong>, klikněte na <strong>„Show key"</strong> a klíč zkopírujte.</p>' +
-        '<p class="sec-guide-p">Vložte ho do pole <strong>„Gemini API klíč (AIza…)"</strong> ve žluté sekci generátoru a klikněte <strong>„Použít jen pro relaci"</strong>.</p>' +
+        '<p class="sec-guide-p">Vložte ho do pole <strong>„Gemini API klíč (AIza…)"</strong> v panelu AI připojení na první stránce a klikněte <strong>„Použít jen pro relaci"</strong>.</p>' +
         '<div class="sec-guide-warn">⚠️ Klíč začíná vždy písmeny <strong>AIza</strong>. Pokud začíná jinak, není to Gemini API klíč.</div>' +
       '</div>' +
 

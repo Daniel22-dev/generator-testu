@@ -1,3 +1,17 @@
+## 7.1.44 — UI/workflow konsolidace (2026-09-18)
+
+### Candidate QA hotfix
+- AI připojení je po přesunu na první stránku viditelné pouze v kroku 0; v dalších krocích už nezabírá mobilní viewport.
+- Odkaz na Google AI Studio v poznámce API klíče je trvale podtržený, aby splnil WCAG rozlišení odkazu od okolního textu.
+
+- Sjednocena horní nástrojová lišta do jedné řady na desktopu; na úzkých displejích se bezpečně posouvá bez rozbití layoutu.
+- Odstraněny historické vstupy do centrální správy přístupů z hlavní obrazovky Generátoru; přístupový model zůstává řízen AI Studiem.
+- API klíč přesunut na první stránku a dokumentace upravena na session-only ukládání; výběr modelu zůstává ve finálním kroku.
+- Zpřesněn přechod do pokročilého nastavení a odstraněno volné pole pro neexplicitní typ cvičení.
+- Opraven light/dark footer a kompletní styl dialogu Bezpečnost pracoviště.
+- Aktualizovány tři provozní nápovědy, onboarding, realistická rizika přísného testu a interní databáze poradce funkcí.
+- Regenerována verze, SBOM a AI assurance evidence pro 7.1.44.
+
 ## 7.1.43 — Etapa 6: MASTER cleanup (2026-09-18)
 
 - Bez změny aplikační logiky nebo pedagogického workflow.

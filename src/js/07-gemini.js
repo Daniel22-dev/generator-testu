@@ -667,10 +667,10 @@ function geminiApiErrorMessage(res, data, model, attempts, retryMs=0){
     action = 'Zkontroluj zvolený model, URL/přílohy a zkus jednodušší zadání.';
   } else if(res.status === 401 || res.status === 403 || /PERMISSION_DENIED|UNAUTHENTICATED/i.test(apiStatus)){
     why = 'API klíč není platný, nemá oprávnění, nebo není omezený na Gemini API.';
-    action = 'Zkontroluj Gemini API klíč ve žluté sekci. Od 19. 6. 2026 Google vyžaduje, aby byl klíč omezený na Gemini API — neomezené klíče vrací chybu 403. Zkontroluj nastavení klíče na aistudio.google.com → API Keys nebo vytvoř nový omezený klíč.';
+    action = 'Zkontroluj Gemini API klíč v panelu AI připojení na první stránce. Od 19. 6. 2026 Google vyžaduje, aby byl klíč omezený na Gemini API — neomezené klíče vrací chybu 403. Zkontroluj nastavení klíče na aistudio.google.com → API Keys nebo vytvoř nový omezený klíč.';
   } else if(modelGone){
     why = `Zvolený model „${model}" pravděpodobně není dostupný nebo není podporovaný pro tento endpoint.`;
-    action = `Změň název modelu v poli „Model" ve žluté sekci, např. na ${GEMINI_MODEL_DEFAULT} nebo ${GEMINI_FALLBACK_MODELS[0]}.`;
+    action = `Změň název modelu v poli „Model" v závěrečném kroku, např. na ${GEMINI_MODEL_DEFAULT} nebo ${GEMINI_FALLBACK_MODELS[0]}.`;
   } else if(res.status === 429 || /RESOURCE_EXHAUSTED/i.test(apiStatus)){
     why = 'Byl překročen limit požadavků nebo kvóta pro API klíč / Google projekt.';
     action = retryMs
@@ -766,7 +766,7 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
   if (!(await ensureGeminiDataNotice())) throw new Error('AI požadavek byl zrušen před odesláním dat.');
   lastGeminiJsonRepaired = false;
   lastGeminiRawResponse = null;
-  if(!geminiApiKey)throw new Error('Gemini API klíč není nastaven. Zadej ho ve žluté sekci.');
+  if(!geminiApiKey)throw new Error('Gemini API klíč není nastaven. Zadej ho v panelu AI připojení na první stránce.');
   const model=(opts && opts.modelOverride && isValidModelName(opts.modelOverride)) ? normalizeModelName(opts.modelOverride) : resolveGeminiModel();
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
   const body = buildGeminiRequestBody(prompt, extraParts, opts);
