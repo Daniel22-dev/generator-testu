@@ -208,6 +208,8 @@ function jumpTo(n) {
 function updateProgress() {
   const modePanel = $('appModePanel');
   if (modePanel) modePanel.classList.toggle('hidden', currentStep !== 0);
+  const firstPageApi = $('firstPageApi');
+  if (firstPageApi) firstPageApi.classList.toggle('hidden', currentStep !== 0);
 
   const progress = $('progressBar');
   if (progress) {

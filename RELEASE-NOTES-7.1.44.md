@@ -16,3 +16,7 @@ Datum: 2026-09-18
 
 ## Kompatibilita
 Bez změny formátu secure exportu, kryptografie, teacher verifieru, rosteru a odevzdávacího payloadu.
+
+## Candidate QA hotfix
+- Opraven P5 axe blocker `link-in-text-block` u odkazu `aistudio.google.com` přidáním nezávislého podtržení.
+- Opraven mobilní visual gate `generator-long-form 360x800`: panel AI připojení se po opuštění prvního kroku skryje, takže aktivní krok zůstává ve viewportu.
