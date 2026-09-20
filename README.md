@@ -1,6 +1,8 @@
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.44
+**Aktuální verze:** 7.1.45
+
+> **7.1.45 AI Core + workflow cleanup (2026-09-19):** konkrétní modely jsou skryté za profily AI Core; Poradce je uzemněný v relevantní KB + aktuálním stavu; Google Forms jsou samostatná cesta předání secure výsledků a legacy týmový bezpečnostní kód byl odstraněn jako neúčinná vrstva.
 
 > **7.1.44 Etapa 6 – MASTER cleanup (2026-09-18):** metadata-only patch bez změny aplikační logiky. Interní pre-release `release-acceptance.json` je přesunut z `public/` do `src/config/`, takže se už nepublikuje do runtime `dist`. Živý stav releasu dokládá `release-integrity.json` a AI Studio release-wave.
 

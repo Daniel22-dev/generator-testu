@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.44">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.45">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -57,8 +57,6 @@
     </div>
   </div>
 
-  <!-- Runtime security value. The visible editor lives in Settings > Bezpečnost pracoviště. -->
-  <input type="hidden" id="bezpKod" value="">
 
   <!-- Banners -->
   <div id="restoredBanner" class="banner green hidden"><span>✓ Obnoveno z předchozí relace</span><button onclick="discardSaved()">Začít znovu</button></div>
@@ -84,25 +82,17 @@
         <span class="gemini-ptitle" id="apiSetupTitle">🔑 AI připojení</span>
         <span class="gemini-status" id="geminiStatus">Klíč není nastaven</span>
       </div>
-      <div class="key-restrict-info">⚠️ Klíč musí být omezený na <strong>Gemini API</strong>; neomezené standardní klíče Google nepřijímá. <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">Jak omezit klíč →</button></div>
       <div class="ai-data-notice" role="note">
-        <strong>🌐 Co se odesílá do Gemini:</strong> text zadání, zvolené URL a přiložené soubory. Jména studentů v diferenciaci generátor vždy nahrazuje kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Před odesláním odstraň osobní, zdravotní, kázeňské a jiné citlivé údaje. Při prvním AI požadavku v každé relaci se zobrazí potvrzení.
+        <strong>🌐 Co se odesílá do AI:</strong> text zadání, použité URL a přiložené soubory. Jména studentů v diferenciaci Generátor nahrazuje kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Před odesláním odstraň osobní, zdravotní, kázeňské a jiné citlivé údaje.
       </div>
       <div class="gemini-key-row">
-        <input type="password" id="geminiKeyInput" placeholder="Gemini API klíč (AIza…)" autocomplete="off" autocorrect="off">
+        <input type="password" id="geminiKeyInput" placeholder="API klíč" autocomplete="off" autocorrect="off">
       </div>
       <div class="gemini-key-actions">
-        <button type="button" id="btnUseKeySession" class="key-btn-recommended" onclick="useGeminiKeyForSession()" title="Klíč zůstane jen do zavření okna. Nejbezpečnější volba — vhodné i na sdíleném/školním zařízení.">Použít jen pro relaci <span class="key-rec-tag">doporučeno</span></button>
-        <button type="button" id="btnClearKey" onclick="clearGeminiKey()" title="Odstraní klíč z prohlížeče. Použij, když končíš práci na cizím zařízení.">Smazat klíč</button>
+        <button type="button" id="btnUseKeySession" class="key-btn-recommended" onclick="useGeminiKeyForSession()" title="Klíč zůstane jen do zavření okna a neukládá se trvale.">Připojit pro tuto relaci</button>
+        <button type="button" id="btnClearKey" onclick="clearGeminiKey()" title="Odstraní klíč z aktuální relace.">Odpojit</button>
       </div>
-      <details class="key-advanced" id="keyAdvanced">
-        <summary>Bezpečnost API klíče</summary>
-        <div class="key-advanced-body gemini-key-actions">
-          <button type="button" id="btnSaveKeyPermanent" onclick="saveGeminiKeyPermanent()" title="Z bezpečnostních důvodů se klíč ukládá pouze do této relace.">Použít bezpečně jen pro relaci</button>
-          <span class="key-advanced-hint">Klíč se v této verzi z bezpečnostních důvodů neukládá trvale. Na sdíleném zařízení ho po práci smaž.</span>
-        </div>
-      </details>
-      <div class="gemini-note" id="geminiNote"><strong>Relace</strong> = klíč se po zavření prohlížeče sám zapomene; nejbezpečnější volba pro školní i sdílená zařízení. Klíč musí být omezený na Gemini API — <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">návod</button>. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a> → Get API key.</div>
+      <div class="gemini-note" id="geminiNote">Klíč se používá jen v této relaci a po zavření prohlížeče se zapomene. <button type="button" class="inline-guide-btn" onclick="showApiKeyGuide()">Jak získat a bezpečně nastavit API klíč →</button></div>
     </div>
   </section>
 
@@ -529,12 +519,12 @@
       </div>
 
       <div class="field" id="submissionModeField">
-        <div class="field-label">Způsob odevzdávání <button class="tt-icon" data-tip="Varianta A: student dostává zpětnou vazbu po každém cvičení zvlášť. Varianta B: vyplní vše a odevzdá najednou — vhodné, pokud chceš, aby si mohl rozmyslet.">?</button></div>
+        <div class="field-label">Průběh odevzdání v testu <button class="tt-icon" data-tip="Tahle volba určuje pouze KDY student uzamkne své odpovědi uvnitř testu. Neurčuje, jak se výsledek předá učiteli — to řídí Výsledek a předání učiteli a u secure testu Nastavení → Předání secure výsledků.">?</button></div>
         <div class="btn-row choice-card-grid two-col variant-card-grid" id="submissionModeBtns">
-          <button class="tag-btn variant-btn" id="varA" data-val="A" onclick="pickVariant('A')"><span class="choice-card-title">Varianta A — Průběžné odevzdávání</span><span class="choice-card-desc">Student odevzdává cvičení jedno po druhém a ihned vidí zpětnou vazbu.</span></button>
-          <button class="tag-btn variant-btn" id="varB" data-val="B" onclick="pickVariant('B')"><span class="choice-card-title">Varianta B — Celkové odevzdávání</span><span class="choice-card-desc">Student vyplní celý test a odevzdá vše najednou tlačítkem na konci.</span></button>
+          <button class="tag-btn variant-btn" id="varA" data-val="A" onclick="pickVariant('A')"><span class="choice-card-title">Průběžně po cvičeních</span><span class="choice-card-desc">Každé cvičení se po odevzdání uzamkne; u okamžitého režimu student dostane příslušnou zpětnou vazbu.</span></button>
+          <button class="tag-btn variant-btn" id="varB" data-val="B" onclick="pickVariant('B')"><span class="choice-card-title">Celý test najednou</span><span class="choice-card-desc">Student může odpovědi upravovat až do finálního odevzdání celého testu.</span></button>
         </div>
-        <div class="small-muted">Pozn.: V bezpečném offline režimu se automaticky používá Varianta B, protože studentský soubor neobsahuje answer key a nemůže průběžně opravovat cvičení.</div>
+        <div class="small-muted">Bezpečný offline režim vždy používá celkové odevzdání. Samotné předání výsledku učiteli pak proběhne přes Google Forms, nebo přes <code>answers.txt</code> podle nastavení zařízení.</div>
       </div>
 
       <div class="field" id="feedbackModeField">
@@ -549,13 +539,13 @@
       </div>
 
       <div class="field" id="resultModeField">
-        <div class="field-label">🔐 Režim výsledků <button class="tt-icon" data-tip="Nejrychlejší je okamžitá známka se screenshotem. Pro klasifikovaný test je nejbezpečnější bezpečný offline režim: student_test.html neobsahuje správné odpovědi a učitel opravuje answers.txt v teacher_verifier.html.">?</button></div>
+        <div class="field-label">🔐 Výsledek a předání učiteli <button class="tt-icon" data-tip="Okamžitý režim zobrazí výsledek studentovi přímo v testu. Bezpečný offline režim správné odpovědi do studentského souboru nedává; šifrovaný výsledek student předá přes nastavený Google Form, nebo přes answers.txt.">?</button></div>
         <div class="field-hint">Vyber podle účelu testu: procvičení = okamžitá známka, klasifikace = bezpečný offline verifier. <strong>V přísném testu se okamžitá známka vypne a použije se bezpečný offline verifier.</strong></div>
         <div class="btn-row choice-card-grid two-col" id="resultModeBtns">
-          <button class="tag-btn active" data-val="instant" onclick="pick('resultMode','instant')"><span class="choice-card-title">⚡ Okamžitá známka</span><span class="choice-card-desc">Student vidí výsledek hned. Vhodné pro procvičení, domácí práci a rychlé orientační testy.</span></button>
-          <button class="tag-btn" data-val="secureOffline" onclick="pick('resultMode','secureOffline')"><span class="choice-card-title">🛡️ Bezpečný offline + hromadný verifier</span><span class="choice-card-desc">Student nevidí známku a odevzdá answers.txt. Správné odpovědi zůstávají v učitelském verifieru.</span></button>
+          <button class="tag-btn active" data-val="instant" onclick="pick('resultMode','instant')"><span class="choice-card-title">⚡ Okamžitý výsledek</span><span class="choice-card-desc">Student po odevzdání vidí body a známku přímo v testu; učiteli lze předat výsledkovou kartu/screenshot.</span></button>
+          <button class="tag-btn" data-val="secureOffline" onclick="pick('resultMode','secureOffline')"><span class="choice-card-title">🛡️ Bezpečný offline + verifier</span><span class="choice-card-desc">Student nevidí známku. Předá zašifrovaný výsledek přes Google Forms nebo answers.txt; správné odpovědi zůstávají jen v učitelském verifieru.</span></button>
         </div>
-        <div class="secure-mode-box" id="resultModeHelp"><strong>Okamžitá známka:</strong> student vidí výsledek hned. <strong>Bezpečný offline:</strong> student nevidí známku a odevzdá answers.txt, který opravíš ve verifieru.</div>
+        <div class="secure-mode-box" id="resultModeHelp"><strong>Okamžitý výsledek:</strong> student vidí body a známku hned. <strong>Bezpečný offline:</strong> student nevidí známku a předá zašifrovaný výsledek učiteli; způsob předání nastavíš v ⚙️ Nastavení.</div>
         <div id="resultModeNote" class="secure-mode-box" style="display:none"></div>
         <div class="security-guide-panel" id="securityGuidePanel">
           <div class="security-guide-head">
@@ -763,9 +753,9 @@
     <!-- ═══════════════════════════ STEP 3 ═══════════════════════════ -->
     <div id="step3" class="hidden">
       <div class="simple-helper" id="simpleSecretsHelper">
-        <b>Jednoduché nastavení:</b> účel testu už nastavil potřebné technické volby. Tady doplň jen údaje pro učitelský přístup; jeden kód můžeš bezpečně vygenerovat tlačítkem níže. Týmový kód se nastavuje jednou v ⚙️ Nastavení → Bezpečnost pracoviště.
+        <b>Učitelský přístup:</b> pro tento test ještě chybí učitelský přístupový kód. Použije se pro učitelský mód a případné odemčení testu; neukládá se do historie ani šablon.
         <div class="simple-quick-row">
-          <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Vygenerovat učitelský kód</button>
+          <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Vygenerovat učitelský přístupový kód</button>
         </div>
       </div>
       <div class="field">
@@ -780,13 +770,6 @@
         </div>
         <input type="hidden" id="heslo" value="" aria-hidden="true">
         <div class="small-muted">Používáš jeden kód. Generátor z něj interně vytvoří oddělený hash pro učitelský mód a oddělený hash pro odemčení.</div>
-      </div>
-      <div class="field hidden" id="securityWorkplaceField">
-        <div class="field-label">🛡️ Bezpečnost pracoviště</div>
-        <div class="secure-mode-box" id="securityWorkplaceStatus" role="status"></div>
-        <div class="ex-action" style="margin-top:7px">
-          <button type="button" class="btn-mini" onclick="openGeneratorSettings()">⚙️ Otevřít nastavení</button>
-        </div>
       </div>
       <!-- overeni bylo odstraněno z UI; state.overeni=NE vynucuje normalizeLoadedState() -->
       <div class="field" id="jokerField">
@@ -845,29 +828,11 @@
       <div class="warn-box hidden" id="fileWarn"></div>
       <div class="chips" id="chips"></div>
 
-      <!-- MODEL SETTINGS -->
-      <div class="gemini-panel gemini-model-only">
-        <div class="gemini-ph">
-          <span class="gemini-ptitle">🤖 Model pro generování</span>
-          <span class="gemini-status">API klíč se nastavuje v panelu AI připojení na první stránce</span>
-        </div>
-        <div class="gemini-model-row">
-          <label class="gemini-model-label" for="geminiModelInput">Model <span class="gemini-model-status" id="geminiModelStatus">výchozí</span></label>
-          <div class="gemini-model-inputwrap">
-            <input type="text" id="geminiModelInput" placeholder="gemini-3.6-flash" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onchange="setGeminiModel(this.value)" oninput="updateGeminiModelUI()">
-            <button type="button" class="gemini-model-reset" onclick="resetGeminiModel()">Výchozí</button>
-          </div>
-          <div class="gemini-model-quick" id="geminiModelQuick">
-            <button type="button" id="qmStrong" onclick="quickModel('strong')" title="Stabilní výchozí model pro kvalitní a složitější testy">⚡ Silný<span class="qm-sub">gemini-3.6-flash</span></button>
-            <button type="button" id="qmLite" onclick="quickModel('lite')" title="Rychlejší a úspornější stabilní model pro jednodušší úlohy">🪶 Lite<span class="qm-sub">gemini-3.5-flash-lite</span></button>
-          </div>
-          <div class="gemini-note">Měň jen když přestane fungovat generování s chybou o modelu. Modelová politika se ve školním režimu řídí serverem. V GitHub režimu lze při ukončení modelu zadat nový stabilní název podle <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener noreferrer">dokumentace Google</a>.</div>
-        </div>
-      </div>
+      <div class="ai-profile-note"><strong>🤖 AI Core:</strong> Generátor volí potřebný profil výkonu automaticky podle operace (úsporný / vyvážený / nejvyšší kvalita). Konkrétní provider ani model se v běžném rozhraní nenastavuje.</div>
 
       <!-- GENERATE BUTTON -->
       <button class="btn-generate" id="btnGenerate" onclick="generateTest()">✨ Vytvořit test přímo</button>
-      <div class="req-note">Spotřebuje jeden nebo více AI požadavků podle počtu a složitosti cvičení; aktivní limity se liší podle modelu a projektu. Bez AI klíče se místo toho jen připraví prompt ke zkopírování (offline).</div>
+      <div class="req-note">Spotřebuje jeden nebo více AI požadavků podle počtu a složitosti cvičení; aktivní limity se mohou lišit podle školního účtu/projektu a AI profilu. Bez AI klíče se místo toho jen připraví prompt ke zkopírování (offline).</div>
       <div class="share-gen hidden" id="exportZadaniGen">
         <button type="button" class="share-btn" onclick="exportZadani()">📤 Exportovat zadání pro správce</button>
         <div class="share-note">Nemáš dnes volné AI požadavky? Ulož zadání do souboru a pošli ho správci — vytvoří test za tebe na svém klíči. Hesla ani nahrané soubory (audio/PDF/obrázky) se nepřenášejí, ty pošli zvlášť.</div>
@@ -1017,39 +982,34 @@
 </div>
 
 <div class="ui-modal-backdrop hidden" id="generatorSettingsModal" role="dialog" aria-modal="true" aria-labelledby="generatorSettingsTitle" onclick="generatorSettingsBackdropClick(event)">
-  <div class="ui-modal" style="max-width:660px">
+  <div class="ui-modal" style="max-width:720px">
     <div class="ui-modal-head">
       <div><b id="generatorSettingsTitle">⚙️ Nastavení Generátoru</b><div class="muted" style="font-size:12px">Nastavení tohoto zařízení</div></div>
       <button type="button" class="ui-modal-x" onclick="closeGeneratorSettings()" aria-label="Zavřít">✕</button>
     </div>
     <div class="ui-modal-body">
       <div class="field" style="margin-bottom:0">
-        <div class="field-label">🛡️ Bezpečnost pracoviště</div>
-        <div class="field-hint">Týmový bezpečnostní kód se nastavuje jednou na vlastním učitelském zařízení. Generátor ho potom používá automaticky tam, kde je potřeba. Na sdíleném školním počítači ho neukládej.</div>
-        <div class="secure-mode-box" id="generatorSettingsSecurityStatus" role="status"></div>
-        <div class="input-wrap" style="margin-top:10px">
-          <input type="password" id="generatorSettingsSecurityInput" placeholder="Vlož týmový bezpečnostní kód od správce..." autocomplete="new-password" oninput="onGeneratorSettingsSecurityInput()">
-          <button type="button" class="btn-eye" onclick="toggleSecret('generatorSettingsSecurityInput', this)" aria-label="Zobrazit nebo skrýt bezpečnostní kód">👁</button>
-        </div>
-        <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
-          <button type="button" class="btn-mini hidden" id="btnGenSecCode" onclick="generateSchoolSecurityCode()">🎲 Vygenerovat nový týmový kód</button>
-          <button type="button" class="btn-mini hidden" id="btnCopySecCode" onclick="copySecurityCode()">📋 Kopírovat pro kolegy</button>
-          <button type="button" class="btn-mini" onclick="saveSecurityCodeLocal()">💾 Uložit na tomto zařízení</button>
-          <button type="button" class="btn-mini" onclick="loadSecurityCodeLocal()">↩ Načíst uložený kód</button>
-          <button type="button" class="btn-mini" onclick="forgetSecurityCodeLocal()">🧹 Zapomenout z tohoto zařízení</button>
-        </div>
-        <div class="small-muted" style="margin-top:10px">Kód není součástí zadání, šablon ani historie. Studentům se nikdy neposílá. Správce může vytvořit nový týmový kód; ostatní učitelé pouze vloží kód, který jim správce předal bezpečnou cestou.</div>
-      </div>
-      <div class="field" style="margin-top:18px;margin-bottom:0;padding-top:16px;border-top:1px solid var(--line)">
-        <div class="field-label">🟣 Odevzdání přes Google Forms</div>
-        <div class="field-hint">Volitelné nastavení pro bezpečný offline test. Vlož responder odkaz na školní Google Form. Formulář doporučujeme nastavit tak, aby sbíral školní e-mail a obsahoval povinnou otázku typu <b>Odstavec</b> pro celý odevzdávací blok <code>SECURE-ANSWERS-V1</code>.</div>
+        <div class="field-label">📤 Předání secure výsledků učiteli</div>
+        <div class="field-hint"><strong>Google Forms je jen sběrná schránka, ne opravovací systém.</strong> Bez nastaveného formuláře student odevzdá zašifrovaný <code>answers.txt</code>. S formulářem zkopíruje stejný zašifrovaný blok <code>SECURE-ANSWERS-V1</code> do školního Google Formu; <code>answers.txt</code> zůstává nouzová záloha.</div>
         <div class="secure-mode-box" id="generatorSettingsFormsStatus" role="status"></div>
-        <input type="url" id="generatorSettingsFormsInput" style="margin-top:10px" placeholder="https://docs.google.com/forms/.../viewform nebo https://forms.gle/..." autocomplete="off" oninput="updateGeneratorSettingsFormsStatus()">
+        <input type="url" id="generatorSettingsFormsInput" style="margin-top:10px" placeholder="Responder odkaz: https://docs.google.com/forms/.../viewform nebo https://forms.gle/..." autocomplete="off" oninput="updateGeneratorSettingsFormsStatus()">
         <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
-          <button type="button" class="btn-mini" onclick="saveGoogleFormsUrlLocal()">💾 Uložit odkaz</button>
-          <button type="button" class="btn-mini" onclick="forgetGoogleFormsUrlLocal()">🧹 Odebrat odkaz</button>
+          <button type="button" class="btn-mini" onclick="saveGoogleFormsUrlLocal()">💾 Používat Google Forms</button>
+          <button type="button" class="btn-mini" onclick="forgetGoogleFormsUrlLocal()">↩ Používat jen answers.txt</button>
         </div>
-        <div class="small-muted" style="margin-top:10px">Do testu se vloží jen responder URL na doméně Google Forms. Odkaz se ukládá pouze na tomto zařízení a není součástí historie zadání. Pokud není nastaven, secure test zachová klasické odevzdání přes <code>answers.txt</code>.</div>
+        <details class="forms-howto" style="margin-top:14px">
+          <summary><strong>Jak Google Forms nastavit a používat — krok za krokem</strong></summary>
+          <ol class="forms-howto-list">
+            <li>Ve školních Google Forms vytvoř formulář pro odevzdání bezpečných testů.</li>
+            <li>Přidej <strong>povinnou otázku typu Odstavec</strong>, např. „Odevzdávací kód z testu“. Do ní student vloží celý blok začínající <code>SECURE-ANSWERS-V1</code>.</li>
+            <li>Volitelně zapni sběr <strong>ověřeného školního e-mailu</strong>. E-mail je další identifikační údaj; nenahrazuje samotný šifrovaný blok.</li>
+            <li>Formulář publikuj a zkopíruj <strong>odkaz pro respondenty</strong> (ne adresu editoru). Vlož ho výše a klikni na „Používat Google Forms“.</li>
+            <li>V nově vygenerovaném secure testu student po odevzdání zkopíruje celý odevzdávací blok, otevře formulář, vloží jej do otázky a formulář odešle.</li>
+            <li>Po testu v Google Forms stáhni odpovědi jako <strong>CSV</strong> a soubor nahraj do <code>teacher_verifier.html</code> v části „Import z Google Forms (CSV)“.</li>
+            <li>Verifier každý blok kryptograficky ověří/dešifruje a teprve potom spočítá body, známku a bezpečnostní signály.</li>
+          </ol>
+          <div class="small-muted"><strong>Důležité:</strong> krátký jednorázový studentský kód není odevzdávací payload. Studentský kód pouze identifikuje studenta; do Forms patří celý <code>SECURE-ANSWERS-V1</code> blok. Pokud je blok nezvykle dlouhý nebo formulář není dostupný, test nabídne <code>answers.txt</code>.</div>
+        </details>
       </div>
     </div>
   </div>

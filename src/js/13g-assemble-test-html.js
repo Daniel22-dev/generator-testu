@@ -50,10 +50,10 @@ async function assembleTestHtml(st, genData) {
   const configHash=await sha256Text(stableStringify(configForHash));
   const manifestBase={v:1,security:'B+C-offline',salt:securitySalt,contentHash,configHash,...configForHash};
   const manifestHash=await sha256Text(stableStringify(manifestBase));
-  const teacherSecurityCode=trim('bezpKod');
-  const verifySecret=teacherSecurityCode
-    ? await derivePerTestSecret(teacherSecurityCode, securitySalt, manifestHash)
-    : makeVerifySecret();
+  // Legacy týmový bezpečnostní kód byl odstraněn: v secure RSA/AES větvi se nepoužíval
+  // a v instant větvi je HMAC klíč součástí studentského HTML, takže týmový secret
+  // nepřidával skutečnou bezpečnost. Report seal proto používá náhodný per-test secret.
+  const verifySecret=makeVerifySecret();
   const teacherAccessCode=trim('ucitelPin')||'';
   // Stage 6: jeden kód pro učitele, ale doménově oddělené PBKDF2 hashe podle účelu.
   const teacherPinHash=await deriveSecretHash('teacher-pin', teacherAccessCode, testId);
@@ -81,7 +81,7 @@ async function assembleTestHtml(st, genData) {
     hesloHash: unlockHash,
     hasUnlock: !!teacherAccessCode,
     verifySecret,
-    securityMode: teacherSecurityCode ? 'teacher-code-derived' : 'random-per-test',
+    securityMode: 'random-per-test',
     securitySalt,
     manifest:{...manifestBase,hash:manifestHash},
     manifestHash,

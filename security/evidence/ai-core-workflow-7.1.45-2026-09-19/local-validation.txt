@@ -1,0 +1,27 @@
+LOCAL VALIDATION – Generator 7.1.45
+
+PASS
+- version consistency
+- Generator Assistant contract gate
+- source CSP / structure / sensitive / production checks
+- JS syntax / hermetic lint fallback (101 files)
+- build + Platform conformance 115/115
+- GARP 2.5.1 tooling selftest 59/59
+- GARP 2.3 regression 86/86
+- suite-session lifecycle 20/20
+- CycloneDX SBOM 113 components + drift check
+- AI assurance fingerprint check
+- SW security freeze
+- SW offline fail-safe 9/9
+- vendored consistency drift 0
+- deployment leak scan
+- quality/budget 35/35
+- browser contract QA PASS
+- XSS sink inventory regression PASS
+
+ENVIRONMENT / PENDING
+- npm ci transport timed out before complete dependency installation.
+- full ESLint dependency stack (eslint/espree/globals) unavailable locally; hermetic fallback passed.
+- jsdom package incomplete, so jsdom-dependent headless/workflow tests are not claimed locally.
+- qa-p5-runtime local harness timed out waiting for index.html QA readiness; this same class of local runtime limitation existed on the preceding candidate and is not claimed as PASS.
+- P5 release/acceptance consequently remain blocked by missing runtime report and must be decided by exact GitHub CI.

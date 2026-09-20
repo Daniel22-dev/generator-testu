@@ -1,69 +1,61 @@
 GARP 2.5.1 – ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.44
-Date: 2026-09-18
-Scope: Stage 6 MASTER cleanup candidate
+Application: generator 7.1.45
+Date: 2026-09-19
+Scope: AI Core abstraction + Generator workflow cleanup candidate
 
 CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.44 across runtime/PWA/QA sources)
-LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.44)
+VERSION CONSISTENCY          PASS (7.1.45 across runtime/PWA/QA sources)
+LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.45)
 GARP 2.5.1 PREP-STATIC       PASS
 N5 SECRET-SCAN               PASS
 GARP TOOLING SELFTEST        PASS 59/59
 SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components)
-AI ASSURANCE FINGERPRINT     PASS
+AI ASSURANCE FINGERPRINT     PASS (ca48adcc64d544adbde341050e7efdd8ea3a224b58b573ea776a280c0b49551e)
 SW SECURITY FREEZE           PASS
 SW OFFLINE FAIL-SAFE         PASS 9/9
 VENDORED CONSISTENCY         PASS (drift 0 for built public profile)
-DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.44 dist
-GARP 2.3 SECURITY REGRESSION PASS 86/86
-SUITE SESSION REGRESSION     PASS 20/20
+DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.45 dist
 PLATFORM CONFORMANCE         PASS 115/115
+GARP 2.3 REGRESSION          PASS 86/86
+SUITE SESSION REGRESSION     PASS 20/20
 QUALITY STATIC/BUDGET        PASS 35/35
-XSS INVENTORY REGRESSION     PASS (no new sink-count regression)
-EVIDENCE MANIFEST            PASS 8/8 files
+BROWSER CONTRACT QA          PASS
+XSS INVENTORY REGRESSION     PASS
+GENERATOR ASSISTANT GATE     PASS (profile/context/retrieval/evidence/UI invariants)
+PRODUCTION READINESS STATIC  PASS
+SOURCE STRUCTURE             PASS
+SOURCE SENSITIVE SCAN        PASS
+CSP STATIC CHECK             PASS
 
-BASELINE PURPOSE
-7.1.44 intentionally changes no application feature or workflow behavior. It is the MASTER cleanup patch that removes source-only pre-release acceptance metadata from the public runtime artifact while preserving the live release-integrity v2 and Studio release-wave authority.
+7.1.45 FUNCTIONAL DELTA
+- normal UI no longer exposes provider/model strings; app uses AI Core profiles economy/balanced/quality;
+- Generator Assistant uses balanced profile, local KB relevance selection, current-test context and evidence validation;
+- first-page AI connection was reduced to the user-essential controls and privacy notice;
+- secure Google Forms handoff is separated from test security and documented as a collection path for encrypted SECURE-ANSWERS-V1 payloads;
+- legacy team/workplace security-code workflow was removed because it was not part of the RSA/AES secure-verifier trust chain;
+- simple-mode teacher-code helper is contextual instead of permanently visible;
+- submission timing, result handoff and student identity are presented as separate concepts.
 
-N5 CLOSURE RETAINED
-The deployment leak scanner blocks:
-- private JWK material,
-- encrypted/private-key PEM material,
-- PGP PRIVATE KEY BLOCK material.
-A public JWK without private `d` remains allowed. These controls remain pinned into the 59/59 tooling selftest.
+SECURE-OFFLINE TRUST CHAIN RETAINED
+- student secure payload: RSA-OAEP + AES-GCM;
+- private decryption key: teacher_verifier.html only;
+- manifest/Test ID/student HTML integrity checks retained;
+- teacher access code still protects teacher mode / unlock paths through domain-separated PBKDF2 hashes;
+- answers.txt remains fallback when Google Forms is disabled/unavailable/too long.
 
-INHERITED EXACT GITHUB RUNTIME BASELINE
-Repository: Daniel22-dev/generator-testu
-Commit: 42be10cd34ca830c8e310f25911cc770baec5ab5
-Application version: 7.1.39
-Deploy workflow run 35062405626: SUCCESS
-P5 workflow run 35062405546: SUCCESS
-This is historical evidence for the immediately preceding runtime baseline, not a 7.1.40 remote attestation.
+LOCAL VALIDATION BOUNDARY
+A complete exact-lockfile npm install could not finish in this sandbox because the package transport timed out. The partial install does not contain a usable jsdom package, therefore jsdom/browser workflow checks that require that dependency were not represented as local PASS. Static checks, build, Platform conformance and the executable GARP 2.5 static/security checks listed above did pass. Exact GitHub CI remains authoritative for the missing dependency-backed browser/workflow evidence.
 
-IMPORTANT 7.1.44 VALIDATION BOUNDARY
-The 7.1.44 candidate has not yet been deployed and therefore has no exact-lockfile GitHub browser/P5/deployment evidence. Locally unavailable/pending final CI artifacts are:
-- browser runtime report,
-- axe runtime report,
-- P5 release certification assembled from those runtime reports,
-- final P5 acceptance.
-The local acceptance gate correctly remains blocked until those reports exist.
-
-CURRENT EVIDENCE
-- security/evidence/autopatch-baseline-7.1.40-2026-09-16/
-- security/security-evidence-manifest-7.1.40-baseline.json
-- security/evidence/n5-closure-2026-09-16/ (historical 7.1.39 N5 closure)
-- security/security-evidence-manifest-7.1.39-n5.json (historical)
-- security/garp25/TOOLING-SOURCE.txt
-- security/evidence/master-cleanup-7.1.44-2026-09-18/
+INHERITED REMOTE BASELINE
+Accepted AI Studio auto-patch baseline remains 7.1.42 until 7.1.45 completes exact GitHub CI/deploy/promotion. Historical successful 7.1.39 deploy/P5 evidence remains historical only and does not attest 7.1.45.
 
 AUTO-PATCH STATUS
-SOURCE PATCH CANDIDATE       7.1.44 READY FOR REMOTE CI
+SOURCE PATCH CANDIDATE       7.1.45 READY FOR REMOTE CI
 STUDIO ENROLLMENT            ACTIVE FROM ACCEPTED 7.1.42 BASELINE
-AUTOMATIC PATCH PROMOTION    ENABLED; 7.1.44 IS THE MASTER CLEANUP PATCH CANDIDATE
-Required next condition: deploy 7.1.44; Generator must notify AI Studio automatically; Studio must verify and persist 7.1.44 without manual release-wave editing.
+AUTOMATIC PATCH PROMOTION    REQUIRES SUCCESSFUL 7.1.45 CANDIDATE CI/DEPLOY
 
 ASSURANCE CEILING
-SECURITY          AMBER pending 7.1.44 remote CI/deployment + LIVE environment
+SECURITY          AMBER pending 7.1.45 exact-lockfile remote CI/deployment + LIVE environment
 PRIVACY           AMBER pending live school-server evidence
 RED TEAM          AMBER pending live-model / production evidence
 RELEASE INTEGRITY AMBER pending signed LIVE deployment evidence

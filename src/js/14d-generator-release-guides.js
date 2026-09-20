@@ -414,52 +414,22 @@ function showStrictSituations(){
 function showApiKeyGuide(){
   if (document.getElementById('apiKeyGuideGate')) return;
 
-  var html =
-    '<div class="sec-guide-hero">' +
-      '<div class="sec-guide-hero-emoji">🔑</div>' +
-      '<div class="sec-guide-hero-title">Jak získat a omezit Gemini API klíč</div>' +
-      '<div class="sec-guide-hero-sub">Postup krok za krokem — zdarma, trvá asi 3 minuty</div>' +
-    '</div>' +
-    '<div class="sec-guide-body">' +
-
-      '<div class="sec-guide-section">' +
-        '<div class="sec-guide-section-title"><span class="sg-ico">1️⃣</span> Přihlaste se do Google AI Studio</div>' +
-        '<p class="sec-guide-p">Otevřete v prohlížeči adresu <strong>aistudio.google.com</strong> a přihlaste se svým Google účtem (stejným, který běžně používáte).</p>' +
-        '<p class="sec-guide-p">Pokud se zobrazí uvítací obrazovka, klikněte na <strong>„Continue"</strong>.</p>' +
-      '</div>' +
-
-      '<div class="sec-guide-section">' +
-        '<div class="sec-guide-section-title"><span class="sg-ico">2️⃣</span> Otevřete správu API klíčů</div>' +
-        '<p class="sec-guide-p">V levém menu klikněte na <strong>„Get API key"</strong> (nebo přejděte přímo na <strong>aistudio.google.com/apikey</strong>).</p>' +
-        '<p class="sec-guide-p">Zobrazí se přehled vašich klíčů. Pokud žádný nemáte, klikněte na <strong>„Create API key"</strong> a vyberte existující projekt nebo nechte vytvořit nový.</p>' +
-      '</div>' +
-
-      '<div class="sec-guide-section">' +
-        '<div class="sec-guide-section-title"><span class="sg-ico">3️⃣</span> Otevřete nastavení klíče v Google Cloud</div>' +
-        '<p class="sec-guide-p">U vašeho klíče klikněte na ikonu tužky ✏️ nebo na název klíče. Tím se dostanete do <strong>Google Cloud Console</strong> — to je správná stránka pro omezení.</p>' +
-        '<p class="sec-guide-p">Pokud vás to přesměruje na <strong>console.cloud.google.com</strong>, jste na správném místě.</p>' +
-      '</div>' +
-
-      '<div class="sec-guide-section">' +
-        '<div class="sec-guide-section-title"><span class="sg-ico">4️⃣</span> Omezte klíč na Gemini API</div>' +
-        '<p class="sec-guide-p">Na stránce úprav klíče najděte sekci <strong>„APIs that can be accessed using this key"</strong>.</p>' +
-        '<p class="sec-guide-p">Klikněte na rozbalovací nabídku <strong>„Select API restrictions"</strong> a vyberte <strong>„Restrict key"</strong>.</p>' +
-        '<p class="sec-guide-p">Ze seznamu vyberte <strong>„Generative Language API"</strong> (to je Gemini API). Ostatní API nechte nezaškrtnuté.</p>' +
-        '<div class="sec-guide-ok">✓ Pod výběrem se zobrazí: <strong>Selected APIs: Gemini API</strong> — to je správný stav.</div>' +
-      '</div>' +
-
-      '<div class="sec-guide-section">' +
-        '<div class="sec-guide-section-title"><span class="sg-ico">5️⃣</span> Uložte a zkopírujte klíč</div>' +
-        '<p class="sec-guide-p">Klikněte na tlačítko <strong>„Save"</strong> dole na stránce.</p>' +
-        '<p class="sec-guide-p">Vraťte se zpět na <strong>aistudio.google.com/apikey</strong>, klikněte na <strong>„Show key"</strong> a klíč zkopírujte.</p>' +
-        '<p class="sec-guide-p">Vložte ho do pole <strong>„Gemini API klíč (AIza…)"</strong> v panelu AI připojení na první stránce a klikněte <strong>„Použít jen pro relaci"</strong>.</p>' +
-        '<div class="sec-guide-warn">⚠️ Klíč začíná vždy písmeny <strong>AIza</strong>. Pokud začíná jinak, není to Gemini API klíč.</div>' +
-      '</div>' +
-
-    '</div>' +
-    '<div class="sec-guide-actions">' +
-      '<button type="button" class="ui-modal-btn primary" id="apiKeyGuideOkBtn">← Zpět</button>' +
-    '</div>';
+  var schoolMode = false;
+  try { schoolMode = typeof genSchoolMode === 'function' && genSchoolMode(); } catch(_){}
+  var html = schoolMode
+    ? '<div class="sec-guide-hero"><div class="sec-guide-hero-emoji">🔑</div><div class="sec-guide-hero-title">AI připojení spravuje škola</div><div class="sec-guide-hero-sub">Ve školním režimu osobní providerový API klíč nepotřebuješ.</div></div>'
+      + '<div class="sec-guide-body"><div class="sec-guide-section"><div class="sec-guide-section-title"><span class="sg-ico">✓</span> Jak to funguje</div>'
+      + '<p class="sec-guide-p">Generátor posílá AI požadavky přes školní AI gateway. Konkrétní provider i model určuje serverová politika podle profilů AI Core; běžný učitel je nenastavuje.</p>'
+      + '<p class="sec-guide-p">Pokud panel hlásí, že školní AI není připravena, nejde o chybějící osobní klíč. Je potřeba zkontrolovat serverovou konfiguraci.</p></div></div>'
+      + '<div class="sec-guide-actions"><button type="button" class="ui-modal-btn primary" id="apiKeyGuideOkBtn">← Zpět</button></div>'
+    : '<div class="sec-guide-hero"><div class="sec-guide-hero-emoji">🔑</div><div class="sec-guide-hero-title">API klíč pro veřejný režim</div><div class="sec-guide-hero-sub">Dnešní serverless transport používá Gemini; klíč se v Generátoru drží pouze po dobu relace.</div></div>'
+      + '<div class="sec-guide-body">'
+      + '<div class="sec-guide-section"><div class="sec-guide-section-title"><span class="sg-ico">1️⃣</span> Získej klíč</div><p class="sec-guide-p">Otevři Google AI Studio, přejdi do správy API klíčů a vytvoř nebo zkopíruj klíč pro projekt, který používáš pro Generátor.</p></div>'
+      + '<div class="sec-guide-section"><div class="sec-guide-section-title"><span class="sg-ico">2️⃣</span> Omez jeho oprávnění</div><p class="sec-guide-p">Pro tento veřejný transport používej klíč určený jen pro Generative Language API / Gemini API. Nedávej Generátoru univerzální klíč s přístupem k nesouvisejícím službám.</p></div>'
+      + '<div class="sec-guide-section"><div class="sec-guide-section-title"><span class="sg-ico">3️⃣</span> Připoj pouze pro relaci</div><p class="sec-guide-p">Vlož klíč do pole <strong>API klíč</strong> a klikni na <strong>Připojit pro tuto relaci</strong>. Po zavření relace se zapomene; trvalé ukládání providerového klíče v prohlížeči Generátor nepoužívá.</p></div>'
+      + '<div class="sec-guide-section"><div class="sec-guide-section-title"><span class="sg-ico">4️⃣</span> Model neřešíš</div><p class="sec-guide-p">Konkrétní model se v běžném rozhraní nevybírá. Generátor požádá AI Core o profil <strong>Úsporný</strong>, <strong>Vyvážený</strong> nebo <strong>Nejvyšší kvalita</strong> podle operace a transport zvolí konkrétní model interně.</p></div>'
+      + '<div class="sec-guide-warn">⚠️ Do AI neposílej osobní, zdravotní, kázeňské ani jiné citlivé údaje žáků. Přílohy a volný text Generátor neumí spolehlivě anonymizovat.</div>'
+      + '</div><div class="sec-guide-actions"><button type="button" class="ui-modal-btn primary" id="apiKeyGuideOkBtn">← Zpět</button></div>';
 
   var backdrop = document.createElement('div');
   backdrop.id = 'apiKeyGuideGate';

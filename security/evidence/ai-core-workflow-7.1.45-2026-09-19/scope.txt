@@ -1,0 +1,22 @@
+Generator 7.1.45 – AI Core / workflow cleanup candidate
+Date: 2026-09-19
+Base: 7.1.44 candidate snapshot
+
+Functional scope:
+- provider/model abstraction in normal UI;
+- Generator Assistant retrieval/current-context/evidence hardening;
+- simplified AI connection panel;
+- separate secure result handoff settings and detailed Google Forms workflow;
+- removal of obsolete team/workplace security-code requirement;
+- contextual simple-mode teacher-code helper;
+- clearer separation of submission timing, result handoff and student identity.
+
+Security invariants retained:
+- secure result payload RSA-OAEP + AES-GCM;
+- teacher-only private verifier key;
+- manifest/Test ID/student HTML integrity checks;
+- domain-separated PBKDF2 teacher/unlock hashes;
+- answers.txt fallback when Forms is not configured/available.
+
+Remote evidence boundary:
+Exact-lockfile GitHub CI, P5 browser/runtime/axe, deployment and AI Studio automatic promotion remain remote requirements and are not claimed by this source-preparation evidence.

@@ -2,70 +2,39 @@
 
 const GEMINI_KEY_SK = 'sestavovac_gemini_key';
 const GEMINI_KEY_SESSION_SK = 'sestavovac_gemini_key_session';
-// Model NENÍ napevno: drží se v poli vedle API klíče, aby životnost nástroje
-// nezávisela na jednom Google stringu. Když Google model zruší, kdokoli (i kolega
-// bez přístupu ke kódu) jej tu přepíše — viz poznámka pod polem v UI.
-const GEMINI_MODEL_SK = 'sestavovac_gemini_model';
-// Produkční výchozí modely: pevné názvy stabilních (GA) modelů. Aktivní limity
-// nejsou v kódu napevno — liší se podle projektu, účtu, modelu a usage tieru.
-const GEMINI_MODEL_DEFAULT = 'gemini-3.6-flash';
-// Při 429 nebo dočasné nedostupnosti zkusíme jednou odlišný stabilní model.
-// Fallback může pomoci, ale neznamená garantovanou samostatnou nebo volnou kvótu.
-const GEMINI_FALLBACK_MODELS = ['gemini-3.5-flash-lite'];
+// Konkrétní provider/model je interní detail transportu. Běžné UI ani aplikační
+// logika pracují pouze s profily AI Core: economy / balanced / quality. Tato mapa
+// existuje jen pro serverless direct-Gemini transport; školní gateway může profily
+// mapovat na OpenAI nebo jiného providera bez změny Generátoru.
+const GEMINI_PROFILE_MODELS = Object.freeze({
+  economy:'gemini-3.5-flash-lite',
+  balanced:'gemini-3.6-flash',
+  quality:'gemini-3.6-flash'
+});
+const GEMINI_FALLBACK_MODELS = [GEMINI_PROFILE_MODELS.economy];
 const GEMINI_DATA_NOTICE_SESSION_SK = 'sestavovac_gemini_data_notice_v1';
 let geminiApiKey = '';
 let geminiKeyScope = '';
-let geminiModel = GEMINI_MODEL_DEFAULT; // vždy obsahuje jen platný, normalizovaný název
 let generatedTestHtml = '';
 let generatedPackage = null;
 let generatedIntegrity = null;
 let lastGenData = null;
 let lastAssembled = null; // {cfg, variants} z posledního sestavení — vstup pro self-test bodování
-let variantSeq = 0;     // 0 = původní test; každá „další skupina" zvýší o 1 (B, C, …)
-let variantSlug = '';   // doplněk do názvu souboru pro variantu (skupina-b, skupina-c…)
+let variantSeq = 0;
+let variantSlug = '';
 let rosterEntries = []; // [{email,label,code}] — roster jednorázových kódů; jen v paměti generátoru
 
-// Model si uživatel může napsat i jako "models/gemini-…"; vedoucí "models/" zahodíme,
-// protože koncový URL už /models/ obsahuje. Povolujeme jen bezpečné znaky názvu modelu.
 function normalizeModelName(s){ return String(s||'').trim().replace(/^models\//i,''); }
 function isValidModelName(s){ return /^[A-Za-z0-9][A-Za-z0-9._-]{1,80}$/.test(normalizeModelName(s)); }
-function migrateLegacyModelName(s){
-  const n = normalizeModelName(s);
-  if (['gemini-2.5-flash','gemini-3.1-flash','gemini-3.5-flash','gemini-flash-latest'].includes(n)) return GEMINI_MODEL_DEFAULT;
-  if (['gemini-2.5-flash-lite','gemini-3.1-flash-lite'].includes(n)) return GEMINI_FALLBACK_MODELS[0];
-  return n;
+function resolveGeminiModel(profile='quality'){
+  const p = ['economy','balanced','quality'].includes(String(profile)) ? String(profile) : 'quality';
+  return GEMINI_PROFILE_MODELS[p] || GEMINI_PROFILE_MODELS.quality;
 }
-// Pořadí priority: živá hodnota v poli → uložený model → výchozí. Vždy vrátí platný název.
-function resolveGeminiModel(){
-  const fromInput = normalizeModelName($('geminiModelInput')?.value || '');
-  if (fromInput && isValidModelName(fromInput)) return fromInput;
-  return (geminiModel && isValidModelName(geminiModel)) ? normalizeModelName(geminiModel) : GEMINI_MODEL_DEFAULT;
-}
-function setGeminiModel(m){
-  const norm = normalizeModelName(m);
-  if (norm && isValidModelName(norm)) {
-    geminiModel = norm;
-    try { if(generatorPersistenceAllowed()) localStorage.setItem(GEMINI_MODEL_SK, geminiModel); } catch(_){}
-    const inp = $('geminiModelInput'); if (inp && norm !== inp.value.trim()) inp.value = norm;
-  }
-  // Při neplatném vstupu necháme text v poli (ať ho uživatel vidí a opraví) a
-  // resolveGeminiModel() spadne na poslední platný/výchozí — status to označí.
-  updateGeminiModelUI();
-  var splitChk = document.getElementById('chkSplitGen');
-  if (splitChk) splitChk.checked = !!state.splitGenerate;
-}
+// Legacy startup hook ponecháváme kvůli stabilnímu pořadí initu; uživatelská volba
+// konkrétního modelu byla odstraněna a případný starý localStorage záznam se čistí.
 function loadGeminiModel(){
-  let stored = '';
-  try { stored = localStorage.getItem(GEMINI_MODEL_SK) || ''; } catch(_){}
-  const migrated = migrateLegacyModelName(stored);
-  geminiModel = (migrated && isValidModelName(migrated)) ? migrated : GEMINI_MODEL_DEFAULT;
-  if (stored && geminiModel !== normalizeModelName(stored)) { try { if(generatorPersistenceAllowed()) localStorage.setItem(GEMINI_MODEL_SK, geminiModel); } catch(_){} }
-  const inp = $('geminiModelInput'); if (inp) inp.value = geminiModel;
-  updateGeminiModelUI();
+  try { localStorage.removeItem('sestavovac_gemini_model'); } catch(_){}
 }
-function resetGeminiModel(){ const inp=$('geminiModelInput'); if(inp) inp.value=GEMINI_MODEL_DEFAULT; setGeminiModel(GEMINI_MODEL_DEFAULT); }
-// Rychlý přepínač mezi „silným" (výchozí) a „lehkým" (první záložní) modelem.
-// Žádné duplicitní názvy — bere se z GEMINI_MODEL_DEFAULT a GEMINI_FALLBACK_MODELS[0].
 
 function toggleTypeCard(el){
   const wasOpen=el.classList.contains('open');
@@ -134,7 +103,7 @@ async function ensureGeminiDataNotice(){
   if(window.GHRAB_PLATFORM?.isSchoolProfile?.()) return true;
   try { if (sessionStorage.getItem(GEMINI_DATA_NOTICE_SESSION_SK) === 'accepted') return true; } catch(_){}
   const ok = await uiConfirm(
-    'Do služby Google Gemini budou odeslány text zadání, zvolené URL a přiložené soubory. Jména studentů v diferenciaci generátor vždy převádí na anonymní kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Potvrď, že jsi odstranil(a) osobní, zdravotní, kázeňské a jiné citlivé údaje. Pokračovat?',
+    'Do externí AI služby budou odeslány text zadání, zvolené URL a přiložené soubory. Jména studentů v diferenciaci generátor vždy převádí na anonymní kódy, ale obsah textů a příloh neumí spolehlivě anonymizovat. Potvrď, že jsi odstranil(a) osobní, zdravotní, kázeňské a jiné citlivé údaje. Pokračovat?',
     'Kontrola dat před odesláním do AI',
     true
   );
@@ -142,9 +111,6 @@ async function ensureGeminiDataNotice(){
   return ok;
 }
 
-function quickModel(which){ setGeminiModel(which==='lite' ? GEMINI_FALLBACK_MODELS[0] : GEMINI_MODEL_DEFAULT); }
-// Vrátí první záložní model, který je platný a LIŠÍ se od aktuálního (jinak by
-// fallback na limitu nedával smysl). Prázdný řetězec = není kam přepnout.
 function pickGeminiFallbackModel(currentModel){
   const cur = normalizeModelName(currentModel).toLowerCase();
   for(const m of GEMINI_FALLBACK_MODELS){
@@ -152,22 +118,6 @@ function pickGeminiFallbackModel(currentModel){
     if(isValidModelName(n) && n.toLowerCase() !== cur) return n;
   }
   return '';
-}
-function updateGeminiModelUI(){
-  const el = $('geminiModelStatus');
-  const live = normalizeModelName($('geminiModelInput')?.value || '');
-  // Zvýrazni aktivní rychlé tlačítko podle skutečně použitého modelu (custom název = žádné).
-  const strongEl=$('qmStrong'), liteEl=$('qmLite');
-  if(strongEl&&liteEl){
-    const cur=(live && isValidModelName(live) ? live : resolveGeminiModel()).toLowerCase();
-    strongEl.classList.toggle('active', cur===normalizeModelName(GEMINI_MODEL_DEFAULT).toLowerCase());
-    liteEl.classList.toggle('active', cur===normalizeModelName(GEMINI_FALLBACK_MODELS[0]).toLowerCase());
-  }
-  if (!el) return;
-  if (live && !isValidModelName(live)) { el.textContent = 'neplatný název — používá se ' + resolveGeminiModel(); el.style.color = 'var(--err)'; return; }
-  const m = resolveGeminiModel();
-  el.textContent = (m === GEMINI_MODEL_DEFAULT) ? 'výchozí (' + GEMINI_MODEL_DEFAULT + ')' : 'vlastní: ' + m;
-  el.style.color = (m === GEMINI_MODEL_DEFAULT) ? 'var(--t4)' : 'var(--ok)';
 }
 
 // Detekce interního prohlížeče v aplikaci (FB/IG/Teams/Outlook/WebView…), kde je
@@ -179,12 +129,8 @@ function isEmbeddedBrowserEnv(){
 }
 function applyKeyEnvUI(){
   if (!isEmbeddedBrowserEnv()) return;
-  const adv = $('keyAdvanced');
-  if (adv) { adv.classList.add('hidden'); adv.open = false; } // celá pokročilá sekce pryč — trvalé uložení tu stejně nedrží
-  const btn = $('btnSaveKeyPermanent');
-  if (btn) { btn.disabled = true; }
   const note = $('geminiNote');
-  if (note) note.innerHTML = 'Jsi pravděpodobně ve <strong>vestavěném prohlížeči aplikace</strong>, kde je trvalé uložení nespolehlivé — klíč proto použij <strong>jen pro relaci</strong>, nebo otevři generátor v běžném Chrome/Safari. Zdarma: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a> → Get API key.';
+  if (note) note.innerHTML = 'Jsi pravděpodobně ve <strong>vestavěném prohlížeči aplikace</strong>. API klíč proto používej pouze pro tuto relaci, nebo Generátor otevři v běžném Chrome/Safari. Podrobný návod je v odkazu „Jak získat a bezpečně nastavit API klíč“.';
 }
 
 function getGeminiInputKey() { return ($('geminiKeyInput')?.value || '').trim(); }
@@ -233,22 +179,20 @@ function clearGeminiKey() {
 function updateGeminiStatus() {
   const b = $('geminiStatus');
   if (b) {
-    if (geminiApiKey) {
-      b.textContent = genSchoolMode() ? '✓ Klíč spravuje školní server' : '✓ Klíč jen v této relaci';
+    if (typeof genSchoolMode === 'function' && genSchoolMode()) {
+      const ready = typeof genSchoolRuntimeReady === 'function' && genSchoolRuntimeReady();
+      b.textContent = ready ? '✓ Školní AI je připojena' : 'Školní AI zatím není připravena';
+      b.style.color = ready ? 'var(--ok)' : 'var(--acc)';
+    } else if (geminiApiKey) {
+      b.textContent = '✓ AI připojena pro tuto relaci';
       b.style.color = 'var(--ok)';
     } else {
-      b.textContent = 'Klíč není nastaven'; b.style.color = 'var(--acc)';
+      b.textContent = 'AI není připojena';
+      b.style.color = 'var(--acc)';
     }
   }
-  // Zvýrazni tlačítko podle toho, kam je klíč právě uložený (relace / trvale / nikam).
-  // Tím je vidět, která volba je aktivní — ne jen text statusu nahoře.
-  const sBtn = $('btnUseKeySession'), pBtn = $('btnSaveKeyPermanent');
+  const sBtn = $('btnUseKeySession');
   if (sBtn) sBtn.classList.toggle('key-btn-active', !!geminiApiKey && geminiKeyScope === 'session');
-  if (pBtn) pBtn.classList.remove('key-btn-active');
-  // Když je klíč skutečně uložený trvale, rozbal pokročilou sekci, ať je zvýrazněná
-  // aktivní volba vidět (jinak by zůstala schovaná pod sbaleným „Pokročilé").
-  const adv = $('keyAdvanced');
-  if (adv) { adv.classList.add('hidden'); adv.open = false; }
 }
 
 function readBlobAsDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('Soubor se nepodařilo přečíst.'));r.readAsDataURL(blob);});}
@@ -627,12 +571,13 @@ function geminiIsRetryableStatus(httpStatus, apiStatus){
 function geminiAttemptsText(attempts, errorType){
   const n = Math.max(1, Math.round(Number(attempts) || 1));
   if (n <= 1) return 'Automatické opakování požadavku se nespustilo.';
-  if (errorType === '503') return `Generátor požadavek zkusil ${n}×, ale Gemini servery stále neodpovídaly.`;
+  if (errorType === '503') return `Generátor požadavek zkusil ${n}×, ale AI služba stále neodpovídala.`;
   return `Generátor požadavek zkusil ${n}×. U 429/kvóty se další opakování okamžitě nespouští, aby se limit dál nespaloval.`;
 }
 function geminiTechLine(model, attempts, extra=''){
-  return `Technicky: model=${model || 'neznámý'}, timeout=${geminiSeconds(GEMINI_TIMEOUT_MS)} s, pokusy=${attempts}${extra ? ', ' + extra : ''}.`;
+  return `Technicky: AI transport=direct, timeout=${geminiSeconds(GEMINI_TIMEOUT_MS)} s, pokusy=${attempts}${extra ? ', ' + extra : ''}.`;
 }
+
 function geminiActionHint(){
   return 'Co zkusit: zmenšit počet cvičení/položek, zkrátit vstupní text nebo přílohy, případně spustit generování znovu později.';
 }
@@ -640,16 +585,16 @@ function geminiCancelledMessage(){
   return 'Generování bylo zrušeno uživatelem. Můžeš upravit zadání a spustit ho znovu.';
 }
 function geminiTimeoutErrorMessage(model, attempts){
-  return 'Gemini neodpověděl do ' + geminiSeconds(GEMINI_TIMEOUT_MS) + ' s.\n\n'
+  return 'AI služba neodpověděla do ' + geminiSeconds(GEMINI_TIMEOUT_MS) + ' s.\n\n'
     + 'Co to znamená: prohlížeč čekal na odpověď API, ale v nastaveném limitu nepřišla žádná použitelná HTTP odpověď. Nejde o chybu bodování ani o rozbitý test; požadavek se nestihl zpracovat nebo vrátit přes síť.\n\n'
-    + 'Nejčastější příčiny: příliš velký prompt, dlouhé zdrojové materiály/přílohy, hodně cvičení najednou, pomalé připojení nebo dočasně zatížený model/API.\n\n'
+    + 'Nejčastější příčiny: příliš velký prompt, dlouhé zdrojové materiály/přílohy, hodně cvičení najednou, pomalé připojení nebo dočasně zatížená AI služba.\n\n'
     + geminiAttemptsText(attempts) + '\n'
     + geminiActionHint() + '\n\n'
     + geminiTechLine(model, attempts, 'ukončeno přes AbortController/fetch timeout');
 }
 function geminiNetworkErrorMessage(err, model, attempts){
   const detail = err && err.message ? err.message : String(err || 'neznámá chyba');
-  return 'Spojení s Gemini selhalo ještě před získáním odpovědi API.\n\n'
+  return 'Spojení s AI službou selhalo ještě před získáním odpovědi API.\n\n'
     + 'Co to znamená: prohlížeč nedokončil síťový požadavek. Může jít o výpadek internetu, blokaci požadavku v prohlížeči/síti nebo dočasnou nedostupnost služby.\n\n'
     + geminiAttemptsText(attempts) + '\n'
     + geminiActionHint() + '\n\n'
@@ -659,46 +604,47 @@ function geminiApiErrorMessage(res, data, model, attempts, retryMs=0){
   const msg = data && data.error && data.error.message ? data.error.message : `HTTP ${res.status}`;
   const apiStatus = data && data.error && data.error.status ? String(data.error.status) : '';
   const statusText = `HTTP ${res.status}` + (apiStatus ? ` / ${apiStatus}` : '');
-  const modelGone = res.status === 404 || /not found|is not found|not supported|unsupported|NOT_FOUND/i.test(msg + ' ' + apiStatus);
-  let why = 'Google API požadavek odmítlo nebo ho nedokázalo zpracovat.';
+  const internalModelUnavailable = res.status === 404 || /not found|is not found|not supported|unsupported|NOT_FOUND/i.test(msg + ' ' + apiStatus);
+  let why = 'AI služba požadavek odmítla nebo ho nedokázala zpracovat.';
   let action = geminiActionHint();
   if(res.status === 400 || /INVALID_ARGUMENT/i.test(apiStatus)){
-    why = 'Požadavek má pro API neplatný tvar nebo obsahuje nepodporovanou kombinaci parametrů/modelu/příloh.';
-    action = 'Zkontroluj zvolený model, URL/přílohy a zkus jednodušší zadání.';
+    why = 'Požadavek má pro API neplatný tvar nebo obsahuje nepodporovanou kombinaci parametrů či příloh.';
+    action = 'Zkontroluj URL/přílohy a zkus jednodušší zadání.';
   } else if(res.status === 401 || res.status === 403 || /PERMISSION_DENIED|UNAUTHENTICATED/i.test(apiStatus)){
-    why = 'API klíč není platný, nemá oprávnění, nebo není omezený na Gemini API.';
-    action = 'Zkontroluj Gemini API klíč v panelu AI připojení na první stránce. Od 19. 6. 2026 Google vyžaduje, aby byl klíč omezený na Gemini API — neomezené klíče vrací chybu 403. Zkontroluj nastavení klíče na aistudio.google.com → API Keys nebo vytvoř nový omezený klíč.';
-  } else if(modelGone){
-    why = `Zvolený model „${model}" pravděpodobně není dostupný nebo není podporovaný pro tento endpoint.`;
-    action = `Změň název modelu v poli „Model" v závěrečném kroku, např. na ${GEMINI_MODEL_DEFAULT} nebo ${GEMINI_FALLBACK_MODELS[0]}.`;
+    why = 'API klíč není platný nebo nemá oprávnění pro aktuální serverless AI transport.';
+    action = 'Zkontroluj API klíč přes návod v panelu AI připojení. Ve školním režimu se osobní provider klíč vůbec nepoužívá.';
+  } else if(internalModelUnavailable){
+    why = 'Interně zvolený AI model není pro tento transport dostupný.';
+    action = 'Obnov stránku a zkus požadavek znovu. Pokud problém trvá, je potřeba aktualizovat interní mapování AI Core; běžný uživatel model nemění.';
   } else if(res.status === 429 || /RESOURCE_EXHAUSTED/i.test(apiStatus)){
-    why = 'Byl překročen limit požadavků nebo kvóta pro API klíč / Google projekt.';
+    why = 'Byl překročen limit požadavků nebo kvóta aktivního AI projektu.';
     action = retryMs
       ? ('Překročen limit. Generátor tlačítko dočasně vypnul; zkus to znovu nejdříve za ' + geminiFormatWait(retryMs) + '. Neklikej opakovaně, další kliknutí by zbytečně spotřebovávalo limit.')
-      : 'Překročen limit. Počkej alespoň 1 minutu, neklikej opakovaně a případně ověř limity/quótu u API klíče.';
+      : 'Překročen limit. Počkej alespoň 1 minutu a neklikej opakovaně.';
   } else if(res.status === 504 || /DEADLINE_EXCEEDED/i.test(apiStatus)){
-    why = 'Server požadavek nestihl dopočítat v interním limitu Google API. To typicky souvisí s velkým vstupem nebo náročným výstupem.';
+    why = 'AI služba požadavek nestihla dopočítat ve svém interním limitu. To typicky souvisí s velkým vstupem nebo náročným výstupem.';
     action = geminiActionHint();
   } else if(res.status === 503 || /UNAVAILABLE/i.test(apiStatus)){
-    why = 'Služba nebo zvolený model je dočasně nedostupný či přetížený. Samotná chyba 503 spolehlivě neurčuje stav kvóty.';
-    action = 'Počkej několik minut a zkus to znovu. Zkontroluj stav služby a aktivní limity projektu v Google AI Studiu; případně přepni na stabilní Lite model.';
+    why = 'AI služba je dočasně nedostupná nebo přetížená. Samotná chyba 503 spolehlivě neurčuje stav kvóty.';
+    action = 'Počkej několik minut a zkus to znovu. Případný záložní profil řeší Generátor automaticky.';
   } else if([500,502,504].includes(Number(res.status)) || /INTERNAL/i.test(apiStatus)){
-    why = 'Chyba je na straně služby nebo její dostupnosti; často pomůže zopakování později.';
-    action = 'Zkus generování znovu za chvíli; pokud problém trvá, zmenši test nebo přepni model.';
+    why = 'Chyba je na straně AI služby nebo její dostupnosti; často pomůže zopakování později.';
+    action = 'Zkus generování znovu za chvíli; pokud problém trvá, zmenši test. Volbu konkrétního modelu řeší AI Core interně.';
   }
   const errType503 = (res.status === 503 || /UNAVAILABLE/i.test(apiStatus)) ? '503' : '';
-  return `Gemini API vrátilo chybu: ${msg}` + (apiStatus ? ` (${apiStatus})` : '') + '\n\n'
+  return `AI služba vrátila chybu: ${msg}` + (apiStatus ? ` (${apiStatus})` : '') + '\n\n'
     + `Typ chyby: ${statusText}.\n`
     + `Co to znamená: ${why}\n\n`
     + geminiAttemptsText(attempts, errType503) + '\n'
     + action + '\n\n'
     + geminiTechLine(model, attempts, statusText);
 }
+
 async function geminiWaitBeforeRetry(attempt, maxAttempts, res, reason, data){
   const delay = geminiRetryDelayMs(attempt, res, data, reason);
   try{
     if(typeof setGenMsg === 'function') {
-      setGenMsg(`Gemini vrátilo neúplný výstup — opakuji (pokus ${attempt + 1}/${maxAttempts}, za ${geminiFormatWait(delay)})…`);
+      setGenMsg(`AI služba vrátila neúplný výstup — opakuji (pokus ${attempt + 1}/${maxAttempts}, za ${geminiFormatWait(delay)})…`);
     }
   }catch(_){ }
   await geminiSleep(delay);
@@ -767,7 +713,8 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
   lastGeminiJsonRepaired = false;
   lastGeminiRawResponse = null;
   if(!geminiApiKey)throw new Error('Gemini API klíč není nastaven. Zadej ho v panelu AI připojení na první stránce.');
-  const model=(opts && opts.modelOverride && isValidModelName(opts.modelOverride)) ? normalizeModelName(opts.modelOverride) : resolveGeminiModel();
+  const profile=(typeof genModelProfile==='function') ? genModelProfile((opts&&opts.operation)||'test-generation') : 'quality';
+  const model=(opts&&opts._directModelInternal&&isValidModelName(opts._directModelInternal)) ? normalizeModelName(opts._directModelInternal) : resolveGeminiModel(profile);
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
   const body = buildGeminiRequestBody(prompt, extraParts, opts);
   const maxAttempts = (opts && opts.noRetry) ? 1 : Math.max(1, Math.min(4, Math.round(Number((opts && opts.maxAttempts) || GEMINI_MAX_ATTEMPTS) || GEMINI_MAX_ATTEMPTS)));
@@ -817,8 +764,8 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
         if(!(opts && opts.noFallback) && !(opts && opts._fellBack)){
           const fb = pickGeminiFallbackModel(model);
           if(fb){
-            try{ if(typeof setGenMsg === 'function') setGenMsg('Model „' + model + '" je na limitu (429). Zkouším záložní model „' + fb + '"…'); }catch(_){ }
-            return await callGeminiJSON(prompt, extraParts, Object.assign({}, opts, { modelOverride: fb, _fellBack: true }));
+            try{ if(typeof setGenMsg === 'function') setGenMsg('Aktivní AI profil je na limitu (429). Zkouším interní záložní profil…'); }catch(_){ }
+            return await callGeminiJSON(prompt, extraParts, Object.assign({}, opts, { _directModelInternal: fb, _fellBack: true }));
           }
         }
         geminiStartCooldown(retryMs || GEMINI_QUOTA_DEFAULT_COOLDOWN_MS);
@@ -830,8 +777,8 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
       if(isOverload && !(opts && opts.noFallback) && !(opts && opts._fellBack)){
         const fb = pickGeminiFallbackModel(model);
         if(fb){
-          try{ if(typeof setGenMsg === 'function') setGenMsg('Model „' + model + '" je přetížený (503). Zkouším záložní model „' + fb + '"…'); }catch(_){ }
-          return await callGeminiJSON(prompt, extraParts, Object.assign({}, opts, { modelOverride: fb, _fellBack: true }));
+          try{ if(typeof setGenMsg === 'function') setGenMsg('AI služba je přetížená (503). Zkouším interní záložní profil…'); }catch(_){ }
+          return await callGeminiJSON(prompt, extraParts, Object.assign({}, opts, { _directModelInternal: fb, _fellBack: true }));
         }
       }
       // 503 = Google overload: omezíme retry na 2 pokusy celkem, abychom nespálili aktivní limit prázdnými požadavky.
@@ -877,7 +824,7 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
       }
     }
   }
-  throw lastErr || new Error('Gemini selhal bez detailu. Zkus generování spustit znovu.');
+  throw lastErr || new Error('AI požadavek selhal bez detailu. Zkus generování spustit znovu.');
 }
 
 function setGenUI(phase) { // 'idle' | 'loading' | 'error' | 'done'

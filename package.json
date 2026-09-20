@@ -1,12 +1,12 @@
 {
   "name": "generator-testu",
-  "version": "7.1.44",
+  "version": "7.1.45",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "check:versions": "node scripts/check-versions.mjs",
-    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && node scripts/check-production-readiness.mjs && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow",
+    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow",
     "lint": "node scripts/lint.mjs",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
@@ -63,15 +63,16 @@
     "garp25:selftest": "node security/garp25/tools/selftest-garp251.mjs",
     "garp25:sw": "node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json",
     "garp25:leaks": "node security/garp25/tools/scan-deployment-leaks.mjs dist",
-    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.44.cdx.json",
-    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.44.cdx.json --check",
+    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.45.cdx.json",
+    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.45.cdx.json --check",
     "garp25:prep-static": "npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks",
     "garp25:ai-evidence": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json",
     "garp25:ai-evidence:check": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check",
     "garp25:sync-rewrite": "node scripts/test-ai-core-version-rewrite.mjs",
     "garp25:vendored": "node security/garp25/tools/check-vendored-consistency.mjs security/vendored-consistency.generator.json",
     "garp25:sw-offline": "node scripts/test-sw-offline-failsafe.mjs",
-    "check:selftest-rpc": "node scripts/check-selftest-rpc-injection.mjs"
+    "check:selftest-rpc": "node scripts/check-selftest-rpc-injection.mjs",
+    "check:assistant": "node scripts/check-generator-assistant.mjs"
   },
   "engines": {
     "node": ">=18"

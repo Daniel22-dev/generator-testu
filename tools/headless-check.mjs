@@ -151,7 +151,7 @@ await checkAsync('Gemini request contract: stabilní model, API key header a val
   let seen = null;
   try {
     w.sessionStorage.setItem('sestavovac_gemini_data_notice_v1', 'accepted');
-    w.eval("geminiApiKey='FAKE_GEMINI_KEY_12345678901234567890'; geminiModel=GEMINI_MODEL_DEFAULT;");
+    w.eval("geminiApiKey='FAKE_GEMINI_KEY_12345678901234567890';");
     w.fetch = async (url, options) => {
       seen = {url:String(url), options};
       return {ok:true,status:200,headers:{get(){return null;}},json:async()=>({candidates:[{finishReason:'STOP',content:{parts:[{text:'{\"ok\":true}'}]}}]})};
