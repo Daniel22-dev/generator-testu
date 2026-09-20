@@ -50,8 +50,9 @@ const assistantKb = assistantKbStart >= 0 && assistantKbEnd > assistantKbStart
   : '';
 
 requireText(core, /status:\s*['"]production-serverless['"]/, 'RELEASE.status musi byt production-serverless.');
-requireText(gemini, /const GEMINI_MODEL_DEFAULT\s*=\s*['"]gemini-3\.6-flash['"]/, 'Vychozi Gemini model neni gemini-3.6-flash.');
-requireText(gemini, /const GEMINI_FALLBACK_MODELS\s*=\s*\[\s*['"]gemini-3\.5-flash-lite['"]/, 'Prvni zalozni model neni gemini-3.5-flash-lite.');
+requireText(gemini, /const GEMINI_PROFILE_MODELS\s*=\s*Object\.freeze\(\{[\s\S]*economy:["']gemini-3\.5-flash-lite["'][\s\S]*balanced:["']gemini-3\.6-flash["'][\s\S]*quality:["']gemini-3\.6-flash["']/, 'Direct transport nema ocekavane interni mapovani AI Core profilu.');
+forbidText(shell, /geminiModelInput|qmStrong|qmLite|quickModel/, 'Bezne UI nesmi zobrazovat konkretni AI modely.');
+requireText(aiIntegration, /'generator-help-answer':\{[^}]*defaultModelProfile:'balanced'/, 'Poradce nepouziva balanced AI Core profil.');
 requireText(gemini, /ensureGeminiDataNotice\(\)/, 'Pred AI pozadavkem chybi transparentni datove upozorneni.');
 requireText(gemini, /if \(!\(await ensureGeminiDataNotice\(\)\)\)/, 'AI volani neni blokovano datovym upozornenim.');
 requireText(persistence, /state\.anonymizace\s*=\s*['"]ANO['"]/, 'Stare ulozene nastaveni se neprevadi na povinnou anonymizaci.');
@@ -110,7 +111,7 @@ forbidText(access, /pinHash|access-manifest\.json|EMBEDDED_MANIFEST/, 'Ve zdroji
 requireText(shell, /role=['"]progressbar['"]/, 'Prubehovy ukazatel nema ARIA roli progressbar.');
 requireText(renderer, /setAttribute\(['"]aria-valuenow['"]/, 'ARIA hodnota prubehu se pri navigaci neaktualizuje.');
 requireText(shell, /id=['"]btnGuide['"][^>]*aria-label=/, 'Ikonove tlacitko navodu nema pristupny nazev.');
-requireText(shell, /class=['"]ai-data-notice['"][^>]*role=['"]note['"]/, 'V UI chybi stale upozorneni na data odesilana do Gemini.');
+requireText(shell, /class=['"]ai-data-notice['"][^>]*role=['"]note['"]/, 'V UI chybi upozorneni na data odesilana do AI.');
 requireText(releaseGuides, /RELEASE\.status\s*===\s*['"]production-serverless['"]/, 'Průvodce vydanim nerozpoznava produkcni serverless stav.');
 
 const currentDocs = [readme, security, operations, audit, checklist].join('\n');

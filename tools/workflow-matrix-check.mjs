@@ -62,7 +62,7 @@ function resetBase(){
   setVal('nazev','Workflow test'); setVal('proKoho','1.A'); setVal('latka','Present simple');
   setVal('vlastniSkala','');
   setVal('listeningTranscript',''); setVal('ucitelJmeno','Daniel Teacher');
-  setVal('ucitelPin','TEACH-ABCDEF-123456'); setVal('heslo',''); setVal('bezpKod','');
+  setVal('ucitelPin','TEACH-ABCDEF-123456'); setVal('heslo','');
   w.eval("Access.profile={role:'admin',userId:'TEST',displayName:'Test',status:'active'}; Access.granted=true;");
   w.enforceModeConstraints(); w.applyVisualState(); w.validate();
 }
@@ -456,44 +456,36 @@ await okAsync('Stage 6: instant teacher-login + screen-guard unlock jedním kód
   }finally{gd.close();}
 });
 
-// 19) Etapa 2: týmový bezpečnostní kód není součástí generovacího workflow.
+// 19) v7.1.45: legacy týmový bezpečnostní kód je odstraněn; Nastavení řeší jen předání secure výsledků.
 resetBase();
 w.eval("Access.profile={role:'trainedTeacher',userId:'TEACHER',displayName:'Teacher',status:'active'};Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimpleTemplate('fl_strict');updateAppModeUI();validate();");
-ok('týmový bezpečnostní kód je mimo formulář testu',()=>{
-  const input=w.document.getElementById('bezpKod');
-  assert(input && input.type==='hidden','kanonický bezpečnostní kód není skrytý runtime input');
-  assert(!input.closest('#step3'),'bezpečnostní kód zůstal uvnitř kroku Doplňky');
-  assert(w.document.getElementById('generatorSettingsModal'),'chybí Nastavení Generátoru');
+ok('legacy týmový bezpečnostní kód už není v UI ani formuláři',()=>{
+  assert(!w.document.getElementById('bezpKod'),'legacy #bezpKod stále existuje');
+  assert(!w.document.getElementById('securityWorkplaceField'),'legacy Bezpečnost pracoviště stále existuje');
+  assert(!w.document.getElementById('generatorSettingsSecurityInput'),'legacy týmový kód stále existuje v Nastavení');
+  assert(w.document.getElementById('generatorSettingsFormsInput'),'chybí samostatné nastavení předání přes Google Forms');
 });
-ok('simple přísný ukáže jen stav Bezpečnosti pracoviště',()=>{
-  const field=w.document.getElementById('securityWorkplaceField');
-  const status=w.document.getElementById('securityWorkplaceStatus');
-  assert(!field.classList.contains('hidden'),'povinný stav Bezpečnosti pracoviště je schovaný');
-  assert(status.textContent.includes('není nastavena'),'chybí srozumitelný stav nenastaveného pracoviště');
+ok('legacy uložený týmový kód se při startu smaže',()=>{
+  w.localStorage.setItem('sestavovac_school_security_code_v1','LEGACY-TEAM-CODE');
+  w.clearLegacySchoolSecurityCode();
+  assert(w.localStorage.getItem('sestavovac_school_security_code_v1')===null,'legacy týmový kód zůstal v localStorage');
+});
+ok('simple helper se zobrazuje jen když chybí učitelský přístupový kód',()=>{
+  setVal('ucitelPin',''); setVal('heslo',''); w.updateSimpleSecretsHelper();
+  const helper=w.document.getElementById('simpleSecretsHelper');
+  assert(helper&&!helper.classList.contains('hidden'),'helper se nezobrazil při chybějícím kódu');
+  w.setTeacherAccessCode('TEACH-ABCDEF-123456');
+  assert(helper.classList.contains('hidden'),'helper zůstal viditelný po doplnění kódu');
 });
 w.openGeneratorSettings();
-ok('Nastavení bezpečnosti synchronizuje týmový kód do runtime',()=>{
+ok('Nastavení secure předání pracuje s Google Forms bez vazby na studentský kód',()=>{
   const modal=w.document.getElementById('generatorSettingsModal');
-  const input=w.document.getElementById('generatorSettingsSecurityInput');
+  const input=w.document.getElementById('generatorSettingsFormsInput');
   assert(!modal.classList.contains('hidden'),'Nastavení se neotevřelo');
-  input.value='TEAM-CODE-0123456789-SECURE';
-  w.onGeneratorSettingsSecurityInput();
-  assert(w.document.getElementById('bezpKod').value==='TEAM-CODE-0123456789-SECURE','kód z Nastavení se nepřenesl do runtime');
-  assert(w.document.getElementById('securityWorkplaceStatus').textContent.includes('je nastavena'),'workflow stav se po nastavení neaktualizoval');
+  assert(input,'chybí responder URL pole');
+  assert((modal.textContent||'').includes('SECURE-ANSWERS-V1'),'Nastavení nevysvětluje celý odevzdávací payload');
+  assert((modal.textContent||'').includes('jednorázový studentský kód'),'Nastavení nerozlišuje studentský kód od payloadu');
   w.closeGeneratorSettings();
-});
-ok('uložený týmový kód se po startu načte automaticky',()=>{
-  w.localStorage.setItem('sestavovac_school_security_code_v1','STORED-TEAM-CODE-0123456789');
-  setVal('bezpKod','');
-  w.autoApplyStoredSecurityCode();
-  const loaded=w.document.getElementById('bezpKod').value;
-  w.localStorage.removeItem('sestavovac_school_security_code_v1');
-  assert(loaded==='STORED-TEAM-CODE-0123456789','uložený týmový kód se automaticky nenačetl');
-});
-w.eval("chooseSimpleTemplate('fl_practice');updateAppModeUI();");
-ok('simple cvičný test stav Bezpečnosti pracoviště nezobrazuje',()=>{
-  const field=w.document.getElementById('securityWorkplaceField');
-  assert(field.classList.contains('hidden'),'nepotřebný stav Bezpečnosti pracoviště zůstal v practice viditelný');
 });
 
 // 20) Přísný secure test musí přenést lockOnLeave až do veřejné studentské konfigurace.
@@ -548,7 +540,7 @@ await okAsync('practice po výsledku automaticky ukáže chybu i správné řeš
 
 // 23) Secure tabs: submit se ukáže až u posledního cvičení a strict skutečně zamkne pagehide.
 await okAsync('secure tabs: submit až na konci a strict odchod zamkne test', async()=>{
-  resetBase();setVal('bezpKod','TEAM-CODE-0123456789-SECURE');
+  resetBase();
   w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B',layout:'tabs',screenGuard:false,exerciseDetail:true,pocet:2,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1},{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
   const gen={exercises:[
     {title:'První',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q1',options:['A','B'],correct:0}]},
@@ -598,7 +590,7 @@ ok('export checklist je zkrácen na 0 / 4 položky podle režimu',()=>{
 
 // 25) Jednorázový device lock lze znovu povolit stejným učitelským přístupovým kódem.
 await okAsync('učitelský přístupový kód odemkne další spuštění na stejném zařízení', async()=>{
-  resetBase();setVal('bezpKod','TEAM-CODE-0123456789-SECURE');
+  resetBase();
   w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B',layout:'tabs',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
   const fakeDerive=w.deriveSecretHash;w.deriveSecretHash=realGeneratorDeriveSecretHash;
   let pkg;

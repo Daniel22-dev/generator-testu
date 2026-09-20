@@ -410,32 +410,17 @@ function tlChecks(){
       return tlPass('Banked cloze + Multiple matching alias', 'Aliasy na cloze text / matching jsou správné; oba typy jsou v manuálním editoru.');
     }},
 
-    { name:'quickModel + Model fallback', run:function(){
-      if (typeof GEMINI_MODEL_DEFAULT === 'undefined') return tlFail('quickModel + Model fallback', 'Chybí GEMINI_MODEL_DEFAULT.');
-      if (typeof GEMINI_FALLBACK_MODELS === 'undefined' || !Array.isArray(GEMINI_FALLBACK_MODELS) || !GEMINI_FALLBACK_MODELS.length) return tlFail('quickModel + Model fallback', 'GEMINI_FALLBACK_MODELS chybí nebo je prázdné.');
-      if (typeof pickGeminiFallbackModel !== 'function') return tlFail('quickModel + Model fallback', 'Chybí pickGeminiFallbackModel().');
-      if (typeof normalizeModelName !== 'function') return tlFail('quickModel + Model fallback', 'Chybí normalizeModelName().');
-      // quickModel
-      if (typeof quickModel !== 'function') return tlFail('quickModel + Model fallback', 'Chybí quickModel().');
-      var lastSet = null;
-      var origSet = typeof setGeminiModel === 'function' ? setGeminiModel : null;
-      if (!origSet) return tlFail('quickModel + Model fallback', 'Chybí setGeminiModel().');
-      // Simulace: zachytíme co quickModel nastaví
-      var orig = window.setGeminiModel;
-      window.setGeminiModel = function(m){ lastSet = m; };
-      quickModel('strong'); var strong = lastSet;
-      quickModel('lite');   var lite = lastSet;
-      window.setGeminiModel = orig;
-      if (strong !== GEMINI_MODEL_DEFAULT) return tlFail('quickModel + Model fallback', 'quickModel("strong") nastavil "' + strong + '", očekáváno "' + GEMINI_MODEL_DEFAULT + '".');
-      if (lite !== GEMINI_FALLBACK_MODELS[0]) return tlFail('quickModel + Model fallback', 'quickModel("lite") nastavil "' + lite + '", očekáváno "' + GEMINI_FALLBACK_MODELS[0] + '".');
-      // pickGeminiFallbackModel
-      var fb1 = pickGeminiFallbackModel(GEMINI_MODEL_DEFAULT);
-      if (!fb1) return tlFail('quickModel + Model fallback', 'pickGeminiFallbackModel(default) vrátil prázdný string — není žádný záložní model.');
-      if (normalizeModelName(fb1).toLowerCase() === normalizeModelName(GEMINI_MODEL_DEFAULT).toLowerCase()) return tlFail('quickModel + Model fallback', 'Fallback model je stejný jako primární (' + fb1 + ').');
-      // Fallback od fallbacku musí být jiný nebo prázdný
-      var fb2 = pickGeminiFallbackModel(GEMINI_FALLBACK_MODELS[0]);
-      if (fb2 && normalizeModelName(fb2).toLowerCase() === normalizeModelName(GEMINI_FALLBACK_MODELS[0]).toLowerCase()) return tlFail('quickModel + Model fallback', 'pickGeminiFallbackModel(lite) vrátil stejný model jako vstup (' + fb2 + ').');
-      return tlPass('quickModel + Model fallback', 'GEMINI_MODEL_DEFAULT=' + GEMINI_MODEL_DEFAULT + ', fallback[0]=' + GEMINI_FALLBACK_MODELS[0] + '. quickModel(strong/lite) nastavuje správné modely. pickGeminiFallbackModel vrací odlišný záložní model.');
+    { name:'AI Core profily + interní fallback', run:function(){
+      if (typeof GEMINI_PROFILE_MODELS === 'undefined') return tlFail('AI Core profily + interní fallback', 'Chybí GEMINI_PROFILE_MODELS.');
+      if (typeof resolveGeminiModel !== 'function') return tlFail('AI Core profily + interní fallback', 'Chybí resolveGeminiModel(profile).');
+      if (typeof GEMINI_FALLBACK_MODELS === 'undefined' || !Array.isArray(GEMINI_FALLBACK_MODELS) || !GEMINI_FALLBACK_MODELS.length) return tlFail('AI Core profily + interní fallback', 'Chybí interní fallback transportu.');
+      if (typeof pickGeminiFallbackModel !== 'function') return tlFail('AI Core profily + interní fallback', 'Chybí pickGeminiFallbackModel().');
+      var economy=resolveGeminiModel('economy'), balanced=resolveGeminiModel('balanced'), quality=resolveGeminiModel('quality');
+      if(!economy||!balanced||!quality) return tlFail('AI Core profily + interní fallback','Některý profil nemá interní mapování.');
+      var fb=pickGeminiFallbackModel(quality);
+      if(!fb) return tlFail('AI Core profily + interní fallback','Quality profil nemá interní záložní model.');
+      if(normalizeModelName(fb).toLowerCase()===normalizeModelName(quality).toLowerCase()) return tlFail('AI Core profily + interní fallback','Fallback je stejný jako primární quality model.');
+      return tlPass('AI Core profily + interní fallback','economy/balanced/quality jsou mapovány interně; běžné UI konkrétní model neřídí.');
     }},
 
     { name:'Manuální editor (funkce + typy)', run:function(){

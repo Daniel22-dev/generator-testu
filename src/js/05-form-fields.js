@@ -682,14 +682,10 @@ function validate() {
 
   const accessCode = (typeof syncTeacherAccessCode === 'function') ? syncTeacherAccessCode() : trim('ucitelPin');
   const baseSecretOk = trim('ucitelJmeno') && accessCode;
-  const needsSecurityCode = typeof securityCodeRequiredForCurrentWorkflow === 'function' ? securityCodeRequiredForCurrentWorkflow() : (state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline'));
-  const securityCode = trim('bezpKod');
-  if (typeof updateSecurityWorkplaceStatus === 'function') updateSecurityWorkplaceStatus();
-  const securityCodeOk = !needsSecurityCode || (securityCode.length >= 16 && securityCode !== accessCode);
-  // Jeden učitelský přístupový kód musí být dost silný pro offline ověřování.
+  // Jeden učitelský přístupový kód musí být dost silný pro offline teacher-login i odemčení.
   // V exportu se z něj odvozují dva doménově oddělené PBKDF2 hashe.
   const accessCodeStrongOk = !accessCode || (accessCode.length >= 12 && !isWeakSecret(accessCode));
-  const secretOk = baseSecretOk && securityCodeOk && accessCodeStrongOk;
+  const secretOk = baseSecretOk && accessCodeStrongOk;
   const groupsOk = state.diferencovany==='NE' || (state.skupiny.length>0 && state.skupiny.every(g => plainText(g.nazev).length > 0 && plainText(g.podminky).length > 0 && Array.isArray(g.studenti) && g.studenti.length > 0));
   // Jednorázové kódy bez vygenerovaného rosteru = verifier nemá seznam a kontrola
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
@@ -702,8 +698,6 @@ function validate() {
   if (!accessCode) msg.push('Doplň učitelský přístupový kód.');
   if (accessCode && accessCode.length < 12) msg.push('Učitelský přístupový kód musí mít aspoň 12 znaků (slabý kód jde offline uhádnout).');
   else if (accessCode && isWeakSecret(accessCode)) msg.push('Učitelský přístupový kód je příliš běžný — zvol méně odhadnutelný.');
-  if (needsSecurityCode && securityCode.length < 16) msg.push((typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline') ? 'Bezpečnost pracoviště není nastavena — otevři ⚙️ Nastavení → Bezpečnost pracoviště a vlož týmový kód od správce (alespoň 16 znaků).' : 'Bezpečnost pracoviště není nastavena — otevři ⚙️ Nastavení → Bezpečnost pracoviště a doplň týmový kód alespoň o 16 znacích.');
-  if (securityCode && securityCode === accessCode) msg.push('Bezpečnostní kód výsledků musí být jiný než učitelský přístupový kód.');
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
   if(!groupLogic.ok) msg.push(...groupLogic.messages);
   $('validHint3').textContent = Array.from(new Set(msg)).join(' ');
@@ -754,7 +748,7 @@ function getCompactResultModeBlock() {
   if ((state.resultMode || 'instant') === 'secureOffline') {
     return `REŽIM VÝSLEDKŮ: BEZPEČNÝ OFFLINE — DOPORUČENO PRO KLASIFIKOVANÝ TEST.
   • Výsledkem přímého generování musí být dvojice souborů: student_test.html a teacher_verifier.html. V generátoru i verifieru jasně připomeň, že studentům se posílá pouze student_test.html; teacher_verifier.html je pouze pro učitele a nesmí být sdílen se studenty.
-  • Studentský HTML nesmí obsahovat answer key, správné odpovědi, učitelský přístupový kód ani verifySecret.
+  • Studentský HTML nesmí obsahovat answer key, správné odpovědi ani učitelský přístupový kód.
   • Student po odevzdání nevidí známku; stáhne zakódovaný answers.txt s odpověďmi a bezpečnostním záznamem.
   • Bezpečný offline režim vždy používá celkové odevzdání celého testu; průběžné odevzdávání cvičení je dostupné jen v okamžitém režimu.
   • Učitelský verifier musí být vždy česky bez ohledu na jazyk studentského testu. Volba „celý test v cílovém jazyce“ platí pouze pro studentský test, ne pro verifier.

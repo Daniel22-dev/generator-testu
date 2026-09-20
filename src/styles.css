@@ -1745,3 +1745,11 @@ body.light .ghrab-platform-footer{--ghrab-platform-surface:#fff;--ghrab-platform
 body.light .ghrab-platform-footer__brand span,body.light .ghrab-platform-footer__meta span{color:#444b6e;opacity:1}
 body.light .ghrab-platform-footer__brand strong{color:#14162a}
 body:not(.light) .ghrab-platform-footer{--ghrab-platform-surface:#0f1120;--ghrab-platform-border:#2d3148;color:#c8cde8;background:#0f1120;border-color:#2d3148}
+
+/* v7.1.45 — AI Core abstraction + jasné předání secure výsledků */
+.ai-profile-note{margin:12px 0 2px;padding:11px 13px;border:1px solid var(--bdr);border-radius:10px;background:var(--bg2);color:var(--t3);font-size:13px;line-height:1.55}
+.ai-profile-note strong{color:var(--t1)}
+.forms-howto{margin-top:12px;border:1px solid var(--bdr);border-radius:10px;background:var(--bg2);padding:10px 12px}
+.forms-howto summary{cursor:pointer;color:var(--t2);font-weight:800;font-size:13px}
+.forms-howto-list{margin:10px 0 0 20px;padding:0;color:var(--t3);font-size:13px;line-height:1.55}
+.forms-howto-list li{margin:6px 0}

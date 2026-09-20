@@ -25,10 +25,11 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.44',
-  date:    '2026-09-16',
+  version: '7.1.45',
+  date:    '2026-09-19',
   status:  'production-serverless',
   changes: [
+    'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
     'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.41): bez změny aplikační logiky. Patch ověřuje skutečné automatické převzetí nové verze AI Studiem. Release zachovává GARP 2.5/N5, platformní kontrakt 1.1.2, Studio Bridge v2, secure runtime, Forms, scoring, kryptografii i AI workflow; po úspěšném Pages deployi Generátor nově odešle AI Studiu repository_dispatch app-updated.',
@@ -38,7 +39,6 @@ const RELEASE = Object.freeze({
     'ETAPA 6 – JEDEN UČITELSKÝ PŘÍSTUPOVÝ KÓD (7.1.37): Generátor má místo samostatného učitelského PINu a odemykacího hesla jeden učitelský přístupový kód. Z jednoho kanonizovaného kódu se nadále odvozují dva různé PBKDF2 hashe s oddělenými doménami teacher-pin a unlock-password; teacher login a povolení dalšího pokusu ověřují pouze teacher-pin, zámková obrazovka pouze unlock-password. Skrytý legacy #heslo zůstává jen jako interní mirror pro kompatibilitu a neřídí kryptografii. Bezpečnost pracoviště, verifier, Google Forms, scoring, RSA/AES a formát SECURE-ANSWERS-V1 se nemění.',
     'ETAPA 5 – PŘEHLEDNĚJŠÍ POKROČILÁ NASTAVENÍ (7.1.36): Pokročilý režim nyní seskupuje stávající volby do pěti sekcí Test / Student / Zpětná vazba / Bezpečnost / Vzhled. Přesouvají se původní DOM prvky se stejnými ID, hodnotami, handlery a validacemi; Simple režim je vrací na původní místa. Ochrana opakovaného pokusu je pouze vysvětlující informace o existujícím secure-offline zámku, nikoli nový přepínač. Studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.',
     'ETAPA 4 – STUDENTSKÉ ODEVZDÁNÍ PŘES GOOGLE FORMS (7.1.34): v Nastavení Generátoru lze uložit pouze validovaný responder odkaz Google Forms. Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého SECURE-ANSWERS-V1 payloadu a otevření školního formuláře; answers.txt zůstává nouzová záloha a automatický fallback při chybějícím formuláři nebo neobvykle dlouhém payloadu. URL formuláře je součástí integrity-bound konfigurace. Formát šifrovaného výsledku, RSA/AES kryptografie, scoring, PIN/odemčení a Stage 3 verifier CSV import se nemění.',
-    'ETAPA 3 – GOOGLE FORMS CSV IMPORT (7.1.33): učitelský secure verifier umí načíst CSV export odpovědí z Google Forms. Automaticky detekuje čárku/středník/tabulátor, najde celý SECURE-ANSWERS-V1 payload, volitelně připojí e-mail a čas formuláře, ignoruje ostatní sloupce a každý payload ověřuje stejnou kryptografickou a bodovací cestou jako answers.txt. Chybějící, nejednoznačné, poškozené nebo cizí payloady jsou fail-closed a viditelné po řádcích; duplicity zůstávají pod stávající kontrolou verifieru. Studentský runtime, formát secure balíku, kryptografie, PIN/odemčení a serverový profil se nemění.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -250,8 +250,8 @@ const THEME_SPECS = {
 
 const DOM_FIELDS = ['nazev','proKoho','latka','zadaniText',
   'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
-const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin','bezpKod'];
-const SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
+const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin'];
+const LEGACY_SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
 const GOOGLE_FORMS_SUBMISSION_URL_KEY = 'sestavovac_google_forms_submission_url_v1';
 const MAX_FILES = 12;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -448,8 +448,8 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'offline',title:'Offline režim / bezpečný offline balíček',status:'reseno',
   keywords:['offline','bez internetu','funguje offline','secure offline','bezpecny offline','balicek','bez site','bez pripojeni'],
   simple:'Ano. Hotový test je jeden HTML soubor a funguje offline. Bezpečný režim navíc nemá ve studentském souboru klíč odpovědí — opravuje se zvlášť učitelským souborem.',
-  detailed:'Vygenerovaný test je samostatný HTML bez externích knihoven, takže běží offline. V režimu „Bezpečný offline" (secureOffline) student_test.html neobsahuje správné odpovědi: student vytvoří zakódovaný answers.txt a učitel ho opraví v teacher_verifier.html. V tomto režimu se netvoří okamžitá známka ani QR/ověřovací .txt.',
-  evidence:['resultMode==="secureOffline"','getCompactVerificationBlock()','student_test.html → answers.txt → teacher_verifier.html','jeden HTML bez CDN']},
+  detailed:'Vygenerovaný test je samostatný HTML bez externích knihoven, takže běží offline. V režimu „Bezpečný offline" (secureOffline) student_test.html neobsahuje správné odpovědi. Po odevzdání vznikne šifrovaný SECURE-ANSWERS-V1 výsledek: je-li nastaven školní Google Form, student ho primárně vloží do formuláře a answers.txt zůstává nouzová záloha; bez Forms se používá answers.txt. Učitel výsledek opraví v teacher_verifier.html. V tomto režimu se netvoří okamžitá známka ani QR/OVR4.',
+  evidence:['resultMode==="secureOffline"','getCompactVerificationBlock()','SECURE-ANSWERS-V1','configuredGoogleFormsUrl()','teacher_verifier.html','jeden HTML bez CDN']},
 
  {id:'okamzita-znamka',title:'Okamžitá známka (instant)',status:'reseno',
   keywords:['okamzita znamka','instant','hned vysledek','rovnou znamka','vysledek ihned','self scoring'],
@@ -459,8 +459,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'teacher-verifier',title:'Teacher verifier (učitelský opravovací soubor)',status:'reseno',
   keywords:['teacher verifier','ucitelsky verifier','opravit answers','answers txt','oprava odpovedi','dekodovat odpovedi','ucitelsky opravovaci soubor'],
-  simple:'Teacher verifier je samostatný učitelský HTML soubor, který v bezpečném režimu dekóduje a opraví studentův answers.txt a spočítá známku.',
-  detailed:'V režimu Bezpečný offline student odevzdá zakódovaný answers.txt. Učitel ho nahraje (jednotlivě i hromadně) do teacher_verifier.html, který obsahuje privátní klíč a plné varianty s klíčem odpovědí, dekóduje odpovědi, nezávisle přepočítá body a známku a porovná je se studentovým záznamem. Tento soubor je jen pro učitele — nikdy ho nedávej studentům.',
+  simple:'Teacher verifier je samostatný učitelský HTML soubor, který v bezpečném režimu dešifruje a opraví studentské výsledky z answers.txt nebo z CSV exportu Google Forms a spočítá známky.',
+  detailed:'V režimu Bezpečný offline student odevzdá šifrovaný SECURE-ANSWERS-V1 výsledek. Bez Forms je v answers.txt; s nastaveným Google Formem student celý blok vloží do formuláře a učitel stáhne CSV. teacher_verifier.html umí hromadně načíst answers.txt i CSV z Forms, obsahuje privátní klíč a plné varianty s klíčem odpovědí, dešifruje odpovědi a nezávisle přepočítá body a známku. Tento soubor je jen pro učitele — nikdy ho nedávej studentům.',
   evidence:['secureTeacherScript()','teacher_verifier.html','PRIVATE_KEY / VARIANTS_FULL','bulkVerifyFiles()','SHARED_SCORING_JS (stejné bodování jako student)']},
 
  {id:'self-test',title:'Self-test bodování',status:'reseno',
@@ -471,21 +471,21 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'overeni-klice',title:'Ověření klíče druhým průchodem (AI)',status:'reseno',
   keywords:['overit klic','overeni klice','druhy pruchod','spravnost klice','ai zkontroluje odpovedi','klic spravne odpovedi','je klic spravne'],
-  simple:'Tahle funkce nechá AI nezávisle vyřešit tvůj test a ukáže položky, kde se její odpověď liší od uloženého klíče — tam nejspíš je chyba v klíči. Vyžaduje Gemini klíč.',
+  simple:'Tahle funkce nechá AI nezávisle vyřešit tvůj test a ukáže položky, kde se její odpověď liší od uloženého klíče — tam nejspíš je chyba v klíči. Vyžaduje aktivní AI připojení.',
   detailed:'aiVerifyKey() požádá AI, aby sama vyřešila úlohy testu (negeneruje nový test) a porovná to s uloženým klíčem. Rozdílné položky označí jako podezřelé — levný signál, kde ručně zkontrolovat. Doplňuje self-test: self-test ověří, že STROJ počítá podle klíče správně; tohle hledá, jestli je sám KLÍČ obsahově správný. Silné u uzavřených typů (výběr, true/false, doplňování), slabší u otevřených překladů.',
-  evidence:['aiVerifyKey() (btnKeyCheck)','porovnání AI odpovědí s uloženým klíčem','vyžaduje Gemini klíč','keyCheckReport']},
+  evidence:['aiVerifyKey() (btnKeyCheck)','porovnání AI odpovědí s uloženým klíčem','aktivní AI připojení','keyCheckReport']},
 
- {id:'gemini-api-klic',title:'Gemini API klíč',status:'reseno',
+ {id:'gemini-api-klic',title:'AI API klíč / připojení',status:'reseno',
   keywords:['gemini','api klic','apikey','klic gemini','ai generovani','primo generovat','vytvorit test primo','model gemini'],
-  simple:'Generátor umí volat Gemini a vytvořit test přímo. Klíč zadáš v panelu AI připojení na první stránce. Bez klíče můžeš připravený prompt zkopírovat do jiného AI nástroje.',
-  detailed:'V panelu AI připojení na první stránce zadáš Gemini API klíč; pak tlačítko „Vytvořit test přímo" pošle prompt (a multimodální přílohy) přes callGeminiJSON na Google API. Klíč se používá pouze pro aktuální relaci a posílá se do Google API v hlavičce požadavku. Bez klíče generátor připraví prompt k ručnímu zkopírování do jiného AI nástroje. Model lze změnit v závěrečném kroku.',
-  evidence:['callGeminiJSON()','x-goog-api-key (jen na Google API)','buildGeminiFilePartsForApi()','geminiApiKey','„Vytvořit test přímo"']},
+  simple:'Generátor umí vytvořit test přímo přes AI Core. Ve veřejném serverless režimu zadáš API klíč v panelu AI připojení; ve školním režimu klíč spravuje server. Bez aktivního AI připojení můžeš připravený prompt zkopírovat jinam.',
+  detailed:'Ve veřejném serverless režimu zadáš v panelu AI připojení providerový API klíč jen pro aktuální relaci; v dnešní veřejné implementaci jde o Gemini transport. Ve školním režimu osobní klíč nezadáváš — AI požadavky jdou přes školní gateway. Aplikační logika pracuje pouze s profily AI Core economy / balanced / quality; konkrétní provider a model určuje transport nebo serverová politika a běžný uživatel je nenastavuje.',
+  evidence:['GHRAB AI Core','modelProfile','economy / balanced / quality','callGeminiJSON()','genSchoolMode()','„Vytvořit test přímo"']},
 
  {id:'ukladani-api-klice',title:'Ukládání API klíče (jen relace)',status:'reseno',
   keywords:['ukladani klice','kam se uklada klic','sessionstorage klic','localstorage klic','zapamatovat klic','relace klic','trvale klic','uchovani klice'],
-  simple:'Gemini API klíč se v této verzi používá pouze pro aktuální relaci. Po zavření prohlížeče se zapomene a trvalé uložení je z bezpečnostních důvodů vypnuté.',
-  detailed:'„Relace" (useGeminiKeyForSession) drží klíč jen do zavření prohlížeče. Tlačítko saveGeminiKeyPermanent je od P1 bezpečnostní alias pro uložení pouze do relace; trvalé browserové uložení je vypnuto. Klíč se odesílá výhradně do Google API v hlavičce, nikdy do žádné jiné služby ani do tohoto poradce.',
-  evidence:['useGeminiKeyForSession() (btnUseKeySession)','saveGeminiKeyPermanent() (btnSaveKeyPermanent)','geminiNote: „Relace = po zavření se zapomene"']},
+  simple:'API klíč ve veřejném serverless režimu se používá pouze pro aktuální relaci. Po zavření prohlížeče se zapomene a trvalé uložení je vypnuté.',
+  detailed:'Ve veřejném serverless režimu useGeminiKeyForSession() drží providerový klíč pouze do zavření relace a staré trvalé browserové uložení se migruje pryč. Ve školním režimu klíč spravuje server a do prohlížeče se osobní provider klíč neukládá. Poradce samotný API klíč ani klíč odpovědí do svého dotazu nevkládá.',
+  evidence:['useGeminiKeyForSession() (btnUseKeySession)','GEMINI_KEY_SESSION_SK','genApplyServerKeyPolicy()','klíč jen pro relaci']},
 
  {id:"pristupove-kody",title:"Přístup z AI Studia",status:"reseno",
   keywords:["pristupovy kod","pristupovy soubor","access code","prihlaseni","AI Studio","odemknout aplikaci"],
@@ -502,7 +502,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"storage",title:"localStorage / sessionStorage (co se ukládá)",status:"reseno",
   keywords:["localstorage","sessionstorage","uklada","co se uklada","data v prohlizeci","soukromi dat","kam se uklada"],
   simple:"Generátor lokálně ukládá rozpracované nastavení, nejvýše pět položek historie, pedagogické šablony a ověřený podepsaný přístup AI Studia. Hesla testu, přílohy a skutečná jména studentů se do běžných snapshotů neukládají.",
-  detailed:"Snapshoty a historie používají localStorage; jména studentů jsou před uložením nahrazena kódy Student A1…, přílohy se neukládají a citlivá pole se čistí. Gemini API klíč se drží pouze pro aktuální relaci a nemá se trvale ukládat do prohlížeče. Centrální permit AI Studia je uložen pod klíčem ghrab.access.permit.v2 a obsahuje podepsané nároky, nikoli soukromý podpisový klíč. Ve studentském secure testu se odpovědi drží za běhu v paměti.",
+  detailed:"Snapshoty a historie používají localStorage; jména studentů jsou před uložením nahrazena kódy Student A1…, přílohy se neukládají a citlivá pole se čistí. Providerový API klíč ve veřejném režimu se drží pouze pro aktuální relaci a nemá se trvale ukládat do prohlížeče. Centrální permit AI Studia je uložen pod klíčem ghrab.access.permit.v2 a obsahuje podepsané nároky, nikoli soukromý podpisový klíč. Ve studentském secure testu se odpovědi drží za běhu v paměti.",
   evidence:["getStoredState()","anonymizeGroupsForStorage()","pushHistory()","ghrab.access.permit.v2","submittedLocked()"]},
 
  {id:'ochrana-answer-key',title:'Ochrana před únikem klíče odpovědí',status:'reseno',
@@ -592,9 +592,15 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'odevzdani-studentu',title:'Co student po dokončení odevzdává',status:'reseno',
   keywords:['co odevzda student','co ma student poslat','odevzdani','odevzdávání','screenshot','answers.txt','zalozni kod','záložní kód','výsledek'],
-  simple:'Záleží na režimu výsledků. U okamžité známky student pošle screenshot výsledkové karty; v bezpečném offline režimu stáhne a pošle zakódovaný answers.txt.',
-  detailed:'Režim resultMode="instant" zobrazí studentovi po odevzdání výsledkovou kartu se jménem, Test ID, body, procenty a známkou; instrukce počítá se screenshotem výsledku. Režim resultMode="secureOffline" studentovi známku hned neukáže: po odevzdání vytvoří zakódovaný answers.txt s odpověďmi a bezpečnostním záznamem, který učitel načte do teacher_verifier.html. Pokud download souboru selže, verifier počítá i s nouzovým vložením záložního textu.',
+  simple:'Záleží na režimu výsledků. U okamžitého výsledku student vidí výsledkovou kartu. V bezpečném offline režimu předá zašifrovaný výsledek přes nastavený Google Form, nebo přes answers.txt; answers.txt je vždy dostupná záloha.',
+  detailed:'Režim resultMode="instant" zobrazí studentovi po odevzdání výsledkovou kartu se jménem, Test ID, body, procenty a známkou; praktickým předáním je screenshot. Režim resultMode="secureOffline" známku hned neukáže a vytvoří šifrovaný SECURE-ANSWERS-V1 výsledek. Je-li v Nastavení uložen responder odkaz školního Google Formu, student celý blok zkopíruje do formuláře a answers.txt zůstává nouzová záloha; bez Forms se answers.txt používá primárně. Učitel načte answers.txt nebo CSV export Forms do teacher_verifier.html.',
   evidence:['resultMode==="instant"','showResult()','výsledková karta: jméno/Test ID/body/%/známka','resultMode==="secureOffline"','downloadAnswers()','SECURE-ANSWERS-V1','bulkVerifyPasted()']},
+
+ {id:'google-forms-secure',title:'Google Forms pro předání secure výsledků',status:'reseno',
+  keywords:['google forms','formulář','formular','forms csv','odevzdavaci kod','odevzdávací kód','secure answers','secures answers v1','responder odkaz','responder link'],
+  simple:'Google Forms je volitelná sběrná cesta pro bezpečný offline test. Student do formuláře vloží celý šifrovaný blok SECURE-ANSWERS-V1; krátký jednorázový studentský kód sám o sobě k opravě nestačí. answers.txt zůstává nouzová záloha.',
+  detailed:'V ⚙️ Nastavení → Předání secure výsledků uloží učitel responder odkaz školního Google Formu. Po dokončení secure testu student zkopíruje celý SECURE-ANSWERS-V1 blok, otevře formulář a vloží ho do povinné otázky typu Odstavec. Form může volitelně sbírat ověřený školní e-mail. Učitel potom stáhne CSV odpovědí a otevře ho v teacher_verifier.html; verifier payloady rozpozná, kryptograficky ověří/dešifruje a opraví stejnou cestou jako answers.txt. Jednorázový studentský kód slouží pouze k identitě studenta, ne jako odevzdávací payload.',
+  evidence:['GOOGLE_FORMS_SUBMISSION_URL_KEY','configuredGoogleFormsUrl()','SECURE-ANSWERS-V1','importFormsCsvFile()','identityMode'],},
 
  {id:'nouzova-zaloha-answers',title:'Nouzová záloha, když nejde stáhnout answers.txt',status:'reseno',
   keywords:['nejde stahnout answers','nejde stáhnout answers','nejde stáhnout soubor','zaloha','záloha','backup','SECURE-ANSWERS','vlozit kod','vložit kód'],
@@ -611,7 +617,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'zpetna-vazba',title:'Zpětná vazba a zobrazení správných odpovědí',status:'reseno',
   keywords:['zpetna vazba','zpětná vazba','feedback','spravne odpovedi','správné odpovědi','ukaze klic','ukáže klíč','vysvetleni','vysvětlení'],
   simple:'Ano, režim zpětné vazby se nastavuje. U klasifikace můžeš vypnout okamžitou zpětnou vazbu; v bezpečném offline režimu student po testu nevidí známku ani klíč, vše řeší učitel ve verifieru.',
-  detailed:'Volba feedbackMode rozlišuje „Bez okamžité ZV“, „Stručná“ a „Učící“. Režim resultMode="instant" může ukazovat výsledek hned podle nastavení feedbacku. Režim resultMode="secureOffline" je pro klasifikaci bezpečnější: student nevidí známku ani správné odpovědi hned, stáhne answers.txt a učitel zpětnou vazbu vytvoří ve verifieru. Ve verifieru lze také zvolit úroveň feedbacku: chyby + správné odpovědi, jen body a známka, chyby bez správných odpovědí nebo kompletní rozbor.',
+  detailed:'Volba feedbackMode rozlišuje „Bez okamžité ZV“, „Stručná“ a „Učící“. Režim resultMode="instant" může ukazovat výsledek hned podle nastavení feedbacku. Režim resultMode="secureOffline" je pro klasifikaci bezpečnější: student nevidí známku ani správné odpovědi hned a předá šifrovaný výsledek přes Google Forms nebo answers.txt; učitel zpětnou vazbu vytvoří až ve verifieru. Ve verifieru lze zvolit úroveň feedbacku: chyby + správné odpovědi, jen body a známka, chyby bez správných odpovědí nebo kompletní rozbor.',
   evidence:['feedbackModeBtns','feedbackMode','resultMode==="instant"','resultMode==="secureOffline"','feedbackLevel','downloadFeedbackHtml()','hideCorrectExport']},
 
  {id:'editor-upravy-testu',title:'Úprava otázek a odpovědí po vygenerování',status:'reseno',
@@ -664,59 +670,57 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'chyba-503',title:'Chyba 503 / UNAVAILABLE při generování',status:'reseno',
   keywords:['503','unavailable','service unavailable','pretizeny','přetížený','pretizene','přetížené servery','high demand','server nedostupny','server nedostupný','generovani selhalo','generování selhalo','zkus znovu'],
-  simple:'Chyba 503 znamená dočasnou nedostupnost nebo přetížení služby/modelu. Počkej několik minut a zkontroluj stav služby a aktivní limity projektu v AI Studiu.',
-  detailed:'HTTP 503 UNAVAILABLE značí dočasnou nedostupnost, přetížení nebo problém služby/modelu. Z této chyby samotné nelze spolehlivě určit kvótu. Počkej několik minut, zkontroluj stav služby a v Google AI Studiu otevři aktuální Rate limits pro svůj projekt. Generátor může jednou zkusit odlišný stabilní model, ale úspěch ani samostatná kvóta nejsou garantovány.',
+  simple:'Chyba 503 znamená dočasnou nedostupnost nebo přetížení AI služby. Počkej několik minut; případný záložní profil řeší Generátor automaticky.',
+  detailed:'HTTP 503 UNAVAILABLE značí dočasnou nedostupnost nebo přetížení AI služby. Z této chyby samotné nelze spolehlivě určit kvótu. Generátor může jednou zkusit interní záložní profil; konkrétní model uživatel nevolí. Ve veřejném serverless režimu lze zkontrolovat stav služby a limity provider projektu.',
   evidence:['geminiApiErrorMessage()','HTTP 503','UNAVAILABLE','RPD','Rate Limit','aistudio.google.com']},
 
  {id:'chyba-429',title:'Chyba 429 / RESOURCE_EXHAUSTED / překročen limit',status:'reseno',
   keywords:['429','resource exhausted','resource_exhausted','prekrocen limit','překročen limit','kvota','kvóta','quota','too many requests','denni limit','denní limit','rpm','rpd','rate limit'],
   simple:'Byl překročen limit požadavků nebo kvóta API klíče. Generátor tlačítko dočasně zablokuje. Počkej alespoň minutu a zkus znovu, nebo ověř limity v AI Studiu.',
-  detailed:'HTTP 429 RESOURCE_EXHAUSTED znamená překročení některého aktivního limitu projektu, například požadavků za minutu, tokenů za minutu nebo požadavků za den. Konkrétní hodnoty se liší podle modelu a usage tieru. Generátor zobrazí cooldown a neprovádí bezhlavé opakování. Aktuální limity ověř v Google AI Studiu v části Rate limits.',
+  detailed:'HTTP 429 RESOURCE_EXHAUSTED znamená překročení některého aktivního limitu projektu, například požadavků za minutu, tokenů za minutu nebo požadavků za den. Konkrétní hodnoty se liší podle provider projektu, profilu a usage tieru. Generátor zobrazí cooldown a neprovádí bezhlavé opakování. Aktuální limity ověř v Google AI Studiu v části Rate limits.',
   evidence:['geminiCooldownRemainingMs()','geminiUpdateCooldownUI()','GEMINI_COOLDOWN_MS','HTTP 429','RESOURCE_EXHAUSTED']},
 
  {id:'chyba-400',title:'Chyba 400 / INVALID_ARGUMENT při generování',status:'reseno',
   keywords:['400','invalid argument','invalid_argument','neplatny klic','neplatný klíč','api key not valid','spatny klic','špatný klíč','klic nefunguje','klíč nefunguje','neplatny pozadavek','neplatný požadavek'],
-  simple:'Chyba 400 nejčastěji znamená neplatný API klíč. Zkontroluj klíč v panelu AI připojení na první stránce — zkopíruj ho znovu z aistudio.google.com → API Keys.',
-  detailed:'HTTP 400 INVALID_ARGUMENT znamená neplatný tvar požadavku, nepodporovanou kombinaci modelu/příloh nebo jiný chybný parametr. Neplatný či neoprávněný klíč se častěji projeví jako 401/403. Zkontroluj model, URL a přílohy; pro návrat k ověřené volbě použij Výchozí (gemini-3.6-flash).',
+  simple:'Chyba 400 znamená neplatný tvar požadavku nebo nepodporovanou kombinaci parametrů. U klíče se častěji zobrazí 401/403.',
+  detailed:'HTTP 400 INVALID_ARGUMENT znamená neplatný tvar požadavku, nepodporovanou kombinaci parametrů/příloh nebo jiný chybný parametr. Neplatný či neoprávněný klíč se častěji projeví jako 401/403. Zkontroluj URL a přílohy; konkrétní model řeší AI Core interně.',
   evidence:['geminiApiErrorMessage()','HTTP 400','INVALID_ARGUMENT','getGeminiInputKey()','useGeminiKeyForSession()']},
 
  {id:'chyba-401-403',title:'Chyba 401 / 403 / PERMISSION_DENIED při generování',status:'reseno',
   keywords:['401','403','permission denied','permission_denied','unauthenticated','nemam opravneni','nemám oprávnění','pristup odepren','přístup odepřen','klic nema opravneni','klíč nemá oprávnění'],
-  simple:'Chyba 401/403 znamená, že API klíč nemá oprávnění. Zkontroluj klíč nebo vytvoř nový s správným projektem v AI Studiu.',
-  detailed:'HTTP 401 nebo 403 PERMISSION_DENIED nastane když API klíč není oprávněn pro daný model nebo projekt. Může to být: (1) klíč patří jinému projektu, (2) projekt nemá povolenou Gemini API, (3) klíč byl omezen nebo odvolán. Řešení: jdi na aistudio.google.com → API Keys, zkontroluj ke kterému projektu klíč patří, případně vytvoř nový klíč ve správném projektu.',
+  simple:'Chyba 401/403 znamená, že veřejný serverless API klíč není platný nebo nemá potřebné oprávnění. Ve školním režimu osobní provider klíč nepoužíváš.',
+  detailed:'HTTP 401 nebo 403 PERMISSION_DENIED ve veřejném serverless režimu znamená, že providerový API klíč není platný nebo oprávněný pro aktuální transport/projekt. Podrobnosti pro dnešní Gemini transport jsou v návodu AI připojení. Ve školním režimu tuto vrstvu řeší serverová gateway.',
   evidence:['geminiApiErrorMessage()','HTTP 401','HTTP 403','PERMISSION_DENIED','UNAUTHENTICATED']},
 
  {id:'chyba-504',title:'Chyba 504 / DEADLINE_EXCEEDED — timeout',status:'reseno',
   keywords:['504','deadline exceeded','deadline_exceeded','timeout','vyprselo','vypršelo','cas vyprsel','čas vypršel','prilis dlouhy test','příliš dlouhý','nestihlo','nestihlo se vygenerovat'],
-  simple:'Chyba 504 znamená, že Gemini nestihlo vygenerovat odpověď v časovém limitu. Zkus zmenšit test — méně cvičení nebo méně položek.',
-  detailed:'HTTP 504 DEADLINE_EXCEEDED znamená, že služba požadavek nestihla dokončit. Typické příčiny: mnoho cvičení, velké přílohy nebo náročná kombinace typů. Zmenši test, použij hybridní generování, zkrať podklady nebo při použití Lite přepni na výchozí gemini-3.6-flash.',
+  simple:'Chyba 504 znamená, že AI služba nestihla vygenerovat odpověď v časovém limitu. Zkus zmenšit test — méně cvičení nebo méně položek.',
+  detailed:'HTTP 504 DEADLINE_EXCEEDED znamená, že služba požadavek nestihla dokončit. Typické příčiny: mnoho cvičení, velké přílohy nebo náročná kombinace typů. Zmenši test, použij hybridní generování nebo zkrať podklady; profil/model řeší AI Core interně.',
   evidence:['geminiApiErrorMessage()','HTTP 504','DEADLINE_EXCEEDED','GEMINI_TIMEOUT_MS','hybridní generování']},
 
  {id:'chyba-poskozeny-json',title:'Poškozený JSON — generátor nemůže sestavit test',status:'reseno',
   keywords:['poskozeny json','poškozený json','spatny json','špatný json','nepodařilo opravit','nepodarilo opravit','json selhal','test negeneruje','generátor nemůže','blbý výstup','divný výstup','nesmyslný výstup'],
-  simple:'Gemini vrátilo neúplný nebo chybně naformátovaný výstup. Generátor se pokusí opravit automaticky. Pokud selže, zkus generovat znovu nebo použij hybridní generování.',
-  detailed:'Poškozený JSON nastane když model vrátí text, který nejde naparsovat jako validní JSON — typicky useknutý výstup (příliš dlouhý test), model vložil text mimo JSON strukturu, nebo nesprávně escapoval znaky. Generátor automaticky zkusí opravit (repairGeminiJson) a při selhání zobrazí chybu. Řešení: (1) zkus generovat znovu — modely jsou nedeterministické, druhý pokus bývá lepší, (2) zmenši test (méně cvičení/položek), (3) zapni hybridní generování — složitá cvičení zvlášť produkují menší JSON, (4) pokud selháváš opakovaně u jednoho typu, nastav ho na ruční editaci (✏️ v pokročilém módu).',
+  simple:'AI služba vrátila neúplný nebo chybně naformátovaný výstup. Generátor se pokusí opravit automaticky. Pokud selže, zkus generovat znovu nebo použij hybridní generování.',
+  detailed:'Poškozený JSON nastane když AI služba vrátí text, který nejde naparsovat jako validní JSON — typicky useknutý výstup (příliš dlouhý test), výstup obsahuje text mimo JSON strukturu, nebo nesprávně escapoval znaky. Generátor automaticky zkusí opravit (repairGeminiJson) a při selhání zobrazí chybu. Řešení: (1) zkus generovat znovu — AI výstupy jsou nedeterministické, druhý pokus bývá lepší, (2) zmenši test (méně cvičení/položek), (3) zapni hybridní generování — složitá cvičení zvlášť produkují menší JSON, (4) pokud selháváš opakovaně u jednoho typu, nastav ho na ruční editaci (✏️ v pokročilém módu).',
   evidence:['repairGeminiJson()','lastGeminiJsonRepaired','lastGeminiRawResponse','hybridní generování','runHybridGeneration()']},
 
  {id:'chyba-data-mimo-zadani',title:'Chyba: data mimo zadání — generátor negeneruje test',status:'reseno',
   keywords:['data mimo zadani','data mimo zadání','pocet polozek','počet položek','ocekavano','očekáváno','spatny pocet','špatný počet','validator','validátor','negeneruje','test negeneruje','chyba validace'],
-  simple:'Gemini vygenerovalo správný JSON, ale s jiným počtem položek nebo špatným typem cvičení než bylo zadáno. Generátor to odmítne a zobrazí co konkrétně nesedí. Zkus generovat znovu.',
-  detailed:'Validátor striktně kontroluje: počet cvičení, typy cvičení, počet položek v každém cvičení a povinná pole. Chyba data mimo zadání nastane když Gemini nedodrží přesné zadání — například u ordering vygeneruje 1 otázku místo 5. Generátor automaticky zkusí jednu opravu (pošle AI seznam chyb). Pokud ani oprava neprojde, zobrazí se detail chyby. Řešení: (1) zkus generovat znovu, (2) pokud se chyba opakuje u konkrétního typu, zkus hybridní generování, (3) složité typy (ordering, categorisation-board) nastav na ruční editaci.',
+  simple:'AI vygenerovala správný JSON, ale s jiným počtem položek nebo špatným typem cvičení než bylo zadáno. Generátor to odmítne a zobrazí co konkrétně nesedí. Zkus generovat znovu.',
+  detailed:'Validátor striktně kontroluje: počet cvičení, typy cvičení, počet položek v každém cvičení a povinná pole. Chyba data mimo zadání nastane když AI nedodrží přesné zadání — například u ordering vygeneruje 1 otázku místo 5. Generátor automaticky zkusí jednu opravu (pošle AI seznam chyb). Pokud ani oprava neprojde, zobrazí se detail chyby. Řešení: (1) zkus generovat znovu, (2) pokud se chyba opakuje u konkrétního typu, zkus hybridní generování, (3) složité typy (ordering, categorisation-board) nastav na ruční editaci.',
   evidence:['validateExerciseSetStrict()','buildExerciseSpecs()','isExerciseValidation','validationDetails','opravný pokyn']},
 
  {id:'chyba-sit',title:'Chyba sítě / fetch selhal / offline',status:'reseno',
   keywords:['sit','síť','network','fetch','offline','neni internet','není internet','odpojeni','odpojení','selhala sit','selhala síť','cors','proxy'],
-  simple:'Generátor nemůže dosáhnout Gemini API kvůli síťovému problému. Zkontroluj připojení k internetu a zkus znovu.',
-  detailed:'Síťová chyba nastane když fetch() požadavek selže ještě před tím, než API odpověď dorazí — typicky kvůli výpadku internetu, firemnímu proxy nebo firewallu blokujícímu api.generativelanguage.googleapis.com. Školní sítě občas blokují přímé API volání. Řešení: (1) zkontroluj připojení k internetu, (2) zkus na mobilních datech jestli to funguje, (3) pokud blokuje školní síť, generuj z domova nebo použij mobilní hotspot.',
+  simple:'Generátor nemůže dosáhnout aktivní AI služby kvůli síťovému problému. Zkontroluj připojení k internetu a zkus znovu.',
+  detailed:'Síťová chyba nastane, když fetch požadavek selže ještě před odpovědí služby — typicky kvůli výpadku internetu, proxy nebo firewallu. Ve veřejném režimu jde o přímý provider transport; ve školním režimu o školní gateway. Zkontroluj připojení a případnou síťovou blokaci.',
   evidence:['callGeminiJSON()','geminiNetworkErrorMessage()','fetch selhal','TypeError']},
 
- {id:'chyba-model-nenalezen',title:'Chyba: model nenalezen / není podporován',status:'reseno',
-  keywords:['model nenalezen','model nenalezeny','model not found','not found','not supported','unsupported','404','model nefunguje','spatny model','špatný model','neexistujici model','neexistující model'],
-  simple:'Název modelu v závěrečném kroku neexistuje nebo již není dostupný. Přepni přes Výchozí nebo ⚡ Silný na gemini-3.6-flash.',
-  detailed:'HTTP 404 nebo odpověď not found znamená, že zadaný model není dostupný. ⚡ Silný nastaví stabilní gemini-3.6-flash, 🪶 Lite stabilní gemini-3.5-flash-lite a Výchozí obnoví doporučenou volbu. Dostupnost modelů ověř v oficiální dokumentaci Gemini API.',
-  evidence:['GEMINI_MODEL_DEFAULT','setGeminiModel()','quickModel()','resetGeminiModel()','NOT_FOUND']},
-
- {id:'typy-cviceni-prehled',title:'Přehled typů cvičení — co který typ dělá',status:'reseno',
+ {id:'chyba-model-nenalezen',title:'Interní AI model není dostupný / 404',status:'reseno',
+  keywords:['model nenalezen','model not found','not found','not supported','unsupported','404','ai model nedostupny','AI model nedostupný'],
+  simple:'Konkrétní model už uživatel nenastavuje. Pokud transport vrátí 404 / model unavailable, jde o interní problém mapování AI Core nebo providera; obnov stránku a pokud chyba trvá, je potřeba aktualizovat transportní konfiguraci.',
+  detailed:'Generátor pracuje s profily economy / balanced / quality. Konkrétní provider/model určuje direct transport nebo školní gateway. Chyba 404/NOT_FOUND proto není pokyn učiteli, aby přepisoval název modelu; běžné UI žádný konkrétní model neobsahuje.',
+  evidence:['GEMINI_PROFILE_MODELS','resolveGeminiModel()','modelProfile','NOT_FOUND']}, {id:'typy-cviceni-prehled',title:'Přehled typů cvičení — co který typ dělá',status:'reseno',
   keywords:['typy cviceni','typy cvičení','co je ordering','co je matching','co je cloze','co je highlight','co je error tagging','co je transformation','co je categorisation','jaké typy','seznam typů','přehled typů','co umí'],
   simple:'Generátor nabízí přes 20 typů cvičení: od klasických (multiple choice, true/false, fill-in-the-blank) přes složitější (ordering, categorisation-board, highlight-evidence, error-tagging) až po produktivní (translation, transformation-chain). Každý typ testuje jiné jazykové dovednosti.',
   detailed:'Základní typy: multiple choice (výběr z možností), true/false (pravda/nepravda), fill-in-the-blank (doplňování), matching (párování), word order (sestavení věty). Složitější: ordering (seřazení vět/kroků), multi-select (více správných odpovědí), highlight-evidence (označení důkazní věty v textu), error-tagging (označení chyby ve větě a její oprava), banked cloze (doplňování ze zásoby slov), multiple matching (přiřazení více položek). Produktivní: translation (překlad), transformation-chain (transformace věty), error correction (oprava chyby). Specifické: categorisation-board (třídění do kategorií), table-completion (doplňování tabulky), reading comprehension (čtení s porozuměním), listening comprehension (poslech). V generátoru je ke každému typu pedagogická funkce (BOD 5).',
@@ -842,11 +846,11 @@ const GENERATOR_ASSISTANT_KB = [
   detailed:"Generátor již nemá vlastní místní přístupový PIN. Pokud uživatel ztratí osobní přístupový soubor nebo získá další školení, správce v AI Studiu vydá nový kumulativní přístup. Učitelský přístupový kód vložený do konkrétního testu nelze po exportu bezpečně přepsat bez změny integrity; uprav je v generátoru a vytvoř nový student_test.html i teacher_verifier.html.",
   evidence:["AI Studio Můj přístup","Vydání přístupu","teacher_verifier.html","student_test.html"]},
 
- {id:'flash-vs-lite',title:'Gemini Flash vs. Flash Lite — jaký je rozdíl',status:'reseno',
-  keywords:['flash vs lite','flash lite','ktery model','který model','lepsi model','lepší model','horsi model','horší model','kdy pouzit lite','kdy použít lite','rychlejsi model','rychlejší model','kvalita modelu','model doporuceni','model doporučení'],
-  simple:'Gemini 3.5 Flash je výchozí volba pro kvalitní a složitější testy. Gemini 3.1 Flash-Lite je rychlejší a úspornější pro jednodušší, dobře vymezené úlohy. Aktivní limity se liší podle projektu.',
-  detailed:'Gemini 3.5 Flash je stabilní výchozí model s podporou strukturovaných výstupů, URL contextu a multimodálních vstupů; hodí se pro složité typy a delší testy. Gemini 3.1 Flash-Lite je stabilní nízkolatenční a nákladově úspornější model pro jednoduché, dobře vymezené úlohy. Přepíná se tlačítky 🪶 Lite a ⚡ Silný. Konkrétní rychlost a aktivní limity závisí na projektu, modelu a zatížení služby.',
-  evidence:['GEMINI_MODEL_DEFAULT','gemini-3.6-flash','gemini-3.5-flash-lite','quickModel()','Rate limits']},
+ {id:'ai-profily',title:'AI profily — úsporný, vyvážený a nejvyšší kvalita',status:'reseno',
+  keywords:['ai profil','profily ai','economy','balanced','quality','model','ktery model','který model','rychlost ai','kvalita ai','usporny','úsporný','vyvazeny','vyvážený','nejvyssi kvalita','nejvyšší kvalita'],
+  simple:'Konkrétní model už běžný uživatel nevolí. Generátor přes AI Core automaticky používá profil Úsporný, Vyvážený nebo Nejvyšší kvalita podle typu operace.',
+  detailed:'AI Core odděluje aplikaci od konkrétního providera a názvu modelu. Kompletní generování testu používá profil quality, dílčí generování a návrhy typicky balanced a lehké pomocné operace economy. V serverless režimu transport profily interně mapuje na provider modely; ve školním režimu může server stejné profily mapovat třeba na OpenAI bez změny Generátoru. Konkrétní model se běžnému učiteli nezobrazuje ani ručně nenastavuje.',
+  evidence:['GEN_AI_OPERATIONS','modelProfile','economy','balanced','quality','GHRAB AI Core']},
 
  {id:"pristup-kolega",title:"Jak dát přístup kolegovi",status:"reseno",
   keywords:["pristup kolega","pridat ucitele","novy ucitel","vydat pristup","skoleni"],
@@ -886,8 +890,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:"student-nema-vysledek",title:"Student po secure testu nevidí výsledek",status:"reseno",
   keywords:["student nema vysledek", "student nemá výsledek", "neukazuje znamku", "neukazuje známku", "jen answers txt", "kde je vysledek"],
-  simple:"V secureOffline režimu je to záměr: student nevidí skóre ani klíč, pouze odevzdá šifrovaný answers.txt. Výsledek zobrazí až učitelský verifier.",
-  detailed:"Po odevzdání student stáhne answers.txt; stejný obsah lze ještě sdílet nebo zkopírovat ze záložního textového pole, dokud stránku nezavře či neobnoví. Učitel otevře odpovídající teacher_verifier.html a soubor načte. Pokud student stránku před uložením výsledku obnoví, rozpracovaný payload už nemusí být dostupný a je nutné postupovat podle pravidel pro technický incident.",
+  simple:"V secureOffline režimu je to záměr: student nevidí skóre ani klíč, pouze odevzdá šifrovaný SECURE-ANSWERS-V1 payload přes nastavenou cestu. Výsledek zobrazí až učitelský verifier.",
+  detailed:"Po odevzdání vznikne SECURE-ANSWERS-V1 payload. Je-li nastaven Google Form, student jej zkopíruje a odešle formulářem; zároveň má k dispozici answers.txt jako nouzovou zálohu. Bez Forms se answers.txt nabídne primárně. Učitel otevře odpovídající teacher_verifier.html a načte soubory nebo CSV z Forms. Pokud student stránku před uložením/předáním výsledku obnoví, payload už nemusí být dostupný a je nutné postupovat podle pravidel pro technický incident.",
   evidence:["downloadAnswers()", "shareAnswers()", "copyAnswers()", "ANSWER_TXT", "teacher_verifier.html"]},
 
  {id:'test-se-zobrazuje-jinak',title:'Test se studentovi zobrazuje jinak než v náhledu',status:'reseno',
@@ -1012,13 +1016,63 @@ const GENERATOR_ASSISTANT_KB = [
  ];
 
 const GA_NOT_ADDRESSED = 'Tento jev není v generátoru nijak výslovně řešen.';
-const GA_CHIPS = ['tisk / PDF','co dát studentům','answers.txt','hromadné vyhodnocení','zpětná vazba','diferenciace','anonymizace','split screen','API klíč','self-test','teacher verifier','fullscreen','export','chyba 503','chyba 429','chyba 400','poškozený JSON','data mimo zadání','model nenalezen','síťová chyba','hybridní generování','ordering','categorisation-board','highlight-evidence','Flash vs Lite','GitHub Pages','šablony','archivace','GDPR','maturita','editor','alternativy'];
+const GA_CHIPS = ['Google Forms','co odevzdá student','jednorázové kódy','answers.txt','teacher verifier','přísný test','běžný test','procvičování','průběžné odevzdání','self-test','AI kontrola klíče','API připojení','tisk / PDF','diferenciace','split screen','fullscreen','export','chyba 503','chyba 429','síťová chyba','šablony','archivace','GDPR','maturita','editor','alternativy'];
 let gaState = { ai:null, mode:'simple', loading:false, query:'' };
 
 function gaStatusMeta(status){
   if(status==='reseno')   return {cls:'ga-st-ok',  label:'✅ Řešeno'};
   if(status==='castecne') return {cls:'ga-st-mid', label:'🟡 Částečně řešeno'};
   return {cls:'ga-st-no', label:'⛔ Není výslovně řešeno'};
+}
+function gaNormTokens(text){
+  return String(text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(t=>t.length>=3);
+}
+function gaRelevantKbEntries(query, limit=12){
+  const qTokens=new Set(gaNormTokens(query));
+  const scored=GENERATOR_ASSISTANT_KB.map((e,index)=>{
+    const keywordText=[e.title,...(e.keywords||[])].join(' ');
+    const bodyText=[e.simple,e.detailed].join(' ');
+    const keyTokens=gaNormTokens(keywordText), bodyTokens=gaNormTokens(bodyText);
+    let score=0;
+    keyTokens.forEach(t=>{if(qTokens.has(t))score+=6;});
+    bodyTokens.forEach(t=>{if(qTokens.has(t))score+=1;});
+    const nq=String(query||'').toLowerCase();
+    (e.keywords||[]).forEach(k=>{if(nq.includes(String(k).toLowerCase()))score+=10;});
+    return {e,index,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.index-b.index);
+  const chosen=scored.slice(0,Math.max(4,Number(limit)||12)).map(x=>x.e);
+  return chosen.length?chosen:GENERATOR_ASSISTANT_KB.slice(0,8);
+}
+function generatorAssistantContext(){
+  const secure=(state.resultMode||'instant')==='secureOffline';
+  const forms=secure && typeof configuredGoogleFormsUrl==='function' && !!configuredGoogleFormsUrl();
+  return {
+    appMode:isSimpleMode()?'simple':'advanced',
+    purpose:typeof getSimplePurposeKey==='function'?getSimplePurposeKey():'',
+    activeTemplate:state.simpleTemplate||'',
+    testMode:state.testMode||'bezny',
+    resultMode:state.resultMode||'instant',
+    feedbackMode:state.feedbackMode||'brief',
+    submissionTiming:state.odevzdavani==='A'?'per-exercise':'whole-test',
+    resultHandoff:secure?(forms?'google-forms-primary-answers-txt-fallback':'answers-txt'):'instant-result-card',
+    identityMode:state.identityMode||'name',
+    oneTimeCodesReady:(state.identityMode==='oneTimeCode'&&Array.isArray(rosterEntries))?rosterEntries.length:0,
+    screenGuard:!!state.screenGuard,
+    strictLock:state.testMode==='prisny'||!!state.screenGuard,
+    randomization:state.randomizace==='ANO',
+    differentiation:state.diferencovany==='ANO',
+    googleFormsConfigured:forms
+  };
+}
+function gaValidateAiAnswer(out, allowedEvidence){
+  const st=(out&&typeof out.status==='string')?out.status.toLowerCase().trim():'';
+  const status=(st==='reseno'||st==='castecne'||st==='ne')?st:'ne';
+  const allowed=new Set(allowedEvidence||[]);
+  const evidence=Array.isArray(out&&out.evidence)?out.evidence.map(String).filter(x=>allowed.has(x)).slice(0,12):[];
+  if(status!=='ne' && !evidence.length){
+    return {status:'ne',simple:'Z dostupných podkladů Generátoru to neumím spolehlivě potvrdit.',detailed:'Poradce nenašel ověřitelnou oporu v aktuálním popisu funkcí. Nechci odpověď domýšlet.',evidence:[]};
+  }
+  return {status,simple:String((out&&out.simple)||GA_NOT_ADDRESSED),detailed:String((out&&out.detailed)||''),evidence};
 }
 // Odpovídá vždy AI, ale POUZE z popisu funkcí generátoru (GENERATOR_ASSISTANT_KB).
 // Posílá se jen dotaz + popis funkcí; NIKDY zdrojový kód, API klíč ani klíč odpovědí.
@@ -1030,13 +1084,16 @@ async function gaRunSearch(){
   if(!genAiAvailable()){
     gaState.ai=null; gaState.loading=false;
     const box=document.getElementById('gaResult');
-    if(box) box.innerHTML='<div class="ga-card"><span class="ga-status ga-st-mid">⚠ Potřebuješ AI klíč</span>'
-      +'<p class="ga-hint">Poradce odpovídá přes AI. Zadej prosím Gemini API klíč v panelu AI připojení na první stránce a zkus dotaz znovu.</p></div>';
+    if(box) box.innerHTML='<div class="ga-card"><span class="ga-status ga-st-mid">⚠ AI není připojena</span>'
+      +'<p class="ga-hint">Poradce odpovídá přes AI. Připoj AI v panelu na první stránce a zkus dotaz znovu.</p></div>';
     return;
   }
   gaState.ai=null; gaState.query=q; gaState.loading=true; renderGeneratorAssistantAnswer();
   const btn=document.getElementById('gaFind'); const old=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='⏳ Hledám…'; }
-  const podklady=GENERATOR_ASSISTANT_KB.map(e=>({title:e.title,status:e.status,keywords:e.keywords||[],simple:e.simple,detailed:e.detailed,evidence:e.evidence}));
+  const relevant=gaRelevantKbEntries(q);
+  const podklady=relevant.map(e=>({title:e.title,status:e.status,keywords:e.keywords||[],simple:e.simple,detailed:e.detailed,evidence:e.evidence}));
+  const currentContext=generatorAssistantContext();
+  const allowedEvidence=relevant.flatMap(e=>Array.isArray(e.evidence)?e.evidence:[]);
   const prompt='Jsi nápověda k JEDNOMU konkrétnímu generátoru testů (webová aplikace pro učitele). '
     +'Odpovídej VÝHRADNĚ z dodaných podkladů (pole "podklady" = popis skutečných funkcí tohoto generátoru). '
     +'Nevymýšlej funkce, nic nedomýšlej, nepiš "pravděpodobně". Urči stav: '
@@ -1046,7 +1103,8 @@ async function gaRunSearch(){
     +'Odpověz česky, srozumitelně pro běžného učitele. simple = krátká netechnická odpověď (1-3 věty). '
     +'detailed = podrobnější vysvětlení. evidence = pole názvů funkcí/konstant/sekcí z podkladů, o které se odpověď opírá (zkopíruj je z podkladů, nevymýšlej nové). '
     +'Vrať POUZE JSON: {"status":"reseno|castecne|ne","simple":"...","detailed":"...","evidence":["..."]} bez dalšího textu. '
-    +'Dotaz učitele (nižší důvěra):\n'+wrapUntrustedField('GENERATOR HELP QUERY', q)+'\npodklady: '+JSON.stringify(podklady);
+    +'Pokud se dotaz týká právě sestavovaného testu, použij currentContext; je strojově odvozený z aktuálního stavu a má vyšší prioritu než obecný popis. '
+    +'Dotaz učitele (nižší důvěra):\n'+wrapUntrustedField('GENERATOR HELP QUERY', q)+'\ncurrentContext: '+JSON.stringify(currentContext)+'\npodklady: '+JSON.stringify(podklady);
   try{
     const out=await callGeminiJSON(prompt,[],{operation:'generator-help-answer'});
     if(ta.value.trim()!==q){
@@ -1054,14 +1112,7 @@ async function gaRunSearch(){
       if(btn){ btn.disabled=false; btn.textContent=old; }
       return;
     }
-    const st=(out&&typeof out.status==='string')?out.status.toLowerCase().trim():'';
-    const status=(st==='reseno'||st==='castecne'||st==='ne')?st:'ne';
-    gaState.ai={
-      status,
-      simple:String((out&&out.simple)||GA_NOT_ADDRESSED),
-      detailed:String((out&&out.detailed)||''),
-      evidence:Array.isArray(out&&out.evidence)?out.evidence.map(String).filter(Boolean).slice(0,12):[]
-    };
+    gaState.ai=gaValidateAiAnswer(out, allowedEvidence);
   }catch(err){
     gaState.ai=null; gaState.loading=false;
     if(btn){ btn.disabled=false; btn.textContent=old; }
@@ -1152,7 +1203,7 @@ function openGeneratorAssistant(){
   bd.id='gaBackdrop'; bd.className='ui-modal-backdrop'; bd.setAttribute('role','dialog'); bd.setAttribute('aria-modal','true'); bd.setAttribute('aria-label','Poradce ke generátoru');
   bd.innerHTML='<div class="ui-modal-box ga-box">'
     + '<div class="ga-head"><span>💬 Poradce ke generátoru</span><button type="button" class="ga-x" id="gaClose" aria-label="Zavřít">✕</button></div>'
-    + '<div class="ga-desc">Zeptej se na cokoliv o funkcích, bezpečnosti nebo ovládání generátoru. Odpovídá AI, ale drží se jen toho, co generátor opravdu umí — když to v něm není, řekne to. (Vyžaduje Gemini klíč v panelu AI připojení na první stránce.)</div>'
+    + '<div class="ga-desc">Zeptej se na cokoliv o funkcích, bezpečnosti nebo ovládání generátoru. Odpovídá AI, ale drží se jen toho, co generátor opravdu umí — když to v něm není, řekne to. (Vyžaduje aktivní AI připojení.)</div>'
     + '<textarea id="gaQuery" class="ga-input" rows="2" placeholder="Např. „Jak je řešen split screen?" nebo „Kde se ukládá API klíč?""></textarea>'
     + '<div class="ga-controls"><div class="ga-mode" role="group" aria-label="Úroveň odpovědi">'
       + '<button type="button" class="ga-mode-btn'+(gaState.mode==='simple'?' active':'')+'" data-mode="simple">Jednoduše</button>'
@@ -1228,15 +1279,16 @@ function syncTeacherAccessCode(){
   const legacy=$('heslo'); if(legacy) legacy.value=normalized; // interní mirror pro starší pomocné cesty
   return normalized;
 }
-function onTeacherAccessCodeInput(){ syncTeacherAccessCode(); onInput(); }
+function onTeacherAccessCodeInput(){ syncTeacherAccessCode(); updateSimpleSecretsHelper(); onInput(); }
 function setTeacherAccessCode(value){
   setVal('ucitelPin', String(value||'').trim().toUpperCase());
   syncTeacherAccessCode();
+  updateSimpleSecretsHelper();
 }
 function fillSimpleSecrets(){
   if (!teacherAccessCodeValue()) setTeacherAccessCode('TEACH-' + randomChunk(6) + '-' + randomChunk(6));
   else syncTeacherAccessCode();
-  validate(); saveSnapshot();
+  updateSimpleSecretsHelper(); validate(); saveSnapshot();
   uiToast('Vygenerováno. Učitelský přístupový kód si před použitím testu poznamenej. Do historie ani šablon se neukládá.', 'warn', 5200);
 }
 function applySimpleDefaults(){

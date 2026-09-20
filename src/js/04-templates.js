@@ -261,7 +261,7 @@ function renderFeedbackModeNote(){
   // V bezpečném offline režimu tato volba neřídí, co student uvidí (hned nevidí nic).
   // Dáme to najevo zřetelně hned nahoře, ne jen drobnou poznámkou za popisem.
   if ((state.resultMode || 'instant') === 'secureOffline') {
-    note.innerHTML = '🛡️ <strong>Bezpečný offline režim:</strong> student po odevzdání nevidí známku ani zpětnou vazbu — odevzdá answers.txt a o úrovni zpětné vazby rozhoduješ ty až při opravě ve verifieru (volba „úroveň feedbacku"). Tato volba se proto na studentský test neprojeví.';
+    note.innerHTML = '🛡️ <strong>Bezpečný offline režim:</strong> student po odevzdání nevidí známku ani zpětnou vazbu — předá šifrovaný výsledek přes nastavený Google Form nebo answers.txt a o úrovni zpětné vazby rozhoduješ ty až při opravě ve verifieru (volba „úroveň feedbacku"). Tato volba se proto na studentský test neprojeví.';
     return;
   }
   note.innerHTML = FEEDBACK_MODE_NOTE[fm] || '';

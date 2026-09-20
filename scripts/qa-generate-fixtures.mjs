@@ -60,7 +60,6 @@ function configure(name, secure) {
   setField("ucitelJmeno", "QA učitel");
   setField("ucitelPin", "482915");
   setField("heslo", "QA-LOCK-2026");
-  setField("bezpKod", "QA-SCHOOL-SECURITY-CODE");
   w.eval(`Object.assign(state, {
     appMode:'advanced', jazyk:'angličtina', instrJazyk:'cs', uroven:['B1'], kombinovat:false,
     pocet:1, typyCviceni:['multiple choice'], cas:15, odevzdavani:'B', randomizace:'NE',

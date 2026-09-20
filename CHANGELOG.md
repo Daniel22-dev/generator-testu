@@ -1,3 +1,13 @@
+## 7.1.45 — AI Core + workflow cleanup (2026-09-19)
+
+- Odstraněna ruční volba konkrétních AI modelů z běžného UI; Generátor používá pouze AI Core profily `economy / balanced / quality`.
+- Poradce používá `balanced`, lokální relevantní retrieval, kontext právě sestavovaného testu a fail-closed kontrolu evidence.
+- Zjednodušen panel AI připojení; provider-specific návod je mimo hlavní workflow.
+- Google Forms přesunuty do samostatného nastavení předání secure výsledků a detailně vysvětlen vztah `SECURE-ANSWERS-V1` / studentský kód / CSV verifier.
+- Odstraněn legacy týmový bezpečnostní kód z UI, validace a sestavení; stará localStorage hodnota se migračně maže.
+- Simple helper pro učitelský kód se zobrazuje jen při chybějícím kódu.
+- Aktualizovány manuál, Test Lab, workflow QA a produkční invarianty; přidán `check:assistant`.
+
 ## 7.1.44 — UI/workflow konsolidace (2026-09-18)
 
 ### Candidate QA hotfix

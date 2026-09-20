@@ -87,25 +87,33 @@ function enforceModeConstraints() {
 function getSecurityGuideState(){
   const secure = (state.resultMode || 'instant') === 'secureOffline';
   const strict = state.testMode === 'prisny';
+  const forms = secure && typeof configuredGoogleFormsUrl === 'function' && !!configuredGoogleFormsUrl();
   if (secure) {
+    const handoff = forms
+      ? 'student po dokončení zkopíruje šifrovaný SECURE-ANSWERS-V1 blok do školního Google Formu; answers.txt zůstává nouzová záloha'
+      : 'student po dokončení odevzdá šifrovaný answers.txt';
     return {
       profile:'secure',
       label: strict ? '🔒 Aktuálně: přísný test + bezpečný offline verifier' : '🛡️ Aktuálně: bezpečný offline + učitelský verifier',
-      help: strict
-        ? '<strong>Přísný test + bezpečný offline:</strong> okamžitá známka je vypnutá. Studentský soubor neobsahuje správné odpovědi; student po dokončení stáhne zakódovaný answers.txt a učitel vše opraví v teacher_verifier.html.'
-        : '<strong>Bezpečný offline:</strong> nejbezpečnější volba pro klasifikaci. Studentský soubor neobsahuje správné odpovědi; student po dokončení stáhne zakódovaný answers.txt a učitel vše opraví v teacher_verifier.html.',
-      note: strict
-        ? '<strong>Logika přísného režimu:</strong> test se může zamknout při opuštění okna/karty a zároveň se opravuje až ve verifieru. Studentům posílej pouze HTTPS odkaz na publikovaný student_test.html, ne HTML soubor jako přílohu.'
-        : '<strong>Co poslat studentům:</strong> pouze HTTPS odkaz na publikovaný student_test.html. <strong>Co nechat u učitele:</strong> teacher_verifier.html se správnými odpověďmi, soukromým klíčem a exporty.'
+      help: (strict ? '<strong>Přísný test + bezpečný offline:</strong> ' : '<strong>Bezpečný offline:</strong> ')
+        + 'studentský soubor neobsahuje správné odpovědi; ' + handoff + '. Známku spočítá teacher_verifier.html.',
+      note: (strict
+        ? '<strong>Logika přísného režimu:</strong> test se může zamknout při opuštění okna/karty. '
+        : '<strong>Distribuce:</strong> studentům posílej pouze studentský test. ')
+        + (forms
+          ? '<strong>Předání výsledků:</strong> Google Forms je pouze sběrná schránka; opravuje až teacher_verifier.html z CSV. '
+          : '<strong>Předání výsledků:</strong> student odevzdá answers.txt. ')
+        + '<strong>Teacher verifier zůstává jen učiteli.</strong>'
     };
   }
   return {
     profile:'instant',
-    label: state.testMode === 'procviceci' ? '💬 Aktuálně: procvičování s okamžitou zpětnou vazbou' : '⚡ Aktuálně: okamžitá známka + screenshot',
-    help:'<strong>Okamžitá známka:</strong> student po odevzdání hned vidí body, procenta a známku. Je to nejpohodlnější režim, ale studentský HTML musí obsahovat hodnoticí logiku.',
-    note:'<strong>Doporučení:</strong> vhodné pro procvičení, domácí práci nebo menší orientační test. Pro klasifikovaný test použij raději bezpečný offline režim.'
+    label: state.testMode === 'procviceci' ? '💬 Aktuálně: procvičování s okamžitou zpětnou vazbou' : '⚡ Aktuálně: okamžitý výsledek + screenshot',
+    help:'<strong>Okamžitý výsledek:</strong> student po odevzdání hned vidí body, procenta a známku. Je to nejpohodlnější režim, ale studentský HTML obsahuje hodnoticí logiku.',
+    note:'<strong>Předání výsledku učiteli:</strong> prakticky screenshot výsledkové karty. Pro bezpečnější klasifikaci použij secure režim.'
   };
 }
+
 function updateSecurityGuideUI(){
   const st = getSecurityGuideState();
   const current = $('securityCurrent');
@@ -226,9 +234,8 @@ function updateAppModeUI(){
   if (tplTip) tplTip.dataset.tip = simple
     ? 'V jednoduchém režimu vybíráš jen účel: procvičování, běžný test nebo přísný test. Generátor podle toho automaticky nastaví technické volby, které se zde nezobrazují.'
     : 'Šablona nastaví režim testu, zpětnou vazbu a hodnocení. V pokročilém režimu jsou řízené volby viditelné; pro úplně ruční konfiguraci zvol Bez šablony.';
-  const helper = $('simpleSecretsHelper'); if (helper) helper.classList.toggle('hidden', !simple);
+  updateSimpleSecretsHelper();
   renderSimpleTemplates();
-  updateSecurityWorkplaceStatus();
 }
 
 function getInstructionLanguageLabel() {
@@ -246,16 +253,6 @@ function makeVerifySecret(){
   return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 function toggleSecret(id, btn){ const el=$(id); if(!el) return; const show = el.type === 'password'; el.type = show ? 'text' : 'password'; if(btn) btn.textContent = show ? '🙈' : '👁'; }
-function securityCodeRequiredForCurrentWorkflow(){
-  // Preserve the 7.1.29 security contract exactly: secureOffline requires the
-  // shared code for non-admin teachers; joker reports require it for everyone.
-  return state.zolicek === 'ANO' || (typeof accIsAdmin === 'function' && !accIsAdmin() && state.resultMode === 'secureOffline');
-}
-function storedSecurityCodeValue(){
-  try { return localStorage.getItem(SCHOOL_SECURITY_CODE_KEY) || ''; }
-  catch(_) { return ''; }
-}
-function securityCodeStoredLocally(){ return Boolean(storedSecurityCodeValue()); }
 function normalizeGoogleFormsResponderUrl(raw){
   const text = String(raw || '').trim();
   if (!text) return '';
@@ -270,7 +267,7 @@ function normalizeGoogleFormsResponderUrl(raw){
   }
   if (host === 'docs.google.com') {
     if (!/^\/forms\/(?:u\/\d+\/)?d(?:\/e)?\/[^/]+\/viewform\/?$/i.test(u.pathname || '')) {
-      if (/\/forms\/.*\/edit\/?$/i.test(u.pathname || '')) throw new TypeError('Tohle je editor formuláře. V Google Forms zkopíruj odkaz určený respondentům (viewform / Odeslat → Odkaz).');
+      if (/\/forms\/.*\/edit\/?$/i.test(u.pathname || '')) throw new TypeError('Tohle je editor formuláře. V Google Forms zkopíruj odkaz určený respondentům (viewform / Publikovat → odkaz pro respondenty).');
       throw new TypeError('Použij responder odkaz Google Forms končící /viewform.');
     }
     return u.toString();
@@ -295,15 +292,15 @@ function updateGeneratorSettingsFormsStatus(){
   const input = $('generatorSettingsFormsInput');
   const raw = input ? input.value : storedGoogleFormsUrlValue();
   if (!String(raw || '').trim()) {
-    status.textContent = '⚪ Google Forms odevzdání není nastaveno. Secure test použije answers.txt.';
+    status.textContent = '🟢 Předání výsledku: answers.txt. Google Forms nejsou na tomto zařízení zapnuté.';
     return;
   }
   try {
     const clean = normalizeGoogleFormsResponderUrl(raw);
     const stored = storedGoogleFormsUrlValue();
     status.textContent = stored && clean === configuredGoogleFormsUrl()
-      ? '🟢 Google Forms odevzdání je nastaveno pro nově generované secure testy.'
-      : '🟡 Odkaz je platný, ale změna ještě není uložena.';
+      ? '🟢 Primární předání: Google Forms. answers.txt zůstává nouzová záloha.'
+      : '🟡 Responder odkaz je platný, ale změna ještě není uložena.';
   } catch(e) {
     status.textContent = '🔴 ' + String(e && e.message ? e.message : e);
   }
@@ -314,13 +311,14 @@ async function saveGoogleFormsUrlLocal(){
   let clean;
   try { clean = normalizeGoogleFormsResponderUrl(raw); }
   catch(e) { await uiAlert(String(e && e.message ? e.message : e), 'Neplatný Google Forms odkaz'); updateGeneratorSettingsFormsStatus(); return; }
-  if (!clean) { await uiAlert('Vlož responder odkaz na Google Form, nebo použij Odebrat odkaz.', 'Chybí odkaz'); return; }
+  if (!clean) { await uiAlert('Vlož responder odkaz na Google Form. Pokud chceš používat answers.txt, zvol „Používat jen answers.txt“.', 'Chybí odkaz'); return; }
   try {
     if(!generatorPersistenceAllowed()) return;
     localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY, clean);
     if (input) input.value = clean;
     updateGeneratorSettingsFormsStatus();
-    uiToast('Google Forms odkaz byl uložen. Použije se pouze u nově vygenerovaných secure testů.', 'ok', 4800);
+    if (typeof updateSecurityGuideUI === 'function') updateSecurityGuideUI();
+    uiToast('Google Forms jsou nastavené jako primární cesta pro nově generované secure testy. answers.txt zůstává záloha.', 'ok', 5200);
   } catch(_) { await uiAlert('Odkaz se nepodařilo uložit. Prohlížeč možná blokuje localStorage.'); }
 }
 async function forgetGoogleFormsUrlLocal(){
@@ -328,59 +326,17 @@ async function forgetGoogleFormsUrlLocal(){
     localStorage.removeItem(GOOGLE_FORMS_SUBMISSION_URL_KEY);
     syncGeneratorSettingsFormsInput();
     updateGeneratorSettingsFormsStatus();
-    uiToast('Google Forms odevzdání bylo na tomto zařízení vypnuto.', 'ok', 4200);
-  } catch(_) { await uiAlert('Odkaz se nepodařilo odebrat.'); }
-}
-function updateGeneratorSettingsSecurityStatus(){
-  const status = $('generatorSettingsSecurityStatus');
-  if (!status) return;
-  const code = trim('bezpKod');
-  const storedCode = storedSecurityCodeValue();
-  if (code.length >= 16 && storedCode === code) {
-    status.textContent = '🟢 Týmový bezpečnostní kód je nastaven a uložen na tomto zařízení.';
-  } else if (code.length >= 16 && storedCode) {
-    status.textContent = '🟡 Pro tuto relaci je načten jiný týmový kód než ten uložený v prohlížeči. Ulož aktuální kód jen pokud je změna záměrná.';
-  } else if (code.length >= 16) {
-    status.textContent = '🟡 Týmový bezpečnostní kód je načten jen pro tuto relaci. Pokud je zařízení tvoje, můžeš ho uložit.';
-  } else if (storedCode) {
-    status.textContent = '🟡 V prohlížeči je uložen kód, ale ještě není načten do této relace.';
-  } else {
-    status.textContent = '🔴 Týmový bezpečnostní kód na tomto zařízení není nastaven.';
-  }
-}
-function updateSecurityWorkplaceStatus(){
-  const relevant = state.zolicek === 'ANO' || state.resultMode === 'secureOffline';
-  const field = $('securityWorkplaceField');
-  if (field) field.classList.toggle('hidden', !relevant);
-  const status = $('securityWorkplaceStatus');
-  if (status) {
-    const code = trim('bezpKod');
-    status.textContent = code.length >= 16
-      ? '🟢 Bezpečnost pracoviště je nastavena. Týmový kód použije Generátor automaticky.'
-      : '🔴 Bezpečnost pracoviště není nastavena. Otevři ⚙️ Nastavení a vlož týmový bezpečnostní kód od správce.';
-  }
-  updateGeneratorSettingsSecurityStatus();
-}
-function syncGeneratorSettingsInputFromCanonical(){
-  const input = $('generatorSettingsSecurityInput');
-  if (input) input.value = trim('bezpKod');
-}
-function onGeneratorSettingsSecurityInput(){
-  const input = $('generatorSettingsSecurityInput');
-  if (!input) return;
-  setSecurityCodeAndRefresh(input.value);
+    if (typeof updateSecurityGuideUI === 'function') updateSecurityGuideUI();
+    uiToast('Google Forms byly vypnuté. Nové secure testy použijí answers.txt.', 'ok', 4200);
+  } catch(_) { await uiAlert('Nastavení se nepodařilo změnit.'); }
 }
 function openGeneratorSettings(){
   const modal = $('generatorSettingsModal');
   if (!modal) return;
-  syncGeneratorSettingsInputFromCanonical();
   syncGeneratorSettingsFormsInput();
-  updateGeneratorSettingsSecurityStatus();
   updateGeneratorSettingsFormsStatus();
-  const gen = $('btnGenSecCode'); if (gen) gen.classList.toggle('hidden', !(typeof accIsAdmin === 'function' && accIsAdmin()));
-  const copy = $('btnCopySecCode'); if (copy) copy.classList.toggle('hidden', !(typeof accIsAdmin === 'function' && accIsAdmin()));
   modal.classList.remove('hidden');
-  const input = $('generatorSettingsSecurityInput');
+  const input = $('generatorSettingsFormsInput');
   if (input) setTimeout(() => input.focus(), 0);
 }
 function closeGeneratorSettings(){
@@ -391,79 +347,14 @@ function generatorSettingsBackdropClick(event){
   const modal = $('generatorSettingsModal');
   if (modal && event && event.target === modal) closeGeneratorSettings();
 }
-function makeHumanSecurityCode(len=36){
-  if (!(window.crypto && window.crypto.getRandomValues))
-    throw new Error('WebCrypto není dostupné — generování přístupového kódu selhalo.');
-  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
-  const bytes = new Uint8Array(len);
-  (crypto || window.crypto).getRandomValues(bytes);
-  let raw = '';
-  for (let i=0;i<len;i++) raw += alphabet[bytes[i] % alphabet.length];
-  return 'GHR-' + raw.match(/.{1,6}/g).join('-');
+function updateSimpleSecretsHelper(){
+  const helper = $('simpleSecretsHelper');
+  if (!helper) return;
+  const missing = !teacherAccessCodeValue();
+  helper.classList.toggle('hidden', !isSimpleMode() || !missing);
 }
-function setSecurityCodeAndRefresh(code){
-  setVal('bezpKod', code || '');
-  syncGeneratorSettingsInputFromCanonical();
-  updateSecurityWorkplaceStatus();
-  validate();
-  saveSnapshot();
-}
-async function generateSchoolSecurityCode(){
-  if (typeof accIsAdmin === 'function' && !accIsAdmin()) {
-    await uiAlert('Nový týmový bezpečnostní kód může vygenerovat jen správce. Vlož kód, který ti správce předal bezpečnou cestou.', 'Vyhrazeno správci');
-    return;
-  }
-  if (trim('bezpKod')) {
-    const replace = await uiConfirm('Pole už obsahuje bezpečnostní kód. Nahradit ho novým?', 'Nahradit bezpečnostní kód?', true);
-    if (!replace) return;
-  }
-  const code = makeHumanSecurityCode(36);
-  setSecurityCodeAndRefresh(code);
-  await uiAlert('Byl vygenerován NOVÝ týmový bezpečnostní kód. Pokud ho mají používat kolegové, zkopíruj právě tento kód a předej ho bezpečnou cestou. Každý kolega ho musí vložit ručně nebo si ho uložit lokálně na svém zařízení.', 'Nový týmový kód');
-}
-function copySecurityCode(){
-  const code = trim('bezpKod');
-  if (!code) { uiAlert('Nejdřív vygeneruj nebo napiš bezpečnostní kód.'); return; }
-  const done = () => uiToast('Bezpečnostní kód zkopírován. Pošli ho jen oprávněným kolegům bezpečnou cestou. Studentům nikdy.', 'warn', 5200);
-  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(code).then(done).catch(() => fallbackCopy(code));
-  else fallbackCopy(code);
-}
-async function saveSecurityCodeLocal(){
-  const code = trim('bezpKod');
-  if (!code) { await uiAlert('Nejdřív vygeneruj nebo napiš bezpečnostní kód.'); return; }
-  const ok = await uiConfirm('Uložit bezpečnostní kód do tohoto prohlížeče? Používej pouze na vlastním učitelském zařízení. Na sdíleném školním počítači neukládej.', 'Uložit lokálně?', true);
-  if (!ok) return;
-  try { if(!generatorPersistenceAllowed()) return; localStorage.setItem(SCHOOL_SECURITY_CODE_KEY, code); updateSecurityWorkplaceStatus(); uiToast('Bezpečnostní kód je uložen lokálně v tomto prohlížeči. Na sdíleném školním počítači tento postup nepoužívej.', 'warn', 5200); }
-  catch(_) { await uiAlert('Kód se nepodařilo uložit. Prohlížeč možná blokuje localStorage.'); }
-}
-async function loadSecurityCodeLocal(){
-  try {
-    const code = localStorage.getItem(SCHOOL_SECURITY_CODE_KEY) || '';
-    if (!code) { await uiAlert('V tomto prohlížeči není uložen žádný školní bezpečnostní kód.'); return; }
-    setSecurityCodeAndRefresh(code);
-    uiToast('Uložený týmový bezpečnostní kód byl načten. Zkontroluj, že používáš aktuální kód týmu.', 'warn', 5200);
-  } catch(_) { await uiAlert('Kód se nepodařilo načíst. Prohlížeč možná blokuje localStorage.'); }
-}
-async function forgetSecurityCodeLocal(){
-  const ok = await uiConfirm('Smazat lokálně uložený bezpečnostní kód z tohoto prohlížeče?', 'Smazat lokální kód?', true);
-  if (!ok) return;
-  try { localStorage.removeItem(SCHOOL_SECURITY_CODE_KEY); updateSecurityWorkplaceStatus(); uiToast('Lokálně uložený bezpečnostní kód byl z tohoto zařízení smazán. Pro aktuální relaci zůstává načtený, dokud ho v Nastavení nesmažeš nebo aplikaci nezavřeš.', 'warn', 6200); }
-  catch(_) { await uiAlert('Lokální kód se nepodařilo smazat.'); }
-}
-// Na vlastním (důvěryhodném) zařízení: pokud je týmový bezpečnostní kód lokálně uložen,
-// doplň ho do pole automaticky a tiše. Uložení kódu = vědomé označení zařízení za vlastní
-// (ukládání i varuje před sdíleným počítačem), takže auto-doplnění je bezpečné. Nepřepisuje
-// už vyplněné pole. Voláno po startu (accOnGranted) i po importu zadání.
-function autoApplyStoredSecurityCode(){
-  try {
-    if (trim('bezpKod')) return;
-    const code = localStorage.getItem(SCHOOL_SECURITY_CODE_KEY) || '';
-    if (!code) return;
-    setVal('bezpKod', code);
-    syncGeneratorSettingsInputFromCanonical();
-    updateSecurityWorkplaceStatus();
-    if (typeof validate === 'function') validate();
-  } catch(_){}
+function clearLegacySchoolSecurityCode(){
+  try { localStorage.removeItem(LEGACY_SCHOOL_SECURITY_CODE_KEY); } catch(_){}
 }
 function anonymizeGroupsForStorage(groups){
   return (Array.isArray(groups) ? groups : []).map((g, gi) => ({
@@ -770,7 +661,6 @@ function loadTemplate(id) {
     enforceModeConstraints();
     safeDomEntries(tpl.dom).forEach(([k,v]) => setVal(k, v));
     SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
-    autoApplyStoredSecurityCode();
     maxStep = 0;
     goTo(0);
     applyVisualState();
@@ -823,7 +713,7 @@ async function importZadaniFile(inp){
     const ok = await uiConfirm('Načíst zadání ze souboru? Přepíše tvoje aktuální rozpracované nastavení formuláře.', 'Načíst zadání od kolegy?', true);
     if (!ok) return;
     applyImportedZadani(data);
-    uiToast('Zadání načteno' + (data.appVersion ? ' (verze ' + esc(String(data.appVersion)) + ')' : '') + '. Učitelský přístupový kód se nepřenáší — nastav ho před generováním. Týmový bezpečnostní kód se na tomto zařízení doplnil sám, pokud ho tu máš uložený (jinak ho vlož / načti). Nahrané soubory případně přilož ručně.', 'ok', 8000);
+    uiToast('Zadání načteno' + (data.appVersion ? ' (verze ' + esc(String(data.appVersion)) + ')' : '') + '. Učitelský přístupový kód se nepřenáší — nastav ho před generováním. Nahrané soubory případně přilož ručně.', 'ok', 8000);
   }catch(err){
     uiToast('Soubor se nepodařilo načíst: ' + (err && err.message ? err.message : err), 'warn', 6000);
   }finally{
@@ -846,7 +736,6 @@ function applyImportedZadani(data){
   enforceModeConstraints();
   safeDomEntries(data.dom).forEach(([k,v]) => setVal(k, v));
   SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
-  autoApplyStoredSecurityCode();   // na vlastním zařízení vrať uložený týmový kód
   if (typeof showFileError === 'function') showFileError('');
   maxStep = 0;
   goTo(0);
@@ -995,7 +884,6 @@ async function loadFromHistory(i) {
   enforceModeConstraints();
   safeDomEntries(h.dom).forEach(([k, v]) => setVal(k, v));
   SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
-  autoApplyStoredSecurityCode();
   maxStep = 4;            // vše už vyplněné → povol skákání po krocích nahoře
   goTo(1);               // rovnou do úprav (zadání / cvičení)
   applyVisualState();

@@ -53,7 +53,7 @@ function safeInitStep(name, fn){
   safeInitStep('setupDragDrop', setupDragDrop);
   const restored = safeInitStep('loadSnapshot', loadSnapshot);
   if (restored) safeInitStep('restoredBanner', function(){ $('restoredBanner').classList.remove('hidden'); });
-  safeInitStep('autoApplyStoredSecurityCode', autoApplyStoredSecurityCode);
+  safeInitStep('clearLegacySchoolSecurityCode', clearLegacySchoolSecurityCode);
   safeInitStep('showOnlyStep', function(){ showOnlyStep(currentStep); });
   if (currentStep === 4) safeInitStep('renderResult', renderResult);
   safeInitStep('renderTemplates', renderTemplates);
