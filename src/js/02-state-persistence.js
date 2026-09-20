@@ -236,7 +236,6 @@ function updateAppModeUI(){
     : 'Šablona nastaví režim testu, zpětnou vazbu a hodnocení. V pokročilém režimu jsou řízené volby viditelné; pro úplně ruční konfiguraci zvol Bez šablony.';
   updateSimpleSecretsHelper();
   renderSimpleTemplates();
-  updateSecurityWorkplaceStatus();
 }
 
 function getInstructionLanguageLabel() {
