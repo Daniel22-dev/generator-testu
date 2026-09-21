@@ -217,10 +217,10 @@ function tlChecks(){
         var got = os(cases[i].seq, co, P);
         if (got !== cases[i].exp) return tlFail('Ordering bodování', 'Scénář „'+cases[i].name+'": čekáno '+cases[i].exp+' b, vráceno '+got+' b. Přísné bodování (celé pořadí přesně = plný počet, jakákoli chyba = 0) neplatí.');
       }
-      // bez odpovědi (student nic nepřesune) → bere se výchozí pořadí → 0 (protože co ≠ [0,1,2,3])
-      if (os(undefined, co, P) !== 0) return tlFail('Ordering bodování', 'Nevyplněná odpověď se nevyhodnotila jako výchozí pořadí (0 b).');
-      // identické pořadí, kde výchozí JE správné → plný počet
-      if (os(undefined, [0,1,2], P) !== P) return tlFail('Ordering bodování', 'Když je výchozí pořadí správné, nedostalo plný počet.');
+      // bez odpovědi (student nic nevybral) → vždy 0 b; samotné výchozí zobrazení není odevzdaná odpověď
+      if (os(undefined, co, P) !== 0) return tlFail('Ordering bodování', 'Nevyplněná odpověď musí mít 0 b.');
+      // I když se výchozí vizuální pořadí náhodou shoduje s klíčem, bez interakce student nesmí získat body.
+      if (os(undefined, [0,1,2], P) !== 0) return tlFail('Ordering bodování', 'Nevyplněné řazení získalo body jen proto, že výchozí pořadí odpovídalo klíči.');
       var ss = '';
       try { ss = secureStudentScript(); } catch(e) { return tlFail('Ordering bodování', 'secureStudentScript() skončil výjimkou.', e && e.message ? e.message : String(e)); }
       var miss = [];

@@ -355,12 +355,12 @@ check('stage5 advanced: reorganizace nemění state', () => {
   if(before!==after) throw new Error('layout změnil aplikační state');
   return 'state byte-for-byte shodný';
 });
-check('stage5 simple: původní kroky se obnoví', () => {
-  w.setAppMode('simple');
+await checkAsync('stage5 simple: původní kroky se obnoví', async () => {
+  await w.setAppMode('simple');
   if(w.document.getElementById('timeField').parentElement.id!=='step2') throw new Error('Délka testu se nevrátila do step2');
   if(w.document.getElementById('diffField').parentElement.id!=='step3') throw new Error('Diferenciace se nevrátila do step3');
   if(!w.document.getElementById('advancedSettingsGroups').classList.contains('hidden')) throw new Error('advanced skupiny zůstaly v Simple viditelné');
-  w.setAppMode('advanced');
+  await w.setAppMode('advanced');
   return 'restore → advanced OK';
 });
 check('stage5 security: jeden pokus je pouze vysvětlení existujícího chování', () => {

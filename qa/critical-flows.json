@@ -38,7 +38,7 @@
         },
         {
           "action": "evaluate",
-          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');;setAppMode('advanced');document.getElementById('nazev').value='QA workflow test';document.getElementById('proKoho').value='2.A';document.getElementById('latka').value='Present Perfect';state.jazyk='angličtina';state.uroven=['B1'];state.typyCviceni=['multiple choice'];showOnlyStep(4);renderResult();;document.querySelector('#step4 details.step4-details').open=true;document.getElementById('promptText').scrollIntoView({block:'center'});"
+          "script": "document.querySelectorAll('.welcome-gate').forEach(x=>x.remove());document.body.classList.remove('onboarding-locked');setAppMode('advanced');document.getElementById('nazev').value='QA workflow test';document.getElementById('proKoho').value='2.A';document.getElementById('latka').value='Present Perfect';state.jazyk='angličtina';state.uroven=['B1'];state.typyCviceni=['multiple choice'];showOnlyStep(4);renderResult();const prompt=document.getElementById('promptText');const details=prompt&&prompt.closest('details.step4-details');if(details)details.open=true;if(prompt)prompt.scrollIntoView({block:'center'});"
         },
         {
           "action": "assertVisible",
