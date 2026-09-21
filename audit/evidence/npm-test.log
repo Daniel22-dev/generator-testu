@@ -1,0 +1,1087 @@
+
+> generator-testu@7.1.46 test
+> node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow
+
+✅  Verze sedi napric projektem: 7.1.46
+
+> generator-testu@7.1.46 check:studio-manifest
+> node scripts/check-studio-manifest-template.mjs
+
+✅ Studio manifest template: generator 7.1.46, cache ghrab-generator-v7.1.46
+✅  QA manifest odpovídá GHRAB-QA-1.0.2 a verzi 7.1.46.
+✅  Lockfile používá veřejný npm registr (113 resolved URL, 0 interních).
+✅  Externí GitHub Actions jsou připnuté plným commit SHA (25 použití).
+✅  Produkcni invariants jsou splneny.
+
+> generator-testu@7.1.46 check:assistant
+> node scripts/check-generator-assistant.mjs
+
+PASS Poradce používá balanced AI Core profil
+PASS Poradce má lokální retrieval, aktuální kontext a validaci opor
+PASS Dotazy na právě sestavovaný test používají aktuální stav
+PASS KB zná Google Forms secure workflow
+PASS KB nenabádá k ruční volbě konkrétního modelu
+PASS UI neobsahuje volbu konkrétního modelu
+PASS Direct transport mapuje interní AI Core profily
+PASS Provider credential/UI už nepřepisuje AI Core profil konkrétním modelem
+PASS Legacy týmový bezpečnostní kód není v UI
+Generator Assistant / AI Core invariants: PASS
+
+> generator-testu@7.1.46 check:selftest-rpc
+> node scripts/check-selftest-rpc-injection.mjs
+
+✅ Self-test RPC bridge: poslední </body> + fallback bez body PASS.
+✅  Aktivní CSP je synchronní, bez unsafe-eval; Acorn je lazy a runtime neobsahuje eval/new Function.
+✅  Zdrojova struktura OK: 11 split modulu, puvodni nazvy pouze jako migracni tombstones.
+✅  Obecná kontrola citlivých údajů prošla (60 veřejných zdrojových souborů).
+
+> generator-testu@7.1.46 qa:garp23
+> npm run test:suite-session && node scripts/qa-garp23-security.mjs
+
+
+> generator-testu@7.1.46 test:suite-session
+> node scripts/test-suite-session-lifecycle.mjs
+
+{
+  "schema": "ghrab-generator-suite-session-test-v1",
+  "platformVersion": "1.1.2",
+  "syntheticDataOnly": true,
+  "checks": [
+    {
+      "ok": true,
+      "name": "Platform 1.1.2 exact vendor SHA-256",
+      "detail": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack waits for runtime cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child clears synthetic Generator canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves other child namespace",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves non-content telemetry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves global suite generation tombstone",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "F-02 records seen and cleanup complete",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack exists after cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay clears pending canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay acknowledges generation",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Reload after replay does not repeat destructive cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab cross-context signal clears canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab stale tab persistence is locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab autosave cannot restore canary",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document cleans despite shared seen ack",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document stays locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed synthetic delete failure is observable",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed does not falsely acknowledge",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed status records failure",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Negative control detects disabled cleanup (weakened copy fails as required)",
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  },
+  "status": "passed"
+}
+{
+  "schema": "ghrab-garp23-security-regression-v1",
+  "syntheticOnly": true,
+  "airStructural": {
+    "attempts": 24,
+    "mutationFamilies": 4,
+    "boundaryEscapes": 0,
+    "officialCorpus": {
+      "vectors": 18,
+      "wrapperAttempts": 54,
+      "boundaryEscapes": 0,
+      "sha256": "3560e60fd78a9cc81cfef1d7d2c3ba52b270ac5f38d582cc0cded3aa31183a6d"
+    },
+    "behavioralLiveModel": "NOT TESTED"
+  },
+  "privacyCanary": {
+    "type": "example.invalid",
+    "preflightBlocked": true
+  },
+  "pc01": {
+    "reviewedApplicationCallSites": 8,
+    "callSites": [
+      {
+        "file": "src/features/preview-editor.js",
+        "line": 526,
+        "operation": "acceptable-answer-enrichment"
+      },
+      {
+        "file": "src/features/testlab.js",
+        "line": 510,
+        "operation": "diagnostic-ping"
+      },
+      {
+        "file": "src/js/01-core.js",
+        "line": 1110,
+        "operation": "generator-help-answer"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 427,
+        "operation": "listening-question-suggestions"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 495,
+        "operation": "reading-package-suggestion"
+      },
+      {
+        "file": "src/js/08-manual-editor.js",
+        "line": 384,
+        "operation": "attempt?'generation-repair':'exercise-generation'"
+      },
+      {
+        "file": "src/js/09-selftest-keycheck.js",
+        "line": 347,
+        "operation": "answer-key-verification"
+      },
+      {
+        "file": "src/js/12-prompt-builder.js",
+        "line": 123,
+        "operation": "grading-scale-parse"
+      }
+    ]
+  },
+  "endWork": {
+    "lifecycleHarness": "scripts/test-suite-session-lifecycle.mjs",
+    "platformVersion": "1.1.2",
+    "contract": "ghrab-suite-session-v1"
+  },
+  "studentPackage": {
+    "canonicalTypesChecked": 21,
+    "answerKeyCanaryAbsent": true
+  },
+  "negativeControls": [
+    "weakened-production-boundary-detected",
+    "new-unreviewed-ai-call-detected",
+    "same-line-multiple-ai-calls-detected",
+    "template-context-ai-call-flagged-for-review",
+    "raw-differentiation-egress-detected",
+    "suite-session-negative-control-detected-by-lifecycle-harness",
+    "answer-key-strip-leak-detected",
+    "same-origin-selftest-sandbox-weakening-detected",
+    "same-origin-print-sandbox-weakening-detected",
+    "benign-pseudonymous-preflight-allowed",
+    "other-app-storage-preserved"
+  ],
+  "passed": 81,
+  "failed": 0,
+  "failures": []
+}
+✅  Oba studentské runtimy používají deadline timer a přepočet po návratu.
+
+> generator-testu@7.1.46 lint
+> node scripts/lint.mjs
+
+⚠️  Plný ESLint nelze v tomto prostředí spustit (chybí: eslint, espree, globals).
+    Aktivován hermetický fallback: parser classic scriptů + node --check modulů.
+    V CI po npm ci zůstává automaticky aktivní plný ESLint se stejnou konfigurací.
+✅  Hermetická syntaktická kontrola prošla (103 souborů).
+
+> generator-testu@7.1.46 prebuild
+> npm run check:embedded-script-terminators && npm run check:studio-manifest
+
+
+> generator-testu@7.1.46 check:embedded-script-terminators
+> node scripts/check-embedded-script-terminators.mjs
+
+✅ Embedded-script terminator guard: PASS (src/js, src/features)
+
+> generator-testu@7.1.46 check:studio-manifest
+> node scripts/check-studio-manifest-template.mjs
+
+✅ Studio manifest template: generator 7.1.46, cache ghrab-generator-v7.1.46
+
+> generator-testu@7.1.46 build
+> node scripts/build.mjs
+
+✅ Generátor 7.1.46: Core 1.0.0 SHA-256 OK · 10 operací · 32 initial modulů + 2 lazy features · 1437.0 kB
+[P3] generator 7.1.46: platform 1.1.2, HTML 2, cache ghrab-generator-v7.1.46
+
+> generator-testu@7.1.46 postbuild
+> node scripts/ghrab-platform-conformance.mjs
+
+{
+  "schema": "ghrab-platform-conformance-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.46",
+  "total": 115,
+  "passed": 115,
+  "failed": 0,
+  "checks": [
+    {
+      "label": "dist exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite dist has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite source has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "consumer schema",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "package ↔ consumer version",
+      "ok": true,
+      "detail": "7.1.46 / 7.1.46"
+    },
+    {
+      "label": "platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact exports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact imports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "native export formats declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy JSON import policy declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "cache naming",
+      "ok": true,
+      "detail": "ghrab-generator-v7.1.46"
+    },
+    {
+      "label": "storage migration declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage namespace sestavovac_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.state.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_tpl_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.templates.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_hist_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.history.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_mode",
+      "ok": true,
+      "detail": "ghrab.generator.theme.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_model",
+      "ok": true,
+      "detail": "ghrab.generator.ai.model.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.local.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key_session",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.session.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_data_notice_v1",
+      "ok": true,
+      "detail": "ghrab.generator.ai.data-notice.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_school_security_code_v1",
+      "ok": true,
+      "detail": "ghrab.generator.security-code.v1"
+    },
+    {
+      "label": "storage namespace genOnboardingDone_v1",
+      "ok": true,
+      "detail": "ghrab.generator.onboarding-done.v1"
+    },
+    {
+      "label": "storage namespace genWelcomeShown_session",
+      "ok": true,
+      "detail": "ghrab.generator.welcome-shown.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_",
+      "ok": true,
+      "detail": "ghrab.generator.legacy."
+    },
+    {
+      "label": "vendor ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.consumer.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/platform-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/brand-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist platform-build-info.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built consumer identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform manifest contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built service-worker contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built artifact contracts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest migration id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest canonical prefix",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact exports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact imports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical logo manifest hash",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no inline school logo base64",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no legacy school logo reference",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no obsolete top-level platform references in satellite build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "platform contract present in build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "full eligible HTML documents found",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker canonical cache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker contract marker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker legacy cleanup list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker update protocol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker platform precache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker P3 asset list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no automatic skipWaiting during install",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no-store bypass",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no obsolete satellite platform asset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA manifest exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA app identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime suite session contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime previous platform rejected",
+      "ok": true,
+      "detail": "1.1.1"
+    },
+    {
+      "label": "runtime current accepted",
+      "ok": true,
+      "detail": "1.1.2"
+    },
+    {
+      "label": "runtime n+1 accepted",
+      "ok": true,
+      "detail": "1.2.0"
+    },
+    {
+      "label": "runtime major rejected",
+      "ok": true,
+      "detail": "2.0.0"
+    },
+    {
+      "label": "storage alias reads migrated value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical storage value created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage alias writes canonical key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration idempotent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration rollback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "rollback restored original value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 create",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 peek",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 take",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge consumes once",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope SHA-256",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrap",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope detection",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrapMaybe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy artifact compatibility",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme contract runtime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact compatibility facade",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "accessibility runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "performance runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy module runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy script loader available",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
+
+> generator-testu@7.1.46 garp25:prep-static
+> npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks
+
+
+> generator-testu@7.1.46 garp25:selftest
+> node security/garp25/tools/selftest-garp251.mjs
+
+{
+  "status": "PASS",
+  "checks": 59,
+  "passed": 59,
+  "failed": []
+}
+
+> generator-testu@7.1.46 garp25:sync-rewrite
+> node scripts/test-ai-core-version-rewrite.mjs
+
+{
+  "status": "PASS",
+  "checks": [
+    "targeted-json-keys-only",
+    "brandVersion-preserved",
+    "build-CORE_VERSION-only"
+  ]
+}
+
+> generator-testu@7.1.46 garp25:sbom:check
+> node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.46.cdx.json --check
+
+✅ CycloneDX 1.7 SBOM odpovídá lockfile: 113 komponent.
+
+> generator-testu@7.1.46 garp25:ai-evidence:check
+> node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check
+
+✅ AI assurance fingerprint current: 743346d5bafd4c8af4be17e15ab7c898d6cec41e468338f5ec640346458ecbba
+
+> generator-testu@7.1.46 garp25:sw
+> node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json
+
+{
+  "status": "PASS",
+  "serviceWorker": "dist/sw.js",
+  "criticalListSource": "security/security-critical-assets.json",
+  "precachedEntries": 27,
+  "precacheSources": [
+    {
+      "source": "addAll:expression",
+      "entries": [
+        "./",
+        "./index.html",
+        "./manifest.webmanifest",
+        "./access/access-gate.css",
+        "./access/deployment-config.js",
+        "./access/reporter-bootstrap.js",
+        "./access/error-reporter.js",
+        "./access/error-reporter.css",
+        "./access/error-reporter-adapter.js",
+        "./manual/",
+        "./manual/index.html",
+        "./icons/icon-32.png",
+        "./icons/icon-192.png",
+        "./icons/icon-512.png",
+        "./icons/apple-touch-icon.png",
+        "./config/brand-manifest.json",
+        "./config/platform-manifest.json",
+        "./assets/brand/school-logo.png",
+        "./ghrab-platform.consumer.json",
+        "./access/suite-session-cleanup.js",
+        "./ghrab/ghrab-platform.js",
+        "./features/testlab.js",
+        "./features/preview-editor.js"
+      ]
+    },
+    {
+      "source": "map-add:GHRAB_PLATFORM_P3_ASSETS",
+      "entries": [
+        "./ghrab/ghrab-platform.css",
+        "./ghrab/ghrab-artifact-envelope-v1.schema.json",
+        "./ghrab/ghrab-app-registry-v2.schema.json",
+        "./ghrab/ghrab-platform-manifest-1.1.2.json",
+        "./assets/brand/school-logo.png",
+        "./ghrab-platform.consumer.json"
+      ]
+    }
+  ],
+  "unresolvedCacheWrites": [],
+  "cacheFirstDetected": true,
+  "policySchema": "ghrab-sw-security-assets-v2",
+  "structuralNetworkOnlyGuard": true,
+  "structuralNetworkFirstFallbackGuard": true,
+  "criticalAssetsInDeployment": [
+    "config/deployment.json",
+    "config/deployment.school-server.json"
+  ],
+  "networkFirstFallbackAssetsInDeployment": [
+    "access/suite-session-cleanup.js",
+    "ghrab/ghrab-platform.js"
+  ],
+  "findings": [],
+  "checkerRevision": "garp-2.5.1-r3-runtime-failsafe-routing",
+  "note": "Static bounded analysis. PASS means network-only authorization/revocation/integrity assets are never cached and route through networkOnlyNoStore, while declared freshness-sensitive offline fail-safe scripts are install-cached and route networkFirst with cache fallback. Does not replace SIM-07 browser revocation/offline tests."
+}
+
+> generator-testu@7.1.46 garp25:sw-offline
+> node scripts/test-sw-offline-failsafe.mjs
+
+PASS install-created-cache
+PASS cleanup-precached
+PASS platform-precached
+PASS cleanup-online-network-first
+PASS platform-online-network-first
+PASS cleanup-offline-cache-fallback
+PASS platform-offline-cache-fallback
+PASS revocation-remains-network-only-no-cache-fallback
+PASS integrity-remains-network-only-no-cache-fallback
+{
+  "status": "PASS",
+  "checks": 9,
+  "cacheName": "ghrab-generator-v7.1.46",
+  "policy": "network-first support layers + network-only authorization/revocation/integrity"
+}
+
+> generator-testu@7.1.46 garp25:vendored
+> node security/garp25/tools/check-vendored-consistency.mjs security/vendored-consistency.generator.json
+
+{
+  "status": "PASS",
+  "canonicalRoot": "..",
+  "components": [
+    {
+      "id": "platform-js",
+      "sha256": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "id": "platform-css",
+      "sha256": "eb465488df46f3d1672d721094800b0be3eb1278924b7699873a483f130b07ad"
+    },
+    {
+      "id": "artifact-envelope-schema",
+      "sha256": "8edeaaadd72c7bf60285440dd59eb31d0e7139755e1e4642d5ab457816e46d58"
+    },
+    {
+      "id": "app-registry-schema",
+      "sha256": "47c797999eb93fbd918b968b90a8f8545f938db486fe635b19efcc7936b5672f"
+    },
+    {
+      "id": "school-logo",
+      "sha256": "300396a48cc36d8c2abda0aea673273d4d985476ba88fb0430630ef89ac86770"
+    }
+  ],
+  "declaredCopies": 11,
+  "checkedCopies": 6,
+  "profileCopiesNotBuilt": 5,
+  "conditionalCopies": [
+    {
+      "path": "dist-school-server/ghrab/ghrab-platform.js",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-platform.css",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-artifact-envelope-v1.schema.json",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-app-registry-v2.schema.json",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/assets/brand/school-logo.png",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    }
+  ],
+  "drift": 0,
+  "findings": []
+}
+
+> generator-testu@7.1.46 garp25:leaks
+> node security/garp25/tools/scan-deployment-leaks.mjs dist
+
+{
+  "status": "PASS",
+  "root": "/mnt/data/review/generator-testu-main/dist",
+  "info": [
+    "INFO-binary-not-scanned:assets/brand/school-logo.png",
+    "INFO-binary-not-scanned:icons/apple-touch-icon.png",
+    "INFO-binary-not-scanned:icons/icon-192.png",
+    "INFO-binary-not-scanned:icons/icon-32.png",
+    "INFO-binary-not-scanned:icons/icon-512.png",
+    "INFO-binary-not-scanned:icons/icon-maskable-512.png"
+  ]
+}
+
+> generator-testu@7.1.46 test:headless:dist
+> node tools/headless-check.mjs dist/index.html
+
+node:internal/modules/package_json_reader:256
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'jsdom' imported from /mnt/data/review/generator-testu-main/tools/headless-check.mjs
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)
+    at packageResolve (node:internal/modules/esm/resolve:768:81)
+    at moduleResolve (node:internal/modules/esm/resolve:854:18)
+    at defaultResolve (node:internal/modules/esm/resolve:984:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:780:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:704:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:687:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:305:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:137:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.16.0

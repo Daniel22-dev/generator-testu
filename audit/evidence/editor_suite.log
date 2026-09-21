@@ -1,0 +1,76 @@
+{"type": "multiple choice", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "multi-select", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "fill-in-the-blank", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "matching", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "word order", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "ordering", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "highlight-evidence", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "categorisation-board", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "table-completion", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "transformation-chain", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "translation", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "true/false", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "error correction", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "error-tagging", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "cloze text", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "sentence transformation", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "reading comprehension", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "dialogue completion", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "categorization", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "word formation", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "listening comprehension", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "odd one out", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "multiple matching", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "banked cloze", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "key word transformation", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "synonym choice", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "antonym choice", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "choose the correct response", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "match word to definition", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "verb form", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "preposition gap-fill", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "question formation", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "word family", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "short answer", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "paraphrase the sentence", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "heading matching", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "gist question", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "summary cloze", "mode": "instant", "ok": true, "roundTrip": true}
+{"type": "multiple choice", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "multi-select", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "fill-in-the-blank", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "matching", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "word order", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "ordering", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "highlight-evidence", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "categorisation-board", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "table-completion", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "transformation-chain", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "translation", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "true/false", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "error correction", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "error-tagging", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "cloze text", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "sentence transformation", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "reading comprehension", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "dialogue completion", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "categorization", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "word formation", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "listening comprehension", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "odd one out", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "multiple matching", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "banked cloze", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "key word transformation", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "synonym choice", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "antonym choice", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "choose the correct response", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "match word to definition", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "verb form", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "preposition gap-fill", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "question formation", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "word family", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "short answer", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "paraphrase the sentence", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "heading matching", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "gist question", "mode": "secureOffline", "ok": true, "roundTrip": true}
+{"type": "summary cloze", "mode": "secureOffline", "ok": true, "roundTrip": true}

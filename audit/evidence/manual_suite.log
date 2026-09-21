@@ -1,0 +1,9 @@
+{"type": "categorisation-board", "ok": true, "invalidBlocked": true}
+{"type": "ordering", "ok": true, "invalidBlocked": true}
+{"type": "multi-select", "ok": true, "invalidBlocked": true}
+{"type": "highlight-evidence", "ok": true, "invalidBlocked": true}
+{"type": "transformation-chain", "ok": true, "invalidBlocked": true}
+{"type": "error-tagging", "ok": true, "invalidBlocked": true}
+{"type": "banked cloze", "ok": true, "invalidBlocked": true}
+{"type": "multiple matching", "ok": true, "invalidBlocked": true}
+{"type": "table-completion", "ok": true, "invalidBlocked": true}

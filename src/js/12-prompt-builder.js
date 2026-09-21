@@ -252,6 +252,8 @@ function isCustomGradeScaleValid(raw, totalBody) { return parseCustomGradeScale(
 function getUiLang(instrJazyk, jazyk) {
   if (instrJazyk !== 'target') return 'cs';
   const j = String(jazyk || '').toLowerCase();
+  if(j.includes('fran')||j.includes('french'))return 'fr';
+  if(j.includes('latin')||j.includes('latina'))return 'la';
   if (j.includes('ang') || j.includes('english')) return 'en';
   if (j.includes('špan') || j.includes('span') || j.includes('esp')) return 'es';
   if (j.includes('něm') || j.includes('german') || j.includes('deutsch')) return 'de';
@@ -326,7 +328,7 @@ function getLabels(lang) {
       jokerUse:'Joker verwenden', jokerPick:'Klicke auf eine Frage, um sie zu überspringen...', jokerUsed:'Joker verwendet', jokerChoiceTitle:'Joker-Auswahl', jokerChoiceHint:'Vor dem Start wählen. Nach dem Start kann die Wahl nicht geändert werden.', jokerDoTest:'Ich schreibe den Test', jokerTake:'Ich nehme den Joker', jokerReport:'JOKER VERWENDET', reportSeal:'Kontrollcode des Berichts', reportSealHint:'Der Screenshot muss den ganzen Bericht mit diesem Code enthalten.', attempt:'Versuch', fullscreen:'Vollbild'
     }
   };
-  return L[lang] || L.cs;
+  return Object.assign({},EXTRA_TEST_LABELS[lang] || L[lang] || L.cs,EXERCISE_UI_LABELS[lang]||EXERCISE_UI_LABELS.cs);
 }
 
 function apiItemExampleForType(type) {

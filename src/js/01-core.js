@@ -25,10 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.45',
-  date:    '2026-09-19',
+  version: '7.1.46',
+  date:    '2026-09-21',
   status:  'production-serverless',
+  sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'AUDIT 7.1.46: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
     'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
     'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
@@ -38,7 +40,6 @@ const RELEASE = Object.freeze({
     'ETAPA 6 QA HOTFIX (7.1.38): bez změny produkční logiky. Workflow test instant větve nyní používá skutečné instant DOM ID/funkci (t-name, t-pin, doTeacherLogin) a secure Stage 6 scénář generuje balík se skutečným PBKDF2 KDF místo záměrné rychlé testovací náhrady. Učitelský přístupový kód, doménově oddělené teacher-pin/unlock-password hashe, runtime, verifier, Forms, scoring a secure formát zůstávají funkčně beze změny.',
     'ETAPA 6 – JEDEN UČITELSKÝ PŘÍSTUPOVÝ KÓD (7.1.37): Generátor má místo samostatného učitelského PINu a odemykacího hesla jeden učitelský přístupový kód. Z jednoho kanonizovaného kódu se nadále odvozují dva různé PBKDF2 hashe s oddělenými doménami teacher-pin a unlock-password; teacher login a povolení dalšího pokusu ověřují pouze teacher-pin, zámková obrazovka pouze unlock-password. Skrytý legacy #heslo zůstává jen jako interní mirror pro kompatibilitu a neřídí kryptografii. Bezpečnost pracoviště, verifier, Google Forms, scoring, RSA/AES a formát SECURE-ANSWERS-V1 se nemění.',
     'ETAPA 5 – PŘEHLEDNĚJŠÍ POKROČILÁ NASTAVENÍ (7.1.36): Pokročilý režim nyní seskupuje stávající volby do pěti sekcí Test / Student / Zpětná vazba / Bezpečnost / Vzhled. Přesouvají se původní DOM prvky se stejnými ID, hodnotami, handlery a validacemi; Simple režim je vrací na původní místa. Ochrana opakovaného pokusu je pouze vysvětlující informace o existujícím secure-offline zámku, nikoli nový přepínač. Studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.',
-    'ETAPA 4 – STUDENTSKÉ ODEVZDÁNÍ PŘES GOOGLE FORMS (7.1.34): v Nastavení Generátoru lze uložit pouze validovaný responder odkaz Google Forms. Nově generovaný secure studentský test po odevzdání nabídne primárně zkopírování celého SECURE-ANSWERS-V1 payloadu a otevření školního formuláře; answers.txt zůstává nouzová záloha a automatický fallback při chybějícím formuláři nebo neobvykle dlouhém payloadu. URL formuláře je součástí integrity-bound konfigurace. Formát šifrovaného výsledku, RSA/AES kryptografie, scoring, PIN/odemčení a Stage 3 verifier CSV import se nemění.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -1286,6 +1287,7 @@ function setTeacherAccessCode(value){
   updateSimpleSecretsHelper();
 }
 function fillSimpleSecrets(){
+  if(teacherAccessCodeValue()){syncTeacherAccessCode();uiToast('Kód už je vyplněný; nic jsem nepřepsal. Pro nový kód nejdřív vyprázdni pole.','info',4200);return;}
   if (!teacherAccessCodeValue()) setTeacherAccessCode('TEACH-' + randomChunk(6) + '-' + randomChunk(6));
   else syncTeacherAccessCode();
   updateSimpleSecretsHelper(); validate(); saveSnapshot();
@@ -1294,7 +1296,9 @@ function fillSimpleSecrets(){
 function applySimpleDefaults(){
   if (!isSimpleMode()) return;
   state.testMode = 'bezny';
-  state.layout = state.layout || 'tabs';
+  state.layout = 'tabs';
+  state.instrJazyk = 'target';
+  state.splitGenerate = false;
   state.resultMode = 'instant';
   state.feedbackMode = 'brief';
   state.odevzdavani = 'B';
@@ -1347,7 +1351,12 @@ function ensureUnlockPasswordForGuard(){
     else syncTeacherAccessCode();
   } catch(_){}
 }
-function setAppMode(mode){
+async function setAppMode(mode){
+  if(mode!=='advanced'&&state.appMode==='advanced'){
+    if(String(state.jazyk||'').toLowerCase()==='čeština'&&!state.simpleTemplate){uiToast('Modul češtiny používá pokročilé nastavení. Pro jednoduchý režim nejdřív vyber šablonu.','info',5000);return;}
+    const ok=await uiConfirm('Jednoduchý režim obnoví výchozí nebo šablonové nastavení hodnocení, skupin, rozložení a detailů cvičení. Název, látka a zdrojové podklady zůstanou. Pokračovat?','Přepnout do jednoduchého režimu?');
+    if(!ok)return;
+  }
   if (mode === 'advanced') {
     state.appMode = 'advanced';
     state.workPreset = 'advanced';
@@ -1363,6 +1372,7 @@ function setAppMode(mode){
   } else {
     state.appMode = 'simple';
     state.workPreset = 'quick';
+    applySimpleDefaults();
   }
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();

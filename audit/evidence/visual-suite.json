@@ -1,0 +1,38 @@
+[
+  {
+    "width": 1400,
+    "layout": {
+      "scroll": 1400,
+      "viewport": 1400
+    },
+    "ok": true,
+    "saveButtonUncovered": true
+  },
+  {
+    "width": 768,
+    "layout": {
+      "scroll": 768,
+      "viewport": 768
+    },
+    "ok": true,
+    "saveButtonUncovered": true
+  },
+  {
+    "width": 390,
+    "layout": {
+      "scroll": 390,
+      "viewport": 390
+    },
+    "ok": true,
+    "saveButtonUncovered": true
+  },
+  {
+    "width": 320,
+    "layout": {
+      "scroll": 320,
+      "viewport": 320
+    },
+    "ok": true,
+    "saveButtonUncovered": true
+  }
+]

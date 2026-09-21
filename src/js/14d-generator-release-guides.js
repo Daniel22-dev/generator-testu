@@ -25,8 +25,8 @@ function updateDeviceBadge(){
 function applyReleaseBadge(){
   const b=$('releaseBadge'); if(b) b.textContent='v'+RELEASE.version+' · '+RELEASE.date+' · '+BUILD_HASH;
   const s=$('releaseStatus'); if(s){
-    const approved=RELEASE.status==='production-serverless';
-    s.textContent=approved?'produkční serverless verze':'DRAFT — nepoužívat ostře';
+    const approved=RELEASE.status==='production-serverless'&&!RELEASE.sourceAuditPending;
+    s.textContent=approved?'produkční serverless verze':(RELEASE.sourceAuditPending?'Lokální audit · čeká na CI a provozní zkoušku':'DRAFT — nepoužívat ostře');
     s.classList.toggle('approved',approved); s.classList.toggle('draft',!approved);
   }
 }
@@ -90,7 +90,7 @@ function showReleaseInfo(){
           '<button type="button" class="ui-modal-btn primary" id="changelogOkBtn">Zavřít</button>' +
         '</div>';
     }
-    var approved = RELEASE.status === 'production-serverless';
+    var approved = RELEASE.status === 'production-serverless' && !RELEASE.sourceAuditPending;
     var statusHtml = approved
       ? '<div class="sec-guide-ok" style="margin:0 0 4px">✅ Technicky ověřená produkční serverless verze — prošla automatickými, integračními a bezpečnostními kontrolami. Formální schválení provozu je rozhodnutí školy.</div>'
       : '<div class="sec-guide-warn" style="margin:0 0 4px">⚠️ DRAFT — nepoužívat pro ostré klasifikované testy.</div>';

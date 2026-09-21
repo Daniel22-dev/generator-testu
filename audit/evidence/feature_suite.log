@@ -1,0 +1,15 @@
+{"test": "lazy-preview", "ok": true, "detail": "3 widths and Escape"}
+{"test": "editor-add-remove", "ok": true, "detail": "2 -> 3 -> 2"}
+{"test": "editor-invalid-rollback", "ok": true, "detail": "1-pair rejected; original package unchanged"}
+{"test": "proposal-check-and-accept", "ok": true, "detail": "none does nothing; only the selected of 3 proposals is added"}
+{"test": "stale-proposals", "ok": true, "detail": "stale proposal refused"}
+{"test": "key-all-types-0", "ok": true, "detail": {"closedDiffs": 0, "openWeaks": 0, "checked": 18, "missing": 0, "invalid": 0, "total": 18, "variants": ["__default"], "ranAt": 1789979516815}}
+{"test": "key-all-types-10", "ok": true, "detail": {"closedDiffs": 0, "openWeaks": 0, "checked": 20, "missing": 0, "invalid": 0, "total": 20, "variants": ["__default"], "ranAt": 1789979517125}}
+{"test": "key-all-types-20", "ok": true, "detail": {"closedDiffs": 0, "openWeaks": 0, "checked": 18, "missing": 0, "invalid": 0, "total": 18, "variants": ["__default"], "ranAt": 1789979517440}}
+{"test": "key-all-types-30", "ok": true, "detail": {"closedDiffs": 0, "openWeaks": 0, "checked": 15, "missing": 0, "invalid": 0, "total": 15, "variants": ["__default"], "ranAt": 1789979518007}}
+{"test": "key-weak-accept", "ok": true, "detail": "checked one of two alternatives applied"}
+{"test": "key-missing-not-green", "ok": true, "detail": {"closedDiffs": 0, "openWeaks": 0, "checked": 0, "missing": 2, "invalid": 0, "total": 2, "variants": ["__default"], "ranAt": 1789979519962}}
+{"test": "key-error-clears-old-green", "ok": true, "detail": "old verification cleared"}
+{"test": "variant-frozen-transaction", "ok": true, "detail": {"same": false, "id": "TAZL9AX-F4FE58CC", "prev": "TAZL980-5375D878", "lang": "en", "total": 12, "self": null, "checks": {}, "slug": "skupina-b"}}
+{"test": "injected-commit-failure-rollback", "ok": true, "detail": {"failed": true, "sameA": true, "sameH": true, "sameD": true, "sameI": true}}
+{"test": "secure-gate-and-keyboard", "ok": true, "detail": "4 required checks + self-test; keyboard Home/End; gate releases"}

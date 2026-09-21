@@ -13,7 +13,7 @@ function applyA11yInstant(key){
   A11Y={timeMult:mult,noLimit:a.time==='none',font:a.font||'normal',dys:!!a.dys};
   if(b){if(a.font==='large')b.classList.add('a11y-large');if(a.font==='xlarge')b.classList.add('a11y-xlarge');if(a.dys)b.classList.add('a11y-dys');}
   var bar=I('a11yNote');
-  if(bar){var parts=[];if(mult>1)parts.push('prodloužený čas ('+(mult===2?'2\u00d7':'+'+Math.round((mult-1)*100)+' %')+')');if(A11Y.noLimit)parts.push('bez časového limitu');if(a.font==='large')parts.push('větší písmo');if(a.font==='xlarge')parts.push('největší písmo');if(a.dys)parts.push('dyslexie-friendly');if(parts.length){bar.textContent='♿ Aktivní úpravy: '+parts.join(', ');bar.classList.remove('hidden');}}
+  if(bar){var parts=[];if(mult>1)parts.push(T('a11yExtraTime')+' ('+(mult===2?'2\u00d7':'+'+Math.round((mult-1)*100)+' %')+')');if(A11Y.noLimit)parts.push(T('a11yNoLimit'));if(a.font==='large')parts.push(T('a11yLarge'));if(a.font==='xlarge')parts.push(T('a11yXLarge'));if(a.dys)parts.push(T('a11yDys'));if(parts.length){bar.textContent='\u267f '+T('a11yActive')+': '+parts.join(', ');bar.classList.remove('hidden');}}
 }
 var jokerUsed=false,jokerMode=false,jokerStartChoice=null,jokerSelectedAt='';
 var generatedTxt='';
@@ -28,8 +28,8 @@ function closeModal(mid){hide(mid);}
 
 function normNameForGroup(s){var raw=String(s||'');try{raw=raw.normalize('NFKD');}catch(_){}return raw.toLowerCase().replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();}
 function b64UrlRoster(buf){var bin='',bytes=new Uint8Array(buf);for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
-async function hashRosterIdentity(name){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))throw new Error('Tento diferencovaný test vyžaduje moderní prohlížeč s WebCrypto.');var input='GIT-DIFF-ROSTER-V1|'+String(CFG.diffRosterSalt||'')+'|'+normNameForGroup(name);var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input));return b64UrlRoster(dig);}
-async function hashIdentityCodeClient(name){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))throw new Error('Ověření jednorázového kódu vyžaduje moderní prohlížeč s WebCrypto.');var input='GIT-IDENTITY-CODE-V1|'+String(CFG.diffRosterSalt||'')+'|'+normNameForGroup(name);var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input));return b64UrlRoster(dig);}
+async function hashRosterIdentity(name){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))throw new Error(T('cryptoRequired'));var input='GIT-DIFF-ROSTER-V1|'+String(CFG.diffRosterSalt||'')+'|'+normNameForGroup(name);var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input));return b64UrlRoster(dig);}
+async function hashIdentityCodeClient(name){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))throw new Error(T('cryptoRequired'));var input='GIT-IDENTITY-CODE-V1|'+String(CFG.diffRosterSalt||'')+'|'+normNameForGroup(name);var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input));return b64UrlRoster(dig);}
 async function identityAllowed(name){if((CFG.identityMode||'name')!=='oneTimeCode')return true;var hashes=CFG.identityCodeHashes||[];if(!hashes.length)return false;return hashes.indexOf(await hashIdentityCodeClient(name))!==-1;}
 async function resolveStudentGroup(name){var groups=CFG.diffGroups||[];if(!groups.length)return null;var h=await hashRosterIdentity(name);for(var i=0;i<groups.length;i++){var hashes=groups[i].studentHashes||[];if(hashes.indexOf(h)!==-1)return groups[i];}return null;}
 function enterFullscreen(){var el=document.documentElement;try{if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();}catch(_){} }
@@ -64,7 +64,7 @@ function applyRuntimeRandomization(){
   document.querySelectorAll('select.match-sel').forEach(function(sel,i){shuffleSelectOptions(sel,base+i*401);});
 }
 function fmtPtsClient(n){n=Number(n)||0;return Number.isInteger(n)?String(n):String(Math.round(n*100)/100).replace('.',',');}
-function chooseJokerStart(use){jokerStartChoice=!!use;var no=I('jokerChoiceNo'),yes=I('jokerChoiceYes');if(no)no.classList.toggle('selected',!use);if(yes)yes.classList.toggle('selected',!!use);var box=I('jokerChoiceConfirm');if(box){box.style.display='block';box.textContent=use?'✅ Zvoleno: BERU SI ŽOLÍKA — test psát nebudeš.':'✅ Zvoleno: DĚLÁM TEST.';box.className='joker-choice-confirm '+(use?'joker-choice-confirm-risk':'joker-choice-confirm-ok');}}
+function chooseJokerStart(use){jokerStartChoice=!!use;var no=I('jokerChoiceNo'),yes=I('jokerChoiceYes');if(no)no.classList.toggle('selected',!use);if(yes)yes.classList.toggle('selected',!!use);var box=I('jokerChoiceConfirm');if(box){box.style.display='block';box.textContent=use?T('jokerSelectedYes'):T('jokerSelectedNo');box.className='joker-choice-confirm '+(use?'joker-choice-confirm-risk':'joker-choice-confirm-ok');}}
 function jokerWatermarkText(){return T('jokerReport')+' · '+(CFG.studentName||'—')+' · '+CFG.testId+' · '+attemptId;}
 function updateJokerWatermark(){var wm=I('jokerWatermark');if(wm){wm.textContent=jokerWatermarkText();wm.classList.toggle('hidden',!jokerUsed);}var rb=I('jokerResultBox');if(rb){rb.textContent='🃏 '+jokerWatermarkText();rb.classList.toggle('hidden',!jokerUsed);}document.body.classList.toggle('joker-mode',!!jokerUsed);}
 async function startTest(){
@@ -73,10 +73,10 @@ async function startTest(){
   if(CFG.zolicek && jokerStartChoice===null){showMessage(T('jokerChoiceTitle'),T('jokerChoiceHint'));return;}
   jokerUsed=!!jokerStartChoice;
   jokerSelectedAt=jokerUsed?new Date().toISOString():'';
-  try{if(!(await identityAllowed(n))){showMessage(T('name'),'Zadaný jednorázový kód není platný pro tento test. Zkontroluj přesný kód od učitele.');I('studentName').focus();return;}}catch(err){showMessage('Ověření kódu',String(err&&err.message?err.message:err));return;}
+  try{if(!(await identityAllowed(n))){showMessage(T('name'),T('invalidIdentityCode'));I('studentName').focus();return;}}catch(err){showMessage(T('codeVerification'),String(err&&err.message?err.message:err));return;}
   var g=null;
-  try{g=await resolveStudentGroup(n);}catch(err){showMessage('Diferencovaný test',String(err&&err.message?err.message:err));return;}
-  if((CFG.diffGroups||[]).length&&!g){showMessage('Diferencovaný test','Zadané jméno/kód není v žádné skupině. Zkontroluj přesný zápis podle pokynů učitele.');I('studentName').focus();return;}
+  try{g=await resolveStudentGroup(n);}catch(err){showMessage(T('differentiatedTest'),String(err&&err.message?err.message:err));return;}
+  if((CFG.diffGroups||[]).length&&!g){showMessage(T('differentiatedTest'),T('unassignedIdentity'));I('studentName').focus();return;}
   CFG.studentName=n;CFG.activeGroupKey=g?g.key:'';CFG.activeGroupName=g?g.name:'';
   activateVariant(variantKeyForGroup(g));
   applyA11yInstant(CFG.activeGroupKey);
@@ -89,7 +89,7 @@ async function startTest(){
   startTimer();
   if(CFG.lockOnLeave||CFG.testMode==='prisny'||CFG.testMode==='bezny') setupLockDetection();
   var first=document.querySelector('.mc-opt,.he-sent,.et-token,.et-type,.et-corr,.fib-inp,.tf-btn,.match-sel,.err-inp,.open-inp,.tc-inp,.trch-inp');
-  if(first)setTimeout(function(){first.focus();},120);
+  if(first)first.focus();
 }
 
 function refreshInstantTimer(){
@@ -147,7 +147,7 @@ function ordBadgeHtmlInst(qid,texts,picks){
     var picked=pos>0;
     return '<div class="ord-row'+(picked?' ord-picked':'')+'" onclick="clickOrdInst(\''+qid+'\','+origIdx+')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \')clickOrdInst(\''+qid+'\','+origIdx+')">'+
       '<div class="ord-badge">'+(picked?String(pos):'')+'</div>'+
-      '<span class="ord-txt">'+H(txt!=null?txt:'')+'</span>'+
+      '<span class="ord-txt">'+esc(txt!=null?txt:'')+'</span>'+
     '</div>';
   }).join('');
 }
@@ -159,13 +159,20 @@ function setTable(qid,r,c,val){if(isLockedQid(qid))return;var g=(ANSWERS[qid]&&A
 function setChain(qid,idx,val){if(isLockedQid(qid))return;var vals=(ANSWERS[qid]&&ANSWERS[qid].type==='chain'&&Array.isArray(ANSWERS[qid].vals))?ANSWERS[qid].vals.slice():[];vals[idx]=val;ANSWERS[qid]={type:'chain',vals:vals};updateProgress();markTabDone(qid);}
 function updateCategory(qid,val){if(isLockedQid(qid))return;ANSWERS[qid]={type:'categorization',val:val};updateProgress();markTabDone(qid);}
 
+function responseHasValue(ans){
+  if(!ans)return false;
+  if(ans.type==='error-tagging')return ans.token!=null&&String(ans.etype||'').trim()!==''&&String(ans.corr||'').trim()!=='';
+  if(ans.val!==''&&ans.val!=null)return true;
+  if(Array.isArray(ans.seq))return ans.seq.length>0;
+  if(Array.isArray(ans.sel))return ans.sel.some(function(v){return v!==''&&v!=null;});
+  if(Array.isArray(ans.vals))return ans.vals.some(function(v){return String(v==null?'':v).trim()!=='';});
+  return Array.isArray(ans.grid)&&ans.grid.some(function(row){return Array.isArray(row)&&row.some(function(v){return v!==''&&v!=null;});});
+}
 function countAnswered(){
-  var n=0;
-  EXS.forEach(function(ex,ei){
-    if(ex.type==='matching'){var p=(ANSWERS['match_'+ei]||{}).pairs||{};n+=Object.keys(p).length;}
-    else(ex.items||[]).forEach(function(_,qi){var ans=ANSWERS[ei+'_'+qi];if(ans){if(ans.val!==''&&ans.val!=null)n++;else if(ans.vals&&ans.vals.some(function(v){return v!=='';}))n++;else if(ans.grid&&ans.grid.some(function(row){return Array.isArray(row)&&row.some(function(v){return v!==''&&v!=null;});}))n++;else if(ans.type==='error-tagging'&&ans.token!=null&&String(ans.etype||'').trim()&&String(ans.corr||'').trim())n++;}});
-  });
-  return n;
+  var n=0;EXS.forEach(function(ex,ei){
+    if(ex.type==='matching')n+=Object.keys((ANSWERS['match_'+ei]||{}).pairs||{}).length;
+    else(ex.items||[]).forEach(function(_,qi){if(responseHasValue(ANSWERS[ei+'_'+qi]))n++;});
+  });return n;
 }
 function countTotal(){return EXS.reduce(function(s,ex){return s+(ex.items||[]).length;},0);}
 function updateProgress(){var el=I('progressDisplay');if(el)el.textContent=countAnswered()+'/'+countTotal();}
@@ -175,7 +182,7 @@ function markTabDone(qid){
   var ex=EXS[ei];if(!ex)return;
   var done=true;
   if(ex.type==='matching'){var p=(ANSWERS['match_'+ei]||{}).pairs||{};done=Object.keys(p).length>=(ex.items||[]).length;}
-  else(ex.items||[]).forEach(function(_,qi){if(!ANSWERS[ei+'_'+qi])done=false;});
+  else(ex.items||[]).forEach(function(_,qi){if(!responseHasValue(ANSWERS[ei+'_'+qi]))done=false;});
   if(CFG.odevzdavani==='A')done=!!EX_SUBMITTED[ei];
   var b=I('tabDone'+ei);if(b)b.classList.toggle('hidden',!done);
 }
@@ -299,7 +306,7 @@ function calcScore(){
   var earned=0,total=0,breakdown=[];
   EXS.forEach(function(ex,ei){var sc=calcExerciseScore(ei);earned+=sc.earned;total+=sc.total;breakdown.push({title:sc.title,earned:sc.earned,total:sc.total});});
   var pct=total>0?Math.round(earned/total*100):0;
-  return{earned:Math.round(earned*100)/100,total:Math.round(total*100)/100,pct:pct,grade:getGrade(pct),breakdown:breakdown};
+  return{earned:Math.round(earned*100)/100,total:Math.round(total*100)/100,pct:pct,grade:(CFG.isCzech&&CFG.csScoringPolicy&&CFG.csScoringPolicy.correctionMode==='manual')?T('manualReview'):getGrade(pct),needsManualReview:!!(CFG.isCzech&&CFG.csScoringPolicy&&CFG.csScoringPolicy.correctionMode==='manual'),breakdown:breakdown};
 }
 var GRADE_SKOLA=[{min:88,g:'1'},{min:74,g:'2'},{min:59,g:'3'},{min:44,g:'4'},{min:0,g:'5'}];
 function getGrade(pct){
@@ -318,6 +325,7 @@ function showResult(res){
   I('resultGrade').textContent=res.grade;I('resultName').textContent=CFG.studentName||'—';I('resultTs').textContent=now.toLocaleString(CFG.uiLang==='cs'?'cs-CZ':CFG.uiLang);var ra=I('resultAttempt');if(ra)ra.textContent=attemptId;
   I('resultPct').textContent=res.pct+'%';I('resultPts').textContent=res.earned+'/'+res.total+' b';
   updateJokerWatermark();
+  if(res.needsManualReview)I('resultPts').textContent+=' (orientační shoda s klíčem; konečné hodnocení provede učitel)';
   I('resultBreakdown').innerHTML=res.breakdown.map(function(b){return '<div class="bdown-row"><span>'+esc(b.title)+'</span><span>'+b.earned+'/'+b.total+' b</span></div>';}).join('');
   var locks=securityEvents.filter(function(e){return e.type==='lock';}).length,unlocks=securityEvents.filter(function(e){return e.type==='unlock';}).length,warns=securityEvents.filter(function(e){return e.type==='warning'||e.type==='heartbeat-gap';}).length;
   if(securityEvents.length){I('resultBreakdown').insertAdjacentHTML('afterend','<div class="security-summary">Bezpečnostní záznam: '+warns+' varování, '+locks+' zámek/zámky, '+unlocks+' odemčení.</div>');}

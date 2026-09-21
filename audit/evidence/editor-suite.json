@@ -1,0 +1,1142 @@
+[
+  {
+    "type": "multiple choice",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979317646
+    }
+  },
+  {
+    "type": "multi-select",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979318708
+    }
+  },
+  {
+    "type": "fill-in-the-blank",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979319690
+    }
+  },
+  {
+    "type": "matching",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979320884
+    }
+  },
+  {
+    "type": "word order",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979321934
+    }
+  },
+  {
+    "type": "ordering",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979322820
+    }
+  },
+  {
+    "type": "highlight-evidence",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979323667
+    }
+  },
+  {
+    "type": "categorisation-board",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979324508
+    }
+  },
+  {
+    "type": "table-completion",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979325662
+    }
+  },
+  {
+    "type": "transformation-chain",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979326597
+    }
+  },
+  {
+    "type": "translation",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979327335
+    }
+  },
+  {
+    "type": "true/false",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979328167
+    }
+  },
+  {
+    "type": "error correction",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979329339
+    }
+  },
+  {
+    "type": "error-tagging",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979330119
+    }
+  },
+  {
+    "type": "cloze text",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979330923
+    }
+  },
+  {
+    "type": "sentence transformation",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979331794
+    }
+  },
+  {
+    "type": "reading comprehension",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979332687
+    }
+  },
+  {
+    "type": "dialogue completion",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979333884
+    }
+  },
+  {
+    "type": "categorization",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979334684
+    }
+  },
+  {
+    "type": "word formation",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979335501
+    }
+  },
+  {
+    "type": "listening comprehension",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979336358
+    }
+  },
+  {
+    "type": "odd one out",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979337248
+    }
+  },
+  {
+    "type": "multiple matching",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979338132
+    }
+  },
+  {
+    "type": "banked cloze",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979339085
+    }
+  },
+  {
+    "type": "key word transformation",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979340201
+    }
+  },
+  {
+    "type": "synonym choice",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979341187
+    }
+  },
+  {
+    "type": "antonym choice",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979342215
+    }
+  },
+  {
+    "type": "choose the correct response",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979342992
+    }
+  },
+  {
+    "type": "match word to definition",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979343999
+    }
+  },
+  {
+    "type": "verb form",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979344986
+    }
+  },
+  {
+    "type": "preposition gap-fill",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979346001
+    }
+  },
+  {
+    "type": "question formation",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979346839
+    }
+  },
+  {
+    "type": "word family",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979347727
+    }
+  },
+  {
+    "type": "short answer",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979348681
+    }
+  },
+  {
+    "type": "paraphrase the sentence",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979349652
+    }
+  },
+  {
+    "type": "heading matching",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979350633
+    }
+  },
+  {
+    "type": "gist question",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979351662
+    }
+  },
+  {
+    "type": "summary cloze",
+    "mode": "instant",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979352546
+    }
+  },
+  {
+    "type": "multiple choice",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979355019
+    }
+  },
+  {
+    "type": "multi-select",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979357864
+    }
+  },
+  {
+    "type": "fill-in-the-blank",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979360396
+    }
+  },
+  {
+    "type": "matching",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979362948
+    }
+  },
+  {
+    "type": "word order",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979365800
+    }
+  },
+  {
+    "type": "ordering",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979367938
+    }
+  },
+  {
+    "type": "highlight-evidence",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979370403
+    }
+  },
+  {
+    "type": "categorisation-board",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979372893
+    }
+  },
+  {
+    "type": "table-completion",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979375118
+    }
+  },
+  {
+    "type": "transformation-chain",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979377268
+    }
+  },
+  {
+    "type": "translation",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979379561
+    }
+  },
+  {
+    "type": "true/false",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979381927
+    }
+  },
+  {
+    "type": "error correction",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979383996
+    }
+  },
+  {
+    "type": "error-tagging",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979386425
+    }
+  },
+  {
+    "type": "cloze text",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979388651
+    }
+  },
+  {
+    "type": "sentence transformation",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979391319
+    }
+  },
+  {
+    "type": "reading comprehension",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979393527
+    }
+  },
+  {
+    "type": "dialogue completion",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979395945
+    }
+  },
+  {
+    "type": "categorization",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979398230
+    }
+  },
+  {
+    "type": "word formation",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979400741
+    }
+  },
+  {
+    "type": "listening comprehension",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979403030
+    }
+  },
+  {
+    "type": "odd one out",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979405507
+    }
+  },
+  {
+    "type": "multiple matching",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979407713
+    }
+  },
+  {
+    "type": "banked cloze",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979410072
+    }
+  },
+  {
+    "type": "key word transformation",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979412442
+    }
+  },
+  {
+    "type": "synonym choice",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979414757
+    }
+  },
+  {
+    "type": "antonym choice",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979416982
+    }
+  },
+  {
+    "type": "choose the correct response",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979419422
+    }
+  },
+  {
+    "type": "match word to definition",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979421420
+    }
+  },
+  {
+    "type": "verb form",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979423617
+    }
+  },
+  {
+    "type": "preposition gap-fill",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979425463
+    }
+  },
+  {
+    "type": "question formation",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979427609
+    }
+  },
+  {
+    "type": "word family",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979429584
+    }
+  },
+  {
+    "type": "short answer",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979432448
+    }
+  },
+  {
+    "type": "paraphrase the sentence",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979434832
+    }
+  },
+  {
+    "type": "heading matching",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979437092
+    }
+  },
+  {
+    "type": "gist question",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979439207
+    }
+  },
+  {
+    "type": "summary cloze",
+    "mode": "secureOffline",
+    "ok": true,
+    "roundTrip": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979441256
+    }
+  }
+]

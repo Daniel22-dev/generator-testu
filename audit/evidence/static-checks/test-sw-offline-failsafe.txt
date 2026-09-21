@@ -1,0 +1,15 @@
+PASS install-created-cache
+PASS cleanup-precached
+PASS platform-precached
+PASS cleanup-online-network-first
+PASS platform-online-network-first
+PASS cleanup-offline-cache-fallback
+PASS platform-offline-cache-fallback
+PASS revocation-remains-network-only-no-cache-fallback
+PASS integrity-remains-network-only-no-cache-fallback
+{
+  "status": "PASS",
+  "checks": 9,
+  "cacheName": "ghrab-generator-v7.1.46",
+  "policy": "network-first support layers + network-only authorization/revocation/integrity"
+}

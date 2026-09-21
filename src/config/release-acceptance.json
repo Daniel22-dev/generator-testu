@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.45",
+  "appVersion": "7.1.46",
   "releaseStatus": "pre-release-source-attestation",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -38,16 +38,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "GARP-2.5.1-N5-CUMULATIVE",
+  "revision": "FUNCTIONAL-COMBINATORIAL-AUDIT-2026-09-21",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "source-only pre-release attestation; exact-lockfile GitHub CI/deployment pending",
-    "note": "7.1.45 is a functional AI-Core/workflow cleanup patch. Local validation covers model abstraction, Generator Assistant grounding, secure submission UX, removal of the legacy team-code gate, build and static security checks; exact-lockfile GitHub CI/deployment remains authoritative."
+    "note": "Local isolated Chromium click tests, deterministic AI fixtures and Node WebCrypto bridge. Exact pinned-dependency CI, live AI linguistic quality, hosting/auth/CSP/PWA and real Studio integration still require acceptance. See audit/REPORT.md.",
+    "exactLockfileCiExecuted": false,
+    "liveAiExecuted": false,
+    "productionDeploymentVerified": false
   },
-  "note": "Source-only P5 acceptance input for Generator 7.1.45. It must not be interpreted as live deployment status.",
+  "note": "Source-only P5 acceptance input for Generator 7.1.46. It must not be interpreted as live deployment status.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

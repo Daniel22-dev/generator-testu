@@ -1,3 +1,5 @@
+> **7.1.46 — lokální audit, nikoli dokončená provozní akceptace.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
+
 # Generátor interaktivních testů
 
 **Aktuální verze:** 7.1.45

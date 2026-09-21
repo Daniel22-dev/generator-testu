@@ -148,9 +148,9 @@ check(uiRender.includes("wrapUntrustedSource('TEACHER-PROVIDED READING PASSAGE'"
 check(uiRender.includes("wrapUntrustedField('LISTENING FOCUS'") && uiRender.includes("wrapUntrustedField('READING TOPIC'"), 'AI suggestion helpers fence teacher free text');
 check(gemini.includes("wrapUntrustedSource('DOCX SOURCE '") && gemini.includes('systemInstruction: { parts:[{ text:aiTrustedSystemInstruction() }] }'), 'Legacy Gemini path fences DOCX and uses common system policy');
 check(aiCore.includes('instructions:aiTrustedSystemInstruction()'), 'GHRAB AI Core path uses common system policy');
-check(keyCheck.includes("wrapUntrustedSource('AI-GENERATED TEST ITEMS FOR INDEPENDENT ANSWER-KEY CHECK', lines)"), 'Answer-key verification fences prior AI-generated test items before a second AI call');
-check((manualEditorAi.match(/wrapUntrustedSource\('PREVIOUS AI VALIDATION DIAGNOSTICS'/g) || []).length >= 2, 'Generation repair retries fence prior-AI validation diagnostics');
-check(previewEditor.includes("wrapUntrustedSource('AI-GENERATED TEST ITEMS FOR ACCEPTABLE-ANSWER ENRICHMENT'"), 'Acceptable-answer enrichment fences prior AI-generated items and answer keys before second AI call');
+check(keyCheck.includes("wrapUntrustedSource('TEST TASKS WITHOUT ANSWER KEY',JSON.stringify("), 'Answer-key verification fences prior AI-generated test items before a second AI call');
+check((manualEditorAi.match(/wrapUntrustedSource\('PREVIOUS AI VALIDATION DIAGNOSTICS'/g) || []).length === 1 && manualEditorAi.includes('async function requestValidatedExerciseData(') && manualEditorAi.includes('for(let attempt=0;attempt<2;attempt++)'), 'Generation repair retries fence prior-AI validation diagnostics');
+check(previewEditor.includes("wrapUntrustedSource('ACCEPTABLE ANSWER PROPOSALS'"), 'Acceptable-answer enrichment fences prior AI-generated items and answer keys before second AI call');
 
 // RT-19 partial transport evidence: execute the real input-parts assembler and
 // preflight used immediately before GHRAB_AI.generate(). This is not a network
@@ -250,14 +250,9 @@ const expectedAiCalls = [
   ['src/js/01-core.js','generator-help-answer'],
   ['src/js/09-selftest-keycheck.js','answer-key-verification'],
   ['src/js/12-prompt-builder.js','grading-scale-parse'],
-  ['src/js/08-manual-editor.js','exercise-generation'],
-  ['src/js/08-manual-editor.js','exercise-generation'],
-  ['src/js/08-manual-editor.js',"correctiveNote?'generation-repair':'exercise-generation'"],
-  ['src/js/08-manual-editor.js',"correctiveNote?'generation-repair':'exercise-generation'"],
-  ['src/js/08-manual-editor.js',"batchCorrectiveNote?'generation-repair':'exercise-generation'"],
-  ['src/js/08-manual-editor.js',"correctiveNote?'generation-repair':'test-generation'"]
+  ['src/js/08-manual-editor.js',"attempt?'generation-repair':'exercise-generation'"]
 ].map(([file,operation])=>`${file}|${operation}`).sort();
-const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|482','src/js/01-core.js|717'].sort();
+const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|483','src/js/01-core.js|718'].sort();
 const aiInventory=aiCallInventory();
 const actualAiCalls=aiInventory.rows;
 const actualAiKeys=actualAiCalls.map(invKey).sort();

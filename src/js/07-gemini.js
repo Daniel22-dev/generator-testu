@@ -827,7 +827,8 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
   throw lastErr || new Error('AI požadavek selhal bez detailu. Zkus generování spustit znovu.');
 }
 
-function setGenUI(phase) { // 'idle' | 'loading' | 'error' | 'done'
+function setGenUI(phase) {
+  if(phase==='done'){resultStep(1);renderResultSteps();} // 'idle' | 'loading' | 'error' | 'done'
   genUiPhase = phase || 'idle';
   const progress = $('genProgress'), err = $('genError'), result = $('genResult'), btn = $('btnGenerate'), cancelBtn = $('btnCancelGen');
   progress.classList.toggle('hidden', phase !== 'loading');

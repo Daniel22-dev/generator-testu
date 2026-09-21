@@ -1,0 +1,390 @@
+[
+  {
+    "language": "en",
+    "instructionMode": "target",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "en"
+  },
+  {
+    "language": "en",
+    "instructionMode": "target",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "en"
+  },
+  {
+    "language": "en",
+    "instructionMode": "cs",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "en",
+    "instructionMode": "cs",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "en",
+    "instructionMode": "mixed",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "en",
+    "instructionMode": "mixed",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "es",
+    "instructionMode": "target",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "es"
+  },
+  {
+    "language": "es",
+    "instructionMode": "target",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "es"
+  },
+  {
+    "language": "es",
+    "instructionMode": "cs",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "es",
+    "instructionMode": "cs",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "es",
+    "instructionMode": "mixed",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "es",
+    "instructionMode": "mixed",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "de",
+    "instructionMode": "target",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "de"
+  },
+  {
+    "language": "de",
+    "instructionMode": "target",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "de"
+  },
+  {
+    "language": "de",
+    "instructionMode": "cs",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "de",
+    "instructionMode": "cs",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "de",
+    "instructionMode": "mixed",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "de",
+    "instructionMode": "mixed",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "fr",
+    "instructionMode": "target",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "fr"
+  },
+  {
+    "language": "fr",
+    "instructionMode": "target",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "fr"
+  },
+  {
+    "language": "fr",
+    "instructionMode": "cs",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "fr",
+    "instructionMode": "cs",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "fr",
+    "instructionMode": "mixed",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "fr",
+    "instructionMode": "mixed",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "la",
+    "instructionMode": "target",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "la"
+  },
+  {
+    "language": "la",
+    "instructionMode": "target",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "la"
+  },
+  {
+    "language": "la",
+    "instructionMode": "cs",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "la",
+    "instructionMode": "cs",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "la",
+    "instructionMode": "mixed",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "la",
+    "instructionMode": "mixed",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "cs",
+    "instructionMode": "target",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "cs",
+    "instructionMode": "target",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "cs",
+    "instructionMode": "cs",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "cs",
+    "instructionMode": "cs",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "cs",
+    "instructionMode": "mixed",
+    "mode": "instant",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "cs",
+    "instructionMode": "mixed",
+    "mode": "secureOffline",
+    "ok": true,
+    "resolved": "cs"
+  },
+  {
+    "language": "en",
+    "given": "Water",
+    "correct": "water",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "en",
+    "given": "river!",
+    "correct": "river",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "en",
+    "given": "don\u2019t",
+    "correct": "don't",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "es",
+    "given": "rio",
+    "correct": "r\u00edo",
+    "expected": 0.5,
+    "actual": 0.5,
+    "ok": true
+  },
+  {
+    "language": "es",
+    "given": "ano",
+    "correct": "a\u00f1o",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "es",
+    "given": "pinguino",
+    "correct": "ping\u00fcino",
+    "expected": 0.5,
+    "actual": 0.5,
+    "ok": true
+  },
+  {
+    "language": "es",
+    "given": "ri\u0301o",
+    "correct": "r\u00edo",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "de",
+    "given": "wasser",
+    "correct": "Wasser",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "de",
+    "given": "schon",
+    "correct": "sch\u00f6n",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "de",
+    "given": "strasse",
+    "correct": "stra\u00dfe",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "fr",
+    "given": "riviere",
+    "correct": "rivi\u00e8re",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "fr",
+    "given": "e\u0301te\u0301",
+    "correct": "\u00e9t\u00e9",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "la",
+    "given": "malum",
+    "correct": "m\u0101lum",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "la",
+    "given": "aqua",
+    "correct": "aqua",
+    "expected": 1,
+    "actual": 1,
+    "ok": true
+  },
+  {
+    "language": "cs",
+    "given": "rada",
+    "correct": "\u0159ada",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "cs",
+    "given": "praha",
+    "correct": "Praha",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  },
+  {
+    "language": "cs",
+    "given": "A B",
+    "correct": "A, B",
+    "expected": 0,
+    "actual": 0,
+    "ok": true
+  }
+]

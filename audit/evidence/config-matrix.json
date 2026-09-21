@@ -1,0 +1,807 @@
+{
+  "modeCount": 576,
+  "pairCount": 1482,
+  "boundaryCount": 3420,
+  "thresholds": [
+    {
+      "type": "multiple choice",
+      "mechanism": "multiple choice",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "multi-select",
+      "mechanism": "multi-select",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 23
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 15
+        }
+      ]
+    },
+    {
+      "type": "fill-in-the-blank",
+      "mechanism": "fill-in-the-blank",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "matching",
+      "mechanism": "matching",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 2,
+          "max": 30
+        }
+      ]
+    },
+    {
+      "type": "word order",
+      "mechanism": "word order",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "ordering",
+      "mechanism": "ordering",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 22
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 14
+        }
+      ]
+    },
+    {
+      "type": "highlight-evidence",
+      "mechanism": "highlight-evidence",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 27
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 13
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 8
+        }
+      ]
+    },
+    {
+      "type": "categorisation-board",
+      "mechanism": "categorisation-board",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "type": "table-completion",
+      "mechanism": "table-completion",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 18
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 8
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 5
+        }
+      ]
+    },
+    {
+      "type": "transformation-chain",
+      "mechanism": "transformation-chain",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 18
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 8
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 5
+        }
+      ]
+    },
+    {
+      "type": "translation",
+      "mechanism": "translation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "true/false",
+      "mechanism": "true/false",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "error correction",
+      "mechanism": "error correction",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "error-tagging",
+      "mechanism": "error-tagging",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 17
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 11
+        }
+      ]
+    },
+    {
+      "type": "cloze text",
+      "mechanism": "cloze text",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 18
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 8
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 5
+        }
+      ]
+    },
+    {
+      "type": "sentence transformation",
+      "mechanism": "sentence transformation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "reading comprehension",
+      "mechanism": "reading comprehension",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 21
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 12
+        }
+      ]
+    },
+    {
+      "type": "dialogue completion",
+      "mechanism": "dialogue completion",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "categorization",
+      "mechanism": "categorization",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "word formation",
+      "mechanism": "word formation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "listening comprehension",
+      "mechanism": "listening comprehension",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 16
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 10
+        }
+      ]
+    },
+    {
+      "type": "odd one out",
+      "mechanism": "multiple choice",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "multiple matching",
+      "mechanism": "matching",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 2,
+          "max": 30
+        }
+      ]
+    },
+    {
+      "type": "banked cloze",
+      "mechanism": "cloze text",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 18
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 8
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 5
+        }
+      ]
+    },
+    {
+      "type": "key word transformation",
+      "mechanism": "sentence transformation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "synonym choice",
+      "mechanism": "multiple choice",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "antonym choice",
+      "mechanism": "multiple choice",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "choose the correct response",
+      "mechanism": "multiple choice",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "match word to definition",
+      "mechanism": "matching",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 2,
+          "max": 30
+        }
+      ]
+    },
+    {
+      "type": "verb form",
+      "mechanism": "fill-in-the-blank",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "preposition gap-fill",
+      "mechanism": "fill-in-the-blank",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "question formation",
+      "mechanism": "sentence transformation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "word family",
+      "mechanism": "word formation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "short answer",
+      "mechanism": "fill-in-the-blank",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "paraphrase the sentence",
+      "mechanism": "sentence transformation",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "heading matching",
+      "mechanism": "matching",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 2,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 2,
+          "max": 30
+        }
+      ]
+    },
+    {
+      "type": "gist question",
+      "mechanism": "multiple choice",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 20
+        }
+      ]
+    },
+    {
+      "type": "summary cloze",
+      "mechanism": "cloze text",
+      "maxima": [
+        {
+          "groups": 1,
+          "min": 1,
+          "max": 18
+        },
+        {
+          "groups": 2,
+          "min": 1,
+          "max": 8
+        },
+        {
+          "groups": 3,
+          "min": 1,
+          "max": 5
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "seconds": 2.22
+}

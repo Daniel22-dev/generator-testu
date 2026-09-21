@@ -1,0 +1,16 @@
+{"scope": "simple-wizard", "language": "en", "purpose": "practice", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "en", "purpose": "standard", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "en", "purpose": "strict", "ok": true, "calls": 1, "mode": "secureOffline", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "es", "purpose": "practice", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "es", "purpose": "standard", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "es", "purpose": "strict", "ok": true, "calls": 1, "mode": "secureOffline", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "de", "purpose": "practice", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "de", "purpose": "standard", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "de", "purpose": "strict", "ok": true, "calls": 1, "mode": "secureOffline", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "fr", "purpose": "practice", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "fr", "purpose": "standard", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "fr", "purpose": "strict", "ok": true, "calls": 1, "mode": "secureOffline", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "la", "purpose": "practice", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "la", "purpose": "standard", "ok": true, "calls": 1, "mode": "instant", "layout": "tabs"}
+{"scope": "simple-wizard", "language": "la", "purpose": "strict", "ok": true, "calls": 1, "mode": "secureOffline", "layout": "tabs"}
+{'scope': 'mode-switch-confirmation', 'ok': True, 'defaults': {'identity': 'name', 'diff': 'NE', 'split': False, 'layout': 'tabs', 'instr': 'target', 'detail': False, 'topic': 'Language fixture test'}}

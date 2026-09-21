@@ -1,0 +1,254 @@
+[
+  {
+    "type": "categorisation-board",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "categorisation-board",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979501938
+    }
+  },
+  {
+    "type": "ordering",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "ordering",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979502729
+    }
+  },
+  {
+    "type": "multi-select",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "multi-select",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979503653
+    }
+  },
+  {
+    "type": "highlight-evidence",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "highlight-evidence",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979504355
+    }
+  },
+  {
+    "type": "transformation-chain",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "transformation-chain",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979505044
+    }
+  },
+  {
+    "type": "error-tagging",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "error-tagging",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979505789
+    }
+  },
+  {
+    "type": "banked cloze",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "banked cloze",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979506362
+    }
+  },
+  {
+    "type": "multiple matching",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "multiple matching",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979506864
+    }
+  },
+  {
+    "type": "table-completion",
+    "ok": true,
+    "score": {
+      "earned": 12,
+      "total": 12,
+      "pct": 100,
+      "grade": "1",
+      "needsManualReview": false,
+      "breakdown": [
+        {
+          "title": "table-completion",
+          "earned": 12,
+          "total": 12
+        }
+      ]
+    },
+    "invalidBlocked": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979507414
+    }
+  }
+]

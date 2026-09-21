@@ -35,7 +35,7 @@ function rosterEscHtml(x){return String(x==null?'':x).replace(/&/g,'&amp;').repl
 function rosterParseEmails(raw){
   var toks=String(raw||'').split(/[\s,;]+/).map(function(x){return x.trim();}).filter(Boolean);
   var seen={},out=[];
-  toks.forEach(function(tok){ if(tok.indexOf('@')<0)return; var low=tok.toLowerCase(); if(seen[low])return; seen[low]=1; out.push({email:low,label:low.split('@')[0]}); });
+  toks.forEach(function(tok){ if(!/^[^\s@]+@[^\s@]+$/.test(tok))return; var low=tok.toLowerCase(); if(seen[low])return; seen[low]=1; out.push({email:low,label:low.split('@')[0]}); });
   return out;
 }
 function rosterMakeCode(){
@@ -55,20 +55,20 @@ function rosterRender(msg){
 function rosterGenerate(){
   var ta=document.getElementById('rosterEmails'); var raw=ta?ta.value:'';
   var parsed=rosterParseEmails(raw);
-  if(!parsed.length){ rosterEntries=[]; rosterRender('Vlož aspoň jeden e-mail ve tvaru prijmeni@domena.'); return; }
+  if(!parsed.length){ rosterEntries=[]; rosterRender('Vlož aspoň jeden e-mail ve tvaru prijmeni@domena.'); validate(); return; }
   var used={};
   parsed.forEach(function(e){ var c; do{ c=rosterMakeCode(); }while(used[c]); used[c]=1; e.code=c; });
-  rosterEntries=parsed; rosterRender('');
+  rosterEntries=parsed; rosterRender('');validate();
 }
 function rosterDownloadCsv(){
   if(!rosterEntries.length){ rosterRender('Nejdřív vygeneruj kódy.'); return; }
   var lines=['email,student,code'];
-  rosterEntries.forEach(function(e){ lines.push([e.email,e.label,e.code].map(function(x){ var v=String(x==null?'':x); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')); });
+  rosterEntries.forEach(function(e){ lines.push([e.email,e.label,e.code].map(function(x){ var v=String(x==null?'':x); if(/^[=+@-]/.test(v))v="'"+v; return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')); });
   try{ downloadBlobFile(lines.join('\n'),'kody_'+outputSlug()+'.csv','text/csv;charset=utf-8'); }
   catch(e){ rosterRender('Stažení CSV selhalo: '+(e&&e.message||e)); }
 }
 function outputSlug(extra='') {
-  const slug = (trim('nazev') || 'test').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'test';
+  const slug = ((lastAssembled&&lastAssembled.sourceState&&lastAssembled.sourceState.__outputFields&&lastAssembled.sourceState.__outputFields.nazev)||trim('nazev') || 'test').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'test';
   const v = (typeof variantSlug === 'string' && variantSlug) ? '_' + variantSlug : '';
   return extra ? slug + v + '_' + extra : slug + v;
 }
@@ -95,27 +95,19 @@ async function downloadGeneratedStudentTest() {
 }
 function teacherVerifierFileName(){ return 'DO_NOT_SEND_TEACHER_VERIFIER_contains_answers_'+outputSlug()+'_'+(generatedPackage&&generatedPackage.testId?generatedPackage.testId:'test')+'.html'; }
 async function makeVariantForNextGroup(){
-  if(!lastGenData){ uiAlert('Nejdřív vygeneruj test, pak z něj můžeš udělat variantu pro další skupinu.'); return; }
-  variantSeq = (variantSeq||0) + 1;
-  var letter = String.fromCharCode(65 + variantSeq); // B, C, D…
-  variantSlug = 'skupina-' + letter.toLowerCase();
-  // Varianta = jiné pořadí: zapni randomizaci (bere se až při sestavení), pak přesestav z týchž dat.
-  if(typeof pick==='function') pick('randomizace','ANO'); else state.randomizace='ANO';
-  var note=document.getElementById('variantNote');
-  if(note){ note.classList.remove('hidden'); note.innerHTML='Připravuji variantu pro skupinu '+letter+'…'; }
+  if(!lastGenData||outputMutationBusy)return;
+  const stamp=outputStamp(),snapshot=outputEditState(),seq=(variantSeq||0)+1;
+  const letter=seq<26?String.fromCharCode(65+seq):String(seq+1);
+  snapshot.randomizace='ANO';
+  const note=$('variantNote');if(note){note.classList.remove('hidden');note.textContent='Připravuji variantu pro skupinu '+letter+'…';}
   try{
-    var built=await assembleTestHtml(state, lastGenData);
-    if(built && typeof built==='object' && built.mode==='secureOffline'){ await validateSecurePackageSmoke(built); generatedPackage=built; generatedTestHtml=''; }
-    else { var html=String(built||''); await validateGeneratedHtmlSmoke(html); generatedTestHtml=html; generatedPackage=null; }
-    lastSelfTest=null; secureGapsAcknowledged=false; keyDiffsAcknowledged=false;
-    if(typeof renderQualityDiagnostics==='function') renderQualityDiagnostics();
-    if(typeof updateSecureDownloadGate==='function') updateSecureDownloadGate();
-    var tid=(generatedPackage&&generatedPackage.testId)||(lastAssembled&&lastAssembled.cfg&&lastAssembled.cfg.testId)||'(nové)';
-    if(note){ note.classList.remove('hidden'); note.innerHTML='✅ Varianta pro skupinu '+letter+' připravena: nové Test ID <b>'+tid+'</b>, nový název souboru (<code>'+outputSlug('student_test')+'.html</code>) a zapnuté promíchané pořadí. Stejná látka i body. Před stažením znovu spusť 🧪 self-test, pak stáhni nahoře jako obvykle. Správné odpovědi posílej studentům až po skončení všech skupin.'; }
-  }catch(e){
-    if(note){ note.classList.remove('hidden'); note.innerHTML='⚠️ Vytvoření varianty selhalo: '+((e&&e.message)?e.message:String(e)); }
-  }
+    await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),stamp,snapshot);
+    variantSeq=seq;variantSlug='skupina-'+letter.toLowerCase();
+    if(note)note.textContent='Varianta '+letter+' je připravena: nové Test ID, stejný obsah a body, promíchané pořadí. Znovu projděte kontrolu obsahu a self-test. Pro tuto variantu stáhněte také její vlastní učitelský soubor.';
+    resultStep(1,true);
+  }catch(error){if(note)note.textContent='Varianta nebyla vytvořena, původní test zůstal zachován: '+error.message;}
 }
+
 async function downloadGeneratedTeacherVerifier() {
   if (!generatedPackage || !generatedPackage.teacherHtml) return;
   if (!enforceSecureGate()) return;

@@ -1,0 +1,90 @@
+{
+  "schema": "ghrab-garp23-security-regression-v1",
+  "syntheticOnly": true,
+  "airStructural": {
+    "attempts": 24,
+    "mutationFamilies": 4,
+    "boundaryEscapes": 0,
+    "officialCorpus": {
+      "vectors": 18,
+      "wrapperAttempts": 54,
+      "boundaryEscapes": 0,
+      "sha256": "3560e60fd78a9cc81cfef1d7d2c3ba52b270ac5f38d582cc0cded3aa31183a6d"
+    },
+    "behavioralLiveModel": "NOT TESTED"
+  },
+  "privacyCanary": {
+    "type": "example.invalid",
+    "preflightBlocked": true
+  },
+  "pc01": {
+    "reviewedApplicationCallSites": 8,
+    "callSites": [
+      {
+        "file": "src/features/preview-editor.js",
+        "line": 526,
+        "operation": "acceptable-answer-enrichment"
+      },
+      {
+        "file": "src/features/testlab.js",
+        "line": 510,
+        "operation": "diagnostic-ping"
+      },
+      {
+        "file": "src/js/01-core.js",
+        "line": 1110,
+        "operation": "generator-help-answer"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 427,
+        "operation": "listening-question-suggestions"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 495,
+        "operation": "reading-package-suggestion"
+      },
+      {
+        "file": "src/js/08-manual-editor.js",
+        "line": 384,
+        "operation": "attempt?'generation-repair':'exercise-generation'"
+      },
+      {
+        "file": "src/js/09-selftest-keycheck.js",
+        "line": 347,
+        "operation": "answer-key-verification"
+      },
+      {
+        "file": "src/js/12-prompt-builder.js",
+        "line": 123,
+        "operation": "grading-scale-parse"
+      }
+    ]
+  },
+  "endWork": {
+    "lifecycleHarness": "scripts/test-suite-session-lifecycle.mjs",
+    "platformVersion": "1.1.2",
+    "contract": "ghrab-suite-session-v1"
+  },
+  "studentPackage": {
+    "canonicalTypesChecked": 21,
+    "answerKeyCanaryAbsent": true
+  },
+  "negativeControls": [
+    "weakened-production-boundary-detected",
+    "new-unreviewed-ai-call-detected",
+    "same-line-multiple-ai-calls-detected",
+    "template-context-ai-call-flagged-for-review",
+    "raw-differentiation-egress-detected",
+    "suite-session-negative-control-detected-by-lifecycle-harness",
+    "answer-key-strip-leak-detected",
+    "same-origin-selftest-sandbox-weakening-detected",
+    "same-origin-print-sandbox-weakening-detected",
+    "benign-pseudonymous-preflight-allowed",
+    "other-app-storage-preserved"
+  ],
+  "passed": 81,
+  "failed": 0,
+  "failures": []
+}

@@ -1,0 +1,83 @@
+[
+  {
+    "case": "roster-input-dedupe-invalid-code-csv",
+    "ok": true,
+    "detail": {
+      "validDistinctEntries": 2,
+      "downloadCSV": true
+    }
+  },
+  {
+    "case": "individual-code-instant-False",
+    "ok": true,
+    "detail": {
+      "mode": "instant",
+      "groups": false,
+      "wrongCodeRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": false
+    }
+  },
+  {
+    "case": "individual-code-instant-True",
+    "ok": true,
+    "detail": {
+      "mode": "instant",
+      "groups": true,
+      "wrongCodeRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": false
+    }
+  },
+  {
+    "case": "individual-code-secureOffline-False",
+    "ok": true,
+    "detail": {
+      "mode": "secureOffline",
+      "groups": false,
+      "wrongCodeRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": true
+    }
+  },
+  {
+    "case": "individual-code-secureOffline-True",
+    "ok": true,
+    "detail": {
+      "mode": "secureOffline",
+      "groups": true,
+      "wrongCodeRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": true
+    }
+  },
+  {
+    "case": "teacher-access-code-and-unlock-hash",
+    "ok": true,
+    "detail": {
+      "wrongPinRefused": true,
+      "rightPinLogin": true,
+      "singleCodeSeparatePurposeHashes": true
+    }
+  },
+  {
+    "case": "joker-and-deadline-instant",
+    "ok": true,
+    "detail": {
+      "jokerRecorded": true,
+      "deadlineAutoSubmit": true
+    }
+  },
+  {
+    "case": "joker-and-deadline-secureOffline",
+    "ok": true,
+    "detail": {
+      "jokerRecorded": true,
+      "deadlineAutoSubmit": true
+    }
+  }
+]

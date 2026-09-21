@@ -903,8 +903,8 @@ body:not(.simple-mode) .simple-only { display: none !important; }
 .editor-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 13px; background:var(--bg3); border-bottom:1px solid var(--bdr); flex-wrap:wrap; }
 .editor-bar-title { font-size:14px; font-weight:700; color:var(--t1); }
 .editor-bar-actions { display:flex; gap:7px; flex-wrap:wrap; }
-.editor-body { flex:1; overflow:auto; padding:14px; }
-.editor-foot { display:flex; gap:8px; padding:11px 13px; background:var(--bg3); border-top:1px solid var(--bdr); flex-wrap:wrap; }
+.editor-body { flex:1; min-height:0; overflow:auto; padding:14px; }
+.editor-foot { display:flex; flex-shrink:0; gap:8px; padding:11px 13px calc(64px + env(safe-area-inset-bottom, 0px)); background:var(--bg3); border-top:1px solid var(--bdr); flex-wrap:wrap; }
 .editor-foot .grow { flex:1; }
 .btn-ed-apply { padding:11px 16px; border-radius:9px; border:none; background:var(--ok); color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:Georgia,serif; min-height:44px; }
 .btn-ed-apply:disabled { opacity:.6; cursor:default; }
@@ -1753,3 +1753,39 @@ body:not(.light) .ghrab-platform-footer{--ghrab-platform-surface:#0f1120;--ghrab
 .forms-howto summary{cursor:pointer;color:var(--t2);font-weight:800;font-size:13px}
 .forms-howto-list{margin:10px 0 0 20px;padding:0;color:var(--t3);font-size:13px;line-height:1.55}
 .forms-howto-list li{margin:6px 0}
+
+/* Reserve the bottom strip for the central privacy/session and report controls.
+   Never cover or disable those controls, even while editing a long test. */
+body.generator-editor-open .ghrab-error-reporter { --ghrab-reporter-bottom:12px !important; }
+@media (max-width:520px) {
+  body.generator-editor-open .ghrab-error-reporter { --ghrab-reporter-bottom:52px !important; }
+  .editor-foot { padding-bottom:calc(112px + env(safe-area-inset-bottom, 0px)); }
+  .editor-foot .grow { display:none; }
+  .editor-foot > button { flex:1 1 190px; white-space:normal; }
+  .ed-ex-head { flex-wrap:wrap; }
+  .ed-type { max-width:100%; overflow-wrap:anywhere; white-space:normal; }
+  .ed-opt { flex-wrap:wrap; }
+  .ed-opt .ed-in { min-width:0; }
+}
+.ed-complex-table { overflow-x:auto; }
+.ed-complex-table table { width:100%; border-collapse:collapse; }
+.ed-complex-table td, .ed-complex-table th { min-width:160px; padding:5px; vertical-align:top; }
+.ed-complex-table .ed-in { box-sizing:border-box; width:100%; }
+
+/* Final output: four explicit steps, one visible task panel. */
+.result-step-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}
+.result-step-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px;min-height:144px;border:1px solid var(--bdr);border-radius:14px;background:var(--bg2);color:var(--t1);text-align:left;cursor:pointer;line-height:1.35;overflow-wrap:anywhere}
+.result-step-card[aria-selected=true]{border:2px solid var(--accent,#52e0ed);padding:15px;background:var(--bg3,#152330)}
+.result-step-card:focus-visible{outline:3px solid var(--accent,#52e0ed);outline-offset:3px}
+.result-step-number{display:grid;place-items:center;width:28px;height:28px;border:1px solid currentColor;border-radius:50%;font-weight:800}
+.result-step-status{font-size:12px;color:var(--t2);margin-top:auto}
+.result-step-card.is-complete .result-step-number{background:var(--ok);color:#071018}
+.result-step-panel{padding:18px;border:1px solid var(--bdr);border-radius:14px;min-width:0}
+.result-step-intro{color:var(--t2);line-height:1.65;margin:10px 0 18px}
+.result-step-nav{display:flex;justify-content:flex-end;margin-top:22px}
+.answer-proposal{display:block;border:1px solid var(--bdr);border-radius:10px;padding:14px;margin:10px 0;line-height:1.6;overflow-wrap:anywhere}
+.answer-proposal input{width:auto;margin-right:10px;vertical-align:middle}
+.answer-proposal-context{display:block;color:var(--t2);font-size:12px;margin-left:26px;white-space:pre-wrap}
+.result-step-panel .btn-edit,.result-step-panel .btn-preview{margin:4px 6px 8px 0}
+@media(max-width:760px){.result-step-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-step-card{min-height:130px;padding:12px}.result-step-card[aria-selected=true]{padding:11px}.result-step-panel{padding:12px}}
+@media(max-width:400px){.result-step-grid{gap:6px}.result-step-card{font-size:12px}.result-step-panel .btn-edit,.result-step-panel .btn-preview{width:100%;margin-right:0}}

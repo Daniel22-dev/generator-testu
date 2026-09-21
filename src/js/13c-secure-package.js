@@ -141,7 +141,7 @@ async function assembleSecureOfflinePackage(st, cfg, variants) {
   const publicCfg = securePublicCfg(cfg, keyInfo);
   const studentHtml = buildSecureStudentHtml(publicCfg, studentVariants);
   const studentHtmlSha256 = await sha256HexText(studentHtml);
-  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?rosterForVerifier():[]), studentHtmlSha256 });
+  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256 });
   const teacherHtml = buildSecureTeacherVerifierHtml(teacherCfg, variants);
   const teacherHtmlSha256 = await sha256HexText(teacherHtml);
   return {

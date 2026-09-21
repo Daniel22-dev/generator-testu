@@ -1,0 +1,810 @@
+[
+  {
+    "test": "czech-entry-three-pages",
+    "ok": true
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_spell_choice",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979868973
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_spell_blank",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "fill-in-the-blank"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979869853
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_error_correction",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "error correction"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979871614
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_word_class",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "categorization"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979873404
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_grammar_board",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "categorization"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979875076
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_matching_terms",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "matching"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979875853
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_syntax_mc",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979877581
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_sentence_member",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "categorization"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979879238
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_punctuation_choice",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979880926
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_punctuation_blank",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "fill-in-the-blank"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979882602
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_punctuation_correction",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "error correction"
+    ],
+    "correction": "manual",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979883367
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_text_mc",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "reading comprehension"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979884131
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_text_tf",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "true/false"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979884906
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_text_evidence",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "highlight-evidence"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979886593
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_ordering",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "ordering"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979888238
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_synonym_choice",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979889970
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_antonym_choice",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979891698
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_phraseology_matching",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "matching"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979893362
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_polysemy_context",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "reading comprehension"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979895049
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_term_definition",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "matching"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979895897
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_style_choice",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979896732
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_style_correction",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "error correction"
+    ],
+    "correction": "manual",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979897581
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_lit_terms",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "matching"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979899272
+    }
+  },
+  {
+    "scope": "exercise",
+    "key": "cs_lit_choice",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979900975
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "pravopis_rychle",
+    "ok": true,
+    "exerciseCount": 2,
+    "types": [
+      "multiple choice",
+      "fill-in-the-blank"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979901944
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "pravopis_oprava_chyb",
+    "ok": true,
+    "exerciseCount": 2,
+    "types": [
+      "error correction",
+      "multiple choice"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 2,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979902753
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "mluvnice",
+    "ok": true,
+    "exerciseCount": 3,
+    "types": [
+      "categorization",
+      "categorization",
+      "matching"
+    ],
+    "correction": "auto",
+    "mode": "secureOffline",
+    "calls": 2,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979904011
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "skladba",
+    "ok": true,
+    "exerciseCount": 3,
+    "types": [
+      "multiple choice",
+      "categorization",
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "secureOffline",
+    "calls": 2,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979905326
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "interpunkce",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979906251
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "interpunkce_doplneni",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "fill-in-the-blank"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979907817
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "interpunkce_oprava",
+    "ok": true,
+    "exerciseCount": 1,
+    "types": [
+      "error correction"
+    ],
+    "correction": "manual",
+    "mode": "instant",
+    "calls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979908464
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "text",
+    "ok": true,
+    "exerciseCount": 3,
+    "types": [
+      "reading comprehension",
+      "true/false",
+      "highlight-evidence"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 3,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979909318
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "slovni_zasoba",
+    "ok": true,
+    "exerciseCount": 5,
+    "types": [
+      "multiple choice",
+      "multiple choice",
+      "matching",
+      "reading comprehension",
+      "matching"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 4,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979911263
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "stylistika",
+    "ok": true,
+    "exerciseCount": 3,
+    "types": [
+      "multiple choice",
+      "error correction",
+      "reading comprehension"
+    ],
+    "correction": "manual",
+    "mode": "instant",
+    "calls": 3,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979913058
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "literatura",
+    "ok": true,
+    "exerciseCount": 3,
+    "types": [
+      "matching",
+      "multiple choice",
+      "categorization"
+    ],
+    "correction": "semi",
+    "mode": "instant",
+    "calls": 3,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979913911
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "prijimacky",
+    "ok": true,
+    "exerciseCount": 5,
+    "types": [
+      "multiple choice",
+      "reading comprehension",
+      "true/false",
+      "multiple choice",
+      "multiple choice"
+    ],
+    "correction": "auto",
+    "mode": "instant",
+    "calls": 5,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979915209
+    }
+  },
+  {
+    "scope": "preset",
+    "key": "maturita",
+    "ok": true,
+    "exerciseCount": 4,
+    "types": [
+      "multiple choice",
+      "multiple choice",
+      "reading comprehension",
+      "multiple choice"
+    ],
+    "correction": "semi",
+    "mode": "secureOffline",
+    "calls": 4,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979917333
+    }
+  },
+  {
+    "test": "czech-max10-and-topic-persistence",
+    "ok": true
+  }
+]

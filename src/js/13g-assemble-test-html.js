@@ -1,4 +1,12 @@
 async function assembleTestHtml(st, genData) {
+  const sourceState=JSON.parse(JSON.stringify(st));
+  sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','ucitelJmeno'].map(id=>[id,trim(id)]));
+  sourceState.__roster=Array.isArray(st.__roster)?JSON.parse(JSON.stringify(st.__roster)):rosterForVerifier();
+  sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
+  st=sourceState;
+  const field=id=>sourceState.__outputFields[id]??trim(id);
+  const outputCefr=CEFR_LEVELS.filter(l=>(st.uroven||[]).includes(l)).join(' / ');
+
   // Všechny exporty obsahují kryptografické hashe integrity a případně hesel/PINů.
   // Bez WebCrypto proto selžou uzamčeně ještě před sestavením, i v instant režimu.
   requireWebCrypto((st.resultMode||'instant')==='secureOffline'?'Bezpečný offline test':'Vytvoření interaktivního testu');
@@ -12,9 +20,9 @@ async function assembleTestHtml(st, genData) {
   const jazyk=st.jazyk||'angličtina';
   const uiLang=getUiLang(st.instrJazyk,jazyk);
   const labels=getLabels(uiLang);
-  const customScaleRaw=trim('vlastniSkala');
+  const customScaleRaw=field('vlastniSkala');
   const summary=variantSummary(defaultExercises);
-  const testId='T'+Date.now().toString(36).toUpperCase().slice(-6);
+  const testId='T'+Date.now().toString(36).toUpperCase().slice(-6)+'-'+randomHex(4).toUpperCase();
   const generatorVersion=RELEASE.version;
   const generatedAt=new Date().toISOString();
   const cr=currentCreator(); // přihlášený proškolený učitel / admin → auditní stopa do výstupů
@@ -22,14 +30,14 @@ async function assembleTestHtml(st, genData) {
   const publicDiffGroups=await buildPublicDiffGroups(diffGroups,securitySalt);
   const identityCodeHashes=await buildPublicIdentityCodeHashes(st,securitySalt);
   const configForHash={
-    generatorVersion,buildHash:BUILD_HASH,releaseDate:RELEASE.date,releaseStatus:RELEASE.status,testId,generatedAt,
+    generatorVersion,buildHash:BUILD_HASH,releaseDate:RELEASE.date,releaseStatus:RELEASE.sourceAuditPending?'source-audit-candidate':RELEASE.status,testId,generatedAt,
     creatorId:cr.id, creatorRole:cr.role,
-    nazev: trim('nazev')||'Test', proKoho: trim('proKoho')||'', jazyk, uiLang,
-    cefr: (String(jazyk||'').toLowerCase()==='čeština' ? '' : cefrLabel()), cefrLevels: (String(jazyk||'').toLowerCase()==='čeština' ? [] : CEFR_LEVELS.filter(l => st.uroven.includes(l))), cefrCombined: (String(jazyk||'').toLowerCase()==='čeština' ? false : !!(st.kombinovat && st.uroven.length > 1)),
+    nazev: field('nazev')||'Test', proKoho: field('proKoho')||'', jazyk, uiLang,
+    cefr: (String(jazyk||'').toLowerCase()==='čeština' ? '' : outputCefr), cefrLevels: (String(jazyk||'').toLowerCase()==='čeština' ? [] : CEFR_LEVELS.filter(l => st.uroven.includes(l))), cefrCombined: (String(jazyk||'').toLowerCase()==='čeština' ? false : !!(st.kombinovat && st.uroven.length > 1)),
     cas: st.cas||45, tema: st.tema||'examBlue', testMode: st.testMode||'bezny',
     randomizace: st.randomizace==='ANO', overeni: st.overeni==='ANO', identityMode: st.identityMode||'name',
     zolicek: st.zolicek==='ANO', layout: st.layout||'tabs', odevzdavani: st.odevzdavani||'B', resultMode: st.resultMode || 'instant',
-    formsSubmissionUrl: (st.resultMode || 'instant') === 'secureOffline' && typeof configuredGoogleFormsUrl === 'function' ? configuredGoogleFormsUrl() : '', 
+    formsSubmissionUrl: (st.resultMode || 'instant') === 'secureOffline' ? st.__formsSubmissionUrl : '', 
     gradeTyp: st.gradeTyp||'skola', gradeScaleRaw: customScaleRaw,
     fuzzyTolerance: (st.fuzzyTolerance==='mild'||st.fuzzyTolerance==='strict')?st.fuzzyTolerance:'off',
     feedbackMode: (['none','brief','learning'].indexOf(st.feedbackMode)!==-1)?st.feedbackMode:'brief',
@@ -54,7 +62,7 @@ async function assembleTestHtml(st, genData) {
   // a v instant větvi je HMAC klíč součástí studentského HTML, takže týmový secret
   // nepřidával skutečnou bezpečnost. Report seal proto používá náhodný per-test secret.
   const verifySecret=makeVerifySecret();
-  const teacherAccessCode=trim('ucitelPin')||'';
+  const teacherAccessCode=field('ucitelPin')||'';
   // Stage 6: jeden kód pro učitele, ale doménově oddělené PBKDF2 hashe podle účelu.
   const teacherPinHash=await deriveSecretHash('teacher-pin', teacherAccessCode, testId);
   const unlockHash=await deriveSecretHash('unlock-password', teacherAccessCode, testId);
@@ -76,7 +84,7 @@ async function assembleTestHtml(st, genData) {
     overeni: configForHash.overeni,
     identityMode: configForHash.identityMode,
     zolicek: configForHash.zolicek,
-    ucitelJmeno: trim('ucitelJmeno')||'',
+    ucitelJmeno: field('ucitelJmeno')||'',
     ucitelPinHash: teacherPinHash,
     hesloHash: unlockHash,
     hasUnlock: !!teacherAccessCode,
@@ -99,12 +107,12 @@ async function assembleTestHtml(st, genData) {
     generatorVersion,
     buildHash: BUILD_HASH,
     releaseDate: RELEASE.date,
-    releaseStatus: RELEASE.status,
+    releaseStatus: RELEASE.sourceAuditPending?'source-audit-candidate':RELEASE.status,
     generatedAt,
     creatorId: cr.id,
     creatorName: cr.name,
     creatorRole: cr.role,
-    appMode: state.appMode || '',
+    appMode: st.appMode || '',
     testId,
     totalBody: summary.totalBody,
     totalQ: summary.totalQ,
@@ -117,7 +125,7 @@ async function assembleTestHtml(st, genData) {
     groupNotes,
     variantKeys: configForHash.variantKeys
   };
-  lastAssembled = { cfg, variants }; // vstup pro self-test bodování (skutečná data testu)
+  lastAssembled={sourceState, cfg, variants }; // vstup pro self-test bodování (skutečná data testu)
   const variantHtmls=buildVariantHtmls(cfg,variants);
   if ((st.resultMode || 'instant') === 'secureOffline') {
     return await assembleSecureOfflinePackage(st, cfg, variants);

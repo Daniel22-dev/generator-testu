@@ -1,0 +1,7226 @@
+{
+  "scope": "Actual type-dropdown + generate-button + request validator + assembly/smoke. Provider is deterministic fixture; not live AI.",
+  "runs": [
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.42
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.92
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.67
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.71
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.62
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.66
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.76
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.65
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.69
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.58
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.71
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.6
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.64
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.64
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.58
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.63
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.63
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.57
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.63
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.67
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.62
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.56
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.63
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.58
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.65
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.6
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.51
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.54
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.53
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.58
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.59
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.56
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.07
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.12
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.14
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.06
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.98
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.17
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.99
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.18
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.01
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.13
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.09
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.97
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.02
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.1
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.04
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.01
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.08
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.84
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.02
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.04
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.86
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.11
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.9
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.01
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.93
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "en",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.56
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.53
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.51
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.5
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.56
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.51
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.53
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.53
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.51
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.52
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.5
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.54
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.56
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.55
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.54
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.57
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.5
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.51
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.54
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.5
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.03
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.97
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.09
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.86
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.8
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.77
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.1
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.87
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.93
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.84
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.93
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.86
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.2
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.86
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.87
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.77
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "es",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.52
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.41
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.9
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.8
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.0
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.84
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.95
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.8
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.98
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.02
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.84
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.92
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.98
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.0
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.76
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.86
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.96
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.75
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.2
+    },
+    {
+      "language": "de",
+      "mode": "secureOffline",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "de",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.41
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.48
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.04
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.15
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.89
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.03
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.84
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.77
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.02
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.75
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.9
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.8
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.75
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.87
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.92
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.85
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.91
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.76
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.94
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.86
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.15
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "fr",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.01
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.53
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.41
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.47
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.46
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.44
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.45
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.42
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.49
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.43
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "multiple choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.89
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multi-select",
+          "style": "multi-select",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.92
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "fill-in-the-blank",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.03
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "word order",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word order",
+          "style": "word order",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.84
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "ordering",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "ordering",
+          "style": "ordering",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "highlight-evidence",
+          "style": "highlight-evidence",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorisation-board",
+          "style": "categorisation-board",
+          "items": 1
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.93
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "table-completion",
+          "style": "table-completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.03
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "transformation-chain",
+          "style": "transformation-chain",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.87
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "translation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "translation",
+          "style": "translation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "true/false",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "true/false",
+          "style": "true/false",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.78
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "error correction",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error correction",
+          "style": "error correction",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.87
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "error-tagging",
+          "style": "error-tagging",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "cloze text",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.04
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "sentence transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "sentence transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.08
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "reading comprehension",
+          "style": "reading comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.04
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "dialogue completion",
+          "style": "dialogue completion",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.14
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "categorization",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "categorization",
+          "style": "categorization",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.9
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "word formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "listening comprehension",
+          "style": "listening comprehension",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.76
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "odd one out",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "odd one out",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "multiple matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "multiple matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.79
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "banked cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "banked cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.15
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "key word transformation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "key word transformation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.83
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "synonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "synonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.8
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "antonym choice",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "antonym choice",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.89
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "choose the correct response",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "choose the correct response",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.03
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "match word to definition",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "match word to definition",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.88
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "verb form",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "verb form",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.92
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "preposition gap-fill",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "preposition gap-fill",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.82
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "question formation",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "question formation",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.99
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "word family",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "word formation",
+          "style": "word family",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.8
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "short answer",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "fill-in-the-blank",
+          "style": "short answer",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.0
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "paraphrase the sentence",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "sentence transformation",
+          "style": "paraphrase the sentence",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.76
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "heading matching",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "matching",
+          "style": "heading matching",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.87
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "gist question",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "multiple choice",
+          "style": "gist question",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 0.81
+    },
+    {
+      "language": "la",
+      "mode": "secureOffline",
+      "type": "summary cloze",
+      "error": "",
+      "calls": 1,
+      "hasOutput": true,
+      "actual": [
+        {
+          "type": "cloze text",
+          "style": "summary cloze",
+          "items": 2
+        }
+      ],
+      "uiLang": "la",
+      "errors": [],
+      "ok": true,
+      "seconds": 1.08
+    }
+  ],
+  "seconds": 269.2
+}
