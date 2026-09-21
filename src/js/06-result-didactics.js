@@ -190,7 +190,7 @@ function renderExportChecklist(collapse){
   // Zaškrtnutí položky NESMÍ sbalit checklist. Překreslení obsahu nemění atribut
   // `open` na elementu details, takže stav rozbalení zůstane zachovaný. Sbalíme jen tehdy,
   // když to volající výslovně chce (čerstvě vygenerovaný / přesestavený test).
-  if (collapse) box.removeAttribute('open');
+  if (collapse) box.toggleAttribute('open', !ready);
   box.innerHTML = `<summary><div class="check-title">✅ Krátká učitelská kontrola</div><div class="check-status ${ready?'ready':''}">${done}/${items.length} hotovo</div></summary>` +
     reqNote +
     `<div class="check-list">${items.map(([k,t,req]) => `<label class="check-item ${req?'check-item-req':''}"><input type="checkbox" ${exportChecklist[k]?'checked':''} onchange="toggleChecklistItem('${esc(k)}', this.checked)"><span>${esc(t)}${req?' <span class="check-req-tag" title="Povinné pro klasifikovaný test: stroj umí ověřit, že bodování počítá podle klíče správně, ale jestli klíč obsahově sedí, musí potvrdit učitel (AI může vyrobit hezký test s chybnou správnou odpovědí).">povinné</span>':''}</span></label>`).join('')}</div>`;

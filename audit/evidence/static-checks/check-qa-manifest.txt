@@ -1,0 +1,1 @@
+✅  QA manifest odpovídá GHRAB-QA-1.0.2 a verzi 7.1.46.

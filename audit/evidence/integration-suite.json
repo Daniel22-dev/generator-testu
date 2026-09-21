@@ -1,0 +1,235 @@
+[
+  {
+    "case": "hybrid-manual-AI-1-instant",
+    "groups": 1,
+    "mode": "instant",
+    "AIcalls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979527073
+    },
+    "ok": true,
+    "seconds": 1.75
+  },
+  {
+    "case": "hybrid-manual-AI-1-secureOffline",
+    "groups": 1,
+    "mode": "secureOffline",
+    "AIcalls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979528993
+    },
+    "ok": true,
+    "seconds": 1.92
+  },
+  {
+    "case": "hybrid-manual-AI-2-instant",
+    "groups": 2,
+    "mode": "instant",
+    "AIcalls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "instant",
+      "ranAt": 1789979530507
+    },
+    "ok": true,
+    "seconds": 1.51
+  },
+  {
+    "case": "hybrid-manual-AI-2-secureOffline",
+    "groups": 2,
+    "mode": "secureOffline",
+    "AIcalls": 1,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979532574
+    },
+    "ok": true,
+    "seconds": 2.07
+  },
+  {
+    "case": "all-manual-no-AI",
+    "error": "",
+    "output": true,
+    "calls": 0,
+    "types": [
+      [
+        "ordering"
+      ]
+    ],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.67
+  },
+  {
+    "case": "manual-cancel-falls-back-to-AI",
+    "error": "",
+    "output": true,
+    "calls": 1,
+    "types": [
+      [
+        "ordering"
+      ]
+    ],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.56
+  },
+  {
+    "case": "manual-abort-whole-generation",
+    "error": "\u274c Generov\u00e1n\u00ed zru\u0161eno.",
+    "output": false,
+    "calls": 0,
+    "types": [],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.13
+  },
+  {
+    "case": "provider-repair",
+    "error": "",
+    "output": true,
+    "calls": 2,
+    "types": [
+      [
+        "multiple choice"
+      ]
+    ],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.46
+  },
+  {
+    "case": "provider-invalid",
+    "error": "\u274c Gemini vr\u00e1til data mimo zad\u00e1n\u00ed, test negeneruji:\n- z\u00e1kladn\u00ed verze: po\u010det cvi\u010den\u00ed je 0, o\u010dek\u00e1v\u00e1no 1.",
+    "output": false,
+    "calls": 2,
+    "types": [],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.06
+  },
+  {
+    "case": "provider-throw",
+    "error": "\u274c Audit provider failure",
+    "output": false,
+    "calls": 1,
+    "types": [],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.05
+  },
+  {
+    "case": "provider-cancel",
+    "error": "\u274c cancelled",
+    "output": false,
+    "calls": 1,
+    "types": [],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.06
+  },
+  {
+    "case": "retry-after-cancel",
+    "error": "",
+    "output": true,
+    "calls": 1,
+    "types": [
+      [
+        "multiple choice"
+      ]
+    ],
+    "disabled": false,
+    "ok": true,
+    "seconds": 0.45
+  },
+  {
+    "case": "failed-regeneration-preserves-output",
+    "oldOutputUnchanged": true,
+    "ok": true,
+    "seconds": 0.07
+  },
+  {
+    "case": "eight-mixed-es",
+    "lang": "es",
+    "groups": 1,
+    "itemsEach": 5,
+    "split": false,
+    "calls": 8,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979536286
+    },
+    "ok": true,
+    "seconds": 1.2
+  },
+  {
+    "case": "eight-mixed-fr",
+    "lang": "fr",
+    "groups": 3,
+    "itemsEach": 5,
+    "split": false,
+    "calls": 8,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979537779
+    },
+    "ok": true,
+    "seconds": 1.49
+  },
+  {
+    "case": "eight-mixed-la",
+    "lang": "la",
+    "groups": 2,
+    "itemsEach": 5,
+    "split": true,
+    "calls": 8,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1789979539268
+    },
+    "ok": true,
+    "seconds": 1.49
+  },
+  {
+    "case": "oversized-eight-complex-blocked-before-AI",
+    "blockedBeforeAI": true,
+    "ok": true,
+    "seconds": 0.04
+  }
+]

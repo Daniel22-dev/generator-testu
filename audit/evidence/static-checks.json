@@ -1,0 +1,104 @@
+[
+  {
+    "check": "check-versions",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-versions.txt"
+  },
+  {
+    "check": "check-studio-manifest-template",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-studio-manifest-template.txt"
+  },
+  {
+    "check": "check-qa-manifest",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-qa-manifest.txt"
+  },
+  {
+    "check": "check-lockfile-registry",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-lockfile-registry.txt"
+  },
+  {
+    "check": "check-action-pins",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-action-pins.txt"
+  },
+  {
+    "check": "check-production-readiness",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-production-readiness.txt"
+  },
+  {
+    "check": "check-generator-assistant",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-generator-assistant.txt"
+  },
+  {
+    "check": "check-selftest-rpc-injection",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-selftest-rpc-injection.txt"
+  },
+  {
+    "check": "check-csp",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-csp.txt"
+  },
+  {
+    "check": "check-source-structure",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-source-structure.txt"
+  },
+  {
+    "check": "check-sensitive-data",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-sensitive-data.txt"
+  },
+  {
+    "check": "check-deadline-timers",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-deadline-timers.txt"
+  },
+  {
+    "check": "check-embedded-script-terminators",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-embedded-script-terminators.txt"
+  },
+  {
+    "check": "check-sw-precache",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/check-sw-precache.txt"
+  },
+  {
+    "check": "test-sw-offline-failsafe",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/test-sw-offline-failsafe.txt"
+  },
+  {
+    "check": "test-suite-session-lifecycle",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/test-suite-session-lifecycle.txt"
+  },
+  {
+    "check": "test-ai-core-version-rewrite",
+    "exitCode": 0,
+    "ok": true,
+    "log": "static-checks/test-ai-core-version-rewrite.txt"
+  }
+]

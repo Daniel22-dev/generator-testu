@@ -1,0 +1,63 @@
+{"type": "multiple choice", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 90952, "teacherBytes": 109903, "seconds": 1.39}
+{"type": "multiple choice", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 95357, "teacherBytes": 116839, "seconds": 1.18}
+{"type": "multiple choice", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 94920, "teacherBytes": 115867, "seconds": 1.11}
+{"type": "multi-select", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 7500, "studentBytes": 91246, "teacherBytes": 110314, "seconds": 1.01}
+{"type": "multi-select", "groups": 2, "maxItems": 23, "ok": true, "estimatedTokens": 11640, "studentBytes": 94715, "teacherBytes": 115519, "seconds": 1.2}
+{"type": "multi-select", "groups": 3, "maxItems": 15, "ok": true, "estimatedTokens": 11700, "studentBytes": 94176, "teacherBytes": 114451, "seconds": 1.09}
+{"type": "fill-in-the-blank", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 89846, "teacherBytes": 109789, "seconds": 1.12}
+{"type": "fill-in-the-blank", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 92039, "teacherBytes": 116497, "seconds": 1.1}
+{"type": "fill-in-the-blank", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 91976, "teacherBytes": 115571, "seconds": 1.25}
+{"type": "matching", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 3300, "studentBytes": 89706, "teacherBytes": 108512, "seconds": 0.88}
+{"type": "matching", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 6600, "studentBytes": 91619, "teacherBytes": 112666, "seconds": 0.95}
+{"type": "matching", "groups": 3, "maxItems": 30, "ok": true, "estimatedTokens": 9900, "studentBytes": 92576, "teacherBytes": 114743, "seconds": 1.16}
+{"type": "word order", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 90792, "teacherBytes": 110368, "seconds": 1.03}
+{"type": "word order", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 94877, "teacherBytes": 118234, "seconds": 1.14}
+{"type": "word order", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 94480, "teacherBytes": 117087, "seconds": 1.13}
+{"type": "ordering", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 7800, "studentBytes": 90608, "teacherBytes": 109912, "seconds": 1.0}
+{"type": "ordering", "groups": 2, "maxItems": 22, "ok": true, "estimatedTokens": 11600, "studentBytes": 93074, "teacherBytes": 114247, "seconds": 1.05}
+{"type": "ordering", "groups": 3, "maxItems": 14, "ok": true, "estimatedTokens": 11400, "studentBytes": 92724, "teacherBytes": 113235, "seconds": 0.98}
+{"type": "highlight-evidence", "groups": 1, "maxItems": 27, "ok": true, "estimatedTokens": 11640, "studentBytes": 90842, "teacherBytes": 109661, "seconds": 1.13}
+{"type": "highlight-evidence", "groups": 2, "maxItems": 13, "ok": true, "estimatedTokens": 11520, "studentBytes": 92129, "teacherBytes": 111325, "seconds": 0.92}
+{"type": "highlight-evidence", "groups": 3, "maxItems": 8, "ok": true, "estimatedTokens": 10980, "studentBytes": 91840, "teacherBytes": 110647, "seconds": 0.91}
+{"type": "categorisation-board", "groups": 1, "maxItems": 1, "ok": true, "estimatedTokens": 1200, "studentBytes": 89104, "teacherBytes": 106782, "seconds": 0.87}
+{"type": "categorisation-board", "groups": 2, "maxItems": 1, "ok": true, "estimatedTokens": 2400, "studentBytes": 89813, "teacherBytes": 107476, "seconds": 0.91}
+{"type": "categorisation-board", "groups": 3, "maxItems": 1, "ok": true, "estimatedTokens": 3600, "studentBytes": 90168, "teacherBytes": 107823, "seconds": 0.78}
+{"type": "table-completion", "groups": 1, "maxItems": 18, "ok": true, "estimatedTokens": 12000, "studentBytes": 91243, "teacherBytes": 110393, "seconds": 0.85}
+{"type": "table-completion", "groups": 2, "maxItems": 8, "ok": true, "estimatedTokens": 11000, "studentBytes": 92423, "teacherBytes": 111928, "seconds": 0.91}
+{"type": "table-completion", "groups": 3, "maxItems": 5, "ok": true, "estimatedTokens": 10650, "studentBytes": 92148, "teacherBytes": 111239, "seconds": 1.05}
+{"type": "transformation-chain", "groups": 1, "maxItems": 18, "ok": true, "estimatedTokens": 12000, "studentBytes": 91431, "teacherBytes": 111053, "seconds": 0.9}
+{"type": "transformation-chain", "groups": 2, "maxItems": 8, "ok": true, "estimatedTokens": 11000, "studentBytes": 92687, "teacherBytes": 112828, "seconds": 0.88}
+{"type": "transformation-chain", "groups": 3, "maxItems": 5, "ok": true, "estimatedTokens": 10650, "studentBytes": 92380, "teacherBytes": 112007, "seconds": 0.88}
+{"type": "translation", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 89954, "teacherBytes": 109891, "seconds": 0.86}
+{"type": "translation", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 92363, "teacherBytes": 116803, "seconds": 1.0}
+{"type": "translation", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 92248, "teacherBytes": 115819, "seconds": 1.09}
+{"type": "true/false", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 90132, "teacherBytes": 109168, "seconds": 0.83}
+{"type": "true/false", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 92897, "teacherBytes": 114632, "seconds": 1.1}
+{"type": "true/false", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 92720, "teacherBytes": 113887, "seconds": 0.95}
+{"type": "error correction", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 89754, "teacherBytes": 109816, "seconds": 0.81}
+{"type": "error correction", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 91763, "teacherBytes": 116578, "seconds": 0.98}
+{"type": "error correction", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 91728, "teacherBytes": 115639, "seconds": 1.15}
+{"type": "error-tagging", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 10200, "studentBytes": 91338, "teacherBytes": 112567, "seconds": 0.91}
+{"type": "error-tagging", "groups": 2, "maxItems": 17, "ok": true, "estimatedTokens": 11820, "studentBytes": 93467, "teacherBytes": 117064, "seconds": 0.9}
+{"type": "error-tagging", "groups": 3, "maxItems": 11, "ok": true, "estimatedTokens": 11790, "studentBytes": 93140, "teacherBytes": 115803, "seconds": 0.88}
+{"type": "cloze text", "groups": 1, "maxItems": 18, "ok": true, "estimatedTokens": 12000, "studentBytes": 89593, "teacherBytes": 109079, "seconds": 0.8}
+{"type": "cloze text", "groups": 2, "maxItems": 8, "ok": true, "estimatedTokens": 11000, "studentBytes": 90203, "teacherBytes": 110146, "seconds": 0.95}
+{"type": "cloze text", "groups": 3, "maxItems": 5, "ok": true, "estimatedTokens": 10650, "studentBytes": 90280, "teacherBytes": 109727, "seconds": 0.82}
+{"type": "sentence transformation", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 90398, "teacherBytes": 110347, "seconds": 0.91}
+{"type": "sentence transformation", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 93695, "teacherBytes": 118171, "seconds": 0.98}
+{"type": "sentence transformation", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 93464, "teacherBytes": 117083, "seconds": 0.99}
+{"type": "reading comprehension", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 7800, "studentBytes": 91134, "teacherBytes": 110091, "seconds": 0.81}
+{"type": "reading comprehension", "groups": 2, "maxItems": 21, "ok": true, "estimatedTokens": 11640, "studentBytes": 94349, "teacherBytes": 114634, "seconds": 0.87}
+{"type": "reading comprehension", "groups": 3, "maxItems": 12, "ok": true, "estimatedTokens": 11520, "studentBytes": 93864, "teacherBytes": 113395, "seconds": 0.95}
+{"type": "dialogue completion", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 91680, "teacherBytes": 110635, "seconds": 0.87}
+{"type": "dialogue completion", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 97541, "teacherBytes": 119035, "seconds": 0.88}
+{"type": "dialogue completion", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 96872, "teacherBytes": 117835, "seconds": 0.92}
+{"type": "categorization", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 90530, "teacherBytes": 109930, "seconds": 0.83}
+{"type": "categorization", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 94091, "teacherBytes": 116920, "seconds": 0.96}
+{"type": "categorization", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 93792, "teacherBytes": 115935, "seconds": 0.98}
+{"type": "word formation", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 5700, "studentBytes": 90260, "teacherBytes": 110200, "seconds": 0.88}
+{"type": "word formation", "groups": 2, "maxItems": 30, "ok": true, "estimatedTokens": 11400, "studentBytes": 93281, "teacherBytes": 117730, "seconds": 0.98}
+{"type": "word formation", "groups": 3, "maxItems": 20, "ok": true, "estimatedTokens": 11700, "studentBytes": 93072, "teacherBytes": 116655, "seconds": 1.02}
+{"type": "listening comprehension", "groups": 1, "maxItems": 30, "ok": true, "estimatedTokens": 10800, "studentBytes": 92438, "teacherBytes": 110827, "seconds": 0.78}
+{"type": "listening comprehension", "groups": 2, "maxItems": 16, "ok": true, "estimatedTokens": 11800, "studentBytes": 95036, "teacherBytes": 113740, "seconds": 0.82}
+{"type": "listening comprehension", "groups": 3, "maxItems": 10, "ok": true, "estimatedTokens": 11400, "studentBytes": 94304, "teacherBytes": 112723, "seconds": 0.89}

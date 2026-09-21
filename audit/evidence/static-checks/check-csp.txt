@@ -1,0 +1,1 @@
+✅  Aktivní CSP je synchronní, bez unsafe-eval; Acorn je lazy a runtime neobsahuje eval/new Function.

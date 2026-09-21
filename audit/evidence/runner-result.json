@@ -1,0 +1,101 @@
+{
+  "validateOnly": true,
+  "results": [
+    {
+      "suite": "config_matrix",
+      "ok": true,
+      "contracts": 5478,
+      "seconds": 0.0
+    },
+    {
+      "suite": "config_extra_suite",
+      "ok": true,
+      "scenarios": 301,
+      "seconds": 0.0
+    },
+    {
+      "suite": "wizard_suite",
+      "ok": true,
+      "scenarios": 16,
+      "seconds": 0.0
+    },
+    {
+      "suite": "czech_suite",
+      "ok": true,
+      "scenarios": 39,
+      "seconds": 0.0
+    },
+    {
+      "suite": "manual_suite",
+      "ok": true,
+      "scenarios": 9,
+      "seconds": 0.0
+    },
+    {
+      "suite": "pipeline_matrix",
+      "ok": true,
+      "scenarios": 380,
+      "seconds": 0.0
+    },
+    {
+      "suite": "browser_matrix",
+      "ok": true,
+      "scenarios": 48,
+      "seconds": 0.0
+    },
+    {
+      "suite": "editor_suite",
+      "ok": true,
+      "scenarios": 76,
+      "seconds": 0.0
+    },
+    {
+      "suite": "feature_suite",
+      "ok": true,
+      "scenarios": 15,
+      "seconds": 0.0
+    },
+    {
+      "suite": "integration_suite",
+      "ok": true,
+      "scenarios": 17,
+      "seconds": 0.0
+    },
+    {
+      "suite": "runtime_suite",
+      "ok": true,
+      "scenarios": 36,
+      "seconds": 0.0
+    },
+    {
+      "suite": "language_suite",
+      "ok": true,
+      "scenarios": 53,
+      "seconds": 0.0
+    },
+    {
+      "suite": "stress_suite",
+      "ok": true,
+      "scenarios": 63,
+      "seconds": 0.0
+    },
+    {
+      "suite": "identity_suite",
+      "ok": true,
+      "scenarios": 8,
+      "seconds": 0.0
+    },
+    {
+      "suite": "accessibility_forms_suite",
+      "ok": true,
+      "scenarios": 12,
+      "seconds": 0.0
+    },
+    {
+      "suite": "visual_suite",
+      "ok": true,
+      "scenarios": 4,
+      "seconds": 0.0
+    }
+  ]
+}

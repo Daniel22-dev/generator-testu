@@ -1,0 +1,38 @@
+{"scope": "exercise", "key": "cs_spell_choice", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_spell_blank", "ok": true, "exerciseCount": 1, "types": ["fill-in-the-blank"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_error_correction", "ok": true, "exerciseCount": 1, "types": ["error correction"], "correction": "semi", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_word_class", "ok": true, "exerciseCount": 1, "types": ["categorization"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_grammar_board", "ok": true, "exerciseCount": 1, "types": ["categorization"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_matching_terms", "ok": true, "exerciseCount": 1, "types": ["matching"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_syntax_mc", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_sentence_member", "ok": true, "exerciseCount": 1, "types": ["categorization"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_punctuation_choice", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_punctuation_blank", "ok": true, "exerciseCount": 1, "types": ["fill-in-the-blank"], "correction": "semi", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_punctuation_correction", "ok": true, "exerciseCount": 1, "types": ["error correction"], "correction": "manual", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_text_mc", "ok": true, "exerciseCount": 1, "types": ["reading comprehension"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_text_tf", "ok": true, "exerciseCount": 1, "types": ["true/false"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_text_evidence", "ok": true, "exerciseCount": 1, "types": ["highlight-evidence"], "correction": "semi", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_ordering", "ok": true, "exerciseCount": 1, "types": ["ordering"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_synonym_choice", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_antonym_choice", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_phraseology_matching", "ok": true, "exerciseCount": 1, "types": ["matching"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_polysemy_context", "ok": true, "exerciseCount": 1, "types": ["reading comprehension"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_term_definition", "ok": true, "exerciseCount": 1, "types": ["matching"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_style_choice", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "semi", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_style_correction", "ok": true, "exerciseCount": 1, "types": ["error correction"], "correction": "manual", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_lit_terms", "ok": true, "exerciseCount": 1, "types": ["matching"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "exercise", "key": "cs_lit_choice", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "semi", "mode": "instant", "calls": 1}
+{"scope": "preset", "key": "pravopis_rychle", "ok": true, "exerciseCount": 2, "types": ["multiple choice", "fill-in-the-blank"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "preset", "key": "pravopis_oprava_chyb", "ok": true, "exerciseCount": 2, "types": ["error correction", "multiple choice"], "correction": "semi", "mode": "instant", "calls": 2}
+{"scope": "preset", "key": "mluvnice", "ok": true, "exerciseCount": 3, "types": ["categorization", "categorization", "matching"], "correction": "auto", "mode": "secureOffline", "calls": 2}
+{"scope": "preset", "key": "skladba", "ok": true, "exerciseCount": 3, "types": ["multiple choice", "categorization", "multiple choice"], "correction": "auto", "mode": "secureOffline", "calls": 2}
+{"scope": "preset", "key": "interpunkce", "ok": true, "exerciseCount": 1, "types": ["multiple choice"], "correction": "auto", "mode": "instant", "calls": 1}
+{"scope": "preset", "key": "interpunkce_doplneni", "ok": true, "exerciseCount": 1, "types": ["fill-in-the-blank"], "correction": "semi", "mode": "instant", "calls": 1}
+{"scope": "preset", "key": "interpunkce_oprava", "ok": true, "exerciseCount": 1, "types": ["error correction"], "correction": "manual", "mode": "instant", "calls": 1}
+{"scope": "preset", "key": "text", "ok": true, "exerciseCount": 3, "types": ["reading comprehension", "true/false", "highlight-evidence"], "correction": "semi", "mode": "instant", "calls": 3}
+{"scope": "preset", "key": "slovni_zasoba", "ok": true, "exerciseCount": 5, "types": ["multiple choice", "multiple choice", "matching", "reading comprehension", "matching"], "correction": "auto", "mode": "instant", "calls": 4}
+{"scope": "preset", "key": "stylistika", "ok": true, "exerciseCount": 3, "types": ["multiple choice", "error correction", "reading comprehension"], "correction": "manual", "mode": "instant", "calls": 3}
+{"scope": "preset", "key": "literatura", "ok": true, "exerciseCount": 3, "types": ["matching", "multiple choice", "categorization"], "correction": "semi", "mode": "instant", "calls": 3}
+{"scope": "preset", "key": "prijimacky", "ok": true, "exerciseCount": 5, "types": ["multiple choice", "reading comprehension", "true/false", "multiple choice", "multiple choice"], "correction": "auto", "mode": "instant", "calls": 5}
+{"scope": "preset", "key": "maturita", "ok": true, "exerciseCount": 4, "types": ["multiple choice", "multiple choice", "reading comprehension", "multiple choice"], "correction": "semi", "mode": "secureOffline", "calls": 4}
+{'test': 'czech-max10-and-topic-persistence', 'ok': True}

@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "checks": [
+    "targeted-json-keys-only",
+    "brandVersion-preserved",
+    "build-CORE_VERSION-only"
+  ]
+}

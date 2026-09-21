@@ -1,0 +1,1 @@
+✅  Externí GitHub Actions jsou připnuté plným commit SHA (25 použití).

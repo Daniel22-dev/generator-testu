@@ -190,6 +190,7 @@ function showOnlyStep(n) {
 }
 
 function goTo(n) {
+  if(window.__GHRAB_GENERATOR_WORKFLOW_ID__||outputMutationBusy)return;
   $('step'+currentStep).classList.add('hidden');
   $('step'+n).classList.remove('hidden');
   currentStep = n;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.45">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.46">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -493,18 +493,19 @@
         <div class="field-hint">Pro ostrý test doporučujeme jednorázový kód. Pro procvičování stačí jméno.</div>
         <div class="btn-row choice-card-grid two-col" id="identityModeBtns">
           <button class="tag-btn active" data-val="name" onclick="pick('identityMode','name')"><span class="choice-card-title">🙂 Jméno</span><span class="choice-card-desc">Student zadá jméno. Vhodné pro procvičování a nízkorizikové testy.</span></button>
-          <button class="tag-btn" data-val="oneTimeCode" onclick="pick('identityMode','oneTimeCode')"><span class="choice-card-title">🔑 Jednorázový kód</span><span class="choice-card-desc">Student zadá kód od učitele. Pro ostrý test; kódy se generují pokaždé nové.</span></button>
+          <button class="tag-btn" data-val="oneTimeCode" onclick="pick('identityMode','oneTimeCode')"><span class="choice-card-title">🔑 Individuální kód studenta</span><span class="choice-card-desc">Student zadá kód od učitele. Pro ostrý test; kódy se generují pokaždé nové.</span></button>
         </div>
       </div>
 
       <div class="field" id="rosterField">
-        <div class="field-label">🔑 Kódy studentů (roster) <button class="tt-icon" data-tip="Použije se u režimu „jednorázový kód". Vlep e-maily skupiny z IS, vygeneruj kódy a pak vygeneruj test — kódy se zapečou JEN do učitelského verifieru (kód → označení studenta), nikdy do studentského testu. E-maily zůstávají u tebe (v CSV pro rozeslání), do verifieru se neukládají. Kódy jsou pokaždé nové.">?</button></div>
-        <div class="field-hint">Pro režim „jednorázový kód". Vlep e-maily skupiny (jeden na řádek nebo oddělené čárkou), vygeneruj kódy, pak vygeneruj test.</div>
+        <div class="field-label">🔑 Kódy studentů (roster) <button class="tt-icon" data-tip="Použije se u režimu „individuální kód". Vlep e-maily skupiny z IS, vygeneruj kódy a pak vygeneruj test — kódy se zapečou JEN do učitelského verifieru (kód → označení studenta), nikdy do studentského testu. E-maily zůstávají u tebe (v CSV pro rozeslání), do verifieru se neukládají. Kódy jsou pokaždé nové.">?</button></div>
+        <div class="field-hint">Pro režim „individuální kód". Vlep e-maily skupiny (jeden na řádek nebo oddělené čárkou), vygeneruj kódy, pak vygeneruj test.</div>
         <textarea id="rosterEmails" rows="4" placeholder="balaz@ghrabuvka, novak@ghrabuvka" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:13px"></textarea>
         <div class="btn-row" style="margin-top:8px;gap:8px">
           <button type="button" class="btn-edit" onclick="rosterGenerate()">🔑 Vygenerovat kódy</button>
           <button type="button" class="btn-edit" style="opacity:.85" onclick="rosterDownloadCsv()">⬇ Stáhnout CSV (e-mail, kód)</button>
         </div>
+        <p class="small-muted">Každému studentovi předej soukromě jen jeho kód. CSV s e-maily a kódy nesdílej se třídou. Pro další test vygeneruj nové kódy. Bez serveru nelze zaručit jednorázové použití napříč zařízeními; duplicitní odevzdání ověřuje učitel.</p>
         <div id="rosterResult" class="small-muted" style="margin-top:8px">Zatím žádné kódy. Vlep e-maily a klikni na „Vygenerovat kódy".</div>
       </div>
 
@@ -625,10 +626,11 @@
         <div class="field-label">✍️ Tolerance překlepů u psaných odpovědí <button class="tt-icon" data-tip="Týká se jen otevřených psaných typů (překlad, slovotvorba, oprava chyb, transformace vět, doplňování). Posuzuje drobnou odchylku od správné odpovědi (Levenshtein ≤ 1 znak). Výběr možností, true/false ani párování to neovlivňuje. Přesná shoda je vždy plný počet bodů bez ohledu na nastavení.">?</button></div>
         <div class="field-hint">Pro klasifikované a maturitní testy je doporučeno <strong>Vypnuto</strong>: u jazyka bývá pravopis součástí hodnocené dovednosti a tiché přidávání bodů za překlep je hůř obhajitelné. Zapni jen tam, kde pravopis nehodnotíš (např. obsahový překlad).</div>
         <div class="btn-row choice-card-grid three-col" id="fuzzyBtns">
-          <button class="tag-btn active" data-val="off" onclick="pick('fuzzyTolerance','off')"><span class="choice-card-title">🔒 Vypnuto</span><span class="choice-card-desc">Jen přesná shoda. Nejčistší varianta pro známkované jazykové testy.</span></button>
+          <button class="tag-btn active" data-val="off" onclick="pick('fuzzyTolerance','off')"><span class="choice-card-title">🔒 Vypnuto</span><span class="choice-card-desc">Bez tolerance překlepů. Platí níže uvedená jazyková pravidla.</span></button>
           <button class="tag-btn" data-val="mild" onclick="pick('fuzzyTolerance','mild')"><span class="choice-card-title">≈ Mírná</span><span class="choice-card-desc">Drobný překlep může získat 0,85 bodu podle typu úlohy.</span></button>
           <button class="tag-btn" data-val="strict" onclick="pick('fuzzyTolerance','strict')"><span class="choice-card-title">± Přísná</span><span class="choice-card-desc">Drobný překlep může získat 0,5 bodu. Kompromis mezi přísností a tolerancí.</span></button>
         </div>
+        <p class="small-muted">Otevřené odpovědi se porovnávají s klíčem a schválenými alternativami, nikoli podle významu pomocí AI. U cizích jazyků se ignorují velká písmena a běžná interpunkce; tento režim proto nepoužívej pro zkoušení německých velkých písmen. Ve španělštině rozdíl jen v přízvuku nebo ü znamená 50 % bodů i bez tolerance překlepů; ñ se od n rozlišuje. V češtině rozhodují přepínače jejího modulu.</p>
         <div class="field-hint" style="margin-top:8px;line-height:1.65"><strong>Příklad</strong> — psaná odpověď, správně má být <strong>„beautiful“</strong>, student napíše <strong>„beatiful“</strong> (1 vynechané písmeno):<br>🔒 <strong>Vypnuto</strong> → 0 b&nbsp;&nbsp;·&nbsp;&nbsp;≈ <strong>Mírná</strong> → 0,85 b (u oprav chyb / transformací / slovotvorby 0,5 b)&nbsp;&nbsp;·&nbsp;&nbsp;± <strong>Přísná</strong> → 0,5 b. Přesné „beautiful“ je vždy plný počet bodů ve všech režimech. Pozor: krátká slova do 5 znaků se netolerují nikdy — např. „horse“ místo „house“ = 0 b i v Mírné/Přísné.</div>
         <div class="small-muted" id="fuzzyNote" style="margin-top:8px"></div>
       </div>
@@ -752,12 +754,7 @@
 
     <!-- ═══════════════════════════ STEP 3 ═══════════════════════════ -->
     <div id="step3" class="hidden">
-      <div class="simple-helper" id="simpleSecretsHelper">
-        <b>Učitelský přístup:</b> pro tento test ještě chybí učitelský přístupový kód. Použije se pro učitelský mód a případné odemčení testu; neukládá se do historie ani šablon.
-        <div class="simple-quick-row">
-          <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Vygenerovat učitelský přístupový kód</button>
-        </div>
-      </div>
+      <div class="simple-helper" id="simpleSecretsHelper">Doplň níže jeden učitelský přístupový kód. Můžeš jej napsat, nebo použít tlačítko u pole.</div>
       <div class="field">
         <div class="field-label">👤 Jméno pro učitelský mód <button class="tt-icon" data-tip="Učitelský mód se nově neaktivuje jen jménem. Vyžaduje jméno učitele + učitelský přístupový kód, aby student nemohl snadno zobrazit správné odpovědi.">?</button></div>
         <input type="text" id="ucitelJmeno" value="Daniel Baláž" autocomplete="off" oninput="onInput()">
@@ -768,6 +765,7 @@
           <input type="password" id="ucitelPin" placeholder="Zadej učitelský přístupový kód..." autocomplete="new-password" oninput="onTeacherAccessCodeInput()">
           <button type="button" class="btn-eye" onclick="toggleSecret('ucitelPin', this)" aria-label="Zobrazit nebo skrýt učitelský přístupový kód">👁</button>
         </div>
+        <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Doplnit náhodný kód do tohoto pole</button>
         <input type="hidden" id="heslo" value="" aria-hidden="true">
         <div class="small-muted">Používáš jeden kód. Generátor z něj interně vytvoří oddělený hash pro učitelský mód a oddělený hash pro odemčení.</div>
       </div>
@@ -839,12 +837,13 @@
       </div>
       <div class="split-gen-row">
         <label class="split-gen-label" title="Každé cvičení se generuje samostatným API requestem — včetně jednoduchých typů. Složitá cvičení generátor odděluje automaticky (hybrid). Tuto volbu použij, pokud chceš rozdělit opravdu každé cvičení zvlášť.">
-          <input type="checkbox" id="chkSplitGen" onchange="state.splitGenerate=this.checked;saveSnapshot();">
+          <input type="checkbox" id="chkSplitGen" onchange="state.splitGenerate=this.checked;saveSnapshot();renderGenerationEstimate();">
           📦 Každé cvičení zvlášť
         </label>
         <span class="split-gen-hint">Včetně jednoduchých — hybrid to dělá automaticky jen pro složitá</span>
       </div>
 
+      <div id="generationEstimate" class="small-muted" role="status"></div>
       <!-- PROGRESS -->
       <div class="gen-progress hidden" id="genProgress">
         <span class="gen-spinner"></span>
@@ -856,52 +855,29 @@
       <div class="gen-error hidden" id="genError"></div>
 
       <!-- RESULT / DOWNLOAD -->
-      <div class="gen-result hidden" id="genResult">
-        <div class="gen-result-title" id="genResultTitle">✅ Test je připraven ke stažení!</div>
-        <button class="btn-preview" id="btnPreview" onclick="openTestPreview()">👁 Náhled testu (bez stahování)</button>
-        <button class="btn-edit" id="btnEdit" onclick="openTestEditor()">✏️ Upravit otázky a odpovědi</button>
-        <div class="enrich-row">
-          <button class="btn-edit" id="btnEnrich" onclick="enrichAltAnswers()">✨ Rozšířit přijatelné odpovědi</button>
-          <span class="req-badge" title="Tato akce znovu volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
-          <button type="button" class="tt-icon enrich-help" data-tip="Funkce znovu požádá Gemini, aby u textově opravovaných úloh doplnilo další uznatelné varianty odpovědí: synonyma, běžné pravopisné varianty, alternativní formulace nebo odpovědi bez zbytečně přísného slovosledu. Nemění zadání ani body; rozšiřuje pouze seznam odpovědí, které má test/verifier uznat jako správné. Po použití je dobré výsledek rychle zkontrolovat v editoru.">?</button>
-        </div>
-        <details class="quality-panel hidden" id="qualityPanel"></details>
-        <details class="quality-panel hidden" id="didacticPanel"></details>
-        <details class="export-checklist" id="exportChecklist"></details>
-        <div class="enrich-row">
-          <button class="btn-edit" id="btnSelfTest" onclick="runScoringSelfTest()" title="Spustí vygenerovaný test proti reálnému kódu hodnocení: udělá syntetické správné i špatné odpovědi, ověří 100/0 % a celý kryptografický řetězec student↔verifier. U klasifikovaného testu je POVINNÝ — bez úspěšného self-testu nepustí stažení. Důvod: špatně spočítaná známka je horší než nespustitelný test.">🧪 Self-test bodování (před ostrým nasazením)</button>
-          <button type="button" class="tt-icon enrich-help" data-tip="Kontrola, že hodnoticí logika počítá body správně — chrání před tichou chybnou známkou, což je horší riziko než rozbitá stránka. Tvůj právě vygenerovaný test u každého typu úlohy synteticky vyplní jednou zcela správně a jednou zcela špatně a nechá to obodovat SKUTEČNÝMI funkcemi staženého testu (v bezpečném režimu i celý šifrovací řetězec student→učitel). Očekává 100 % za vše správně a 0 % za vše špatně. Také upozorní na úlohy bez uloženého klíče správné odpovědi. Spouštěj po každé změně hodnocení a před prvním klasifikovaným nasazením.">?</button>
-        </div>
-        <div id="selfTestReport" class="hidden"></div>
-        <div class="enrich-row">
-          <button class="btn-edit" id="btnKeyCheck" onclick="aiVerifyKey()" title="Druhý nezávislý klíč: požádá AI, aby sama vyřešila úlohy tohoto testu (NEgeneruje nový test), a porovná její odpovědi s uloženým klíčem. Položky, kde se AI a klíč liší, označí jako podezřelé — levný signál, kde nejspíš je chyba v klíči. Není to důkaz chyby; je to seznam míst k ruční kontrole. Vyžaduje Gemini klíč v panelu AI připojení na první stránce.">🔑 Ověřit klíč druhým průchodem (AI)</button>
-          <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
-          <button type="button" class="tt-icon enrich-help" data-tip="Self-test ověří, že STROJ počítá body podle klíče správně. Neumí ale poznat, jestli je sám KLÍČ obsahově správný (AI může vyrobit hezkou otázku se špatně označenou správnou odpovědí). Tahle funkce proto nechá AI nezávisle odpovědět na stejné otázky a ukáže položky, kde se její odpověď liší od uloženého klíče — přesně tam je nejvyšší šance na chybu v klíči. Funguje u uzavřených a krátkých typů (výběr, true/false, doplňování, slovotvorba…); u otevřených překladů/transformací je signál slabší a bere se jen jako upozornění.">?</button>
-        </div>
-        <div id="keyCheckReport" class="hidden"></div>
-        <div class="enrich-row">
-          <button type="button" class="btn-edit" style="opacity:.75" onclick="runScannerTests()" title="Spustí 14 fixture testů bezpečnostního skeneru (6 povinných scénářů + 8 regresních). Ověří, že scanner po změnách pravidel stále správně blokuje citlivá data a nepropouští falešně negativní nálezy. Volej po každé úpravě SecretScanner pravidel.">🛡 Testy skeneru (regrese)</button>
-        </div>
-        <div id="secureGateBanner" class="hidden"></div>
-        <button class="btn-dl-test" id="btnDownloadMain" onclick="downloadGeneratedTest()">⬇ Stáhnout test (.html)</button>
-        <!-- SECURE OFFLINE: studentský soubor = primární „bezpečné" stažení (tohle se publikuje studentům) -->
-        <div class="dl-student-block hidden" id="dlStudentBlock">
-          <button class="btn-dl-test" id="btnDownloadStudent" onclick="downloadGeneratedStudentTest()" title="Tento soubor jde studentům (přes HTTPS odkaz, ne jako příloha). Před stažením proběhne kontrola obsahu — pokud by v něm omylem byl klíč odpovědí nebo soukromý dešifrovací klíč, stažení se zablokuje.">⬇ Stáhnout studentský test</button>
-          <div class="dl-safe-note">✅ <strong>Tohle je ten soubor pro studenty</strong> (<code>student_test.html</code>) — tenhle publikuješ na web / posíláš na něj odkaz. Nejsou v něm správné odpovědi a před stažením se to ještě automaticky kontroluje.</div>
-        </div>
-        <!-- SECURE OFFLINE: učitelský verifier = vizuálně oddělený, citlivý soubor (nikdy nepublikovat) -->
-        <div class="dl-teacher-block hidden" id="dlTeacherBlock">
-          <div class="dl-teacher-head">🔒 Jen pro učitele — nikdy nepublikovat</div>
-          <div class="warn-box" id="teacherFileWarning"><strong>⚠️ Pozor:</strong> <code>teacher_verifier.html</code> obsahuje <strong>správné odpovědi</strong>, soukromý dešifrovací klíč, učitelský náhled i archivní nástroje. Drž ho jen u sebe — nikdy ho nedávej studentům ani do sdílené/publikované složky. Studentům jde pouze <code>student_test.html</code> nahoře.</div>
-          <button class="btn-dl-secondary btn-dl-danger" id="btnDownloadTeacher" onclick="downloadGeneratedTeacherVerifier()" title="Tento soubor obsahuje SPRÁVNÉ ODPOVĚDI a soukromý dešifrovací klíč. Stahuje se s prefixem DO_NOT_SEND_TEACHER_VERIFIER_… aby varování přežilo i mimo aplikaci. Nikdy nesdílej se studenty ani na veřejný web.">⬇ Stáhnout učitelský verifier — NEPOSÍLAT STUDENTŮM</button>
-        </div>
-        <div class="integrity-panel hidden" id="integrityPanel"></div>
-        <div class="dl-variant-block" style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--bdr2)">
-          <button type="button" class="btn-edit" id="btnVariant" onclick="makeVariantForNextGroup()" title="Vytvoří z téhož testu novou variantu pro další skupinu: nové Test ID, nový název souboru a promíchané pořadí. Stejná látka i body, bez nového volání AI.">🔀 Nová varianta pro další skupinu</button>
-          <div class="small-muted" style="margin-top:6px">Stejná látka i body, ale nové Test ID a jiné pořadí — ať druhá skupina nesdílí otázky. Správné odpovědi posílej studentům až po skončení všech skupin.</div>
-          <div id="variantNote" class="secure-mode-box hidden" style="margin-top:8px"></div>
-        </div>
-      </div>
+<div class="gen-result hidden" id="genResult"><div class="gen-result-title" id="genResultTitle">✅ Test je připraven ke stažení!</div><div class="result-step-grid" role="tablist" aria-label="Dokončení testu"><button type="button" class="result-step-card" role="tab" id="resultTab1" aria-controls="resultPanel1" aria-selected="true" tabindex="0" data-result-step="1" onclick="resultStep(1)" onkeydown="resultStepKey(event,1)"><span class="result-step-number">1</span><strong>Zkontrolovat obsah</strong><span class="result-step-status">Doporučené</span></button><button type="button" class="result-step-card" role="tab" id="resultTab2" aria-controls="resultPanel2" aria-selected="false" tabindex="-1" data-result-step="2" onclick="resultStep(2)" onkeydown="resultStepKey(event,2)"><span class="result-step-number">2</span><strong>Ověřit bodování</strong><span class="result-step-status">Doporučené</span></button><button type="button" class="result-step-card" role="tab" id="resultTab3" aria-controls="resultPanel3" aria-selected="false" tabindex="-1" data-result-step="3" onclick="resultStep(3)" onkeydown="resultStepKey(event,3)"><span class="result-step-number">3</span><strong>Druhý pohled AI</strong><span class="result-step-status">Volitelné</span></button><button type="button" class="result-step-card" role="tab" id="resultTab4" aria-controls="resultPanel4" aria-selected="false" tabindex="-1" data-result-step="4" onclick="resultStep(4)" onkeydown="resultStepKey(event,4)"><span class="result-step-number">4</span><strong>Stáhnout a předat</strong><span class="result-step-status">Doporučené</span></button></div><section id="resultPanel1" data-result-panel="1" role="tabpanel" aria-labelledby="resultTab1" class="result-step-panel"><h3>1. Zkontrolovat obsah</h3><p class="result-step-intro">Prohlédni zadání, správné odpovědi a přijatelné varianty. Technická kontrola nerozpozná obsahově chybný klíč.</p><button class="btn-preview" id="btnPreview" onclick="openTestPreview()">👁 Náhled testu (bez stahování)</button><button class="btn-edit" id="btnEdit" onclick="openTestEditor()">✏️ Upravit otázky a odpovědi</button><details class="export-checklist" id="exportChecklist"></details><details class="quality-panel hidden" id="qualityPanel"></details><details class="quality-panel hidden" id="didacticPanel"></details><div class="result-step-nav"><button type="button" class="btn-next" onclick="resultStep(2,true)">Další krok →</button></div></section><section id="resultPanel2" data-result-panel="2" role="tabpanel" aria-labelledby="resultTab2" class="result-step-panel hidden"><h3>2. Ověřit bodování</h3><p class="result-step-intro">Self-test ověří skutečné bodování: správné, chybné i prázdné odpovědi a dílčí skóre. Pro bezpečný offline test je povinný. Nenahrazuje kontrolu obsahu.</p><div class="enrich-row">
+<button class="btn-edit" id="btnSelfTest" onclick="runScoringSelfTest()" title="Spustí vygenerovaný test proti reálnému kódu hodnocení: udělá syntetické správné i špatné odpovědi, ověří 100/0 % a celý kryptografický řetězec student↔verifier. U klasifikovaného testu je POVINNÝ — bez úspěšného self-testu nepustí stažení. Důvod: špatně spočítaná známka je horší než nespustitelný test.">🧪 Self-test bodování (před ostrým nasazením)</button>
+<button class="tt-icon enrich-help" data-tip="Kontrola, že hodnoticí logika počítá body správně — chrání před tichou chybnou známkou, což je horší riziko než rozbitá stránka. Tvůj právě vygenerovaný test u každého typu úlohy synteticky vyplní jednou zcela správně a jednou zcela špatně a nechá to obodovat SKUTEČNÝMI funkcemi staženého testu (v bezpečném režimu i celý šifrovací řetězec student→učitel). Očekává 100 % za vše správně a 0 % za vše špatně. Také upozorní na úlohy bez uloženého klíče správné odpovědi. Spouštěj po každé změně hodnocení a před prvním klasifikovaným nasazením." type="button">?</button>
+</div><div class="hidden" id="selfTestReport"></div><div class="result-step-nav"><button type="button" class="btn-next" onclick="resultStep(3,true)">Další krok →</button></div></section><section id="resultPanel3" data-result-panel="3" role="tabpanel" aria-labelledby="resultTab3" class="result-step-panel hidden"><h3>3. Druhý pohled AI</h3><p class="result-step-intro">Tyto kontroly jsou volitelné a volají AI. Návrhy nejsou automaticky správné: přijmi jen konkrétní ověřené odpovědi. Po změně zopakuj kontrolu obsahu a self-test.</p><div class="enrich-row">
+<button class="btn-edit" id="btnEnrich" onclick="enrichAltAnswers()">✨ Rozšířit přijatelné odpovědi</button>
+<span class="req-badge" title="Tato akce znovu volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
+<button class="tt-icon enrich-help" data-tip="Funkce znovu požádá Gemini, aby u textově opravovaných úloh doplnilo další uznatelné varianty odpovědí: synonyma, běžné pravopisné varianty, alternativní formulace nebo odpovědi bez zbytečně přísného slovosledu. Nemění zadání ani body; rozšiřuje pouze seznam odpovědí, které má test/verifier uznat jako správné. Po použití je dobré výsledek rychle zkontrolovat v editoru." type="button">?</button>
+</div><div class="enrich-row">
+<button class="btn-edit" id="btnKeyCheck" onclick="aiVerifyKey()" title="Druhý nezávislý klíč: požádá AI, aby sama vyřešila úlohy tohoto testu (NEgeneruje nový test), a porovná její odpovědi s uloženým klíčem. Položky, kde se AI a klíč liší, označí jako podezřelé — levný signál, kde nejspíš je chyba v klíči. Není to důkaz chyby; je to seznam míst k ruční kontrole. Vyžaduje Gemini klíč v panelu AI připojení na první stránce.">🔑 Ověřit klíč druhým průchodem (AI)</button>
+<span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru.">spotřebuje AI požadavek</span>
+<button class="tt-icon enrich-help" data-tip="Self-test ověří, že STROJ počítá body podle klíče správně. Neumí ale poznat, jestli je sám KLÍČ obsahově správný (AI může vyrobit hezkou otázku se špatně označenou správnou odpovědí). Tahle funkce proto nechá AI nezávisle odpovědět na stejné otázky a ukáže položky, kde se její odpověď liší od uloženého klíče — přesně tam je nejvyšší šance na chybu v klíči. Funguje u uzavřených a krátkých typů (výběr, true/false, doplňování, slovotvorba…); u otevřených překladů/transformací je signál slabší a bere se jen jako upozornění." type="button">?</button>
+</div><div class="hidden" id="keyCheckReport"></div><div id="answerProposalReport" class="hidden"></div><div class="result-step-nav"><button type="button" class="btn-next" onclick="resultStep(4,true)">Další krok →</button></div></section><section id="resultPanel4" data-result-panel="4" role="tabpanel" aria-labelledby="resultTab4" class="result-step-panel hidden"><h3>4. Stáhnout a předat</h3><p class="result-step-intro">Studentům předej pouze studentský soubor jako webový odkaz. Učitelský verifier obsahuje klíč a zůstává soukromý. Uchovej si i přístupový kód.</p><div class="hidden" id="secureGateBanner"></div><button class="btn-dl-test" id="btnDownloadMain" onclick="downloadGeneratedTest()">⬇ Stáhnout test (.html)</button><div class="dl-student-block hidden" id="dlStudentBlock">
+<button class="btn-dl-test" id="btnDownloadStudent" onclick="downloadGeneratedStudentTest()" title="Tento soubor jde studentům (přes HTTPS odkaz, ne jako příloha). Před stažením proběhne kontrola obsahu — pokud by v něm omylem byl klíč odpovědí nebo soukromý dešifrovací klíč, stažení se zablokuje.">⬇ Stáhnout studentský test</button>
+<div class="dl-safe-note">✅ <strong>Tohle je ten soubor pro studenty</strong> (<code>student_test.html</code>) — tenhle publikuješ na web / posíláš na něj odkaz. Nejsou v něm správné odpovědi a před stažením se to ještě automaticky kontroluje.</div>
+</div><div class="dl-teacher-block hidden" id="dlTeacherBlock">
+<div class="dl-teacher-head">🔒 Jen pro učitele — nikdy nepublikovat</div>
+<div class="warn-box" id="teacherFileWarning"><strong>⚠️ Pozor:</strong> <code>teacher_verifier.html</code> obsahuje <strong>správné odpovědi</strong>, soukromý dešifrovací klíč, učitelský náhled i archivní nástroje. Drž ho jen u sebe — nikdy ho nedávej studentům ani do sdílené/publikované složky. Studentům jde pouze <code>student_test.html</code> nahoře.</div>
+<button class="btn-dl-secondary btn-dl-danger" id="btnDownloadTeacher" onclick="downloadGeneratedTeacherVerifier()" title="Tento soubor obsahuje SPRÁVNÉ ODPOVĚDI a soukromý dešifrovací klíč. Stahuje se s prefixem DO_NOT_SEND_TEACHER_VERIFIER_… aby varování přežilo i mimo aplikaci. Nikdy nesdílej se studenty ani na veřejný web.">⬇ Stáhnout učitelský verifier — NEPOSÍLAT STUDENTŮM</button>
+</div><details class="step4-details"><summary>Volitelně: další skupina</summary><div class="dl-variant-block" style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--bdr2)">
+<button class="btn-edit" id="btnVariant" onclick="makeVariantForNextGroup()" title="Vytvoří z téhož testu novou variantu pro další skupinu: nové Test ID, nový název souboru a promíchané pořadí. Stejná látka i body, bez nového volání AI." type="button">🔀 Nová varianta pro další skupinu</button>
+<div class="small-muted" style="margin-top:6px">Stejná látka i body, ale nové Test ID a jiné pořadí — ať druhá skupina nesdílí otázky. Správné odpovědi posílej studentům až po skončení všech skupin.</div>
+<div class="secure-mode-box hidden" id="variantNote" style="margin-top:8px"></div>
+</div></details></section></div>
 
       <hr class="step4-sep">
 

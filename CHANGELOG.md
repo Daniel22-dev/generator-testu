@@ -1,3 +1,7 @@
+## 7.1.46 — 2026-09-21 — source audit candidate
+
+Opravy generování, formulářů, editací, lokalizace FR/LA, odpovědí, bodování, variant a překryvu editoru. Nové čtyři kroky výsledkové obrazovky. Důkazy a omezení v audit/REPORT.md. Živá AI a provozní akceptace nebyly provedeny.
+
 ## 7.1.45 — AI Core + workflow cleanup (2026-09-19)
 
 - Odstraněna ruční volba konkrétních AI modelů z běžného UI; Generátor používá pouze AI Core profily `economy / balanced / quality`.

@@ -47,7 +47,7 @@ async function hashIdentityCode(value,salt){
 }
 async function buildPublicIdentityCodeHashes(st,salt){
   if(!st || (st.identityMode||'name')!=='oneTimeCode') return [];
-  const rows=(typeof rosterEntries!=='undefined'&&Array.isArray(rosterEntries))?rosterEntries:[];
+  const rows=Array.isArray(st.__roster)?st.__roster:((typeof rosterEntries!=='undefined'&&Array.isArray(rosterEntries))?rosterEntries:[]);
   const out=[];
   for(const row of rows){ if(row&&row.code) out.push(await hashIdentityCode(row.code,salt)); }
   return Array.from(new Set(out));
@@ -87,9 +87,9 @@ function randomHex(bytes){const a=new Uint8Array(bytes||16);if(!(window.crypto&&
 function shuffled(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 function resolveCorrectIndex(item) {
   if (!item || !Array.isArray(item.options)) return -1;
-  if (typeof item.correct === 'number') { if (item.correct < 0 || item.correct >= item.options.length) return -1; return item.correct; }
+  if (typeof item.correct === 'number') { if (!Number.isInteger(item.correct) || item.correct < 0 || item.correct >= item.options.length) return -1; return item.correct; }
   const c = String(item.correct ?? '').trim();
-  if (/^[0-9]+$/.test(c)) return parseInt(c, 10);
+  if (/^[0-9]+$/.test(c)) { const index=Number(c); return index<item.options.length?index:-1; }
   const byText = item.options.map(String).findIndex(x => x.trim().toLowerCase() === c.toLowerCase());
   if (byText >= 0) return byText;
   if (c.length === 1) {
@@ -108,6 +108,45 @@ function getApiDiffGroups(st){if(st.diferencovany!=='ANO'||!Array.isArray(st.sku
 function valueText(v){return String(v == null ? '' : v).replace(/\u0000/g,'').trim();}
 function hasAnyText(obj, keys){return keys.some(k => valueText(obj && obj[k]).length > 0);}
 function hasNonEmptyArray(obj, key){return Array.isArray(obj && obj[key]) && obj[key].filter(x => valueText(x).length > 0).length > 0;}
+
+// A single contract for the model, manual forms, editor and both scorers.
+// Canonicalization copies data: validation and failed edits must not mutate inputs.
+function canonicalizeExercise(ex, spec){
+  if(!ex || typeof ex!=='object')return ex;
+  const copy=JSON.parse(JSON.stringify(ex)), type=normalizeType(copy.type||''), style=(spec&&spec.style)||copy.style||'';
+  copy.type=type;
+  function alias(it,key,keys){if(!valueText(it[key])){for(const k of keys){if(valueText(it[k])){it[key]=it[k];break;}}}}
+  copy.items=(Array.isArray(copy.items)?copy.items:[]).map(function(it){
+    if(!it||typeof it!=='object'||Array.isArray(it))return it;
+    if(['multiple choice','reading comprehension','listening comprehension','multi-select','ordering','highlight-evidence','categorisation-board','table-completion'].includes(type))alias(it,'question',['prompt']);
+    if(type==='reading comprehension')alias(it,'passage',['text','source']);
+    if(type==='dialogue completion')alias(it,'dialogue',['prompt','question']);
+    if(type==='true/false')alias(it,'statement',['question','prompt']);
+    if(['fill-in-the-blank','error correction','word formation'].includes(type))alias(it,'sentence',['prompt','question']);
+    if(type==='translation'){alias(it,'prompt',['source','sentence','question']);alias(it,'answer',['translation','model_answer']);}
+    if(type==='sentence transformation'){alias(it,'prompt',['sentence','question']);alias(it,'answer',['correct_sentence','model_answer']);}
+    if(type==='error correction')alias(it,'correction',['answer']);
+    if(type==='word order'){alias(it,'correct_sentence',['answer']);if(!Array.isArray(it.words)&&valueText(it.prompt||it.sentence))it.words=valueText(it.prompt||it.sentence).split(/\s+/);}
+    if(type==='categorization'){alias(it,'text',['item','prompt']);alias(it,'correct_category',['category','answer']);}
+    if(type==='cloze text')alias(it,'text',['passage']);
+    if(type==='word formation')alias(it,'base_word',['base']);
+    if(['multiple choice','reading comprehension','listening comprehension','dialogue completion'].includes(type))it.correct=resolveCorrectIndex(it);
+    if(['highlight-evidence','error-tagging'].includes(type)){const k=type==='error-tagging'?'error_token_index':'correct';if(it[k]!=null&&typeof it[k]!=='boolean'&&String(it[k]).trim()!=='')it[k]=Number(it[k]);}
+    if(type==='fill-in-the-blank'){
+      if(style==='short answer'&&valueText(it.sentence)&&!String(it.sentence).includes('___'))it.sentence+=' ___';
+      const gaps=(String(it.sentence||'').match(/___/g)||[]).length;
+      if(gaps===1&&Array.isArray(it.answers)&&it.answers.length){
+        if(!valueText(it.answer))it.answer=it.answers[0];
+        const alts=Array.isArray(it.alt_answers)?it.alt_answers.flat():[];
+        it.alt_answers=Array.from(new Set(alts.concat(it.answers.slice(1)).filter(x=>valueText(x))));
+        delete it.answers;
+      }
+    }
+    return it;
+  });
+  return copy;
+}
+
 function validateExerciseSetStrict(st,exercises,whereLabel){
   const specs=buildExerciseSpecs(st),errors=[];
   if(!Array.isArray(exercises)){
@@ -117,14 +156,35 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
   }
   const n=Math.min(Array.isArray(exercises)?exercises.length:0,specs.length);
   for(let i=0;i<n;i++){
-    const ex=exercises[i]||{},spec=specs[i],type=normalizeType(ex.type||'');
+    const spec=specs[i],ex=canonicalizeExercise(exercises[i]||{},spec),type=normalizeType(ex.type||'');
     if(!isAllowedExerciseType(type))errors.push(`${whereLabel}, cvičení ${i+1}: typ "${type}" je vypnutý, protože vyžaduje ruční hodnocení.`);
     if(type!==spec.type)errors.push(`${whereLabel}, cvičení ${i+1}: typ je "${type}", očekáváno "${spec.type}".`);
     const items=Array.isArray(ex.items)?ex.items:[];
     if(items.length!==spec.count)errors.push(`${whereLabel}, cvičení ${i+1}: počet položek je ${items.length}, očekáváno ${spec.count}.`);
+    if(type==='matching'){const rights=items.map(it=>valueText(it&&it.right).toLowerCase());if(new Set(rights).size!==rights.length)errors.push(`${whereLabel}, cviceni ${i+1}: kazda prava strana matching musi byt jednoznacna (bez duplicit).`);}
     items.forEach((it,qi)=>{
       const loc=`${whereLabel}, cvičení ${i+1}, položka ${qi+1}`;
-      if(!it || typeof it!=='object'){errors.push(`${loc}: položka není objekt.`);return;}
+      if(!it || typeof it!=='object'||Array.isArray(it)){errors.push(`${loc}: položka není objekt.`);return;}
+      if(['multiple choice','reading comprehension','listening comprehension','dialogue completion','multi-select'].includes(type)&&Array.isArray(it.options)){
+        const labels=it.options.map(x=>valueText(x).toLowerCase());
+        if(labels.some(x=>!x)||new Set(labels).size!==labels.length)errors.push(`${loc}: options museji byt neprazdne a navzajem odlisitelne.`);
+      }
+      if(['categorization','categorisation-board'].includes(type)&&Array.isArray(it.categories)){
+        const cats=it.categories.map(x=>valueText(x).toLowerCase());
+        if(cats.some(x=>!x)||new Set(cats).size!==cats.length)errors.push(`${loc}: kategorie museji byt neprazdne a jedinecne.`);
+        if(type==='categorization'&&!cats.includes(valueText(it.correct_category||it.category||it.answer).toLowerCase()))errors.push(`${loc}: spravna kategorie neni v nabidce.`);
+      }
+      if(['fill-in-the-blank','cloze text'].includes(type)){
+        const text=type==='cloze text'?it.text:it.sentence;
+        const gaps=(String(text||'').match(/___/g)||[]).length;
+        const answers=type==='cloze text'||Array.isArray(it.answers)?it.answers:[it.answer];
+        if(!Array.isArray(answers)||gaps!==answers.length||answers.some(x=>typeof x!=='string'||!valueText(x)))errors.push(`${loc}: kazda mezera ___ musi mit prave jednu nepr azdnou odpoved ve spravnem poradi.`.replace('nepr azdnou','neprazdnou'));
+        if(Array.isArray(it.alt_answers)){
+          const nested=type==='cloze text'||gaps>1;
+          if(nested&&it.alt_answers.some(x=>!Array.isArray(x)))errors.push(`${loc}: alternativy museji byt rozdelene po mezerach (pole poli).`);
+          if(nested&&it.alt_answers.length>gaps)errors.push(`${loc}: alternativ je vice nez mezer.`);
+        }
+      }
       if(['multiple choice','reading comprehension','listening comprehension'].includes(type)){
         if(!hasAnyText(it,['question','prompt']))errors.push(`${loc}: chybí question/prompt.`);
         if(type==='reading comprehension'&&!hasAnyText(ex,['passage','source_text','text','source'])&&!hasAnyText(it,['passage','text','source']))errors.push(`${loc}: reading comprehension potřebuje sdílený text (passage) na úrovni cvičení, nebo u položky.`);
@@ -164,7 +224,7 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
         }else{
           toks.forEach((tok,ti)=>{ if(!valueText(tok))errors.push(`${loc}: error-tagging token ${ti+1} nesmí být prázdný.`); });
           const ix=Number(it.error_token_index);
-          if(!Number.isInteger(ix)||ix<0||ix>=toks.length)errors.push(`${loc}: error-tagging: error_token_index musí být platný 0-based index do tokens (0..${toks.length-1}).`);
+          if(it.error_token_index==null||typeof it.error_token_index==='boolean'||String(it.error_token_index).trim()===''||!Number.isInteger(ix)||ix<0||ix>=toks.length)errors.push(`${loc}: error-tagging: error_token_index musí být platný 0-based index do tokens (0..${toks.length-1}).`);
         }
         const opts=Array.isArray(it.error_type_options)?it.error_type_options:null;
         if(!opts||opts.filter(x=>valueText(x)).length<2){
@@ -200,7 +260,7 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
           errors.push(`${loc}: multi-select: "correct" musí být pole indexů (např. [0,2,3]).`);
         }else{
           const optsN=Array.isArray(it.options)?it.options.length:0;const seen={};let bad=false,dup=false;
-          it.correct.forEach(ix=>{const num=Number(ix);if(!Number.isInteger(num)||num<0||num>=optsN)bad=true;if(seen[num])dup=true;seen[num]=1;});
+          it.correct.forEach(ix=>{const num=Number(ix);if(ix==null||typeof ix==='boolean'||String(ix).trim()===''||!Number.isInteger(num)||num<0||num>=optsN)bad=true;if(seen[num])dup=true;seen[num]=1;});
           if(it.correct.length<1)errors.push(`${loc}: multi-select musí mít aspoň jednu správnou možnost.`);
           if(bad)errors.push(`${loc}: multi-select: každý index v "correct" musí odkazovat na existující možnost (0 = první).`);
           if(dup)errors.push(`${loc}: multi-select: "correct" nesmí obsahovat duplicitní indexy.`);
@@ -213,7 +273,7 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
           errors.push(`${loc}: ordering: "correct_order" musí být pole indexů (přesná permutace, např. [1,3,0,2]).`);
         }else if(oitems){
           const nn=oitems.length;const seen={};let bad=false,dup=false;
-          it.correct_order.forEach(ix=>{const num=Number(ix);if(!Number.isInteger(num)||num<0||num>=nn)bad=true;if(seen[num])dup=true;seen[num]=1;});
+          it.correct_order.forEach(ix=>{const num=Number(ix);if(ix==null||typeof ix==='boolean'||String(ix).trim()===''||!Number.isInteger(num)||num<0||num>=nn)bad=true;if(seen[num])dup=true;seen[num]=1;});
           if(bad)errors.push(`${loc}: ordering: každý index v "correct_order" musí být 0..${nn-1}.`);
           if(dup)errors.push(`${loc}: ordering: "correct_order" nesmí obsahovat duplicitní indexy.`);
           if(it.correct_order.length!==nn)errors.push(`${loc}: ordering: "correct_order" musí obsahovat všechny indexy položek právě jednou (přesná permutace ${nn} položek).`);
@@ -226,7 +286,7 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
         }else{
           hs.forEach((sent,si)=>{ if(!valueText(sent))errors.push(`${loc}: highlight-evidence věta ${si+1} nesmí být prázdná.`); });
           const ci=Number(it.correct);
-          if(!Number.isInteger(ci)||ci<0||ci>=hs.length)errors.push(`${loc}: highlight-evidence: correct musí být platný 0-based index do sentences (0..${hs.length-1}).`);
+          if(it.correct==null||typeof it.correct==='boolean'||String(it.correct).trim()===''||!Number.isInteger(ci)||ci<0||ci>=hs.length)errors.push(`${loc}: highlight-evidence: correct musí být platný 0-based index do sentences (0..${hs.length-1}).`);
         }
       }else if(type==='transformation-chain'){
         if(!hasAnyText(it,['base_sentence']))errors.push(`${loc}: transformation-chain potřebuje neprázdný base_sentence.`);
@@ -351,7 +411,7 @@ function csEnsureExerciseFeedback(st,type,ex,items){
 
 function normalizeGeneratedExercises(st,genData,whereLabel='základní verze'){
   const specs=buildExerciseSpecs(st);
-  const raw=Array.isArray(genData?.exercises)?genData.exercises:[];
+  const raw=Array.isArray(genData?.exercises)?genData.exercises.map((ex,i)=>canonicalizeExercise(ex,specs[i])):[];
   validateExerciseSetStrict(st,raw,whereLabel);
   return raw.map((ex,i)=>{
     const spec=specs[i],type=normalizeType(ex.type||spec.type);
@@ -363,8 +423,8 @@ function normalizeGeneratedExercises(st,genData,whereLabel='základní verze'){
     const item_points=makeItemPoints(spec.pts,spec.count);
     items = csEnsureExerciseFeedback(st,type,ex,items);
     const GENERATOR_INTERNAL_FIELDS = ['manualMode']; // nikdy nepatří do studentského testu
-    // Titul cvičení: AI generuje nesmysly ("test", "complete the test" apod.) → vždy použij typ
-    const cleanEx = Object.assign({},ex,{type,title:type,points_total:spec.pts,points_each:item_points[0]||1,item_points,items});
+    // Preserve an explicitly edited title and the selected pedagogical style.
+    const cleanEx = Object.assign({},ex,{type,style:spec.style,title:valueText(ex.title)||spec.style||type,points_total:spec.pts,points_each:item_points[0]||1,item_points,items});
     GENERATOR_INTERNAL_FIELDS.forEach(function(k){ delete cleanEx[k]; });
     return cleanEx;
   });

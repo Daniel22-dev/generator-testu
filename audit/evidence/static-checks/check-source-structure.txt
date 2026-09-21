@@ -1,0 +1,1 @@
+✅  Zdrojova struktura OK: 11 split modulu, puvodni nazvy pouze jako migracni tombstones.

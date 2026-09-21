@@ -1,0 +1,10 @@
+PASS Poradce používá balanced AI Core profil
+PASS Poradce má lokální retrieval, aktuální kontext a validaci opor
+PASS Dotazy na právě sestavovaný test používají aktuální stav
+PASS KB zná Google Forms secure workflow
+PASS KB nenabádá k ruční volbě konkrétního modelu
+PASS UI neobsahuje volbu konkrétního modelu
+PASS Direct transport mapuje interní AI Core profily
+PASS Provider credential/UI už nepřepisuje AI Core profil konkrétním modelem
+PASS Legacy týmový bezpečnostní kód není v UI
+Generator Assistant / AI Core invariants: PASS

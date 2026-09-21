@@ -1,0 +1,1860 @@
+[
+  {
+    "case": "CEFR-select-assemble",
+    "level": "A1",
+    "ok": true
+  },
+  {
+    "case": "CEFR-select-assemble",
+    "level": "A2",
+    "ok": true
+  },
+  {
+    "case": "CEFR-select-assemble",
+    "level": "B1",
+    "ok": true
+  },
+  {
+    "case": "CEFR-select-assemble",
+    "level": "B2",
+    "ok": true
+  },
+  {
+    "case": "CEFR-select-assemble",
+    "level": "C1",
+    "ok": true
+  },
+  {
+    "case": "CEFR-select-assemble",
+    "level": "C2",
+    "ok": true
+  },
+  {
+    "mask": 1,
+    "expected": "A1",
+    "label": "A1",
+    "kept": "A1",
+    "ok": true
+  },
+  {
+    "mask": 2,
+    "expected": "A2",
+    "label": "A2",
+    "kept": "A2",
+    "ok": true
+  },
+  {
+    "mask": 3,
+    "expected": "A1/A2",
+    "label": "A1/A2",
+    "kept": "A2",
+    "ok": true
+  },
+  {
+    "mask": 4,
+    "expected": "B1",
+    "label": "B1",
+    "kept": "B1",
+    "ok": true
+  },
+  {
+    "mask": 5,
+    "expected": "A1/B1",
+    "label": "A1/B1",
+    "kept": "B1",
+    "ok": true
+  },
+  {
+    "mask": 6,
+    "expected": "A2/B1",
+    "label": "A2/B1",
+    "kept": "B1",
+    "ok": true
+  },
+  {
+    "mask": 7,
+    "expected": "A1/A2/B1",
+    "label": "A1/A2/B1",
+    "kept": "B1",
+    "ok": true
+  },
+  {
+    "mask": 8,
+    "expected": "B2",
+    "label": "B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 9,
+    "expected": "A1/B2",
+    "label": "A1/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 10,
+    "expected": "A2/B2",
+    "label": "A2/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 11,
+    "expected": "A1/A2/B2",
+    "label": "A1/A2/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 12,
+    "expected": "B1/B2",
+    "label": "B1/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 13,
+    "expected": "A1/B1/B2",
+    "label": "A1/B1/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 14,
+    "expected": "A2/B1/B2",
+    "label": "A2/B1/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 15,
+    "expected": "A1/A2/B1/B2",
+    "label": "A1/A2/B1/B2",
+    "kept": "B2",
+    "ok": true
+  },
+  {
+    "mask": 16,
+    "expected": "C1",
+    "label": "C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 17,
+    "expected": "A1/C1",
+    "label": "A1/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 18,
+    "expected": "A2/C1",
+    "label": "A2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 19,
+    "expected": "A1/A2/C1",
+    "label": "A1/A2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 20,
+    "expected": "B1/C1",
+    "label": "B1/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 21,
+    "expected": "A1/B1/C1",
+    "label": "A1/B1/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 22,
+    "expected": "A2/B1/C1",
+    "label": "A2/B1/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 23,
+    "expected": "A1/A2/B1/C1",
+    "label": "A1/A2/B1/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 24,
+    "expected": "B2/C1",
+    "label": "B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 25,
+    "expected": "A1/B2/C1",
+    "label": "A1/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 26,
+    "expected": "A2/B2/C1",
+    "label": "A2/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 27,
+    "expected": "A1/A2/B2/C1",
+    "label": "A1/A2/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 28,
+    "expected": "B1/B2/C1",
+    "label": "B1/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 29,
+    "expected": "A1/B1/B2/C1",
+    "label": "A1/B1/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 30,
+    "expected": "A2/B1/B2/C1",
+    "label": "A2/B1/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 31,
+    "expected": "A1/A2/B1/B2/C1",
+    "label": "A1/A2/B1/B2/C1",
+    "kept": "C1",
+    "ok": true
+  },
+  {
+    "mask": 32,
+    "expected": "C2",
+    "label": "C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 33,
+    "expected": "A1/C2",
+    "label": "A1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 34,
+    "expected": "A2/C2",
+    "label": "A2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 35,
+    "expected": "A1/A2/C2",
+    "label": "A1/A2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 36,
+    "expected": "B1/C2",
+    "label": "B1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 37,
+    "expected": "A1/B1/C2",
+    "label": "A1/B1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 38,
+    "expected": "A2/B1/C2",
+    "label": "A2/B1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 39,
+    "expected": "A1/A2/B1/C2",
+    "label": "A1/A2/B1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 40,
+    "expected": "B2/C2",
+    "label": "B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 41,
+    "expected": "A1/B2/C2",
+    "label": "A1/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 42,
+    "expected": "A2/B2/C2",
+    "label": "A2/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 43,
+    "expected": "A1/A2/B2/C2",
+    "label": "A1/A2/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 44,
+    "expected": "B1/B2/C2",
+    "label": "B1/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 45,
+    "expected": "A1/B1/B2/C2",
+    "label": "A1/B1/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 46,
+    "expected": "A2/B1/B2/C2",
+    "label": "A2/B1/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 47,
+    "expected": "A1/A2/B1/B2/C2",
+    "label": "A1/A2/B1/B2/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 48,
+    "expected": "C1/C2",
+    "label": "C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 49,
+    "expected": "A1/C1/C2",
+    "label": "A1/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 50,
+    "expected": "A2/C1/C2",
+    "label": "A2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 51,
+    "expected": "A1/A2/C1/C2",
+    "label": "A1/A2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 52,
+    "expected": "B1/C1/C2",
+    "label": "B1/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 53,
+    "expected": "A1/B1/C1/C2",
+    "label": "A1/B1/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 54,
+    "expected": "A2/B1/C1/C2",
+    "label": "A2/B1/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 55,
+    "expected": "A1/A2/B1/C1/C2",
+    "label": "A1/A2/B1/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 56,
+    "expected": "B2/C1/C2",
+    "label": "B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 57,
+    "expected": "A1/B2/C1/C2",
+    "label": "A1/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 58,
+    "expected": "A2/B2/C1/C2",
+    "label": "A2/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 59,
+    "expected": "A1/A2/B2/C1/C2",
+    "label": "A1/A2/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 60,
+    "expected": "B1/B2/C1/C2",
+    "label": "B1/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 61,
+    "expected": "A1/B1/B2/C1/C2",
+    "label": "A1/B1/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 62,
+    "expected": "A2/B1/B2/C1/C2",
+    "label": "A2/B1/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "mask": 63,
+    "expected": "A1/A2/B1/B2/C1/C2",
+    "label": "A1/A2/B1/B2/C1/C2",
+    "kept": "C2",
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple choice",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple choice",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple choice",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple choice",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple choice",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple choice",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multi-select",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multi-select",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multi-select",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multi-select",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multi-select",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multi-select",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "fill-in-the-blank",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "fill-in-the-blank",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "fill-in-the-blank",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "fill-in-the-blank",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "fill-in-the-blank",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "fill-in-the-blank",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "matching",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "matching",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "matching",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "matching",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "matching",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "matching",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word order",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word order",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word order",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word order",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word order",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word order",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "ordering",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "ordering",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "ordering",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "ordering",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "ordering",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "ordering",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "highlight-evidence",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "highlight-evidence",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "highlight-evidence",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "highlight-evidence",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "highlight-evidence",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "highlight-evidence",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorisation-board",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorisation-board",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorisation-board",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorisation-board",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorisation-board",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorisation-board",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "table-completion",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "table-completion",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "table-completion",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "table-completion",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "table-completion",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "table-completion",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "transformation-chain",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "transformation-chain",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "transformation-chain",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "transformation-chain",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "transformation-chain",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "transformation-chain",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "translation",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "translation",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "translation",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "translation",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "translation",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "translation",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "true/false",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "true/false",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "true/false",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "true/false",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "true/false",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "true/false",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error correction",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error correction",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error correction",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error correction",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error correction",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error correction",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error-tagging",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error-tagging",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error-tagging",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error-tagging",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error-tagging",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "error-tagging",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "cloze text",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "cloze text",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "cloze text",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "cloze text",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "cloze text",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "cloze text",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "sentence transformation",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "sentence transformation",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "sentence transformation",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "sentence transformation",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "sentence transformation",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "sentence transformation",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "reading comprehension",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "reading comprehension",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "reading comprehension",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "reading comprehension",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "reading comprehension",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "reading comprehension",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "dialogue completion",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "dialogue completion",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "dialogue completion",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "dialogue completion",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "dialogue completion",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "dialogue completion",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorization",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorization",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorization",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorization",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorization",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "categorization",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word formation",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word formation",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word formation",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word formation",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word formation",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word formation",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "listening comprehension",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "listening comprehension",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "listening comprehension",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "listening comprehension",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "listening comprehension",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "listening comprehension",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "odd one out",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "odd one out",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "odd one out",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "odd one out",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "odd one out",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "odd one out",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple matching",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple matching",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple matching",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple matching",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple matching",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "multiple matching",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "banked cloze",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "banked cloze",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "banked cloze",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "banked cloze",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "banked cloze",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "banked cloze",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "key word transformation",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "key word transformation",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "key word transformation",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "key word transformation",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "key word transformation",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "key word transformation",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "synonym choice",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "synonym choice",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "synonym choice",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "synonym choice",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "synonym choice",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "synonym choice",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "antonym choice",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "antonym choice",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "antonym choice",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "antonym choice",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "antonym choice",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "antonym choice",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "choose the correct response",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "choose the correct response",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "choose the correct response",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "choose the correct response",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "choose the correct response",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "choose the correct response",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "match word to definition",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "match word to definition",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "match word to definition",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "match word to definition",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "match word to definition",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "match word to definition",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "verb form",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "verb form",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "verb form",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "verb form",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "verb form",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "verb form",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "preposition gap-fill",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "preposition gap-fill",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "preposition gap-fill",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "preposition gap-fill",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "preposition gap-fill",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "preposition gap-fill",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "question formation",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "question formation",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "question formation",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "question formation",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "question formation",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "question formation",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word family",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word family",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word family",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word family",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word family",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "word family",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "short answer",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "short answer",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "short answer",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "short answer",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "short answer",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "short answer",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "paraphrase the sentence",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "paraphrase the sentence",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "paraphrase the sentence",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "paraphrase the sentence",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "paraphrase the sentence",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "paraphrase the sentence",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "heading matching",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "heading matching",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "heading matching",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "heading matching",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "heading matching",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "heading matching",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "gist question",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "gist question",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "gist question",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "gist question",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "gist question",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "gist question",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "summary cloze",
+    "points": 0,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "summary cloze",
+    "points": -1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "summary cloze",
+    "points": 0.5,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "summary cloze",
+    "points": 1,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "summary cloze",
+    "points": 999,
+    "ok": true
+  },
+  {
+    "case": "points-boundary",
+    "type": "summary cloze",
+    "points": 1000,
+    "ok": true
+  },
+  {
+    "case": "custom-scale-complete",
+    "ok": true,
+    "allowed": true
+  },
+  {
+    "case": "custom-scale-gap",
+    "ok": true,
+    "allowed": false
+  },
+  {
+    "case": "custom-scale-overlap",
+    "ok": true,
+    "allowed": false
+  },
+  {
+    "case": "inactive-URL-not-listening-source",
+    "ok": true
+  }
+]

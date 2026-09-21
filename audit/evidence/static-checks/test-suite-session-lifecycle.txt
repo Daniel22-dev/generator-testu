@@ -1,0 +1,113 @@
+{
+  "schema": "ghrab-generator-suite-session-test-v1",
+  "platformVersion": "1.1.2",
+  "syntheticDataOnly": true,
+  "checks": [
+    {
+      "ok": true,
+      "name": "Platform 1.1.2 exact vendor SHA-256",
+      "detail": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack waits for runtime cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child clears synthetic Generator canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves other child namespace",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves non-content telemetry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves global suite generation tombstone",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "F-02 records seen and cleanup complete",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack exists after cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay clears pending canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay acknowledges generation",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Reload after replay does not repeat destructive cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab cross-context signal clears canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab stale tab persistence is locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab autosave cannot restore canary",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document cleans despite shared seen ack",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document stays locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed synthetic delete failure is observable",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed does not falsely acknowledge",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed status records failure",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Negative control detects disabled cleanup (weakened copy fails as required)",
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  },
+  "status": "passed"
+}

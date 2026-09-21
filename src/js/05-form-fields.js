@@ -576,9 +576,8 @@ function workflowTypeStats(){
 }
 function hasListeningSource(){
   if(!usesListeningComprehension()) return true;
-  const hasFile=(typeof fileObjects!=='undefined'&&Array.isArray(fileObjects)&&fileObjects.length>0)
-    || (Array.isArray(state.fileNames)&&state.fileNames.length>0);
-  const hasUrl=Array.isArray(state.urls)&&state.urls.some(u=>String(u||'').trim());
+  const hasFile=state.zadaniTab==='file'&&typeof fileObjects!=='undefined'&&Array.isArray(fileObjects)&&fileObjects.length>0;
+  const hasUrl=state.zadaniTab==='url'&&Array.isArray(state.urls)&&state.urls.some(u=>String(u||'').trim());
   return !!(hasFile||hasUrl||trim('listeningTranscript'));
 }
 function gradeScaleOverlaps(scale){
@@ -620,7 +619,7 @@ function validate() {
   const customTypeUnsupported = !!trim('vlastniTyp') && !isAllowedExerciseType(normalizeType(trim('vlastniTyp')));
   const typeStats=workflowTypeStats();
   const hasTyp = state.exerciseDetail
-    ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => isAllowedExerciseType(normalizeType(ex.typ || 'multiple choice')) && (ex.pocetOtazek || 0) > 0 && (ex.body || 0) > 0)
+    ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => isAllowedExerciseType(normalizeType(ex.typ || 'multiple choice')) && Number.isInteger(ex.pocetOtazek) && ex.pocetOtazek>=1 && ex.pocetOtazek<=30 && (scoringTypeFor(ex.typ)!=='matching'||ex.pocetOtazek>=2) && Number.isInteger(ex.body) && ex.body>=1 && ex.body<=999)
     : ((sanitizeExerciseTypeList(state.typyCviceni).length > 0 || (trim('vlastniTyp') && !customTypeDisabled && !customTypeUnsupported)) && typeStats.distinct <= 10 && typeStats.distinct <= state.pocet);
   const listeningOk=hasListeningSource();
   $('next1').disabled = !(hasTyp && state.uroven.length > 0 && listeningOk);
@@ -629,12 +628,13 @@ function validate() {
   if(!state.exerciseDetail && typeStats.distinct>10) step1Msg.push('Vybráno je '+typeStats.distinct+' různých typů, ale jeden test podporuje nejvýše 10.');
   else if(!state.exerciseDetail && typeStats.distinct>state.pocet) step1Msg.push('Počet cvičení musí být alespoň stejný jako počet různých typů ('+typeStats.distinct+').');
   if(!listeningOk) step1Msg.push('Listening comprehension vyžaduje zdroj: audio/video soubor, URL nebo transkript. Bez zdroje by student neměl co poslouchat.');
+  if(state.exerciseDetail&&!hasTyp)step1Msg.push('Zkontroluj počet položek (1–30, párování nejméně 2) a celé body (1–999) u každého cvičení.');
   if(hint1) hint1.textContent=step1Msg.join(' ');
 
   const hasBody = state.exerciseDetail
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0) > 0
     : state.body > 0;
-  const effTotalBody = state.exerciseConfig && state.exerciseConfig.length
+  const effTotalBody = state.exerciseDetail && state.exerciseConfig && state.exerciseConfig.length
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0)
     : state.body;
   // AI-přečtená stupnice platí, jen pokud sedí na aktuální text pole (jinak ji zneplatníme).
@@ -647,7 +647,8 @@ function validate() {
   const scaleGaps=gradeScaleGaps(parsedForValidation);
   const scaleOverlaps=gradeScaleOverlaps(parsedForValidation);
   const gradeOk = state.gradeTyp !== 'vlastni' || ((localScaleValid || aiScaleValid) && scaleGaps.length===0 && scaleOverlaps.length===0);
-  $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk);
+  $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk && (state.exerciseDetail||Number(state.body)>=Number(state.pocet)));
+  if(typeof renderGenerationEstimate==='function')renderGenerationEstimate();
   const skala = $('vlastniSkala');
   const skalaErr = $('vlastniSkalaErr');
   const skalaBad = state.gradeTyp === 'vlastni' && !gradeOk;
@@ -694,7 +695,7 @@ function validate() {
   const groupLogic=workflowGroupValidation();
   $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
-  if (!rosterOk) msg.push('Identita „jednorázový kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
+  if (!rosterOk) msg.push('Identita „individuální kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
   if (!accessCode) msg.push('Doplň učitelský přístupový kód.');
   if (accessCode && accessCode.length < 12) msg.push('Učitelský přístupový kód musí mít aspoň 12 znaků (slabý kód jde offline uhádnout).');
   else if (accessCode && isWeakSecret(accessCode)) msg.push('Učitelský přístupový kód je příliš běžný — zvol méně odhadnutelný.');
@@ -824,16 +825,16 @@ const SPECIAL_STYLES = {
     recipe:'Each item: left = a word/term, right = its short definition (one unique definition per word; the app builds the dropdown from all right values). Keep definitions concise and unambiguous so exactly one word fits each. Emit type "matching" with left and right on every item.' },
   // Řízená produkce → fill-in-the-blank / sentence transformation / word formation
   'verb form': { score:'fill-in-the-blank',
-    recipe:'Emit type "fill-in-the-blank". Each item is a sentence with ___ where a verb goes, with the base/infinitive in brackets, e.g. "She ___ (go) home yesterday."; "answers" = the correct conjugated form(s); include valid contracted/spelling variants in answers. One gap per item.' },
+    recipe:'Emit type "fill-in-the-blank". Each item is a sentence with ___ where a verb goes, with the base/infinitive in brackets, e.g. "She ___ (go) home yesterday."; "answer" = one correct conjugated form; "alt_answers" = valid contracted/spelling variants. Never encode alternatives as additional gap answers. One gap per item.' },
   'preposition gap-fill': { score:'fill-in-the-blank',
-    recipe:'Emit type "fill-in-the-blank". Each sentence has one ___ where a PREPOSITION belongs; "answers" = the correct preposition, adding accepted alternatives only when truly interchangeable. One gap per item.' },
+    recipe:'Emit type "fill-in-the-blank". Each sentence has one ___ where a PREPOSITION belongs; "answer" = one correct preposition; put interchangeable alternatives in "alt_answers", not in "answers". One gap per item.' },
   'question formation': { score:'sentence transformation',
     recipe:'Emit type "sentence transformation". In "prompt" give a statement or an answer (optionally with the required question word) and ask the student to FORM the matching question; "answer"/"alt_answers" hold the correct question and its acceptable phrasings (word-order/punctuation variants).' },
   'word family': { score:'word formation',
     recipe:'Emit type "word formation". Give a sentence with ___ and a base word in brackets; the student writes the correct DERIVED form (noun/adjective/adverb/verb) that fits, e.g. "Her ___ (decide) was final." -> decision; "answer" = the derived word, with valid variants in "alt_answers".' },
   // Volnější produkce → fill-in-the-blank / sentence transformation (jen s uzavřenou množinou odpovědí)
   'short answer': { score:'fill-in-the-blank',
-    recipe:'Emit type "fill-in-the-blank". Each item is a question with a SHORT expected answer (1-5 words); put the question in "sentence"/"prompt"; "answers" = all acceptable short answers including reasonable wording/spelling variants. Use only questions with a small, closed set of correct answers (avoid open-ended ones).' },
+    recipe:'Emit type "fill-in-the-blank". Each item is a question with a SHORT expected answer (1-5 words); put the question followed by one ___ response blank in "sentence"; "answer" = one short answer; "alt_answers" = other accepted wording/spelling variants. There is exactly ONE gap, not one gap per alternative. Use only questions with a small, closed set of correct answers (avoid open-ended ones).' },
   'paraphrase the sentence': { score:'sentence transformation',
     recipe:'Emit type "sentence transformation". Give an original sentence in "prompt" and ask the student to rewrite it keeping the meaning (optionally starting with a given word); "answer"/"alt_answers" list the acceptable paraphrases — be generous with valid rewordings since several can be correct.' },
   // Porozumění → matching / multiple choice / cloze text
@@ -883,7 +884,7 @@ function seedEmptyExerciseTypes(){
 }
 
 function syncExerciseConfig() {
-  const n = state.pocet;
+  const n = state.pocet, oldLength=state.exerciseConfig.length;
   // Grow
   while (state.exerciseConfig.length < n) {
     const i = state.exerciseConfig.length;
@@ -902,7 +903,7 @@ function syncExerciseConfig() {
   // Pokud existuje globální cíl bodů, rozdistribuj rovnoměrně.
   // Jinak, pokud uživatel některé body nastavil, ponecháme je;
   // nové (čerstvě vytvořené) zůstávají na 0 → validate() to upozorní.
-  if (state.body > 0) syncExercisePoints();
+  if (state.body > 0 && oldLength!==n) syncExercisePoints();
 }
 
 function syncExercisePoints(totalOverride) {
@@ -971,9 +972,10 @@ function updateExField(i, field, value) {
   const BOOL_FIELDS = ['manualMode'];
   state.exerciseConfig[i][field] = field === 'typ' ? value
     : BOOL_FIELDS.includes(field) ? !!value
-    : (parseInt(value, 10) || 0);
+    : (String(value).trim()===''?0:Number(value));
   if (field === 'typ') { renderSmartTimeTip();
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;
+    renderExerciseConfig();
   }
   // Update b/ot. cell inline (without re-rendering whole row → preserves input focus)
   const ex = state.exerciseConfig[i];

@@ -1,0 +1,578 @@
+[
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.13
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.26
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.92
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.09
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.94
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.86
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "prisny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.88
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.15
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "ANO",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.99
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.91
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.11
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.93
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.09
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.93
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.76
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "prisny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.78
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.05
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.02
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.8
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.97
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.88
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.0
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.79
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.66
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "prisny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.6
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.9
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.81
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.83
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.91
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.77
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.88
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.78
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "bezny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.68
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "prisny",
+      "resultMode": "secureOffline",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.65
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.98
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "NE",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.83
+  }
+]

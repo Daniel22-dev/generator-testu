@@ -1,0 +1,92 @@
+[
+  {
+    "language": "en",
+    "mode": "instant",
+    "supportConfigurations": 30,
+    "ok": true
+  },
+  {
+    "language": "en",
+    "mode": "secureOffline",
+    "supportConfigurations": 30,
+    "formsCopyAndOpen": true,
+    "urlCases": 6,
+    "oversizeFallback": true,
+    "ok": true
+  },
+  {
+    "language": "es",
+    "mode": "instant",
+    "supportConfigurations": 30,
+    "ok": true
+  },
+  {
+    "language": "es",
+    "mode": "secureOffline",
+    "supportConfigurations": 30,
+    "formsCopyAndOpen": true,
+    "urlCases": 6,
+    "oversizeFallback": true,
+    "ok": true
+  },
+  {
+    "language": "de",
+    "mode": "instant",
+    "supportConfigurations": 30,
+    "ok": true
+  },
+  {
+    "language": "de",
+    "mode": "secureOffline",
+    "supportConfigurations": 30,
+    "formsCopyAndOpen": true,
+    "urlCases": 6,
+    "oversizeFallback": true,
+    "ok": true
+  },
+  {
+    "language": "fr",
+    "mode": "instant",
+    "supportConfigurations": 30,
+    "ok": true
+  },
+  {
+    "language": "fr",
+    "mode": "secureOffline",
+    "supportConfigurations": 30,
+    "formsCopyAndOpen": true,
+    "urlCases": 6,
+    "oversizeFallback": true,
+    "ok": true
+  },
+  {
+    "language": "la",
+    "mode": "instant",
+    "supportConfigurations": 30,
+    "ok": true
+  },
+  {
+    "language": "la",
+    "mode": "secureOffline",
+    "supportConfigurations": 30,
+    "formsCopyAndOpen": true,
+    "urlCases": 6,
+    "oversizeFallback": true,
+    "ok": true
+  },
+  {
+    "language": "cs",
+    "mode": "instant",
+    "supportConfigurations": 30,
+    "ok": true
+  },
+  {
+    "language": "cs",
+    "mode": "secureOffline",
+    "supportConfigurations": 30,
+    "formsCopyAndOpen": true,
+    "urlCases": 6,
+    "oversizeFallback": true,
+    "ok": true
+  }
+]
