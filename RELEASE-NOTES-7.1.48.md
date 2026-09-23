@@ -7,7 +7,7 @@ Datum: 2026-09-23
 - V Simple režimu je způsob práce se zdrojem pevně `Automaticky`; uživatel nemusí rozhodovat mezi technickými režimy.
 - V Advanced režimu byl původní rozbalovací seznam nahrazen šesti kartami: Automaticky, Obsah a fakta, Slovní zásoba, Gramatika / jazykové jevy, Vzor úloh a obtížnosti, Kombinovat.
 - Každá karta obsahuje krátké vysvětlení přímo v UI, ikonu, aktivní stav a plný tooltip s detailnějším popisem.
-- Pod kartami zůstává detailní dynamické vysvětlení vybrané možnosti; obecný `?` tooltip u nadpisu zůstává zachován.
+- Obecný `?` tooltip u nadpisu zůstává zachován; detail konkrétní volby je dostupný přímo jako tooltip dané karty.
 - Přepnutí z Advanced do Simple vždy resetuje `sourceUseMode` na `auto`, takže skrytá pokročilá volba nemůže ovlivňovat Simple prompt.
 - Starší Simple snapshot s jiným `sourceUseMode` se při načtení normalizuje na `auto`.
 
