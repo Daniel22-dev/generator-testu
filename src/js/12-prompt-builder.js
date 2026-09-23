@@ -472,9 +472,11 @@ function buildContentPrompt(st,apiSourceNotes=[]){
     || (st.zadaniTab==='file' && !!fileObjects.length)
     || (st.zadaniTab==='url' && !!(st.urls||[]).some(Boolean));
   if(hasSourceMaterial){
+    const activeReadingTopic = specs.some(s=>s.type==='reading comprehension') && typeof rcEffectiveTopic==='function' ? rcEffectiveTopic() : '';
     const sourcePolicy = sourceUsePolicyPrompt(st.sourceUseMode||'auto', {
       cefr:uroven,
-      reading:specs.some(s=>s.type==='reading comprehension')
+      reading:specs.some(s=>s.type==='reading comprehension'),
+      readingTopic:!!activeReadingTopic
     });
     if(sourcePolicy) src+='\n\n'+sourcePolicy;
   }
@@ -489,11 +491,12 @@ function buildContentPrompt(st,apiSourceNotes=[]){
   const instrLang=st.instrJazyk==='target'?jazyk:st.instrJazyk==='mixed'?`Czech UI, task instructions in ${jazyk}`:'Czech UI and Czech task instructions';
   const exJSON=specs.map(s=>apiExerciseExampleJson(s.type)).join(',\n    ');
   const rcWords = ({short:'60–100', medium:'130–190', long:'240–340'})[st.rcLength] || '130–190';
+  const readingTopicLocked = specs.some(s=>s.type==='reading comprehension') && typeof rcEffectiveTopic==='function' && !!rcEffectiveTopic();
   const specLines=specs.map((s,i)=>{
     const styleKey=specialStyleKey(s.style);
     const styleNote=styleKey?` STYLE = "${styleKey}": ${SPECIAL_STYLES[styleKey].recipe}`:'';
     const rcNote=(s.type==='reading comprehension')
-      ? ` READING COMPREHENSION RULES: put ONE shared reading text at the EXERCISE level as "passage" — a single coherent text of about ${rcWords} words at CEFR ${uroven}. The passage AS A WHOLE must match CEFR ${uroven} in non-target vocabulary, syntax, sentence complexity and information density. If an active source-use policy explicitly identifies lesson TARGET vocabulary, a limited set of those source-supported target items may be slightly above ${uroven}; keep the surrounding language at ${uroven}. If there is no active source material, generate vocabulary and syntax directly at CEFR ${uroven}. All ${s.count} items refer to that one shared passage. Each item must contain ONLY {question, options[2+], correct, explanation}. Do NOT put a passage inside items and do NOT repeat or give each question its own text.`
+      ? ` READING COMPREHENSION RULES: put ONE shared reading text at the EXERCISE level as "passage" — a single coherent text of about ${rcWords} words at CEFR ${uroven}. The passage AS A WHOLE must match CEFR ${uroven} in non-target vocabulary, syntax, sentence complexity and information density.${readingTopicLocked?' A teacher-selected READING TOPIC is present and is the MANDATORY thematic frame; source material may contribute only naturally compatible elements and must never replace that topic.':''} If an active source-use policy explicitly identifies lesson TARGET vocabulary, a limited set of those source-supported target items may be slightly above ${uroven}; keep the surrounding language at ${uroven} and never force target items that do not fit the selected topic. If there is no active source material, generate vocabulary and syntax directly at CEFR ${uroven}. All ${s.count} items refer to that one shared passage. Each item must contain ONLY {question, options[2+], correct, explanation}. Do NOT put a passage inside items and do NOT repeat or give each question its own text.`
       : '';
 
     const catBoardNote=(s.type==='categorisation-board')
