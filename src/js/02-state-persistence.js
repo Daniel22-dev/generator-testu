@@ -26,6 +26,7 @@ function normalizeLoadedState(s) {
   if (legacyPurposeMap[s.simpleTemplate]) s.simpleTemplate = legacyPurposeMap[s.simpleTemplate];
   if (s.simpleTemplate && !(SIMPLE_TEMPLATES.fl[s.simpleTemplate] || SIMPLE_TEMPLATES.cs[s.simpleTemplate])) s.simpleTemplate = '';
   if (['auto','content','vocabulary','grammar','model','combined'].indexOf(s.sourceUseMode) === -1) s.sourceUseMode = 'auto';
+  if (s.appMode !== 'advanced') s.sourceUseMode = 'auto';
   if (typeof s.screenGuard !== 'boolean') s.screenGuard = false;
   if (['none','brief','learning'].indexOf(s.feedbackMode) === -1) s.feedbackMode = 'brief';
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';

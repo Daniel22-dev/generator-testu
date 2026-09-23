@@ -1,3 +1,11 @@
+## 7.1.48 — 2026-09-23 — přehlednější volba práce se zdrojem
+
+- Simple režim používá pro zdrojový materiál vždy `Automaticky`; pokročilá volba se při návratu do Simple bezpečně resetuje.
+- Advanced režim místo selectu zobrazuje všech šest způsobů použití zdroje jako karty s názvem, ikonou a stručným vysvětlením přímo na kartě.
+- Každá karta má navíc plný hover/focus tooltip a vybraná karta má jednoznačný aktivní stav.
+- Zachován obecný `?` tooltip u nadpisu; každá karta má navíc vlastní detailní hover/focus tooltip.
+- Samotná AI logika zdrojů, Reading workflow, CEFR pravidla a jazykově specifické scoringové chování se nemění.
+
 ## 7.1.47 — 2026-09-22 — sjednocení workflow + zdrojový Reading
 
 - Simple i Advanced mají jednotnou volbu účelu: Procvičování / Běžný test / Přísný test.

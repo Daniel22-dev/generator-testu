@@ -1,8 +1,10 @@
-> **7.1.47 — lokální kandidát po workflow úpravě; produkční akceptace následuje přes standardní CI/GARP brány.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
+> **7.1.48 — kandidát UI zpřehlednění práce se zdroji; produkční akceptace následuje přes standardní CI/GARP brány.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.47
+**Aktuální verze:** 7.1.48
+
+> **7.1.48 Přehlednější práce se zdrojem (2026-09-23):** Simple režim používá vždy Automaticky. Advanced režim zobrazuje šest voleb jako přehledné karty s krátkým popisem přímo na kartě a plným tooltipem; přepnutí zpět do Simple bezpečně vrací režim zdroje na Automaticky.
 
 > **7.1.47 Workflow zdrojů + Reading (2026-09-22):** Simple i Advanced používají stejné tři účely testu; Advanced pouze předvyplní technické volby. Zdrojový materiál má explicitní režimy použití a Reading se zdrojem používá samostatnou analýzu podkladu před generováním. CEFR je pro Reading explicitní a poznámky k souborům/URL se propisují do AI promptu. Jazykově specifické scoringové/ortografické změny nejsou součástí této verze.
 
