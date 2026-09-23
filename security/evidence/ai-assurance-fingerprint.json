@@ -1,22 +1,22 @@
 {
   "schema": "ghrab-ai-assurance-fingerprint-v1",
   "appId": "generator",
-  "appVersion": "7.1.48",
+  "appVersion": "7.1.49",
   "coreVersion": "1.0.0",
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "3a0d0ee71c6a2e0e1d6d6d2fd372e7caae9dfead900020e8606bb1466229386a",
+  "fingerprint": "9883039908a9f0671fe54d97ba2a02e071f9ce334695ea7ae9c9fc3daf4b5fb4",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 161130,
-      "sha256": "b18c56af5c80fe80f57e3804b199d43c0af8d16e3f73ff4df3c79c90223ad496"
+      "size": 160797,
+      "sha256": "897faf2fce6c68312e8eba13ae9ddc720e8a465d96a59e042e426f1a754fed01"
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 48264,
-      "sha256": "970b82fa24dd77082c9d5dcbb02ec5f1d6ef63cf73bf1dfbc1d9d08854cc8754"
+      "size": 48022,
+      "sha256": "6cc0639dc0dfa7061ab99d46abe7ca9aa2e315d8dd5e1437772000f0ab18b89e"
     },
     {
       "path": "src/js/05-form-fields.js",
@@ -31,7 +31,7 @@
     {
       "path": "src/js/07z-ai-core-integration.js",
       "size": 11522,
-      "sha256": "b23d09706f1a15aaa6be639082bbcb865d0f2d824c0d9ea60498e36325131ffd"
+      "sha256": "c93419d1d4befacf2f7a5a257d1a399c8d37cce80e48d6144289a815b13774ff"
     },
     {
       "path": "src/js/08-manual-editor.js",
@@ -45,8 +45,8 @@
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 53117,
-      "sha256": "5fc494f737a69392e2ac502af84ae84420c93c072355dd7004d67dd8309a1b46"
+      "size": 53628,
+      "sha256": "3e33098b2a19d44b1c55942f840b20f6924d8d1aaa60c07ad217e588c2c6fc6d"
     },
     {
       "path": "src/js/13a-secure-helpers.js",
@@ -71,7 +71,7 @@
     {
       "path": "public/ai-operations.json",
       "size": 5570,
-      "sha256": "fe3a0f9c0dfc3ac6ca4cfce3409e42d8679c997a52b35f5d9a4d245ec130b40f"
+      "sha256": "77b813b829cf846861acf7eef61d31b934b6da0fdac6806bd8052e95b66f62bf"
     },
     {
       "path": "ghrab-ai-core.consumer.json",

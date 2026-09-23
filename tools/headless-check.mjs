@@ -437,6 +437,16 @@ check('reading source: simple vynutí pouze Automaticky', () => {
   if(w.eval('state.sourceUseMode')!=='auto') throw new Error('simple zachoval advanced sourceUseMode');
   return 'auto only';
 });
+check('reading source: explicitní Reading téma má prioritu před tématem zdroje', () => {
+  w.eval("Object.assign(state,{appMode:'advanced',workPreset:'full',jazyk:'angličtina',uroven:['B2'],zadaniTab:'text',sourceUseMode:'content',typyCviceni:['reading comprehension'],pocet:1,body:5,exerciseDetail:false,rcTopic:'Práce a kariéra'});");
+  w.document.getElementById('zadaniText').value='Environment test: recycling, pollution, renewable energy, carbon footprint.';
+  const prompt=w.buildContentPrompt(w.eval('state'),[]);
+  for(const needle of ['READING TOPIC PRIORITY','supplied READING TOPIC is mandatory','Práce a kariéra','Use source facts only as support inside that Reading topic']){
+    if(!prompt.includes(needle)) throw new Error('topic-priority prompt missing '+needle);
+  }
+  if(prompt.includes('Use source topics/facts as the content basis')) throw new Error('source content still overrides explicit Reading topic');
+  return 'Reading topic > source topic';
+});
 
 // Test Lab jako admin: lazy feature se v JSDOM nenačte přes dynamický import automaticky.
 const testLabFeature = path.join(path.dirname(target), 'features', 'testlab.js');

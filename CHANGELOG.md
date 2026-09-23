@@ -1,3 +1,13 @@
+## 7.1.49 — 2026-09-23 — priorita explicitního tématu Readingu
+
+- Explicitně zvolené nebo ručně zadané téma Readingu je nově povinným tematickým rámcem výsledného textu.
+- Zdrojový materiál již nesmí přepsat zvolené Reading téma ani rozšířit text na jiné hlavní téma.
+- Režimy Automaticky, Obsah a fakta a Kombinovat přenášejí pouze prvky, které lze do vybraného tématu přirozeně začlenit.
+- Slovní zásoba ze zdroje se používá jen tehdy, když do zvoleného tématu přirozeně zapadá; nevhodné výrazy se nenutí jen kvůli vyšší míře reuse.
+- Dvoufázová analýza zdroje zná informaci, že je Reading topic uzamčen, a při výběru vocabulary preferuje kompatibilní položky.
+- Stejná priorita je v samostatném AI návrhu Readingu i v hlavním generování celého testu.
+- CEFR nadále řídí celkovou jazykovou náročnost a trust-boundary ochrana zdrojů zůstává zachována.
+
 ## 7.1.48 — 2026-09-23 — přehlednější volba práce se zdrojem
 
 - Simple režim používá pro zdrojový materiál vždy `Automaticky`; pokročilá volba se při návratu do Simple bezpečně resetuje.

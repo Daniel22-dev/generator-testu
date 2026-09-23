@@ -1,8 +1,10 @@
-> **7.1.48 — kandidát UI zpřehlednění práce se zdroji; produkční akceptace následuje přes standardní CI/GARP brány.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
+> **7.1.49 — kandidát s prioritou explicitního tématu Readingu; produkční akceptace následuje přes standardní CI/GARP brány.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.48
+**Aktuální verze:** 7.1.49
+
+> **7.1.49 Priorita tématu Readingu (2026-09-23):** pokud učitel explicitně vybere nebo zadá téma Readingu, je povinným tematickým rámcem. Zdroj ho nesmí přepsat; podle režimu zdroje se přenášejí pouze přirozeně slučitelné prvky a nevhodná vocabulary/obsah se nenutí do textu.
 
 > **7.1.48 Přehlednější práce se zdrojem (2026-09-23):** Simple režim používá vždy Automaticky. Advanced režim zobrazuje šest voleb jako přehledné karty s krátkým popisem přímo na kartě a plným tooltipem; přepnutí zpět do Simple bezpečně vrací režim zdroje na Automaticky.
 
