@@ -1789,3 +1789,10 @@ body.generator-editor-open .ghrab-error-reporter { --ghrab-reporter-bottom:12px 
 .result-step-panel .btn-edit,.result-step-panel .btn-preview{margin:4px 6px 8px 0}
 @media(max-width:760px){.result-step-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-step-card{min-height:130px;padding:12px}.result-step-card[aria-selected=true]{padding:11px}.result-step-panel{padding:12px}}
 @media(max-width:400px){.result-step-grid{gap:6px}.result-step-card{font-size:12px}.result-step-panel .btn-edit,.result-step-panel .btn-preview{width:100%;margin-right:0}}
+
+/* 7.1.47 — sjednocený účel testu + práce se zdrojovým materiálem */
+.purpose-profile-note{grid-column:1/-1;padding:9px 11px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:.84rem;line-height:1.45;color:var(--t3)}
+.source-use-panel{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2)}
+.source-use-panel select{width:100%;margin-top:6px}
+.source-use-note{margin-top:8px;font-size:.84rem;line-height:1.45;color:var(--t3)}
+.ai-source-meta{margin:8px 0 12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:.84rem;line-height:1.5}

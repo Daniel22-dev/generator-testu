@@ -25,12 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.46',
+  version: '7.1.47',
   date:    '2026-09-21',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
-    'AUDIT 7.1.46: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
+    'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
     'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
     'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
@@ -269,7 +269,7 @@ const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','
 const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
-  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', sourceSliceMode:'start',
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', sourceSliceMode:'start', sourceUseMode:'auto',
   cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
   body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfig:[],
   fuzzyTolerance:'off',
@@ -281,7 +281,7 @@ const DEFAULT = {
   ageGroup:'', ageGroupCustom:'',           // BOD 15 — věková skupina / ročník
   testPurpose:'',                            // pedagogický účel testu (label presetu)
   pedagogicalPreset:'',                      // BOD 6 — zvolený systémový preset
-  simpleTemplate:'',                         // jednoduchá šablona (simple mode) — zamyká a skrývá volby
+  simpleTemplate:'',                         // interní profil účelu testu; v simple řídí skryté technické volby, v advanced pouze předvyplňuje
   screenGuard:false,                         // hlídání obrazovky (zámek při opuštění) nezávisle na testMode
   feedbackMode:'brief',                      // BOD 8 — none | brief | learning
   differentiationLevel:'standard',           // BOD 7 — basic | standard | challenge (celý test)
@@ -1313,9 +1313,10 @@ function applySimpleDefaults(){
   state.fuzzyTolerance = 'off';
   state.screenGuard = false;
   if (!state.body || state.body <= 0) { state.body = 30; setVal('bodyCustom', 30); }
-  // Aktivní jednoduchá šablona přebíjí tvrdé defaulty svými zamčenými hodnotami.
-  // Tím může i v jednoduchém módu vzniknout např. offline/přísný test — volby jsou
-  // ale schované, takže je učitel nevidí ani nemění (řídí je výhradně šablona).
+  // V jednoduchém režimu musí vždy existovat jeden ze tří společných profilů účelu.
+  // Když starší snapshot žádný profil nemá, použij standardní/běžný test.
+  if (!state.simpleTemplate && typeof simplePurposeTemplateId === 'function') state.simpleTemplate = simplePurposeTemplateId('standard');
+  // Aktivní profil účelu přebíjí skryté technické defaulty.
   applySimpleTemplateLocks();
 }
 // Aplikuje zamčené hodnoty aktivní jednoduché šablony na state. Volá se z

@@ -461,13 +461,31 @@ function buildContentPrompt(st,apiSourceNotes=[]){
       if(used.length<joined.length) src+='\n'+aiTruncationNote(joined.length, used.length);
     }
     if(apiSourceNotes.length)src+='\n\n'+wrapUntrustedMetadata('ATTACHED FILE METADATA', apiSourceNotes.map((x,i)=>(i+1)+'. '+x).join('\n'));
+    const fileNote=trim('zadaniFileNote');
+    if(fileNote) src+='\n\n'+wrapUntrustedField('TEACHER NOTE ABOUT ATTACHED FILES', fileNote);
   }else if(st.zadaniTab==='url'&&st.urls?.filter(Boolean).length){
     src='\n\n'+wrapUntrustedUrls(st.urls.filter(Boolean));
+    const urlNote=trim('zadaniUrlNote');
+    if(urlNote) src+='\n\n'+wrapUntrustedField('TEACHER NOTE ABOUT URL SOURCES', urlNote);
+  }
+  const hasSourceMaterial = (st.zadaniTab==='text' && !!trim('zadaniText'))
+    || (st.zadaniTab==='file' && !!fileObjects.length)
+    || (st.zadaniTab==='url' && !!(st.urls||[]).some(Boolean));
+  if(hasSourceMaterial){
+    const sourcePolicy = sourceUsePolicyPrompt(st.sourceUseMode||'auto', {
+      cefr:uroven,
+      reading:specs.some(s=>s.type==='reading comprehension')
+    });
+    if(sourcePolicy) src+='\n\n'+sourcePolicy;
   }
   const listeningBlock = buildListeningUserBlock();
   if (listeningBlock) src += '\n\n' + listeningBlock;
   const readingBlock = buildReadingUserBlock();
   if (readingBlock) src += '\n\n' + readingBlock;
+  if(specs.some(s=>s.type==='reading comprehension') && st.readingSourceAnalysis){
+    src += '\n\n' + wrapUntrustedMetadata('PRE-ANALYZED READING SOURCE INVENTORY — source-supported data only', JSON.stringify(st.readingSourceAnalysis));
+    src += '\nUse this pre-analysis only as an inventory of source-supported material for Reading. Respect SOURCE MATERIAL USE POLICY above; never invent additional allegedly source-derived vocabulary/content.';
+  }
   const instrLang=st.instrJazyk==='target'?jazyk:st.instrJazyk==='mixed'?`Czech UI, task instructions in ${jazyk}`:'Czech UI and Czech task instructions';
   const exJSON=specs.map(s=>apiExerciseExampleJson(s.type)).join(',\n    ');
   const rcWords = ({short:'60–100', medium:'130–190', long:'240–340'})[st.rcLength] || '130–190';
@@ -475,7 +493,7 @@ function buildContentPrompt(st,apiSourceNotes=[]){
     const styleKey=specialStyleKey(s.style);
     const styleNote=styleKey?` STYLE = "${styleKey}": ${SPECIAL_STYLES[styleKey].recipe}`:'';
     const rcNote=(s.type==='reading comprehension')
-      ? ` READING COMPREHENSION RULES: put ONE shared reading text at the EXERCISE level as "passage" — a single coherent text of about ${rcWords} words at CEFR ${uroven}. All ${s.count} items refer to that one shared passage. Each item must contain ONLY {question, options[2+], correct, explanation}. Do NOT put a passage inside items and do NOT repeat or give each question its own text.`
+      ? ` READING COMPREHENSION RULES: put ONE shared reading text at the EXERCISE level as "passage" — a single coherent text of about ${rcWords} words at CEFR ${uroven}. The passage AS A WHOLE must match CEFR ${uroven} in non-target vocabulary, syntax, sentence complexity and information density. If an active source-use policy explicitly identifies lesson TARGET vocabulary, a limited set of those source-supported target items may be slightly above ${uroven}; keep the surrounding language at ${uroven}. If there is no active source material, generate vocabulary and syntax directly at CEFR ${uroven}. All ${s.count} items refer to that one shared passage. Each item must contain ONLY {question, options[2+], correct, explanation}. Do NOT put a passage inside items and do NOT repeat or give each question its own text.`
       : '';
 
     const catBoardNote=(s.type==='categorisation-board')

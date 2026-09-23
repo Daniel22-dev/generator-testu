@@ -155,7 +155,7 @@ ok('simple Procvičování nastaví stabilní formativní profil',()=>{
 w.eval("chooseSimplePurpose('standard')");
 ok('simple Běžný test resetuje historii klikání na standardní profil',()=>{
   const s=JSON.parse(w.eval('JSON.stringify(state)'));
-  assert(s.simpleTemplate==='','běžný test má zůstat bez interní šablony');
+  assert(s.simpleTemplate==='fl_standard','běžný test má používat kanonický standardní profil');
   assert(s.testMode==='bezny'&&s.resultMode==='instant'&&s.feedbackMode==='brief','nesedí standard profil');
   assert(s.screenGuard===false,'běžný test zdědil screenGuard');
 });
@@ -170,10 +170,16 @@ ok('simple účel se zachová při změně jazykové sady',()=>{
   assert(s.appMode==='simple'&&s.testMode==='prisny'&&s.simpleTemplate==='cs_strict','přísný účel se při změně jazyka ztratil');
 });
 w.eval("setAppMode('advanced');renderSimpleTemplates();");
-ok('advanced UI zachovává původní plnou sadu šablon',()=>{
-  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns .simple-tpl-card')];
-  assert(cards.length===4,'čeština advanced má mít 3 šablony + Bez šablony');
-  assert(!!w.document.querySelector('#simpleTemplateBtns .clear-card'),'advanced přišel o Bez šablony');
+ok('advanced UI používá stejné tři účely jako simple',()=>{
+  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns [data-purpose]')];
+  assert(cards.length===3,'advanced má mít stejné 3 účely');
+  assert(cards.map(x=>x.dataset.purpose).join(',')==='practice,standard,strict','advanced účely se liší od simple');
+  assert(w.document.getElementById('testModeField').classList.contains('hidden'),'duplicitní Režim testu je viditelný');
+});
+w.eval("chooseSimplePurpose('standard');pick('feedbackMode','learning');");
+ok('advanced účel je pouze profil a technické volby zůstávají editovatelné',()=>{
+  const s=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(s.simpleTemplate==='cs_standard'&&s.feedbackMode==='learning','profil účelu uzamkl technickou volbu');
 });
 
 // 4) Vizuální aktivace/deaktivace pro všechny zásadní závislosti.

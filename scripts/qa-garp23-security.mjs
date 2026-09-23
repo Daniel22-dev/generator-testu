@@ -245,6 +245,7 @@ function invKey(row){return `${row.file}|${row.operation}`;}
 const expectedAiCalls = [
   ['src/features/preview-editor.js','acceptable-answer-enrichment'],
   ['src/features/testlab.js','diagnostic-ping'],
+  ['src/js/03-ui-render.js','reading-source-analysis'],
   ['src/js/03-ui-render.js','listening-question-suggestions'],
   ['src/js/03-ui-render.js','reading-package-suggestion'],
   ['src/js/01-core.js','generator-help-answer'],

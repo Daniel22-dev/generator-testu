@@ -13,6 +13,11 @@ const SIMPLE_TEMPLATES = {
       desc:'Učení za pochodu. Student vidí známku i vysvětlení hned po odevzdání.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'mild', differentiationLevel:'standard', gradeTyp:'skola' }
     },
+    fl_standard: {
+      icon:'✅', label:'Běžný test', purpose:'běžné ověření znalostí',
+      desc:'Standardní test. Výchozí nastavení je okamžitý výsledek a stručná zpětná vazba; v pokročilém režimu lze podrobnosti změnit.',
+      locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
+    },
     fl_homework: {
       icon:'🏠', label:'Domácí procvičení', purpose:'samostatné domácí procvičení',
       desc:'Samostatná práce doma. Měkčí tolerance překlepů, učící zpětná vazba.',
@@ -35,6 +40,11 @@ const SIMPLE_TEMPLATES = {
       desc:'Učení za pochodu. Automatické opravování, učící zpětná vazba s vysvětlením.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
+    cs_standard: {
+      icon:'✅', label:'Běžný test', purpose:'běžné ověření znalostí',
+      desc:'Standardní test. Výchozí nastavení je okamžitý výsledek a stručná zpětná vazba; v pokročilém režimu lze podrobnosti změnit.',
+      locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
+    },
     cs_text: {
       icon:'📖', label:'Práce s textem', purpose:'čtenářská gramotnost a porozumění textu',
       desc:'Čtenářská gramotnost a porozumění. Stručná zpětná vazba po odevzdání.',
@@ -56,18 +66,15 @@ const SIMPLE_LOCK_LABELS = {
   gradeTyp:      { skola:'Školní známkování 1–5', vlastni:'Vlastní stupnice' }
 };
 const SIMPLE_LOCK_ORDER = ['testMode','resultMode','feedbackMode','fuzzyTolerance','differentiationLevel','gradeTyp'];
-// Volby, které ŠABLONA plně řídí. Když je v pokročilém režimu aktivní jakákoli
-// šablona, tyto volby jsou zamčené (zašedlé) a nejdou proklikat — bez ohledu na to,
-// zda je konkrétní hodnota uvedená v `locks` (např. screenGuard u procvičení je
-// implicitně OFF a stejně zamčený, aby nešlo zapnout hlídání u procvičovací šablony).
-// Pro ruční úpravu musí učitel šablonu nejdřív odepnout („✖ Bez šablony").
+// Historické mapy zachováváme kvůli kompatibilitě starších snapshotů a pomocných
+// funkcí. Od 7.1.47 ale společný účel testu v pokročilém režimu nic nezamyká —
+// pouze předvyplní doporučené technické hodnoty.
 const TEMPLATE_GOVERNED_KEYS = ['testMode','resultMode','feedbackMode','fuzzyTolerance','differentiationLevel','gradeTyp','screenGuard'];
 const TEMPLATE_LOCK_FIELD_MAP = {
   testMode:'testModeBtns', resultMode:'resultModeBtns', feedbackMode:'feedbackModeBtns',
   fuzzyTolerance:'fuzzyBtns', differentiationLevel:'diffLevelBtns', gradeTyp:'gradeOptions', screenGuard:'screenGuardBtns'
 };
-// True, když je v pokročilém režimu aktivní šablona (= režim a bezpečnost jsou zamčené).
-function templateLockActive(){ return !!state.simpleTemplate && !isSimpleMode(); }
+function templateLockActive(){ return false; }
 function simpleTemplateSet(){
   return (String(state.jazyk||'').toLowerCase()==='čeština') ? SIMPLE_TEMPLATES.cs : SIMPLE_TEMPLATES.fl;
 }
@@ -85,10 +92,9 @@ function activeTemplateDef(){
 // typy, počet a čas zůstávají vždy na učiteli. V jednoduchém režimu se volby šablony
 // skryjí, v pokročilém zůstanou viditelné a editovatelné. Staré wrappery choosePreset/
 // applyPreset/clearPreset byly odstraněny v 6.11.70 (nic je nevolalo).
-// ═══ JEDNODUCHÉ ŠABLONY — výběr, zrušení, detail ══════════════════════════════
-// Výběr jednoduché šablony: zapne zamčené hodnoty, ostatní nechá na učiteli.
-// Druhý klik na stejnou šablonu otevře detail (co přesně zapíná). Klik na jinou
-// přepne. Zamčené volby se v jednoduchém módu nezobrazují (renderSimpleTemplates).
+// ═══ PROFILY ÚČELU TESTU — kompatibilní obslužné funkce ═══════════════════════
+// Starší veřejné helpery ponecháváme kvůli snapshotům/QA; nové UI používá tři
+// společné účely přes chooseSimplePurpose(). V advanced režimu se hodnoty nezamykají.
 function chooseSimpleTemplate(id){
   const t = simpleTemplateById(id);
   if (!t) return;
@@ -100,7 +106,7 @@ function chooseSimpleTemplate(id){
   renderSimpleTemplates();
   const msg = isSimpleMode()
     ? ('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň jen látku, typy a počet.')
-    : ('Šablona: ' + t.label + '. Režim a bezpečnost jsou nastavené a zamčené (zašedlé). Doplň látku, typy a počet; pro ruční úpravu šablonu odepni.');
+    : ('Profil: ' + t.label + '. Výchozí technické hodnoty jsou předvyplněné a můžeš je dále upravit.');
   uiToast(msg, 'ok', 4200);
 }
 function clearSimpleTemplate(){
@@ -135,6 +141,10 @@ function simpleTemplateLockList(t){
 // Vykreslí karty jednoduchých šablon podle aktuálního jazyka. Volá se při změně
 // jazyka i při výběru šablony (kvůli zvýraznění aktivní karty).
 function getSimplePurposeKey(){
+  const id = String(state.simpleTemplate || '');
+  if (/strict/.test(id)) return 'strict';
+  if (/practice|homework|cs_text/.test(id)) return 'practice';
+  if (/standard|graded_quick/.test(id)) return 'standard';
   if (state.testMode === 'prisny') return 'strict';
   if (state.testMode === 'procviceci') return 'practice';
   return 'standard';
@@ -143,87 +153,48 @@ function simplePurposeTemplateId(key){
   const cs = String(state.jazyk || '').toLowerCase() === 'čeština';
   if (key === 'practice') return cs ? 'cs_practice' : 'fl_practice';
   if (key === 'strict') return cs ? 'cs_strict' : 'fl_strict';
-  return '';
+  return cs ? 'cs_standard' : 'fl_standard';
 }
 function chooseSimplePurpose(key){
-  if (!isSimpleMode()) return;
-  if (key === 'standard') {
-    // „Běžný test“ odpovídá přesně dosavadním bezpečným defaultům jednoduchého
-    // režimu. Nezavádíme nový preset ani neměníme generátor výsledného testu.
-    state.simpleTemplate = '';
-    applySimpleDefaults();
-  } else {
-    const id = simplePurposeTemplateId(key);
-    const t = simpleTemplateById(id);
-    if (!t) return;
-    state.simpleTemplate = id;
-    applyTemplateValues(id);
-  }
+  const id = simplePurposeTemplateId(key);
+  const t = simpleTemplateById(id);
+  if (!t) return;
+  state.simpleTemplate = id;
+  state.testPurpose = t.purpose || '';
+  applyTemplateValues(id);
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
+  renderSimpleTemplates();
   const labels = {practice:'Procvičování', standard:'Běžný test', strict:'Přísný test'};
-  try { uiToast('Účel nastaven: ' + (labels[key] || key) + '. Technické volby nastavil Generátor automaticky.', 'ok', 3600); } catch(_){}
+  const tail = isSimpleMode()
+    ? ' Technické volby nastavil Generátor automaticky.'
+    : ' Výchozí technické volby byly předvyplněny; další nastavení můžeš upravit níže.';
+  try { uiToast('Účel nastaven: ' + (labels[key] || key) + '.' + tail, 'ok', 4200); } catch(_){}
 }
 function renderSimpleTemplates(){
   const wrap = $('simpleTemplateBtns');
   if (!wrap) return;
+  const active = getSimplePurposeKey();
+  const cards = [
+    {key:'practice', icon:'💬', title:'Procvičování', desc:'Student dostane výsledek a učící zpětnou vazbu hned. Pro nácvik, opakování a domácí přípravu.', badge:'Výsledek hned'},
+    {key:'standard', icon:'✅', title:'Běžný test', desc:'Standardní ověření znalostí. Výchozí chování je okamžitý výsledek; v pokročilém režimu lze navazující technické volby upravit.', badge:'Běžné použití'},
+    {key:'strict', icon:'🔒', title:'Přísný test', desc:'Test pod dohledem. Opuštění stránky pokus uzamkne a výsledek se zpracuje v učitelském verifieru.', badge:'Zámek + verifier'}
+  ];
   let html = '';
-
-  // Etapa 1 workflow simplification: v jednoduchém režimu učitel neřeší technické
-  // šablony. Vybere jen pedagogický účel. Interně používáme stejné již auditované
-  // hodnoty/presety jako dříve; pokročilý režim zůstává beze změny.
+  cards.forEach(function(c){
+    const isActive = active === c.key;
+    html += '<button type="button" class="tag-btn preset-card simple-purpose-card' + (isActive?' active':'') + '" '
+      + 'data-purpose="' + c.key + '" onclick="chooseSimplePurpose(\'' + c.key + '\')">'
+      + '<span class="preset-card-top"><span class="preset-card-emoji">' + c.icon + '</span>'
+      + '<span class="preset-card-text"><span class="preset-card-title">' + esc(c.title) + '</span>'
+      + '<span class="preset-card-desc">' + esc(c.desc) + '</span></span></span>'
+      + '<span class="preset-card-mode ' + (c.key === 'strict' ? 'strict' : (c.key === 'practice' ? 'instant' : 'flex')) + '">' + esc(c.badge) + '</span>'
+      + '</button>';
+  });
   if (isSimpleMode()) {
-    const active = getSimplePurposeKey();
-    const cards = [
-      {
-        key:'practice', icon:'💬', title:'Procvičování',
-        desc:'Student dostane výsledek a učící zpětnou vazbu hned. Pro nácvik, opakování a domácí přípravu.',
-        badge:'Výsledek hned'
-      },
-      {
-        key:'standard', icon:'✅', title:'Běžný test',
-        desc:'Standardní test s okamžitým výsledkem. Opuštění stránky se zaznamená, ale pokus se nezamkne.',
-        badge:'Běžné použití'
-      },
-      {
-        key:'strict', icon:'🔒', title:'Přísný test',
-        desc:'Test pod dohledem. Opuštění stránky pokus uzamkne a výsledek se zpracuje v učitelském verifieru.',
-        badge:'Zámek + verifier'
-      }
-    ];
-    cards.forEach(function(c){
-      const isActive = active === c.key;
-      html += '<button type="button" class="tag-btn preset-card simple-purpose-card' + (isActive?' active':'') + '" '
-        + 'data-purpose="' + c.key + '" onclick="chooseSimplePurpose(\'' + c.key + '\')">'
-        + '<span class="preset-card-top"><span class="preset-card-emoji">' + c.icon + '</span>'
-        + '<span class="preset-card-text"><span class="preset-card-title">' + esc(c.title) + '</span>'
-        + '<span class="preset-card-desc">' + esc(c.desc) + '</span></span></span>'
-        + '<span class="preset-card-mode ' + (c.key === 'strict' ? 'strict' : (c.key === 'practice' ? 'instant' : 'flex')) + '">' + esc(c.badge) + '</span>'
-        + '</button>';
-    });
-    html += '<button type="button" class="simple-advanced-link" onclick="clearSimpleTemplate()">⚙️ Přepnout do pokročilého nastavení</button>';
+    html += '<button type="button" class="simple-advanced-link" onclick="setAppMode(\'advanced\')">⚙️ Přepnout do pokročilého nastavení</button>';
   } else {
-    // Pokročilý režim: původní plná sada šablon zůstává zachována 1:1.
-    const set = simpleTemplateSet();
-    const active = state.simpleTemplate || '';
-    for (const id in set){
-      if (!Object.prototype.hasOwnProperty.call(set,id)) continue;
-      const t = set[id];
-      const isActive = (active === id);
-      html += '<button type="button" class="tag-btn preset-card simple-tpl-card' + (isActive?' active':'') + '" '
-        + 'data-val="' + id + '" onclick="chooseSimpleTemplate(\'' + id + '\')">'
-        + '<span class="preset-card-top"><span class="preset-card-emoji">' + t.icon + '</span>'
-        + '<span class="preset-card-text"><span class="preset-card-title">' + esc(t.label) + '</span>'
-        + '<span class="preset-card-desc">' + esc(t.desc) + '</span></span></span>'
-        + '<span class="simple-tpl-detaillink">' + (isActive ? 'Klikni znovu pro detail ▸' : 'Detail ▸') + '</span>'
-        + '</button>';
-    }
-    html += '<button type="button" class="tag-btn preset-card clear-card simple-tpl-card' + (active===''?' active':'') + '" '
-      + 'data-val="" onclick="clearSimpleTemplate()">'
-      + '<span class="preset-card-top"><span class="preset-card-text">'
-      + '<span class="preset-card-title">✖ Bez šablony</span>'
-      + '<span class="preset-card-desc">Zruší označení šablony, tvoje ruční nastavení ale ponechá.</span>'
-      + '</span></span></button>';
+    html += '<div class="purpose-profile-note">ℹ️ Účel testu je společný pro oba režimy. V pokročilém režimu předvyplní bezpečné výchozí hodnoty; podrobnosti upravíš v dalších sekcích.</div>';
   }
   wrap.innerHTML = html;
 }
@@ -234,7 +205,7 @@ function openSimpleTemplateDetail(id){
   const locks = simpleTemplateLockList(t);
   let body = '<div class="stpl-detail">';
   body += '<p class="stpl-detail-desc">' + esc(t.desc) + '</p>';
-  body += '<div class="stpl-detail-h">' + (simple ? 'Tato šablona automaticky nastaví:' : 'Tato šablona nastaví a zamkne (pro úpravu šablonu odepni):') + '</div><ul class="stpl-detail-list">';
+  body += '<div class="stpl-detail-h">' + (simple ? 'Tento účel automaticky nastaví:' : 'Tento účel předvyplní:') + '</div><ul class="stpl-detail-list">';
   locks.forEach(function(l){ body += '<li>' + esc(l) + '</li>'; });
   body += '</ul>';
   body += '<div class="stpl-detail-h">Doplníš sám:</div><ul class="stpl-detail-list stpl-detail-open">'
@@ -243,7 +214,7 @@ function openSimpleTemplateDetail(id){
     + '</ul>';
   body += '<p class="stpl-detail-foot">' + (simple
       ? 'Tyto volby se v jednoduchém režimu neukazují, aby nešlo nic omylem rozladit. Chceš-li je měnit ručně, přepni nahoře na <strong>Pokročilý režim</strong>.'
-      : 'V pokročilém režimu jsou tyto volby viditelné, ale <strong>zamčené (zašedlé)</strong> — šablona je řídí. Chceš-li je měnit, klikni na <strong>„✖ Bez šablony"</strong>; tím šablonu odepneš a vše se odemkne (tvoje aktuální hodnoty zůstanou).')
+      : 'V pokročilém režimu jsou technické volby viditelné a můžeš je dál upravit. Účel testu zůstává společným pedagogickým profilem.')
     + '</p>';
   body += '</div>';
   uiModal({ title: t.icon + ' ' + t.label, message: body, html:true, okText:'Rozumím', cancelText:null }).then(function(){});

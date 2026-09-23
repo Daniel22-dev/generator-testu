@@ -334,7 +334,7 @@ w.setAppMode('advanced');
 w.renderSimpleTemplates();
 check('stage5 advanced: pět skupin a přesné členství', () => {
   const expected={
-    advancedGroupTest:['timeField','testModeField','strictRiskField','submissionModeField','globalBodyField','gradeField'],
+    advancedGroupTest:['timeField','strictRiskField','submissionModeField','globalBodyField','gradeField'],
     advancedGroupStudent:['identityModeField','rosterField','diffLevelField','diffField','randomField'],
     advancedGroupFeedback:['feedbackModeField','fuzzyField'],
     advancedGroupSecurity:['resultModeField','screenGuardField','attemptProtectionInfo'],
@@ -378,17 +378,56 @@ check('stage5 security: jeden pokus je pouze vysvětlení existujícího chován
   if(el.querySelector('input,select,textarea,button')) throw new Error('Etapa 5 přidala nový ovladač pokusu');
   return 'read-only secure-offline explanation';
 });
-check('stage1 advanced: původní šablony zůstaly dostupné', () => {
-  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns .simple-tpl-card')];
-  if(cards.length!==5) throw new Error('angličtina má mít 4 šablony + Bez šablony, nalezeno '+cards.length);
+check('stage1 advanced: stejné tři účely jako v simple', () => {
+  const cards=[...w.document.querySelectorAll('#simpleTemplateBtns [data-purpose]')];
+  if(cards.length!==3) throw new Error('advanced má mít stejné 3 účely, nalezeno '+cards.length);
+  if(cards.map(x=>x.dataset.purpose).join(',')!=='practice,standard,strict') throw new Error('advanced účely se liší od simple');
+  if(!w.document.getElementById('testModeField').classList.contains('hidden')) throw new Error('duplicitní Režim testu je stále viditelný');
   return cards.length;
 });
+check('stage1 advanced: účel předvyplní, ale technické volby nezamkne', () => {
+  w.chooseSimplePurpose('standard');
+  w.pick('feedbackMode','learning');
+  const st=w.eval('state');
+  if(st.simpleTemplate!=='fl_standard'||st.feedbackMode!=='learning') throw new Error('advanced profil není editovatelný');
+  return 'fl_standard + ručně změněný feedback';
+});
 
-// všech 7 jednoduchých šablon
+// Legacy ID zůstávají načitatelné kvůli starým snapshotům, ale nové UI je nenabízí.
 for (const [lang, ids] of [['angličtina', ['fl_practice','fl_homework','fl_graded_quick','fl_strict']], ['čeština', ['cs_practice','cs_text','cs_strict']]]) {
   w.eval(`pickJazyk('${lang}')`);
-  for (const id of ids) check('šablona ' + id, () => { w.eval(`chooseSimpleTemplate('${id}')`); return w.eval('state.testMode+"/"+state.resultMode+"/"+state.feedbackMode'); });
+  for (const id of ids) check('legacy profil ' + id, () => { w.eval(`chooseSimpleTemplate('${id}')`); return w.eval('state.testMode+"/"+state.resultMode+"/"+state.feedbackMode'); });
 }
+
+// Zdrojový materiál + Reading: CEFR musí být explicitní a podklad musí projít až do promptu.
+check('reading source: bez zvolené CEFR není skrytý fallback B1', () => {
+  w.eval("state.uroven=[]");
+  if(w.compCefrForPrompt()!=='') throw new Error('Reading má stále skrytý CEFR fallback');
+  w.eval("state.uroven=['B1']");
+  if(w.compCefrForPrompt()!=='B1') throw new Error('B1 se nepropaguje do Readingu');
+  return 'explicitní CEFR';
+});
+check('reading source: režim zdroje + poznámka + preanalýza jsou v hlavním promptu', () => {
+  w.eval("Object.assign(state,{jazyk:'angličtina',uroven:['B1'],zadaniTab:'file',sourceUseMode:'vocabulary',typyCviceni:['reading comprehension'],pocet:1,body:5,exerciseDetail:false,readingSourceAnalysis:{target_vocabulary:['boarding pass','luggage'],content_points:['airport trip']}});fileObjects.length=0;fileObjects.push({displayName:'unit5.txt',textContent:'Unit 5: boarding pass, luggage, delayed flight.',embedStatus:'embedded'});");
+  w.document.getElementById('zadaniFileNote').value='Use the vocabulary from Unit 5.';
+  const prompt=w.buildContentPrompt(w.eval('state'),['unit5.txt']);
+  for(const needle of ['SOURCE MATERIAL USE POLICY','Slovní zásoba','CEFR B1','TEACHER NOTE ABOUT ATTACHED FILES','PRE-ANALYZED READING SOURCE INVENTORY','boarding pass']){
+    if(!prompt.includes(needle)) throw new Error('v promptu chybí '+needle);
+  }
+  if(!/passage AS A WHOLE must match CEFR B1/.test(prompt)) throw new Error('chybí explicitní CEFR pravidlo Readingu');
+  w.eval("fileObjects.length=0;delete state.readingSourceAnalysis;state.zadaniTab='text';state.sourceUseMode='auto';");
+  w.document.getElementById('zadaniFileNote').value='';
+  return 'source policy + note + analysis + CEFR';
+});
+check('reading source: nový UI ovladač má všech šest režimů', () => {
+  const sel=w.document.getElementById('sourceUseSelect');
+  if(!sel) throw new Error('chybí sourceUseSelect');
+  const vals=[...sel.options].map(o=>o.value).join(',');
+  if(vals!=='auto,content,vocabulary,grammar,model,combined') throw new Error(vals);
+  w.pickSourceUse('vocabulary');
+  if(w.eval('state.sourceUseMode')!=='vocabulary'||sel.value!=='vocabulary') throw new Error('sourceUseMode se nesynchronizuje');
+  return vals;
+});
 
 // Test Lab jako admin: lazy feature se v JSDOM nenačte přes dynamický import automaticky.
 const testLabFeature = path.join(path.dirname(target), 'features', 'testlab.js');
