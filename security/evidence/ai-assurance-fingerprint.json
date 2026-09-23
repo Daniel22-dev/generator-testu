@@ -6,7 +6,7 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "fb4ef10c90ab3d77045f25b09a1ae06aab616b738fd265cb67a56634ea2322d9",
+  "fingerprint": "9883039908a9f0671fe54d97ba2a02e071f9ce334695ea7ae9c9fc3daf4b5fb4",
   "files": [
     {
       "path": "src/js/01-core.js",
@@ -15,8 +15,8 @@
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 50139,
-      "sha256": "bbba29498d72a95bc752cff3c8d41086ec9e5108a50dd092a9f331a25e7a5380"
+      "size": 48022,
+      "sha256": "6cc0639dc0dfa7061ab99d46abe7ca9aa2e315d8dd5e1437772000f0ab18b89e"
     },
     {
       "path": "src/js/05-form-fields.js",
@@ -45,8 +45,8 @@
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 53719,
-      "sha256": "32829d4711dd8bc274dab82886773349b07413d928407f75bf66a53692d62509"
+      "size": 53628,
+      "sha256": "3e33098b2a19d44b1c55942f840b20f6924d8d1aaa60c07ad217e588c2c6fc6d"
     },
     {
       "path": "src/js/13a-secure-helpers.js",
