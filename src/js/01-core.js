@@ -26,7 +26,7 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
   version: '7.1.48',
-  date:    '2026-09-21',
+  date:    '2026-09-23',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
@@ -40,7 +40,6 @@ const RELEASE = Object.freeze({
     'ETAPA 6 SECURE UNLOCK HOTFIX (7.1.39): exact GitHub CI 7.1.38 odhalilo skutečnou produkční nekonzistenci pouze v secure studentském runtime: lokální deriveSecretHash() kanonizoval velikost písmen pro teacher-pin, ale ne pro unlock-password. Secure zámková obrazovka proto mohla odmítnout tentýž učitelský přístupový kód zadaný s jinou velikostí písmen, přestože teacher-login i instant runtime jej přijaly. Secure runtime nyní kanonizuje teacher-pin i unlock-password shodně; PBKDF2 domény/salty zůstávají oddělené a verifier, Forms, scoring, RSA/AES i SECURE-ANSWERS-V1 se nemění.',
     'ETAPA 6 QA HOTFIX (7.1.38): bez změny produkční logiky. Workflow test instant větve nyní používá skutečné instant DOM ID/funkci (t-name, t-pin, doTeacherLogin) a secure Stage 6 scénář generuje balík se skutečným PBKDF2 KDF místo záměrné rychlé testovací náhrady. Učitelský přístupový kód, doménově oddělené teacher-pin/unlock-password hashe, runtime, verifier, Forms, scoring a secure formát zůstávají funkčně beze změny.',
     'ETAPA 6 – JEDEN UČITELSKÝ PŘÍSTUPOVÝ KÓD (7.1.37): Generátor má místo samostatného učitelského PINu a odemykacího hesla jeden učitelský přístupový kód. Z jednoho kanonizovaného kódu se nadále odvozují dva různé PBKDF2 hashe s oddělenými doménami teacher-pin a unlock-password; teacher login a povolení dalšího pokusu ověřují pouze teacher-pin, zámková obrazovka pouze unlock-password. Skrytý legacy #heslo zůstává jen jako interní mirror pro kompatibilitu a neřídí kryptografii. Bezpečnost pracoviště, verifier, Google Forms, scoring, RSA/AES a formát SECURE-ANSWERS-V1 se nemění.',
-    'ETAPA 5 – PŘEHLEDNĚJŠÍ POKROČILÁ NASTAVENÍ (7.1.36): Pokročilý režim nyní seskupuje stávající volby do pěti sekcí Test / Student / Zpětná vazba / Bezpečnost / Vzhled. Přesouvají se původní DOM prvky se stejnými ID, hodnotami, handlery a validacemi; Simple režim je vrací na původní místa. Ochrana opakovaného pokusu je pouze vysvětlující informace o existujícím secure-offline zámku, nikoli nový přepínač. Studentský runtime, verifier, Google Forms, kryptografie, scoring, PIN/odemčení a serverový profil se nemění.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný

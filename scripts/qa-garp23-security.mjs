@@ -253,7 +253,7 @@ const expectedAiCalls = [
   ['src/js/12-prompt-builder.js','grading-scale-parse'],
   ['src/js/08-manual-editor.js',"attempt?'generation-repair':'exercise-generation'"]
 ].map(([file,operation])=>`${file}|${operation}`).sort();
-const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|484','src/js/01-core.js|719'].sort();
+const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|483','src/js/01-core.js|718'].sort();
 const aiInventory=aiCallInventory();
 const actualAiCalls=aiInventory.rows;
 const actualAiKeys=actualAiCalls.map(invKey).sort();
