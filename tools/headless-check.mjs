@@ -441,10 +441,10 @@ check('reading source: explicitní Reading téma má prioritu před tématem zdr
   w.eval("Object.assign(state,{appMode:'advanced',workPreset:'full',jazyk:'angličtina',uroven:['B2'],zadaniTab:'text',sourceUseMode:'content',typyCviceni:['reading comprehension'],pocet:1,body:5,exerciseDetail:false,rcTopic:'Práce a kariéra'});");
   w.document.getElementById('zadaniText').value='Environment test: recycling, pollution, renewable energy, carbon footprint.';
   const prompt=w.buildContentPrompt(w.eval('state'),[]);
-  for(const needle of ['READING TOPIC PRIORITY','mandatory thematic frame','Práce a kariéra','supporting material INSIDE the selected Reading topic']){
+  for(const needle of ['READING TOPIC PRIORITY','supplied READING TOPIC is mandatory','Práce a kariéra','Use source facts only as support inside that Reading topic']){
     if(!prompt.includes(needle)) throw new Error('topic-priority prompt missing '+needle);
   }
-  if(prompt.includes('Use source topics, facts and content as the primary content basis')) throw new Error('source content still overrides explicit Reading topic');
+  if(prompt.includes('Use source topics/facts as the content basis')) throw new Error('source content still overrides explicit Reading topic');
   return 'Reading topic > source topic';
 });
 
