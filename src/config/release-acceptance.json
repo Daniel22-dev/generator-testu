@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.47",
+  "appVersion": "7.1.48",
   "releaseStatus": "pre-release-source-attestation",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -50,7 +50,7 @@
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Source-only P5 acceptance input for Generator 7.1.47. It must not be interpreted as live deployment status.",
+  "note": "Source-only P5 acceptance input for Generator 7.1.48. It must not be interpreted as live deployment status.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

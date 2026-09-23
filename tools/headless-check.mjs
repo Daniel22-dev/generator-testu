@@ -419,14 +419,23 @@ check('reading source: režim zdroje + poznámka + preanalýza jsou v hlavním p
   w.document.getElementById('zadaniFileNote').value='';
   return 'source policy + note + analysis + CEFR';
 });
-check('reading source: nový UI ovladač má všech šest režimů', () => {
-  const sel=w.document.getElementById('sourceUseSelect');
-  if(!sel) throw new Error('chybí sourceUseSelect');
-  const vals=[...sel.options].map(o=>o.value).join(',');
+check('reading source: advanced má šest vysvětlených karet', () => {
+  w.eval("setAppMode('advanced')");
+  w.renderSourceUseNote();
+  const cards=[...w.document.querySelectorAll('#sourceUseCards .source-use-card')];
+  const vals=cards.map(c=>c.dataset.sourceUse).join(',');
   if(vals!=='auto,content,vocabulary,grammar,model,combined') throw new Error(vals);
+  if(cards.some(c=>!c.querySelector('.source-use-card-desc')||!String(c.title||'').trim())) throw new Error('některá karta nemá inline popis nebo tooltip');
   w.pickSourceUse('vocabulary');
-  if(w.eval('state.sourceUseMode')!=='vocabulary'||sel.value!=='vocabulary') throw new Error('sourceUseMode se nesynchronizuje');
+  if(w.eval('state.sourceUseMode')!=='vocabulary'||!w.document.querySelector('#sourceUseCards [data-source-use="vocabulary"]').classList.contains('active')) throw new Error('sourceUseMode se nesynchronizuje');
   return vals;
+});
+check('reading source: simple vynutí pouze Automaticky', () => {
+  w.eval("state.appMode='simple';state.workPreset='quick';enforceModeConstraints();applyVisualState()");
+  const cards=[...w.document.querySelectorAll('#sourceUseCards .source-use-card')];
+  if(cards.length!==1||cards[0].dataset.sourceUse!=='auto') throw new Error('simple zobrazuje víc než Automaticky');
+  if(w.eval('state.sourceUseMode')!=='auto') throw new Error('simple zachoval advanced sourceUseMode');
+  return 'auto only';
 });
 
 // Test Lab jako admin: lazy feature se v JSDOM nenačte přes dynamický import automaticky.

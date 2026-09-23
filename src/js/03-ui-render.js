@@ -309,21 +309,38 @@ function pickRcLength(v){ state.rcLength = v; applyVisualState(); saveSnapshot()
 
 // ═══ PRÁCE SE ZDROJOVÝM MATERIÁLEM ═══════════════════════════════════════════════
 const SOURCE_USE_MODES = Object.freeze({
-  auto:{label:'Automaticky (doporučeno)', note:'AI sama rozpozná, zda je podklad hlavně obsah, slovní zásoba, gramatika nebo vzor úloh. U Readingu využije relevantní slovní zásobu z lekce, pokud ji ve zdroji skutečně najde.'},
-  content:{label:'Obsah a fakta', note:'AI vychází z témat, informací a faktů ve zdroji, ale přeformuluje je pro zvolenou úroveň a nekopíruje původní test.'},
-  vocabulary:{label:'Slovní zásoba', note:'AI nejprve vytáhne klíčovou slovní zásobu ze zdroje a přirozeně ji použije v nových úlohách. U Readingu je cílová slovní zásoba výjimkou z CEFR, okolní jazyk zůstává na zvolené úrovni.'},
-  grammar:{label:'Gramatika / jazykové jevy', note:'AI rozpozná procvičované struktury a vytvoří nové příklady se stejnými jevy; obsah zdroje nemusí kopírovat.'},
-  model:{label:'Vzor obtížnosti a typu úloh', note:'AI použije zdroj jako vzor náročnosti a konstrukce úloh, ale vytvoří nový obsah. Zvolená CEFR úroveň má přednost, pokud je zdroj obtížnější.'},
-  combined:{label:'Kombinovat', note:'AI propojí obsah, cílovou slovní zásobu, procvičované jevy i styl úloh. Nevytváří kopii původního testu a celkovou náročnost řídí zvolená CEFR úroveň.'}
+  auto:{icon:'✨', label:'Automaticky', short:'AI sama pozná, co je ze zdroje pro nový test nejdůležitější.', note:'AI sama rozpozná, zda je podklad hlavně obsah, slovní zásoba, gramatika nebo vzor úloh. U Readingu využije relevantní slovní zásobu z lekce, pokud ji ve zdroji skutečně najde.'},
+  content:{icon:'📚', label:'Obsah a fakta', short:'Převezme témata a informace, ale vytvoří nový obsah.', note:'AI vychází z témat, informací a faktů ve zdroji, ale přeformuluje je pro zvolenou úroveň a nekopíruje původní test.'},
+  vocabulary:{icon:'🔤', label:'Slovní zásoba', short:'Najde cílové výrazy a použije je v nových úlohách.', note:'AI nejprve vytáhne klíčovou slovní zásobu ze zdroje a přirozeně ji použije v nových úlohách. U Readingu je cílová slovní zásoba výjimkou z CEFR, okolní jazyk zůstává na zvolené úrovni.'},
+  grammar:{icon:'🧩', label:'Gramatika / jazykové jevy', short:'Rozpozná procvičované struktury a vytvoří nové příklady.', note:'AI rozpozná procvičované struktury a vytvoří nové příklady se stejnými jevy; obsah zdroje nemusí kopírovat.'},
+  model:{icon:'🧭', label:'Vzor úloh a obtížnosti', short:'Napodobí princip a náročnost úloh, nikoli jejich obsah.', note:'AI použije zdroj jako vzor náročnosti a konstrukce úloh, ale vytvoří nový obsah. Zvolená CEFR úroveň má přednost, pokud je zdroj obtížnější.'},
+  combined:{icon:'🧠', label:'Kombinovat', short:'Propojí obsah, slovní zásobu, gramatiku i styl úloh.', note:'AI propojí obsah, cílovou slovní zásobu, procvičované jevy i styl úloh. Nevytváří kopii původního testu a celkovou náročnost řídí zvolená CEFR úroveň.'}
 });
 function normalizeSourceUseMode(v){ return SOURCE_USE_MODES[v] ? v : 'auto'; }
-function pickSourceUse(v){ state.sourceUseMode=normalizeSourceUseMode(v); renderSourceUseNote(); validate(); saveSnapshot(); }
+function pickSourceUse(v){
+  state.sourceUseMode=isSimpleMode() ? 'auto' : normalizeSourceUseMode(v);
+  renderSourceUseNote(); validate(); saveSnapshot();
+}
+function renderSourceUseChoices(){
+  const wrap=document.getElementById('sourceUseCards'); if(!wrap)return;
+  const simple=isSimpleMode();
+  const active=simple ? 'auto' : normalizeSourceUseMode(state.sourceUseMode);
+  const keys=simple ? ['auto'] : ['auto','content','vocabulary','grammar','model','combined'];
+  wrap.classList.toggle('source-use-simple',simple);
+  wrap.innerHTML=keys.map(function(key){
+    const def=SOURCE_USE_MODES[key]; const on=key===active;
+    return '<button type="button" class="source-use-card'+(on?' active':'')+'" data-source-use="'+key+'" aria-pressed="'+(on?'true':'false')+'" title="'+esc(def.note)+'" onclick="pickSourceUse(\''+key+'\')">'
+      +'<span class="source-use-card-title"><span aria-hidden="true">'+def.icon+'</span> '+esc(def.label)+(key==='auto'?' <span class="source-use-recommended">Doporučeno</span>':'')+'</span>'
+      +'<span class="source-use-card-desc">'+esc(def.short)+'</span>'
+      +'</button>';
+  }).join('');
+}
 function renderSourceUseNote(){
-  const mode=normalizeSourceUseMode(state.sourceUseMode);
-  const sel=document.getElementById('sourceUseSelect'); if(sel&&sel.value!==mode)sel.value=mode;
+  const mode=isSimpleMode() ? 'auto' : normalizeSourceUseMode(state.sourceUseMode);
+  renderSourceUseChoices();
   const note=document.getElementById('sourceUseNote'); if(!note)return;
   const def=SOURCE_USE_MODES[mode]||SOURCE_USE_MODES.auto;
-  note.innerHTML='<strong>'+esc(def.label)+':</strong> '+esc(def.note)+(usesReadingComprehension()?'<br><strong>Reading:</strong> celková slovní zásoba a syntax se vždy přizpůsobí zvolené CEFR úrovni; cílové výrazy převzaté z probírané lekce mohou být mírně nad ní.':'');
+  note.innerHTML=(isSimpleMode()?'<strong>Jednoduchý režim:</strong> Generátor používá podklad automaticky. ':'<strong>'+esc(def.label)+':</strong> ')+esc(def.note)+(usesReadingComprehension()?'<br><strong>Reading:</strong> celková slovní zásoba a syntax se vždy přizpůsobí zvolené CEFR úrovni; cílové výrazy převzaté z probírané lekce mohou být mírně nad ní.':'');
 }
 function activeSourceMaterialPresent(){
   if(state.zadaniTab==='text')return !!trim('zadaniText');

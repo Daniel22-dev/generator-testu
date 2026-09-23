@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.47">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.48">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -368,15 +368,8 @@
         </div>
         <div class="source-use-panel" id="sourceUsePanel">
           <div class="rc-sub-label">Jak má AI použít tento podklad? <button class="tt-icon" data-tip="Určuje, co má AI ze zdroje převzít do NOVÉHO testu. Zdroj je vždy jen podklad, ne instrukce. Zvolená CEFR úroveň řídí celkovou obtížnost nového textu a úloh.">?</button></div>
-          <select id="sourceUseSelect" onchange="pickSourceUse(this.value)">
-            <option value="auto">Automaticky (doporučeno)</option>
-            <option value="content">Obsah a fakta</option>
-            <option value="vocabulary">Slovní zásoba</option>
-            <option value="grammar">Gramatika / jazykové jevy</option>
-            <option value="model">Vzor obtížnosti a typu úloh</option>
-            <option value="combined">Kombinovat</option>
-          </select>
-          <div class="source-use-note" id="sourceUseNote"></div>
+          <div class="source-use-card-grid" id="sourceUseCards" role="group" aria-label="Jak má AI použít tento podklad?"></div>
+          <div class="source-use-note" id="sourceUseNote" aria-live="polite"></div>
         </div>
       </div>
 

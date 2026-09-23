@@ -1792,7 +1792,17 @@ body.generator-editor-open .ghrab-error-reporter { --ghrab-reporter-bottom:12px 
 
 /* 7.1.47 — sjednocený účel testu + práce se zdrojovým materiálem */
 .purpose-profile-note{grid-column:1/-1;padding:9px 11px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:.84rem;line-height:1.45;color:var(--t3)}
-.source-use-panel{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2)}
-.source-use-panel select{width:100%;margin-top:6px}
-.source-use-note{margin-top:8px;font-size:.84rem;line-height:1.45;color:var(--t3)}
+.source-use-panel{margin-top:12px;padding:12px;border:1px solid var(--bdr);border-radius:12px;background:var(--bg2)}
+.source-use-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.source-use-card-grid.source-use-simple{grid-template-columns:minmax(0,1fr)}
+.source-use-card{display:flex;flex-direction:column;gap:6px;min-height:98px;padding:11px 12px;border:1px solid var(--bdr);border-radius:11px;background:var(--bg);color:var(--t1);text-align:left;cursor:pointer;line-height:1.35;transition:border-color .15s ease,background .15s ease,transform .15s ease}
+.source-use-card:hover{border-color:var(--acc);transform:translateY(-1px)}
+.source-use-card:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.source-use-card.active{border:2px solid var(--acc);padding:10px 11px;background:var(--bg3)}
+.source-use-card-title{font-weight:800;font-size:.9rem}
+.source-use-card-desc{font-size:.8rem;color:var(--t2)}
+.source-use-recommended{display:inline-block;margin-left:5px;padding:2px 6px;border:1px solid var(--bdr);border-radius:999px;font-size:.68rem;font-weight:700;color:var(--t2);vertical-align:1px}
+.source-use-note{margin-top:9px;font-size:.84rem;line-height:1.45;color:var(--t3)}
+@media(max-width:760px){.source-use-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:460px){.source-use-card-grid{grid-template-columns:minmax(0,1fr)}.source-use-card{min-height:0}}
 .ai-source-meta{margin:8px 0 12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:.84rem;line-height:1.5}

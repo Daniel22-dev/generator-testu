@@ -25,11 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.47',
+  version: '7.1.48',
   date:    '2026-09-21',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
     'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
     'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
     'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
@@ -1312,6 +1313,7 @@ function applySimpleDefaults(){
   state.identityMode = 'name';
   state.fuzzyTolerance = 'off';
   state.screenGuard = false;
+  state.sourceUseMode = 'auto';
   if (!state.body || state.body <= 0) { state.body = 30; setVal('bodyCustom', 30); }
   // V jednoduchém režimu musí vždy existovat jeden ze tří společných profilů účelu.
   // Když starší snapshot žádný profil nemá, použij standardní/běžný test.
@@ -1355,7 +1357,7 @@ function ensureUnlockPasswordForGuard(){
 async function setAppMode(mode){
   if(mode!=='advanced'&&state.appMode==='advanced'){
     if(String(state.jazyk||'').toLowerCase()==='čeština'&&!state.simpleTemplate){uiToast('Modul češtiny používá pokročilé nastavení. Pro jednoduchý režim nejdřív vyber šablonu.','info',5000);return;}
-    const ok=await uiConfirm('Jednoduchý režim obnoví výchozí nebo šablonové nastavení hodnocení, skupin, rozložení a detailů cvičení. Název, látka a zdrojové podklady zůstanou. Pokračovat?','Přepnout do jednoduchého režimu?');
+    const ok=await uiConfirm('Jednoduchý režim obnoví výchozí nebo šablonové nastavení hodnocení, skupin, rozložení a detailů cvičení. Název, látka a zdrojové podklady zůstanou; způsob použití podkladu se vrátí na Automaticky. Pokračovat?','Přepnout do jednoduchého režimu?');
     if(!ok)return;
   }
   if (mode === 'advanced') {
