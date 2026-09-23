@@ -1,8 +1,10 @@
-> **7.1.46 — lokální audit, nikoli dokončená provozní akceptace.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
+> **7.1.47 — lokální kandidát po workflow úpravě; produkční akceptace následuje přes standardní CI/GARP brány.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.45
+**Aktuální verze:** 7.1.47
+
+> **7.1.47 Workflow zdrojů + Reading (2026-09-22):** Simple i Advanced používají stejné tři účely testu; Advanced pouze předvyplní technické volby. Zdrojový materiál má explicitní režimy použití a Reading se zdrojem používá samostatnou analýzu podkladu před generováním. CEFR je pro Reading explicitní a poznámky k souborům/URL se propisují do AI promptu. Jazykově specifické scoringové/ortografické změny nejsou součástí této verze.
 
 > **7.1.45 AI Core + workflow cleanup (2026-09-19):** konkrétní modely jsou skryté za profily AI Core; Poradce je uzemněný v relevantní KB + aktuálním stavu; Google Forms jsou samostatná cesta předání secure výsledků a legacy týmový bezpečnostní kód byl odstraněn jako neúčinná vrstva.
 

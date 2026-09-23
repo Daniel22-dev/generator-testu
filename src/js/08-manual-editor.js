@@ -530,6 +530,16 @@ async function generateTest(){
     await waitForFileReads();
     const filePack=await buildGeminiFilePartsForApi();
     const useUrlContext=workState.zadaniTab==='url'&&Array.isArray(workState.urls)&&workState.urls.some(u=>String(u||'').trim());
+    const readingWithSource = plan.specs.some(s=>s.type==='reading comprehension')
+      && typeof activeSourceMaterialPresent==='function' && activeSourceMaterialPresent();
+    if(readingWithSource){
+      if(geminiCancelRequested) throw new Error('Generování zrušeno.');
+      const lvl=(workState.uroven&&workState.uroven.length)?workState.uroven.join(' + '):'';
+      if(!lvl) throw new Error('Pro Reading comprehension nejdřív zvol úroveň CEFR.');
+      setGenMsg('Analyzuji zdroj pro Reading (obsah, slovní zásobu a jazykové jevy)…');
+      workState.readingSourceAnalysis=await analyzeReadingSourceForAi(filePack.parts,lvl);
+      if(geminiCancelRequested) throw new Error('Generování zrušeno.');
+    }
     let built;
     if(plan.manual){built=await generateTestWithManual(workState,filePack,useUrlContext);}
     else {

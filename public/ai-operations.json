@@ -1,7 +1,7 @@
 {
   "schema": "ghrab-ai-operations-v1",
   "appId": "generator",
-  "appVersion": "7.1.46",
+  "appVersion": "7.1.47",
   "registryVersion": "1.1.0",
   "coreVersion": "1.0.0",
   "contractVersion": "1",
@@ -93,6 +93,29 @@
       "maxOutputTokensHint": 16384
     },
     {
+      "operation": "reading-source-analysis",
+      "schemaId": "generator.object.v1",
+      "defaultModelProfile": "balanced",
+      "allowedModelProfiles": [
+        "balanced",
+        "quality"
+      ],
+      "inputTypes": [
+        "text",
+        "image",
+        "document",
+        "url"
+      ],
+      "streaming": false,
+      "expectedOutputs": 1,
+      "maxOutputTokensHint": 8192,
+      "maxProviderRequestsPerWorkflow": 2,
+      "providerTools": [
+        "url_context"
+      ],
+      "providerToolActivation": "teacher-opt-in; provider may invoke only the fixed url_context tool; no local tool loop or side effects"
+    },
+    {
       "operation": "reading-package-suggestion",
       "schemaId": "generator.object.v1",
       "defaultModelProfile": "balanced",
@@ -101,11 +124,19 @@
         "quality"
       ],
       "inputTypes": [
-        "text"
+        "text",
+        "image",
+        "document",
+        "url"
       ],
       "streaming": false,
       "expectedOutputs": 1,
-      "maxOutputTokensHint": 16384
+      "maxOutputTokensHint": 16384,
+      "maxProviderRequestsPerWorkflow": 2,
+      "providerTools": [
+        "url_context"
+      ],
+      "providerToolActivation": "teacher-opt-in; provider may invoke only the fixed url_context tool; no local tool loop or side effects"
     },
     {
       "operation": "grading-scale-parse",

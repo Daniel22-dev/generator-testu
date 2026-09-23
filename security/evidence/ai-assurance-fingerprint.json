@@ -1,22 +1,22 @@
 {
   "schema": "ghrab-ai-assurance-fingerprint-v1",
   "appId": "generator",
-  "appVersion": "7.1.46",
+  "appVersion": "7.1.47",
   "coreVersion": "1.0.0",
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "db9b2a01046b6b03e247815653e0e9d3fc5c130e58bf0370aad9cb732095d2eb",
+  "fingerprint": "edd447d072c3acb78f42b587e39515347b3ae565bd672471894a379b89bac52d",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 161158,
-      "sha256": "f0516039a20756f85130933653dabc4c7a188974e298a38d970e099eb7143055"
+      "size": 161332,
+      "sha256": "bd08994418aab7e4dd6be61aaf7c0751334c3ce8c4c5e70db4bd07605826b4f0"
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 37816,
-      "sha256": "f31b9c4bd831b1eb66dc17c5649d2533e78ac065024776c85af8e05b2d346a92"
+      "size": 48056,
+      "sha256": "645685d6c3739fe8e7a3e329db62591e8b5a5c52291942909ddf3cb35eda9f37"
     },
     {
       "path": "src/js/05-form-fields.js",
@@ -31,12 +31,12 @@
     {
       "path": "src/js/07z-ai-core-integration.js",
       "size": 11522,
-      "sha256": "323b518b0628b360d30e621431e66c4b8805d0243e31f086af65d08051f2a9bd"
+      "sha256": "dffd35c6de2f82cb173c62bd193a257eeba175025a6ce620d74b73df25b55f52"
     },
     {
       "path": "src/js/08-manual-editor.js",
-      "size": 65301,
-      "sha256": "6d1db6bf0678b6b08d949d8d62406981c3a25c17597ce448ee04809334662b70"
+      "size": 66026,
+      "sha256": "b433d924d40e48181eaabe9d1f47205c02994f98f005a144354332019aa0e638"
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
@@ -45,8 +45,8 @@
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 51520,
-      "sha256": "0a52406c7525655de0455b6469ce6c349b85d7bdd82afd0a90a57f739cc94671"
+      "size": 53117,
+      "sha256": "5fc494f737a69392e2ac502af84ae84420c93c072355dd7004d67dd8309a1b46"
     },
     {
       "path": "src/js/13a-secure-helpers.js",
@@ -70,8 +70,8 @@
     },
     {
       "path": "public/ai-operations.json",
-      "size": 4636,
-      "sha256": "8b197723c9cd3f25b537c8c13967eccc1065c1e6004552cd05ed3822f2e9d7be"
+      "size": 5570,
+      "sha256": "bacf0b282ef325f32876a961d47455f927c1064276ec6f14de94836ff5b3c1f7"
     },
     {
       "path": "ghrab-ai-core.consumer.json",

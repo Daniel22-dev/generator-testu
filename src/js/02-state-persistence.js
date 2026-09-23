@@ -20,9 +20,12 @@ function normalizeLoadedState(s) {
   if (typeof s.ageGroupCustom !== 'string') s.ageGroupCustom = '';
   if (typeof s.testPurpose !== 'string') s.testPurpose = '';
   if (typeof s.pedagogicalPreset !== 'string') s.pedagogicalPreset = '';
-  // Sjednocená šablona: platí v obou režimech. Musí být platné ID.
+  // Interní profil účelu testu. Staré detailní šablony mapujeme na tři společné účely.
   if (typeof s.simpleTemplate !== 'string') s.simpleTemplate = '';
+  const legacyPurposeMap = { fl_homework:'fl_practice', fl_graded_quick:'fl_standard', cs_text:'cs_practice' };
+  if (legacyPurposeMap[s.simpleTemplate]) s.simpleTemplate = legacyPurposeMap[s.simpleTemplate];
   if (s.simpleTemplate && !(SIMPLE_TEMPLATES.fl[s.simpleTemplate] || SIMPLE_TEMPLATES.cs[s.simpleTemplate])) s.simpleTemplate = '';
+  if (['auto','content','vocabulary','grammar','model','combined'].indexOf(s.sourceUseMode) === -1) s.sourceUseMode = 'auto';
   if (typeof s.screenGuard !== 'boolean') s.screenGuard = false;
   if (['none','brief','learning'].indexOf(s.feedbackMode) === -1) s.feedbackMode = 'brief';
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
@@ -129,7 +132,7 @@ function updateSecurityGuideUI(){
   });
 }
 function markAdvancedSections(){
-  const ids = ['instrJazykBtns','testModeBtns','layoutBtns','resultModeBtns','randomBtns','gradeSkola','themeGrid','zolicekBtns','diffBtns','diffLevelBtns','fuzzyBtns','feedbackModeBtns','identityModeBtns'];
+  const ids = ['instrJazykBtns','layoutBtns','resultModeBtns','randomBtns','gradeSkola','themeGrid','zolicekBtns','diffBtns','diffLevelBtns','fuzzyBtns','feedbackModeBtns','identityModeBtns'];
   const rosterF = $('rosterField'); if (rosterF) rosterF.classList.add('advanced-only');
   ids.forEach(id => { const el = $(id); const f = el && el.closest ? el.closest('.field') : null; if (f) f.classList.add('advanced-only'); });
   const varA = $('varA'); const subField = varA && varA.closest ? varA.closest('.field') : null; if (subField) subField.classList.add('advanced-only');
@@ -141,7 +144,7 @@ function markAdvancedSections(){
 // inline handlery, hodnoty i validační vazby. V Simple režimu se vrátí na původní
 // místa pomocí inertních placeholderů, takže Etapa 5 nemění jednoduchý workflow.
 const ADVANCED_SETTINGS_GROUPS = [
-  { id:'advancedGroupTest', icon:'🧪', title:'Test', desc:'Režim, čas, odevzdávání, body a stupnice hodnocení.', fields:['timeField','testModeField','strictRiskField','submissionModeField','globalBodyField','gradeField'] },
+  { id:'advancedGroupTest', icon:'🧪', title:'Test', desc:'Čas, odevzdávání, body a stupnice hodnocení. Účel/režim testu se volí společně už v předchozím kroku.', fields:['timeField','strictRiskField','submissionModeField','globalBodyField','gradeField'] },
   { id:'advancedGroupStudent', icon:'🧑‍🎓', title:'Student', desc:'Identita, roster, diferenciace a pořadí otázek.', fields:['identityModeField','rosterField','diffLevelField','diffField','randomField'] },
   { id:'advancedGroupFeedback', icon:'💬', title:'Zpětná vazba', desc:'Kolik student uvidí po odevzdání a jak přísně se hodnotí překlepy.', fields:['feedbackModeField','fuzzyField'] },
   { id:'advancedGroupSecurity', icon:'🛡️', title:'Bezpečnost', desc:'Zpracování výsledků, hlídání obrazovky a ochrana opakovaného pokusu.', fields:['resultModeField','screenGuardField','attemptProtectionInfo'] },
@@ -227,13 +230,13 @@ function updateAppModeUI(){
   const tplLabel = $('simpleTemplateLabelText');
   const tplHint = $('simpleTemplateHint');
   const tplTip = $('simpleTemplateTip');
-  if (tplLabel) tplLabel.textContent = simple ? 'K čemu má test sloužit?' : 'Šablona testu';
+  if (tplLabel) tplLabel.textContent = 'K čemu má test sloužit?';
   if (tplHint) tplHint.textContent = simple
     ? 'Vyber jednu ze tří možností. Ostatní technické nastavení udělá Generátor za tebe.'
-    : 'Šablona přednastaví režim a hodnocení. Pro úplně ruční nastavení zvol „Bez šablony“.';
+    : 'Stejná volba jako v jednoduchém režimu. Nastaví výchozí chování testu; podrobnosti níže můžeš dál upravit.';
   if (tplTip) tplTip.dataset.tip = simple
-    ? 'V jednoduchém režimu vybíráš jen účel: procvičování, běžný test nebo přísný test. Generátor podle toho automaticky nastaví technické volby, které se zde nezobrazují.'
-    : 'Šablona nastaví režim testu, zpětnou vazbu a hodnocení. V pokročilém režimu jsou řízené volby viditelné; pro úplně ruční konfiguraci zvol Bez šablony.';
+    ? 'Vyber účel: procvičování, běžný test nebo přísný test. Generátor podle toho automaticky nastaví technické volby, které se zde nezobrazují.'
+    : 'Účel testu je společný pro oba režimy. V pokročilém režimu pouze předvyplní technické volby; další nastavení zůstávají dostupná níže.';
   updateSimpleSecretsHelper();
   renderSimpleTemplates();
 }

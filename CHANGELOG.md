@@ -1,3 +1,15 @@
+## 7.1.47 — 2026-09-22 — sjednocení workflow + zdrojový Reading
+
+- Simple i Advanced mají jednotnou volbu účelu: Procvičování / Běžný test / Přísný test.
+- Advanced režim používá účel jako předvyplňovací profil; technické volby se již šablonou nezamykají a duplicitní pole Režim testu je skryto.
+- Přidáno explicitní „Jak má AI použít tento podklad?“: automaticky, obsah, slovní zásoba, gramatika, vzor, kombinovat.
+- Reading se zdrojem používá dvoufázový tok: analýza zdroje → nový text/otázky; stejná pre-analýza se používá i v hlavním generování testu.
+- Zvolená CEFR úroveň řídí celkovou slovní zásobu, syntax a informační náročnost Readingu; bez zdroje není používán skrytý fallback pro AI návrh Readingu.
+- Poznámky k souborům a URL se nyní propisují do hlavního AI promptu.
+- AI registr rozšířen o `reading-source-analysis`; Reading suggestion nyní podporuje přílohy a URL kontext.
+- Staré template ID se migračně mapují na nové tři účely.
+- Jazykově specifická pravidla (akcenty, umlauty, členy, ortografické varianty apod.) zůstala záměrně beze změny pro samostatnou následnou etapu.
+
 ## 7.1.46 — 2026-09-21 — source audit candidate
 
 Opravy generování, formulářů, editací, lokalizace FR/LA, odpovědí, bodování, variant a překryvu editoru. Nové čtyři kroky výsledkové obrazovky. Důkazy a omezení v audit/REPORT.md. Živá AI a provozní akceptace nebyly provedeny.

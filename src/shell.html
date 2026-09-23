@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.46">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.47">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -179,13 +179,10 @@
     <!-- ═══════════════════════════ STEP 1 ═══════════════════════════ -->
     <div id="step1" class="hidden">
       <div class="field" id="simpleTemplateField">
-        <div class="field-label"><span id="simpleTemplateLabelText">K čemu má test sloužit?</span> <button class="tt-icon" id="simpleTemplateTip" data-tip="V jednoduchém režimu vybíráš jen účel testu. Generátor automaticky nastaví technické volby; v pokročilém režimu můžeš šablony a nastavení řídit ručně.">?</button></div>
+        <div class="field-label"><span id="simpleTemplateLabelText">K čemu má test sloužit?</span> <button class="tt-icon" id="simpleTemplateTip" data-tip="V obou režimech vybíráš stejný účel testu. V jednoduchém režimu Generátor nastaví technické volby automaticky; v pokročilém je předvyplní a můžeš je dále upravit.">?</button></div>
         <div class="field-hint" id="simpleTemplateHint">Vyber jednu ze tří možností. Ostatní technické nastavení udělá Generátor za tebe.</div>
         <div class="btn-row preset-card-grid" id="simpleTemplateBtns"></div>
-        <div class="tpl-lock-banner hidden" id="tplLockBanner">
-          <span class="tpl-lock-banner-text">🔒 Režim testu a bezpečnost níže určuje šablona <strong id="tplLockBannerName"></strong> — volby jsou zamčené (zašedlé). Chceš-li je měnit ručně, odepni šablonu.</span>
-          <button type="button" class="tpl-lock-detach-btn" onclick="clearSimpleTemplate()">✏️ Upravit ručně (odepnout šablonu)</button>
-        </div>
+        <div class="tpl-lock-banner hidden" id="tplLockBanner" aria-hidden="true"></div>
       </div>
 
       <div class="field">
@@ -336,7 +333,7 @@
       </div>
 
       <div class="field">
-        <div class="field-label">Konkrétní zadání <button class="tt-icon" data-tip="Podklad pro obsah cvičení. Text = napiš přímo. Soubory = přilož dokumenty nebo fotky stránek učebnice. Odkazy = URL zdrojů. Pokud nic nevyplníš, Claude vymyslí příklady sám.">?</button></div>
+        <div class="field-label">Konkrétní zadání <button class="tt-icon" data-tip="Podklad pro obsah cvičení. Text = napiš přímo. Soubory = přilož dokumenty nebo fotky stránek učebnice. Odkazy = URL zdrojů. Pokud nic nevyplníš, AI vymyslí příklady sama podle zvolené úrovně a tématu.">?</button></div>
         <div class="tabs" role="tablist" aria-label="Zdroj zadání cvičení">
           <button class="tab-btn active" id="tabBtnText" data-tab="text" role="tab" aria-selected="true" aria-controls="tab-text" onclick="switchTab('text')">✏️ Text</button>
           <button class="tab-btn" id="tabBtnFile" data-tab="file" role="tab" aria-selected="false" aria-controls="tab-file" onclick="switchTab('file')">📎 Soubory</button>
@@ -369,6 +366,18 @@
           <button type="button" class="btn-add-url" onclick="addUrl()">+ Přidat další odkaz</button>
           <textarea id="zadaniUrlNote" rows="2" placeholder="Co z těchto zdrojů použít? (nepovinné)..." style="margin-top:8px" oninput="onInput()"></textarea>
         </div>
+        <div class="source-use-panel" id="sourceUsePanel">
+          <div class="rc-sub-label">Jak má AI použít tento podklad? <button class="tt-icon" data-tip="Určuje, co má AI ze zdroje převzít do NOVÉHO testu. Zdroj je vždy jen podklad, ne instrukce. Zvolená CEFR úroveň řídí celkovou obtížnost nového textu a úloh.">?</button></div>
+          <select id="sourceUseSelect" onchange="pickSourceUse(this.value)">
+            <option value="auto">Automaticky (doporučeno)</option>
+            <option value="content">Obsah a fakta</option>
+            <option value="vocabulary">Slovní zásoba</option>
+            <option value="grammar">Gramatika / jazykové jevy</option>
+            <option value="model">Vzor obtížnosti a typu úloh</option>
+            <option value="combined">Kombinovat</option>
+          </select>
+          <div class="source-use-note" id="sourceUseNote"></div>
+        </div>
       </div>
 
       <div class="field hidden" id="listeningBlock">
@@ -392,7 +401,7 @@
 
       <div class="field hidden" id="readingBlock">
         <div class="field-label">📖 Reading comprehension — délka, téma, text <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ reading comprehension. Nastav délku a téma textu (téma se mění podle CEFR). Text i otázky můžeš napsat ručně, nebo je nechat navrhnout AI a schválit. Jeden text na cvičení, otázky pod ním.">?</button></div>
-        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>reading comprehension</strong> — dole zvol délku a téma textu. Buď napiš vlastní text a otázky ručně, nebo nech <strong>AI navrhnout text + otázky</strong>, prohlédni si náhled a schval. Bez tématu/textu vybere obsah AI sama podle úrovně.</span></div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>reading comprehension</strong> — zvol délku a případně téma. Pokud je nahoře aktivní zdroj, AI ho použije podle volby <strong>„Jak má AI použít tento podklad?“</strong>; bez zdroje vytvoří text přímo podle zvolené CEFR úrovně.</span></div>
         <div class="field-hint">Jeden souvislý text na cvičení; otázky se vážou na něj (text se neopakuje u každé otázky).</div>
         <div class="btn-row" id="rcLenBtns">
           <button class="tag-btn" data-val="short" onclick="pickRcLength('short')">Krátký (~60–100 slov)</button>
@@ -408,8 +417,8 @@
         <div class="rc-sub-label">Text a otázky <button class="tt-icon" data-tip="Buď napiš vlastní text a otázky ručně (offline), nebo nech AI navrhnout text + otázky, prohlédni si náhled a schval. Schválený text se použije jako pevný zdroj — otázky čerpají jen z něj.">?</button></div>
         <div class="ai-suggest-row">
           <button type="button" class="ai-suggest-btn" id="rcAiBtn" onclick="aiSuggestReading()">✨ Navrhnout text a otázky</button>
-          <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do tvé denní AI kvóty (RPD). Není to offline funkce generátoru. Každé kliknutí (i „Navrhnout jiný“) = 1 požadavek.">spotřebuje AI požadavek</span>
-          <span class="ai-suggest-hint">Podle úrovně, tématu a délky. Náhled si přečteš a schválíš (nebo necháš navrhnout jiný).</span>
+          <span class="req-badge" title="Tato akce volá Gemini přes internet a počítá se do denní AI kvóty. Bez zdroje obvykle 1 požadavek; se zdrojem obvykle 2 (analýza + nový Reading).">spotřebuje AI požadavek</span>
+          <span class="ai-suggest-hint">Podle CEFR, tématu, délky a aktivního zdroje. Se zdrojem AI nejprve zjistí, co v něm skutečně je, a až potom vytvoří nový text.</span>
         </div>
         <div class="ai-prev hidden" id="rcAiPreview"></div>
         <textarea id="readingText" rows="5" placeholder="Souvislý text k přečtení (nepovinné). Můžeš ho napsat ručně, nebo sem vložit návrh AI. Pokud ho vyplníš, použije se přesně tento text." oninput="onInput()"></textarea>
@@ -446,7 +455,7 @@
         </div>
       </div>
 
-      <div class="field" id="testModeField">
+      <div class="field hidden" id="testModeField">
         <div class="field-label">🧭 Režim testu <button class="tt-icon" data-tip="Volba určuje, jak má výsledný HTML test působit: běžný = standardní známkovaný test, přísný = test pod kontrolou s minimem nápověd, procvičovací = učení s vysvětlením a měkčími pravidly. Nejde jen o vzhled, ale o chování testu, feedback a bezpečnostní omezení.">?</button></div>
         <div class="field-hint">Zvol, jestli má výsledný test sloužit hlavně ke klasifikaci, přísné kontrole, nebo procvičování.</div>
         <div class="btn-row preset-card-grid mode-preset-grid" id="testModeBtns">

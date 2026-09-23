@@ -26,7 +26,10 @@ function generationPlan(st){
     if(st.splitGenerate||complex||costs[i]>3500){flush();batches.push([i]);}
     else {if(cost+costs[i]>3500)flush();pending.push(i);cost+=costs[i];}
   });flush();
-  return {specs,config,batches,costs,estimatedTokens:costs.reduce((a,b)=>a+b,0),groups:factor,manual:config.filter(x=>x.manualMode).length,maxLogicalCalls:batches.length*2,maxCalls:batches.length*8};
+  const sourceAnalysisCalls = specs.some(s=>s.type==='reading comprehension')
+    && typeof activeSourceMaterialPresent==='function' && activeSourceMaterialPresent() ? 1 : 0;
+  const plannedAiCalls = batches.length + sourceAnalysisCalls;
+  return {specs,config,batches,costs,estimatedTokens:costs.reduce((a,b)=>a+b,0),groups:factor,manual:config.filter(x=>x.manualMode).length,sourceAnalysisCalls,plannedAiCalls,maxLogicalCalls:plannedAiCalls*2,maxCalls:plannedAiCalls*8};
 }
 function lockGenerationInputs(lock){
   if(lock){generationUiLocked=[];document.querySelectorAll('main button, main input, main select, main textarea').forEach(el=>{if(el.id==='btnCancelGen')return;generationUiLocked.push([el,el.disabled]);el.disabled=true;});}
@@ -65,7 +68,7 @@ function renderResultSteps(){
 }
 function renderGenerationEstimate(){
   const el=$('generationEstimate');if(!el)return;
-  try{const p=generationPlan(state);el.textContent=p.specs.length+' cvi\u010den\u00ed \u00b7 '+p.specs.reduce((n,s)=>n+s.count,0)+' polo\u017eek \u00b7 '+p.groups+' variant(a) \u00b7 '+p.batches.length+' pl\u00e1novan\u00fdch AI po\u017eadavk\u016f'+(p.manual?' + '+p.manual+' ru\u010dn\u00edch cvi\u010den\u00ed':'')+'. Nejv\u00fd\u0161e '+p.maxCalls+' vol\u00e1n\u00ed v\u010detn\u011b opravy obsahu a transportn\u00edch opakov\u00e1n\u00ed (p\u0159\u00edm\u00e9 API). Jde o pl\u00e1n, nikoli z\u00e1ruku v\u00fdsledku AI.';el.className='small-muted';}
+  try{const p=generationPlan(state);el.textContent=p.specs.length+' cvi\u010den\u00ed \u00b7 '+p.specs.reduce((n,s)=>n+s.count,0)+' polo\u017eek \u00b7 '+p.groups+' variant(a) \u00b7 '+p.plannedAiCalls+' pl\u00e1novan\u00fdch AI po\u017eadavk\u016f'+(p.sourceAnalysisCalls?' (v\u010detn\u011b anal\u00fdzy zdroje pro Reading)':'')+(p.manual?' + '+p.manual+' ru\u010dn\u00edch cvi\u010den\u00ed':'')+'. Nejv\u00fd\u0161e '+p.maxCalls+' vol\u00e1n\u00ed v\u010detn\u011b opravy obsahu a transportn\u00edch opakov\u00e1n\u00ed (p\u0159\u00edm\u00e9 API). Jde o pl\u00e1n, nikoli z\u00e1ruku v\u00fdsledku AI.';el.className='small-muted';}
   catch(error){el.textContent=error.message;el.className='warn-box';}
 }
 
