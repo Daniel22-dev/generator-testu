@@ -1,0 +1,69 @@
+{
+  "schema": "garp27-architecture-policy-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.50",
+  "toolRevision": "generator-garp27-architecture-integrity-v1-g02",
+  "sourceScopes": [
+    "src",
+    "scripts"
+  ],
+  "productionArtifacts": [
+    "dist"
+  ],
+  "forbiddenSourceEdges": [
+    {
+      "fromPrefix": "src/",
+      "toPrefix": "scripts/"
+    },
+    {
+      "fromPrefix": "src/",
+      "toPrefix": "security/"
+    },
+    {
+      "fromPrefix": "src/",
+      "toPrefix": ".github/"
+    },
+    {
+      "fromPrefix": "src/",
+      "toPrefix": "audit/"
+    },
+    {
+      "fromPrefix": "src/",
+      "toPrefix": "vendor/garp-2.7-consolidated-r2/"
+    }
+  ],
+  "forbiddenArtifactFragments": [
+    "GARP27_MUTATION_TEST",
+    "GARP27_G02_APP_POLICY_MUTATION_TEST",
+    "-----BEGIN PRIVATE KEY-----",
+    "-----BEGIN ENCRYPTED PRIVATE KEY-----",
+    "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+  ],
+  "forbiddenArtifactPathPrefixes": [
+    "scripts/",
+    "security/",
+    "audit/",
+    ".github/",
+    "vendor/garp-2.7-consolidated-r2/"
+  ],
+  "requiredFiles": [
+    "package-lock.json",
+    "public/ai-operations.json",
+    "public/config/deployment.json",
+    "public/config/deployment.school-server.json",
+    "public/config/data-manifest.json",
+    "src/config/release-acceptance.json",
+    "security/garp27/garp-policy.json",
+    "security/garp27/capability-inventory.json",
+    "vendor/garp-2.7-consolidated-r2/MASTER/CONTRACTS/garp27-core.json",
+    "vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json"
+  ],
+  "minimumCheckedSourceFiles": 70,
+  "liveServerValidationRequired": true,
+  "singleAuthority": "GARP-2.7",
+  "legacyAuthorities": [
+    "GARP-2.5.1"
+  ],
+  "minimumArtifactFiles": 20
+}

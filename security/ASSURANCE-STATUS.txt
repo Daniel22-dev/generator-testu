@@ -1,70 +1,50 @@
-GARP 2.5.1 – ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.45
-Date: 2026-09-19
-Scope: AI Core abstraction + Generator workflow cleanup candidate
+GARP 2.7 - ASSURANCE STATUS SNAPSHOT
+Application: generator 7.1.50
+Date: 2026-09-24
+Scope: GARP 2.7 r2 / G-02 migration candidate; no intentional functional runtime change
+
+ACTIVE SECURITY AUTHORITY
+GARP 2.7 r2 / consolidation 2026-09-23-r2
+Legacy GARP 2.5.1/N5 remains mandatory regression evidence.
 
 CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.45 across runtime/PWA/QA sources)
-LOCAL BUILD                  PASS (cache ghrab-generator-v7.1.45)
-GARP 2.5.1 PREP-STATIC       PASS
-N5 SECRET-SCAN               PASS
-GARP TOOLING SELFTEST        PASS 59/59
+VERSION CONSISTENCY          PASS (7.1.50 across runtime/PWA/QA sources)
+GARP 2.7 PACKAGE SELFTEST    PASS 19/19
+GARP 2.7 CONTRACT SELFTEST   PASS 25/25 (G-02 5/5)
+GENERATOR CONTRACT GATE      PASS 6/6
+G-02 POLICY MUTATIONS        PASS 6/6
+AUTO-PATCH CONTRACT          PASS (synthetic state admission + actual release-dispatch structure)
+ARCHITECTURE TOOL SELFTEST    PASS (fail-closed compact architecture gate)
+G27-AR MUTATION SUITE         REQUIRED IN EXACT CI
+GARP 2.5.1 TOOLING SELFTEST  PASS 59/59
 SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components)
-AI ASSURANCE FINGERPRINT     PASS (ca48adcc64d544adbde341050e7efdd8ea3a224b58b573ea776a280c0b49551e)
-SW SECURITY FREEZE           PASS
-SW OFFLINE FAIL-SAFE         PASS 9/9
-VENDORED CONSISTENCY         PASS (drift 0 for built public profile)
-DEPLOYMENT LEAK SCAN         PASS on locally built 7.1.45 dist
-PLATFORM CONFORMANCE         PASS 115/115
-GARP 2.3 REGRESSION          PASS 86/86
-SUITE SESSION REGRESSION     PASS 20/20
-QUALITY STATIC/BUDGET        PASS 35/35
-BROWSER CONTRACT QA          PASS
-XSS INVENTORY REGRESSION     PASS
-GENERATOR ASSISTANT GATE     PASS (profile/context/retrieval/evidence/UI invariants)
-PRODUCTION READINESS STATIC  PASS
-SOURCE STRUCTURE             PASS
-SOURCE SENSITIVE SCAN        PASS
-CSP STATIC CHECK             PASS
+AI ASSURANCE FINGERPRINT     PASS (c8a56cbf33be2f0a3ca58befa1c05d2ff407116fa7bfdf1f726cebe21a6ebbe3)
 
-7.1.45 FUNCTIONAL DELTA
-- normal UI no longer exposes provider/model strings; app uses AI Core profiles economy/balanced/quality;
-- Generator Assistant uses balanced profile, local KB relevance selection, current-test context and evidence validation;
-- first-page AI connection was reduced to the user-essential controls and privacy notice;
-- secure Google Forms handoff is separated from test security and documented as a collection path for encrypted SECURE-ANSWERS-V1 payloads;
-- legacy team/workplace security-code workflow was removed because it was not part of the RSA/AES secure-verifier trust chain;
-- simple-mode teacher-code helper is contextual instead of permanently visible;
-- submission timing, result handoff and student identity are presented as separate concepts.
+PRESERVED SECURITY BOUNDARIES
+DATA CLASS                   D3
+AGENTIC PROFILE              PARTIAL
+PROVIDER TOOL                url_context only; teacher opt-in; no local autonomous tool loop or application side effects
+STANDALONE EGRESS            explicit direct-gemini; no automatic fallback
+SCHOOL EGRESS                same-origin school-gateway only; local provider keys forbidden
+REAL D3 STUDENT AI EGRESS    NOT APPROVED BY THIS LOCAL MIGRATION STAGE
 
-SECURE-OFFLINE TRUST CHAIN RETAINED
-- student secure payload: RSA-OAEP + AES-GCM;
-- private decryption key: teacher_verifier.html only;
-- manifest/Test ID/student HTML integrity checks retained;
-- teacher access code still protects teacher mode / unlock paths through domain-separated PBKDF2 hashes;
-- answers.txt remains fallback when Google Forms is disabled/unavailable/too long.
+GARP 2.7 TRUST / CI
+TRUST ANCHOR SHA-256         b8da6b1ad1acf1bc4f26ca41570ce3c5a88e6562828dd0493af39f359a23d262
+EXTERNAL CI PIN              wired into every workflow path invoking qa:p5:ci
+FOUNDATION CI                wired into p5-release-gate and deploy
+SELF-APPROVAL OF TRUST       blocked by external CI pin
 
-LOCAL VALIDATION BOUNDARY
-A complete exact-lockfile npm install could not finish in this sandbox because the package transport timed out. The partial install does not contain a usable jsdom package, therefore jsdom/browser workflow checks that require that dependency were not represented as local PASS. Static checks, build, Platform conformance and the executable GARP 2.5 static/security checks listed above did pass. Exact GitHub CI remains authoritative for the missing dependency-backed browser/workflow evidence.
+SERVER / LIVE
+SCHOOL SERVER PHASE          DEFERRED_BY_OWNER_DECISION
+SHIELD-LIVE                  NOT TESTED
+RI-LIVE                      NOT TESTED
+GARP 2.7 LIVE STATUS         NOT_TESTED
+SERVER ENDPOINTS ADDED       NO
+DOCKER/FORTINET CHANGES      NO
 
-INHERITED REMOTE BASELINE
-Accepted AI Studio auto-patch baseline remains 7.1.42 until 7.1.45 completes exact GitHub CI/deploy/promotion. Historical successful 7.1.39 deploy/P5 evidence remains historical only and does not attest 7.1.45.
+RELEASE ADMISSION
+Release may proceed only after exact npm ci/build, P5 R2, GARP 2.7 architecture/mutations/FOUNDATION, legacy regressions, release-integrity verification and the existing Safe Promotion path all pass on the exact candidate commit.
 
-AUTO-PATCH STATUS
-SOURCE PATCH CANDIDATE       7.1.45 READY FOR REMOTE CI
-STUDIO ENROLLMENT            ACTIVE FROM ACCEPTED 7.1.42 BASELINE
-AUTOMATIC PATCH PROMOTION    REQUIRES SUCCESSFUL 7.1.45 CANDIDATE CI/DEPLOY
-
-ASSURANCE CEILING
-SECURITY          AMBER pending 7.1.45 exact-lockfile remote CI/deployment + LIVE environment
-PRIVACY           AMBER pending live school-server evidence
-RED TEAM          AMBER pending live-model / production evidence
-RELEASE INTEGRITY AMBER pending signed LIVE deployment evidence
-SHIELD ASSURANCE  AMBER pending SHIELD-LIVE evidence
-OVERALL           AMBER
-
-SHIELD-LIVE        NOT TESTED
-RI-LIVE            NOT TESTED
-BEHAVIORAL AIR     NOT TESTED for live model in this stage
-AGENTIC PROFILE    PARTIAL
-REAL STUDENT DATA  NOT APPROVED BY THIS LOCAL STAGE
-SCHOOL SERVER PROD NOT TESTED BY THIS LOCAL STAGE
+Detailed migration evidence: security/garp27/MIGRATION-ASSESSMENT.md
+GARP 2.7 adapter: security/garp27/README.md
+Historical GARP 2.5.1 record: APP-generator-GARP.txt and security/garp25/
