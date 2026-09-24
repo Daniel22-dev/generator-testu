@@ -18,7 +18,7 @@
   "governanceAcceptance": "G-01-SEPARATE-OWNER-ACTION",
   "note": "This anchor binds the Generator-specific GARP 2.7 r2 policy/inventory, r2 core/ecosystem inventory, complete vendored master and six application-specific verification tools. It preserves the existing D3 and AGENTIC=PARTIAL boundary. inputAppZipSha256 identifies the pre-migration source artifact. CI additionally pins this anchor by SHA-256.",
   "adapterToolSha256s": {
-    "scripts/garp27/architecture-integrity.mjs": "925a9c66e17b62455ee9dcd3d497543f26c4ddf528a66950dde26e73ba38b252",
+    "scripts/garp27/architecture-integrity.mjs": "6fcf2f7a4140d31344296c2a24bb46558e21100df44128475a7239bac640540d",
     "scripts/garp27/mutation-tests.mjs": "2565d9ec1224cc5c7914812117eaea686d1fc9b6b405d792c1429889f27684f1",
     "scripts/garp27/contract-gate.mjs": "1e67d0823e2a6864fd172a68889307eb96a274d97deeb230e50535635de39c59",
     "scripts/garp27/policy-admission-mutations.mjs": "860e0f4b2d6f7323744aa9858c65a5ad1f20ed522c49b851fbe8b6cf8a9fd173",
