@@ -1,0 +1,86 @@
+{
+  "schema": "garp27-capability-inventory-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.50",
+  "dataClass": "D3",
+  "agentic": true,
+  "aiOperations": [
+    "test-generation",
+    "exercise-generation",
+    "generation-repair",
+    "listening-question-suggestions",
+    "reading-source-analysis",
+    "reading-package-suggestion",
+    "grading-scale-parse",
+    "answer-key-verification",
+    "acceptable-answer-enrichment",
+    "generator-help-answer",
+    "diagnostic-ping"
+  ],
+  "providerTools": [
+    "url_context"
+  ],
+  "aiCore": "1.0.0",
+  "platform": "1.1.2",
+  "runtimeProfiles": {
+    "standalone": {
+      "defaultMode": "direct-gemini",
+      "allowedModes": [
+        "direct-gemini"
+      ],
+      "allowLocalProviderKeys": true,
+      "automaticFallback": false
+    },
+    "school": {
+      "defaultMode": "school-gateway",
+      "allowedModes": [
+        "school-gateway"
+      ],
+      "allowLocalProviderKeys": false,
+      "automaticFallback": false,
+      "status": "DEFERRED_BY_OWNER_DECISION"
+    }
+  },
+  "inputClasses": [
+    "manual-text",
+    "image",
+    "document",
+    "url",
+    "generator-testu-zadani-json"
+  ],
+  "storageClasses": [
+    "localStorage",
+    "sessionStorage",
+    "CacheStorage"
+  ],
+  "crossAppInterfaces": [
+    "AI Studio signed permit and app-guard bootstrap",
+    "suite-session lifecycle events",
+    "studio-manifest contract",
+    "target-scoped handoff envelope",
+    "repository_dispatch app-updated after verified public release"
+  ],
+  "privilegedBrowserCapabilities": [
+    "file-open",
+    "file-download",
+    "print",
+    "clipboard-when-user-invoked"
+  ],
+  "autonomousToolCapabilities": [],
+  "releaseAuthorities": [
+    "GARP-2.7",
+    "GARP-2.5.1-legacy-regression",
+    "P5-R2",
+    "Safe-Promotion"
+  ],
+  "serverCapabilities": {
+    "schoolSession": "DEFERRED",
+    "schoolGateway": "DEFERRED",
+    "serverEgress": "DEFERRED",
+    "uploadQuarantine": "DEFERRED",
+    "serverAuditWatchdog": "DEFERRED",
+    "containerReverseProxyValidation": "DEFERRED"
+  },
+  "agenticProfile": "PARTIAL"
+}

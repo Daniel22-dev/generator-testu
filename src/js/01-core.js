@@ -25,12 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.49',
+  version: '7.1.50',
   date:    '2026-09-23',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
-    'READING TOPIC PRIORITY (7.1.49): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
+    'READING TOPIC PRIORITY (7.1.50): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
     'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
     'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
     'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',

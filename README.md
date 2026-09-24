@@ -1,8 +1,10 @@
-> **7.1.49 — kandidát s prioritou explicitního tématu Readingu; produkční akceptace následuje přes standardní CI/GARP brány.** Začněte v [audit/REPORT.html](audit/REPORT.html) a [audit/README.md](audit/README.md). Přiložený dist je nutné před nasazením znovu sestavit s uzamčenými závislostmi. Starší záznamy níže nepotvrzují toto vydání.
+> **7.1.50 — migrace na GARP 2.7 r2 / G-02 FIX; bez záměrné změny funkčního runtime.** Aktivní bezpečnostní autorita je nyní GARP 2.7, GARP 2.5.1 zůstává povinným regresním základem a serverová/LIVE fáze zůstává odložena. Začněte v [security/garp27/README.md](security/garp27/README.md) a [security/garp27/MIGRATION-ASSESSMENT.md](security/garp27/MIGRATION-ASSESSMENT.md).
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.49
+**Aktuální verze:** 7.1.50
+
+> **7.1.50 GARP 2.7 r2 / G-02 (2026-09-24):** přidává aplikační GARP 2.7 policy/inventory/trust adapter, fail-closed architecture a mutation brány, auto-patch admission a externě připnutý CI trust anchor. Zachovává D3 a AGENTIC=PARTIAL; serverové LIVE kontroly jsou nadále NOT_TESTED.
 
 > **7.1.49 Priorita tématu Readingu (2026-09-23):** pokud učitel explicitně vybere nebo zadá téma Readingu, je povinným tematickým rámcem. Zdroj ho nesmí přepsat; podle režimu zdroje se přenášejí pouze přirozeně slučitelné prvky a nevhodná vocabulary/obsah se nenutí do textu.
 

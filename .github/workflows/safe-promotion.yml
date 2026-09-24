@@ -66,8 +66,10 @@ jobs:
       - name: Verify GHRAB Platform P3 conformance
         run: npm run qa:platform
 
-      - name: Enforce P5 R2 release gate including GARP 2.5 and N5
+      - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         run: npm run qa:p5:ci
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: fcaefe4f22244856cac4f5e8e6a57c53583a0f994d06f96c242a9eee20f65877
 
       - name: Upload candidate QA evidence
         if: always()
@@ -124,7 +126,7 @@ jobs:
           fi
           pr_number="$(gh pr list --repo "$GITHUB_REPOSITORY" --head candidate --base main --state open --json number --jq '.[0].number // empty')"
           if [ -z "$pr_number" ]; then
-            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.5/N5, QA, P3 and P5 R2 may be promoted. A second independent PR-certification job must also pass before merge.')"
+            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.7, legacy GARP 2.5.1/N5, QA, P3 and P5 R2 may be promoted. A second independent PR-certification job must also pass before merge.')"
             pr_number="${pr_url##*/}"
           fi
           pr_head="$(gh pr view "$pr_number" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
@@ -202,9 +204,11 @@ jobs:
         if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:platform
 
-      - name: Enforce PR P5 R2 release gate including GARP 2.5 and N5
+      - name: Enforce PR P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:p5:ci
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: fcaefe4f22244856cac4f5e8e6a57c53583a0f994d06f96c242a9eee20f65877
 
       - name: Upload PR certification evidence
         if: always() && steps.pr_freshness.outputs.current == 'true'

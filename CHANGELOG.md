@@ -1,3 +1,13 @@
+## 7.1.50 — 2026-09-24 — migrace na GARP 2.7 r2 / G-02 FIX
+
+- Build fail-closed ověřuje přesnou verzi Acorn proti pinu v `package.json`; artefakt se nevytvoří s jinou verzí parseru.
+- Aktivní bezpečnostní autorita je GARP 2.7; GARP 2.5.1/N5 zůstává povinnou regresní vrstvou.
+- Přidán bitově připnutý GARP 2.7 r2 master, aplikační policy/capability inventory, trust anchor a FOUNDATION/architecture/mutation/auto-patch brány.
+- Zachována klasifikace D3 a AGENTIC=PARTIAL s jediným teacher-opt-in provider nástrojem url_context; žádný autonomní lokální tool loop nebyl přidán.
+- GitHub CI dostává externí SHA-256 pin trust anchoru, takže změna GARP pravidel se nemůže sama schválit.
+- School-server fáze zůstává DEFERRED_BY_OWNER_DECISION a LIVE stav NOT_TESTED.
+- Funkční logika generování testů se tímto releasem záměrně nemění.
+
 ## 7.1.49 — 2026-09-23 — priorita explicitního tématu Readingu
 
 - Explicitně zvolené nebo ručně zadané téma Readingu je nově povinným tematickým rámcem výsledného textu.

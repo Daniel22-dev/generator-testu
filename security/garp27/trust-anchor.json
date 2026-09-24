@@ -1,0 +1,28 @@
+{
+  "schema": "garp27-trust-anchor-v1",
+  "garpVersion": "2.7",
+  "consolidationRevision": "2026-09-23-r2",
+  "appId": "generator",
+  "appVersion": "7.1.50",
+  "inputGarpZipSha256": "0c278aefa0581b3ba13dd5725da9d3fc624976c255602ec16b054fc81da6f7c8",
+  "inputAppZipSha256": "21cd1544de2ac27832eef1503bca9c2d503b21b4fa4596b07707a4cd4f9c43d3",
+  "canonicalPackageContractCheckSha256": "ddc64e0f88ff82e4af9440a3e8f5dcabafa83eb7ab45bf7efb2d84b4b34f47e5",
+  "architecturePolicySha256": "356a607f75ed26edc0e89be82b4a098af43450d5e0c65a8acd3f365dafaf10d9",
+  "capabilityInventorySha256": "1d07065dfc04174d1bc3c60f17b39978fdcdb8f45b5c7cac3ef2507c1407d134",
+  "garpPolicySha256": "1cc7693d9ce9ace97301a52c280bd47b12fbb3a6cd0ef7b54c58d8e3c4a2acf3",
+  "garp27CoreContractSha256": "c0728c4b231767f3c62932511a3b2b09c5c9f682b2765def55064fd3cf3d3fb1",
+  "garp27EcosystemInventorySha256": "b5a738f20745283159bfc7563900cf555406c62e3121fb56abb4fd11639a86bf",
+  "garp27VendorTreeSha256": "2c653aa771c16ce1b610492bf5bf9d57c37af4987c85109de6cbb7cf8aa9a2fb",
+  "garp27VendorFileCount": 64,
+  "serverDecision": "DEFERRED_BY_OWNER_DECISION",
+  "governanceAcceptance": "G-01-SEPARATE-OWNER-ACTION",
+  "note": "This anchor binds the Generator-specific GARP 2.7 r2 policy/inventory, r2 core/ecosystem inventory, complete vendored master and six application-specific verification tools. It preserves the existing D3 and AGENTIC=PARTIAL boundary. inputAppZipSha256 identifies the pre-migration source artifact. CI additionally pins this anchor by SHA-256.",
+  "adapterToolSha256s": {
+    "scripts/garp27/architecture-integrity.mjs": "6fcf2f7a4140d31344296c2a24bb46558e21100df44128475a7239bac640540d",
+    "scripts/garp27/mutation-tests.mjs": "2565d9ec1224cc5c7914812117eaea686d1fc9b6b405d792c1429889f27684f1",
+    "scripts/garp27/contract-gate.mjs": "1e67d0823e2a6864fd172a68889307eb96a274d97deeb230e50535635de39c59",
+    "scripts/garp27/policy-admission-mutations.mjs": "860e0f4b2d6f7323744aa9858c65a5ad1f20ed522c49b851fbe8b6cf8a9fd173",
+    "scripts/garp27/auto-patch-contract.mjs": "a4da84c88114d779e5fbcdcf82ad7b237e1b2e09d820824926685fbbbe42f926",
+    "scripts/garp27/foundation-gate.mjs": "db6d07103ac0e192a5abd8eed8915a48f12c60c74c64976aada026ef86f8dbec"
+  }
+}

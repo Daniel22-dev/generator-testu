@@ -2,7 +2,7 @@
   "schema": "ghrab-platform-consumer-v1",
   "appId": "generator",
   "appName": "Generátor interaktivních testů",
-  "appVersion": "7.1.49",
+  "appVersion": "7.1.50",
   "platform": {
     "version": "1.1.2",
     "contract": "ghrab-platform-v1",
@@ -101,7 +101,7 @@
     ]
   },
   "cache": {
-    "name": "ghrab-generator-v7.1.49",
+    "name": "ghrab-generator-v7.1.50",
     "updateMessage": "GHRAB_SKIP_WAITING"
   },
   "html": {

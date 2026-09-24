@@ -1,0 +1,56 @@
+{
+  "schema": "garp27-policy-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.50",
+  "identity": {
+    "standaloneProfile": "signed-permit client bootstrap bound to appId=generator; no client role claim authorizes a future protected server operation",
+    "schoolProfile": "server-session enforcement is prepared in deployment configuration but remains deferred until an approved school runtime exists",
+    "rule": "Application identity, role and ownership claims from browser-controlled state are never sufficient evidence for a future server-side protected operation."
+  },
+  "requestApiAi": {
+    "registry": "public/ai-operations.json",
+    "registeredOperations": 11,
+    "agentic": "PARTIAL",
+    "controls": "GHRAB AI Core operation registry, bounded request sizes and retries, explicit model profiles, teacher-opt-in url_context only on allowlisted operations, strict post-parse validation, no autonomous local tool loop or application side-effect executor."
+  },
+  "egress": {
+    "standalone": "direct-gemini only, explicitly selected by the standalone runtime profile, without automatic fallback; real D3 student data is not approved for external AI egress by this local migration stage.",
+    "school": "school-gateway is the only school profile AI transport; local provider keys are forbidden and same-origin gateway enforcement remains server-phase deferred",
+    "crossApp": "Generator receives no generic cross-application network or administrative capability; Studio interaction is limited to signed access/bootstrap and release notification contracts."
+  },
+  "files": {
+    "currentBoundary": "Teacher-controlled source text, images, documents, URLs and assignment JSON imports remain lower-trust inputs and pass existing type, size, checksum, parsing and sanitization controls before application or AI use.",
+    "serverBoundary": "Server-side upload quarantine or document processing is not claimed; it remains deferred with the school-server phase."
+  },
+  "dataLifecycle": {
+    "classification": "D3 school assessment data: teacher materials may coexist locally with student identifiers, answers and results; pseudonymization is not treated as anonymization.",
+    "storage": "Namespaced localStorage/sessionStorage plus static PWA CacheStorage under public/config/data-manifest.json and suite-session cleanup rules.",
+    "retention": "The current standalone profile retains client data until explicit end-work or browser site-data clearing; school-server retention is not active and must be re-verified when connected.",
+    "deletion": "generatorEndWork and suite-session cleanup remove Generator-owned content and credentials with explicit reservations for security tombstones and non-owned shared state."
+  },
+  "release": {
+    "activeAuthority": "GARP-2.7",
+    "promotion": "candidate -> cumulative QA/GARP gates -> certified pull request -> protected main -> exact release identity -> verified Pages deployment -> app-updated notification",
+    "publicAssurance": "GitHub Pages remains a transitional public deployment; school-server SHIELD-LIVE and RI-LIVE are not claimed.",
+    "rollback": "Existing release-integrity identity, Safe Promotion ancestry checks and prior releasable versions remain the rollback baseline."
+  },
+  "inventory": {
+    "source": "security/garp27/capability-inventory.json",
+    "architecturePolicy": "security/garp27/architecture-policy.json",
+    "changeRule": "A new AI operation, provider tool, egress mode, import class, privileged browser capability, storage authority or release authority requires inventory update and matching tests before admission."
+  },
+  "securityHealth": {
+    "localCi": "GARP 2.7 contract, G-02 policy admission, architecture-integrity, mutation, auto-patch, legacy GARP 2.5.1/N5 and existing P5/release controls remain active without the school server.",
+    "live": "NOT_TESTED for school runtime until approved target infrastructure supplies trusted runtime evidence.",
+    "failureMode": "Harness errors, empty scope, stale or mismatched evidence, missing required controls and unresolved critical imports never become PASS."
+  },
+  "incident": {
+    "current": "Existing bounded error reporting, release evidence, fail-closed access behavior and Safe Promotion are retained; diagnostic content remains minimized and controlled.",
+    "future": "Central watchdog, server monitoring and infrastructure containment are deferred and require separate approval before activation."
+  },
+  "recovery": {
+    "current": "Safe Promotion, exact release identity, deterministic build inputs, prior release history, local data cleanup and existing release-integrity tooling remain the recovery baseline.",
+    "future": "Server restore, trust-root custody and live recovery drills remain NOT_TESTED until the school runtime is approved."
+  }
+}
