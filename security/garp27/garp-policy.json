@@ -2,7 +2,7 @@
   "schema": "garp27-policy-v1",
   "garpVersion": "2.7",
   "appId": "generator",
-  "appVersion": "7.1.50",
+  "appVersion": "7.1.52",
   "identity": {
     "standaloneProfile": "signed-permit client bootstrap bound to appId=generator; no client role claim authorizes a future protected server operation",
     "schoolProfile": "server-session enforcement is prepared in deployment configuration but remains deferred until an approved school runtime exists",

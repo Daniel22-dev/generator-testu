@@ -1,17 +1,17 @@
 {
   "schema": "ghrab-ai-assurance-fingerprint-v1",
   "appId": "generator",
-  "appVersion": "7.1.50",
+  "appVersion": "7.1.52",
   "coreVersion": "1.0.0",
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "c8a56cbf33be2f0a3ca58befa1c05d2ff407116fa7bfdf1f726cebe21a6ebbe3",
+  "fingerprint": "a6eb94e011d530bf9f317f7f559060d54f4c39475bee8209edff74930c28b19f",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 160797,
-      "sha256": "34c42d6d664cfa791b25bb5cba634c42aff7214c60527d887e326c02289ecc9a"
+      "size": 160617,
+      "sha256": "fa450bf0cdbcebb9c957bd6bfd714c3123b28ba372a41497e42ff9acaaae6506"
     },
     {
       "path": "src/js/03-ui-render.js",
@@ -20,18 +20,18 @@
     },
     {
       "path": "src/js/05-form-fields.js",
-      "size": 113347,
-      "sha256": "c810e0d96867d481866dc3cffa5d4ae8279803b5dff95f05a897356e9653c329"
+      "size": 113531,
+      "sha256": "163896c6d0fae58b71dc6dcf82fc7af821d2253a00de4b980aac57d6c60f7646"
     },
     {
       "path": "src/js/07-gemini.js",
-      "size": 63030,
-      "sha256": "229dbc3acfdaa6cb652861f59b479098b1713faccbc0b6c9c73a1da407bf61ed"
+      "size": 54717,
+      "sha256": "e924a23f86d39e58c731a1a78269db9f9f0e2f76d423d084e30b33f53d55b775"
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
-      "size": 11522,
-      "sha256": "2534160c53f0ad2c58b5b2c2feca8f1628bb6cac35fd1a2c5af24d80fac91b89"
+      "size": 11801,
+      "sha256": "26e41bc26b6923b1f11df0e3bb0ff23aeb45e6cce636bc594d0304350e9de677"
     },
     {
       "path": "src/js/08-manual-editor.js",
@@ -55,8 +55,8 @@
     },
     {
       "path": "src/js/50-cs-module.js",
-      "size": 94792,
-      "sha256": "b93d9eb70428c740a8b946ebd1cc404d9fe4f6aa3bd866269345c4ebda202a83"
+      "size": 94695,
+      "sha256": "45c85aa62da99a06a919587ee8e04b4a567acf421814a49cc6cf669d6dab7401"
     },
     {
       "path": "src/features/preview-editor.js",
@@ -70,8 +70,8 @@
     },
     {
       "path": "public/ai-operations.json",
-      "size": 5570,
-      "sha256": "56d2bed71d76b04ff0aa283d8239c7bd87801ac7d6f52f937bf94998f2180fa2"
+      "size": 5571,
+      "sha256": "1132455b5e7124fec17252957fdc3243a80045a79534ece6a55bc383a5621b24"
     },
     {
       "path": "ghrab-ai-core.consumer.json",

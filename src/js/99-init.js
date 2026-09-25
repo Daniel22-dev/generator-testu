@@ -50,6 +50,7 @@ function safeInitStep(name, fn){
   safeInitStep('migrateStorage', migrateStorage);
   safeInitStep('clearOldUnsafeStorage', clearOldUnsafeStorage);
   safeInitStep('markAdvancedSections', markAdvancedSections);
+  safeInitStep('initExerciseTypeHelp', initExerciseTypeHelp);
   safeInitStep('setupDragDrop', setupDragDrop);
   const restored = safeInitStep('loadSnapshot', loadSnapshot);
   if (restored) safeInitStep('restoredBanner', function(){ $('restoredBanner').classList.remove('hidden'); });

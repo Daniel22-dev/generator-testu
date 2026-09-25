@@ -1,24 +1,31 @@
 GARP 2.7 - ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.50
-Date: 2026-09-24
-Scope: GARP 2.7 r2 / G-02 migration candidate; no intentional functional runtime change
+Application: generator 7.1.52
+Date: 2026-09-25
+Scope: GARP 2.7 r2 / G-02 + Reading AI registry fix + exercise-type UX + Simple-mode item/point controls
 
 ACTIVE SECURITY AUTHORITY
 GARP 2.7 r2 / consolidation 2026-09-23-r2
 Legacy GARP 2.5.1/N5 remains mandatory regression evidence.
 
 CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.50 across runtime/PWA/QA sources)
+VERSION CONSISTENCY          PASS (7.1.52 across runtime/PWA/QA sources)
+JS SYNTAX                    PASS (node --check, 126 JS/MJS files)
+AI OPERATION REGISTRY        PASS (11/11; runtime/public parity)
+READING MODE REGRESSION      ADDED (Simple/Advanced x practice/standard/strict; exact jsdom run delegated to CI)
+EXERCISE TYPE HELP           PASS (38/38 + contextual examples + Simple-mode item/point contract)
 GARP 2.7 PACKAGE SELFTEST    PASS 19/19
 GARP 2.7 CONTRACT SELFTEST   PASS 25/25 (G-02 5/5)
 GENERATOR CONTRACT GATE      PASS 6/6
 G-02 POLICY MUTATIONS        PASS 6/6
 AUTO-PATCH CONTRACT          PASS (synthetic state admission + actual release-dispatch structure)
-ARCHITECTURE TOOL SELFTEST    PASS (fail-closed compact architecture gate)
-G27-AR MUTATION SUITE         REQUIRED IN EXACT CI
+GARP 2.7 SOURCE ARCHITECTURE PASS (38/42 checks; remaining 4 are exact-dist artifact checks)
+EXACT DIST ARCHITECTURE      NOT RUN LOCALLY (npm dependency cache incomplete; CI required)
+G27-AR MUTATION SUITE        DEFERRED TO EXACT CI (requires built dist)
 GARP 2.5.1 TOOLING SELFTEST  PASS 59/59
+GARP 2.3 SECURITY REGRESSION PASS (82/82)
+SUITE SESSION LIFECYCLE      PASS (20/20)
 SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components)
-AI ASSURANCE FINGERPRINT     PASS (c8a56cbf33be2f0a3ca58befa1c05d2ff407116fa7bfdf1f726cebe21a6ebbe3)
+AI ASSURANCE FINGERPRINT     PASS (a6eb94e011d530bf9f317f7f559060d54f4c39475bee8209edff74930c28b19f)
 
 PRESERVED SECURITY BOUNDARIES
 DATA CLASS                   D3
@@ -29,7 +36,7 @@ SCHOOL EGRESS                same-origin school-gateway only; local provider key
 REAL D3 STUDENT AI EGRESS    NOT APPROVED BY THIS LOCAL MIGRATION STAGE
 
 GARP 2.7 TRUST / CI
-TRUST ANCHOR SHA-256         fcaefe4f22244856cac4f5e8e6a57c53583a0f994d06f96c242a9eee20f65877
+TRUST ANCHOR SHA-256         36af5a8dcdbca16823b63aac086f0141ebfd0b957cb9e737b7ea913b940c00fb
 EXTERNAL CI PIN              wired into every workflow path invoking qa:p5:ci
 FOUNDATION CI                wired into p5-release-gate and deploy
 SELF-APPROVAL OF TRUST       blocked by external CI pin
@@ -43,7 +50,7 @@ SERVER ENDPOINTS ADDED       NO
 DOCKER/FORTINET CHANGES      NO
 
 RELEASE ADMISSION
-Release may proceed only after exact npm ci/build, P5 R2, GARP 2.7 architecture/mutations/FOUNDATION, legacy regressions, release-integrity verification and the existing Safe Promotion path all pass on the exact candidate commit.
+Local source/static review is clean. Release may proceed only through the existing candidate -> Safe Promotion -> main path. Exact npm ci/build, P5 R2, GARP 2.7 exact-dist architecture/mutations/FOUNDATION, browser/runtime/accessibility checks and release-integrity verification remain CI authority for the exact candidate commit.
 
 Detailed migration evidence: security/garp27/MIGRATION-ASSESSMENT.md
 GARP 2.7 adapter: security/garp27/README.md

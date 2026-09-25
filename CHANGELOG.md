@@ -1,3 +1,21 @@
+## 7.1.52 — 2026-09-25 — exercise UX, Simple detail controls, final cleanup
+
+- zachována oprava univerzálního Reading workflow a fail-closed parity AI registrů z 7.1.51;
+- typy cvičení jsou přeuspořádané do pedagogických kategorií a každá karta má kontextový popis + příklad na hover/focus/touch;
+- odstraněna stará rozbalovací nápověda typů cvičení;
+- přidán fail-closed gate 38/38 pro úplnost nápovědy a budoucí nové typy;
+- Jednoduchý režim umožňuje volitelně nastavit typ, počet položek a body pro každé cvičení; ruční/technické řízení zůstává pouze v Pokročilém režimu;
+- sjednocena terminologie „položky“ / „b/pol.“ a výchozí počet položek se odvozuje od typu cvičení;
+- odstraněn mrtvý odkaz na legacy `typeGuidePanel` a proveden finální source cleanup.
+
+## 7.1.51 — 2026-09-25 — universal Reading AI registry hotfix
+
+- opraven chybejici runtime zaznam `reading-source-analysis`;
+- `reading-package-suggestion` podporuje text/image/document podle AI kontraktu;
+- sjednocen modelový profil `generator-help-answer` s platným záměrem Poradce (`balanced`);
+- novy fail-closed gate hlida paritu runtime a verejneho AI registru;
+- pridana regresni matice Readingu se zdrojem napric Simple/Advanced a procvicovacim/bezny/prisnym ucelem.
+
 ## 7.1.50 — 2026-09-24 — migrace na GARP 2.7 r2 / G-02 FIX
 
 - Build fail-closed ověřuje přesnou verzi Acorn proti pinu v `package.json`; artefakt se nevytvoří s jinou verzí parseru.

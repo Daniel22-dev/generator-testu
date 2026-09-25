@@ -1,5 +1,5 @@
 /* ===================== GHRAB AI CORE 1.0.0 · GENERÁTOR P1 ===================== */
-const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.50'});
+const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.52'});
 const GEN_AI_SCHEMA_ID='generator.object.v1';
 const GEN_AI_SCHEMAS=Object.freeze({[GEN_AI_SCHEMA_ID]:{type:'object',additionalProperties:true}});
 const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN_AI_APP.id,operations:Object.freeze({
@@ -7,7 +7,8 @@ const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN
   'exercise-generation':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text','image','document'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:32768},
   'generation-repair':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text','image','document'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:32768},
   'listening-question-suggestions':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text','document'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:16384},
-  'reading-package-suggestion':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:16384},
+  'reading-source-analysis':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text','image','document'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
+  'reading-package-suggestion':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text','image','document'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:16384},
   'grading-scale-parse':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:4096},
   'answer-key-verification':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
   'acceptable-answer-enrichment':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},

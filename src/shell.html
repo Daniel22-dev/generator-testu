@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.50">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.52">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -202,6 +202,7 @@
         <button class="btn-exdetail" id="btnExDetail" onclick="toggleExDetail()">
           <span>⚙️ Nastavit cvičení podrobně</span><span class="bxd-arrow">▼</span>
         </button>
+        <div class="field-hint simple-only simple-exdetail-hint">Volitelné: můžeš nechat vše na Generátoru, nebo si u každého cvičení určit <strong>typ, počet položek a body</strong>. U Reading comprehension nastavíš délku textu níže (60–100 / 130–190 / 240–340 slov).</div>
         <div class="ex-table hidden" id="exConfigList"></div>
         <div class="ex-totals hidden" id="exTotals"></div>
         <div class="hybrid-banner" id="hybridBanner">
@@ -218,7 +219,7 @@
 
       <div class="field" id="globalTypesField">
         <div class="field-label">Typy cvičení <button class="tt-icon" data-tip="Typy jsou rozdělené podle pedagogické funkce: co daná úloha u žáka skutečně měří. Vyber napříč kategoriemi pro vyvážený test. Claude rozmístí typy rovnoměrně do cvičení.">?</button></div>
-        <div class="field-hint">Vyber vše, co chceš použít — typy jsou rozdělené podle pedagogické funkce</div>
+        <div class="field-hint">Vyber vše, co chceš použít. Najetím myší na kartu zobrazíš stručný popis a příklad; na dotykovém zařízení použij ikonu <strong>i</strong>.</div>
         <div class="ped-filter advanced-only" id="pedFilter">
           <span>Zobrazit funkci:</span>
           <button type="button" class="ped-chip active" data-fn="all" onclick="filterPedagogy('all')">vše</button>
@@ -296,11 +297,18 @@
 
       <div class="validation-hint" id="validHint1"></div>
 
-      <details class="quality-panel" id="typeGuidePanel" style="margin-bottom:12px" ontoggle="if(this.open){var g=document.getElementById('typeGuideGrid');if(g&&!g.innerHTML&&typeof buildTypeGuide==='function')g.innerHTML=buildTypeGuide();}">
-        <summary><span>📖 Co který typ cvičení umí</span><small>rozklikni · najeď nebo klikni na kartu</small></summary>
-        <p style="font-size:12px;color:var(--t4);margin:8px 0 0">Všechny typy se hodnotí automaticky. Najetím myší (PC) nebo kliknutím (mobil) zobrazíš popis a příklad.</p>
-        <div class="type-guide-grid" id="typeGuideGrid"></div>
-      </details>
+      <div class="exercise-type-popover hidden" id="exerciseTypePopover" role="tooltip" aria-hidden="true">
+        <div class="exercise-type-popover-top">
+          <span class="exercise-type-popover-cat" id="exerciseTypePopoverCat"></span>
+          <span class="exercise-type-popover-hint">popis + příklad</span>
+        </div>
+        <div class="exercise-type-popover-title" id="exerciseTypePopoverTitle"></div>
+        <div class="exercise-type-popover-desc" id="exerciseTypePopoverDesc"></div>
+        <div class="exercise-type-popover-example-wrap">
+          <div class="exercise-type-popover-example-label">Příklad</div>
+          <div class="exercise-type-popover-example" id="exerciseTypePopoverExample"></div>
+        </div>
+      </div>
 
       <div class="field">
         <div class="field-label">Jazyková úroveň <span style="font-weight:400;color:var(--t4);text-transform:none;letter-spacing:0;font-size:10px">(SERR / CEFR)</span> <button class="tt-icon" data-tip="Úrovně dle Společného evropského referenčního rámce. A1 = začátečník, C2 = téměř rodilý mluvčí. Kombinací vytvoříš test vhodný pro smíšenou třídu.">?</button></div>

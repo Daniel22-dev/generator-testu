@@ -182,6 +182,53 @@ ok('advanced účel je pouze profil a technické volby zůstávají editovateln�
   assert(s.simpleTemplate==='cs_standard'&&s.feedbackMode==='learning','profil účelu uzamkl technickou volbu');
 });
 
+// 3c) Reading se zdrojem musi projit CELOU dvoufazovou AI cestou ve vsech pracovnich a testovych rezimech.
+await okAsync('Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsech 3 ucelech testu',async()=>{
+  const originalCall=w.callGeminiJSON;
+  const seen=[];
+  w.callGeminiJSON=async function(_prompt,_parts,opts={}){
+    const operation=opts.operation||'';
+    seen.push(operation);
+    if(operation==='reading-source-analysis') return {summary:'Synthetic source',target_vocabulary:['travel'],grammar_targets:[],content_points:['trip'],task_style_notes:[]};
+    if(operation==='reading-package-suggestion') return {passage:'Synthetic B1 travel passage.',questions:[{q:'Where is the traveller going?',a:'Prague'}],used_target_vocabulary:['travel']};
+    throw new Error('Unexpected AI operation in Reading matrix: '+operation);
+  };
+  const cases=[
+    {appMode:'simple',purpose:'practice',expected:'procviceci'},
+    {appMode:'simple',purpose:'standard',expected:'bezny'},
+    {appMode:'simple',purpose:'strict',expected:'prisny'},
+    {appMode:'advanced',testMode:'procviceci',expected:'procviceci'},
+    {appMode:'advanced',testMode:'bezny',expected:'bezny'},
+    {appMode:'advanced',testMode:'prisny',expected:'prisny'}
+  ];
+  try{
+    const registry=JSON.parse(w.eval("JSON.stringify({analysis:GEN_AI_OPERATIONS.operations['reading-source-analysis'],suggestion:GEN_AI_OPERATIONS.operations['reading-package-suggestion']})"));
+    assert(registry.analysis,'reading-source-analysis chybi v runtime registru');
+    assert(registry.suggestion,'reading-package-suggestion chybi v runtime registru');
+    assert(['text','image','document'].every(t=>registry.analysis.inputTypes.includes(t)),'reading-source-analysis nema text/image/document');
+    assert(['text','image','document'].every(t=>registry.suggestion.inputTypes.includes(t)),'reading-package-suggestion nema text/image/document');
+    w.eval("geminiApiKey='workflow-test-key';");
+    for(const c of cases){
+      resetBase();
+      setVal('zadaniText','Travel vocabulary source: journey, accommodation, departure.');
+      w.eval("Object.assign(state,{zadaniTab:'text',uroven:['B1'],typyCviceni:['reading comprehension'],rcLength:'medium',rcTopic:'Cestovani',sourceUseMode:'auto'});");
+      if(c.appMode==='simple') w.chooseSimplePurpose(c.purpose);
+      else w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',testMode:${JSON.stringify(c.testMode)}});enforceModeConstraints();`);
+      const actualMode=w.eval('state.testMode');
+      assert(actualMode===c.expected,`${c.appMode}/${c.purpose||c.testMode} normalizovan na ${actualMode}`);
+      const before=seen.length;
+      await w.aiSuggestReading();
+      const ops=seen.slice(before);
+      assert(ops.length===2,`${c.appMode}/${actualMode} neprovedl obe Reading AI faze: ${ops.join(',')}`);
+      assert(ops[0]==='reading-source-analysis'&&ops[1]==='reading-package-suggestion',`${c.appMode}/${actualMode} ma chybne poradi/operace: ${ops.join(',')}`);
+      const err=w.document.querySelector('#rcAiPreview .ai-prev-err');
+      assert(!err,`${c.appMode}/${actualMode} skoncil chybou: ${err&&err.textContent}`);
+      assert(/Synthetic B1 travel passage/.test(w.document.getElementById('rcAiPreview')?.textContent||''),`${c.appMode}/${actualMode} nedokoncil navrh Readingu`);
+    }
+  }finally{w.callGeminiJSON=originalCall;}
+  return cases.length+' kombinaci x 2 AI faze';
+});
+
 // 4) Vizuální aktivace/deaktivace pro všechny zásadní závislosti.
 let uiCases=0;
 for(const testMode of domains.testMode)for(const resultMode of domains.resultMode)for(const feedbackMode of domains.feedbackMode){
