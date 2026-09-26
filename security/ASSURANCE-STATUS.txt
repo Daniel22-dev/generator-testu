@@ -1,14 +1,14 @@
 GARP 2.7 - ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.52
-Date: 2026-09-25
-Scope: GARP 2.7 r2 / G-02 + Reading AI registry fix + exercise-type UX + Simple-mode item/point controls
+Application: generator 7.1.53
+Date: 2026-09-26
+Scope: GARP 2.7 r2 / G-02 + Reading registry + exercise-type UX + Simple item/point toggle hotfix + purpose-card UX
 
 ACTIVE SECURITY AUTHORITY
 GARP 2.7 r2 / consolidation 2026-09-23-r2
 Legacy GARP 2.5.1/N5 remains mandatory regression evidence.
 
 CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.52 across runtime/PWA/QA sources)
+VERSION CONSISTENCY          PASS (7.1.53 across runtime/PWA/QA sources)
 JS SYNTAX                    PASS (node --check, 126 JS/MJS files)
 AI OPERATION REGISTRY        PASS (11/11; runtime/public parity)
 READING MODE REGRESSION      ADDED (Simple/Advanced x practice/standard/strict; exact jsdom run delegated to CI)
@@ -25,7 +25,7 @@ GARP 2.5.1 TOOLING SELFTEST  PASS 59/59
 GARP 2.3 SECURITY REGRESSION PASS (82/82)
 SUITE SESSION LIFECYCLE      PASS (20/20)
 SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components)
-AI ASSURANCE FINGERPRINT     PASS (a6eb94e011d530bf9f317f7f559060d54f4c39475bee8209edff74930c28b19f)
+AI ASSURANCE FINGERPRINT     PASS (c2f4e444b7bf212291e80a926d87313a4cc0078e7200e17a4540be8579d05a24)
 
 PRESERVED SECURITY BOUNDARIES
 DATA CLASS                   D3
@@ -36,7 +36,7 @@ SCHOOL EGRESS                same-origin school-gateway only; local provider key
 REAL D3 STUDENT AI EGRESS    NOT APPROVED BY THIS LOCAL MIGRATION STAGE
 
 GARP 2.7 TRUST / CI
-TRUST ANCHOR SHA-256         36af5a8dcdbca16823b63aac086f0141ebfd0b957cb9e737b7ea913b940c00fb
+TRUST ANCHOR SHA-256         406a2d3648dbe42378801f347b98a1982c1e02d08b119a74c45dff99978c3cca
 EXTERNAL CI PIN              wired into every workflow path invoking qa:p5:ci
 FOUNDATION CI                wired into p5-release-gate and deploy
 SELF-APPROVAL OF TRUST       blocked by external CI pin

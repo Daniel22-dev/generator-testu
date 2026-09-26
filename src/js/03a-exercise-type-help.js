@@ -68,14 +68,31 @@ function positionExerciseTypeHelp(anchor){
   const a = anchor.getBoundingClientRect();
   const p = n.pop.getBoundingClientRect();
   const margin = 12;
-  const gap = 10;
-  let left = a.left + (a.width / 2) - (p.width / 2);
-  left = Math.max(margin, Math.min(left, window.innerWidth - p.width - margin));
-  let top = a.bottom + gap;
-  if (top + p.height > window.innerHeight - margin && a.top - p.height - gap >= margin) {
-    top = a.top - p.height - gap;
+  const gap = 12;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let left;
+  let top;
+  const fitsRight = a.right + gap + p.width <= vw - margin;
+  const fitsLeft = a.left - gap - p.width >= margin;
+
+  if (fitsRight) {
+    left = a.right + gap;
+    top = a.top + (a.height - p.height) / 2;
+  } else if (fitsLeft) {
+    left = a.left - p.width - gap;
+    top = a.top + (a.height - p.height) / 2;
+  } else {
+    left = a.left + (a.width / 2) - (p.width / 2);
+    top = a.bottom + gap;
+    if (top + p.height > vh - margin && a.top - p.height - gap >= margin) {
+      top = a.top - p.height - gap;
+    }
   }
-  top = Math.max(margin, Math.min(top, window.innerHeight - p.height - margin));
+
+  left = Math.max(margin, Math.min(left, vw - p.width - margin));
+  top = Math.max(margin, Math.min(top, vh - p.height - margin));
   n.pop.style.left = Math.round(left) + 'px';
   n.pop.style.top = Math.round(top) + 'px';
 }

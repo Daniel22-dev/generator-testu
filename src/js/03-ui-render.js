@@ -1,4 +1,35 @@
 // ═══ Visual state sync ════════════════════════════════════════════════════════
+function syncExerciseDetailUi() {
+  const open = !!state.exerciseDetail;
+  const simple = typeof isSimpleMode === 'function' && isSimpleMode();
+  const btn = $('btnExDetail');
+  if (btn) {
+    btn.classList.toggle('active', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const label = btn.querySelector('span:first-child');
+    if (label) {
+      label.textContent = open
+        ? (simple ? '▲ Skrýt položky a body' : '▲ Skrýt podrobné nastavení')
+        : (simple ? '⚙️ Upravit položky a body' : '⚙️ Nastavit cvičení podrobně');
+    }
+    btn.title = open
+      ? 'Kliknutím panel sbalíš a vrátíš se ke kartám typů cvičení.'
+      : (simple
+        ? 'Volitelné: nastav u každého cvičení typ, počet položek a body.'
+        : 'Nastav jednotlivá cvičení podrobně včetně typu, počtu úloh, bodů a případného ručního zadání.');
+  }
+
+  const list = $('exConfigList');
+  const totals = $('exTotals');
+  const globalTypes = $('globalTypesField');
+  const globalBody = $('globalBodyField');
+  if (list) list.classList.toggle('hidden', !open);
+  if (totals) totals.classList.toggle('hidden', !open);
+  if (globalTypes) globalTypes.classList.toggle('hidden', open);
+  if (globalBody) globalBody.classList.toggle('hidden', open);
+  if (open && typeof renderExerciseConfig === 'function') renderExerciseConfig();
+}
+
 function applyVisualState() {
   // Tato funkce POUZE čte state a překresluje DOM.
   // Mutace stavu patří do enforceModeConstraints() nebo normalizeLoadedState().
@@ -116,16 +147,8 @@ function applyVisualState() {
   const aiWrap = $('aiScaleWrap');
   if (aiWrap) aiWrap.classList.toggle('hidden', state.gradeTyp !== 'vlastni');
 
-  // Exercise detail
-  const btnEd = $('btnExDetail');
-  if (btnEd) btnEd.classList.toggle('active', state.exerciseDetail);
-  $('exConfigList') && $('exConfigList').classList.toggle('hidden', !state.exerciseDetail);
-  $('exTotals') && $('exTotals').classList.toggle('hidden', !state.exerciseDetail);
-  const gtf = $('globalTypesField');
-  if (gtf) gtf.classList.toggle('hidden', state.exerciseDetail);
-  const gbf2 = $('globalBodyField');
-  if (gbf2) gbf2.classList.toggle('hidden', state.exerciseDetail);
-  if (state.exerciseDetail) renderExerciseConfig();
+  // Exercise detail: jeden zdroj pravdy pro tabulku, kartičky i popisek tlačítka.
+  syncExerciseDetailUi();
 
   switchTabVisuals(state.zadaniTab);
   renderSourceUseNote();
