@@ -301,6 +301,24 @@ resetBase();
 ok('legacy vlastní typ cvičení není v UI dostupný',()=>{
   assert(!w.document.getElementById('vlastniTyp'),'legacy #vlastniTyp stále existuje');
 });
+ok('Simple: položky a body lze otevřít a znovu sbalit',()=>{
+  resetBase();
+  w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',simpleTemplate:'fl_standard',pocet:2,typyCviceni:['multiple choice','translation'],exerciseDetail:false,exerciseConfig:[]});applySimpleDefaults();applyVisualState();");
+  w.toggleExDetail();
+  let st=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(st.exerciseDetail===true,'Simple detail se po otevření vrátil na false');
+  assert(!w.document.getElementById('exConfigList').classList.contains('hidden'),'tabulka se neotevřela');
+  assert(w.document.getElementById('globalTypesField').classList.contains('hidden'),'kartičky zůstaly při otevřené tabulce viditelné');
+  assert(w.document.getElementById('btnExDetail').getAttribute('aria-expanded')==='true','aria-expanded po otevření není true');
+
+  w.toggleExDetail();
+  st=JSON.parse(w.eval('JSON.stringify(state)'));
+  assert(st.exerciseDetail===false,'Simple detail se nepodařilo sbalit');
+  assert(w.document.getElementById('exConfigList').classList.contains('hidden'),'tabulka po sbalení zůstala viditelná');
+  assert(!w.document.getElementById('globalTypesField').classList.contains('hidden'),'kartičky se po sbalení nevrátily');
+  assert(w.document.getElementById('btnExDetail').getAttribute('aria-expanded')==='false','aria-expanded po sbalení není false');
+  assert((w.document.querySelector('#btnExDetail span:first-child')?.textContent||'').includes('Upravit položky a body'),'tlačítko se nevrátilo do sbaleného popisku');
+});
 w.eval('state.typyCviceni=[];state.pocet=1;');w.validate();
 ok('bez výběru podporovaného typu je krok zablokován',()=>{
   assert(w.document.getElementById('next1').disabled,'prázdný výběr typu prošel');

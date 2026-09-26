@@ -1304,7 +1304,8 @@ function applySimpleDefaults(){
   state.odevzdavani = 'B';
   state.randomizace = 'NE';
   state.gradeTyp = 'skola';
-  state.exerciseDetail = false;
+  // Detail počtu položek a bodů je od 7.1.52 dostupný i v Simple režimu.
+  // Nesmíme ho zde při každé validaci resetovat, jinak panel nejde znovu sbalit.
   state.zolicek = 'NE';
   state.diferencovany = 'NE';
   state.anonymizace = 'ANO';
@@ -1374,6 +1375,9 @@ async function setAppMode(mode){
   } else {
     state.appMode = 'simple';
     state.workPreset = 'quick';
+    // Při vědomém přepnutí do Simple začni s kompaktním zavřeným panelem.
+    // Další otevření/zavření už applySimpleDefaults nesmí přepisovat.
+    state.exerciseDetail = false;
     applySimpleDefaults();
   }
   enforceModeConstraints();

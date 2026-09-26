@@ -934,39 +934,24 @@ function toggleExDetail() {
   state.exerciseDetail = !state.exerciseDetail;
 
   if (state.exerciseDetail) {
-    // Pre-populate types from global selection into each exercise
+    // Při otevření přenes aktuální výběr kartiček do tabulky.
     syncExerciseConfig();
-    renderExerciseConfig();
   } else {
-    // Sync unique types back to global selection when turning off
+    // Při sbalení vrať použité typy zpět do kartiček a zachovej součet bodů.
     const usedTypes = [...new Set(
       state.exerciseConfig.map(e => e.typ).filter(t => t && t !== '— Claude vybere —')
     )];
-    if (usedTypes.length > 0) {
-      state.typyCviceni = usedTypes;
-      applyVisualState();
+    if (usedTypes.length > 0) state.typyCviceni = usedTypes;
+    if (state.exerciseConfig.length) {
+      const sum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
+      if (sum > 0) { state.body = sum; setVal('bodyCustom', sum); }
     }
   }
 
-  const btn = $('btnExDetail');
-  if (btn) btn.classList.toggle('active', state.exerciseDetail);
-  $('exConfigList').classList.toggle('hidden', !state.exerciseDetail);
-  $('exTotals').classList.toggle('hidden', !state.exerciseDetail);
-  renderHybridBanner();
-
-  // Hide/show global types field and body field
-  const gtf = $('globalTypesField');
-  if (gtf) gtf.classList.toggle('hidden', state.exerciseDetail);
-  const gbf = $('globalBodyField');
-  if (gbf) gbf.classList.toggle('hidden', state.exerciseDetail);
-
-  // When turning OFF: write exercise sum back to global body
-  if (!state.exerciseDetail && state.exerciseConfig.length) {
-    const sum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
-    if (sum > 0) { state.body = sum; setVal('bodyCustom', sum); }
-  }
-
+  // validate() v Simple režimu už nesmí exerciseDetail resetovat.
   validate();
+  applyVisualState();
+  renderHybridBanner();
   saveSnapshot();
 }
 

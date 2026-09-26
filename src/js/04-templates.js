@@ -10,12 +10,12 @@ const SIMPLE_TEMPLATES = {
   fl: {
     fl_practice: {
       icon:'⚡', label:'Procvičení (okamžitá známka)', purpose:'procvičení a upevnění látky',
-      desc:'Učení za pochodu. Student vidí známku i vysvětlení hned po odevzdání.',
+      desc:'Student po odevzdání hned vidí výsledek, správné řešení a vysvětlení chyb.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'mild', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     fl_standard: {
       icon:'✅', label:'Běžný test', purpose:'běžné ověření znalostí',
-      desc:'Standardní test. Výchozí nastavení je okamžitý výsledek a stručná zpětná vazba; v pokročilém režimu lze podrobnosti změnit.',
+      desc:'Student po odevzdání hned vidí body, procenta a známku; zpětná vazba zůstává stručná.',
       locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     fl_homework: {
@@ -30,19 +30,19 @@ const SIMPLE_TEMPLATES = {
     },
     fl_strict: {
       icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
-      desc:'Kontrolované psaní. Opuštění testu uzamkne pokus; odemkne jen učitel.',
+      desc:'Student nevidí okamžitou známku. Opuštění testu uzamkne pokus a výsledek zpracuje učitel ve verifieru.',
       locks:{ testMode:'prisny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     }
   },
   cs: {
     cs_practice: {
       icon:'✍️', label:'Procvičení pravopisu / mluvnice', purpose:'procvičení pravopisu a mluvnice',
-      desc:'Učení za pochodu. Automatické opravování, učící zpětná vazba s vysvětlením.',
+      desc:'Student po odevzdání hned vidí výsledek, správné řešení a vysvětlení chyb.',
       locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     cs_standard: {
       icon:'✅', label:'Běžný test', purpose:'běžné ověření znalostí',
-      desc:'Standardní test. Výchozí nastavení je okamžitý výsledek a stručná zpětná vazba; v pokročilém režimu lze podrobnosti změnit.',
+      desc:'Student po odevzdání hned vidí body, procenta a známku; zpětná vazba zůstává stručná.',
       locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     cs_text: {
@@ -52,7 +52,7 @@ const SIMPLE_TEMPLATES = {
     },
     cs_strict: {
       icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
-      desc:'Kontrolované psaní. Opuštění testu uzamkne pokus; odemkne jen učitel.',
+      desc:'Student nevidí okamžitou známku. Opuštění testu uzamkne pokus a výsledek zpracuje učitel ve verifieru.',
       locks:{ testMode:'prisny', resultMode:'secureOffline', feedbackMode:'none', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     }
   }
@@ -176,9 +176,9 @@ function renderSimpleTemplates(){
   if (!wrap) return;
   const active = getSimplePurposeKey();
   const cards = [
-    {key:'practice', icon:'💬', title:'Procvičování', desc:'Student dostane výsledek a učící zpětnou vazbu hned. Pro nácvik, opakování a domácí přípravu.', badge:'Výsledek hned'},
-    {key:'standard', icon:'✅', title:'Běžný test', desc:'Standardní ověření znalostí. Výchozí chování je okamžitý výsledek; v pokročilém režimu lze navazující technické volby upravit.', badge:'Běžné použití'},
-    {key:'strict', icon:'🔒', title:'Přísný test', desc:'Test pod dohledem. Opuštění stránky pokus uzamkne a výsledek se zpracuje v učitelském verifieru.', badge:'Zámek + verifier'}
+    {key:'practice', icon:'💬', title:'Procvičování', desc:'Výsledek hned. Student u chyb vidí správné řešení a vysvětlení; vhodné pro nácvik a opakování.', badge:'Výsledek + vysvětlení'},
+    {key:'standard', icon:'✅', title:'Běžný test', desc:'Výsledek hned. Student vidí body, procenta a známku; zpětná vazba je stručná, bez učícího rozboru.', badge:'Body + známka hned'},
+    {key:'strict', icon:'🔒', title:'Přísný test', desc:'Bez okamžité známky. Opuštění testu pokus uzamkne; výsledek zpracuje učitel ve verifieru.', badge:'Zámek + verifier'}
   ];
   let html = '';
   cards.forEach(function(c){
