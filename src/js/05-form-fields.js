@@ -890,9 +890,13 @@ function syncExerciseConfig() {
     const i = state.exerciseConfig.length;
     const custom = trim('vlastniTyp');
     const typePool = sanitizeExerciseTypeList([...state.typyCviceni, ...(custom ? [custom] : [])]);
+    const initialType = typePool[i % Math.max(typePool.length, 1)] || '';
+    const initialCount = typeof defaultItemCount === 'function' && initialType
+      ? defaultItemCount(initialType)
+      : 8;
     state.exerciseConfig.push({
-      typ: typePool[i % Math.max(typePool.length, 1)] || '',
-      pocetOtazek: 8,
+      typ: initialType,
+      pocetOtazek: initialCount,
       body: defaultExercisePoints(),
     });
   }
@@ -977,7 +981,7 @@ function updateExField(i, field, value) {
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;
     renderExerciseConfig();
   }
-  // Update b/ot. cell inline (without re-rendering whole row → preserves input focus)
+  // Update b/pol. cell inline (without re-rendering whole row → preserves input focus)
   const ex = state.exerciseConfig[i];
   const bpp = ex.body > 0 && ex.pocetOtazek > 0 ? (ex.body / ex.pocetOtazek).toFixed(1) : '—';
   const row = document.querySelectorAll('#exConfigList .ex-row')[i];
@@ -1017,9 +1021,9 @@ function renderExerciseConfig() {
   const headHtml =
     '<div class="ex-table-head">' +
     '<span></span><span>Typ cvičení</span>' +
-    '<span style="text-align:center">Otázek</span>' +
+    '<span style="text-align:center">Položek</span>' +
     '<span style="text-align:center">Body</span>' +
-    '<span style="text-align:right">b/ot.</span></div>';
+    '<span style="text-align:right">b/pol.</span></div>';
 
   // Normalizace: catBoard má vždy 1 položku — opravíme i uložený stav, ne jen displej.
   state.exerciseConfig.forEach(function(ex){ if(normalizeType(ex.typ||'')==='categorisation-board' && ex.pocetOtazek!==1) ex.pocetOtazek=1; });
@@ -1092,11 +1096,11 @@ function renderExTotals() {
   const warn = globalBody > 0 && totalBody !== globalBody
     ? `<span class="tot-warn"> ⚠ nesedí s globálním (${globalBody} b)</span>` : '';
   el.innerHTML = `
-    <div class="tot-item">Celkem otázek: <span class="tot-val">${totalQ}</span></div>
+    <div class="tot-item">Celkem položek: <span class="tot-val">${totalQ}</span></div>
     <div class="tot-item">Celkem bodů: <span class="tot-val">${totalBody}</span>${warn}</div>
     <div class="ex-action">
       <button class="btn-mini" type="button" onclick="distributeExercisePoints()">⚖️ Rozdělit body rovnoměrně</button>
-      <button class="tt-icon" type="button" data-tip="Použije se jen při podrobném nastavení cvičení. Generátor vezme cílový celkový počet bodů a rozdělí ho co nejrovnoměrněji mezi jednotlivá cvičení. Například 55 bodů mezi 4 cvičeními rozdělí jako 14 + 14 + 14 + 13. Počet otázek se nemění; mění se pouze body za jednotlivá cvičení.">?</button>
+      <button class="tt-icon" type="button" data-tip="Použije se jen při podrobném nastavení cvičení. Generátor vezme cílový celkový počet bodů a rozdělí ho co nejrovnoměrněji mezi jednotlivá cvičení. Například 55 bodů mezi 4 cvičeními rozdělí jako 14 + 14 + 14 + 13. Počet položek se nemění; mění se pouze body za jednotlivá cvičení.">?</button>
     </div>`;
   setTimeout(initTooltips, 0);
 }
@@ -1106,17 +1110,17 @@ function buildExerciseDetail() {
   state.exerciseConfig.forEach((ex, i) => {
     const typ = ex.typ && ex.typ !== '— Claude vybere —' ? ex.typ : 'typ dle uvážení';
     const bpp = ex.body > 0 && ex.pocetOtazek > 0
-      ? ' (' + (ex.body / ex.pocetOtazek).toFixed(1) + ' b/otázku)' : '';
+      ? ' (' + (ex.body / ex.pocetOtazek).toFixed(1) + ' b/položku)' : '';
     lines.push(
       '\n┌─ Cvičení ' + (i+1) + ': ' + typ,
-      '│  Počet otázek: ' + ex.pocetOtazek,
+      '│  Počet položek: ' + ex.pocetOtazek,
       '│  Body za cvičení: ' + ex.body + bpp,
       '└' + '─'.repeat(40)
     );
   });
   const totalB = state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0);
   const totalQ = state.exerciseConfig.reduce((s,e)=>s+(e.pocetOtazek||0),0);
-  lines.push('\nCelkem: ' + totalQ + ' otázek, ' + totalB + ' bodů');
+  lines.push('\nCelkem: ' + totalQ + ' položek, ' + totalB + ' bodů');
   return lines.join('\n');
 }
 

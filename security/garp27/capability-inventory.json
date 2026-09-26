@@ -2,7 +2,7 @@
   "schema": "garp27-capability-inventory-v1",
   "garpVersion": "2.7",
   "appId": "generator",
-  "appVersion": "7.1.50",
+  "appVersion": "7.1.52",
   "dataClass": "D3",
   "agentic": true,
   "aiOperations": [

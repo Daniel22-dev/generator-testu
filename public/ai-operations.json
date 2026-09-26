@@ -1,7 +1,7 @@
 {
   "schema": "ghrab-ai-operations-v1",
   "appId": "generator",
-  "appVersion": "7.1.50",
+  "appVersion": "7.1.52",
   "registryVersion": "1.1.0",
   "coreVersion": "1.0.0",
   "contractVersion": "1",
@@ -186,10 +186,10 @@
     {
       "operation": "generator-help-answer",
       "schemaId": "generator.object.v1",
-      "defaultModelProfile": "economy",
+      "defaultModelProfile": "balanced",
       "allowedModelProfiles": [
-        "economy",
-        "balanced"
+        "balanced",
+        "quality"
       ],
       "inputTypes": [
         "text"

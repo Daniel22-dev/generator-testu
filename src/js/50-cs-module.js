@@ -428,8 +428,7 @@
     const instrField = document.getElementById('instrJazykBtns') && document.getElementById('instrJazykBtns').closest('.field');
     const ageField = document.getElementById('ageGroupBtns') && document.getElementById('ageGroupBtns').closest('.field');
     const globalTypesField = document.getElementById('globalTypesField');
-    const typeGuide = document.getElementById('typeGuidePanel');
-    csSetHidden(cefrField, active); csSetHidden(instrField, active); csSetHidden(ageField, active); csSetHidden(globalTypesField, active || !!state.exerciseDetail); csSetHidden(typeGuide, active);
+    csSetHidden(cefrField, active); csSetHidden(instrField, active); csSetHidden(ageField, active); csSetHidden(globalTypesField, active || !!state.exerciseDetail);
     const countField = document.getElementById('pocetBtns') && document.getElementById('pocetBtns').closest('.field');
     const sourceField = document.getElementById('tabBtnText') && document.getElementById('tabBtnText').closest('.field');
     const listeningField = document.getElementById('listeningBlock');

@@ -36,69 +36,6 @@ function loadGeminiModel(){
   try { localStorage.removeItem('sestavovac_gemini_model'); } catch(_){}
 }
 
-function toggleTypeCard(el){
-  const wasOpen=el.classList.contains('open');
-  document.querySelectorAll('.type-card.open').forEach(c=>c.classList.remove('open'));
-  if(!wasOpen) el.classList.add('open');
-}
-function buildTypeGuide(){
-  var D=[
-    ['multiple choice','r','Otázka s v\u00edce mo\u017enostmi, jedna spr\u00e1vn\u00e1. Nejrychlej\u0161\u00ed na vypln\u011bn\u00ed, vhodn\u00e9 na gramatiku i slovn\u00ed z\u00e1sobu.','She ___ to school every day. \u2192 goes / go / went / gone'],
-    ['multi-select','r','V\u00edce spr\u00e1vn\u00fdch odpov\u011bd\u00ed \u2014 student ozna\u010d\u00ed V\u0160ECHNY. Hodnotit se p\u0159\u00edsn\u011b jako celek.','Zak\u0159\u00ed\u017ekni v\u0161echny spr\u00e1vn\u00e9 tvary: \u2611 goes \u00b7 \u2610 go \u00b7 \u2611 is going \u00b7 \u2610 goed'],
-    ['true/false','r','Student rozhodne, zda tvrzen\u00ed plat\u00ed.','She goes to school by bus. \u2192 Pravda \u2713 / Nepravda'],
-    ['matching','r','P\u0159i\u0159azen\u00ed dvojic: slovo\u2194p\u0159eklad, p\u016flky v\u011bt, obr\u00e1zek\u2194popis.','go \u2192 \u0161el \u00b7 run \u2192 b\u011b\u017eel \u00b7 see \u2192 vid\u011bl'],
-    ['odd one out','r','Najdi slovo, kter\u00e9 do \u0159ady nepat\u0159\u00ed.','go / run / beautiful / walk \u2192 beautiful nepat\u0159\u00ed'],
-    ['categorization','r','Za\u0159azen\u00ed jedn\u00e9 polo\u017eky do kategorie (v\u00fdber z menu).','play \u2192 Regular / Irregular? \u2192 Regular \u2713'],
-    ['categorisation-board','r','T\u0159\u00edd\u00edc\u00ed tabule: 6\u201310 slov/v\u011bt \u2192 kategorie. Partial scoring. 1 polo\u017eka = 1 tabulka.','Rozt\u0159i\u010f 8 v\u011bt: Defining / Non-defining relative clause'],
-    ['highlight-evidence','r','Student vybere v\u011btu jako d\u016fkaz odpov\u011bdi.','Which sentence explains why Mark was late? \u2192 B: He missed the bus. \u2713'],
-    ['fill-in-the-blank','c','Dopln\u011bn\u00ed chyb\u011bj\u00edc\u00edho slova do mezery ve v\u011bt\u011b.','She ___ to school yesterday. \u2192 went'],
-    ['word order','c','Se\u0159azen\u00ed rozh\u00e1zen\u00fdch slov do spr\u00e1vn\u00e9 v\u011bty.','every / she / day / goes \u2192 She goes to school every day.'],
-    ['translation','c','P\u0159elo\u017een\u00ed v\u011bty do c\u00edlov\u00e9ho jazyka. Hodnotit se jako cel\u00e1 v\u011bta nebo p\u0159ijateln\u00e9 alternativy.','Ona \u0161la do \u0161koly v\u010dera. \u2192 She went to school yesterday. \u2713'],
-    ['error correction','c','Najdi a oprav chybu ve v\u011bt\u011b.','She go to school every day. \u2192 goes'],
-    ['word formation','c','Vytvo\u0159en\u00ed spr\u00e1vn\u00e9ho tvaru slova ze slovn\u00edho z\u00e1kladu.','beauty \u2192 ___ \u2192 beautiful \u2713'],
-    ['sentence transformation','c','P\u0159eps\u00e1n\u00ed v\u011bty se zachov\u00e1n\u00edm smyslu.','She is too tired to study. \u2192 She is not energetic enough to study.'],
-    ['key word transformation','c','P\u0159eps\u00e1n\u00ed v\u011bty pomoc\u00ed kl\u00ed\u010dov\u00e9ho slova (2\u20135 slov).','It was too cold. + ENOUGH \u2192 It wasn\'t warm enough.'],
-    ['table-completion','c','Dopln\u011bn\u00ed chyb\u011bj\u00edc\u00edch pol\u00ed\u010dek v tabulce (tvary sloves, gramatika).','go | went | ___ \u2192 gone \u2713'],
-    ['transformation-chain','c','V\u00fdchoz\u00ed v\u011bta + s\u00e9rie transformac\u00ed. Partial scoring po kroc\u00edch.','She goes. \u2192 negative \u2192 question \u2192 past simple'],
-    ['error-tagging','c','Student ozna\u010d\u00ed chybn\u00fd token, vybere typ chyby a nap\u00ed\u0161e opravu. Partial scoring.','She go to school. \u2192 token: go \u00b7 typ: verb form \u00b7 oprava: goes'],
-    ['reading comprehension','p','Text a MC ot\u00e1zky ov\u011b\u0159uj\u00edc\u00ed porozum\u011bn\u00ed. V\u0161echny ot\u00e1zky sd\u00edlej\u00ed jeden text.','Text o Lond\u00fdnu \u2192 What is the main topic? \u2192 A) History \u2713'],
-    ['dialogue completion','p','Dopln\u011bn\u00ed chyb\u011bj\u00edc\u00ed repliky v dialogu v\u00fdb\u011brem z mo\u017enost\u00ed.','A: What did you do? B: ___ \u2192 I went shopping \u2713'],
-    ['listening comprehension','p','MC ot\u00e1zky k poslechu \u2014 audio p\u0159ehr\u00e1v\u00e1 u\u010ditel, student\u016fm se nezobrazuje.','U\u010ditel pust\u00ed nahr\u00e1vku \u2192 Where did she go? \u2192 A) School \u2713'],
-    ['cloze text','p','Souvot\u00e1n\u00ed text s v\u00edce mezery k dopln\u011bn\u00ed.','She ___(1) to school every ___(2). \u2192 goes, day'],
-    ['banked cloze','p','Text s mezerami + z\u00e1sobn\u00edk slov, student vybere spr\u00e1vn\u00e1 slova.','Z\u00e1sobn\u00edk: however/although/because \u2192 ___ it was late, she stayed.'],
-    ['ordering','p','Se\u0159azen\u00ed v\u011bt, krok\u016f nebo ud\u00e1lost\u00ed do spr\u00e1vn\u00e9ho po\u0159ad\u00ed tla\u010d\u00edtky.','Se\u0159a\u010f kroky receptu: p\u0159idej vejce \u2192 ml\u00e9ko \u2192 upec \u2192 pod\u00e1vej'],
-    ['multiple matching','p','P\u0159i\u0159azen\u00ed nadpis\u016f nebo tvrzen\u00ed k odstavc\u016fm (MCM form\u00e1t).','P\u0159i\u0159a\u010f nadpisy 1\u20135 k odstavc\u016fm A\u2013E v \u010dl\u00e1nku'],
-    ['synonym choice','r','Vyber nejbli\u017e\u0161\u00ed synonymum. Boduje se jako multiple choice.','happy \u2192 glad / sad / tired / fast \u2192 glad \u2713'],
-    ['antonym choice','r','Vyber opak (antonymum). Boduje se jako multiple choice.','big \u2192 small / huge / wide / tall \u2192 small \u2713'],
-    ['choose the correct response','r','Vyber vhodnou reakci v dialogu. Boduje se jako multiple choice.','"Thanks a lot!" \u2192 You\u2019re welcome \u2713 / Yes, I do'],
-    ['match word to definition','r','P\u0159i\u0159a\u010f slovo k jeho definici. Boduje se jako matching.','generous \u2192 ochotn\u00fd d\u00e1vat \u00b7 brave \u2192 nebojácn\u00fd'],
-    ['verb form','c','Dopl\u0148 spr\u00e1vn\u00fd tvar slovesa do mezery. Boduje se jako fill-in-the-blank.','She ___ (go) home yesterday. \u2192 went \u2713'],
-    ['preposition gap-fill','c','Dopl\u0148 spr\u00e1vnou p\u0159edlo\u017eku. Boduje se jako fill-in-the-blank.','I\u2019m good ___ math. \u2192 at \u2713'],
-    ['question formation','c','Vytvo\u0159 ot\u00e1zku k zadan\u00e9 v\u011bt\u011b/odpov\u011bdi. Boduje se jako sentence transformation.','Odpov\u011b\u010f: To London. \u2192 Where did she go? \u2713'],
-    ['word family','c','Vytvo\u0159 odvozen\u00fd tvar slova (podst./p\u0159\u00edd./p\u0159\u00edsl.). Boduje se jako word formation.','Her ___ (decide) was final. \u2192 decision \u2713'],
-    ['short answer','c','Kr\u00e1tk\u00e1 odpov\u011b\u010f (1\u20135 slov) s uzav\u0159enou mno\u017einou \u0159e\u0161en\u00ed. Boduje se jako fill-in-the-blank.','What is the capital of France? \u2192 Paris \u2713'],
-    ['paraphrase the sentence','c','P\u0159eformuluj v\u011btu se zachov\u00e1n\u00edm smyslu. Boduje se jako sentence transformation (v\u00edce alternativ).','It\u2019s very cold. \u2192 It isn\u2019t warm at all.'],
-    ['heading matching','p','P\u0159i\u0159a\u010f nadpis k odstavci textu. Boduje se jako matching.','Odstavec o po\u010das\u00ed \u2192 nadpis "Climate" \u2713'],
-    ['gist question','p','Ot\u00e1zka na hlavn\u00ed my\u0161lenku textu (ne detail). Boduje se jako multiple choice.','What is the text mainly about? \u2192 A) Recycling \u2713'],
-    ['summary cloze','p','Dopl\u0148 mezery v souhrnu textu. Boduje se jako cloze text.','The author argues that ___(1) helps the ___(2). \u2192 reading, brain']
-  ];
-  var CAT={r:'rozpozn\u00e1v\u00e1n\u00ed',c:'\u0159\u00edzen\u00e1 produkce',p:'porozum\u011bn\u00ed'};
-  var CLS={r:'tc-recog',c:'tc-ctrl',p:'tc-comp'};
-  // Seskup karty podle kategorie (r -> c -> p), aby barevné skupiny šly za sebou.
-  // Stabilní řazení zachová původní pořadí uvnitř každé skupiny.
-  var ORD={r:0,c:1,p:2};
-  D=D.slice().sort(function(a,b){return (ORD[a[1]]==null?9:ORD[a[1]])-(ORD[b[1]]==null?9:ORD[b[1]]);});
-  return D.map(function(d){
-    return '<div class="type-card" onclick="toggleTypeCard(this)">'
-      +'<div class="type-card-name">'+d[0]+'</div>'
-      +'<span class="type-card-cat '+CLS[d[1]]+'">'+CAT[d[1]]+'</span>'
-      +'<div class="type-card-body">'
-      +'<div class="type-card-desc">'+d[2]+'</div>'
-      +'<div class="type-card-ex">'+d[3]+'</div>'
-      +'</div></div>';
-  }).join('');
-}
-
 async function ensureGeminiDataNotice(){
   if(window.GHRAB_PLATFORM?.isSchoolProfile?.()) return true;
   try { if (sessionStorage.getItem(GEMINI_DATA_NOTICE_SESSION_SK) === 'accepted') return true; } catch(_){}

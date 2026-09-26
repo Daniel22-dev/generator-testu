@@ -1,8 +1,12 @@
-> **7.1.50 — migrace na GARP 2.7 r2 / G-02 FIX; bez záměrné změny funkčního runtime.** Aktivní bezpečnostní autorita je nyní GARP 2.7, GARP 2.5.1 zůstává povinným regresním základem a serverová/LIVE fáze zůstává odložena. Začněte v [security/garp27/README.md](security/garp27/README.md) a [security/garp27/MIGRATION-ASSESSMENT.md](security/garp27/MIGRATION-ASSESSMENT.md).
+> **7.1.52 — Reading registry hotfix + Exercise UX refinement.** Zachovává opravu AI registrů z 7.1.51 a doplňuje přehlednější výběr typů cvičení s kontextovou nápovědou a základní řízení položek/bodů i v Jednoduchém režimu. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.50
+**Aktuální verze:** 7.1.52
+
+> **7.1.52 Exercise UX + Simple detail controls (2026-09-25):** typy cvičení jsou uspořádané do pedagogických kategorií s hover/focus/touch nápovědou a příklady; stará rozbalovací nápověda byla odstraněna. Jednoduchý režim nově dovoluje volitelně upravit typ, počet položek a body po jednotlivých cvičeních, zatímco ruční/technické ovládání zůstává pouze v Pokročilém režimu. Součástí buildu je parity gate pro 38/38 nápověd i základní Simple-mode kontrakt.
+
+> **7.1.51 Reading AI registry hotfix (2026-09-25):** Reading se zdrojem je povolen konzistentně v Simple i Advanced a napříč účely testu. Runtime AI registr je synchronizován s veřejným kontraktem; nový fail-closed gate blokuje budoucí drift registrů před buildem/releasem.
 
 > **7.1.50 GARP 2.7 r2 / G-02 (2026-09-24):** přidává aplikační GARP 2.7 policy/inventory/trust adapter, fail-closed architecture a mutation brány, auto-patch admission a externě připnutý CI trust anchor. Zachovává D3 a AGENTIC=PARTIAL; serverové LIVE kontroly jsou nadále NOT_TESTED.
 

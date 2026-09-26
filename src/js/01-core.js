@@ -25,7 +25,7 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.50',
+  version: '7.1.52',
   date:    '2026-09-23',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
@@ -723,8 +723,8 @@ const GENERATOR_ASSISTANT_KB = [
   detailed:'Generátor pracuje s profily economy / balanced / quality. Konkrétní provider/model určuje direct transport nebo školní gateway. Chyba 404/NOT_FOUND proto není pokyn učiteli, aby přepisoval název modelu; běžné UI žádný konkrétní model neobsahuje.',
   evidence:['GEMINI_PROFILE_MODELS','resolveGeminiModel()','modelProfile','NOT_FOUND']}, {id:'typy-cviceni-prehled',title:'Přehled typů cvičení — co který typ dělá',status:'reseno',
   keywords:['typy cviceni','typy cvičení','co je ordering','co je matching','co je cloze','co je highlight','co je error tagging','co je transformation','co je categorisation','jaké typy','seznam typů','přehled typů','co umí'],
-  simple:'Generátor nabízí přes 20 typů cvičení: od klasických (multiple choice, true/false, fill-in-the-blank) přes složitější (ordering, categorisation-board, highlight-evidence, error-tagging) až po produktivní (translation, transformation-chain). Každý typ testuje jiné jazykové dovednosti.',
-  detailed:'Základní typy: multiple choice (výběr z možností), true/false (pravda/nepravda), fill-in-the-blank (doplňování), matching (párování), word order (sestavení věty). Složitější: ordering (seřazení vět/kroků), multi-select (více správných odpovědí), highlight-evidence (označení důkazní věty v textu), error-tagging (označení chyby ve větě a její oprava), banked cloze (doplňování ze zásoby slov), multiple matching (přiřazení více položek). Produktivní: translation (překlad), transformation-chain (transformace věty), error correction (oprava chyby). Specifické: categorisation-board (třídění do kategorií), table-completion (doplňování tabulky), reading comprehension (čtení s porozuměním), listening comprehension (poslech). V generátoru je ke každému typu pedagogická funkce (BOD 5).',
+  simple:'Generátor nabízí 38 typů cvičení rozdělených podle pedagogické funkce (např. Rozpoznání, Řízená produkce, Volnější produkce a Porozumění). U každé karty zobrazí na hover/focus nebo přes ikonu i stručné vysvětlení a konkrétní příklad, takže není potřeba hledat v samostatné nápovědě.',
+  detailed:'Typy cvičení jsou v UI seskupené podle pedagogické funkce a každý typ má vlastní kontextovou nápovědu se shrnutím a příkladem. Základní typy zahrnují multiple choice, true/false, fill-in-the-blank, matching a word order; mezi složitější patří ordering, multi-select, highlight-evidence, error-tagging, banked cloze a multiple matching; produktivní typy zahrnují translation, transformation-chain a error correction; specifické typy zahrnují categorisation-board, table-completion, reading comprehension a listening comprehension. Registr nápovědy je kryt QA kontrolou 38/38 typů, aby nové typy nezůstaly bez vysvětlení.',
   evidence:['EXERCISE_TYPES','normalizeType()','MANUAL_SUPPORTED_TYPES','isManualSupported()','pedagogická mapa typů']},
 
  {id:'typy-ordering-vs-wordorder',title:'Ordering vs. word order — jaký je rozdíl',status:'reseno',

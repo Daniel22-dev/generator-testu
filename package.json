@@ -1,12 +1,12 @@
 {
   "name": "generator-testu",
-  "version": "7.1.50",
+  "version": "7.1.52",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "check:versions": "node scripts/check-versions.mjs",
-    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow",
+    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && npm run check:exercise-help && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow",
     "lint": "node scripts/lint.mjs",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
@@ -54,17 +54,17 @@
     "qa:xss": "node scripts/qa-p5-xss-sinks.mjs",
     "qa:lock": "node scripts/qa-p5-lock.mjs",
     "pretest:reporter": "npm run build",
-    "qa:garp23": "npm run test:suite-session && node scripts/qa-garp23-security.mjs",
+    "qa:garp23": "npm run check:ai-operations && npm run test:suite-session && node scripts/qa-garp23-security.mjs",
     "check:embedded-script-terminators": "node scripts/check-embedded-script-terminators.mjs",
-    "prebuild": "npm run check:embedded-script-terminators && npm run check:studio-manifest",
+    "prebuild": "npm run check:ai-operations && npm run check:exercise-help && npm run check:embedded-script-terminators && npm run check:studio-manifest",
     "test:headless:dist": "node tools/headless-check.mjs dist/index.html",
     "check:studio-manifest": "node scripts/check-studio-manifest-template.mjs",
     "test:suite-session": "node scripts/test-suite-session-lifecycle.mjs",
     "garp25:selftest": "node security/garp25/tools/selftest-garp251.mjs",
     "garp25:sw": "node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json",
     "garp25:leaks": "node security/garp25/tools/scan-deployment-leaks.mjs dist",
-    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.50.cdx.json",
-    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.50.cdx.json --check",
+    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.52.cdx.json",
+    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.52.cdx.json --check",
     "garp25:prep-static": "npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks",
     "garp25:ai-evidence": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json",
     "garp25:ai-evidence:check": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check",
@@ -80,7 +80,9 @@
     "qa:garp27:auto-patch": "node scripts/garp27/auto-patch-contract.mjs",
     "qa:garp27:static": "npm run qa:garp27:contracts && npm run qa:garp27:architecture && npm run qa:garp27:policy-mutations && npm run qa:garp27:mutations && npm run qa:garp27:auto-patch",
     "qa:garp27": "npm run build && npm run garp25:prep-static && npm run qa:garp27:static",
-    "qa:garp27:foundation": "node scripts/garp27/foundation-gate.mjs"
+    "qa:garp27:foundation": "node scripts/garp27/foundation-gate.mjs",
+    "check:ai-operations": "node scripts/check-ai-operation-registry.mjs",
+    "check:exercise-help": "node scripts/check-exercise-type-help.mjs"
   },
   "engines": {
     "node": ">=18"

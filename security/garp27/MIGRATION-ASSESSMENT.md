@@ -1,7 +1,7 @@
 # Generator testu - GARP 2.7 r2 migration assessment
 
 Datum: 2026-09-24  
-Aplikace: `generator` / Generator testu 7.1.50  
+Aplikace: `generator` / Generator testu 7.1.52  
 Aktivni kontrakt: GARP 2.7 / konsolidace `2026-09-23-r2`  
 Vstupni aplikacni ZIP SHA-256: `21cd1544de2ac27832eef1503bca9c2d503b21b4fa4596b07707a4cd4f9c43d3`  
 GARP r2 vstupni ZIP SHA-256: `0c278aefa0581b3ba13dd5725da9d3fc624976c255602ec16b054fc81da6f7c8`
@@ -40,7 +40,7 @@ Provedeno a PASS:
 - Generator auto-patch contract vcetne staticke vazby na release dispatch;
 - G27-AR architecture checker selftest na syntetickem production fixture 54/54;
 - G27-AR mutation suite na syntetickem fixture 10/10;
-- verze 7.1.50 sedi napric zdrojovymi/runtime kontrakty;
+- verze 7.1.52 sedi napric zdrojovymi/runtime kontrakty;
 - legacy GARP 2.5.1 tooling selftest 59/59.
 
 Lokalni clean build a tim i pozitivni production-artifact cast architecture/foundation gate nebyly v tomto prostredi dokonceny, protoze exact-lockfile dependency install nema kompletni lokalni npm cache (`yocto-queue@0.1.0` chybi) a sitovy install predtim vyprsel. Architecture gate tento stav spravne klasifikuje jako FAIL misto falesneho PASS. Autoritativni plny vysledek proto musi dodat exact GitHub CI po nahrani kandidata.

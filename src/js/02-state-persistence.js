@@ -137,7 +137,10 @@ function markAdvancedSections(){
   const rosterF = $('rosterField'); if (rosterF) rosterF.classList.add('advanced-only');
   ids.forEach(id => { const el = $(id); const f = el && el.closest ? el.closest('.field') : null; if (f) f.classList.add('advanced-only'); });
   const varA = $('varA'); const subField = varA && varA.closest ? varA.closest('.field') : null; if (subField) subField.classList.add('advanced-only');
-  const btnEx = $('btnExDetail'); if (btnEx) btnEx.classList.add('advanced-only');
+  // Per-exercise quantities are useful even in Simple mode. The renderer keeps
+  // the Simple variant intentionally compact (type + item count + points) and
+  // hides the advanced/manual-generation controls there.
+  const btnEx = $('btnExDetail'); if (btnEx) btnEx.classList.remove('advanced-only');
 }
 
 // Etapa 5 — pouze informační architektura Pokročilého režimu.
@@ -238,6 +241,14 @@ function updateAppModeUI(){
   if (tplTip) tplTip.dataset.tip = simple
     ? 'Vyber účel: procvičování, běžný test nebo přísný test. Generátor podle toho automaticky nastaví technické volby, které se zde nezobrazují.'
     : 'Účel testu je společný pro oba režimy. V pokročilém režimu pouze předvyplní technické volby; další nastavení zůstávají dostupná níže.';
+  const exDetailBtn = $('btnExDetail');
+  if (exDetailBtn) {
+    const label = exDetailBtn.querySelector('span:first-child');
+    if (label) label.textContent = simple ? '⚙️ Upravit položky a body' : '⚙️ Nastavit cvičení podrobně';
+    exDetailBtn.title = simple
+      ? 'Volitelné: nastav u každého cvičení počet položek a body. Ostatní technické volby zůstávají automatické.'
+      : 'Nastav jednotlivá cvičení podrobně včetně typu, počtu úloh, bodů a případného ručního zadání.';
+  }
   updateSimpleSecretsHelper();
   renderSimpleTemplates();
 }
