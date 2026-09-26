@@ -36,7 +36,7 @@ SCHOOL EGRESS                same-origin school-gateway only; local provider key
 REAL D3 STUDENT AI EGRESS    NOT APPROVED BY THIS LOCAL MIGRATION STAGE
 
 GARP 2.7 TRUST / CI
-TRUST ANCHOR SHA-256         36af5a8dcdbca16823b63aac086f0141ebfd0b957cb9e737b7ea913b940c00fb
+TRUST ANCHOR SHA-256         406a2d3648dbe42378801f347b98a1982c1e02d08b119a74c45dff99978c3cca
 EXTERNAL CI PIN              wired into every workflow path invoking qa:p5:ci
 FOUNDATION CI                wired into p5-release-gate and deploy
 SELF-APPROVAL OF TRUST       blocked by external CI pin
