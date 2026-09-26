@@ -19,7 +19,7 @@
     "public/sw.js",
     "public/manual/index.html",
     "README.md",
-    "RELEASE-NOTES-7.1.52.md"
+    "RELEASE-NOTES-7.1.53.md"
   ],
   "distCachePaths": [
     "dist/access/error-reporter.js",
