@@ -2,7 +2,7 @@
   "distEntry": "dist/index.html",
   "appId": "generator",
   "appName": "Generátor testů",
-  "version": "7.1.52",
+  "version": "7.1.53",
   "reporterPath": "public/access/error-reporter.js",
   "stylePath": "public/access/error-reporter.css",
   "adapterPath": "public/access/error-reporter-adapter.js",
