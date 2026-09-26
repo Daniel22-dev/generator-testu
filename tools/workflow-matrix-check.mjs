@@ -15,6 +15,11 @@ const dom = new JSDOM(html, {
   pretendToBeVisual: true,
   beforeParse(w) {
     w.acorn = acorn;
+    w.__GHRAB_DEPLOYMENT_CONFIG__ = Object.freeze({
+      schema:'ghrab-deployment-config-v1', version:1, environmentId:'workflow-test',
+      profile:'github-pages', authMode:'signed-permit', aiTransport:'direct-gemini', apiBaseUrl:'',
+      features:Object.freeze({allowLocalProviderKeys:true,serverSessionReady:false,schoolGatewayReady:false,schoolServerConnected:false})
+    });
     if (!w.crypto || !w.crypto.subtle) Object.defineProperty(w, 'crypto', { value: webcrypto });
     w.matchMedia = w.matchMedia || (q => ({ matches:false, media:q, addListener(){}, removeListener(){}, addEventListener(){}, removeEventListener(){} }));
     w.scrollTo = () => {};
