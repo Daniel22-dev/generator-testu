@@ -1,3 +1,13 @@
+## 7.1.53 — 2026-09-26 — UX hotfix panelu cvičení a profilů testu
+
+- opraven stav Simple panelu „Upravit položky a body“: lze jej otevřít i znovu sbalit;
+- při otevřeném detailu se karty typů skryjí, při sbalení se okamžitě vrátí a zachovají typy z tabulky;
+- aktivní tlačítko jasně mění text na „Skrýt položky a body“ a používá aria-expanded;
+- zvětšen odstup informačního textu od tlačítka;
+- kontextová nápověda typů má neprůhledné pozadí, menší šířku a preferuje umístění vedle karty;
+- Procvičování, Běžný test a Přísný test nyní stručně popisují skutečné výsledkové/feedbackové/bezpečnostní chování;
+- přidán regresní scénář Simple otevřít → sbalit → návrat karet.
+
 ## 7.1.52 — 2026-09-25 — exercise UX, Simple detail controls, final cleanup
 
 - zachována oprava univerzálního Reading workflow a fail-closed parity AI registrů z 7.1.51;

@@ -1,8 +1,10 @@
-> **7.1.52 — Reading registry hotfix + Exercise UX refinement.** Zachovává opravu AI registrů z 7.1.51 a doplňuje přehlednější výběr typů cvičení s kontextovou nápovědou a základní řízení položek/bodů i v Jednoduchém režimu. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
+> **7.1.53 — UX hotfix pro Simple nastavení a profily testu.** Opravuje sbalení panelu položek/bodů, návrat karet typů cvičení, polohu a čitelnost kontextové nápovědy a stručně popisuje skutečné chování tří profilů Procvičování / Běžný / Přísný. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.52
+**Aktuální verze:** 7.1.53
+
+> **7.1.53 UX hotfix (2026-09-26):** Simple panel „Upravit položky a body“ lze znovu sbalit; po sbalení se vrací karty typů cvičení se synchronizovaným výběrem. Kontextová nápověda typů má neprůhledné pozadí a preferuje umístění vedle karty. Karty účelu testu nyní stručně popisují reálné chování Procvičování, Běžného a Přísného testu bez zbytečných poznámek o režimech.
 
 > **7.1.52 Exercise UX + Simple detail controls (2026-09-25):** typy cvičení jsou uspořádané do pedagogických kategorií s hover/focus/touch nápovědou a příklady; stará rozbalovací nápověda byla odstraněna. Jednoduchý režim nově dovoluje volitelně upravit typ, počet položek a body po jednotlivých cvičeních, zatímco ruční/technické ovládání zůstává pouze v Pokročilém režimu. Součástí buildu je parity gate pro 38/38 nápověd i základní Simple-mode kontrakt.
 
