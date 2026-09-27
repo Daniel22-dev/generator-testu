@@ -1,6 +1,6 @@
 const GHRAB_SW_CONTRACT='ghrab-service-worker-v1';
 /* GHRAB service-worker contract v1 · update activation is user-controlled. */
-const CACHE_NAME = "ghrab-generator-v7.1.53";
+const CACHE_NAME = "ghrab-generator-v7.1.54";
 const CACHE_PREFIXES = ["ghrab-generator-v", "generator-testu-pwa-v"];
 const CORE_ASSETS = [
   "./",
@@ -49,10 +49,12 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-async function networkFirst(request, fallbackUrl = '') {
+// httpCache 'no-store' obchází HTTP cache úplně. 'no-cache' vždy ověří aktuálnost
+// u serveru (If-None-Match / If-Modified-Since), ale nezměněný soubor nestahuje znovu (304).
+async function networkFirst(request, fallbackUrl = '', httpCache = 'no-store') {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetch(request, { cache: 'no-store' });
+    const response = await fetch(request, { cache: httpCache });
     if (!response || !response.ok) throw new Error(`HTTP ${response?.status || 0}`);
     await cache.put(request, response.clone());
     return response;
@@ -119,7 +121,8 @@ self.addEventListener('fetch', (event) => {
   }
   if (request.mode === 'navigate') {
     const fallback = url.pathname.includes('/manual/') ? './manual/index.html' : './index.html';
-    event.respondWith(networkFirst(request, fallback));
+    // Stránka aplikace (~1,4 MB) se při každém otevření ověří u serveru, ale stáhne se jen při změně.
+    event.respondWith(networkFirst(request, fallback, 'no-cache'));
     return;
   }
   if (url.pathname.endsWith('/manifest.webmanifest') || url.pathname.endsWith('/build-info.json')) {

@@ -376,7 +376,6 @@ function akvCard(d,kind,index){
   const pick=kind==='weak'&&akvCanAdd(d)?'<label class="akv-pick-row"><input type="checkbox" class="akv-pick" data-wi="'+index+'">P\u0159ijmout tuto odpov\u011b\u010f jako alternativu</label>':'<p>Rozd\u00edl posu\u010f v editoru; u tohoto form\u00e1tu se alternativy automaticky nep\u0159id\u00e1vaj\u00ed.</p>';
   return '<div class="akv-item '+kind+'"><b>'+H(d.variant)+' \u00b7 cv. '+d.ex+' / pol. '+d.q+' \u00b7 '+H(d.type)+'</b><p>'+H(d.question)+'</p><p>Kl\u00ed\u010d: <b>'+H(d.key)+'</b></p><p>AI: <b>'+H(akvDisplay(d.ai))+'</b></p>'+pick+'</div>';
 }
-function akvItemIsMulti(it){return Array.isArray(it.answers);}
 function akvAddAltToItem(it,ai,type){
   if(!it)return false;
   const add=(old,value,key)=>{if(typeof value!=='string'||!value.trim()||akvNorm(value)===akvNorm(key)||old.some(v=>akvNorm(v)===akvNorm(value)))return false;old.push(value.trim());return true;};

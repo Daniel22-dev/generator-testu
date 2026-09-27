@@ -1,31 +1,38 @@
 GARP 2.7 - ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.53
-Date: 2026-09-26
-Scope: GARP 2.7 r2 / G-02 + Reading registry + exercise-type UX + Simple item/point toggle hotfix + purpose-card UX
+Application: generator 7.1.54
+Date: 2026-09-27
+Scope: 7.1.54 cleanup (17 unreferenced functions removed, readable build script with byte-identical output) + service-worker navigation revalidation (no-cache instead of no-store for app-shell navigation only)
 
 ACTIVE SECURITY AUTHORITY
 GARP 2.7 r2 / consolidation 2026-09-23-r2
 Legacy GARP 2.5.1/N5 remains mandatory regression evidence.
 
-CURRENT LOCAL / STATIC STATUS
-VERSION CONSISTENCY          PASS (7.1.53 across runtime/PWA/QA sources)
-JS SYNTAX                    PASS (node --check, 126 JS/MJS files)
+CURRENT LOCAL STATUS (npm ci from lockfile, Node 22, Chromium 141; local run, not the protected CI)
+VERSION CONSISTENCY          PASS (7.1.54 across runtime/PWA/QA sources)
+JS SYNTAX                    PASS (node --check, 131 tracked JS/MJS files outside vendored GARP/audit)
 AI OPERATION REGISTRY        PASS (11/11; runtime/public parity)
-READING MODE REGRESSION      ADDED (Simple/Advanced x practice/standard/strict; exact jsdom run delegated to CI)
-EXERCISE TYPE HELP           PASS (38/38 + contextual examples + Simple-mode item/point contract)
+EXERCISE TYPE HELP           PASS (38/38 + Simple-mode item/point contract)
+NPM TEST (FULL CHAIN)        PASS (Test Lab 26 pass / 0 fail; workflow audit 50/0; precache 23/23)
 GARP 2.7 PACKAGE SELFTEST    PASS 19/19
 GARP 2.7 CONTRACT SELFTEST   PASS 25/25 (G-02 5/5)
 GENERATOR CONTRACT GATE      PASS 6/6
 G-02 POLICY MUTATIONS        PASS 6/6
-AUTO-PATCH CONTRACT          PASS (synthetic state admission + actual release-dispatch structure)
-GARP 2.7 SOURCE ARCHITECTURE PASS (38/42 checks; remaining 4 are exact-dist artifact checks)
-EXACT DIST ARCHITECTURE      NOT RUN LOCALLY (npm dependency cache incomplete; CI required)
-G27-AR MUTATION SUITE        DEFERRED TO EXACT CI (requires built dist)
+AUTO-PATCH CONTRACT          PASS
+GARP 2.7 ARCHITECTURE        PASS 42/42 (CI=true, freshly built dist, new external trust pin; old pin and missing pin both FAIL as required)
+G27-AR MUTATION SUITE        PASS 10/10
+GARP 2.7 FOUNDATION          FOUNDATION_PASS_LIVE_NOT_TESTED 12/12 (CI=true, local source-tree surrogate identity)
+QA P5 CI CHAIN               PASS (qa:p5:ci incl. AXE_REQUIRED=1: quality 35/0, browser, runtime, XSS sinks, axe, release, acceptance)
 GARP 2.5.1 TOOLING SELFTEST  PASS 59/59
 GARP 2.3 SECURITY REGRESSION PASS (82/82)
 SUITE SESSION LIFECYCLE      PASS (20/20)
-SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components)
-AI ASSURANCE FINGERPRINT     PASS (c2f4e444b7bf212291e80a926d87313a4cc0078e7200e17a4540be8579d05a24)
+SERVICE WORKER FREEZE (GH-02) PASS (0 findings); offline fail-safe test PASS
+SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components, security/sbom/generator-testu-7.1.54.cdx.json)
+AI ASSURANCE FINGERPRINT     REGENERATED (721ac02c3658fa5ee6b67c4163a2df1a18fc86b081f0ca686ecc4a568e04a5bc)
+                             AI-boundary files changed only by deletion of unreferenced functions; prompts, transport,
+                             models and system instructions unchanged. Inherited behavioral AIR evidence requires owner review
+                             per invalidationRule; no live-model AIR run was performed.
+FIXTURE BROWSER AUDIT        14/16 suites PASS; wizard_suite and integration_suite fail with identical cases and messages on
+                             unchanged 7.1.53 (stale test expectations, not an application regression)
 
 PRESERVED SECURITY BOUNDARIES
 DATA CLASS                   D3
@@ -36,7 +43,7 @@ SCHOOL EGRESS                same-origin school-gateway only; local provider key
 REAL D3 STUDENT AI EGRESS    NOT APPROVED BY THIS LOCAL MIGRATION STAGE
 
 GARP 2.7 TRUST / CI
-TRUST ANCHOR SHA-256         406a2d3648dbe42378801f347b98a1982c1e02d08b119a74c45dff99978c3cca
+TRUST ANCHOR SHA-256         2e36e1c299625e2f0dbeb2f9f70e0953faf7876525aba3285e6f4692bd1f5a54 (re-anchored for 7.1.54 version binding; previous 406a2d36…)
 EXTERNAL CI PIN              wired into every workflow path invoking qa:p5:ci
 FOUNDATION CI                wired into p5-release-gate and deploy
 SELF-APPROVAL OF TRUST       blocked by external CI pin

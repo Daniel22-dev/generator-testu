@@ -1,8 +1,10 @@
-> **7.1.53 — UX hotfix pro Simple nastavení a profily testu.** Opravuje sbalení panelu položek/bodů, návrat karet typů cvičení, polohu a čitelnost kontextové nápovědy a stručně popisuje skutečné chování tří profilů Procvičování / Běžný / Přísný. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
+> **7.1.54 — úklid a zrychlení otevírání.** Service worker nezměněnou stránku aplikace při otevření znovu nestahuje, jen ověří její aktuálnost u serveru. Odstraněno 17 nevolaných funkcí a sestavovací skript je čitelný. Chování aplikace se nemění. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.53
+**Aktuální verze:** 7.1.54
+
+> **7.1.54 Úklid a zrychlení (2026-09-27):** navigace na stránku aplikace používá v service workeru podmíněné ověření (`cache: 'no-cache'`) místo úplného obejití HTTP cache; nezměněná stránka se nestahuje znovu (odpověď 304), nová verze se projeví okamžitě. Odstraněno 17 nevolaných funkcí, `scripts/build.mjs` přepsán čitelně (výstup `dist` bajtově shodný). Rozhraní, bodování, secure runtime, AI prompty ani bezpečnostní model se nemění.
 
 > **7.1.53 UX hotfix (2026-09-26):** Simple panel „Upravit položky a body“ lze znovu sbalit; po sbalení se vrací karty typů cvičení se synchronizovaným výběrem. Kontextová nápověda typů má neprůhledné pozadí a preferuje umístění vedle karty. Karty účelu testu nyní stručně popisují reálné chování Procvičování, Běžného a Přísného testu bez zbytečných poznámek o režimech.
 

@@ -442,16 +442,6 @@ async function generateTestWithManual(st,filePack,useUrlContext){
   const combined=mergeExerciseSlices(st,parts);lastGenData=combined;
   return await assembleTestHtml(st,combined);
 }
-async function runSplitGeneration(st,filePack,useUrlContext){
-  const parts=[];
-  for(let i=0;i<st.exerciseConfig.length;i++){
-    setGenMsg('Generuji cvi\u010den\u00ed '+(i+1)+' / '+st.exerciseConfig.length);
-    const indices=[i],data=await requestValidatedExerciseData(exerciseSliceState(st,indices),filePack,useUrlContext);
-    parts.push({indices,data});
-  }
-  const combined=mergeExerciseSlices(st,parts);lastGenData=combined;
-  return await assembleTestHtml(st,combined);
-}
 async function runHybridGeneration(st,filePack,useUrlContext,complexIdxs,simpleIdxs){
   const parts=[],slices=complexIdxs.map(i=>[i]);if(simpleIdxs.length)slices.push(simpleIdxs);
   for(const indices of slices){

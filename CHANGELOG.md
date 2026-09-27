@@ -1,3 +1,11 @@
+## 7.1.54 — 2026-09-27 — úklid kódu a rychlejší otevírání
+
+- service worker: navigace na stránku aplikace používá `fetch(request, { cache: 'no-cache' })` místo `'no-store'`; stránka se při každém otevření ověří u serveru, nezměněná se znovu nestahuje (304), nová verze se projeví okamžitě; offline záloha beze změny; bezpečnostně citlivé soubory dál `networkOnlyNoStore`, soubory pro offline fail-safe dál `networkFirst` s `'no-store'`;
+- odstraněno 17 nevolaných funkcí: 10 kompatibilních přežitků starého přístupu v `16-access.js` (`accTryActivate`, `accResetPinFlow`, `accAdmin*`, `accValidManifest`, `accSetAppGated`, `accEnsureGate`, `accStartBootWatchdog`, `runAccessBootSafely`) a `readingVocabularyTargetRange`, `simpleTemplateSet`, `saveGeminiKeyPermanent`, `runSplitGeneration`, `akvItemIsMulti`, `isCustomGradeScaleValid`, `derivePerTestSecret`;
+- `scripts/build.mjs` přepsán z hustých jednořádkových zápisů do čitelné podoby; samotný přepis výstup nemění (ověřeno bajtovou shodou `dist` při pevném `GHRAB_BUILD_TIME`); opraveno porovnání escape znaku v CSS kompakci (dosud nikdy neplatilo, na současné CSS bez vlivu) a pořadí validace `GHRAB_BUILD_TIME`;
+- přegenerován AI assurance otisk: změna souborů AI hranice je pouze odstranění nevolaných funkcí, prompty, transport, modely ani systémové instrukce se nemění;
+- zvýšení verze přepsalo `appVersion` v GARP 2.7 policy souborech, proto jsou v `trust-anchor.json` nové otisky a v CI nový pin `GARP27_EXTERNAL_TRUST_SHA256`.
+
 ## 7.1.53 — 2026-09-26 — UX hotfix panelu cvičení a profilů testu
 
 - opraven stav Simple panelu „Upravit položky a body“: lze jej otevřít i znovu sbalit;

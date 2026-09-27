@@ -247,7 +247,6 @@ function gradeScaleGaps(scale){
   if(s[s.length-1].max<100) gaps.push((s[s.length-1].max+1)+'–100 %');
   return gaps;
 }
-function isCustomGradeScaleValid(raw, totalBody) { return parseCustomGradeScale(raw, totalBody).length > 0; }
 
 function getUiLang(instrJazyk, jazyk) {
   if (instrJazyk !== 'target') return 'cs';

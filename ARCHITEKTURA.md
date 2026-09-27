@@ -55,6 +55,8 @@ Service worker Generátoru obsluhuje pouze vlastní scope a ukládá jen statick
 
 `CORE_ASSETS` musí odpovídat skutečným souborům v `dist/`; tuto vazbu hlídá `check-sw-precache.mjs`. Service worker nepoužívá `skipWaiting`, takže nová verze nepřevezme otevřenou kartu a sama nezahodí rozpracovanou práci. Aktivuje se po zavření starých klientů.
 
+Navigace na stránku aplikace (`index.html`, manuál) jde strategií network-first s `cache: 'no-cache'`: prohlížeč se při každém otevření zeptá serveru podmíněným dotazem a nezměněnou stránku znovu nestahuje (304); nová verze se projeví okamžitě, offline se použije uložená kopie. Bezpečnostně citlivé soubory zůstávají network-only s `no-store`, `access/suite-session-cleanup.js` a `ghrab/ghrab-platform.js` network-first s `no-store`.
+
 ## Datový tok AI
 
 1. Učitel vyplní konfiguraci, zdroje a přílohy.

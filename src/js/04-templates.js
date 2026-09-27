@@ -75,9 +75,6 @@ const TEMPLATE_LOCK_FIELD_MAP = {
   fuzzyTolerance:'fuzzyBtns', differentiationLevel:'diffLevelBtns', gradeTyp:'gradeOptions', screenGuard:'screenGuardBtns'
 };
 function templateLockActive(){ return false; }
-function simpleTemplateSet(){
-  return (String(state.jazyk||'').toLowerCase()==='čeština') ? SIMPLE_TEMPLATES.cs : SIMPLE_TEMPLATES.fl;
-}
 function simpleTemplateById(id){
   return (SIMPLE_TEMPLATES.fl[id]) || (SIMPLE_TEMPLATES.cs[id]) || null;
 }
