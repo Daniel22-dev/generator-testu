@@ -7,9 +7,9 @@
     "component": {
       "type": "application",
       "name": "generator-testu",
-      "version": "7.1.54",
-      "purl": "pkg:npm/generator-testu@7.1.54",
-      "bom-ref": "pkg:npm/generator-testu@7.1.54?root=true"
+      "version": "7.1.55",
+      "purl": "pkg:npm/generator-testu@7.1.55",
+      "bom-ref": "pkg:npm/generator-testu@7.1.55?root=true"
     }
   },
   "components": [
@@ -2877,7 +2877,7 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:npm/generator-testu@7.1.54?root=true",
+      "ref": "pkg:npm/generator-testu@7.1.55?root=true",
       "dependsOn": [
         "pkg:npm/acorn@8.17.0?path=node_modules%2Facorn",
         "pkg:npm/axe-core@4.12.1?path=node_modules%2Faxe-core",
