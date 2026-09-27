@@ -54,16 +54,6 @@ Access.blockAllGeneration = !Access.granted || Access.envKind === 'unofficialCop
 Access.warnLevel = Access.envKind === 'unofficialCopy' ? 'block' : (Access.envKind === 'local' ? 'soft' : 'none');
 
 function accIsAdmin(){ return !!(Access.profile && Access.profile.role === 'admin'); }
-function accValidManifest(){ return false; }
-function accSetAppGated(){ /* centrální brána běží před aplikačním JS */ }
-function accEnsureGate(){ /* kompatibilita se staršími testy */ }
-function accStartBootWatchdog(){ /* kompatibilita se staršími testy */ }
-function runAccessBootSafely(){ accOnGranted(); }
-function accTryActivate(){ location.href = STUDIO_ROOT + 'access/'; }
-function accResetPinFlow(){ location.href = STUDIO_ROOT + 'access/'; }
-function accAdminAddTeacher(){ openAdminPanel(); }
-function accAdminAction(){ openAdminPanel(); }
-function accAdminExport(){ openAdminPanel(); }
 
 function currentCreator(){
   var p = Access.profile;

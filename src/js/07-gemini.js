@@ -99,13 +99,6 @@ function useGeminiKeyForSession() {
   } catch(_){}
   setGeminiKey(key, key ? 'session' : '');
 }
-async function saveGeminiKeyPermanent() {
-  // P1 bezpečnostní politika: i v GitHub profilu je provider klíč pouze pro relaci.
-  // Zachováváme původní veřejné API funkce kvůli kompatibilitě starších HTML/UI.
-  useGeminiKeyForSession();
-  try { localStorage.removeItem(GEMINI_KEY_SK); } catch(_){}
-  if (geminiApiKey) uiToast('Klíč byl uložen pouze pro tuto relaci. Trvalé ukládání je z bezpečnostních důvodů vypnuto.', 'ok', 4200);
-}
 
 function clearGeminiKey() {
   try { sessionStorage.removeItem(GEMINI_KEY_SESSION_SK); } catch(_){}

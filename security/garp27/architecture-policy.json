@@ -2,7 +2,7 @@
   "schema": "garp27-architecture-policy-v1",
   "garpVersion": "2.7",
   "appId": "generator",
-  "appVersion": "7.1.53",
+  "appVersion": "7.1.54",
   "toolRevision": "generator-garp27-architecture-integrity-v1-g02",
   "sourceScopes": [
     "src",

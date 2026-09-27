@@ -25,11 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.53',
-  date:    '2026-09-26',
+  version: '7.1.54',
+  date:    '2026-09-27',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'ÚKLID A ZRYCHLENÍ (7.1.54): service worker ověřuje stránku aplikace u serveru podmíněným dotazem, takže nezměněnou stránku (~1,4 MB) při otevření znovu nestahuje; čerstvost verze a offline záloha zůstávají stejné. Odstraněno 17 nevolaných funkcí (přežitky starého přístupu a nahrazené pomocné funkce); sestavovací skript přepsán čitelně se shodným výstupem. Bez změny rozhraní, bodování, secure runtime, AI promptů a bezpečnostního modelu.',
     'UX HOTFIX (7.1.53): opraveno otevírání a sbalování nastavení položek/bodů v Simple režimu, po sbalení se vracejí karty typů cvičení; hover nápověda se otevírá přednostně vedle karty a má neprůhledné pozadí; profily Procvičování/Běžný/Přísný stručně a věcně popisují skutečné chování testu.',
     'READING TOPIC PRIORITY (7.1.50): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
     'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
@@ -39,7 +40,6 @@ const RELEASE = Object.freeze({
     'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
     'ETAPA 5 – AUTO-PATCH E2E (7.1.41): bez změny aplikační logiky. Patch ověřuje skutečné automatické převzetí nové verze AI Studiem. Release zachovává GARP 2.5/N5, platformní kontrakt 1.1.2, Studio Bridge v2, secure runtime, Forms, scoring, kryptografii i AI workflow; po úspěšném Pages deployi Generátor nově odešle AI Studiu repository_dispatch app-updated.',
     'GARP 2.5 / N5 AUTO-PATCH BASELINE (7.1.40): bez změny aplikační logiky. Release sjednocuje verzi po uzavření N5 detekce a GARP 2.5 evidence a vytváří čistý patch baseline pro budoucí automatické přebírání novějších patch verzí AI Studiem. Secure runtime, teacher access, Forms, scoring, AI workflow, RSA/AES, exporty i uživatelské workflow zůstávají funkčně beze změny.',
-    'ETAPA 6 SECURE UNLOCK HOTFIX (7.1.39): exact GitHub CI 7.1.38 odhalilo skutečnou produkční nekonzistenci pouze v secure studentském runtime: lokální deriveSecretHash() kanonizoval velikost písmen pro teacher-pin, ale ne pro unlock-password. Secure zámková obrazovka proto mohla odmítnout tentýž učitelský přístupový kód zadaný s jinou velikostí písmen, přestože teacher-login i instant runtime jej přijaly. Secure runtime nyní kanonizuje teacher-pin i unlock-password shodně; PBKDF2 domény/salty zůstávají oddělené a verifier, Forms, scoring, RSA/AES i SECURE-ANSWERS-V1 se nemění.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
