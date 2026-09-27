@@ -1,3 +1,10 @@
+## 7.1.55 — 2026-09-27 — karta O aplikaci a sjednocený katalog změn
+
+- hlavní hlavička nově nabízí vstup **O aplikaci** místo samostatného tlačítka „co je nového“;
+- karta **O aplikaci** shrnuje identitu a účel Generátoru, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a odkazy na nápovědu;
+- dosavadní changelog je přesunut dovnitř jako rozbalovací **Katalog změn**; zachovává přepínač mezi hlavním Generátorem a samostatně verzovaným modulem Český jazyk;
+- změna je informační/UX vrstva: nezasahuje do generování, bodování, secure runtime, AI promptů, exportů ani bezpečnostního modelu.
+
 ## 7.1.54 — 2026-09-27 — úklid kódu a rychlejší otevírání
 
 - service worker: navigace na stránku aplikace používá `fetch(request, { cache: 'no-cache' })` místo `'no-store'`; stránka se při každém otevření ověří u serveru, nezměněná se znovu nestahuje (304), nová verze se projeví okamžitě; offline záloha beze změny; bezpečnostně citlivé soubory dál `networkOnlyNoStore`, soubory pro offline fail-safe dál `networkFirst` s `'no-store'`;

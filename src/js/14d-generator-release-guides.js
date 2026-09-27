@@ -30,110 +30,114 @@ function applyReleaseBadge(){
     s.classList.toggle('approved',approved); s.classList.toggle('draft',!approved);
   }
 }
-// Modal s changelogem této verze — pro učitele a kolegy, ať vidí, co se v této verzi
-// změnilo a podle čeho se rozhodnout, jestli ji použít pro ostrý test.
+// Jednotná karta „O aplikaci“. Nahrazuje samostatný changelogový vstup:
+// identita a účel → autor/garant → školní projekt → určení/přístup → technický stav
+// → provozní zásady a nápověda → rozbalovací Katalog změn.
 function showReleaseInfo(){
-  if (document.getElementById('changelogGate')) return;
-  var envLabel = ({
-    official:'oficiální adresa',
-    unofficialCopy:'⚠ NEOFICIÁLNÍ kopie — generování blokováno',
-    local:'lokální soubor (file://)',
-    unverified:'web (oficiální adresa zatím nenastavena)',
-    unknown:'neurčeno'
-  })[Access && Access.envKind] || 'neurčeno';
-
+  if (document.getElementById('aboutAppGate')) return;
+  var approved = RELEASE.status === 'production-serverless' && !RELEASE.sourceAuditPending;
+  var statusLabel = approved
+    ? 'technicky ověřená serverless verze'
+    : (RELEASE.sourceAuditPending ? 'zdroj připraven · čeká na exact CI a provozní ověření' : 'vývojová verze');
   var MAX_CHANGES = 10;
 
-  // Společný renderer seznamu změn (formát "NÁZEV (verze): text").
   function renderItems(changes){
     return changes.slice(0, MAX_CHANGES).map(function(c){
       var m = c.match(/^([^(]+)\(([^)]+)\):\s*([\s\S]*)$/);
       var title, version, body;
       if(m){ title = m[1].trim(); version = m[2].trim(); body = m[3].trim(); }
       else { title = ''; version = ''; body = c; }
-      return '<div class="sec-guide-section">' +
-        (title ? '<div class="sec-guide-section-title" style="font-size:12px;gap:6px">' +
-          '<span style="font-size:13px">📝</span> ' + esc(title) +
-          (version ? ' <span style="font-weight:400;color:var(--t4);font-size:11px;text-transform:none;letter-spacing:0">'+(/^v/i.test(version)?'':'v')+esc(version)+'</span>' : '') +
-        '</div>' : '') +
-        '<p class="sec-guide-p" style="font-size:12.5px;color:var(--t3)">' + esc(body) + '</p>' +
-      '</div>';
+      return '<article class="about-change-card">' +
+        (title ? '<div class="about-change-head"><strong>' + esc(title) + '</strong>' +
+          (version ? '<span>'+(/^v/i.test(version)?'':'v')+esc(version)+'</span>' : '') + '</div>' : '') +
+        '<p>' + esc(body) + '</p>' +
+      '</article>';
     }).join('');
   }
 
-  // Přepínač mezi hlavním changelogem generátoru a changelogem modulu ČJ.
-  function tabsHtml(active){
-    function tab(id,label){
-      var on = id===active;
-      return '<button type="button" class="cl-tab'+(on?' active':'')+'" data-cltab="'+id+'" aria-pressed="'+(on?'true':'false')+'">'+label+'</button>';
-    }
-    return '<div class="cl-tabs">'+tab('main','Generátor')+tab('cs','<span class="flag flag-cz" aria-hidden="true"></span> Modul ČJ')+'</div>';
-  }
-
-  // Celý obsah boxu pro zvolený tab.
-  function buildHtml(tab){
-    if(tab==='cs'){
-      var csWindowNote = RELEASE_CS.changes.length > MAX_CHANGES
-        ? '<p class="sec-guide-p" style="color:var(--t4);font-style:italic">Zobrazeno posledních '+MAX_CHANGES+' změn modulu.</p>' : '';
-      return '<div class="sec-guide-hero" style="background:linear-gradient(135deg,#7f1d1d 0%,#1e3a8a 100%);padding:18px 22px 14px">' +
-          '<div class="sec-guide-hero-emoji" style="font-size:28px;margin-bottom:4px"><span class="flag flag-cz" aria-hidden="true"></span></div>' +
-          '<div class="sec-guide-hero-title" style="font-size:15px">' + esc(RELEASE_CS.module) + ' ' + esc(RELEASE_CS.version) + '</div>' +
-          '<div class="sec-guide-hero-sub">aktualizováno ' + esc(RELEASE_CS.date) + ' · samostatné verzování modulu</div>' +
-        '</div>' +
-        '<div class="sec-guide-body" style="padding:12px 16px 8px">' +
-          tabsHtml('cs') +
-          '<div class="sec-guide-ok" style="margin:0 0 4px">Changelog modulu Český jazyk. Verzování modulu je nezávislé na verzi generátoru.</div>' +
-          '<div style="margin-top:10px">' + renderItems(RELEASE_CS.changes) + '</div>' +
-          csWindowNote +
-        '</div>' +
-        '<div class="sec-guide-actions">' +
-          '<button type="button" class="ui-modal-btn primary" id="changelogOkBtn">Zavřít</button>' +
-        '</div>';
-    }
-    var approved = RELEASE.status === 'production-serverless' && !RELEASE.sourceAuditPending;
-    var statusHtml = approved
-      ? '<div class="sec-guide-ok" style="margin:0 0 4px">✅ Technicky ověřená produkční serverless verze — prošla automatickými, integračními a bezpečnostními kontrolami. Formální schválení provozu je rozhodnutí školy.</div>'
-      : '<div class="sec-guide-warn" style="margin:0 0 4px">⚠️ DRAFT — nepoužívat pro ostré klasifikované testy.</div>';
-    var windowNote = RELEASE.changes.length > MAX_CHANGES
-      ? '<p class="sec-guide-p" style="color:var(--t4);font-style:italic">Zobrazeno posledních '+MAX_CHANGES+' změn; starší se průběžně odmazávají.</p>' : '';
-    return '<div class="sec-guide-hero" style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);padding:18px 22px 14px">' +
-        '<div class="sec-guide-hero-emoji" style="font-size:28px;margin-bottom:4px">📋</div>' +
-        '<div class="sec-guide-hero-title" style="font-size:15px">Generátor testů v' + esc(RELEASE.version) + '</div>' +
-        '<div class="sec-guide-hero-sub">vydáno ' + esc(RELEASE.date) + ' · build ' + esc(BUILD_HASH) + ' · ' + esc(envLabel) + '</div>' +
-      '</div>' +
-      '<div class="sec-guide-body" style="padding:12px 16px 8px">' +
-        tabsHtml('main') +
-        statusHtml +
-        '<div style="margin-top:10px">' + renderItems(RELEASE.changes) + '</div>' +
-        windowNote +
-      '</div>' +
-      '<div class="sec-guide-actions">' +
-        '<button type="button" class="ui-modal-btn primary" id="changelogOkBtn">Zavřít</button>' +
-      '</div>';
+  function tab(id,label,active){
+    var on=id===active;
+    return '<button type="button" class="cl-tab'+(on?' active':'')+'" data-cltab="'+id+'" aria-pressed="'+(on?'true':'false')+'">'+label+'</button>';
   }
 
   var backdrop = document.createElement('div');
-  backdrop.id = 'changelogGate';
+  backdrop.id = 'aboutAppGate';
   backdrop.className = 'ui-modal-backdrop sec-guide-gate';
   backdrop.setAttribute('role', 'dialog');
   backdrop.setAttribute('aria-modal', 'true');
+  backdrop.setAttribute('aria-labelledby', 'aboutAppTitle');
+
   var box = document.createElement('div');
-  box.className = 'ui-modal-box sec-guide-box changelog-box';
+  box.className = 'ui-modal-box sec-guide-box about-app-box';
   backdrop.appendChild(box);
   document.body.appendChild(backdrop);
 
-  function close(){ backdrop.remove(); }
-  function render(tab){
-    box.innerHTML = buildHtml(tab);
-    box.querySelector('#changelogOkBtn').addEventListener('click', close);
-    Array.prototype.forEach.call(box.querySelectorAll('[data-cltab]'), function(btn){
-      btn.addEventListener('click', function(){ render(btn.getAttribute('data-cltab')); });
-    });
-  }
-  render('main');
+  box.innerHTML =
+    '<div class="sec-guide-hero about-app-hero">' +
+      '<div class="sec-guide-hero-emoji" aria-hidden="true">🧪</div>' +
+      '<div class="sec-guide-hero-title" id="aboutAppTitle">Generátor testů</div>' +
+      '<div class="sec-guide-hero-sub">Tvorba interaktivních testů · součást ekosystému AI Studio GHRAB</div>' +
+    '</div>' +
+    '<div class="sec-guide-body about-app-body">' +
+      '<section class="about-overview-grid" aria-label="Základní informace o aplikaci">' +
+        '<article class="about-identity-card">' +
+          '<div class="about-identity-kicker">GENERÁTOR TESTŮ</div>' +
+          '<h2>Interaktivní testy pro výuku</h2>' +
+          '<p class="about-identity-lead">Nástroj pro přípravu procvičovacích i klasifikovaných testů, diferencovaných variant a bezpečného offline vyhodnocení.</p>' +
+          '<p>Generátor vede učitele od pedagogického zadání přes AI asistované sestavení až k náhledu, kontrole a exportu hotového testu.</p>' +
+        '</article>' +
+        '<div class="about-facts-grid">' +
+          '<article class="about-fact-card"><span>AUTOR A VÝVOJOVÝ GARANT</span><h3>Daniel Baláž</h3><p>Koncepce, návrh funkcí, metodické vedení a vývoj aplikace.</p></article>' +
+          '<article class="about-fact-card"><span>ŠKOLNÍ PROJEKT</span><h3>Gymnázium, Ostrava-Hrabůvka</h3><p>Interní školní projekt určený pro přípravu a realizaci výuky.</p></article>' +
+          '<article class="about-fact-card"><span>URČENÍ A PŘÍSTUP</span><h3>Učitelský nástroj</h3><p>Přístup k aplikaci se řídí oprávněním vydaným v AI Studiu. Uživatel odpovídá za kontrolu obsahu před použitím ve výuce.</p></article>' +
+          '<article class="about-fact-card"><span>TECHNICKÝ STAV</span><h3>v' + esc(RELEASE.version) + ' · PWA</h3><p>GHRAB Platform 1.1.2 · ' + esc(statusLabel) + '. Podrobná QA a bezpečnostní evidence se vede odděleně.</p></article>' +
+        '</div>' +
+      '</section>' +
+      '<section class="about-section" aria-labelledby="aboutPrinciplesTitle">' +
+        '<div class="about-section-heading"><span>PROVOZNÍ ZÁSADY</span><h2 id="aboutPrinciplesTitle">Co je dobré vědět</h2></div>' +
+        '<div class="about-principles-grid">' +
+          '<article class="about-principle-card"><b aria-hidden="true">01</b><div><h3>Kontrola před použitím</h3><p>Před ostrým použitím projdi náhled, správnost zadání a odpovědí a u klasifikovaného testu spusť dostupné kontrolní mechanismy.</p></div></article>' +
+          '<article class="about-principle-card"><b aria-hidden="true">02</b><div><h3>Bezpečný test</h3><p>U bezpečného offline workflow patří studentům pouze studentský test. Učitelský verifier, klíče a další učitelské soubory zůstávají oddělené.</p></div></article>' +
+          '<article class="about-principle-card"><b aria-hidden="true">03</b><div><h3>Nápověda</h3><p class="about-help-links"><a href="./manual/">Interaktivní manuál</a><button type="button" data-about-security>Bezpečný provoz ve škole</button></p></div></article>' +
+        '</div>' +
+      '</section>' +
+      '<section class="about-section" aria-labelledby="aboutChangelogTitle">' +
+        '<details class="about-changelog" id="aboutChangelog">' +
+          '<summary><span><span>HISTORIE VYDÁNÍ</span><strong id="aboutChangelogTitle">Katalog změn</strong><small>Rozbal historii hlavního Generátoru nebo samostatně verzovaného modulu Český jazyk.</small></span><i aria-hidden="true"></i></summary>' +
+          '<div class="about-changelog-body">' +
+            '<div class="cl-tabs">' + tab('main','Generátor','main') + tab('cs','<span class="flag flag-cz" aria-hidden="true"></span> Modul ČJ','main') + '</div>' +
+            '<div data-clpanel="main">' +
+              '<div class="about-changelog-note">Aktuální verze <strong>v' + esc(RELEASE.version) + '</strong> · ' + esc(RELEASE.date) + '. Zobrazuje se posledních ' + MAX_CHANGES + ' release záznamů vedených přímo v aplikaci.</div>' +
+              '<div class="about-change-list">' + renderItems(RELEASE.changes) + '</div>' +
+            '</div>' +
+            '<div data-clpanel="cs" hidden>' +
+              '<div class="about-changelog-note">' + esc(RELEASE_CS.module) + ' <strong>' + esc(RELEASE_CS.version) + '</strong> · aktualizováno ' + esc(RELEASE_CS.date) + ' · samostatné verzování modulu.</div>' +
+              '<div class="about-change-list">' + renderItems(RELEASE_CS.changes) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</details>' +
+      '</section>' +
+    '</div>' +
+    '<div class="sec-guide-actions"><button type="button" class="ui-modal-btn primary" id="aboutAppCloseBtn">Zavřít</button></div>';
 
-  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) close(); });
-  backdrop.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+  function close(){ backdrop.remove(); }
+  box.querySelector('#aboutAppCloseBtn').addEventListener('click', close);
+  var securityBtn = box.querySelector('[data-about-security]');
+  if(securityBtn) securityBtn.addEventListener('click', function(){ close(); showSecurityGuide(); });
+  Array.prototype.forEach.call(box.querySelectorAll('[data-cltab]'), function(btn){
+    btn.addEventListener('click', function(){
+      var active=btn.getAttribute('data-cltab');
+      Array.prototype.forEach.call(box.querySelectorAll('[data-cltab]'), function(tabBtn){
+        var on=tabBtn.getAttribute('data-cltab')===active;
+        tabBtn.classList.toggle('active',on);
+        tabBtn.setAttribute('aria-pressed',on?'true':'false');
+      });
+      Array.prototype.forEach.call(box.querySelectorAll('[data-clpanel]'), function(panel){
+        panel.hidden=panel.getAttribute('data-clpanel')!==active;
+      });
+    });
+  });
+  backdrop.addEventListener('click', function(e){ if(e.target===backdrop) close(); });
 }
 
 // Vestavěný provozní návod „Jak používat ostře" — pro kolegy, kteří nástroj nestavěli.

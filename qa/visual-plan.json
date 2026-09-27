@@ -235,12 +235,12 @@
       ]
     },
     {
-      "id": "generator-changelog",
-      "name": "Changelog konkrétní verze",
+      "id": "generator-about",
+      "name": "O aplikaci a katalog změn",
       "url": "/dist/index.html",
-      "expectedText": "Generátor testů v",
+      "expectedText": "Generátor testů",
       "mustVisible": [
-        "#changelogGate"
+        "#aboutAppGate"
       ],
       "steps": [
         {

@@ -1,38 +1,37 @@
 GARP 2.7 - ASSURANCE STATUS SNAPSHOT
-Application: generator 7.1.54
+Application: generator 7.1.55
 Date: 2026-09-27
-Scope: 7.1.54 cleanup (17 unreferenced functions removed, readable build script with byte-identical output) + service-worker navigation revalidation (no-cache instead of no-store for app-shell navigation only)
+Scope: 7.1.55 O aplikaci UX/information layer; changelog moved under About; no intended generation/scoring/secure-runtime/AI/security-model change
 
 ACTIVE SECURITY AUTHORITY
 GARP 2.7 r2 / consolidation 2026-09-23-r2
 Legacy GARP 2.5.1/N5 remains mandatory regression evidence.
 
-CURRENT LOCAL STATUS (npm ci from lockfile, Node 22, Chromium 141; local run, not the protected CI)
-VERSION CONSISTENCY          PASS (7.1.54 across runtime/PWA/QA sources)
-JS SYNTAX                    PASS (node --check, 131 tracked JS/MJS files outside vendored GARP/audit)
+CURRENT LOCAL STATUS (restricted local runner; exact npm registry install unavailable in this environment)
+VERSION CONSISTENCY          PASS (7.1.55 across project bindings)
+JS SYNTAX / SOURCE LINT      PASS (112 files; hermetic parser/node --check fallback)
 AI OPERATION REGISTRY        PASS (11/11; runtime/public parity)
 EXERCISE TYPE HELP           PASS (38/38 + Simple-mode item/point contract)
-NPM TEST (FULL CHAIN)        PASS (Test Lab 26 pass / 0 fail; workflow audit 50/0; precache 23/23)
+FULL NPM TEST / BUILD        NOT RUN (exact npm ci could not complete: registry DNS unavailable in this runner)
 GARP 2.7 PACKAGE SELFTEST    PASS 19/19
 GARP 2.7 CONTRACT SELFTEST   PASS 25/25 (G-02 5/5)
-GENERATOR CONTRACT GATE      PASS 6/6
+GENERATOR CONTRACT GATE      PASS
 G-02 POLICY MUTATIONS        PASS 6/6
 AUTO-PATCH CONTRACT          PASS
-GARP 2.7 ARCHITECTURE        PASS 42/42 (CI=true, freshly built dist, new external trust pin; old pin and missing pin both FAIL as required)
-G27-AR MUTATION SUITE        PASS 10/10
-GARP 2.7 FOUNDATION          FOUNDATION_PASS_LIVE_NOT_TESTED 12/12 (CI=true, local source-tree surrogate identity)
-QA P5 CI CHAIN               PASS (qa:p5:ci incl. AXE_REQUIRED=1: quality 35/0, browser, runtime, XSS sinks, axe, release, acceptance)
+GARP 2.7 ARCHITECTURE        DEFERRED LOCAL (requires freshly built dist + external CI trust pin)
+G27-AR MUTATION SUITE        DEFERRED LOCAL (8/10 observable checks passed; positive/exact-dist cases require built dist)
+GARP 2.7 FOUNDATION          NOT RUN (requires exact built artifact)
+QA P5 CI CHAIN               NOT RUN (remains authority for exact candidate commit)
 GARP 2.5.1 TOOLING SELFTEST  PASS 59/59
-GARP 2.3 SECURITY REGRESSION PASS (82/82)
-SUITE SESSION LIFECYCLE      PASS (20/20)
-SERVICE WORKER FREEZE (GH-02) PASS (0 findings); offline fail-safe test PASS
-SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components, security/sbom/generator-testu-7.1.54.cdx.json)
-AI ASSURANCE FINGERPRINT     REGENERATED (721ac02c3658fa5ee6b67c4163a2df1a18fc86b081f0ca686ecc4a568e04a5bc)
-                             AI-boundary files changed only by deletion of unreferenced functions; prompts, transport,
-                             models and system instructions unchanged. Inherited behavioral AIR evidence requires owner review
-                             per invalidationRule; no live-model AIR run was performed.
-FIXTURE BROWSER AUDIT        14/16 suites PASS; wizard_suite and integration_suite fail with identical cases and messages on
-                             unchanged 7.1.53 (stale test expectations, not an application regression)
+SBOM DRIFT CHECK             PASS (CycloneDX 1.7, 113 components, security/sbom/generator-testu-7.1.55.cdx.json)
+AI ASSURANCE FINGERPRINT     CURRENT (a25829d104866304a271a0e1d243899ab173b6876b469ce21a287372915441d5)
+                             7.1.55 changes the About/information UI only; no intended AI prompt, transport,
+                             model, system-instruction, scoring or secure-runtime behavior change.
+
+LOCAL LIMITATION
+The local runner could not resolve registry.npmjs.org, so the exact dev dependency set (including Acorn 8.17.0)
+could not be installed. No claim is made that 7.1.55 passed the full build/browser/P5 chain locally. The existing
+candidate -> Safe Promotion -> main workflow remains the release authority and must execute exact-lockfile CI.
 
 PRESERVED SECURITY BOUNDARIES
 DATA CLASS                   D3
@@ -43,7 +42,7 @@ SCHOOL EGRESS                same-origin school-gateway only; local provider key
 REAL D3 STUDENT AI EGRESS    NOT APPROVED BY THIS LOCAL MIGRATION STAGE
 
 GARP 2.7 TRUST / CI
-TRUST ANCHOR SHA-256         2e36e1c299625e2f0dbeb2f9f70e0953faf7876525aba3285e6f4692bd1f5a54 (re-anchored for 7.1.54 version binding; previous 406a2d36…)
+TRUST ANCHOR SHA-256         8f9e875f38f432c603de46d982fffe817aad9a0c56ffc85f15a5c730339ba833 (re-anchored for 7.1.55 version binding)
 EXTERNAL CI PIN              wired into every workflow path invoking qa:p5:ci
 FOUNDATION CI                wired into p5-release-gate and deploy
 SELF-APPROVAL OF TRUST       blocked by external CI pin
