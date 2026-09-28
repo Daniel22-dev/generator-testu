@@ -86,7 +86,7 @@ function activeTemplateDef(){
 // ── BOD 6: Šablony testu — sjednocené napříč jednoduchým i pokročilým režimem ──
 // Dřívější samostatné systémové presety (PEDAGOGICAL_PRESETS) byly nahrazeny jednou
 // sdílenou sadou SIMPLE_TEMPLATES (viz výše). Šablona nastavuje jen režim/hodnocení;
-// typy, počet a čas zůstávají vždy na učiteli. V jednoduchém režimu se volby šablony
+// typy a čas zůstávají na učiteli; počet cvičení se odvozuje 1:1 od zvolených typů. V jednoduchém režimu se volby šablony
 // skryjí, v pokročilém zůstanou viditelné a editovatelné. Staré wrappery choosePreset/
 // applyPreset/clearPreset byly odstraněny v 6.11.70 (nic je nevolalo).
 // ═══ PROFILY ÚČELU TESTU — kompatibilní obslužné funkce ═══════════════════════
@@ -102,7 +102,7 @@ function chooseSimpleTemplate(id){
   applyVisualState(); validate(); saveSnapshot();
   renderSimpleTemplates();
   const msg = isSimpleMode()
-    ? ('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň jen látku, typy a počet.')
+    ? ('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň látku a typy; počet cvičení se dopočítá automaticky.')
     : ('Profil: ' + t.label + '. Výchozí technické hodnoty jsou předvyplněné a můžeš je dále upravit.');
   uiToast(msg, 'ok', 4200);
 }
@@ -306,40 +306,25 @@ function renderSourceMeters(){
 function pickSourceSlice(v){ state.sourceSliceMode=(v==='end')?'end':'start'; renderSourceMeters(); saveSnapshot(); }
 
 function toggleType(t) {
-  const custom = trim('vlastniTyp');
-  // Stav PŘED změnou: kolik různých typů a zda počet cvičení „seděl na podlaze"
-  // (počet == počtu typů → počet byl řízený výběrem typů, ne ručně nastavený výš).
-  const prevDistinct = new Set(sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])])).size;
-  const wasFloorBound = (state.pocet||0) === prevDistinct;
-
-  const wasSelected = state.typyCviceni.includes(t);
-  if (!wasSelected && prevDistinct >= 10) {
-    try { uiToast('Jeden test může mít nejvýše 10 různých typů cvičení. Odeber některý typ nebo použij detailní konfiguraci.', 'warn', 5000); } catch(_){}
+  const currentTypes = sanitizeExerciseTypeList(state.typyCviceni || []);
+  const wasSelected = currentTypes.includes(normalizeType(t));
+  if (!wasSelected && currentTypes.length >= 10) {
+    try { uiToast('Jeden test může mít nejvýše 10 cvičení. Odeber některý typ nebo použij podrobné nastavení.', 'warn', 5000); } catch(_){}
     return;
   }
+
+  // V běžném výběru platí 1 vybraný typ = 1 cvičení. Tím zůstává počet,
+  // kartičky typů i skrytá detailní konfigurace vždy ve stejném stavu.
   state.typyCviceni = wasSelected
-    ? state.typyCviceni.filter(x=>x!==t)
-    : [...state.typyCviceni, t];
-  // Počet cvičení musí být aspoň počet vybraných typů (každý typ se dostane do cvičení).
-  // Když počet sledoval výběr typů (byl na podlaze), drž ho na nové podlaze v OBOU směrech —
-  // po odebrání typu se tak počet sníží (dřív v něm zůstávalo staré vyšší číslo). Když měl
-  // uživatel záměrně víc cvičení než typů (ruční volba tlačítkem), počet jen hlídáme zespodu
-  // a nesnižujeme ho. Strop 10, minimum 1.
-  const distinctTypes = new Set(sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])])).size;
-  let newPocet = state.pocet || 0;
-  if (wasFloorBound) newPocet = distinctTypes;
-  else if (distinctTypes > newPocet) newPocet = distinctTypes;
-  newPocet = Math.min(10, Math.max(1, newPocet));
-  if (newPocet !== (state.pocet||0)) {
-    state.pocet = newPocet;
-    syncExerciseConfig();
-    renderSmartTimeTip();
-  }
+    ? currentTypes.filter(x => x !== normalizeType(t))
+    : [...currentTypes, normalizeType(t)];
+  syncExerciseConfigFromGlobalTypes();
+
   applyVisualState(); renderSmartTimeTip(); validate(); saveSnapshot();
   // Comprehension typy vyžadují další nastavení — když je učitel nově zaškrtne,
   // upozorni: doroluj na blok a krátce ho zvýrazni, ať si doladění nikdo nepřehlédne.
-  if (!wasSelected && (t === 'listening comprehension' || t === 'reading comprehension')) {
-    flashCompBlock(t === 'listening comprehension' ? 'listeningBlock' : 'readingBlock');
+  if (!wasSelected && (normalizeType(t) === 'listening comprehension' || normalizeType(t) === 'reading comprehension')) {
+    flashCompBlock(normalizeType(t) === 'listening comprehension' ? 'listeningBlock' : 'readingBlock');
   }
 }
 

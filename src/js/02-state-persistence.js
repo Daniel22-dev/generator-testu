@@ -35,6 +35,19 @@ function normalizeLoadedState(s) {
   if (s.splitGenerate === undefined) s.splitGenerate = false;
   if (s.manualMode === undefined) s.manualMode = false;
   if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
+
+  // Starší snapshoty mohly držet tři navzájem rozdílné údaje: počet cvičení,
+  // globální typy a skrytou exerciseConfig. Po načtení vždy obnov jednu autoritu.
+  if (s.exerciseDetail && Array.isArray(s.exerciseConfig) && s.exerciseConfig.length) {
+    s.pocet = Math.min(10, s.exerciseConfig.length);
+    s.exerciseConfig = s.exerciseConfig.slice(0, s.pocet);
+  } else {
+    const loadedTypes = sanitizeExerciseTypeList(s.typyCviceni || []).slice(0, 10);
+    if (loadedTypes.length) {
+      s.typyCviceni = loadedTypes;
+      s.pocet = loadedTypes.length;
+    }
+  }
   return s;
 }
 

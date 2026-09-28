@@ -69,13 +69,15 @@ function buildExerciseSpecs(st) {
     });
   }
   const types = typePool.length ? typePool : ['multiple choice'];
-  const n = Math.max(1, parseInt(st.pocet, 10) || types.length || 1);
+  // V globálním režimu je každý zvolený typ jedno cvičení. st.pocet je pouze
+  // synchronizovaný odraz tohoto seznamu, ne druhý nezávislý zdroj pravdy.
+  const n = typePool.length ? typePool.length : Math.max(1, parseInt(st.pocet, 10) || 1);
   const totalPts = Math.max(n, parseInt(st.body, 10) || n * 10);
   const basePts = Math.floor(totalPts / n);
   const rem = totalPts % n;
   const out = [];
   for (let i = 0; i < n; i++) {
-    const style = types[i % types.length] || 'multiple choice';
+    const style = types[i] || 'multiple choice';
     const type = scoringTypeFor(style);
     const count = defaultItemCount(style);
     const pts = basePts + (i < rem ? 1 : 0);

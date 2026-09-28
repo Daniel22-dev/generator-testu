@@ -6,7 +6,7 @@ let generationUiLocked=[];
 function generationPlan(st){
   const specs=buildExerciseSpecs(st), groups=getApiDiffGroups(st), factor=Math.max(1,groups.length);
   if(!specs.length||specs.length>10)throw new Error('Test mus\u00ed obsahovat 1 a\u017e 10 cvi\u010den\u00ed.');
-  if(!st.exerciseDetail&&sanitizeExerciseTypeList(st.typyCviceni||[]).length>specs.length)throw new Error('Po\u010det cvi\u010den\u00ed je men\u0161\u00ed ne\u017e po\u010det vybran\u00fdch typ\u016f.');
+  if(!st.exerciseDetail&&sanitizeExerciseTypeList(st.typyCviceni||[]).length!==specs.length)throw new Error('Po\u010det cvi\u010den\u00ed se neshoduje s po\u010dtem vybran\u00fdch typ\u016f.');
   if(!st.exerciseDetail&&Number(st.body)<specs.length)throw new Error('Celkov\u00fd po\u010det bod\u016f mus\u00ed b\u00fdt alespo\u0148 po\u010det cvi\u010den\u00ed.');
   const config=specs.map((s,i)=>{
     const old=st.exerciseDetail&&st.exerciseConfig?st.exerciseConfig[i]:null;

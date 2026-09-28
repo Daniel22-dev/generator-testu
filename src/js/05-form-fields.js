@@ -543,13 +543,8 @@ function initTooltips() {
 // ═══ Validation ═══════════════════════════════════════════════════════════════
 function onInput() { validate(); renderSourceMeters(); saveSnapshot(); }
 function onCustomTypeInput(){
-  const custom = trim('vlastniTyp');
-  const distinct = new Set(sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])])).size;
-  if (distinct <= 10 && distinct > (state.pocet||0)) {
-    state.pocet = distinct;
-    syncExerciseConfig();
-    renderSmartTimeTip();
-  }
+  syncExerciseConfigFromGlobalTypes();
+  renderSmartTimeTip();
   onInput();
 }
 
@@ -572,7 +567,7 @@ function isWeakSecret(s){
 function workflowTypeStats(){
   const custom=trim('vlastniTyp');
   const types=sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])]);
-  return {types, distinct:new Set(types).size};
+  return {types, count:types.length, distinct:new Set(types).size};
 }
 function hasListeningSource(){
   if(!usesListeningComprehension()) return true;
@@ -620,13 +615,13 @@ function validate() {
   const typeStats=workflowTypeStats();
   const hasTyp = state.exerciseDetail
     ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => isAllowedExerciseType(normalizeType(ex.typ || 'multiple choice')) && Number.isInteger(ex.pocetOtazek) && ex.pocetOtazek>=1 && ex.pocetOtazek<=30 && (scoringTypeFor(ex.typ)!=='matching'||ex.pocetOtazek>=2) && Number.isInteger(ex.body) && ex.body>=1 && ex.body<=999)
-    : ((sanitizeExerciseTypeList(state.typyCviceni).length > 0 || (trim('vlastniTyp') && !customTypeDisabled && !customTypeUnsupported)) && typeStats.distinct <= 10 && typeStats.distinct <= state.pocet);
+    : ((typeStats.count > 0 || (trim('vlastniTyp') && !customTypeDisabled && !customTypeUnsupported)) && typeStats.count <= 10 && typeStats.count === state.pocet);
   const listeningOk=hasListeningSource();
   $('next1').disabled = !(hasTyp && state.uroven.length > 0 && listeningOk);
   const hint1=$('validHint1'), step1Msg=[];
   if(customTypeUnsupported) step1Msg.push('Vlastní typ cvičení není technicky podporován. Použij některý z nabízených typů nebo jeho běžný synonymní název (např. gap fill).');
-  if(!state.exerciseDetail && typeStats.distinct>10) step1Msg.push('Vybráno je '+typeStats.distinct+' různých typů, ale jeden test podporuje nejvýše 10.');
-  else if(!state.exerciseDetail && typeStats.distinct>state.pocet) step1Msg.push('Počet cvičení musí být alespoň stejný jako počet různých typů ('+typeStats.distinct+').');
+  if(!state.exerciseDetail && typeStats.count>10) step1Msg.push('Vybráno je '+typeStats.count+' cvičení, ale jeden test podporuje nejvýše 10.');
+  else if(!state.exerciseDetail && typeStats.count>0 && typeStats.count!==state.pocet) step1Msg.push('Počet cvičení se musí přesně shodovat s počtem zvolených typů ('+typeStats.count+').');
   if(!listeningOk) step1Msg.push('Listening comprehension vyžaduje zdroj: audio/video soubor, URL nebo transkript. Bez zdroje by student neměl co poslouchat.');
   if(state.exerciseDetail&&!hasTyp)step1Msg.push('Zkontroluj počet položek (1–30, párování nejméně 2) a celé body (1–999) u každého cvičení.');
   if(hint1) hint1.textContent=step1Msg.join(' ');
@@ -864,6 +859,59 @@ function defaultExercisePoints() {
   return state.body > 0 && state.pocet > 0 ? Math.max(1, Math.round(state.body / state.pocet)) : 10;
 }
 
+// Globální výběr typů je v běžném režimu zároveň seznamem cvičení.
+// Pořadí je stabilní podle pořadí výběru; duplicity mohou vzniknout pouze po
+// návratu z detailní konfigurace, kde lze stejný typ použít vícekrát.
+function globalExerciseTypes() {
+  const custom = trim('vlastniTyp');
+  return sanitizeExerciseTypeList([...(state.typyCviceni || []), ...(custom ? [custom] : [])]).slice(0, 10);
+}
+
+function sameExerciseType(a, b) {
+  const ak = specialStyleKey(a) || normalizeType(a);
+  const bk = specialStyleKey(b) || normalizeType(b);
+  return ak === bk;
+}
+
+// Přestaví skrytou detailní konfiguraci přesně podle globálních typů.
+// To je zásadní: stará exerciseConfig už nesmí po otevření panelu přepsat nově
+// zvolené kartičky (typicky Reading comprehension).
+function syncExerciseConfigFromGlobalTypes() {
+  const types = globalExerciseTypes();
+  const previous = Array.isArray(state.exerciseConfig) ? state.exerciseConfig : [];
+
+  if (!types.length) {
+    state.exerciseConfig = [];
+    state.pocet = 1;
+    return;
+  }
+
+  state.typyCviceni = types.slice();
+  state.pocet = types.length;
+  const defaultPts = defaultExercisePoints();
+  state.exerciseConfig = types.map((type, i) => {
+    const old = previous[i] || null;
+    const sameType = !!old && sameExerciseType(old.typ, type);
+    const oldCount = old ? Number(old.pocetOtazek) : NaN;
+    const oldBody = old ? Number(old.body) : NaN;
+    const count = sameType && Number.isInteger(oldCount) && oldCount >= 1 && oldCount <= 30
+      ? oldCount
+      : defaultItemCount(type);
+    return {
+      ...(old || {}),
+      typ: type,
+      pocetOtazek: normalizeType(type) === 'categorisation-board' ? 1 : count,
+      body: Number.isInteger(oldBody) && oldBody >= 1 && oldBody <= 999 ? oldBody : defaultPts,
+      manualMode: sameType ? !!old.manualMode : false,
+    };
+  });
+
+  // V globálním režimu je state.body jediný viditelný bodový cíl. Starý skrytý
+  // detail nesmí po otevření vrátit ani staré typy, ani staré rozdělení bodů.
+  // Proto body vždy znovu rozděl podle aktuálního celkového počtu.
+  if (state.body > 0) syncExercisePoints();
+}
+
 // Doplní typy do cvičení, která zatím žádný (smysluplný) typ nemají — z globálního
 // výběru typů (round-robin). NEpřepisuje typy, které si uživatel v podrobném nastavení
 // nastavil ručně. Řeší případ, kdy řádky cvičení vznikly dřív (např. po volbě počtu
@@ -898,6 +946,7 @@ function syncExerciseConfig() {
       typ: initialType,
       pocetOtazek: initialCount,
       body: defaultExercisePoints(),
+      manualMode: false,
     });
   }
   // Shrink
@@ -905,8 +954,6 @@ function syncExerciseConfig() {
   // Doplň typy do prázdných řádků z aktuálního globálního výběru (viz výše).
   seedEmptyExerciseTypes();
   // Pokud existuje globální cíl bodů, rozdistribuj rovnoměrně.
-  // Jinak, pokud uživatel některé body nastavil, ponecháme je;
-  // nové (čerstvě vytvořené) zůstávají na 0 → validate() to upozorní.
   if (state.body > 0 && oldLength!==n) syncExercisePoints();
 }
 
@@ -931,24 +978,27 @@ function distributeExercisePoints() {
 }
 
 function toggleExDetail() {
-  state.exerciseDetail = !state.exerciseDetail;
-
-  if (state.exerciseDetail) {
-    // Při otevření přenes aktuální výběr kartiček do tabulky.
-    syncExerciseConfig();
+  if (!state.exerciseDetail) {
+    // Před otevřením je autoritou globální výběr. Přestav tabulku přesně podle něj,
+    // aby se nikdy neobjevila stará skrytá konfigurace z předchozího stavu.
+    if (globalExerciseTypes().length) syncExerciseConfigFromGlobalTypes();
+    else syncExerciseConfig();
+    state.exerciseDetail = true;
   } else {
-    // Při sbalení vrať použité typy zpět do kartiček a zachovej součet bodů.
-    const usedTypes = [...new Set(
-      state.exerciseConfig.map(e => e.typ).filter(t => t && t !== '— Claude vybere —')
-    )];
-    if (usedTypes.length > 0) state.typyCviceni = usedTypes;
-    if (state.exerciseConfig.length) {
-      const sum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
-      if (sum > 0) { state.body = sum; setVal('bodyCustom', sum); }
+    // Detail je při sbalení autoritou. Každý řádek musí mít platný typ, jinak by
+    // kartičky nedokázaly konfiguraci věrně zobrazit.
+    const usedTypes = state.exerciseConfig.map(e => String(e.typ || '').trim());
+    if (!usedTypes.length || usedTypes.some(t => !isAllowedExerciseType(normalizeType(t)))) {
+      try { uiToast('Nejdřív nastav platný typ u každého cvičení. Pak lze podrobné nastavení skrýt.', 'warn', 5000); } catch(_){}
+      return;
     }
+    state.typyCviceni = usedTypes.map(t => specialStyleKey(t) || normalizeType(t));
+    state.pocet = state.exerciseConfig.length;
+    const sum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
+    if (sum > 0) { state.body = sum; setVal('bodyCustom', sum); }
+    state.exerciseDetail = false;
   }
 
-  // validate() v Simple režimu už nesmí exerciseDetail resetovat.
   validate();
   applyVisualState();
   renderHybridBanner();
@@ -965,6 +1015,8 @@ function updateExField(i, field, value) {
   if (field === 'typ') { renderSmartTimeTip();
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;
     renderExerciseConfig();
+    // Typ řídí i navazující Reading/Listening bloky; překresli je okamžitě.
+    applyVisualState();
   }
   // Update b/pol. cell inline (without re-rendering whole row → preserves input focus)
   const ex = state.exerciseConfig[i];
