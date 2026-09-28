@@ -41,7 +41,7 @@ export async function validateScenario(s, { root }) {
   w.eval(`state=JSON.parse(JSON.stringify(DEFAULT));Object.assign(state,{
     appMode:${JSON.stringify(s.appMode)}, jazyk:${JSON.stringify(s.language)},
     uroven:${JSON.stringify(s.language === "čeština" ? [] : ["B1"])},
-    typyCviceni:['multiple choice'], pocet:2, cas:15, odevzdavani:'B',
+    typyCviceni:['multiple choice'], pocet:1, cas:15, odevzdavani:'B',
     testMode:${JSON.stringify(s.testMode)}, resultMode:${JSON.stringify(s.resultMode)},
     identityMode:${JSON.stringify(s.identityMode)}, anonymizace:'ANO', feedbackMode:'brief'
   });rosterEntries=[{email:'student@example.com',label:'QA',code:'ABC234'}];`);

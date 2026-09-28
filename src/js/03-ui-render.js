@@ -303,10 +303,26 @@ function unmarkTemplateIfDiverged(key){
 function pickNum(key, value) {
   // Ochrana identity studentů je od v7 povinná a nelze ji vypnout.
   if (key === 'anonymizace') value = 'ANO';
-  state[key] = value;
-  if (key==='cas') setVal('casCustom', value);
-  if (key==='body') { setVal('bodyCustom', value); syncExercisePoints(); }
-  if (key==='pocet') { syncExerciseConfig(); renderSmartTimeTip(); }
+
+  if (key === 'pocet' && !state.exerciseDetail) {
+    const selected = typeof globalExerciseTypes === 'function' ? globalExerciseTypes() : sanitizeExerciseTypeList(state.typyCviceni || []);
+    if (selected.length) {
+      state.pocet = selected.length;
+      syncExerciseConfigFromGlobalTypes();
+      if (Number(value) !== selected.length) {
+        try { uiToast('Počet cvičení se řídí vybranými typy: 1 typ = 1 cvičení. Pro opakování stejného typu použij podrobné nastavení.', 'info', 5200); } catch(_){}
+      }
+    } else {
+      state.pocet = value;
+      syncExerciseConfig();
+    }
+    renderSmartTimeTip();
+  } else {
+    state[key] = value;
+    if (key==='cas') setVal('casCustom', value);
+    if (key==='body') { setVal('bodyCustom', value); syncExercisePoints(); }
+    if (key==='pocet') { syncExerciseConfig(); renderSmartTimeTip(); }
+  }
   applyVisualState(); validate(); saveSnapshot();
 }
 
