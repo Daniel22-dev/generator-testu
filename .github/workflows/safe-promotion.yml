@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: generator-safe-promotion
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   candidate-gate:
@@ -25,6 +25,21 @@ jobs:
       has_changes: ${{ steps.diff.outputs.has_changes }}
       pr_number: ${{ steps.pr.outputs.number }}
     steps:
+      - name: Cancel superseded candidate runs
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for workflow in p5-release-gate.yml safe-promotion.yml; do
+            runs="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/runs?branch=candidate&per_page=100")"
+            while read -r run_id; do
+              [ -z "$run_id" ] && continue
+              [ "$run_id" = "$GITHUB_RUN_ID" ] && continue
+              gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" >/dev/null || true
+            done < <(jq -r --arg sha "$GITHUB_SHA" '.workflow_runs[] | select(.status != "completed" and .head_sha != $sha) | .id' <<<"$runs")
+          done
+
       - name: Record exact candidate SHA
         id: certified
         shell: bash
