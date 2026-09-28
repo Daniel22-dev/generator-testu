@@ -12,18 +12,7 @@ function generatorPersistenceAllowed(){
 // ═══ Constants ════════════════════════════════════════════════════════════════
 const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
-// ─── RELEASE ─────────────────────────────────────────────────────────────────
-// JEDEN zdroj pravdy pro verzi. Všechna ostatní místa (title, footer, balíčky,
-// archiv, feedback dokumenty) čtou odsud — netřeba synchronizovat. Při bumpu
-// edituj jen tento blok.
-//   version: SemVer-styl, "MAJOR.MINOR.PATCH[-tag]"
-//   date:    'YYYY-MM-DD' kdy byla verze sestavena
-//   status:  'production-serverless' = technicky ověřená produkční verze bez školního serveru
-//            'draft' = ve vývoji, NEpoužívat pro ostré testy
-//   changes: krátké body „co se v této verzi změnilo" (NEJNOVĚJŠÍ NAHOŘE).
-//   PRAVIDLO: udržuj jen POSLEDNÍCH 10 záznamů. Při bumpu přidej nový na začátek
-//   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
-//   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
+// Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
   version: '7.1.57',
   date:    '2026-09-28',
@@ -42,9 +31,7 @@ const RELEASE = Object.freeze({
     'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
   ]
 });
-// Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
-// hash. Slouží jako "build hash" v balíčcích a archivu, ať lze ostře rozlišit, který
-// soubor test vyrobil. Není to kryptografický hash, jen identifikátor.
+// Stabilní nekryptografický build identifikátor.
 function computeBuildHash(){
   const s=RELEASE.version+'|'+RELEASE.date+'|'+RELEASE.status;
   let h=0x811c9dc5; // FNV-1a 32-bit
@@ -95,10 +82,7 @@ function aiTrustedSystemInstruction(){
   ].join(' ');
 }
 
-// Samostatný changelog MODULU ČESKÝ JAZYK. Modul má vlastní verzování (V16…),
-// nezávislé na verzi generátoru. Záznamy ve stejném formátu jako RELEASE.changes:
-// "NÁZEV (V16): text". Newest first. Zobrazuje se v changelog modalu pod přepínačem
-// „Modul ČJ" vedle hlavního changelogu generátoru.
+// Samostatný changelog modulu Český jazyk.
 const RELEASE_CS = Object.freeze({
   module:  'Modul Český jazyk',
   version: 'V19',
