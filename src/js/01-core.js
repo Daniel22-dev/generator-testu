@@ -82,7 +82,7 @@ function aiTrustedSystemInstruction(){
   ].join(' ');
 }
 
-// Samostatný changelog modulu Český jazyk.
+// Samostatný changelog MODULU ČESKÝ JAZYK
 const RELEASE_CS = Object.freeze({
   module:  'Modul Český jazyk',
   version: 'V19',
