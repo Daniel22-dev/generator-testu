@@ -2405,3 +2405,16 @@ body.simple-mode .source-use-card-grid{grid-template-columns:1fr}
 .http-code-help{display:inline;border:0;background:transparent;color:var(--acc);font:inherit;font-weight:800;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;cursor:pointer;padding:0 1px}
 .http-code-help:hover{color:var(--acc-btn)}
 .http-code-help:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+
+
+/* ── Rozhodnutí nad rozdíly druhého AI průchodu ─────────────────────────── */
+.akv-decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.akv-decision{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--bdr2);border-radius:9px;padding:9px 10px;cursor:pointer;background:var(--bg3)}
+.akv-decision:hover{border-color:var(--acc-b)}
+.akv-decision input{width:17px;height:17px;margin-top:2px;flex:0 0 auto;accent-color:var(--acc)}
+.akv-decision span{display:block;line-height:1.35}
+.akv-decision b{display:block;font-size:13.5px;color:var(--t1);margin-bottom:3px}
+.akv-decision small{display:block;font-size:12px;color:var(--t4);line-height:1.4}
+.akv-decision.keep:has(input:checked){border-color:var(--ok-b);background:var(--ok-d)}
+.akv-decision.ai:has(input:checked){border-color:var(--acc-b);background:var(--acc-d)}
+@media(max-width:560px){.akv-decision-grid{grid-template-columns:1fr}}
