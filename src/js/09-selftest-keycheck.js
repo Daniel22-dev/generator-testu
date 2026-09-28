@@ -340,15 +340,19 @@ async function aiVerifyKey(){
       units.push({i:units.length+1,type:ex.type,q:JSON.stringify({left:ex.items.map(it=>it.left),rightOptions:right}),variant:key,ex0:ei,qi0:0,exObj:ex,itObj:ex.items[0]});
     }else (ex.items||[]).forEach((it,qi)=>units.push({i:units.length+1,type:ex.type,q:akvQuestionText(ex,it),variant:key,ex0:ei,qi0:qi,exObj:ex,itObj:it}));
   }));
-  resetKeyCheckState();akvBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.textContent='Ov\u011b\u0159uji '+units.length+' \u00faloh ve '+keys.length+' variant\u00e1ch\u2026';}
+  const batches=boundedReviewBatches(units,x=>x.q.length);
+  resetKeyCheckState();akvBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.innerHTML=aiReviewProgressHtml('keyCheckProgress','Ověření klíče druhým průchodem',batches.length);}
   try{
     const answers=new Map();
-    for(const batch of boundedReviewBatches(units,x=>x.q.length)){
+    for(let bi=0;bi<batches.length;bi++){
+      const batch=batches[bi];
+      aiReviewProgressUpdate('keyCheckProgress',Math.max(12,Math.round(12+(bi/batches.length)*76)),'AI ověřuje dávku '+(bi+1)+'/'+batches.length+' · '+batch.length+' úloh…');
       const data=await callGeminiJSON(akvBuildPrompt(batch),[],{operation:'answer-key-verification'});requireOutputStamp(stamp);
       if(!data||!Array.isArray(data.answers))throw new Error('AI nevr\u00e1tila pole odpov\u011bd\u00ed.');
       const valid=new Set(batch.map(x=>x.i));
       for(const answer of data.answers){if(!answer||!Number.isInteger(answer.i)||!valid.has(answer.i)||answers.has(answer.i))throw new Error('AI vr\u00e1tila neplatn\u00e9 nebo duplicitn\u00ed ID odpov\u011bdi.');answers.set(answer.i,answer.a);}
     }
+    aiReviewProgressUpdate('keyCheckProgress',95,'Porovnávám druhý průchod s uloženým klíčem…');
     const diffs=[],weaks=[];let checked=0,missing=0,invalid=0;
     for(const u of units){if(!answers.has(u.i)){missing++;continue;}
       const ai=answers.get(u.i),verdict=akvCompare(u.exObj,u.itObj,ai);if(verdict==='invalid'){invalid++;continue;}checked++;
@@ -361,7 +365,7 @@ async function aiVerifyKey(){
     const incomplete=missing+invalid>0||!checked,title=incomplete?'AI kontrola je ne\u00fapln\u00e1':diffs.length||weaks.length?'AI kontrola: n\u00e1lezy k posouzen\u00ed':'AI odpov\u011bdi se shoduj\u00ed s ulo\u017een\u00fdm kl\u00ed\u010dem';
     if(out)out.innerHTML=collapsibleResultHtml(title,incomplete||diffs.length||weaks.length?'is-warn':'is-pass',akvRender(keys.join(', '),checked,missing+invalid,diffs,weaks));
     updateSecureDownloadGate();
-  }catch(error){if(out)out.textContent='Kontrola selhala; nen\u00ed dokladem spr\u00e1vnosti kl\u00ed\u010de. '+error.message;}
+  }catch(error){if(out)setErrorTextWithHttpHelp(out,'Kontrola selhala; není dokladem správnosti klíče. '+(error&&error.message?error.message:String(error)));}
   finally{akvBusy=false;if(btn)btn.disabled=false;}
 }
 function akvRender(variant,checked,missing,diffs,weaks){

@@ -2389,3 +2389,19 @@ body.simple-mode .source-use-card-grid{grid-template-columns:1fr}
 @media(hover:none){
   .exercise-type-info { cursor: pointer; }
 }
+
+
+/* ── Doplňkové AI kontroly: viditelný průběh ─────────────────────────────── */
+.ai-review-progress{margin-top:10px;border:1px solid var(--bdr);background:var(--bg3);border-radius:10px;padding:10px 12px}
+.ai-review-progress-head{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:13px}
+.ai-review-progress-pct{font-variant-numeric:tabular-nums;color:var(--acc);font-weight:800}
+.ai-review-progress-track{height:9px;border-radius:999px;background:var(--bdr2);overflow:hidden;margin-top:8px}
+.ai-review-progress-bar{height:100%;width:0;background:var(--acc);transition:width .25s ease;position:relative;overflow:hidden}
+.ai-review-progress.is-active .ai-review-progress-bar::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:aiReviewSweep 1.35s linear infinite}
+.ai-review-progress-text{margin-top:7px;color:var(--t4);font-size:12.5px;line-height:1.45}
+@keyframes aiReviewSweep{to{transform:translateX(100%)}}
+
+/* HTTP kód v chybové hlášce funguje jako kontextová nápověda. */
+.http-code-help{display:inline;border:0;background:transparent;color:var(--acc);font:inherit;font-weight:800;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;cursor:pointer;padding:0 1px}
+.http-code-help:hover{color:var(--acc-btn)}
+.http-code-help:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}

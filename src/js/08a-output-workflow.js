@@ -43,6 +43,7 @@ async function commitAnswerData(data,stamp,sourceState){
   if(outputMutationBusy)throw new Error('Pr\u00e1v\u011b prob\u00edh\u00e1 jin\u00e1 \u00faprava testu.');
   outputMutationBusy=true;
   const previous={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,checklist:exportChecklist,selfTest:lastSelfTest,gaps:secureGapsAcknowledged,diffs:keyDiffsAcknowledged};
+  const retainedChecklist=Object.assign({},previous.checklist||{});
   try{
     const built=await assembleTestHtml(sourceState||outputEditState(),data);
     if(built&&built.mode==='secureOffline')await validateSecurePackageSmoke(built);else await validateGeneratedHtmlSmoke(String(built||''));
@@ -50,7 +51,9 @@ async function commitAnswerData(data,stamp,sourceState){
     generatedTestHtml=generatedPackage?'':String(built||'');lastGenData=data;
     generatedIntegrity=null;generatedIntegrity=integrityDataForCurrentOutput();
     if(generatedIntegrity&&generatedTestHtml)generatedIntegrity.studentHtmlSha256=await sha256HexText(generatedTestHtml);
-    exportChecklist={};lastSelfTest=null;secureGapsAcknowledged=false;keyDiffsAcknowledged=false;
+    // Učitelské potvrzení patří k tomuto konkrétnímu testu a při jeho drobné úpravě se zbytečně nemaže.
+    // Technické kontroly se naopak musí spustit znovu nad novým sestavením.
+    exportChecklist=retainedChecklist;lastSelfTest=null;secureGapsAcknowledged=false;keyDiffsAcknowledged=false;
     resetKeyCheckState();resetVerificationReports();renderExportChecklist(true);renderQualityDiagnostics();updateSecureDownloadGate();
     return true;
   }catch(error){lastAssembled=previous.assembled;lastGenData=previous.data;generatedTestHtml=previous.html;generatedPackage=previous.pack;generatedIntegrity=previous.integrity;exportChecklist=previous.checklist;lastSelfTest=previous.selfTest;secureGapsAcknowledged=previous.gaps;keyDiffsAcknowledged=previous.diffs;throw error;}
@@ -74,6 +77,24 @@ function renderGenerationEstimate(){
 
 function boundedReviewBatches(items,lengthOf){
   const out=[];let batch=[],size=0;
-  for(const item of items){const length=lengthOf(item);if(length>24000)throw new Error('Jedna \u00faloha je pro dopl\u0148kovou AI kontrolu p\u0159\u00edli\u0161 dlouh\u00e1. Zkontroluj ji ru\u010dn\u011b v editoru.');if(batch.length&&(batch.length>=12||size+length>24000)){out.push(batch);batch=[];size=0;}batch.push(item);size+=length;}
+  for(const item of items){const length=lengthOf(item);if(length>24000)throw new Error('Jedna úloha je pro doplňkovou AI kontrolu příliš dlouhá. Zkontroluj ji ručně v editoru.');if(batch.length&&(batch.length>=12||size+length>24000)){out.push(batch);batch=[];size=0;}batch.push(item);size+=length;}
   if(batch.length)out.push(batch);return out;
+}
+function aiReviewProgressHtml(id,label,total){
+  const safeId=String(id||'aiReviewProgress').replace(/[^a-zA-Z0-9_-]/g,'');
+  const count=Math.max(1,Math.round(Number(total)||1));
+  return '<div class="ai-review-progress is-active" id="'+safeId+'" role="status" aria-live="polite">'
+    +'<div class="ai-review-progress-head"><strong>'+esc(label)+'</strong><span class="ai-review-progress-pct">0 %</span></div>'
+    +'<div class="ai-review-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="ai-review-progress-bar"></div></div>'
+    +'<div class="ai-review-progress-text">Připravuji AI kontrolu · 0/'+count+' dávek</div></div>';
+}
+function aiReviewProgressUpdate(id,pct,text){
+  const box=$(id);if(!box)return;
+  const p=Math.max(0,Math.min(100,Math.round(Number(pct)||0)));
+  const track=box.querySelector('.ai-review-progress-track'),bar=box.querySelector('.ai-review-progress-bar'),pctEl=box.querySelector('.ai-review-progress-pct'),textEl=box.querySelector('.ai-review-progress-text');
+  if(track)track.setAttribute('aria-valuenow',String(p));
+  if(bar)bar.style.width=p+'%';
+  if(pctEl)pctEl.textContent=p+' %';
+  if(textEl)textEl.textContent=String(text||'');
+  box.classList.toggle('is-active',p<100);
 }

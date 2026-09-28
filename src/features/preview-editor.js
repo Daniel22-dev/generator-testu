@@ -1,11 +1,26 @@
 (function (global) {
   'use strict';
 // ═══ Náhled testu před stažením ════════════════════════════════════════════════
+function previewRosterCode(){
+  if((state.identityMode||'name')!=='oneTimeCode')return '';
+  if(typeof rosterEntries==='undefined'||!Array.isArray(rosterEntries))return '';
+  const entry=rosterEntries.find(e=>e&&String(e.code||'').trim());
+  return entry?String(entry.code).trim():'';
+}
+function secureTeacherPreviewHtml(html){
+  const code=previewRosterCode();
+  if(!code)return {html,previewCodeInjected:false};
+  const codeJson=JSON.stringify(code).replace(/</g,'\\u003c');
+  const helper='<script>(function(){var apply=function(){var i=document.getElementById("studentName");if(!i)return;i.value='+codeJson+';i.type="password";i.autocomplete="off";i.setAttribute("aria-label","Platný studentský kód předvyplněný pouze pro učitelský náhled");i.title="Kód je předvyplněn pouze v učitelském náhledu. Stažený studentský soubor se nemění.";};if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",apply,{once:true});else apply();})();<\/script>';
+  const out=/<\/body>/i.test(html)?html.replace(/<\/body>/i,helper+'</body>'):html+helper;
+  return {html:out,previewCodeInjected:true};
+}
 function getPreviewHtml(){
   if (generatedPackage && generatedPackage.mode === 'secureOffline' && generatedPackage.studentHtml) {
-    return { html: generatedPackage.studentHtml, secure: true };
+    const preview=secureTeacherPreviewHtml(generatedPackage.studentHtml);
+    return { html: preview.html, secure: true, previewCodeInjected: preview.previewCodeInjected };
   }
-  if (generatedTestHtml) return { html: generatedTestHtml, secure: false };
+  if (generatedTestHtml) return { html: generatedTestHtml, secure: false, previewCodeInjected:false };
   return null;
 }
 function previewEscHandler(e){ if (e && e.key === 'Escape') closeTestPreview(); }
@@ -22,9 +37,17 @@ function openTestPreview(){
   const pv = getPreviewHtml();
   const modal = $('previewModal'), frame = $('previewFrame'), note = $('previewNote');
   if (!pv || !pv.html) { uiAlert('Nejdřív vygeneruj test, pak ho můžeš zobrazit v náhledu.'); return; }
-  if (note) note.textContent = pv.secure
-    ? 'Studentský test (bez správných odpovědí). Vidíš zadání, otázky, nabídku odpovědí i design přesně jako studenti. Správnost klíče zkontroluješ v učitelském verifieru.'
-    : 'Hotový test tak, jak ho uvidí studenti. Náhled je interaktivní — můžeš si projít cvičení.';
+  if (note) {
+    if(pv.secure && (state.identityMode||'name')==='oneTimeCode'){
+      note.textContent = pv.previewCodeInjected
+        ? 'Učitelský náhled studentského testu. Jeden platný kód je předvyplněn pouze v tomto dočasném náhledu (je skrytý); stažený studentský soubor se nemění. Klikni na Začít test a projdi zadání jako student.'
+        : 'Studentský test používá individuální kódy. V tomto náhledu už není dostupný původní seznam kódů v paměti, proto je pro spuštění potřeba zadat některý platný studentský kód. Stažený studentský soubor se nemění.';
+    }else{
+      note.textContent = pv.secure
+        ? 'Studentský test (bez správných odpovědí). Vidíš zadání, otázky, nabídku odpovědí i design přesně jako studenti. Správnost klíče zkontroluješ v učitelském verifieru.'
+        : 'Hotový test tak, jak ho uvidí studenti. Náhled je interaktivní — můžeš si projít cvičení.';
+    }
+  }
   setPreviewWidth(360);
   if (frame) frame.srcdoc = pv.html;
   exportChecklist.preview = true;
@@ -518,11 +541,14 @@ async function enrichAltAnswers(){
   if(!lastGenData){await uiAlert('Nejd\u0159\u00edv vygeneruj test.');return;}
   if(!genAiAvailable()){await uiAlert('Pro n\u00e1vrhy alternativ je pot\u0159eba p\u0159ipojen\u00ed AI. Ru\u010dn\u011b je m\u016f\u017ee\u0161 p\u0159idat v editoru.');return;}
   const stamp=outputStamp(),work=JSON.parse(JSON.stringify(lastGenData)),flat=enCollectFlat(work),btn=$('btnEnrich'),out=$('answerProposalReport');
-  if(!flat.length){await uiAlert('Tento test nem\u00e1 podporovan\u00e9 psan\u00e9 odpov\u011bdi. U v\u00fdb\u011bru mo\u017enost\u00ed se alternativy nep\u0159id\u00e1vaj\u00ed.');return;}
-  enBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.textContent='P\u0159ipravuji n\u00e1vrhy; zat\u00edm se nic nem\u011bn\u00ed\u2026';}
+  if(!flat.length){await uiAlert('Tento test nemá podporované psané odpovědi. U výběru možností se alternativy nepřidávají.');return;}
+  const batches=boundedReviewBatches(flat,r=>r.prompt.length+r.correct.length);
+  enBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.innerHTML=aiReviewProgressHtml('answerProposalProgress','Hledání přijatelných odpovědí',batches.length);}
   try{
     const candidates=[];
-    for(const batch of boundedReviewBatches(flat,r=>r.prompt.length+r.correct.length)){
+    for(let bi=0;bi<batches.length;bi++){
+      const batch=batches[bi];
+      aiReviewProgressUpdate('answerProposalProgress',Math.max(12,Math.round(12+(bi/batches.length)*76)),'AI zpracovává dávku '+(bi+1)+'/'+batches.length+' · '+batch.length+' položek…');
       const data=await callGeminiJSON(enBuildPrompt(batch),[],{operation:'acceptable-answer-enrichment'});requireOutputStamp(stamp);
       if(!data||!Array.isArray(data.items))throw new Error('AI nevr\u00e1tila seznam n\u00e1vrh\u016f.');
       const ids=new Set(batch.map(r=>r.id)),seen=new Set();
@@ -533,9 +559,10 @@ async function enrichAltAnswers(){
         merged.arr.slice((Array.isArray(old)?old:[]).length).forEach(value=>candidates.push({refId:item.id,value}));
       }
     }
+    aiReviewProgressUpdate('answerProposalProgress',95,'Skládám návrhy k učitelskému schválení…');
     enReview={stamp,work,flat,candidates};
     if(out){out.innerHTML='<p><b>'+candidates.length+' n\u00e1vrh\u016f. Nic nebylo automaticky p\u0159id\u00e1no.</b> Za\u0161krtni pouze obsahov\u011b spr\u00e1vn\u00e9 alternativy.</p>'+candidates.map((c,i)=>{const r=flat[c.refId];return '<label class="answer-proposal"><input type="checkbox" class="en-pick" data-pi="'+i+'">'+H(c.value)+'<span class="answer-proposal-context">'+H(r.variant)+' \u00b7 cv. '+(r.ei+1)+' / '+(r.ii+1)+' \u00b7 '+H(r.type)+'<br>Kl\u00ed\u010d: '+H(r.correct)+'<br>'+H(r.prompt)+'</span></label>';}).join('')+(candidates.length?'<button type="button" class="btn-edit" id="btnAcceptProposals" onclick="enAcceptSelected()">P\u0159idat vybran\u00e9 odpov\u011bdi a p\u0159esestavit</button>':'')+'<div id="enApplyStatus" role="status"></div>';}
-  }catch(error){enReview=null;if(out)out.textContent='N\u00e1vrhy se nepoda\u0159ilo p\u0159ipravit. Test z\u016fstal beze zm\u011bny. '+error.message;}
+  }catch(error){enReview=null;if(out)setErrorTextWithHttpHelp(out,'Návrhy se nepodařilo připravit. Test zůstal beze změny. '+(error&&error.message?error.message:String(error)));}
   finally{enBusy=false;if(btn)btn.disabled=false;}
 }
 async function enAcceptSelected(){
