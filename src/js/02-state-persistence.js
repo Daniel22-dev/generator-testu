@@ -454,8 +454,9 @@ function clearOldUnsafeStorage(){
 }
 
 // Legacy klíče pro migraci šablon a historie.
-const LEGACY_TPL_KEYS = ['sestavovac_tpl_v5_12_0','sestavovac_tpl_v5_11_1','sestavovac_tpl_v5_11_0','sestavovac_tpl_v5_10_6','sestavovac_tpl_v5_9_6','sestavovac_tpl_v5_9_5','sestavovac_tpl_v5_9_4','sestavovac_tpl_v5_9_3','sestavovac_tpl_v5_9_1','sestavovac_tpl_v5_9_0','sestavovac_tpl_v5_8_6','sestavovac_tpl_v5_8_5','sestavovac_tpl_v5_8_4','sestavovac_tpl_v5_8_3','sestavovac_tpl_v5_8_2','sestavovac_tpl_v5_8_1','sestavovac_tpl_v5_8_0','sestavovac_tpl_v5_7_4','sestavovac_tpl_v5_7_3','sestavovac_tpl_v5_7_2','sestavovac_tpl_v5_7_1','sestavovac_tpl_v5_6','sestavovac_tpl_v5_4','sestavovac_tpl_v5'];
-const LEGACY_HIST_KEYS = ['sestavovac_hist_v5_12_0','sestavovac_hist_v5_11_1','sestavovac_hist_v5_11_0','sestavovac_hist_v5_10_6','sestavovac_hist_v5_9_6','sestavovac_hist_v5_9_5','sestavovac_hist_v5_9_4','sestavovac_hist_v5_9_3','sestavovac_hist_v5_9_1','sestavovac_hist_v5_9_0','sestavovac_hist_v5_8_6','sestavovac_hist_v5_8_5','sestavovac_hist_v5_8_4','sestavovac_hist_v5_8_3','sestavovac_hist_v5_8_2','sestavovac_hist_v5_8_1','sestavovac_hist_v5_8_0','sestavovac_hist_v5_7_4','sestavovac_hist_v5_7_3','sestavovac_hist_v5_7_2','sestavovac_hist_v5_7_1','sestavovac_hist_v5_7','sestavovac_hist_v5_6','sestavovac_hist_v5_4','sestavovac_hist_v5'];
+const LEGACY_STORAGE_SUFFIXES='12_0 11_1 11_0 10_6 9_6 9_5 9_4 9_3 9_1 9_0 8_6 8_5 8_4 8_3 8_2 8_1 8_0 7_4 7_3 7_2 7_1 7 6 4'.split(' ');
+function legacyStorageKeys(kind,skip7=false){return LEGACY_STORAGE_SUFFIXES.filter(v=>!skip7||v!=='7').map(v=>'sestavovac_'+kind+'_v5_'+v).concat('sestavovac_'+kind+'_v5')}
+const LEGACY_TPL_KEYS=legacyStorageKeys('tpl',true),LEGACY_HIST_KEYS=legacyStorageKeys('hist');
 
 let storageWarnShown = false;
 function safeSetItem(key, value){
@@ -578,172 +579,21 @@ function flashSave() {
 }
 
 // ═══ Templates ════════════════════════════════════════════════════════════════
-function loadTemplates() {
-  return readArr(TPL_KEY);
-}
-function saveTemplates(tpls) {
-  return safeSetItem(TPL_KEY, JSON.stringify(tpls));
-}
-
-// Bezpečné předvyplnění: pouze konfigurační stav, nikdy obsah zadání/URL/přílohy/identity/kódy.
+function loadTemplates(){return readArr(TPL_KEY)}
+function saveTemplates(t){return safeSetItem(TPL_KEY,JSON.stringify(t))}
 const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni rcLength sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard feedbackMode differentiationLevel'.split(' ');
-function getTemplatePrefill(){
-  const p={}; TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));
-  p.skupinyCount=(state.skupiny||[]).length; p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||''); return p;
-}
-function applyTemplatePrefill(p){
-  if(!p)return; TEMPLATE_PREFILL_KEYS.forEach(k=>{if(p[k]!==undefined)state[k]=cloneSafeStoredValue(p[k])});
-  const n=Math.max(0,Math.min(12,Number(p.skupinyCount)||0)),names=Array.isArray(p.skupinyNazvy)?p.skupinyNazvy:[];
-  state.skupiny=[]; if((state.diferencovany||'NE')==='ANO')for(let i=0;i<n;i++)state.skupiny.push({id:groupIdCounter++,nazev:names[i]||('Skupina '+(i+1)),podminky:'',studenti:[]});
-}
-function finishTemplateLoad(msg,type='ok'){
-  normalizeLoadedState(state); enforceModeConstraints(); maxStep=0; goTo(0); applyVisualState();
-  if(typeof renderGroups==='function')renderGroups(); if(typeof renderTeacherMapping==='function')renderTeacherMapping();
-  validate(); saveSnapshot(); uiToast(msg,type,5500);
-}
-async function saveTemplate(){
-  const name=await uiPrompt('Název šablony',trim('nazev')||'Moje šablona'); if(!name)return;
-  const why=await uiPrompt('Logika šablony (nepovinné — krátký popis účelu šablony)',''),tpls=loadTemplates();
-  tpls.push({id:Date.now(),name,why:why||'',format:'prefill_v2',prefill:getTemplatePrefill(),ts:Date.now()});
-  if(!saveTemplates(tpls))return; renderTemplates(); flashSave();
-  uiToast('Šablona uložena. Příště předvyplní jazyk, úroveň, cvičení, čas, body i režim; obsah, přílohy, jména a přístupové kódy se neukládají.','ok',6000);
-}
-function loadTemplate(id){
-  const tpl=loadTemplates().find(t=>t.id===id); if(!tpl)return;
-  if(tpl.format==='prefill_v2'){
-    applyTemplatePrefill(cloneSafeStoredValue(tpl.prefill));
-    finishTemplateLoad('Šablona „'+esc(tpl.name)+'“ načtena — formulář je předvyplněný.');
-    return;
-  }
-  if(tpl.format==='profile_v1'){
-    applyTemplatePrefill(cloneSafeStoredValue(tpl.profile));
-    finishTemplateLoad('Starší šablona obsahuje jen režim a hodnocení. Pro plné předvyplnění ji po nastavení ulož znovu.','warn');
-    return;
-  }
-  replaceStateFromUntrusted(tpl.state); if(!state.urls?.length)state.urls=[''];
-  fileObjects=[]; fileReadPromises=[]; state.fileNames=[]; showFileError('');
-  if(state.zadaniTab==='file')state.zadaniTab='text'; if(!state.layout)state.layout='tabs'; if(!state.resultMode)state.resultMode='instant';
-  safeDomEntries(tpl.dom).forEach(([k,v])=>setVal(k,v)); SENSITIVE_FIELD_IDS.forEach(id=>setVal(id,''));
-  finishTemplateLoad('Starší plná šablona načtena. Přístupové údaje a přílohy byly vyčištěny.');
-}
-
+function getTemplatePrefill(){const p={};TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));p.skupinyCount=(state.skupiny||[]).length;p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||'');return p}
+function applyTemplatePrefill(p){if(!p)return;TEMPLATE_PREFILL_KEYS.forEach(k=>{if(p[k]!==undefined)state[k]=cloneSafeStoredValue(p[k])});const n=Math.max(0,Math.min(12,Number(p.skupinyCount)||0)),names=Array.isArray(p.skupinyNazvy)?p.skupinyNazvy:[];state.skupiny=[];if((state.diferencovany||'NE')==='ANO')for(let i=0;i<n;i++)state.skupiny.push({id:groupIdCounter++,nazev:names[i]||('Skupina '+(i+1)),podminky:'',studenti:[]})}
+function finishTemplateLoad(msg,type='ok'){normalizeLoadedState(state);enforceModeConstraints();maxStep=0;goTo(0);applyVisualState();if(typeof renderGroups==='function')renderGroups();if(typeof renderTeacherMapping==='function')renderTeacherMapping();validate();saveSnapshot();uiToast(msg,type,5000)}
+async function saveTemplate(){const name=await uiPrompt('Název šablony',trim('nazev')||'Moje šablona');if(!name)return;const why=await uiPrompt('Logika šablony (nepovinné)',''),t=loadTemplates();t.push({id:Date.now(),name,why:why||'',format:'prefill_v2',prefill:getTemplatePrefill(),ts:Date.now()});if(!saveTemplates(t))return;renderTemplates();flashSave();uiToast('Šablona uložena a připravena k předvyplnění.','ok',4500)}
+function loadTemplate(id){const t=loadTemplates().find(x=>x.id===id);if(!t)return;if(t.format==='prefill_v2'){applyTemplatePrefill(cloneSafeStoredValue(t.prefill));finishTemplateLoad('Šablona „'+esc(t.name)+'“ načtena.');return}if(t.format==='profile_v1'){applyTemplatePrefill(cloneSafeStoredValue(t.profile));finishTemplateLoad('Starší profil načten. Pro plné předvyplnění jej ulož znovu.','warn');return}replaceStateFromUntrusted(t.state);if(!state.urls?.length)state.urls=[''];fileObjects=[];fileReadPromises=[];state.fileNames=[];showFileError('');if(state.zadaniTab==='file')state.zadaniTab='text';if(!state.layout)state.layout='tabs';if(!state.resultMode)state.resultMode='instant';safeDomEntries(t.dom).forEach(([k,v])=>setVal(k,v));SENSITIVE_FIELD_IDS.forEach(x=>setVal(x,''));finishTemplateLoad('Starší šablona načtena; citlivá pole byla vyčištěna.')}
 // Přenos očištěného zadání mezi kolegy.
-function buildZadaniExport(){
-  const dom = {};
-  DOM_FIELDS.forEach(id => { dom[id] = val(id); });
-  return {
-    __type: 'generator-testu-zadani',
-    formatVersion: 1,
-    appVersion: RELEASE.version,
-    exportedAt: new Date().toISOString(),
-    dom,
-    state: getStoredState()
-  };
-}
-function exportZadani(){
-  try{
-    const data = buildZadaniExport();
-    const slug = (trim('nazev') || 'zadani').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'zadani';
-    const ts = new Date().toISOString().slice(0,10);
-    downloadBlobFile(JSON.stringify(data, null, 2), 'zadani_' + slug + '_' + ts + '.json', 'application/json;charset=utf-8');
-    const hasFiles = Array.isArray(state.fileNames) && state.fileNames.length > 0;
-    uiToast(hasFiles
-      ? 'Zadání exportováno. POZOR: nahrané soubory (audio/PDF/obrázky) se do souboru nepřenášejí — pošli je kolegovi zvlášť.'
-      : 'Zadání exportováno do souboru. Pošli ho kolegovi (e-mailem / Teams), který má volné AI požadavky.', hasFiles ? 'warn' : 'ok', 6500);
-  }catch(err){
-    uiToast('Export zadání selhal: ' + (err && err.message ? err.message : err), 'warn');
-  }
-}
-async function importZadaniFile(inp){
-  const f = inp && inp.files && inp.files[0];
-  if (!f){ return; }
-  try{
-    if (f.size > MAX_ZADANI_IMPORT_BYTES) throw new Error('Soubor zadání je větší než povolených 512 kB.');
-    const raw = await readBlobAsText(f);
-    const data = JSON.parse(raw);
-    if (!data || data.__type !== 'generator-testu-zadani' || data.formatVersion !== 1 || !data.state){
-      uiToast('Tento soubor není exportované zadání generátoru (.json). Zkontroluj, že posíláš správný soubor.', 'warn', 6000);
-      return;
-    }
-    const ok = await uiConfirm('Načíst zadání ze souboru? Přepíše tvoje aktuální rozpracované nastavení formuláře.', 'Načíst zadání od kolegy?', true);
-    if (!ok) return;
-    applyImportedZadani(data);
-    uiToast('Zadání načteno' + (data.appVersion ? ' (verze ' + esc(String(data.appVersion)) + ')' : '') + '. Učitelský přístupový kód se nepřenáší — nastav ho před generováním. Nahrané soubory případně přilož ručně.', 'ok', 8000);
-  }catch(err){
-    uiToast('Soubor se nepodařilo načíst: ' + (err && err.message ? err.message : err), 'warn', 6000);
-  }finally{
-    if (inp) inp.value = '';
-  }
-}
-function applyImportedZadani(data){
-  replaceStateFromUntrusted(data.state);
-  if (!state.urls || !state.urls.length) state.urls = [''];
-  fileObjects = [];
-  fileReadPromises = [];
-  state.fileNames = [];
-  if (state.zadaniTab === 'file') state.zadaniTab = 'text';  // nahrané soubory se nepřenášejí
-  if (!state.exerciseConfig) state.exerciseConfig = [];
-  if (typeof state.exerciseDetail !== 'boolean') state.exerciseDetail = false;
-  if (!state.tema) state.tema = 'modern';
-  if (!state.resultMode) state.resultMode = 'instant';
-  if (!state.layout) state.layout = 'tabs';
-  normalizeLoadedState(state);
-  enforceModeConstraints();
-  safeDomEntries(data.dom).forEach(([k,v]) => setVal(k, v));
-  SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
-  if (typeof showFileError === 'function') showFileError('');
-  maxStep = 0;
-  goTo(0);
-  applyVisualState();
-  if (typeof renderGroups === 'function') renderGroups();
-  if (typeof renderTeacherMapping === 'function') renderTeacherMapping();
-  validate();
-  saveSnapshot();
-}
-
-async function deleteTemplate(id) {
-  const ok = await uiConfirm('Smazat šablonu?', 'Smazat šablonu?', true);
-  if (!ok) return;
-  saveTemplates(loadTemplates().filter(t => t.id !== id));
-  renderTemplates();
-}
-
-function renderTemplates() {
-  const tpls = loadTemplates();
-  const strip = $('templatesStrip');
-  const list = $('tplList');
-  const count = $('tplCount');
-  if (!tpls.length) { strip.classList.add('hidden'); return; }
-  strip.classList.remove('hidden');
-  count.textContent = '(' + tpls.length + ')';
-  const RL = { instant:'\u26a1 okamžitá zn\u00e1mka', secureOffline:'\ud83d\udd12 verifier' };
-  const FL = { none:'bez zpět. vazby', brief:'stručná zpět. vazba', learning:'učící zpět. vazba' };
-  const DL = { basic:'podpora', challenge:'challenge' };
-  list.innerHTML = tpls.map(function(t) {
-    const isPrefill=t.format==='prefill_v2', isProfile=t.format==='profile_v1', isNew=isPrefill||isProfile;
-    const p=(isPrefill?t.prefill:t.profile)||{};
-    const badges = [];
-    if (isNew) {
-      if (RL[p.resultMode]) badges.push(RL[p.resultMode]);
-      if (FL[p.feedbackMode]) badges.push(FL[p.feedbackMode]);
-      if (DL[p.differentiationLevel]) badges.push(DL[p.differentiationLevel]);
-      if (p.diferencovany === 'ANO' && p.skupinyCount > 0) badges.push(p.skupinyCount + '\u00a0skupiny');
-    }
-    return '<div class="tpl-card">'
-      + '<div class="tpl-card-head">'
-      + '<span class="tpl-card-name">' + esc(t.name) + '</span>'
-      + '<div class="tpl-card-btns">'
-      + '<button class="tpl-load" onclick="loadTemplate(' + t.id + ')" title="Načíst šablonu">' + (isPrefill ? '📄 Načíst šablonu' : (isProfile ? '📄 Načíst profil' : '📄 Načíst (starý formát)')) + '</button>'
-      + '<button class="tpl-del" onclick="deleteTemplate(' + t.id + ')" title="Smazat šablonu">\u2715</button>'
-      + '</div>'
-      + '</div>'
-      + (badges.length ? '<div class="tpl-badges">' + badges.map(function(b){ return '<span class="tpl-badge">' + esc(b) + '</span>'; }).join('') + '</div>' : '')
-      + (t.why ? '<div class="preset-modal-why" style="margin-top:7px"><strong>Logika šablony:</strong> ' + esc(t.why) + '</div>' : '')
-      + (isProfile ? '<div class="tpl-old-note">Starší profil: pro plné předvyplnění jej ulož znovu.</div>' : (!isNew ? '<div class="tpl-old-note">Starý formát. Po načtení ulož znovu.</div>' : ''))
-      + '</div>';
-  }).join('');
-}
-
+function buildZadaniExport(){const dom={};DOM_FIELDS.forEach(id=>dom[id]=val(id));return{__type:'generator-testu-zadani',formatVersion:1,appVersion:RELEASE.version,exportedAt:new Date().toISOString(),dom,state:getStoredState()}}
+function exportZadani(){try{const data=buildZadaniExport(),slug=(trim('nazev')||'zadani').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'zadani',ts=new Date().toISOString().slice(0,10);downloadBlobFile(JSON.stringify(data,null,2),'zadani_'+slug+'_'+ts+'.json','application/json;charset=utf-8');const files=Array.isArray(state.fileNames)&&state.fileNames.length>0;uiToast(files?'Zadání exportováno. Přílohy pošli zvlášť.':'Zadání exportováno. Pošli JSON kolegovi.',files?'warn':'ok',5500)}catch(err){uiToast('Export zadání selhal: '+(err?.message||err),'warn')}}
+async function importZadaniFile(inp){const f=inp?.files?.[0];if(!f)return;try{if(f.size>MAX_ZADANI_IMPORT_BYTES)throw new Error('Soubor zadání je větší než 512 kB.');const data=JSON.parse(await readBlobAsText(f));if(!data||data.__type!=='generator-testu-zadani'||data.formatVersion!==1||!data.state){uiToast('Tento soubor není platné exportované zadání.','warn',5500);return}if(!await uiConfirm('Načíst zadání a přepsat aktuální formulář?','Načíst zadání od kolegy?',true))return;applyImportedZadani(data);uiToast('Zadání načteno'+(data.appVersion?' (verze '+esc(String(data.appVersion))+')':'')+'. Přístupový kód ani přílohy se nepřenášejí.','ok',6500)}catch(err){uiToast('Soubor se nepodařilo načíst: '+(err?.message||err),'warn',5500)}finally{if(inp)inp.value=''}}
+function applyImportedZadani(data){replaceStateFromUntrusted(data.state);if(!state.urls?.length)state.urls=[''];fileObjects=[];fileReadPromises=[];state.fileNames=[];if(state.zadaniTab==='file')state.zadaniTab='text';if(!state.exerciseConfig)state.exerciseConfig=[];if(typeof state.exerciseDetail!=='boolean')state.exerciseDetail=false;if(!state.tema)state.tema='modern';if(!state.resultMode)state.resultMode='instant';if(!state.layout)state.layout='tabs';normalizeLoadedState(state);enforceModeConstraints();safeDomEntries(data.dom).forEach(([k,v])=>setVal(k,v));SENSITIVE_FIELD_IDS.forEach(id=>setVal(id,''));if(typeof showFileError==='function')showFileError('');maxStep=0;goTo(0);applyVisualState();if(typeof renderGroups==='function')renderGroups();if(typeof renderTeacherMapping==='function')renderTeacherMapping();validate();saveSnapshot()}
+async function deleteTemplate(id){if(!await uiConfirm('Smazat šablonu?','Smazat šablonu?',true))return;saveTemplates(loadTemplates().filter(t=>t.id!==id));renderTemplates()}
+function renderTemplates(){const t=loadTemplates(),s=$('templatesStrip'),l=$('tplList'),c=$('tplCount');if(!t.length){s.classList.add('hidden');return}s.classList.remove('hidden');c.textContent='('+t.length+')';const R={instant:'⚡ okamžitá známka',secureOffline:'🔒 verifier'},F={none:'bez zpět. vazby',brief:'stručná zpět. vazba',learning:'učící zpět. vazba'},D={basic:'podpora',challenge:'challenge'};l.innerHTML=t.map(x=>{const a=x.format==='prefill_v2',p=x.format==='profile_v1',n=a||p,v=(a?x.prefill:x.profile)||{},bad=[];if(n){if(R[v.resultMode])bad.push(R[v.resultMode]);if(F[v.feedbackMode])bad.push(F[v.feedbackMode]);if(D[v.differentiationLevel])bad.push(D[v.differentiationLevel]);if(v.diferencovany==='ANO'&&v.skupinyCount>0)bad.push(v.skupinyCount+' skupiny')}return '<div class="tpl-card"><div class="tpl-card-head"><span class="tpl-card-name">'+esc(x.name)+'</span><div class="tpl-card-btns"><button class="tpl-load" onclick="loadTemplate('+x.id+')" title="Načíst šablonu">'+(a?'📄 Načíst':p?'📄 Načíst profil':'📄 Načíst starou')+'</button><button class="tpl-del" onclick="deleteTemplate('+x.id+')" title="Smazat šablonu">✕</button></div></div>'+(bad.length?'<div class="tpl-badges">'+bad.map(y=>'<span class="tpl-badge">'+esc(y)+'</span>').join('')+'</div>':'')+(x.why?'<div class="preset-modal-why" style="margin-top:7px"><strong>Logika šablony:</strong> '+esc(x.why)+'</div>':'')+(p?'<div class="tpl-old-note">Starší profil — ulož znovu pro plné předvyplnění.</div>':!n?'<div class="tpl-old-note">Starý formát — po načtení ulož znovu.</div>':'')+'</div>'}).join('')}
 // ═══ History ══════════════════════════════════════════════════════════════════
 function loadHistory() {
   return readArr(HIST_KEY);

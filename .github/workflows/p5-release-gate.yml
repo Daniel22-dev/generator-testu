@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: generator-p5-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   p5-release-gate:
     runs-on: ubuntu-latest
