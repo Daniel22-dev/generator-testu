@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.57',
+  version: '7.1.58',
   date:    '2026-09-28',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové AI dávky a analýza Readingu se při chybě zachovají v relaci a další pokus naváže od nedokončené části. Jedna logická AI dávka má společný časový strop, takže fallbacky už nemohou násobit timeout. Běžná cvičení se seskupují podle rozpočtu; samostatně zůstávají jen skutečně náročné typy.',
     'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
     'AI DOSTUPNOST (7.1.56): aktualizovány profily Gemini a stabilní fallbacky. Chyby AI nově uvádějí bezpečný HTTP stav a interní kód pro přesnější diagnostiku.',
     'O APLIKACI (7.1.55): hlavní hlavička nově používá jednotný vstup O aplikaci. Karta shrnuje účel Generátoru, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a nápovědu; dosavadní changelog je přesunut dovnitř jako rozbalovací Katalog změn včetně samostatně verzovaného modulu Český jazyk.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
     'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
     'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
-    'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
