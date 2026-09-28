@@ -1,6 +1,4 @@
-// ═══ Normalizace načteného stavu ══════════════════════════════════════════════
-// Voláno při loadSnapshot / loadTemplate / loadFromHistory.
-// Synchronizuje appMode ↔ workPreset a zajistí, že overeni=NE (panel odstraněn).
+// Normalizace načteného stavu.
 function normalizeLoadedState(s) {
   if (!s.appMode) s.appMode = 'simple';
   if (!s.workPreset || s.workPreset === 'safe') {
@@ -11,16 +9,13 @@ function normalizeLoadedState(s) {
   else if (s.workPreset === 'advanced') s.appMode = 'advanced';
   // Ověřovací panel byl odebrán z UI; hodnota je vždy NE.
   s.overeni = 'NE';
-  // Tolerance překlepů: starší snapshoty/šablony field nemají → bezpečné Vypnuto.
   if (s.fuzzyTolerance !== 'mild' && s.fuzzyTolerance !== 'strict') s.fuzzyTolerance = 'off';
-  // „Jiné/kombinace" bylo zrušeno — starší snapshot s touto volbou nech znovu vybrat.
   if (s.jazyk === '__jine__') s.jazyk = '';
   // ── Pedagogicko-didaktická vrstva: doplň bezpečné defaulty pro starší data ──
   if (typeof s.ageGroup !== 'string') s.ageGroup = '';
   if (typeof s.ageGroupCustom !== 'string') s.ageGroupCustom = '';
   if (typeof s.testPurpose !== 'string') s.testPurpose = '';
   if (typeof s.pedagogicalPreset !== 'string') s.pedagogicalPreset = '';
-  // Interní profil účelu testu. Staré detailní šablony mapujeme na tři společné účely.
   if (typeof s.simpleTemplate !== 'string') s.simpleTemplate = '';
   const legacyPurposeMap = { fl_homework:'fl_practice', fl_graded_quick:'fl_standard', cs_text:'cs_practice' };
   if (legacyPurposeMap[s.simpleTemplate]) s.simpleTemplate = legacyPurposeMap[s.simpleTemplate];
@@ -36,8 +31,6 @@ function normalizeLoadedState(s) {
   if (s.manualMode === undefined) s.manualMode = false;
   if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
 
-  // Starší snapshoty mohly držet tři navzájem rozdílné údaje: počet cvičení,
-  // globální typy a skrytou exerciseConfig. Po načtení vždy obnov jednu autoritu.
   if (s.exerciseDetail && Array.isArray(s.exerciseConfig) && s.exerciseConfig.length) {
     s.pocet = Math.min(10, s.exerciseConfig.length);
     s.exerciseConfig = s.exerciseConfig.slice(0, s.pocet);
@@ -51,16 +44,11 @@ function normalizeLoadedState(s) {
   return s;
 }
 
-// ═══ Křížové závislosti mezi poli stavu ═══════════════════════════════════════
-// Veškerá pravidla „jedno pole vynutí jiné" na jednom místě.
-// Voláno z pick(), pickDiff(), setAppMode().
+// Křížové závislosti stavu.
 function enforceModeConstraints() {
   // Ověřovací panel odebrán z UI; vždy NE.
   state.overeni = 'NE';
-  // Modul ČJ řídí exerciseConfig, bodování i typy — vyžaduje pokročilý mód,
-  // jinak applySimpleDefaults() jeho nastavení při každé validaci přepisuje.
-  // VÝJIMKA: pokud je aktivní jednoduchá šablona, čeština smí zůstat v jednoduchém
-  // módu — šablona řídí režim/hodnocení a volby jsou skryté, takže nehrozí konflikt.
+  // ČJ vyžaduje advanced, pokud skryté volby neřídí jednoduchá šablona.
   if (String(state.jazyk || '').toLowerCase() === 'čeština' && isSimpleMode() && !state.simpleTemplate) {
     state.appMode = 'advanced'; state.workPreset = 'advanced';
   }
@@ -69,35 +57,26 @@ function enforceModeConstraints() {
     state.resultMode = 'secureOffline';
     state.odevzdavani = 'B';
   }
-  // Procvičovací mód → okamžitý výsledek a skutečně formativní chování.
-  // Žolík je klasifikační výjimka, proto v procvičování nedává smysl.
   if (state.testMode === 'procviceci') {
     state.resultMode = 'instant';
     state.feedbackMode = 'learning';
     state.zolicek = 'NE';
   }
-  // Bezpečný offline → celkové odevzdání. Normálně by v jednoduchém módu přepnul do
-  // pokročilého, ALE pokud offline nastavila jednoduchá šablona, smí zůstat v simple
-  // (volby jsou skryté, řídí je šablona — to je celý smysl šablon na známku/přísných).
   if ((state.resultMode || 'instant') === 'secureOffline') {
     state.odevzdavani = 'B';
     state.feedbackMode = 'none';
     if (isSimpleMode() && !state.simpleTemplate) { state.appMode = 'advanced'; state.workPreset = 'advanced'; }
   }
-  // Bez okamžité zpětné vazby nelze použít průběžné odevzdávání: cvičení by se
-  // nevratně uzamklo bez jakékoli informace pro studenta.
+  // Bez okamžité zpětné vazby nelze použít průběžné odevzdávání.
   if (state.feedbackMode === 'none') state.odevzdavani = 'B';
-  // Okamžitá známka + přísný test jsou navzájem neslučitelné → vrátit na secureOffline.
   if (state.resultMode === 'instant' && state.testMode === 'prisny') {
     state.resultMode = 'secureOffline';
     state.odevzdavani = 'B';
   }
-  // Diferenciace → vyžaduje pokročilý mód (skupiny + podmínky jsou advanced-only).
   if (state.diferencovany === 'ANO' && isSimpleMode()) {
     state.appMode = 'advanced';
     state.workPreset = 'advanced';
   }
-  // Jednoduchý mód → vynuť výchozí nastavení (přepisuje případné nesoulady z load).
   if (isSimpleMode()) applySimpleDefaults();
 }
 
@@ -150,16 +129,11 @@ function markAdvancedSections(){
   const rosterF = $('rosterField'); if (rosterF) rosterF.classList.add('advanced-only');
   ids.forEach(id => { const el = $(id); const f = el && el.closest ? el.closest('.field') : null; if (f) f.classList.add('advanced-only'); });
   const varA = $('varA'); const subField = varA && varA.closest ? varA.closest('.field') : null; if (subField) subField.classList.add('advanced-only');
-  // Per-exercise quantities are useful even in Simple mode. The renderer keeps
-  // the Simple variant intentionally compact (type + item count + points) and
-  // hides the advanced/manual-generation controls there.
+  // Počet položek/body zůstávají dostupné i v Simple.
   const btnEx = $('btnExDetail'); if (btnEx) btnEx.classList.remove('advanced-only');
 }
 
-// Etapa 5 — pouze informační architektura Pokročilého režimu.
-// Existující .field uzly se PŘESOUVAJÍ, nekopírují: zůstávají jim stejná ID,
-// inline handlery, hodnoty i validační vazby. V Simple režimu se vrátí na původní
-// místa pomocí inertních placeholderů, takže Etapa 5 nemění jednoduchý workflow.
+// Advanced UI přesouvá existující .field uzly; nekopíruje je.
 const ADVANCED_SETTINGS_GROUPS = [
   { id:'advancedGroupTest', icon:'🧪', title:'Test', desc:'Čas, odevzdávání, body a stupnice hodnocení. Účel/režim testu se volí společně už v předchozím kroku.', fields:['timeField','strictRiskField','submissionModeField','globalBodyField','gradeField'] },
   { id:'advancedGroupStudent', icon:'🧑‍🎓', title:'Student', desc:'Identita, roster, diferenciace a pořadí otázek.', fields:['identityModeField','rosterField','diffLevelField','diffField','randomField'] },
@@ -232,7 +206,6 @@ function organizeAdvancedSettings(){
 }
 
 function updateAppModeUI(){
-  // markAdvancedSections() se volá jednou při startu v init() — DOM prvky se nemění.
   const simple = isSimpleMode();
   document.body.classList.toggle('simple-mode', simple);
   document.body.classList.toggle('advanced-mode', !simple);
@@ -396,7 +369,6 @@ function getStoredState(){
   const clean = JSON.parse(JSON.stringify(state));
   clean.fileNames = [];
   if (Array.isArray(clean.skupiny)) clean.skupiny = anonymizeGroupsForStorage(clean.skupiny);
-  // V prohlížeči nikdy neukládáme reálné přílohy, hesla/PINy ani skutečná jména studentů.
   return clean;
 }
 const MAX_ZADANI_IMPORT_BYTES = 512 * 1024;
@@ -462,7 +434,6 @@ function safeDomEntries(raw){
 }
 function sanitizePromptForStorage(prompt){
   let out = String(prompt || '');
-  // Starší i nové názvy polí; historie nikdy nesmí obsahovat učitelský přístupový kód ani staré PIN/heslo.
   out = out.replace(
     /(?:Heslo pro odemčení(?: bezpečnostního zámku)?|Odemykací heslo(?: zámkové obrazovky)?|Učitelský přístupový kód)\s*:\s*.*$/gm,
     'Učitelský přístupový kód: [NEULOŽENO]'
@@ -482,8 +453,7 @@ function clearOldUnsafeStorage(){
   try { OLD_KEYS_TO_CLEAR.forEach(k => { if (!active.has(k)) localStorage.removeItem(k); }); } catch(_){}
 }
 
-// Seznam VŠECH historických klíčů (od nejnovějšího po nejstarší), z nichž se při startu
-// přenášejí šablony a historie do aktuálního klíče — DŘÍV, než cokoli smaže clearOldUnsafeStorage.
+// Legacy klíče pro migraci šablon a historie.
 const LEGACY_TPL_KEYS = ['sestavovac_tpl_v5_12_0','sestavovac_tpl_v5_11_1','sestavovac_tpl_v5_11_0','sestavovac_tpl_v5_10_6','sestavovac_tpl_v5_9_6','sestavovac_tpl_v5_9_5','sestavovac_tpl_v5_9_4','sestavovac_tpl_v5_9_3','sestavovac_tpl_v5_9_1','sestavovac_tpl_v5_9_0','sestavovac_tpl_v5_8_6','sestavovac_tpl_v5_8_5','sestavovac_tpl_v5_8_4','sestavovac_tpl_v5_8_3','sestavovac_tpl_v5_8_2','sestavovac_tpl_v5_8_1','sestavovac_tpl_v5_8_0','sestavovac_tpl_v5_7_4','sestavovac_tpl_v5_7_3','sestavovac_tpl_v5_7_2','sestavovac_tpl_v5_7_1','sestavovac_tpl_v5_6','sestavovac_tpl_v5_4','sestavovac_tpl_v5'];
 const LEGACY_HIST_KEYS = ['sestavovac_hist_v5_12_0','sestavovac_hist_v5_11_1','sestavovac_hist_v5_11_0','sestavovac_hist_v5_10_6','sestavovac_hist_v5_9_6','sestavovac_hist_v5_9_5','sestavovac_hist_v5_9_4','sestavovac_hist_v5_9_3','sestavovac_hist_v5_9_1','sestavovac_hist_v5_9_0','sestavovac_hist_v5_8_6','sestavovac_hist_v5_8_5','sestavovac_hist_v5_8_4','sestavovac_hist_v5_8_3','sestavovac_hist_v5_8_2','sestavovac_hist_v5_8_1','sestavovac_hist_v5_8_0','sestavovac_hist_v5_7_4','sestavovac_hist_v5_7_3','sestavovac_hist_v5_7_2','sestavovac_hist_v5_7_1','sestavovac_hist_v5_7','sestavovac_hist_v5_6','sestavovac_hist_v5_4','sestavovac_hist_v5'];
 
@@ -508,11 +478,9 @@ function readArr(key){
   catch(_){ return []; }
 }
 
-// Přenese šablony a historii ze starých klíčů do aktuálních. Sloučí a deduplikuje podle id,
-// novější (z dřívějšího klíče v seznamu) má přednost. Bezpečné spustit opakovaně (idempotentní).
+// Idempotentní migrace starých šablon a historie.
 function migrateStorage(){
   try {
-    // ŠABLONY: aktuální + všechny legacy, dedup podle id
     const seenTpl = new Set();
     const mergedTpl = [];
     for (const arr of [readArr(TPL_KEY), ...LEGACY_TPL_KEYS.map(readArr)]) {
@@ -525,7 +493,6 @@ function migrateStorage(){
     }
     if (mergedTpl.length) safeSetItem(TPL_KEY, JSON.stringify(mergedTpl));
 
-    // HISTORIE: aktuální + všechny legacy, dedup podle hash (jinak ts), nejnovější nahoře, limit 50
     const seenHist = new Set();
     const mergedHist = [];
     for (const arr of [readArr(HIST_KEY), ...LEGACY_HIST_KEYS.map(readArr)]) {
@@ -612,95 +579,55 @@ function flashSave() {
 
 // ═══ Templates ════════════════════════════════════════════════════════════════
 function loadTemplates() {
-  // migrateStorage() při startu sloučí všechny staré klíče do TPL_KEY, takže stačí číst aktuální.
   return readArr(TPL_KEY);
 }
 function saveTemplates(tpls) {
   return safeSetItem(TPL_KEY, JSON.stringify(tpls));
 }
 
-// Klíče pedagogického profilu — to jediné, co šablona ukládá.
-// Záměrně NEOBSAHUJE exerciseConfig, cas, jazyk, nazev testu, téma.
-const PROFILE_KEYS = ['testMode','resultMode','feedbackMode','differentiationLevel','fuzzyTolerance','gradeTyp'];
-
-function getTemplateProfile() {
-  const p = {};
-  PROFILE_KEYS.forEach(function(k){ p[k] = state[k]; });
-  p.diferencovany = state.diferencovany || 'NE';
-  p.skupinyCount = (state.skupiny || []).length;
-  p.skupinyNazvy = (state.skupiny || []).map(function(g){ return g.nazev || ''; });
-  return p;
+// Bezpečné předvyplnění: pouze konfigurační stav, nikdy obsah zadání/URL/přílohy/identity/kódy.
+const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni rcLength sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard feedbackMode differentiationLevel'.split(' ');
+function getTemplatePrefill(){
+  const p={}; TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));
+  p.skupinyCount=(state.skupiny||[]).length; p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||''); return p;
 }
-
-function applyTemplateProfile(p) {
-  if (!p) return;
-  PROFILE_KEYS.forEach(function(k){ if (p[k] !== undefined) state[k] = p[k]; });
-  state.diferencovany = p.diferencovany || 'NE';
-  if (state.diferencovany === 'NE') {
-    state.skupiny = [];
-  } else if (p.skupinyCount > 0) {
-    state.skupiny = [];
-    const names = p.skupinyNazvy || [];
-    for (let i = 0; i < p.skupinyCount; i++) {
-      state.skupiny.push({ id: groupIdCounter++, nazev: names[i] || ('Skupina ' + (i + 1)), podminky: '', studenti: [] });
-    }
+function applyTemplatePrefill(p){
+  if(!p)return; TEMPLATE_PREFILL_KEYS.forEach(k=>{if(p[k]!==undefined)state[k]=cloneSafeStoredValue(p[k])});
+  const n=Math.max(0,Math.min(12,Number(p.skupinyCount)||0)),names=Array.isArray(p.skupinyNazvy)?p.skupinyNazvy:[];
+  state.skupiny=[]; if((state.diferencovany||'NE')==='ANO')for(let i=0;i<n;i++)state.skupiny.push({id:groupIdCounter++,nazev:names[i]||('Skupina '+(i+1)),podminky:'',studenti:[]});
+}
+function finishTemplateLoad(msg,type='ok'){
+  normalizeLoadedState(state); enforceModeConstraints(); maxStep=0; goTo(0); applyVisualState();
+  if(typeof renderGroups==='function')renderGroups(); if(typeof renderTeacherMapping==='function')renderTeacherMapping();
+  validate(); saveSnapshot(); uiToast(msg,type,5500);
+}
+async function saveTemplate(){
+  const name=await uiPrompt('Název šablony',trim('nazev')||'Moje šablona'); if(!name)return;
+  const why=await uiPrompt('Logika šablony (nepovinné — krátký popis účelu šablony)',''),tpls=loadTemplates();
+  tpls.push({id:Date.now(),name,why:why||'',format:'prefill_v2',prefill:getTemplatePrefill(),ts:Date.now()});
+  if(!saveTemplates(tpls))return; renderTemplates(); flashSave();
+  uiToast('Šablona uložena. Příště předvyplní jazyk, úroveň, cvičení, čas, body i režim; obsah, přílohy, jména a přístupové kódy se neukládají.','ok',6000);
+}
+function loadTemplate(id){
+  const tpl=loadTemplates().find(t=>t.id===id); if(!tpl)return;
+  if(tpl.format==='prefill_v2'){
+    applyTemplatePrefill(cloneSafeStoredValue(tpl.prefill));
+    finishTemplateLoad('Šablona „'+esc(tpl.name)+'“ načtena — formulář je předvyplněný.');
+    return;
   }
-}
-
-async function saveTemplate() {
-  const name = await uiPrompt('Název šablony', trim('nazev') || 'Moje šablona');
-  if (!name) return;
-  const why = await uiPrompt('Logika šablony (nepovinné — krátký popis účelu šablony)', '');
-  const tpls = loadTemplates();
-  tpls.push({ id: Date.now(), name, why: why || '', format: 'profile_v1', profile: getTemplateProfile(), ts: Date.now() });
-  if (!saveTemplates(tpls)) return;
-  renderTemplates();
-  flashSave();
-  uiToast('Šablona uložena — ukládá pedagogický profil (mód, zpětná vazba, hodnocení, diferenciace). Cvičení, čas a jazyk zůstávají na tobě.', 'ok', 5000);
-}
-
-function loadTemplate(id) {
-  const tpls = loadTemplates();
-  const tpl = tpls.find(t => t.id === id);
-  if (!tpl) return;
-  if (tpl.format === 'profile_v1') {
-    // Nový selektivní formát — aplikuje jen pedagogický profil, nedotkne se cvičení, času ani jazyka.
-    applyTemplateProfile(cloneSafeStoredValue(tpl.profile));
-    enforceModeConstraints();
-    normalizeLoadedState(state);
-    applyVisualState();
-    if (typeof renderGroups === 'function') renderGroups();
-    if (typeof renderTeacherMapping === 'function') renderTeacherMapping();
-    validate();
-    saveSnapshot();
-    uiToast('Šablona „' + esc(tpl.name) + '“ aplikována — cvičení, čas a jazyk jsou beze změny.', 'ok', 3500);
-  } else {
-    // Starý plný formát — zpětná kompatibilita: obnoví vše jako dřív.
-    replaceStateFromUntrusted(tpl.state);
-    if (!state.urls?.length) state.urls = [''];
-    fileObjects = [];
-    fileReadPromises = [];
-    state.fileNames = [];
-    showFileError('');
-    if (state.zadaniTab === 'file' && state.fileNames.length === 0) state.zadaniTab = 'text';
-    if (!state.layout) state.layout = 'tabs';
-    if (!state.resultMode) state.resultMode = 'instant';
-    normalizeLoadedState(state);
-    enforceModeConstraints();
-    safeDomEntries(tpl.dom).forEach(([k,v]) => setVal(k, v));
-    SENSITIVE_FIELD_IDS.forEach(id => setVal(id, ''));
-    maxStep = 0;
-    goTo(0);
-    applyVisualState();
-    validate();
+  if(tpl.format==='profile_v1'){
+    applyTemplatePrefill(cloneSafeStoredValue(tpl.profile));
+    finishTemplateLoad('Starší šablona obsahuje jen režim a hodnocení. Pro plné předvyplnění ji po nastavení ulož znovu.','warn');
+    return;
   }
+  replaceStateFromUntrusted(tpl.state); if(!state.urls?.length)state.urls=[''];
+  fileObjects=[]; fileReadPromises=[]; state.fileNames=[]; showFileError('');
+  if(state.zadaniTab==='file')state.zadaniTab='text'; if(!state.layout)state.layout='tabs'; if(!state.resultMode)state.resultMode='instant';
+  safeDomEntries(tpl.dom).forEach(([k,v])=>setVal(k,v)); SENSITIVE_FIELD_IDS.forEach(id=>setVal(id,''));
+  finishTemplateLoad('Starší plná šablona načtena. Přístupové údaje a přílohy byly vyčištěny.');
 }
 
-// ═══ PŘENOS ZADÁNÍ MEZI KOLEGY ════════════════════════════════════════════════
-// Export/import celé konfigurace formuláře do .json souboru. Stejný tvar jako snapshot
-// (dom + state), bez hesel/PINů (nejsou v DOM_FIELDS) a bez nahraných souborů (binárky
-// se neukládají). Použití: kolega bez volných AI requestů vyplní zadání, exportuje ho a
-// pošle, druhý učitel ho načte a vygeneruje test na svém klíči/kvótě.
+// Přenos očištěného zadání mezi kolegy.
 function buildZadaniExport(){
   const dom = {};
   DOM_FIELDS.forEach(id => { dom[id] = val(id); });
@@ -793,8 +720,8 @@ function renderTemplates() {
   const FL = { none:'bez zpět. vazby', brief:'stručná zpět. vazba', learning:'učící zpět. vazba' };
   const DL = { basic:'podpora', challenge:'challenge' };
   list.innerHTML = tpls.map(function(t) {
-    const isNew = t.format === 'profile_v1';
-    const p = t.profile || {};
+    const isPrefill=t.format==='prefill_v2', isProfile=t.format==='profile_v1', isNew=isPrefill||isProfile;
+    const p=(isPrefill?t.prefill:t.profile)||{};
     const badges = [];
     if (isNew) {
       if (RL[p.resultMode]) badges.push(RL[p.resultMode]);
@@ -806,13 +733,13 @@ function renderTemplates() {
       + '<div class="tpl-card-head">'
       + '<span class="tpl-card-name">' + esc(t.name) + '</span>'
       + '<div class="tpl-card-btns">'
-      + '<button class="tpl-load" onclick="loadTemplate(' + t.id + ')" title="Aplikovat šablonu">' + (isNew ? 'Aplikovat' : '\ud83d\udcc4 Načíst (starý formát)') + '</button>'
+      + '<button class="tpl-load" onclick="loadTemplate(' + t.id + ')" title="Načíst šablonu">' + (isPrefill ? '📄 Načíst šablonu' : (isProfile ? '📄 Načíst profil' : '📄 Načíst (starý formát)')) + '</button>'
       + '<button class="tpl-del" onclick="deleteTemplate(' + t.id + ')" title="Smazat šablonu">\u2715</button>'
       + '</div>'
       + '</div>'
       + (badges.length ? '<div class="tpl-badges">' + badges.map(function(b){ return '<span class="tpl-badge">' + esc(b) + '</span>'; }).join('') + '</div>' : '')
       + (t.why ? '<div class="preset-modal-why" style="margin-top:7px"><strong>Logika šablony:</strong> ' + esc(t.why) + '</div>' : '')
-      + (!isNew ? '<div class="tpl-old-note">Starý formát (obnoví vše vč. cvičení). Ulož znovu pro nový selektivní formát.</div>' : '')
+      + (isProfile ? '<div class="tpl-old-note">Starší profil: pro plné předvyplnění jej ulož znovu.</div>' : (!isNew ? '<div class="tpl-old-note">Starý formát. Po načtení ulož znovu.</div>' : ''))
       + '</div>';
   }).join('');
 }
@@ -823,7 +750,6 @@ function loadHistory() {
 }
 function pushHistory(prompt) {
   try {
-    // Prompt je od v7 pseudonymizovaný už při sestavení; sanitizace je druhá pojistka.
     const promptForHistory = prompt;
     const safePrompt = sanitizePromptForStorage(promptForHistory);
     const hash = shortHash(safePrompt);

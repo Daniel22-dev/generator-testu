@@ -1,5 +1,5 @@
 /* ===================== GHRAB AI CORE 1.0.0 · GENERÁTOR P1 ===================== */
-const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.56'});
+const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.57'});
 const GEN_AI_SCHEMA_ID='generator.object.v1';
 const GEN_AI_SCHEMAS=Object.freeze({[GEN_AI_SCHEMA_ID]:{type:'object',additionalProperties:true}});
 const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN_AI_APP.id,operations:Object.freeze({
@@ -42,13 +42,21 @@ async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   const response=await window.GHRAB_AI.generate({operation,modelProfile:genModelProfile(operation),instructions:aiTrustedSystemInstruction(),inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal:currentGeminiAbortController?.signal});
   lastGeminiRawResponse=JSON.stringify(response.result);lastGeminiJsonRepaired=false;return response.result;
 }
+async function genCallCoreResilient(p,x,o){
+  try{return await callGeminiJSONCore(p,x,o)}catch(a){
+    if(genSchoolMode()||a?.status!==503||a?.code!=='PROVIDER_UNAVAILABLE')throw a;
+    await new Promise(r=>setTimeout(r,2000));
+    if(currentGeminiAbortController?.signal?.aborted)throw Object.assign(new Error('Požadavek byl zrušen.'),{name:'AbortError'});
+    try{return await callGeminiJSONCore(p,x,o)}catch(b){b.providerRequests=(a.providerRequests||0)+(b.providerRequests||0);throw b}
+  }
+}
 const genLegacyCallGeminiJSON=callGeminiJSON;
 callGeminiJSON=async function callGeminiJSONThroughCore(prompt,extraParts=[],opts={}){
   if(opts.__legacyTest===true||window.__TEST_USE_LEGACY_GEMINI__)return genLegacyCallGeminiJSON(prompt,extraParts,opts);
   // GHRAB AI Core 1.0.0 nemá kontrakt pro providerové nástroje. URL Context proto
   // zůstává pouze v přímém Gemini režimu; školní brána jej výše výslovně odmítne.
   if(!genSchoolMode()&&opts.urlContext)return genLegacyCallGeminiJSON(prompt,extraParts,opts);
-  try{return await callGeminiJSONCore(prompt,extraParts,opts)}catch(error){
+  try{return await genCallCoreResilient(prompt,extraParts,opts)}catch(error){
     if(window.GHRAB_AI?.formatUserError){
       const base=window.GHRAB_AI.formatUserError(error,'cs-CZ');
       const technical=[];
