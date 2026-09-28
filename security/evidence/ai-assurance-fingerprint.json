@@ -6,7 +6,7 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "938dfb19af8e295ca41775bf04f1d8eef48af0b7e78c742c6a73a8f16ce42478",
+  "fingerprint": "aff477280ff61297873d41ac42237972c67495165931226bd16ecf3a8cea51e0",
   "files": [
     {
       "path": "src/js/01-core.js",
@@ -40,8 +40,8 @@
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
-      "size": 54297,
-      "sha256": "01055b28434b08b1e2577334d2cc5b8dfa424cb103418e83631d5e6900b68e99"
+      "size": 64126,
+      "sha256": "3d953fb187d082185100b3e9c5bd97bc99531f315aa5ad8863c47b798243e028"
     },
     {
       "path": "src/js/12-prompt-builder.js",
@@ -60,8 +60,8 @@
     },
     {
       "path": "src/features/preview-editor.js",
-      "size": 55604,
-      "sha256": "aeab7012421f8063c70dd996c90b79b36e12f6aee9be2c8a65d73247dc0b72df"
+      "size": 55639,
+      "sha256": "b18bf8cc3dd6377c52634f2ad6ecb46e24f20e05b0dc42f35d7657699d9b0663"
     },
     {
       "path": "src/features/testlab.js",
