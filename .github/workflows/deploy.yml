@@ -59,12 +59,12 @@ jobs:
       - name: Enforce GARP 2.7 foundation on release source
         run: npm run qa:garp27:foundation
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 8f9e875f38f432c603de46d982fffe817aad9a0c56ffc85f15a5c730339ba833
+          GARP27_EXTERNAL_TRUST_SHA256: 390d48476e038f43cff9a25bda6142c78c813e4b6b0f90ea9527afb07639a165
 
       - name: Enforce final P5 R2 release gate
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 8f9e875f38f432c603de46d982fffe817aad9a0c56ffc85f15a5c730339ba833
+          GARP27_EXTERNAL_TRUST_SHA256: 390d48476e038f43cff9a25bda6142c78c813e4b6b0f90ea9527afb07639a165
 
       - name: Prepare release identity
         env:
