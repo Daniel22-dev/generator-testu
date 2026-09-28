@@ -19,7 +19,7 @@ const RELEASE = Object.freeze({
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
-    'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové AI dávky a analýza Readingu se při chybě zachovají v relaci a další pokus naváže od nedokončené části. Jedna logická AI dávka má společný časový strop, takže fallbacky už nemohou násobit timeout. Běžná cvičení se seskupují podle rozpočtu; samostatně zůstávají jen skutečně náročné typy.',
+    'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové dávky a Reading analýza se při chybě zachovají a další pokus naváže. AI dávka má jeden timeout a běžné typy se zbytečně netříští.',
     'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
     'AI DOSTUPNOST (7.1.56): aktualizovány profily Gemini a stabilní fallbacky. Chyby AI nově uvádějí bezpečný HTTP stav a interní kód pro přesnější diagnostiku.',
     'O APLIKACI (7.1.55): hlavní hlavička nově používá jednotný vstup O aplikaci. Karta shrnuje účel Generátoru, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a nápovědu; dosavadní changelog je přesunut dovnitř jako rozbalovací Katalog změn včetně samostatně verzovaného modulu Český jazyk.',

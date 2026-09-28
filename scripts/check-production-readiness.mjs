@@ -105,7 +105,7 @@ forbidText(templatePrefillBlock, /zadaniText|readingText|listeningTranscript|fil
 requireText(persistence, /format:\s*['"]prefill_v2['"][\s\S]*getTemplatePrefill\(\)/, 'Nové šablony se neukládají ve formátu prefill_v2.');
 requireText(aiIntegration, /async function genCallCoreResilient[\s\S]*status!==503[\s\S]*setTimeout\(r,2000\)[\s\S]*providerRequests=/, 'Přímý Gemini transport nemá omezený backoff retry pro přechodnou HTTP 503.');
 requireText(aiIntegration, /GEN_LOGICAL_REQUEST_TIMEOUT_MS[\s\S]*hardTimedOut[\s\S]*code:'TIMEOUT'/, 'AI Core integrace nemá společný časový strop logické dávky.');
-requireText(generationWorkflow, /generationResumeCheckpoint[\s\S]*readingSourceAnalysis[\s\S]*activeCheckpoint\.parts=parts\.slice\(\)[\s\S]*Hotové části/, 'Generování nezachovává hotové dávky a Reading analýzu pro bezpečné navázání.');
+requireText(generationWorkflow, /generationResumeCheckpoint[\s\S]*cp\.r[\s\S]*cp\.p=parts\.slice\(\)[\s\S]*Zachováno/, 'Generování nezachovává hotové dávky a Reading analýzu pro bezpečné navázání.');
 forbidText(outputWorkflow, /const complex=isManualSupported/, 'Batching nesmí označit cvičení za složité jen proto, že má ruční editor.');
 requireText(outputWorkflow, /batchBudget=6000[\s\S]*reading comprehension[\s\S]*listening comprehension[\s\S]*cloze text/, 'Batching nemá očekávaný rozpočet a explicitní seznam skutečně náročných typů.');
 requireText(persistence, /MAX_ZADANI_IMPORT_BYTES[\s\S]*formatVersion\s*!==\s*1/, 'Import zadání nekontroluje velikost a verzi formátu.');
