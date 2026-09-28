@@ -322,9 +322,9 @@ function akvBuildPrompt(items){
     'Return JSON {"answers":[{"i":1,"a":<answer in the required shape>}]}. Preserve all IDs. '+
     'For gaps and arrays, order is significant.\n'+wrapUntrustedSource('TEST TASKS WITHOUT ANSWER KEY',JSON.stringify(items.map(x=>({i:x.i,type:x.type,question:x.q,answerShape:akvShape(x.type)}))));
 }
-let akvBusy=false,akvWeakRows=[],akvVariantKey='__default',akvSourceStamp=null;
+let akvBusy=false,akvWeakRows=[],akvDiffRows=[],akvVariantKey='__default',akvSourceStamp=null;
 let lastKeyCheck=null,keyDiffsAcknowledged=false;
-function resetKeyCheckState(){lastKeyCheck=null;keyDiffsAcknowledged=false;akvWeakRows=[];akvSourceStamp=null;}
+function resetKeyCheckState(){lastKeyCheck=null;keyDiffsAcknowledged=false;akvWeakRows=[];akvDiffRows=[];akvSourceStamp=null;}
 function akvDisplay(value){return typeof value==='string'?value:JSON.stringify(value);}
 function akvCanAdd(row){return ['fill-in-the-blank','cloze text','word order','word formation','error correction','translation','sentence transformation'].includes(row.type)||(row.type==='dialogue completion'&&typeof row.ai==='string');}
 async function aiVerifyKey(){
@@ -357,10 +357,10 @@ async function aiVerifyKey(){
     for(const u of units){if(!answers.has(u.i)){missing++;continue;}
       const ai=answers.get(u.i),verdict=akvCompare(u.exObj,u.itObj,ai);if(verdict==='invalid'){invalid++;continue;}checked++;
       const key=u.type==='matching'?u.exObj.items.map(it=>it.right):akvCorrectText(u.exObj,u.itObj);
-      const row={variant:u.variant,ex:u.ex0+1,q:u.qi0+1,ex0:u.ex0,qi0:u.qi0,type:u.type,key:akvDisplay(key),ai,question:u.q};
+      const row={variant:u.variant,ex:u.ex0+1,q:u.qi0+1,ex0:u.ex0,qi0:u.qi0,type:u.type,key:akvDisplay(key),ai,question:u.q,exObj:u.exObj,itObj:u.itObj};
       if(verdict==='diff')diffs.push(row);else if(verdict==='weak')weaks.push(row);
     }
-    akvSourceStamp=stamp;akvWeakRows=weaks;akvVariantKey=keys.join(', ');
+    akvSourceStamp=stamp;akvWeakRows=weaks;akvDiffRows=diffs;akvVariantKey=keys.join(', ');
     lastKeyCheck={closedDiffs:diffs.length,openWeaks:weaks.length,checked,missing,invalid,total:units.length,variants:keys,ranAt:Date.now()};keyDiffsAcknowledged=false;
     const incomplete=missing+invalid>0||!checked,title=incomplete?'AI kontrola je ne\u00fapln\u00e1':diffs.length||weaks.length?'AI kontrola: n\u00e1lezy k posouzen\u00ed':'AI odpov\u011bdi se shoduj\u00ed s ulo\u017een\u00fdm kl\u00ed\u010dem';
     if(out)out.innerHTML=collapsibleResultHtml(title,incomplete||diffs.length||weaks.length?'is-warn':'is-pass',akvRender(keys.join(', '),checked,missing+invalid,diffs,weaks));
@@ -368,17 +368,121 @@ async function aiVerifyKey(){
   }catch(error){if(out)setErrorTextWithHttpHelp(out,'Kontrola selhala; není dokladem správnosti klíče. '+(error&&error.message?error.message:String(error)));}
   finally{akvBusy=false;if(btn)btn.disabled=false;}
 }
+function akvHumanClosedAnswer(row,value){
+  const t=row.type,it=row.itObj||{},ex=row.exObj||{};
+  if(t==='true/false'){
+    const b=typeof value==='string'&&/^(true|false)$/i.test(value)?value.toLowerCase()==='true':value;
+    return b===true?'true (PRAVDA)':b===false?'false (NEPRAVDA)':akvDisplay(value);
+  }
+  if(ST_CHOICE_TYPES.includes(t)||t==='dialogue completion'&&Array.isArray(it.options)){
+    let ix=-1;
+    if(Number.isInteger(value))ix=value;
+    else if(typeof value==='string'){
+      const v=value.trim();
+      if(/^[A-Za-z]$/.test(v))ix=v.toUpperCase().charCodeAt(0)-65;
+      else if(/^\d+$/.test(v))ix=Number(v);
+      else ix=(it.options||[]).findIndex(x=>akvNorm(x)===akvNorm(v));
+    }
+    return ix>=0&&it.options&&it.options[ix]!=null?String.fromCharCode(65+ix)+') '+String(it.options[ix]):akvDisplay(value);
+  }
+  if(t==='multi-select'&&Array.isArray(value))return value.map(ix=>it.options&&it.options[ix]!=null?String.fromCharCode(65+ix)+') '+it.options[ix]:'#'+ix).join(' · ');
+  if(t==='ordering'&&Array.isArray(value))return value.map(ix=>Array.isArray(it.items)&&it.items[ix]!=null?String(it.items[ix]):('#'+ix)).join(' → ');
+  if(t==='highlight-evidence'&&Number.isInteger(value))return Array.isArray(it.sentences)&&it.sentences[value]!=null?String(it.sentences[value]):('#'+value);
+  if(t==='matching'&&Array.isArray(value))return value.map((v,i)=>String(ex.items&&ex.items[i]&&ex.items[i].left!=null?ex.items[i].left:(i+1))+' → '+String(v)).join(' · ');
+  if(t==='categorisation-board'&&Array.isArray(value))return value.map((v,i)=>String(it.entries&&it.entries[i]&&it.entries[i].text!=null?it.entries[i].text:(i+1))+' → '+String(v)).join(' · ');
+  if(t==='error-tagging'&&value&&typeof value==='object'){
+    const token=Array.isArray(it.tokens)&&it.tokens[value.token]!=null?it.tokens[value.token]:('#'+value.token);
+    return String(token)+' · '+String(value.etype||'')+' · oprava: '+String(value.corr||'');
+  }
+  return akvDisplay(value);
+}
+function akvClosedTarget(data,row){
+  const v=row.variant==='__default'?data:data.group_variants&&data.group_variants[row.variant];
+  const exs=Array.isArray(v)?v:v&&v.exercises;
+  const ex=exs&&exs[row.ex0],it=ex&&Array.isArray(ex.items)?ex.items[row.qi0]:null;
+  return {ex,it};
+}
+function akvChoiceIndexForApply(it,ai){
+  if(!it||!Array.isArray(it.options))return -1;
+  if(Number.isInteger(ai))return ai;
+  if(typeof ai!=='string')return -1;
+  const v=ai.trim();
+  if(/^[A-Za-z]$/.test(v))return v.toUpperCase().charCodeAt(0)-65;
+  if(/^\d+$/.test(v))return Number(v);
+  return it.options.findIndex(x=>akvNorm(x)===akvNorm(v));
+}
+function akvCanReplaceClosed(row){
+  return ['matching','true/false','multi-select','ordering','highlight-evidence','categorisation-board','error-tagging','categorization'].includes(row.type)
+    || ST_CHOICE_TYPES.includes(row.type)
+    || (row.type==='dialogue completion'&&row.itObj&&Array.isArray(row.itObj.options));
+}
+function akvApplyClosedKey(data,row){
+  const target=akvClosedTarget(data,row),ex=target.ex,it=target.it,ai=row.ai,t=row.type;
+  if(!ex||!it)return false;
+  if(t==='matching'){if(!Array.isArray(ai)||!Array.isArray(ex.items)||ai.length!==ex.items.length)return false;ex.items.forEach((pair,i)=>{pair.right=String(ai[i]);});return true;}
+  if(ST_CHOICE_TYPES.includes(t)||t==='dialogue completion'&&Array.isArray(it.options)){const ix=akvChoiceIndexForApply(it,ai);if(ix<0||ix>=it.options.length)return false;it.correct=ix;return true;}
+  if(t==='true/false'){let v=ai;if(typeof v==='string'&&/^(true|false)$/i.test(v))v=v.toLowerCase()==='true';if(typeof v!=='boolean')return false;it.correct=v;return true;}
+  if(t==='multi-select'){if(!Array.isArray(ai)||!ai.every(Number.isInteger))return false;it.correct=ai.slice();return true;}
+  if(t==='ordering'){if(!Array.isArray(ai)||!ai.every(Number.isInteger))return false;it.correct_order=ai.slice();return true;}
+  if(t==='highlight-evidence'){if(!Number.isInteger(ai))return false;it.correct=ai;return true;}
+  if(t==='categorisation-board'){if(!Array.isArray(ai)||!Array.isArray(it.entries)||ai.length!==it.entries.length)return false;it.entries.forEach((entry,i)=>{if(entry&&typeof entry==='object')entry.category=String(ai[i]);});return true;}
+  if(t==='error-tagging'){if(!ai||typeof ai!=='object'||!Number.isInteger(ai.token)||typeof ai.etype!=='string'||typeof ai.corr!=='string')return false;it.error_token_index=ai.token;it.error_type=ai.etype;it.correction=ai.corr;return true;}
+  if(t==='categorization'){if(typeof ai!=='string'||!ai.trim())return false;it.correct_category=ai.trim();return true;}
+  return false;
+}
+function akvUpdateClosedReviewStatus(){
+  const el=$('akvClosedReviewStatus');if(!el)return;
+  const chosen=document.querySelectorAll('.akv-diff-decision:checked').length,total=akvDiffRows.length;
+  el.className='akv-apply-status'+(chosen===total&&total?' ok':'');
+  el.textContent=chosen+'/'+total+' nálezů má rozhodnutí.';
+}
+async function akvApplyClosedReview(){
+  const status=$('akvClosedReviewStatus');
+  if(outputMutationBusy||!akvSourceStamp||!akvDiffRows.length)return;
+  const decisions=akvDiffRows.map((row,i)=>{const el=document.querySelector('input[name="akv-diff-'+i+'"]:checked');return el?el.value:'';});
+  const missing=decisions.filter(x=>!x).length;
+  if(missing){if(status){status.className='akv-apply-status warn';status.textContent='Ještě rozhodni u '+missing+' nálezů. Nic jsem zatím nezměnil.';}return;}
+  const useAi=decisions.map((v,i)=>v==='ai'?i:-1).filter(i=>i>=0);
+  if(!useAi.length){
+    keyDiffsAcknowledged=true;
+    document.querySelectorAll('.akv-diff-decision').forEach(el=>el.disabled=true);
+    if(status){status.className='akv-apply-status ok';status.textContent='Všechny rozdíly jsi prošel/a a ponechal/a původní klíč. Nic v testu se nezměnilo.';}
+    updateSecureDownloadGate();return;
+  }
+  const data=JSON.parse(JSON.stringify(lastGenData));let changed=0;
+  try{
+    requireOutputStamp(akvSourceStamp);
+    for(const i of useAi){if(akvApplyClosedKey(data,akvDiffRows[i]))changed++;else throw new Error('Návrh AI u nálezu '+(i+1)+' nelze bezpečně převést do klíče. Použij ruční editor.');}
+    if(status){status.className='akv-apply-status';status.textContent='Ukládám '+changed+' změn klíče a znovu sestavuji test…';}
+    await commitAnswerData(data,akvSourceStamp);
+    const out=$('keyCheckReport');
+    if(out){out.classList.remove('hidden');out.innerHTML=collapsibleResultHtml('Klíč upraven podle tvého rozhodnutí','is-pass','<p><b>Změněno '+changed+' položek.</b> Ostatní nálezy zůstaly podle tvého rozhodnutí beze změny.</p><p>Protože se změnil správný klíč, spusť znovu <b>self-test bodování</b>. Druhý AI průchod je volitelný, ale po změně klíče je vhodné jej zopakovat pro kontrolu.</p>');}
+  }catch(error){if(status){status.className='akv-apply-status warn';status.textContent='Změny nebyly uloženy: '+(error&&error.message?error.message:String(error));}}
+}
 function akvRender(variant,checked,missing,diffs,weaks){
-  let html='<p>Varianty: '+H(variant)+'. Ov\u011b\u0159eno '+checked+' \u00faloh; chyb\u011bj\u00edc\u00ed nebo neplatn\u00e9 odpov\u011bdi: '+missing+'. Shoda nen\u00ed d\u016fkaz spr\u00e1vnosti, neshoda nen\u00ed d\u016fkaz chyby.</p>';
-  if(diffs.length)html+='<h4>Uzav\u0159en\u00e9 odpov\u011bdi k revizi</h4>'+diffs.map(d=>akvCard(d,'diff')).join('');
-  if(weaks.length)html+='<h4>Otev\u0159en\u00e9 odpov\u011bdi k posouzen\u00ed</h4>'+weaks.map((d,i)=>akvCard(d,'weak',i)).join('');
-  if(weaks.some(akvCanAdd))html+='<button type="button" class="akv-apply-btn" onclick="akvApplySelected()">P\u0159idat za\u0161krtnut\u00e9 odpov\u011bdi a p\u0159esestavit</button><div id="akvApplyStatus" role="status"></div>';
-  if(!checked||missing)html+='<p><b>Ne\u00fapln\u00e1 kontrola. Zb\u00fdvaj\u00edc\u00ed \u00falohy zkontroluj ru\u010dn\u011b; tento v\u00fdsledek neozna\u010duje cel\u00fd kl\u00ed\u010d za ov\u011b\u0159en\u00fd.</b></p>';
+  let html='<p class="akv-note"><b>Co s výsledkem:</b> druhý AI průchod nic sám neopravuje. U <b>uzavřených úloh</b> (např. true/false nebo výběr z možností) nejde o další přijatelnou odpověď — AI tvrdí, že správný klíč má být jiný. U každého nálezu proto rozhodni, zda ponechat klíč testu, nebo převzít návrh AI.</p>';
+  html+='<div class="akv-legend"><span class="akv-leg-item"><span class="akv-dot key"></span><b>Klíč testu</b> = co se nyní hodnotí jako správně</span><span class="akv-leg-item"><span class="akv-dot ai"></span><b>Návrh AI</b> = nezávislý druhý názor, ne automatická pravda</span></div>';
+  html+='<p class="akv-note">Ověřeno '+checked+' úloh · chybějící/neplatné odpovědi '+missing+'. Shoda není důkaz správnosti; neshoda je místo k tvému rozhodnutí.</p>';
+  if(diffs.length){
+    html+='<div class="akv-section-head diff">Uzavřené odpovědi — vyžadují rozhodnutí ('+diffs.length+')</div>'+diffs.map((d,i)=>akvCard(d,'diff',i)).join('');
+    html+='<div class="akv-apply-row"><button type="button" class="akv-apply-btn" onclick="akvApplyClosedReview()">✓ Použít moje rozhodnutí</button><button type="button" class="btn-edit" onclick="openTestEditor()">✏️ Upravit ručně v editoru</button><div id="akvClosedReviewStatus" class="akv-apply-status">0/'+diffs.length+' nálezů má rozhodnutí.</div></div>';
+  }else html+='<div class="akv-clean">U uzavřených úloh AI nenašla žádný rozdíl proti uloženému klíči.</div>';
+  if(weaks.length){
+    html+='<div class="akv-section-head weak">Otevřené odpovědi — možné další uznatelné varianty</div><p class="akv-weak-hint">Tady může být správných formulací více. Zaškrtnutím pouze přidáš další odpověď jako uznatelnou; původní klíč se nemaže.</p>'+weaks.map((d,i)=>akvCard(d,'weak',i)).join('');
+  }
+  if(weaks.some(akvCanAdd))html+='<div class="akv-apply-row"><button type="button" class="akv-apply-btn" onclick="akvApplySelected()">Přidat zaškrtnuté alternativy</button><div id="akvApplyStatus" class="akv-apply-status" role="status"></div></div>';
+  if(!checked||missing)html+='<p><b>Neúplná kontrola. Zbývající úlohy zkontroluj ručně; tento výsledek neoznačuje celý klíč za ověřený.</b></p>';
   return html;
 }
 function akvCard(d,kind,index){
-  const pick=kind==='weak'&&akvCanAdd(d)?'<label class="akv-pick-row"><input type="checkbox" class="akv-pick" data-wi="'+index+'">P\u0159ijmout tuto odpov\u011b\u010f jako alternativu</label>':'<p>Rozd\u00edl posu\u010f v editoru; u tohoto form\u00e1tu se alternativy automaticky nep\u0159id\u00e1vaj\u00ed.</p>';
-  return '<div class="akv-item '+kind+'"><b>'+H(d.variant)+' \u00b7 cv. '+d.ex+' / pol. '+d.q+' \u00b7 '+H(d.type)+'</b><p>'+H(d.question)+'</p><p>Kl\u00ed\u010d: <b>'+H(d.key)+'</b></p><p>AI: <b>'+H(akvDisplay(d.ai))+'</b></p>'+pick+'</div>';
+  const head='<div class="akv-item-head"><span>'+H(d.variant)+' · cv. '+d.ex+' / pol. '+d.q+'</span><span class="akv-type-badge">'+H(d.type)+'</span><span class="akv-flag '+kind+'">'+(kind==='diff'?'AI NESOUHLASÍ':'DALŠÍ MOŽNÁ VARIANTA')+'</span></div>';
+  const cmp='<div class="akv-cmp"><div class="akv-cmp-row key"><span class="akv-cmp-label">Klíč testu</span><span class="akv-cmp-val">'+H(akvHumanClosedAnswer(d,d.key))+'</span></div><div class="akv-cmp-row ai"><span class="akv-cmp-label">Návrh AI</span><span class="akv-cmp-val">'+H(akvHumanClosedAnswer(d,d.ai))+'</span></div></div>';
+  let action='';
+  if(kind==='diff'){
+    if(akvCanReplaceClosed(d))action='<div class="akv-decision-grid"><label class="akv-decision keep"><input type="radio" class="akv-diff-decision" name="akv-diff-'+index+'" value="keep" onchange="akvUpdateClosedReviewStatus()"><span><b>Ponechat klíč</b><small>AI se podle mě mýlí; test nech beze změny.</small></span></label><label class="akv-decision ai"><input type="radio" class="akv-diff-decision" name="akv-diff-'+index+'" value="ai" onchange="akvUpdateClosedReviewStatus()"><span><b>Převzít návrh AI</b><small>Změň správný klíč na odpověď navrženou druhým průchodem.</small></span></label></div>';
+    else action='<p class="akv-more"><b>Tento typ neumím bezpečně přepsat jedním kliknutím.</b> Otevři ruční editor a rozhodni tam.</p>';
+  }else action=akvCanAdd(d)?'<label class="akv-pick-row"><input type="checkbox" class="akv-pick" data-wi="'+index+'"><span><b>Přijmout jako další uznatelnou odpověď</b><br>Klíč zůstane zachován, pouze se rozšíří seznam přijatelných variant.</span></label>':'<p class="akv-more">Tento nález je jen upozornění k ručnímu posouzení; automatické přidání alternativy u tohoto formátu není bezpečné.</p>';
+  return '<div class="akv-item '+kind+'">'+head+'<div class="akv-q-full">'+H(d.question)+'</div>'+cmp+action+'</div>';
 }
 function akvAddAltToItem(it,ai,type){
   if(!it)return false;
