@@ -364,7 +364,8 @@ ok('Legacy snapshot s jiným počtem se při načtení normalizuje podle typů',
   assert(st.pocet===2,'legacy počet nebyl opraven: '+st.pocet);
   assert(JSON.stringify(st.typyCviceni)===JSON.stringify(['multiple choice','reading comprehension']),'legacy typy se změnily');
 });
-w.eval('state.typyCviceni=[];state.pocet=1;');w.validate();
+resetBase();
+w.eval('state.typyCviceni=[];state.pocet=1;state.exerciseDetail=false;state.exerciseConfig=[];');w.validate();
 ok('bez výběru podporovaného typu je krok zablokován',()=>{
   assert(w.document.getElementById('next1').disabled,'prázdný výběr typu prošel');
 });
