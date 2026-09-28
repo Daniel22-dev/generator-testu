@@ -1,10 +1,14 @@
+> **7.1.58 — odolné dávkové generování.** Hotové části a analýza Readingu se při chybě zachovají v relaci, další pokus naváže od nedokončené dávky a jeden logický AI požadavek už nemůže násobit timeout přes několik fallback modelů.
+
 > **7.1.57 — AI dostupnost a diagnostika.** Kvalitní profil používá aktuální stabilní Gemini 3.8 Flash, vyvážený profil Gemini 3.7 Flash a při providerové nedostupnosti se zkouší více stabilních fallbacků. Chybová hláška nově zachovává HTTP stav a interní kód pro přesnou diagnostiku.
 
 > **7.1.54 — úklid a zrychlení otevírání.** Service worker nezměněnou stránku aplikace při otevření znovu nestahuje, jen ověří její aktuálnost u serveru. Odstraněno 17 nevolaných funkcí a sestavovací skript je čitelný. Chování aplikace se nemění. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.57
+**Aktuální verze:** 7.1.58
+
+> **7.1.58 Odolné generování (2026-09-28):** úspěšné dávky se během jednoho otevřeného okna checkpointují, Reading analýza se při stejném zadání znovu neopakuje, logický AI požadavek má společný časový strop a batching už neodděluje úlohu jen proto, že podporuje ruční editor.
 
 > **7.1.57 AI dostupnost (2026-09-28):** opraveno providerové mapování a diagnostika. Generování používá aktuální stabilní profily a více fallbacků; při chybě se neztratí bezpečný HTTP stav a interní kód. Scoring, verifier, secure runtime ani GARP autorita se nemění.
 

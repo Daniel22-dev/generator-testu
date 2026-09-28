@@ -376,6 +376,9 @@ window.reNumberSteps = function(itemIndex) {
 
 // ── Generování s manuálními cvičeními ────────────────────────────────────────
 // Validate each AI response at the boundary; never accept just a nonempty exercises[].
+let generationResumeCheckpoint=null;
+function generationResumeKey(s,p,f){return shortHash(JSON.stringify({v:RELEASE.version,s,b:p.batches,m:(f.parts||[]).map(q=>{const x=q.inline_data||q.inlineData;return[x?.mime_type||x?.mimeType||'',String(x?.data||'').length]})}))}
+function generationCheckpoint(k,n){let c=generationResumeCheckpoint;if(!c||c.k!==k||c.n!==n)c=generationResumeCheckpoint={k,n,p:[],r:null};return c}
 async function requestValidatedExerciseData(st,filePack,useUrlContext){
   const prompt=buildContentPrompt(st,filePack.notes||[]);
   let correction='';
@@ -510,6 +513,7 @@ async function generateTest(){
     geminiClearCooldown();
   }
   const previousOutput={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,seq:variantSeq,slug:variantSlug};
+  let cp=null;
   geminiCancelRequested=false;genBeginAiWorkflow();lockGenerationInputs(true);
   variantSeq=0;variantSlug='';if($('variantNote'))$('variantNote').classList.add('hidden');
   generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; lastSelfTest=null; secureGapsAcknowledged=false;
@@ -520,24 +524,25 @@ async function generateTest(){
     await waitForFileReads();
     const filePack=await buildGeminiFilePartsForApi();
     const useUrlContext=workState.zadaniTab==='url'&&Array.isArray(workState.urls)&&workState.urls.some(u=>String(u||'').trim());
+    if(!plan.manual)cp=generationCheckpoint(generationResumeKey(workState,plan,filePack),plan.batches.length);
     const readingWithSource = plan.specs.some(s=>s.type==='reading comprehension')
       && typeof activeSourceMaterialPresent==='function' && activeSourceMaterialPresent();
     if(readingWithSource){
       if(geminiCancelRequested) throw new Error('Generování zrušeno.');
       const lvl=(workState.uroven&&workState.uroven.length)?workState.uroven.join(' + '):'';
       if(!lvl) throw new Error('Pro Reading comprehension nejdřív zvol úroveň CEFR.');
-      setGenMsg('Analyzuji zdroj pro Reading (obsah, slovní zásobu a jazykové jevy)…');
-      workState.readingSourceAnalysis=await analyzeReadingSourceForAi(filePack.parts,lvl);
+      if(cp?.r){setGenMsg('Používám hotovou analýzu Readingu…');workState.readingSourceAnalysis=cp.r}
+      else{setGenMsg('Analyzuji zdroj pro Reading…');workState.readingSourceAnalysis=await analyzeReadingSourceForAi(filePack.parts,lvl);if(cp)cp.r=workState.readingSourceAnalysis}
       if(geminiCancelRequested) throw new Error('Generování zrušeno.');
     }
     let built;
     if(plan.manual){built=await generateTestWithManual(workState,filePack,useUrlContext);}
     else {
-      const parts=[];
-      for(let b=0;b<plan.batches.length;b++){
+      const parts=cp?cp.p.slice():[];
+      for(let b=parts.length;b<plan.batches.length;b++){
         if(geminiCancelRequested)throw new Error('Generov\u00e1n\u00ed zru\u0161eno.');
-        const indices=plan.batches[b];setGenMsg('Generuji \u010d\u00e1st '+(b+1)+' / '+plan.batches.length+' (cvi\u010den\u00ed '+indices.map(i=>i+1).join(', ')+')');
-        const data=await requestValidatedExerciseData(exerciseSliceState(workState,indices),filePack,useUrlContext);parts.push({indices,data});
+        const indices=plan.batches[b];setGenMsg((parts.length?'Navazuji · ':'')+'Generuji \u010d\u00e1st '+(b+1)+' / '+plan.batches.length+' (cvi\u010den\u00ed '+indices.map(i=>i+1).join(', ')+')');
+        const data=await requestValidatedExerciseData(exerciseSliceState(workState,indices),filePack,useUrlContext);parts.push({indices,data});if(cp)cp.p=parts.slice();
       }
       const data=mergeExerciseSlices(workState,parts);lastGenData=data;built=await assembleTestHtml(workState,data);
     }
@@ -598,15 +603,17 @@ async function generateTest(){
         );
       }
     }
+    generationResumeCheckpoint=null;
     recordGeneratorTelemetry('success');
   }
   catch(e){
     generatedTestHtml='';generatedPackage=null;generatedIntegrity=null;lastGenData=null;lastAssembled=null;
-    const cancelled=geminiCancelRequested||/zrušeno|cancelled|canceled|abort/i.test(String(e?.message||e));
+    const cancelled=geminiCancelRequested||/zrušeno|cancelled|canceled|abort/i.test(String(e?.message||e)),saved=cp?.parts?.length||0;
+    const resume=cp&&(saved||cp.r)?' Zachováno '+saved+'/'+cp.n+(cp.r?' + Reading':'')+'. Spusť Generovat znovu; navážu.':'';
     recordGeneratorTelemetry(cancelled?'cancelled':'error');
-    setGenErr(e?.message||String(e));
+    setGenErr((e?.message||String(e))+resume);
     setGenUI('error');
-    if(previousOutput.assembled){lastAssembled=previousOutput.assembled;lastGenData=previousOutput.data;generatedTestHtml=previousOutput.html;generatedPackage=previousOutput.pack;generatedIntegrity=previousOutput.integrity;variantSeq=previousOutput.seq;variantSlug=previousOutput.slug;exportChecklist={};lastSelfTest=null;resetKeyCheckState();resetVerificationReports();setGenUI('done');renderExportChecklist(true);$('genError').classList.remove('hidden');$('genError').textContent='Nový test nebyl vytvořen. Původní výstup zůstal zachován. '+(e?.message||String(e));}
+    if(previousOutput.assembled){lastAssembled=previousOutput.assembled;lastGenData=previousOutput.data;generatedTestHtml=previousOutput.html;generatedPackage=previousOutput.pack;generatedIntegrity=previousOutput.integrity;variantSeq=previousOutput.seq;variantSlug=previousOutput.slug;exportChecklist={};lastSelfTest=null;resetKeyCheckState();resetVerificationReports();setGenUI('done');renderExportChecklist(true);$('genError').classList.remove('hidden');$('genError').textContent='Nový test nebyl vytvořen. Původní výstup zůstal zachován. '+(e?.message||String(e))+resume;}
   } finally { genEndAiWorkflow();lockGenerationInputs(false); }
 }
 

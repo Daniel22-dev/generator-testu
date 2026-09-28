@@ -22,9 +22,9 @@ function generationPlan(st){
   specs.forEach((s,i)=>{
     if(config[i].manualMode)return;
     if(costs[i]>12000)throw new Error('Cvi\u010den\u00ed '+(i+1)+' ('+s.style+') je p\u0159\u00edli\u0161 rozs\u00e1hl\u00e9 pro jeden bezpe\u010dn\u011b pl\u00e1novan\u00fd po\u017eadavek. Sni\u017e po\u010det polo\u017eek nebo skupin. Odhad '+costs[i]+' v\u00fdstupn\u00edch token\u016f; aplika\u010dn\u00ed rozpo\u010det je 12000.');
-    const complex=isManualSupported(s.style)||s.type==='reading comprehension'||s.type==='listening comprehension'||s.type==='cloze text';
-    if(st.splitGenerate||complex||costs[i]>3500){flush();batches.push([i]);}
-    else {if(cost+costs[i]>3500)flush();pending.push(i);cost+=costs[i];}
+    const batchBudget=6000,complex=['reading comprehension','listening comprehension','cloze text'].includes(s.type);
+    if(st.splitGenerate||complex||costs[i]>batchBudget){flush();batches.push([i]);}
+    else {if(cost+costs[i]>batchBudget)flush();pending.push(i);cost+=costs[i];}
   });flush();
   const sourceAnalysisCalls = specs.some(s=>s.type==='reading comprehension')
     && typeof activeSourceMaterialPresent==='function' && activeSourceMaterialPresent() ? 1 : 0;
