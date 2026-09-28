@@ -619,19 +619,44 @@ function saveTemplates(tpls) {
   return safeSetItem(TPL_KEY, JSON.stringify(tpls));
 }
 
-// Klíče pedagogického profilu — to jediné, co šablona ukládá.
-// Záměrně NEOBSAHUJE exerciseConfig, cas, jazyk, nazev testu, téma.
-const PROFILE_KEYS = ['testMode','resultMode','feedbackMode','differentiationLevel','fuzzyTolerance','gradeTyp'];
+// Klíče plné předvyplňovací šablony. Záměrně sem NEPATŘÍ obsah zadání,
+// zdrojové texty/URL/přílohy, jména studentů ani přístupové kódy.
+const TEMPLATE_PREFILL_KEYS = [
+  'appMode','workPreset','jazyk','instrJazyk','uroven','kombinovat',
+  'pocet','typyCviceni','rcLength','sourceUseMode','cas','odevzdavani','randomizace',
+  'testMode','layout','resultMode','identityMode','body','gradeTyp','exerciseDetail','exerciseConfig',
+  'fuzzyTolerance','tema','zolicek','diferencovany','overeni','anonymizace',
+  'ageGroup','ageGroupCustom','testPurpose','simpleTemplate','screenGuard','feedbackMode','differentiationLevel'
+];
 
-function getTemplateProfile() {
+function getTemplatePrefill() {
   const p = {};
-  PROFILE_KEYS.forEach(function(k){ p[k] = state[k]; });
-  p.diferencovany = state.diferencovany || 'NE';
+  TEMPLATE_PREFILL_KEYS.forEach(function(k){ p[k] = cloneSafeStoredValue(state[k]); });
   p.skupinyCount = (state.skupiny || []).length;
   p.skupinyNazvy = (state.skupiny || []).map(function(g){ return g.nazev || ''; });
   return p;
 }
 
+function applyTemplatePrefill(p) {
+  if (!p) return;
+  TEMPLATE_PREFILL_KEYS.forEach(function(k){
+    if (p[k] !== undefined) state[k] = cloneSafeStoredValue(p[k]);
+  });
+  // Šablona smí obnovit pouze strukturu diferenciace, nikdy skutečná jména ani podmínky studentů.
+  if ((state.diferencovany || 'NE') === 'NE') {
+    state.skupiny = [];
+  } else {
+    const count = Math.max(0, Math.min(12, Number(p.skupinyCount) || 0));
+    const names = Array.isArray(p.skupinyNazvy) ? p.skupinyNazvy : [];
+    state.skupiny = [];
+    for (let i = 0; i < count; i++) {
+      state.skupiny.push({ id: groupIdCounter++, nazev: names[i] || ('Skupina ' + (i + 1)), podminky: '', studenti: [] });
+    }
+  }
+}
+
+// Starší selektivní profil 7.1.56 držíme jen kvůli zpětné kompatibilitě.
+const PROFILE_KEYS = ['testMode','resultMode','feedbackMode','differentiationLevel','fuzzyTolerance','gradeTyp'];
 function applyTemplateProfile(p) {
   if (!p) return;
   PROFILE_KEYS.forEach(function(k){ if (p[k] !== undefined) state[k] = p[k]; });
@@ -652,19 +677,31 @@ async function saveTemplate() {
   if (!name) return;
   const why = await uiPrompt('Logika šablony (nepovinné — krátký popis účelu šablony)', '');
   const tpls = loadTemplates();
-  tpls.push({ id: Date.now(), name, why: why || '', format: 'profile_v1', profile: getTemplateProfile(), ts: Date.now() });
+  tpls.push({ id: Date.now(), name, why: why || '', format: 'prefill_v2', prefill: getTemplatePrefill(), ts: Date.now() });
   if (!saveTemplates(tpls)) return;
   renderTemplates();
   flashSave();
-  uiToast('Šablona uložena — ukládá pedagogický profil (mód, zpětná vazba, hodnocení, diferenciace). Cvičení, čas a jazyk zůstávají na tobě.', 'ok', 5000);
+  uiToast('Šablona uložena — příště předvyplní jazyk, úroveň, typy cvičení, počet, čas, body, režim, hodnocení i diferenciaci. Obsah zadání, přílohy, jména studentů a přístupové kódy se neukládají.', 'ok', 6500);
 }
 
 function loadTemplate(id) {
   const tpls = loadTemplates();
   const tpl = tpls.find(t => t.id === id);
   if (!tpl) return;
-  if (tpl.format === 'profile_v1') {
-    // Nový selektivní formát — aplikuje jen pedagogický profil, nedotkne se cvičení, času ani jazyka.
+  if (tpl.format === 'prefill_v2') {
+    applyTemplatePrefill(cloneSafeStoredValue(tpl.prefill));
+    normalizeLoadedState(state);
+    enforceModeConstraints();
+    maxStep = 0;
+    goTo(0);
+    applyVisualState();
+    if (typeof renderGroups === 'function') renderGroups();
+    if (typeof renderTeacherMapping === 'function') renderTeacherMapping();
+    validate();
+    saveSnapshot();
+    uiToast('Šablona „' + esc(tpl.name) + '“ načtena — formulář byl předvyplněn. Obsah zadání, přílohy, jména studentů a přístupové kódy zůstávají mimo šablonu.', 'ok', 5500);
+  } else if (tpl.format === 'profile_v1') {
+    // 7.1.56 ukládala pouze pedagogický profil; chybějící hodnoty už nelze zpětně dopočítat.
     applyTemplateProfile(cloneSafeStoredValue(tpl.profile));
     enforceModeConstraints();
     normalizeLoadedState(state);
@@ -673,7 +710,7 @@ function loadTemplate(id) {
     if (typeof renderTeacherMapping === 'function') renderTeacherMapping();
     validate();
     saveSnapshot();
-    uiToast('Šablona „' + esc(tpl.name) + '“ aplikována — cvičení, čas a jazyk jsou beze změny.', 'ok', 3500);
+    uiToast('Načtena starší profilová šablona — obsahuje jen režim, zpětnou vazbu, hodnocení a diferenciaci. Pro plné předvyplnění ji po nastavení formuláře ulož znovu.', 'warn', 7000);
   } else {
     // Starý plný formát — zpětná kompatibilita: obnoví vše jako dřív.
     replaceStateFromUntrusted(tpl.state);
