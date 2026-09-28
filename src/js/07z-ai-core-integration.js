@@ -32,6 +32,15 @@ function genEnsureAiCore(){
   window.GHRAB_AI.configure({app:GEN_AI_APP,runtimeConfig:genCreateAiRuntimeConfig({timeoutMs:GEMINI_TIMEOUT_MS,maxRequestBytes:18*1024*1024,maxPartBytes:14*1024*1024}),operations:GEN_AI_OPERATIONS,outputSchemas:GEN_AI_SCHEMAS,credentialProvider:async({mode})=>mode==='direct-gemini'?{apiKey:String(geminiApiKey||'')}:null,authProvider:async()=>null,telemetrySink:()=>{}});
 }
 function genWorkflowId(opts={}){return opts.workflowId||window.__GHRAB_GENERATOR_WORKFLOW_ID__||undefined}
+function genProviderBackoff(ms,signal){
+  return new Promise((resolve,reject)=>{
+    if(signal?.aborted){const e=new Error('Požadavek byl zrušen.');e.name='AbortError';reject(e);return}
+    const timer=setTimeout(done,ms);
+    function abort(){clearTimeout(timer);signal?.removeEventListener?.('abort',abort);const e=new Error('Požadavek byl zrušen.');e.name='AbortError';reject(e)}
+    function done(){signal?.removeEventListener?.('abort',abort);resolve()}
+    signal?.addEventListener?.('abort',abort,{once:true});
+  });
+}
 async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   if(!(await ensureGeminiDataNotice()))throw new Error('AI požadavek byl zrušen před odesláním dat.');
   if(genSchoolMode()&&opts.urlContext)throw Object.assign(new Error('URL Context zatím školní AI brána nepodporuje. Vlož obsah stránky jako text nebo soubor, případně použij přímý GitHub režim.'),{code:'FEATURE_UNSUPPORTED'});
@@ -39,8 +48,26 @@ async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   if(genSchoolMode()&&mediaParts.some(part=>{const inline=part?.inline_data||part?.inlineData;const mime=String(inline?.mime_type||inline?.mimeType||'');return mime.startsWith('audio/')||mime.startsWith('video/')}))throw Object.assign(new Error('Školní AI brána v P1 nepřijímá zvuk ani video. Použij přepis, PDF, dokument nebo obrázek.'),{code:'FEATURE_UNSUPPORTED'});
   genEnsureAiCore();const operation=opts.operation||'test-generation';const registration=GEN_AI_OPERATIONS.operations[operation];if(!registration)throw Object.assign(new Error('Neznámá AI operace: '+operation),{code:'UNREGISTERED_OPERATION'});
   const inputParts=genCoreParts(prompt,extraParts);genPreflight(inputParts);geminiCancelRequested=false;
-  const response=await window.GHRAB_AI.generate({operation,modelProfile:genModelProfile(operation),instructions:aiTrustedSystemInstruction(),inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal:currentGeminiAbortController?.signal});
-  lastGeminiRawResponse=JSON.stringify(response.result);lastGeminiJsonRepaired=false;return response.result;
+  const signal=currentGeminiAbortController?.signal;
+  const request={operation,modelProfile:genModelProfile(operation),instructions:aiTrustedSystemInstruction(),inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal};
+  let accumulatedProviderRequests=0;
+  for(let attempt=0;attempt<2;attempt++){
+    try{
+      const response=await window.GHRAB_AI.generate(request);
+      lastGeminiRawResponse=JSON.stringify(response.result);lastGeminiJsonRepaired=false;return response.result;
+    }catch(error){
+      accumulatedProviderRequests+=Number(error?.providerRequests||0);
+      const transientDirect503=!genSchoolMode()&&Number(error?.status||0)===503&&String(error?.code||'')==='PROVIDER_UNAVAILABLE';
+      if(transientDirect503&&attempt===0){
+        // Gemini doporučuje retry po krátkém odstupu u 503. Fallback modely už proběhly
+        // uvnitř AI Core; zde dáme provideru čas na zotavení a celé kolo zopakujeme jen jednou.
+        await genProviderBackoff(1800+Math.floor(Math.random()*700),signal);
+        continue;
+      }
+      if(error&&accumulatedProviderRequests>0)error.providerRequests=accumulatedProviderRequests;
+      throw error;
+    }
+  }
 }
 const genLegacyCallGeminiJSON=callGeminiJSON;
 callGeminiJSON=async function callGeminiJSONThroughCore(prompt,extraParts=[],opts={}){
