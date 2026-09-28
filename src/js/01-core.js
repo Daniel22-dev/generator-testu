@@ -25,11 +25,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 //   pole a smaž nejstarší (poslední) položku, ať jich zůstane 10. Zobrazení je navíc
 //   pojištěné v showReleaseInfo (slice 0–10), takže víc než 10 se nikdy neukáže.
 const RELEASE = Object.freeze({
-  version: '7.1.56',
+  version: '7.1.57',
   date:    '2026-09-28',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
     'AI DOSTUPNOST (7.1.56): aktualizovány profily Gemini a stabilní fallbacky. Chyby AI nově uvádějí bezpečný HTTP stav a interní kód pro přesnější diagnostiku.',
     'O APLIKACI (7.1.55): hlavní hlavička nově používá jednotný vstup O aplikaci. Karta shrnuje účel Generátoru, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a nápovědu; dosavadní changelog je přesunut dovnitř jako rozbalovací Katalog změn včetně samostatně verzovaného modulu Český jazyk.',
     'ÚKLID A ZRYCHLENÍ (7.1.54): service worker ověřuje stránku aplikace u serveru podmíněným dotazem, takže nezměněnou stránku (~1,4 MB) při otevření znovu nestahuje; čerstvost verze a offline záloha zůstávají stejné. Odstraněno 17 nevolaných funkcí (přežitky starého přístupu a nahrazené pomocné funkce); sestavovací skript přepsán čitelně se shodným výstupem. Bez změny rozhraní, bodování, secure runtime, AI promptů a bezpečnostního modelu.',
@@ -39,7 +40,6 @@ const RELEASE = Object.freeze({
     'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
     'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
     'ETAPA 6 – MASTER CLEANUP (7.1.44): bez změny aplikační logiky. Pre-release release-acceptance metadata jsou přesunuta mimo veřejný runtime dist; živý stav releasu zůstává doložen release-integrity v2 a Studio release-wave.',
-    'ETAPA 5 – AUTO-PATCH E2E (7.1.42): bez změny aplikační logiky. Kontrolní patch nad přijatým 7.1.41 baseline ověřuje celý ostrý řetězec Generátor → Pages release identity → app-updated → AI Studio patch-only promotion → chráněný main a produkční deploy.',
   ]
 });
 // Stabilní fingerprint verze — krátký hash z verze+data+statusu. Stejný zdroj = stejný
@@ -556,9 +556,9 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:"sablony",title:"Šablony",status:"reseno",
   keywords:["sablona", "sablony", "template", "ulozit nastaveni", "znovu pouzit nastaveni", "predloha"],
-  simple:"Šablona ukládá pedagogický profil testu, nikoli celé zadání. Neobsahuje jazyk, téma, cvičení, čas, přílohy, jména studentů ani přístupové údaje.",
-  detailed:"Nový formát profile_v1 ukládá pracovní režim, způsob výsledku a zpětné vazby, úroveň diferenciace, toleranci odpovědí, typ známkování a pouze počet/názvy skupin. Po načtení ponechá jazyk, cvičení, čas a obsah beze změny. Staré plné šablony lze kvůli zpětné kompatibilitě načíst, ale citlivá pole se při tom vždy vymažou.",
-  evidence:["PROFILE_KEYS", "getTemplateProfile()", "applyTemplateProfile()", "saveTemplate()", "SENSITIVE_FIELD_IDS"]},
+  simple:"Šablona funguje jako předvyplňovací vzor: ukládá jazyk, CEFR, typy cvičení, počet, čas, body, režim, hodnocení a bezpečné didaktické volby. Neobsahuje text zadání, přílohy, jména studentů ani přístupové kódy.",
+  detailed:"Formát prefill_v2 ukládá bezpečnou konfiguraci formuláře: pracovní režim, jazyk a CEFR, typy a počet cvičení, čas, body, vzhled, způsob výsledku a zpětné vazby, toleranci, známkování a pouze počet/názvy diferenciačních skupin. Neukládá název a látku testu, zdrojové texty, URL, přílohy, podmínky skupin, jména studentů ani přístupové údaje. Starší profile_v1 lze načíst, ale obsahuje jen původní omezený pedagogický profil.",
+  evidence:["TEMPLATE_PREFILL_KEYS", "getTemplatePrefill()", "applyTemplatePrefill()", "saveTemplate()", "SENSITIVE_FIELD_IDS"]},
 
  {id:"historie",title:"Historie",status:"reseno",
   keywords:["historie", "minule testy", "posledni prompty", "vratit se k testu", "drive vygenerovane", "log promptu"],
@@ -873,9 +873,9 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:"sablony-ulozeni",title:"Co přesně ukládá šablona",status:"reseno",
   keywords:["co uklada sablona", "co ukládá šablona", "ulozeni sablony", "uložení šablony", "template profile", "pedagogicky profil"],
-  simple:"Šablona ukládá pouze pedagogický profil a základní strukturu diferenciace. Nejde o kopii celého testu.",
-  detailed:"Ukládají se: testMode, resultMode, feedbackMode, differentiationLevel, fuzzyTolerance, gradeTyp, zapnutí diferenciace a počet/názvy skupin. Neukládají se cvičení, počet otázek, jazyk, název, téma, čas, podmínky skupin, seznam studentů, soubory, URL, API klíč, hesla ani PINy. Pro přenos celého očištěného zadání mezi kolegy použij samostatný export zadání JSON.",
-  evidence:["PROFILE_KEYS", "getTemplateProfile()", "profile_v1", "exportZadani()", "buildZadaniExport()"]},
+  simple:"Šablona ukládá bezpečné předvyplnění konfigurace formuláře, ale neukládá vlastní obsah zadání ani citlivé údaje.",
+  detailed:"Ukládají se mimo jiné jazyk, CEFR, typy cvičení, počet, čas, body, režim testu a výsledků, feedback, tolerance, známkování, vzhled a bezpečná struktura diferenciace. Neukládají se název/látka testu, zdrojové texty, URL, přílohy, podmínky skupin, seznam studentů, API klíč ani učitelský přístupový kód. Pro přenos celého očištěného zadání mezi kolegy použij export zadání JSON.",
+  evidence:["TEMPLATE_PREFILL_KEYS", "getTemplatePrefill()", "prefill_v2", "exportZadani()", "buildZadaniExport()"]},
 
  {id:"historie-snapshoty",title:"Co přesně ukládá historie a snapshot",status:"reseno",
   keywords:["snapshot", "historie ulozeni", "historie uložení", "obnovit nastaveni", "obnovit nastavení", "lokalni historie"],
