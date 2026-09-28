@@ -30,9 +30,8 @@ function applyReleaseBadge(){
     s.classList.toggle('approved',approved); s.classList.toggle('draft',!approved);
   }
 }
-// Jednotná karta „O aplikaci“. Nahrazuje samostatný changelogový vstup:
-// identita a účel → autor/garant → školní projekt → určení/přístup → technický stav
-// → provozní zásady a nápověda → rozbalovací Katalog změn.
+// Jednotná karta „O aplikaci“. Informační vrstva bez zásahu do generování,
+// scoringu, AI workflow nebo bezpečnostního modelu.
 function showReleaseInfo(){
   if (document.getElementById('aboutAppGate')) return;
   var approved = RELEASE.status === 'production-serverless' && !RELEASE.sourceAuditPending;
@@ -73,41 +72,54 @@ function showReleaseInfo(){
   document.body.appendChild(backdrop);
 
   box.innerHTML =
-    '<div class="sec-guide-hero about-app-hero">' +
-      '<div class="sec-guide-hero-emoji" aria-hidden="true">🧪</div>' +
-      '<div class="sec-guide-hero-title" id="aboutAppTitle">Generátor testů</div>' +
-      '<div class="sec-guide-hero-sub">Tvorba interaktivních testů · součást ekosystému AI Studio GHRAB</div>' +
-    '</div>' +
-    '<div class="sec-guide-body about-app-body">' +
-      '<section class="about-overview-grid" aria-label="Základní informace o aplikaci">' +
-        '<article class="about-identity-card">' +
-          '<div class="about-identity-kicker">GENERÁTOR TESTŮ</div>' +
-          '<h2>Interaktivní testy pro výuku</h2>' +
-          '<p class="about-identity-lead">Nástroj pro přípravu procvičovacích i klasifikovaných testů, diferencovaných variant a bezpečného offline vyhodnocení.</p>' +
-          '<p>Generátor vede učitele od pedagogického zadání přes AI asistované sestavení až k náhledu, kontrole a exportu hotového testu.</p>' +
+    '<header class="about-app-hero">' +
+      '<div class="about-app-hero-main">' +
+        '<div class="about-app-mark" aria-hidden="true">🧪</div>' +
+        '<div class="about-app-headings">' +
+          '<div class="about-app-eyebrow">AI STUDIO GHRAB</div>' +
+          '<div class="about-app-title" id="aboutAppTitle">Generátor interaktivních testů</div>' +
+          '<div class="about-app-subtitle">Tvorba interaktivních testů pro výuku · školní ekosystém AI Studio GHRAB</div>' +
+        '</div>' +
+      '</div>' +
+      '<button type="button" class="about-app-close" id="aboutAppCloseBtn" aria-label="Zavřít informace o aplikaci">×</button>' +
+      '<div class="about-status-row" aria-label="Technický stav aplikace">' +
+        '<span class="about-status-chip">v' + esc(RELEASE.version) + '</span>' +
+        '<span class="about-status-chip">PWA</span>' +
+        '<span class="about-status-chip">GHRAB Platform 1.1.2</span>' +
+        '<span class="about-status-chip '+(approved?'is-ok':'')+'">' + esc(statusLabel) + '</span>' +
+      '</div>' +
+    '</header>' +
+    '<div class="about-app-scroll">' +
+      '<section class="about-intro-layout" aria-label="Základní informace o aplikaci">' +
+        '<article class="about-purpose-panel">' +
+          '<div class="about-section-kicker">O APLIKACI</div>' +
+          '<h2>Interaktivní testy bez zbytečné techniky</h2>' +
+          '<p class="about-purpose-lead">Generátor pomáhá učiteli připravit procvičovací i klasifikované testy, diferencované varianty a bezpečné offline vyhodnocení.</p>' +
+          '<p>Od pedagogického zadání vede přes AI asistované sestavení k náhledu, kontrole a exportu hotového testu. Učitel má stále poslední slovo nad obsahem i použitím výsledku.</p>' +
         '</article>' +
-        '<div class="about-facts-grid">' +
-          '<article class="about-fact-card"><span>AUTOR A VÝVOJOVÝ GARANT</span><h3>Daniel Baláž</h3><p>Koncepce, návrh funkcí, metodické vedení a vývoj aplikace.</p></article>' +
-          '<article class="about-fact-card"><span>ŠKOLNÍ PROJEKT</span><h3>Gymnázium, Ostrava-Hrabůvka</h3><p>Interní školní projekt určený pro přípravu a realizaci výuky.</p></article>' +
-          '<article class="about-fact-card"><span>URČENÍ A PŘÍSTUP</span><h3>Učitelský nástroj</h3><p>Přístup k aplikaci se řídí oprávněním vydaným v AI Studiu. Uživatel odpovídá za kontrolu obsahu před použitím ve výuce.</p></article>' +
-          '<article class="about-fact-card"><span>TECHNICKÝ STAV</span><h3>v' + esc(RELEASE.version) + ' · PWA</h3><p>GHRAB Platform 1.1.2 · ' + esc(statusLabel) + '. Podrobná QA a bezpečnostní evidence se vede odděleně.</p></article>' +
-        '</div>' +
+        '<aside class="about-meta-panel" aria-label="Identita a odpovědnost">' +
+          '<div class="about-meta-row"><span>Autor a vývojový garant</span><strong>Daniel Baláž</strong><small>Koncepce, návrh funkcí, metodické vedení a vývoj aplikace.</small></div>' +
+          '<div class="about-meta-row"><span>Školní projekt</span><strong>Gymnázium, Ostrava-Hrabůvka</strong><small>Interní nástroj pro přípravu a realizaci výuky.</small></div>' +
+          '<div class="about-meta-row"><span>Určení a přístup</span><strong>Učitelský nástroj</strong><small>Přístup se řídí oprávněním vydaným v AI Studiu.</small></div>' +
+        '</aside>' +
       '</section>' +
+
       '<section class="about-section" aria-labelledby="aboutPrinciplesTitle">' +
-        '<div class="about-section-heading"><span>PROVOZNÍ ZÁSADY</span><h2 id="aboutPrinciplesTitle">Co je dobré vědět</h2></div>' +
+        '<div class="about-section-heading"><span>PROVOZNÍ ZÁSADY</span><h2 id="aboutPrinciplesTitle">Tři věci, které je dobré vědět</h2></div>' +
         '<div class="about-principles-grid">' +
-          '<article class="about-principle-card"><b aria-hidden="true">01</b><div><h3>Kontrola před použitím</h3><p>Před ostrým použitím projdi náhled, správnost zadání a odpovědí a u klasifikovaného testu spusť dostupné kontrolní mechanismy.</p></div></article>' +
-          '<article class="about-principle-card"><b aria-hidden="true">02</b><div><h3>Bezpečný test</h3><p>U bezpečného offline workflow patří studentům pouze studentský test. Učitelský verifier, klíče a další učitelské soubory zůstávají oddělené.</p></div></article>' +
-          '<article class="about-principle-card"><b aria-hidden="true">03</b><div><h3>Nápověda</h3><p class="about-help-links"><a href="./manual/">Interaktivní manuál</a><button type="button" data-about-security>Bezpečný provoz ve škole</button></p></div></article>' +
+          '<article class="about-principle-card"><div class="about-principle-no">01</div><div><h3>Kontrola před použitím</h3><p>Projdi náhled, zadání a správné odpovědi. U klasifikovaného testu využij dostupné kontrolní mechanismy.</p></div></article>' +
+          '<article class="about-principle-card"><div class="about-principle-no">02</div><div><h3>Bezpečný test</h3><p>Studentům patří pouze studentský test. Verifier, klíče a další učitelské soubory zůstávají oddělené.</p></div></article>' +
+          '<article class="about-principle-card"><div class="about-principle-no">03</div><div><h3>Nápověda</h3><div class="about-help-links"><a href="./manual/">Interaktivní manuál</a><button type="button" data-about-security>Bezpečný provoz ve škole</button></div></div></article>' +
         '</div>' +
       '</section>' +
-      '<section class="about-section" aria-labelledby="aboutChangelogTitle">' +
+
+      '<section class="about-section about-history-section" aria-labelledby="aboutChangelogTitle">' +
         '<details class="about-changelog" id="aboutChangelog">' +
-          '<summary><span><span>HISTORIE VYDÁNÍ</span><strong id="aboutChangelogTitle">Katalog změn</strong><small>Rozbal historii hlavního Generátoru nebo samostatně verzovaného modulu Český jazyk.</small></span><i aria-hidden="true"></i></summary>' +
+          '<summary><span><span>HISTORIE VYDÁNÍ</span><strong id="aboutChangelogTitle">Katalog změn</strong><small>Generátor a samostatně verzovaný modul Český jazyk</small></span><i aria-hidden="true"></i></summary>' +
           '<div class="about-changelog-body">' +
             '<div class="cl-tabs">' + tab('main','Generátor','main') + tab('cs','<span class="flag flag-cz" aria-hidden="true"></span> Modul ČJ','main') + '</div>' +
             '<div data-clpanel="main">' +
-              '<div class="about-changelog-note">Aktuální verze <strong>v' + esc(RELEASE.version) + '</strong> · ' + esc(RELEASE.date) + '. Zobrazuje se posledních ' + MAX_CHANGES + ' release záznamů vedených přímo v aplikaci.</div>' +
+              '<div class="about-changelog-note">Aktuální verze <strong>v' + esc(RELEASE.version) + '</strong> · ' + esc(RELEASE.date) + '. Zobrazuje se posledních ' + MAX_CHANGES + ' release záznamů.</div>' +
               '<div class="about-change-list">' + renderItems(RELEASE.changes) + '</div>' +
             '</div>' +
             '<div data-clpanel="cs" hidden>' +
@@ -117,11 +129,11 @@ function showReleaseInfo(){
           '</div>' +
         '</details>' +
       '</section>' +
-    '</div>' +
-    '<div class="sec-guide-actions"><button type="button" class="ui-modal-btn primary" id="aboutAppCloseBtn">Zavřít</button></div>';
+    '</div>';
 
   function close(){ backdrop.remove(); }
-  box.querySelector('#aboutAppCloseBtn').addEventListener('click', close);
+  var closeBtn = box.querySelector('#aboutAppCloseBtn');
+  closeBtn.addEventListener('click', close);
   var securityBtn = box.querySelector('[data-about-security]');
   if(securityBtn) securityBtn.addEventListener('click', function(){ close(); showSecurityGuide(); });
   Array.prototype.forEach.call(box.querySelectorAll('[data-cltab]'), function(btn){
@@ -138,6 +150,8 @@ function showReleaseInfo(){
     });
   });
   backdrop.addEventListener('click', function(e){ if(e.target===backdrop) close(); });
+  backdrop.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  closeBtn.focus();
 }
 
 // Vestavěný provozní návod „Jak používat ostře" — pro kolegy, kteří nástroj nestavěli.
