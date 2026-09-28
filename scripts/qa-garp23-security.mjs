@@ -253,12 +253,16 @@ const expectedAiCalls = [
   ['src/js/12-prompt-builder.js','grading-scale-parse'],
   ['src/js/08-manual-editor.js',"attempt?'generation-repair':'exercise-generation'"]
 ].map(([file,operation])=>`${file}|${operation}`).sort();
-const expectedNonCodeMentions=['src/features/testlab.js|111','src/js/01-core.js|484','src/js/01-core.js|719'].sort();
+const expectedNonCodeMentionsByFile = new Map([['src/features/testlab.js',1],['src/js/01-core.js',2]]);
 const aiInventory=aiCallInventory();
 const actualAiCalls=aiInventory.rows;
 const actualAiKeys=actualAiCalls.map(invKey).sort();
 check(JSON.stringify(actualAiKeys)===JSON.stringify(expectedAiCalls), `PC-01 enumerates exactly ${expectedAiCalls.length} reviewed callGeminiJSON application call sites`);
-check(JSON.stringify(aiInventory.nonCodeMentions.map(r=>`${r.file}|${r.line}`).sort())===JSON.stringify(expectedNonCodeMentions), 'PC-01 inventories all non-code callGeminiJSON mentions so ambiguous/new occurrences fail closed');
+const actualNonCodeMentionsByFile = new Map();
+for (const row of aiInventory.nonCodeMentions) actualNonCodeMentionsByFile.set(row.file,(actualNonCodeMentionsByFile.get(row.file)||0)+1);
+const nonCodeInventoryMatches = actualNonCodeMentionsByFile.size===expectedNonCodeMentionsByFile.size
+  && [...expectedNonCodeMentionsByFile].every(([file,count])=>actualNonCodeMentionsByFile.get(file)===count);
+check(nonCodeInventoryMatches, 'PC-01 inventories all non-code callGeminiJSON mentions by file/count so ambiguous/new occurrences fail closed without brittle line-number coupling');
 const wrapperEvidenceByFile = new Map();
 for (const row of actualAiCalls) {
   if (!wrapperEvidenceByFile.has(row.file)) {
