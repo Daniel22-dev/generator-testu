@@ -95,6 +95,13 @@ forbidText(aiIntegration, /GHRAB_PLATFORM\.(?:isSchoolProfile|createAiRuntimeCon
 requireText(aiIntegration, /allowedModes:\s*\['direct-gemini'\]/, 'Veřejný AI profil není omezen na direct-gemini.');
 requireText(aiIntegration, /allowedModes:\s*\['school-gateway'\]/, 'Školní AI profil není omezen na school-gateway.');
 requireText(aiIntegration, /schoolServerConnected===true/, 'Školní AI brána není blokována do potvrzeného připojení serveru.');
+requireText(persistence, /const TEMPLATE_PREFILL_KEYS\s*=\s*\[[\s\S]*['"]jazyk['"][\s\S]*['"]uroven['"][\s\S]*['"]pocet['"][\s\S]*['"]typyCviceni['"][\s\S]*['"]cas['"][\s\S]*['"]body['"][\s\S]*['"]exerciseConfig['"]/, 'Uživatelská šablona nepředvyplňuje klíčová nastavení formuláře.');
+const templatePrefillStart = persistence.indexOf('const TEMPLATE_PREFILL_KEYS');
+const templatePrefillEnd = persistence.indexOf('];', templatePrefillStart);
+const templatePrefillBlock = templatePrefillStart >= 0 && templatePrefillEnd > templatePrefillStart ? persistence.slice(templatePrefillStart, templatePrefillEnd + 2) : '';
+forbidText(templatePrefillBlock, /zadaniText|readingText|listeningTranscript|fileNames|urls|studenti|podminky|heslo|ucitelPin/, 'Šablona nesmí ukládat obsah zadání, přílohy, URL, identity/podmínky studentů ani přístupové kódy.');
+requireText(persistence, /format:\s*['"]prefill_v2['"][\s\S]*getTemplatePrefill\(\)/, 'Nové šablony se neukládají ve formátu prefill_v2.');
+requireText(aiIntegration, /function genProviderBackoff\([\s\S]*transientDirect503[\s\S]*status\|\|0\)===503[\s\S]*await genProviderBackoff\(/, 'Přímý Gemini transport nemá omezený backoff retry pro přechodnou HTTP 503.');
 requireText(persistence, /MAX_ZADANI_IMPORT_BYTES[\s\S]*formatVersion\s*!==\s*1/, 'Import zadání nekontroluje velikost a verzi formátu.');
 requireText(persistence, /FORBIDDEN_DATA_KEYS[\s\S]*replaceStateFromUntrusted/, 'Načítání stavu nemá ochranu proti nebezpečným objektovým klíčům.');
 if (publicDeployment.features?.schoolServerConnected !== false || publicDeployment.features?.serverSessionReady !== false || publicDeployment.features?.schoolGatewayReady !== false) fail('Veřejný deployment nepravdivě tvrdí připravenost školního serveru.');
