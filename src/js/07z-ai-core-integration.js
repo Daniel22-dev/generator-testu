@@ -42,11 +42,12 @@ async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   const response=await window.GHRAB_AI.generate({operation,modelProfile:genModelProfile(operation),instructions:aiTrustedSystemInstruction(),inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal:currentGeminiAbortController?.signal});
   lastGeminiRawResponse=JSON.stringify(response.result);lastGeminiJsonRepaired=false;return response.result;
 }
-async function genCallCoreResilient(prompt,extraParts,opts){
-  try{return await callGeminiJSONCore(prompt,extraParts,opts)}catch(first){
-    if(genSchoolMode()||Number(first?.status)!==503||first?.code!=='PROVIDER_UNAVAILABLE')throw first;
-    await new Promise((resolve,reject)=>{const s=currentGeminiAbortController?.signal,t=setTimeout(resolve,2000);if(s)s.addEventListener('abort',()=>{clearTimeout(t);reject(Object.assign(new Error('Požadavek byl zrušen.'),{name:'AbortError'}))},{once:true})});
-    try{return await callGeminiJSONCore(prompt,extraParts,opts)}catch(last){last.providerRequests=Number(first?.providerRequests||0)+Number(last?.providerRequests||0);throw last}
+async function genCallCoreResilient(p,x,o){
+  try{return await callGeminiJSONCore(p,x,o)}catch(a){
+    if(genSchoolMode()||a?.status!==503||a?.code!=='PROVIDER_UNAVAILABLE')throw a;
+    await new Promise(r=>setTimeout(r,2000));
+    if(currentGeminiAbortController?.signal?.aborted)throw Object.assign(new Error('Požadavek byl zrušen.'),{name:'AbortError'});
+    try{return await callGeminiJSONCore(p,x,o)}catch(b){b.providerRequests=(a.providerRequests||0)+(b.providerRequests||0);throw b}
   }
 }
 const genLegacyCallGeminiJSON=callGeminiJSON;
