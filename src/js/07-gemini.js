@@ -8,10 +8,12 @@ const GEMINI_KEY_SESSION_SK = 'sestavovac_gemini_key_session';
 // mapovat na OpenAI nebo jiného providera bez změny Generátoru.
 const GEMINI_PROFILE_MODELS = Object.freeze({
   economy:'gemini-3.5-flash-lite',
-  balanced:'gemini-3.6-flash',
-  quality:'gemini-3.6-flash'
+  balanced:'gemini-3.7-flash',
+  quality:'gemini-3.8-flash'
 });
-const GEMINI_FALLBACK_MODELS = [GEMINI_PROFILE_MODELS.economy];
+// Více stabilních fallbacků snižuje závislost na jedné providerové kapacitě.
+// Pořadí je záměrné: nejprve předchozí stabilní Flash, potom lehký model.
+const GEMINI_FALLBACK_MODELS = ['gemini-3.6-flash', GEMINI_PROFILE_MODELS.economy];
 const GEMINI_DATA_NOTICE_SESSION_SK = 'sestavovac_gemini_data_notice_v1';
 let geminiApiKey = '';
 let geminiKeyScope = '';
