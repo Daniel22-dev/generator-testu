@@ -758,34 +758,26 @@ function renderTemplates() {
   const FL = { none:'bez zpět. vazby', brief:'stručná zpět. vazba', learning:'učící zpět. vazba' };
   const DL = { basic:'podpora', challenge:'challenge' };
   list.innerHTML = tpls.map(function(t) {
-    const isPrefill = t.format === 'prefill_v2';
-    const isProfile = t.format === 'profile_v1';
-    const p = isPrefill ? (t.prefill || {}) : (t.profile || {});
+    const isPrefill=t.format==='prefill_v2', isProfile=t.format==='profile_v1', isNew=isPrefill||isProfile;
+    const p=(isPrefill?t.prefill:t.profile)||{};
     const badges = [];
-    if (isPrefill || isProfile) {
-      if (p.jazyk) badges.push(p.jazyk);
-      if (Array.isArray(p.uroven) && p.uroven.length) badges.push(p.uroven.join('/'));
+    if (isNew) {
       if (RL[p.resultMode]) badges.push(RL[p.resultMode]);
       if (FL[p.feedbackMode]) badges.push(FL[p.feedbackMode]);
       if (DL[p.differentiationLevel]) badges.push(DL[p.differentiationLevel]);
       if (p.diferencovany === 'ANO' && p.skupinyCount > 0) badges.push(p.skupinyCount + '\u00a0skupiny');
-      if (isPrefill && Array.isArray(p.typyCviceni) && p.typyCviceni.length) badges.push(p.typyCviceni.length + '\u00a0typy cvičení');
-      if (isPrefill && Number(p.cas) > 0) badges.push(Number(p.cas) + '\u00a0min');
     }
-    let note = '';
-    if (isProfile) note = '<div class="tpl-old-note">Profil z verze 7.1.56: ukládá jen režim/hodnocení. Pro plné předvyplnění nastav formulář a ulož šablonu znovu.</div>';
-    else if (!isPrefill) note = '<div class="tpl-old-note">Starý plný formát. Po načtení doporučujeme uložit znovu jako novou šablonu.</div>';
     return '<div class="tpl-card">'
       + '<div class="tpl-card-head">'
       + '<span class="tpl-card-name">' + esc(t.name) + '</span>'
       + '<div class="tpl-card-btns">'
-      + '<button class="tpl-load" onclick="loadTemplate(' + t.id + ')" title="Načíst a předvyplnit formulář">' + (isPrefill ? '📄 Načíst šablonu' : (isProfile ? '📄 Načíst profil' : '📄 Načíst (starý formát)')) + '</button>'
+      + '<button class="tpl-load" onclick="loadTemplate(' + t.id + ')" title="Načíst šablonu">' + (isPrefill ? '📄 Načíst šablonu' : (isProfile ? '📄 Načíst profil' : '📄 Načíst (starý formát)')) + '</button>'
       + '<button class="tpl-del" onclick="deleteTemplate(' + t.id + ')" title="Smazat šablonu">\u2715</button>'
       + '</div>'
       + '</div>'
       + (badges.length ? '<div class="tpl-badges">' + badges.map(function(b){ return '<span class="tpl-badge">' + esc(b) + '</span>'; }).join('') + '</div>' : '')
       + (t.why ? '<div class="preset-modal-why" style="margin-top:7px"><strong>Logika šablony:</strong> ' + esc(t.why) + '</div>' : '')
-      + note
+      + (isProfile ? '<div class="tpl-old-note">Starší profil: pro plné předvyplnění jej ulož znovu.</div>' : (!isNew ? '<div class="tpl-old-note">Starý formát. Po načtení ulož znovu.</div>' : ''))
       + '</div>';
   }).join('');
 }
