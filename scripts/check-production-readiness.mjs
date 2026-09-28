@@ -97,8 +97,8 @@ requireText(aiIntegration, /allowedModes:\s*\['school-gateway'\]/, 'Školní AI 
 requireText(aiIntegration, /schoolServerConnected===true/, 'Školní AI brána není blokována do potvrzeného připojení serveru.');
 requireText(persistence, /const TEMPLATE_PREFILL_KEYS[\s\S]*jazyk[\s\S]*uroven[\s\S]*pocet[\s\S]*typyCviceni[\s\S]*cas[\s\S]*body[\s\S]*exerciseConfig/, 'Uživatelská šablona nepředvyplňuje klíčová nastavení formuláře.');
 const templatePrefillStart = persistence.indexOf('const TEMPLATE_PREFILL_KEYS');
-const templatePrefillEnd = persistence.indexOf('];', templatePrefillStart);
-const templatePrefillBlock = templatePrefillStart >= 0 && templatePrefillEnd > templatePrefillStart ? persistence.slice(templatePrefillStart, templatePrefillEnd + 2) : '';
+const templatePrefillEnd = persistence.indexOf('\n', templatePrefillStart);
+const templatePrefillBlock = templatePrefillStart >= 0 && templatePrefillEnd > templatePrefillStart ? persistence.slice(templatePrefillStart, templatePrefillEnd) : '';
 forbidText(templatePrefillBlock, /zadaniText|readingText|listeningTranscript|fileNames|urls|studenti|podminky|heslo|ucitelPin/, 'Šablona nesmí ukládat obsah zadání, přílohy, URL, identity/podmínky studentů ani přístupové kódy.');
 requireText(persistence, /format:\s*['"]prefill_v2['"][\s\S]*getTemplatePrefill\(\)/, 'Nové šablony se neukládají ve formátu prefill_v2.');
 requireText(aiIntegration, /async function genCallCoreResilient[\s\S]*status!==503[\s\S]*setTimeout\(r,2000\)[\s\S]*providerRequests=/, 'Přímý Gemini transport nemá omezený backoff retry pro přechodnou HTTP 503.');
