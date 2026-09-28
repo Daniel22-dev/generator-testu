@@ -562,7 +562,7 @@ async function enrichAltAnswers(){
     aiReviewProgressUpdate('answerProposalProgress',95,'Skládám návrhy k učitelskému schválení…');
     enReview={stamp,work,flat,candidates};
     if(out){out.innerHTML='<p><b>'+candidates.length+' n\u00e1vrh\u016f. Nic nebylo automaticky p\u0159id\u00e1no.</b> Za\u0161krtni pouze obsahov\u011b spr\u00e1vn\u00e9 alternativy.</p>'+candidates.map((c,i)=>{const r=flat[c.refId];return '<label class="answer-proposal"><input type="checkbox" class="en-pick" data-pi="'+i+'">'+H(c.value)+'<span class="answer-proposal-context">'+H(r.variant)+' \u00b7 cv. '+(r.ei+1)+' / '+(r.ii+1)+' \u00b7 '+H(r.type)+'<br>Kl\u00ed\u010d: '+H(r.correct)+'<br>'+H(r.prompt)+'</span></label>';}).join('')+(candidates.length?'<button type="button" class="btn-edit" id="btnAcceptProposals" onclick="enAcceptSelected()">P\u0159idat vybran\u00e9 odpov\u011bdi a p\u0159esestavit</button>':'')+'<div id="enApplyStatus" role="status"></div>';}
-  }catch(error){enReview=null;if(out)setErrorTextWithHttpHelp(out,'Návrhy se nepodařilo připravit. Test zůstal beze změny. '+(error&&error.message?error.message:String(error)));}
+  }catch(error){enReview=null;if(out)setErrorTextWithHttpHelp(out,'✨ Rozšíření přijatelných odpovědí se nepodařilo dokončit. Test zůstal beze změny. '+(error&&error.message?error.message:String(error)));}
   finally{enBusy=false;if(btn)btn.disabled=false;}
 }
 async function enAcceptSelected(){
