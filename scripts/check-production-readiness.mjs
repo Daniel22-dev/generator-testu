@@ -50,7 +50,7 @@ const assistantKb = assistantKbStart >= 0 && assistantKbEnd > assistantKbStart
   : '';
 
 requireText(core, /status:\s*['"]production-serverless['"]/, 'RELEASE.status musi byt production-serverless.');
-requireText(gemini, /const GEMINI_PROFILE_MODELS\s*=\s*Object\.freeze\(\{[\s\S]*economy:["']gemini-3\.5-flash-lite["'][\s\S]*balanced:["']gemini-3\.6-flash["'][\s\S]*quality:["']gemini-3\.6-flash["']/, 'Direct transport nema ocekavane interni mapovani AI Core profilu.');
+requireText(gemini, /const GEMINI_PROFILE_MODELS\s*=\s*Object\.freeze\(\{[\s\S]*economy:["']gemini-3\.5-flash-lite["'][\s\S]*balanced:["']gemini-3\.7-flash["'][\s\S]*quality:["']gemini-3\.8-flash["']/, 'Direct transport nema ocekavane aktualni mapovani AI Core profilu.');
 forbidText(shell, /geminiModelInput|qmStrong|qmLite|quickModel/, 'Bezne UI nesmi zobrazovat konkretni AI modely.');
 requireText(aiIntegration, /'generator-help-answer':\{[^}]*defaultModelProfile:'balanced'/, 'Poradce nepouziva balanced AI Core profil.');
 requireText(gemini, /ensureGeminiDataNotice\(\)/, 'Pred AI pozadavkem chybi transparentni datove upozorneni.');

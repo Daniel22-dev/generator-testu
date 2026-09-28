@@ -1,10 +1,12 @@
-> **7.1.55 — O aplikaci.** Hlavička nově nabízí jednotný vstup O aplikaci; identita, účel, odpovědnost, technický stav, provozní zásady a nápověda jsou na jednom místě a dosavadní changelog je uvnitř jako rozbalovací Katalog změn. Funkční generování, scoring, secure runtime, AI prompty ani bezpečnostní model se nemění.
+> **7.1.56 — AI dostupnost a diagnostika.** Kvalitní profil používá aktuální stabilní Gemini 3.8 Flash, vyvážený profil Gemini 3.7 Flash a při providerové nedostupnosti se zkouší více stabilních fallbacků. Chybová hláška nově zachovává HTTP stav a interní kód pro přesnou diagnostiku.
 
 > **7.1.54 — úklid a zrychlení otevírání.** Service worker nezměněnou stránku aplikace při otevření znovu nestahuje, jen ověří její aktuálnost u serveru. Odstraněno 17 nevolaných funkcí a sestavovací skript je čitelný. Chování aplikace se nemění. Aktivní bezpečnostní autorita zůstává GARP 2.7; GARP 2.5.1 zůstává regresním základem.
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.55
+**Aktuální verze:** 7.1.56
+
+> **7.1.56 AI dostupnost (2026-09-28):** opraveno providerové mapování a diagnostika. Generování používá aktuální stabilní profily a více fallbacků; při chybě se neztratí bezpečný HTTP stav a interní kód. Scoring, verifier, secure runtime ani GARP autorita se nemění.
 
 > **7.1.55 O aplikaci (2026-09-27):** hlavička používá jednotný vstup **O aplikaci**. Karta obsahuje účel aplikace, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a nápovědu. Dosavadní changelog je zachován jako rozbalovací **Katalog změn** s oddělenou historií hlavního Generátoru a modulu Český jazyk. Generování, scoring, secure runtime, AI prompty ani bezpečnostní model se nemění.
 

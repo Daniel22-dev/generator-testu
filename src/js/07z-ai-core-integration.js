@@ -1,5 +1,5 @@
 /* ===================== GHRAB AI CORE 1.0.0 · GENERÁTOR P1 ===================== */
-const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.55'});
+const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.56'});
 const GEN_AI_SCHEMA_ID='generator.object.v1';
 const GEN_AI_SCHEMAS=Object.freeze({[GEN_AI_SCHEMA_ID]:{type:'object',additionalProperties:true}});
 const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN_AI_APP.id,operations:Object.freeze({
@@ -21,7 +21,7 @@ function genDeploymentKind(){const config=genDeploymentConfig();const features=c
 function genSchoolMode(){return genDeploymentKind()==='school'}
 function genSchoolRuntimeReady(){const config=genDeploymentConfig();return genSchoolMode()&&config.features?.serverSessionReady===true&&config.features?.schoolGatewayReady===true&&config.features?.schoolServerConnected===true}
 function genResolveEndpoint(base,value,fallback){return new URL(String(value||fallback),base||location.href).href}
-function genCreateAiRuntimeConfig(options={}){const config=genDeploymentConfig();const kind=genDeploymentKind();const common={requestTimeoutMs:Number(options.timeoutMs||GEMINI_TIMEOUT_MS),gatewayMaxRetries:0,maxRequestBytes:Number(options.maxRequestBytes||18*1024*1024),maxPartBytes:Number(options.maxPartBytes||14*1024*1024),directGemini:{endpointBase:'https://generativelanguage.googleapis.com/v1beta/models',profileModels:{economy:resolveGeminiModel('economy'),balanced:resolveGeminiModel('balanced'),quality:resolveGeminiModel('quality')},fallbackModels:[resolveGeminiModel('economy')],useResponseSchema:false,maxOutputTokens:32768}};if(kind==='public')return{schema:'ghrab-runtime-config-v1',ai:{...common,defaultMode:'direct-gemini',selectedMode:'direct-gemini',allowedModes:['direct-gemini'],allowUserModeSelection:false,automaticFallback:false,gatewayUrl:'/api/v1/ai/generate',healthUrl:'/api/v1/ai/health'},telemetry:{enabled:false}};if(!genSchoolRuntimeReady())throw genConfigurationError('Školní AI brána není serverem potvrzena jako připojená a připravená.');const base=config.apiBaseUrl||location.origin+'/';const gatewayUrl=genResolveEndpoint(base,config.endpoints?.aiGenerate,'ai/generate');const healthUrl=genResolveEndpoint(base,config.endpoints?.aiHealth,'ai/health');if(new URL(gatewayUrl).origin!==location.origin||new URL(healthUrl).origin!==location.origin)throw genConfigurationError('Školní AI endpoint musí být same-origin.');return{schema:'ghrab-runtime-config-v1',ai:{...common,defaultMode:'school-gateway',selectedMode:'school-gateway',allowedModes:['school-gateway'],allowUserModeSelection:false,automaticFallback:false,gatewayUrl,healthUrl},telemetry:{enabled:false}}}
+function genCreateAiRuntimeConfig(options={}){const config=genDeploymentConfig();const kind=genDeploymentKind();const common={requestTimeoutMs:Number(options.timeoutMs||GEMINI_TIMEOUT_MS),gatewayMaxRetries:0,maxRequestBytes:Number(options.maxRequestBytes||18*1024*1024),maxPartBytes:Number(options.maxPartBytes||14*1024*1024),directGemini:{endpointBase:'https://generativelanguage.googleapis.com/v1beta/models',profileModels:{economy:resolveGeminiModel('economy'),balanced:resolveGeminiModel('balanced'),quality:resolveGeminiModel('quality')},fallbackModels:[...GEMINI_FALLBACK_MODELS],useResponseSchema:false,maxOutputTokens:32768}};if(kind==='public')return{schema:'ghrab-runtime-config-v1',ai:{...common,defaultMode:'direct-gemini',selectedMode:'direct-gemini',allowedModes:['direct-gemini'],allowUserModeSelection:false,automaticFallback:false,gatewayUrl:'/api/v1/ai/generate',healthUrl:'/api/v1/ai/health'},telemetry:{enabled:false}};if(!genSchoolRuntimeReady())throw genConfigurationError('Školní AI brána není serverem potvrzena jako připojená a připravená.');const base=config.apiBaseUrl||location.origin+'/';const gatewayUrl=genResolveEndpoint(base,config.endpoints?.aiGenerate,'ai/generate');const healthUrl=genResolveEndpoint(base,config.endpoints?.aiHealth,'ai/health');if(new URL(gatewayUrl).origin!==location.origin||new URL(healthUrl).origin!==location.origin)throw genConfigurationError('Školní AI endpoint musí být same-origin.');return{schema:'ghrab-runtime-config-v1',ai:{...common,defaultMode:'school-gateway',selectedMode:'school-gateway',allowedModes:['school-gateway'],allowUserModeSelection:false,automaticFallback:false,gatewayUrl,healthUrl},telemetry:{enabled:false}}}
 function genAiAvailable(){return genSchoolMode()?genSchoolRuntimeReady():Boolean(geminiApiKey)}
 function genCoreParts(prompt,extraParts){const out=[{type:'text',text:String(prompt||'')}];for(const part of(Array.isArray(extraParts)?extraParts:[])){if(part&&typeof part.text==='string'){out.push({type:'text',text:part.text});continue}const inline=part?.inline_data||part?.inlineData;if(inline?.data){const mime=inline.mime_type||inline.mimeType||'application/octet-stream';out.push({type:String(mime).startsWith('image/')?'image':'document',mimeType:mime,name:inline.name||'attachment',source:{kind:'inline-base64',data:inline.data}})}}return out}
 function genPreflight(parts){const text=parts.filter(part=>part.type==='text').map(part=>part.text).join('\n');if(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/.test(text)||/\b(?:\+?420\s*)?(?:\d[\s-]*){9}\b/.test(text)){const error=new Error('V zadání je možný osobní kontakt. Před odesláním do AI jej nahraď anonymním kódem.');error.code='PREFLIGHT_BLOCKED';throw error}return true}
@@ -48,7 +48,20 @@ callGeminiJSON=async function callGeminiJSONThroughCore(prompt,extraParts=[],opt
   // GHRAB AI Core 1.0.0 nemá kontrakt pro providerové nástroje. URL Context proto
   // zůstává pouze v přímém Gemini režimu; školní brána jej výše výslovně odmítne.
   if(!genSchoolMode()&&opts.urlContext)return genLegacyCallGeminiJSON(prompt,extraParts,opts);
-  try{return await callGeminiJSONCore(prompt,extraParts,opts)}catch(error){if(window.GHRAB_AI?.formatUserError)throw new Error(window.GHRAB_AI.formatUserError(error,'cs-CZ'));throw error}
+  try{return await callGeminiJSONCore(prompt,extraParts,opts)}catch(error){
+    if(window.GHRAB_AI?.formatUserError){
+      const base=window.GHRAB_AI.formatUserError(error,'cs-CZ');
+      const technical=[];
+      const status=Number(error?.status||0);
+      const code=String(error?.code||'').trim();
+      const requests=Number(error?.providerRequests||0);
+      if(status)technical.push('HTTP '+status);
+      if(code&&code!=='UNKNOWN_ERROR')technical.push(code);
+      if(requests>0)technical.push('provider requests='+requests);
+      throw new Error(technical.length?base+'\n\nTechnicky: '+technical.join(' · ')+'.':base);
+    }
+    throw error
+  }
 };
 function genBeginAiWorkflow(){window.__GHRAB_GENERATOR_WORKFLOW_ID__=window.GHRAB_PLATFORM?.uuid?.('generator-workflow')||`generator-workflow-${Date.now()}`;return window.__GHRAB_GENERATOR_WORKFLOW_ID__}
 function genEndAiWorkflow(){window.__GHRAB_GENERATOR_WORKFLOW_ID__=''}
