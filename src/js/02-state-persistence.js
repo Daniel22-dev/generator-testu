@@ -9,16 +9,13 @@ function normalizeLoadedState(s) {
   else if (s.workPreset === 'advanced') s.appMode = 'advanced';
   // Ověřovací panel byl odebrán z UI; hodnota je vždy NE.
   s.overeni = 'NE';
-  // Tolerance překlepů: starší snapshoty/šablony field nemají → bezpečné Vypnuto.
   if (s.fuzzyTolerance !== 'mild' && s.fuzzyTolerance !== 'strict') s.fuzzyTolerance = 'off';
-  // „Jiné/kombinace" bylo zrušeno — starší snapshot s touto volbou nech znovu vybrat.
   if (s.jazyk === '__jine__') s.jazyk = '';
   // ── Pedagogicko-didaktická vrstva: doplň bezpečné defaulty pro starší data ──
   if (typeof s.ageGroup !== 'string') s.ageGroup = '';
   if (typeof s.ageGroupCustom !== 'string') s.ageGroupCustom = '';
   if (typeof s.testPurpose !== 'string') s.testPurpose = '';
   if (typeof s.pedagogicalPreset !== 'string') s.pedagogicalPreset = '';
-  // Interní profil účelu testu. Staré detailní šablony mapujeme na tři společné účely.
   if (typeof s.simpleTemplate !== 'string') s.simpleTemplate = '';
   const legacyPurposeMap = { fl_homework:'fl_practice', fl_graded_quick:'fl_standard', cs_text:'cs_practice' };
   if (legacyPurposeMap[s.simpleTemplate]) s.simpleTemplate = legacyPurposeMap[s.simpleTemplate];
@@ -34,8 +31,6 @@ function normalizeLoadedState(s) {
   if (s.manualMode === undefined) s.manualMode = false;
   if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
 
-  // Starší snapshoty mohly držet tři navzájem rozdílné údaje: počet cvičení,
-  // globální typy a skrytou exerciseConfig. Po načtení vždy obnov jednu autoritu.
   if (s.exerciseDetail && Array.isArray(s.exerciseConfig) && s.exerciseConfig.length) {
     s.pocet = Math.min(10, s.exerciseConfig.length);
     s.exerciseConfig = s.exerciseConfig.slice(0, s.pocet);
@@ -62,14 +57,11 @@ function enforceModeConstraints() {
     state.resultMode = 'secureOffline';
     state.odevzdavani = 'B';
   }
-  // Procvičovací mód → okamžitý výsledek a skutečně formativní chování.
-  // Žolík je klasifikační výjimka, proto v procvičování nedává smysl.
   if (state.testMode === 'procviceci') {
     state.resultMode = 'instant';
     state.feedbackMode = 'learning';
     state.zolicek = 'NE';
   }
-  // secureOffline = celé odevzdání; zvolená simple šablona smí zachovat simple mód.
   if ((state.resultMode || 'instant') === 'secureOffline') {
     state.odevzdavani = 'B';
     state.feedbackMode = 'none';
@@ -77,17 +69,14 @@ function enforceModeConstraints() {
   }
   // Bez okamžité zpětné vazby nelze použít průběžné odevzdávání.
   if (state.feedbackMode === 'none') state.odevzdavani = 'B';
-  // Okamžitá známka + přísný test jsou navzájem neslučitelné → vrátit na secureOffline.
   if (state.resultMode === 'instant' && state.testMode === 'prisny') {
     state.resultMode = 'secureOffline';
     state.odevzdavani = 'B';
   }
-  // Diferenciace → vyžaduje pokročilý mód (skupiny + podmínky jsou advanced-only).
   if (state.diferencovany === 'ANO' && isSimpleMode()) {
     state.appMode = 'advanced';
     state.workPreset = 'advanced';
   }
-  // Jednoduchý mód → vynuť výchozí nastavení (přepisuje případné nesoulady z load).
   if (isSimpleMode()) applySimpleDefaults();
 }
 
@@ -217,7 +206,6 @@ function organizeAdvancedSettings(){
 }
 
 function updateAppModeUI(){
-  // markAdvancedSections() se volá jednou při startu v init() — DOM prvky se nemění.
   const simple = isSimpleMode();
   document.body.classList.toggle('simple-mode', simple);
   document.body.classList.toggle('advanced-mode', !simple);
@@ -381,7 +369,6 @@ function getStoredState(){
   const clean = JSON.parse(JSON.stringify(state));
   clean.fileNames = [];
   if (Array.isArray(clean.skupiny)) clean.skupiny = anonymizeGroupsForStorage(clean.skupiny);
-  // V prohlížeči nikdy neukládáme reálné přílohy, hesla/PINy ani skutečná jména studentů.
   return clean;
 }
 const MAX_ZADANI_IMPORT_BYTES = 512 * 1024;
@@ -447,7 +434,6 @@ function safeDomEntries(raw){
 }
 function sanitizePromptForStorage(prompt){
   let out = String(prompt || '');
-  // Starší i nové názvy polí; historie nikdy nesmí obsahovat učitelský přístupový kód ani staré PIN/heslo.
   out = out.replace(
     /(?:Heslo pro odemčení(?: bezpečnostního zámku)?|Odemykací heslo(?: zámkové obrazovky)?|Učitelský přístupový kód)\s*:\s*.*$/gm,
     'Učitelský přístupový kód: [NEULOŽENO]'
@@ -764,7 +750,6 @@ function loadHistory() {
 }
 function pushHistory(prompt) {
   try {
-    // Prompt je od v7 pseudonymizovaný už při sestavení; sanitizace je druhá pojistka.
     const promptForHistory = prompt;
     const safePrompt = sanitizePromptForStorage(promptForHistory);
     const hash = shortHash(safePrompt);
