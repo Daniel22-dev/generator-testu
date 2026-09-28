@@ -6,7 +6,7 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "85b173514b9c47429facf8720ce42d379baa0c0cec0528462a95cb9a15d3ce8b",
+  "fingerprint": "578848fe8c7cd24224b305e3af8e15b8b52f8e066e62469597df983eba824f21",
   "files": [
     {
       "path": "src/js/01-core.js",
@@ -30,8 +30,8 @@
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
-      "size": 13431,
-      "sha256": "4a26f25b3c27ae22333bfa3ce0af38dc851a0bd0cff5711f77025bf9dd2929ad"
+      "size": 13420,
+      "sha256": "838fcb791c97b3aa47d01903fc32d0d65bfd9ed75c28bf7174da151976ec7926"
     },
     {
       "path": "src/js/08-manual-editor.js",

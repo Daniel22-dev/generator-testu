@@ -15,7 +15,7 @@ const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN
   'generator-help-answer':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
   'diagnostic-ping':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:1024}
 })});
-const GEN_LOGICAL_REQUEST_TIMEOUT_MS=GEMINI_TIMEOUT_MS;
+const GEN_LOGICAL_REQUEST_TIMEOUT_MS=180000;
 function genConfigurationError(message){return Object.assign(new Error(message),{code:'CONFIGURATION_ERROR'})}
 function genDeploymentConfig(){const config=window.__GHRAB_DEPLOYMENT_CONFIG__;if(!config||typeof config!=='object')throw genConfigurationError('Chybí ověřená deployment konfigurace.');return config}
 function genDeploymentKind(){const config=genDeploymentConfig();const features=config.features||{};if(config.profile==='github-pages'&&config.authMode==='signed-permit'&&config.aiTransport==='direct-gemini'&&features.allowLocalProviderKeys===true)return'public';if(config.profile==='school-server'&&config.authMode==='server-session'&&config.aiTransport==='school-gateway'&&features.allowLocalProviderKeys===false)return'school';throw genConfigurationError('Deployment profil, autorizace a AI transport si navzájem neodpovídají.')}
