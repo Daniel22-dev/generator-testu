@@ -2389,32 +2389,3 @@ body.simple-mode .source-use-card-grid{grid-template-columns:1fr}
 @media(hover:none){
   .exercise-type-info { cursor: pointer; }
 }
-
-
-/* ── Doplňkové AI kontroly: viditelný průběh ─────────────────────────────── */
-.ai-review-progress{margin-top:10px;border:1px solid var(--bdr);background:var(--bg3);border-radius:10px;padding:10px 12px}
-.ai-review-progress-head{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:13px}
-.ai-review-progress-pct{font-variant-numeric:tabular-nums;color:var(--acc);font-weight:800}
-.ai-review-progress-track{height:9px;border-radius:999px;background:var(--bdr2);overflow:hidden;margin-top:8px}
-.ai-review-progress-bar{height:100%;width:0;background:var(--acc);transition:width .25s ease;position:relative;overflow:hidden}
-.ai-review-progress.is-active .ai-review-progress-bar::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:aiReviewSweep 1.35s linear infinite}
-.ai-review-progress-text{margin-top:7px;color:var(--t4);font-size:12.5px;line-height:1.45}
-@keyframes aiReviewSweep{to{transform:translateX(100%)}}
-
-/* HTTP kód v chybové hlášce funguje jako kontextová nápověda. */
-.http-code-help{display:inline;border:0;background:transparent;color:var(--acc);font:inherit;font-weight:800;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;cursor:pointer;padding:0 1px}
-.http-code-help:hover{color:var(--acc-btn)}
-.http-code-help:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
-
-
-/* ── Rozhodnutí nad rozdíly druhého AI průchodu ─────────────────────────── */
-.akv-decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.akv-decision{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--bdr2);border-radius:9px;padding:9px 10px;cursor:pointer;background:var(--bg3)}
-.akv-decision:hover{border-color:var(--acc-b)}
-.akv-decision input{width:17px;height:17px;margin-top:2px;flex:0 0 auto;accent-color:var(--acc)}
-.akv-decision span{display:block;line-height:1.35}
-.akv-decision b{display:block;font-size:13.5px;color:var(--t1);margin-bottom:3px}
-.akv-decision small{display:block;font-size:12px;color:var(--t4);line-height:1.4}
-.akv-decision.keep:has(input:checked){border-color:var(--ok-b);background:var(--ok-d)}
-.akv-decision.ai:has(input:checked){border-color:var(--acc-b);background:var(--acc-d)}
-@media(max-width:560px){.akv-decision-grid{grid-template-columns:1fr}}
