@@ -1362,9 +1362,13 @@ async function setAppMode(mode){
   } else {
     state.appMode = 'simple';
     state.workPreset = 'quick';
-    // Při vědomém přepnutí do Simple začni s kompaktním zavřeným panelem.
-    // Další otevření/zavření už applySimpleDefaults nesmí přepisovat.
+    // Při vědomém přepnutí do Simple skutečně odstraň Advanced-only stav.
+    // Nestačí jej jen skrýt: staré skupiny, roster kódů ani detailní konfigurace
+    // se po pozdějším návratu do Advanced nesmějí nečekaně znovu objevit.
     state.exerciseDetail = false;
+    state.exerciseConfig = [];
+    state.skupiny = [];
+    try { if (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries)) rosterEntries.length = 0; } catch(_) {}
     applySimpleDefaults();
   }
   enforceModeConstraints();
