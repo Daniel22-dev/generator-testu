@@ -1,0 +1,85 @@
+name: Apply Generator 7.1.59 release patch
+
+on:
+  push:
+    branches: [apply-7159]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-generator-7159
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout helper branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify candidate base is unchanged
+        shell: bash
+        env:
+          EXPECTED_BASE: f64d675d960379d11e2c5d2f77c7b8d0c9884da4
+        run: |
+          set -euo pipefail
+          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          test "$current_candidate" = "$EXPECTED_BASE" || {
+            echo "::error::candidate moved: expected $EXPECTED_BASE, got $current_candidate"
+            exit 1
+          }
+
+      - name: Apply exact 7.1.59 target files
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .release-7159-patch.b64.txt > /tmp/release-7159.xz
+          xz -dc /tmp/release-7159.xz | tar -xf -
+          rm -f src/js/15-welcome-onboarding.js
+
+          # Helper artifacts are not part of the release tree.
+          rm -f .release-7159-patch.b64.txt
+          rm -f .github/workflows/apply-7159.yml
+
+          # The patch carries the complete target file list and SHA-256 manifest.
+          sort .release-target-files > /tmp/target-files
+          find . -type f ! -path './.git/*' ! -name '.release-target-files' ! -name '.release-target-sha256'             | sed 's#^./##' | sort > /tmp/actual-files
+          diff -u /tmp/target-files /tmp/actual-files
+          sha256sum -c .release-target-sha256
+
+          test "$(node -p "require('./package.json').version")" = "7.1.59"
+          test "$(sha256sum security/garp27/trust-anchor.json | awk '{print $1}')" = "2e28192a8c983406487cec28fc6443af31f070b549c46bb7c0fbf506e661d88e"
+
+          rm -f .release-target-files .release-target-sha256
+
+      - name: Commit verified release tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: Generator testu 7.1.59"
+
+      - name: Fail closed if candidate moved, then push release
+        shell: bash
+        env:
+          EXPECTED_BASE: f64d675d960379d11e2c5d2f77c7b8d0c9884da4
+        run: |
+          set -euo pipefail
+          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          test "$current_candidate" = "$EXPECTED_BASE" || {
+            echo "::error::candidate moved before push: expected $EXPECTED_BASE, got $current_candidate"
+            exit 1
+          }
+          git push origin HEAD:refs/heads/candidate
+
+      - name: Remove helper branch
+        if: success()
+        shell: bash
+        run: |
+          git push origin --delete apply-7159 || true
