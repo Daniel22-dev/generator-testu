@@ -276,12 +276,12 @@ function itemFeedbackStatusHtml(ex,item,ans,pts){
   var raw=scoreItem(ex,item,ans,pts);
   var got=Math.round(raw*100)/100;
   var good=got>=pts-1e-9;
-  var html='<div class="ap-feedback '+(good?'ap-ok':'ap-bad')+'"><b>'+(good?'✓ Správně':'✕ Chyba')+'</b> <span class="small">('+got+'/'+pts+' b)</span></div>';
+  var html='<div class="ap-feedback '+(good?'ap-ok':'ap-bad')+'"><b>'+(good?'✓ '+(LABELS.fbCorrect||'Správně'):'✕ '+(LABELS.fbWrong||'Chyba'))+'</b> <span class="small">('+got+'/'+pts+' '+esc(LABELS.ptsShort||'b')+')</span></div>';
   if(!good&&CFG.testMode==='procviceci'){
     var correct=correctTextForTeacher(ex,item);
     if(correct)html+='<div class="small"><b>'+esc(T('correctAnswers'))+':</b> '+esc(correct)+'</div>';
   }
-  if((CFG.feedbackMode||'brief')==='learning')html+=csItemFeedbackHtml(item,good,true)||(item.explanation?'<div class="small"><b>Vysvětlení:</b> '+esc(item.explanation)+'</div>':'');
+  if((CFG.feedbackMode||'brief')==='learning')html+=csItemFeedbackHtml(item,good,true)||(item.explanation?'<div class="small"><b>'+esc(LABELS.fbExplain||'Vysvětlení')+':</b> '+esc(item.explanation)+'</div>':'');
   return html;
 }
 function exerciseFeedbackHtml(ei){

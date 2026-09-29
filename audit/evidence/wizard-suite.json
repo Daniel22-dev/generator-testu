@@ -144,6 +144,9 @@
       "layout": "tabs",
       "instr": "target",
       "detail": false,
+      "groups": 0,
+      "exerciseConfig": 0,
+      "roster": 0,
       "topic": "Language fixture test"
     }
   }

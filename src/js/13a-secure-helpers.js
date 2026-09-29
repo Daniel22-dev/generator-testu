@@ -166,12 +166,12 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
       if(!it || typeof it!=='object'||Array.isArray(it)){errors.push(`${loc}: položka není objekt.`);return;}
       if(['multiple choice','reading comprehension','listening comprehension','dialogue completion','multi-select'].includes(type)&&Array.isArray(it.options)){
         const labels=it.options.map(x=>valueText(x).toLowerCase());
-        if(labels.some(x=>!x)||new Set(labels).size!==labels.length)errors.push(`${loc}: options museji byt neprazdne a navzajem odlisitelne.`);
+        if(labels.some(x=>!x)||new Set(labels).size!==labels.length)errors.push(`${loc}: možnosti musí být vyplněné a navzájem odlišné.`);
       }
       if(['categorization','categorisation-board'].includes(type)&&Array.isArray(it.categories)){
         const cats=it.categories.map(x=>valueText(x).toLowerCase());
-        if(cats.some(x=>!x)||new Set(cats).size!==cats.length)errors.push(`${loc}: kategorie museji byt neprazdne a jedinecne.`);
-        if(type==='categorization'&&!cats.includes(valueText(it.correct_category||it.category||it.answer).toLowerCase()))errors.push(`${loc}: spravna kategorie neni v nabidce.`);
+        if(cats.some(x=>!x)||new Set(cats).size!==cats.length)errors.push(`${loc}: kategorie musí být vyplněné a jedinečné.`);
+        if(type==='categorization'&&!cats.includes(valueText(it.correct_category||it.category||it.answer).toLowerCase()))errors.push(`${loc}: správná kategorie není v nabídce.`);
       }
       if(['fill-in-the-blank','cloze text'].includes(type)){
         const text=type==='cloze text'?it.text:it.sentence;
@@ -180,8 +180,8 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
         if(!Array.isArray(answers)||gaps!==answers.length||answers.some(x=>typeof x!=='string'||!valueText(x)))errors.push(`${loc}: kazda mezera ___ musi mit prave jednu nepr azdnou odpoved ve spravnem poradi.`.replace('nepr azdnou','neprazdnou'));
         if(Array.isArray(it.alt_answers)){
           const nested=type==='cloze text'||gaps>1;
-          if(nested&&it.alt_answers.some(x=>!Array.isArray(x)))errors.push(`${loc}: alternativy museji byt rozdelene po mezerach (pole poli).`);
-          if(nested&&it.alt_answers.length>gaps)errors.push(`${loc}: alternativ je vice nez mezer.`);
+          if(nested&&it.alt_answers.some(x=>!Array.isArray(x)))errors.push(`${loc}: alternativy musí být rozdělené po mezerách (pole polí).`);
+          if(nested&&it.alt_answers.length>gaps)errors.push(`${loc}: alternativ je víc než mezer.`);
         }
       }
       if(['multiple choice','reading comprehension','listening comprehension'].includes(type)){

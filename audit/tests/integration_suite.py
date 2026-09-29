@@ -39,12 +39,12 @@ try:
   p.evaluate('__providerBehavior="valid";__calls=[]');start();done();s=status();assert s['output'] and not s['error'],s;return s
  case('retry-after-cancel',retry)
  def preserve():
-  prev=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');p.evaluate('__providerBehavior="throw";__calls=[]');start();done();s=status();now=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');assert prev==now and s['output'] and not s['disabled'],s;return {'oldOutputUnchanged':True}
+  prev=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');p.evaluate('__providerBehavior="throw";__calls=[]');start();p.locator('#uiModal [data-ui-ok]').click();done();s=status();assert s['calls']>=1,('regeneration must really be attempted after confirmation',s);now=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');assert prev==now and s['output'] and not s['disabled'],s;return {'oldOutputUnchanged':True}
  case('failed-regeneration-preserves-output',preserve)
  def mixed(lang,groups,split):
   types=['translation','listening comprehension','cloze text','matching','ordering','word formation','table-completion','reading comprehension'];reset(types,'secureOffline',lang)
   p.evaluate('a=>{state.exerciseConfig.forEach(e=>e.pocetOtazek=5);state.splitGenerate=a.split;if(a.groups>1){state.diferencovany="ANO";state.skupiny=Array.from({length:a.groups},(_,i)=>({nazev:"G"+i,podminky:"Specific group "+i,studenti:["QA"+i]}));}validate();}',{'groups':groups,'split':split})
-  planned=p.evaluate('generationPlan(state)');start();done();s=status();assert s['output'] and not s['error'] and len(s['types'])==groups and all(x==types for x in s['types']),s;assert s['calls']==len(planned['batches']),s
+  planned=p.evaluate('generationPlan(state)');start();done();s=status();assert s['output'] and not s['error'] and len(s['types'])==groups and all(x==types for x in s['types']),s;assert s['calls']==planned['plannedAiCalls'],(s,planned)
   st=p.evaluate('async()=>await runScoringSelfTest()');assert st['ok'] and not st['hasGaps'],st
   return {'lang':lang,'groups':groups,'itemsEach':5,'split':split,'calls':s['calls'],'selfTest':st}
  for lang,groups,split in [('es',1,False),('fr',3,False),('la',2,True)]:case('eight-mixed-'+lang,lambda l=lang,g=groups,s=split:mixed(l,g,s))

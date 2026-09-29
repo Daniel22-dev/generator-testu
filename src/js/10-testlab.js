@@ -101,7 +101,11 @@ async function makeVariantForNextGroup(){
   snapshot.randomizace='ANO';
   const note=$('variantNote');if(note){note.classList.remove('hidden');note.textContent='Připravuji variantu pro skupinu '+letter+'…';}
   try{
-    await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),stamp,snapshot);
+    await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),stamp,snapshot,{freshArtifact:true,reason:'Nová varianta je nový test.'});
+    // A real new variant is a new test artefact: human review must not be inherited.
+    exportChecklist={};
+    renderExportChecklist(true);
+    updateSecureDownloadGate();
     variantSeq=seq;variantSlug='skupina-'+letter.toLowerCase();
     if(note)note.textContent='Varianta '+letter+' je připravena: nové Test ID, stejný obsah a body, promíchané pořadí. Znovu projděte kontrolu obsahu a self-test. Pro tuto variantu stáhněte také její vlastní učitelský soubor.';
     resultStep(1,true);

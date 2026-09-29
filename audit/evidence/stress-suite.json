@@ -11,12 +11,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979607683
+      "ranAt": 1790693989146
     },
     "estimatedTokens": 5700,
-    "studentBytes": 90952,
-    "teacherBytes": 109903,
-    "seconds": 1.39
+    "studentBytes": 91582,
+    "teacherBytes": 109957,
+    "seconds": 1.37
   },
   {
     "type": "multiple choice",
@@ -30,12 +30,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979608867
+      "ranAt": 1790693990699
     },
     "estimatedTokens": 11400,
-    "studentBytes": 95357,
-    "teacherBytes": 116839,
-    "seconds": 1.18
+    "studentBytes": 95987,
+    "teacherBytes": 116895,
+    "seconds": 1.55
   },
   {
     "type": "multiple choice",
@@ -49,12 +49,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979609978
+      "ranAt": 1790693992227
     },
     "estimatedTokens": 11700,
-    "studentBytes": 94920,
-    "teacherBytes": 115867,
-    "seconds": 1.11
+    "studentBytes": 95550,
+    "teacherBytes": 115923,
+    "seconds": 1.53
   },
   {
     "type": "multi-select",
@@ -68,12 +68,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979610988
+      "ranAt": 1790693993539
     },
     "estimatedTokens": 7500,
-    "studentBytes": 91246,
-    "teacherBytes": 110314,
-    "seconds": 1.01
+    "studentBytes": 91876,
+    "teacherBytes": 110370,
+    "seconds": 1.31
   },
   {
     "type": "multi-select",
@@ -87,12 +87,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979612189
+      "ranAt": 1790693994917
     },
     "estimatedTokens": 11640,
-    "studentBytes": 94715,
-    "teacherBytes": 115519,
-    "seconds": 1.2
+    "studentBytes": 95345,
+    "teacherBytes": 115575,
+    "seconds": 1.38
   },
   {
     "type": "multi-select",
@@ -106,12 +106,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979613279
+      "ranAt": 1790693996320
     },
     "estimatedTokens": 11700,
-    "studentBytes": 94176,
-    "teacherBytes": 114451,
-    "seconds": 1.09
+    "studentBytes": 94806,
+    "teacherBytes": 114505,
+    "seconds": 1.4
   },
   {
     "type": "fill-in-the-blank",
@@ -125,128 +125,128 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979614396
+      "ranAt": 1790693997633
     },
     "estimatedTokens": 5700,
-    "studentBytes": 89846,
-    "teacherBytes": 109789,
+    "studentBytes": 90476,
+    "teacherBytes": 109845,
+    "seconds": 1.31
+  },
+  {
+    "type": "fill-in-the-blank",
+    "groups": 2,
+    "maxItems": 30,
+    "ok": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1790693999208
+    },
+    "estimatedTokens": 11400,
+    "studentBytes": 92669,
+    "teacherBytes": 116553,
+    "seconds": 1.57
+  },
+  {
+    "type": "fill-in-the-blank",
+    "groups": 3,
+    "maxItems": 20,
+    "ok": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1790694000673
+    },
+    "estimatedTokens": 11700,
+    "studentBytes": 92606,
+    "teacherBytes": 115627,
+    "seconds": 1.47
+  },
+  {
+    "type": "matching",
+    "groups": 1,
+    "maxItems": 30,
+    "ok": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1790694001936
+    },
+    "estimatedTokens": 3300,
+    "studentBytes": 90336,
+    "teacherBytes": 108568,
+    "seconds": 1.26
+  },
+  {
+    "type": "matching",
+    "groups": 2,
+    "maxItems": 30,
+    "ok": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1790694003519
+    },
+    "estimatedTokens": 6600,
+    "studentBytes": 92249,
+    "teacherBytes": 112722,
+    "seconds": 1.58
+  },
+  {
+    "type": "matching",
+    "groups": 3,
+    "maxItems": 30,
+    "ok": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1790694005145
+    },
+    "estimatedTokens": 9900,
+    "studentBytes": 93206,
+    "teacherBytes": 114799,
+    "seconds": 1.63
+  },
+  {
+    "type": "word order",
+    "groups": 1,
+    "maxItems": 30,
+    "ok": true,
+    "selfTest": {
+      "ok": true,
+      "hasErrors": false,
+      "hasGaps": false,
+      "gapCount": 0,
+      "error": null,
+      "mode": "secure",
+      "ranAt": 1790694006268
+    },
+    "estimatedTokens": 5700,
+    "studentBytes": 91422,
+    "teacherBytes": 110422,
     "seconds": 1.12
   },
   {
-    "type": "fill-in-the-blank",
-    "groups": 2,
-    "maxItems": 30,
-    "ok": true,
-    "selfTest": {
-      "ok": true,
-      "hasErrors": false,
-      "hasGaps": false,
-      "gapCount": 0,
-      "error": null,
-      "mode": "secure",
-      "ranAt": 1789979615497
-    },
-    "estimatedTokens": 11400,
-    "studentBytes": 92039,
-    "teacherBytes": 116497,
-    "seconds": 1.1
-  },
-  {
-    "type": "fill-in-the-blank",
-    "groups": 3,
-    "maxItems": 20,
-    "ok": true,
-    "selfTest": {
-      "ok": true,
-      "hasErrors": false,
-      "hasGaps": false,
-      "gapCount": 0,
-      "error": null,
-      "mode": "secure",
-      "ranAt": 1789979616747
-    },
-    "estimatedTokens": 11700,
-    "studentBytes": 91976,
-    "teacherBytes": 115571,
-    "seconds": 1.25
-  },
-  {
-    "type": "matching",
-    "groups": 1,
-    "maxItems": 30,
-    "ok": true,
-    "selfTest": {
-      "ok": true,
-      "hasErrors": false,
-      "hasGaps": false,
-      "gapCount": 0,
-      "error": null,
-      "mode": "secure",
-      "ranAt": 1789979617633
-    },
-    "estimatedTokens": 3300,
-    "studentBytes": 89706,
-    "teacherBytes": 108512,
-    "seconds": 0.88
-  },
-  {
-    "type": "matching",
-    "groups": 2,
-    "maxItems": 30,
-    "ok": true,
-    "selfTest": {
-      "ok": true,
-      "hasErrors": false,
-      "hasGaps": false,
-      "gapCount": 0,
-      "error": null,
-      "mode": "secure",
-      "ranAt": 1789979618577
-    },
-    "estimatedTokens": 6600,
-    "studentBytes": 91619,
-    "teacherBytes": 112666,
-    "seconds": 0.95
-  },
-  {
-    "type": "matching",
-    "groups": 3,
-    "maxItems": 30,
-    "ok": true,
-    "selfTest": {
-      "ok": true,
-      "hasErrors": false,
-      "hasGaps": false,
-      "gapCount": 0,
-      "error": null,
-      "mode": "secure",
-      "ranAt": 1789979619739
-    },
-    "estimatedTokens": 9900,
-    "studentBytes": 92576,
-    "teacherBytes": 114743,
-    "seconds": 1.16
-  },
-  {
-    "type": "word order",
-    "groups": 1,
-    "maxItems": 30,
-    "ok": true,
-    "selfTest": {
-      "ok": true,
-      "hasErrors": false,
-      "hasGaps": false,
-      "gapCount": 0,
-      "error": null,
-      "mode": "secure",
-      "ranAt": 1789979620766
-    },
-    "estimatedTokens": 5700,
-    "studentBytes": 90792,
-    "teacherBytes": 110368,
-    "seconds": 1.03
-  },
-  {
     "type": "word order",
     "groups": 2,
     "maxItems": 30,
@@ -258,12 +258,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979621906
+      "ranAt": 1790694007767
     },
     "estimatedTokens": 11400,
-    "studentBytes": 94877,
-    "teacherBytes": 118234,
-    "seconds": 1.14
+    "studentBytes": 95507,
+    "teacherBytes": 118290,
+    "seconds": 1.5
   },
   {
     "type": "word order",
@@ -277,12 +277,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979623036
+      "ranAt": 1790694009220
     },
     "estimatedTokens": 11700,
-    "studentBytes": 94480,
-    "teacherBytes": 117087,
-    "seconds": 1.13
+    "studentBytes": 95110,
+    "teacherBytes": 117143,
+    "seconds": 1.45
   },
   {
     "type": "ordering",
@@ -296,12 +296,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979624036
+      "ranAt": 1790694010391
     },
     "estimatedTokens": 7800,
-    "studentBytes": 90608,
-    "teacherBytes": 109912,
-    "seconds": 1.0
+    "studentBytes": 91238,
+    "teacherBytes": 109968,
+    "seconds": 1.17
   },
   {
     "type": "ordering",
@@ -315,12 +315,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979625081
+      "ranAt": 1790694011752
     },
     "estimatedTokens": 11600,
-    "studentBytes": 93074,
-    "teacherBytes": 114247,
-    "seconds": 1.05
+    "studentBytes": 93704,
+    "teacherBytes": 114303,
+    "seconds": 1.36
   },
   {
     "type": "ordering",
@@ -334,12 +334,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979626069
+      "ranAt": 1790694013103
     },
     "estimatedTokens": 11400,
-    "studentBytes": 92724,
-    "teacherBytes": 113235,
-    "seconds": 0.98
+    "studentBytes": 93354,
+    "teacherBytes": 113291,
+    "seconds": 1.35
   },
   {
     "type": "highlight-evidence",
@@ -353,12 +353,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979627195
+      "ranAt": 1790694014283
     },
     "estimatedTokens": 11640,
-    "studentBytes": 90842,
-    "teacherBytes": 109661,
-    "seconds": 1.13
+    "studentBytes": 91472,
+    "teacherBytes": 109717,
+    "seconds": 1.18
   },
   {
     "type": "highlight-evidence",
@@ -372,12 +372,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979628121
+      "ranAt": 1790694015605
     },
     "estimatedTokens": 11520,
-    "studentBytes": 92129,
-    "teacherBytes": 111325,
-    "seconds": 0.92
+    "studentBytes": 92759,
+    "teacherBytes": 111381,
+    "seconds": 1.32
   },
   {
     "type": "highlight-evidence",
@@ -391,12 +391,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979629028
+      "ranAt": 1790694016895
     },
     "estimatedTokens": 10980,
-    "studentBytes": 91840,
-    "teacherBytes": 110647,
-    "seconds": 0.91
+    "studentBytes": 92470,
+    "teacherBytes": 110703,
+    "seconds": 1.29
   },
   {
     "type": "categorisation-board",
@@ -410,12 +410,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979629902
+      "ranAt": 1790694017960
     },
     "estimatedTokens": 1200,
-    "studentBytes": 89104,
-    "teacherBytes": 106782,
-    "seconds": 0.87
+    "studentBytes": 89734,
+    "teacherBytes": 106838,
+    "seconds": 1.07
   },
   {
     "type": "categorisation-board",
@@ -429,12 +429,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979630815
+      "ranAt": 1790694019039
     },
     "estimatedTokens": 2400,
-    "studentBytes": 89813,
-    "teacherBytes": 107476,
-    "seconds": 0.91
+    "studentBytes": 90443,
+    "teacherBytes": 107532,
+    "seconds": 1.08
   },
   {
     "type": "categorisation-board",
@@ -448,12 +448,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979631593
+      "ranAt": 1790694020173
     },
     "estimatedTokens": 3600,
-    "studentBytes": 90168,
-    "teacherBytes": 107823,
-    "seconds": 0.78
+    "studentBytes": 90798,
+    "teacherBytes": 107878,
+    "seconds": 1.14
   },
   {
     "type": "table-completion",
@@ -467,12 +467,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979632446
+      "ranAt": 1790694021305
     },
     "estimatedTokens": 12000,
-    "studentBytes": 91243,
-    "teacherBytes": 110393,
-    "seconds": 0.85
+    "studentBytes": 91873,
+    "teacherBytes": 110449,
+    "seconds": 1.12
   },
   {
     "type": "table-completion",
@@ -486,12 +486,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979633354
+      "ranAt": 1790694022484
     },
     "estimatedTokens": 11000,
-    "studentBytes": 92423,
-    "teacherBytes": 111928,
-    "seconds": 0.91
+    "studentBytes": 93053,
+    "teacherBytes": 111984,
+    "seconds": 1.18
   },
   {
     "type": "table-completion",
@@ -505,12 +505,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979634398
+      "ranAt": 1790694023672
     },
     "estimatedTokens": 10650,
-    "studentBytes": 92148,
-    "teacherBytes": 111239,
-    "seconds": 1.05
+    "studentBytes": 92778,
+    "teacherBytes": 111295,
+    "seconds": 1.19
   },
   {
     "type": "transformation-chain",
@@ -524,12 +524,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979635300
+      "ranAt": 1790694024856
     },
     "estimatedTokens": 12000,
-    "studentBytes": 91431,
-    "teacherBytes": 111053,
-    "seconds": 0.9
+    "studentBytes": 92061,
+    "teacherBytes": 111109,
+    "seconds": 1.18
   },
   {
     "type": "transformation-chain",
@@ -543,12 +543,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979636177
+      "ranAt": 1790694026039
     },
     "estimatedTokens": 11000,
-    "studentBytes": 92687,
-    "teacherBytes": 112828,
-    "seconds": 0.88
+    "studentBytes": 93317,
+    "teacherBytes": 112884,
+    "seconds": 1.18
   },
   {
     "type": "transformation-chain",
@@ -562,12 +562,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979637060
+      "ranAt": 1790694027300
     },
     "estimatedTokens": 10650,
-    "studentBytes": 92380,
-    "teacherBytes": 112007,
-    "seconds": 0.88
+    "studentBytes": 93010,
+    "teacherBytes": 112063,
+    "seconds": 1.26
   },
   {
     "type": "translation",
@@ -581,12 +581,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979637924
+      "ranAt": 1790694028540
     },
     "estimatedTokens": 5700,
-    "studentBytes": 89954,
-    "teacherBytes": 109891,
-    "seconds": 0.86
+    "studentBytes": 90584,
+    "teacherBytes": 109947,
+    "seconds": 1.24
   },
   {
     "type": "translation",
@@ -600,12 +600,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979638924
+      "ranAt": 1790694030159
     },
     "estimatedTokens": 11400,
-    "studentBytes": 92363,
-    "teacherBytes": 116803,
-    "seconds": 1.0
+    "studentBytes": 92993,
+    "teacherBytes": 116859,
+    "seconds": 1.62
   },
   {
     "type": "translation",
@@ -619,12 +619,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979640008
+      "ranAt": 1790694031612
     },
     "estimatedTokens": 11700,
-    "studentBytes": 92248,
-    "teacherBytes": 115819,
-    "seconds": 1.09
+    "studentBytes": 92878,
+    "teacherBytes": 115875,
+    "seconds": 1.45
   },
   {
     "type": "true/false",
@@ -638,12 +638,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979640845
+      "ranAt": 1790694032831
     },
     "estimatedTokens": 5700,
-    "studentBytes": 90132,
-    "teacherBytes": 109168,
-    "seconds": 0.83
+    "studentBytes": 90762,
+    "teacherBytes": 109224,
+    "seconds": 1.22
   },
   {
     "type": "true/false",
@@ -657,12 +657,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979641945
+      "ranAt": 1790694034354
     },
     "estimatedTokens": 11400,
-    "studentBytes": 92897,
-    "teacherBytes": 114632,
-    "seconds": 1.1
+    "studentBytes": 93527,
+    "teacherBytes": 114690,
+    "seconds": 1.52
   },
   {
     "type": "true/false",
@@ -676,12 +676,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979642897
+      "ranAt": 1790694035727
     },
     "estimatedTokens": 11700,
-    "studentBytes": 92720,
-    "teacherBytes": 113887,
-    "seconds": 0.95
+    "studentBytes": 93350,
+    "teacherBytes": 113943,
+    "seconds": 1.37
   },
   {
     "type": "error correction",
@@ -695,12 +695,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979643707
+      "ranAt": 1790694036929
     },
     "estimatedTokens": 5700,
-    "studentBytes": 89754,
-    "teacherBytes": 109816,
-    "seconds": 0.81
+    "studentBytes": 90384,
+    "teacherBytes": 109872,
+    "seconds": 1.2
   },
   {
     "type": "error correction",
@@ -714,12 +714,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979644684
+      "ranAt": 1790694038353
     },
     "estimatedTokens": 11400,
-    "studentBytes": 91763,
-    "teacherBytes": 116578,
-    "seconds": 0.98
+    "studentBytes": 92393,
+    "teacherBytes": 116634,
+    "seconds": 1.42
   },
   {
     "type": "error correction",
@@ -733,12 +733,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979645837
+      "ranAt": 1790694039812
     },
     "estimatedTokens": 11700,
-    "studentBytes": 91728,
-    "teacherBytes": 115639,
-    "seconds": 1.15
+    "studentBytes": 92358,
+    "teacherBytes": 115695,
+    "seconds": 1.46
   },
   {
     "type": "error-tagging",
@@ -752,12 +752,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979646741
+      "ranAt": 1790694041031
     },
     "estimatedTokens": 10200,
-    "studentBytes": 91338,
-    "teacherBytes": 112567,
-    "seconds": 0.91
+    "studentBytes": 91968,
+    "teacherBytes": 112623,
+    "seconds": 1.22
   },
   {
     "type": "error-tagging",
@@ -771,12 +771,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979647643
+      "ranAt": 1790694042404
     },
     "estimatedTokens": 11820,
-    "studentBytes": 93467,
-    "teacherBytes": 117064,
-    "seconds": 0.9
+    "studentBytes": 94097,
+    "teacherBytes": 117120,
+    "seconds": 1.37
   },
   {
     "type": "error-tagging",
@@ -790,12 +790,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979648523
+      "ranAt": 1790694043687
     },
     "estimatedTokens": 11790,
-    "studentBytes": 93140,
-    "teacherBytes": 115803,
-    "seconds": 0.88
+    "studentBytes": 93770,
+    "teacherBytes": 115859,
+    "seconds": 1.28
   },
   {
     "type": "cloze text",
@@ -809,12 +809,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979649328
+      "ranAt": 1790694044849
     },
     "estimatedTokens": 12000,
-    "studentBytes": 89593,
-    "teacherBytes": 109079,
-    "seconds": 0.8
+    "studentBytes": 90223,
+    "teacherBytes": 109133,
+    "seconds": 1.16
   },
   {
     "type": "cloze text",
@@ -828,12 +828,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979650280
+      "ranAt": 1790694046012
     },
     "estimatedTokens": 11000,
-    "studentBytes": 90203,
-    "teacherBytes": 110146,
-    "seconds": 0.95
+    "studentBytes": 90833,
+    "teacherBytes": 110202,
+    "seconds": 1.16
   },
   {
     "type": "cloze text",
@@ -847,12 +847,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979651098
+      "ranAt": 1790694047191
     },
     "estimatedTokens": 10650,
-    "studentBytes": 90280,
-    "teacherBytes": 109727,
-    "seconds": 0.82
+    "studentBytes": 90910,
+    "teacherBytes": 109783,
+    "seconds": 1.18
   },
   {
     "type": "sentence transformation",
@@ -866,12 +866,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979652013
+      "ranAt": 1790694048485
     },
     "estimatedTokens": 5700,
-    "studentBytes": 90398,
-    "teacherBytes": 110347,
-    "seconds": 0.91
+    "studentBytes": 91028,
+    "teacherBytes": 110403,
+    "seconds": 1.29
   },
   {
     "type": "sentence transformation",
@@ -885,12 +885,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979652989
+      "ranAt": 1790694049963
     },
     "estimatedTokens": 11400,
-    "studentBytes": 93695,
-    "teacherBytes": 118171,
-    "seconds": 0.98
+    "studentBytes": 94325,
+    "teacherBytes": 118227,
+    "seconds": 1.47
   },
   {
     "type": "sentence transformation",
@@ -904,12 +904,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979653977
+      "ranAt": 1790694051387
     },
     "estimatedTokens": 11700,
-    "studentBytes": 93464,
-    "teacherBytes": 117083,
-    "seconds": 0.99
+    "studentBytes": 94094,
+    "teacherBytes": 117139,
+    "seconds": 1.42
   },
   {
     "type": "reading comprehension",
@@ -923,12 +923,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979654783
+      "ranAt": 1790694052606
     },
     "estimatedTokens": 7800,
-    "studentBytes": 91134,
-    "teacherBytes": 110091,
-    "seconds": 0.81
+    "studentBytes": 91764,
+    "teacherBytes": 110147,
+    "seconds": 1.22
   },
   {
     "type": "reading comprehension",
@@ -942,12 +942,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979655653
+      "ranAt": 1790694054027
     },
     "estimatedTokens": 11640,
-    "studentBytes": 94349,
-    "teacherBytes": 114634,
-    "seconds": 0.87
+    "studentBytes": 94979,
+    "teacherBytes": 114690,
+    "seconds": 1.42
   },
   {
     "type": "reading comprehension",
@@ -961,12 +961,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979656602
+      "ranAt": 1790694055387
     },
     "estimatedTokens": 11520,
-    "studentBytes": 93864,
-    "teacherBytes": 113395,
-    "seconds": 0.95
+    "studentBytes": 94494,
+    "teacherBytes": 113451,
+    "seconds": 1.36
   },
   {
     "type": "dialogue completion",
@@ -980,12 +980,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979657467
+      "ranAt": 1790694056530
     },
     "estimatedTokens": 5700,
-    "studentBytes": 91680,
-    "teacherBytes": 110635,
-    "seconds": 0.87
+    "studentBytes": 92310,
+    "teacherBytes": 110691,
+    "seconds": 1.14
   },
   {
     "type": "dialogue completion",
@@ -999,12 +999,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979658349
+      "ranAt": 1790694058063
     },
     "estimatedTokens": 11400,
-    "studentBytes": 97541,
-    "teacherBytes": 119035,
-    "seconds": 0.88
+    "studentBytes": 98171,
+    "teacherBytes": 119091,
+    "seconds": 1.53
   },
   {
     "type": "dialogue completion",
@@ -1018,12 +1018,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979659268
+      "ranAt": 1790694059519
     },
     "estimatedTokens": 11700,
-    "studentBytes": 96872,
-    "teacherBytes": 117835,
-    "seconds": 0.92
+    "studentBytes": 97502,
+    "teacherBytes": 117889,
+    "seconds": 1.45
   },
   {
     "type": "categorization",
@@ -1037,12 +1037,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979660102
+      "ranAt": 1790694060676
     },
     "estimatedTokens": 5700,
-    "studentBytes": 90530,
-    "teacherBytes": 109930,
-    "seconds": 0.83
+    "studentBytes": 91160,
+    "teacherBytes": 109986,
+    "seconds": 1.16
   },
   {
     "type": "categorization",
@@ -1056,12 +1056,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979661059
+      "ranAt": 1790694062101
     },
     "estimatedTokens": 11400,
-    "studentBytes": 94091,
-    "teacherBytes": 116920,
-    "seconds": 0.96
+    "studentBytes": 94721,
+    "teacherBytes": 116976,
+    "seconds": 1.43
   },
   {
     "type": "categorization",
@@ -1075,12 +1075,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979662040
+      "ranAt": 1790694063685
     },
     "estimatedTokens": 11700,
-    "studentBytes": 93792,
-    "teacherBytes": 115935,
-    "seconds": 0.98
+    "studentBytes": 94422,
+    "teacherBytes": 115991,
+    "seconds": 1.57
   },
   {
     "type": "word formation",
@@ -1094,12 +1094,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979662926
+      "ranAt": 1790694064964
     },
     "estimatedTokens": 5700,
-    "studentBytes": 90260,
-    "teacherBytes": 110200,
-    "seconds": 0.88
+    "studentBytes": 90890,
+    "teacherBytes": 110256,
+    "seconds": 1.28
   },
   {
     "type": "word formation",
@@ -1113,12 +1113,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979663907
+      "ranAt": 1790694066412
     },
     "estimatedTokens": 11400,
-    "studentBytes": 93281,
-    "teacherBytes": 117730,
-    "seconds": 0.98
+    "studentBytes": 93911,
+    "teacherBytes": 117786,
+    "seconds": 1.45
   },
   {
     "type": "word formation",
@@ -1132,12 +1132,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979664928
+      "ranAt": 1790694067838
     },
     "estimatedTokens": 11700,
-    "studentBytes": 93072,
-    "teacherBytes": 116655,
-    "seconds": 1.02
+    "studentBytes": 93702,
+    "teacherBytes": 116711,
+    "seconds": 1.43
   },
   {
     "type": "listening comprehension",
@@ -1151,12 +1151,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979665709
+      "ranAt": 1790694068943
     },
     "estimatedTokens": 10800,
-    "studentBytes": 92438,
-    "teacherBytes": 110827,
-    "seconds": 0.78
+    "studentBytes": 93068,
+    "teacherBytes": 110883,
+    "seconds": 1.1
   },
   {
     "type": "listening comprehension",
@@ -1170,12 +1170,12 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979666529
+      "ranAt": 1790694070169
     },
     "estimatedTokens": 11800,
-    "studentBytes": 95036,
-    "teacherBytes": 113740,
-    "seconds": 0.82
+    "studentBytes": 95666,
+    "teacherBytes": 113796,
+    "seconds": 1.22
   },
   {
     "type": "listening comprehension",
@@ -1189,11 +1189,11 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979667419
+      "ranAt": 1790694071423
     },
     "estimatedTokens": 11400,
-    "studentBytes": 94304,
-    "teacherBytes": 112723,
-    "seconds": 0.89
+    "studentBytes": 94934,
+    "teacherBytes": 112779,
+    "seconds": 1.26
   }
 ]

@@ -1,3 +1,22 @@
+## 7.1.59 — 2026-09-29 — workflow / user-journey audit
+
+- učitel už neuvízne bez vysvětlení: prázdné jméno pro učitelský mód má hlášku; pole se nepředvyplňuje jménem autora (starší uložená hodnota se vyprázdní);
+- studentský test s identitou „jméno“ žádá jméno a příjmení, ne „kód (např. A1)“; body u otázek podle jazyka testu;
+- druhý pohled AI: rozhodnutí u rozdílů klíče zůstává vidět, krok 3 ukazuje „Čeká na tvé rozhodnutí“, rozdíly se řeší jen po položkách (plošné potvrzení v kroku 4 odstraněno), klíč i návrh AI se zobrazují ve stejném tvaru;
+- nevyřešené rozdíly klíče přežijí přidání alternativ, přijetí návrhů i nesouvisející úpravu v editoru; ruční změna klíče dané položky je vyřeší;
+- po každé změně testu self-test ukáže, proč už neplatí; učitelská kontrola téhož testu zůstává potvrzená;
+- neúspěšné nové generování zachová původní test včetně kontrol; nahrazení hotového testu vyžaduje potvrzení; HTTP kód v této chybě je klikatelný;
+- didaktická kontrola počítá body ze sestaveného testu; verifier zná plánovaný čas a nezobrazuje interní „__default“;
+- bez Google Forms není answers.txt označen jako „nouzová záloha“;
+- chyby AI mají řádek „Co dál:“ podle HTTP/technického kódu (upravit zadání, zmenšit přílohy, zkontrolovat klíč, počkat, kontaktovat správce), i ve vysvětlení po kliknutí na kód;
+- krok 4 u testu se zámkem vysvětluje, jak zamčený test odemknout (5× klepnout na zámek + učitelský kód);
+- průběh, chyby, nápovědy a výsledky kontrol se ohlašují čtečce obrazovky; na 360 px nepřetékají tlačítka kroku 3; dialog popisu šablony už nežádá název;
+- neúplná AI kontrola klíče se nevydává za hotovou; návrhy dalších odpovědí jsou čitelné a po změně testu přestanou jít použít;
+- změna nastavení po vygenerování je vidět u stažení a jde použít bez nového AI generování;
+- zpětná vazba procvičování, zkratka bodů a názvy záložek v jazyce testu; validační hlášky editoru s diakritikou;
+- odstraněno 12 nedosažitelných funkcí (starý účtový modal a onboarding), díky tomu jsou rozpočty výkonu splněny s rezervou;
+- nová klikací sada `audit/tests/journey_suite.py` (16 cest) a workflow `journey-e2e.yml`; kontrola učitelského náhledu ve workflow auditu je nově behaviorální; přegenerován AI assurance otisk (změny UI a stavového modelu, prompty/transport beze změny).
+
 ## 7.1.55 — 2026-09-27 — karta O aplikaci a sjednocený katalog změn
 
 - hlavní hlavička nově nabízí vstup **O aplikaci** místo samostatného tlačítka „co je nového“;

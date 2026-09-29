@@ -2,6 +2,9 @@
 
 function buildIntroHtml(cfg, exercises) {
   const L = cfg.labels;
+  // Popisek identity musí odpovídat tomu, co student skutečně zadává.
+  const idLabel = (cfg.diffGroups && cfg.diffGroups.length) ? [L.name, L.namePh]
+    : (cfg.identityMode === 'oneTimeCode' ? [L.name, L.namePh] : [L.nameIdentity || L.name, L.nameIdentityPh || L.namePh]);
   const totalQ = exercises.reduce((s,ex) => s+(ex.items?.length||0), 0);
   return '<div id="introScreen" class="screen">' +
     '<div class="intro-card">' +
@@ -22,8 +25,8 @@ function buildIntroHtml(cfg, exercises) {
     (cfg.overeni ? '<li>' + H(L.ruleVerify) + '</li>' : '') +
     (cfg.zolicek ? '<li><strong>' + H(L.ruleJoker) + '</strong></li>' : '') +
     '</ul></div>' +
-    '<label class="name-lbl" for="studentName">' + H(L.name) + '</label>' +
-    '<input type="text" id="studentName" class="name-inp" placeholder="' + H(L.namePh) + '" autocomplete="off" autocorrect="off">' +
+    '<label class="name-lbl" for="studentName">' + H(idLabel[0]) + '</label>' +
+    '<input type="text" id="studentName" class="name-inp" placeholder="' + H(idLabel[1]) + '" autocomplete="off" autocorrect="off">' +
     (cfg.diffGroups && cfg.diffGroups.length ? '<div class="group-warning">Diferencovaný test: zadej přesně jméno/kód podle pokynů učitele.</div>' : '') +
     (cfg.zolicek ? '<div class="joker-choice" id="jokerChoice"><div class="joker-choice-title">&#127183; ' + H(L.jokerChoiceTitle) + '</div><div class="joker-choice-hint">' + H(L.jokerChoiceHint) + '</div><div class="joker-choice-row"><button type="button" class="joker-choice-btn" id="jokerChoiceNo" onclick="chooseJokerStart(false)">' + H(L.jokerDoTest) + '</button><button type="button" class="joker-choice-btn joker-choice-risk" id="jokerChoiceYes" onclick="chooseJokerStart(true)">' + H(L.jokerTake) + '</button></div><div class="joker-choice-confirm" id="jokerChoiceConfirm" style="display:none"></div></div>' : '') +
     '<button class="btn-fullscreen" type="button" onclick="enterFullscreen()"><span class="fs-ico" aria-hidden="true"></span> ' + H(L.fullscreen || 'Fullscreen') + '</button>' +
@@ -63,7 +66,7 @@ function buildTabsNavHtml(exercises, L) {
   return '<div class="tabs-nav" id="tabsNav">' +
     exercises.map((ex,i) => '<button class="tab-btn' + (i===0?' tab-active':'') + '" id="tabBtn' + i + '" onclick="switchTab(' + i + ')">' +
       '<span class="tab-num">' + (i+1) + '</span>' +
-      '<span class="tab-name">' + H((ex.title||ex.type).slice(0,12)) + '</span>' +
+      '<span class="tab-name" title="' + H(ex.title||ex.type) + '">' + H(ex.title||ex.type) + '</span>' +
       '<span class="tab-done hidden" id="tabDone' + i + '">&#10003;</span>' +
       '</button>').join('') +
     '</div>';
@@ -165,7 +168,7 @@ function buildQuestionHtml(item, qi, ei, type, pts, cfg, rcSkip) {
   const L = cfg.labels;
   const qid  = ei + '_' + qi;
   const qnum = qi + 1;
-  const hdr  = '<div class="q-hdr"><span class="q-num">' + qnum + '</span><span class="q-pts">' + pts + '&nbsp;b</span></div>';
+  const hdr  = '<div class="q-hdr"><span class="q-num">' + qnum + '</span><span class="q-pts">' + pts + '&nbsp;' + H((cfg.labels && cfg.labels.ptsShort) || 'b') + '</span></div>';
   const joker = '';
   // Vysvětlení/nápovědu PŘÍMO U OTÁZKY (před odevzdáním) ukazujeme jen v procvičovacím
   // režimu — tam nejde o známku a cílem je učení za pochodu. U běžného známkovaného testu

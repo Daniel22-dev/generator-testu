@@ -11,10 +11,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "instant",
-      "ranAt": 1789979527073
+      "ranAt": 1790693899796
     },
     "ok": true,
-    "seconds": 1.75
+    "seconds": 1.69
   },
   {
     "case": "hybrid-manual-AI-1-secureOffline",
@@ -28,10 +28,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979528993
+      "ranAt": 1790693901835
     },
     "ok": true,
-    "seconds": 1.92
+    "seconds": 2.04
   },
   {
     "case": "hybrid-manual-AI-2-instant",
@@ -45,10 +45,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "instant",
-      "ranAt": 1789979530507
+      "ranAt": 1790693904028
     },
     "ok": true,
-    "seconds": 1.51
+    "seconds": 2.19
   },
   {
     "case": "hybrid-manual-AI-2-secureOffline",
@@ -62,10 +62,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979532574
+      "ranAt": 1790693906571
     },
     "ok": true,
-    "seconds": 2.07
+    "seconds": 2.54
   },
   {
     "case": "all-manual-no-AI",
@@ -79,7 +79,7 @@
     ],
     "disabled": false,
     "ok": true,
-    "seconds": 0.67
+    "seconds": 0.96
   },
   {
     "case": "manual-cancel-falls-back-to-AI",
@@ -93,7 +93,7 @@
     ],
     "disabled": false,
     "ok": true,
-    "seconds": 0.56
+    "seconds": 0.67
   },
   {
     "case": "manual-abort-whole-generation",
@@ -117,17 +117,17 @@
     ],
     "disabled": false,
     "ok": true,
-    "seconds": 0.46
+    "seconds": 0.63
   },
   {
     "case": "provider-invalid",
-    "error": "\u274c Gemini vr\u00e1til data mimo zad\u00e1n\u00ed, test negeneruji:\n- z\u00e1kladn\u00ed verze: po\u010det cvi\u010den\u00ed je 0, o\u010dek\u00e1v\u00e1no 1.",
+    "error": "\u274c Gemini vr\u00e1til data mimo zad\u00e1n\u00ed, test negeneruji:\n- z\u00e1kladn\u00ed verze: po\u010det cvi\u010den\u00ed je 0, o\u010dek\u00e1v\u00e1no 1.\nCo d\u00e1l: spus\u0165 generov\u00e1n\u00ed znovu; kdy\u017e se to opakuje, sni\u017e po\u010det cvi\u010den\u00ed nebo polo\u017eek.",
     "output": false,
     "calls": 2,
     "types": [],
     "disabled": false,
     "ok": true,
-    "seconds": 0.06
+    "seconds": 0.08
   },
   {
     "case": "provider-throw",
@@ -137,7 +137,7 @@
     "types": [],
     "disabled": false,
     "ok": true,
-    "seconds": 0.05
+    "seconds": 0.07
   },
   {
     "case": "provider-cancel",
@@ -161,13 +161,13 @@
     ],
     "disabled": false,
     "ok": true,
-    "seconds": 0.45
+    "seconds": 0.58
   },
   {
     "case": "failed-regeneration-preserves-output",
     "oldOutputUnchanged": true,
     "ok": true,
-    "seconds": 0.07
+    "seconds": 0.13
   },
   {
     "case": "eight-mixed-es",
@@ -175,7 +175,7 @@
     "groups": 1,
     "itemsEach": 5,
     "split": false,
-    "calls": 8,
+    "calls": 7,
     "selfTest": {
       "ok": true,
       "hasErrors": false,
@@ -183,10 +183,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979536286
+      "ranAt": 1790693911538
     },
     "ok": true,
-    "seconds": 1.2
+    "seconds": 1.64
   },
   {
     "case": "eight-mixed-fr",
@@ -194,7 +194,7 @@
     "groups": 3,
     "itemsEach": 5,
     "split": false,
-    "calls": 8,
+    "calls": 9,
     "selfTest": {
       "ok": true,
       "hasErrors": false,
@@ -202,10 +202,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979537779
+      "ranAt": 1790693913944
     },
     "ok": true,
-    "seconds": 1.49
+    "seconds": 2.41
   },
   {
     "case": "eight-mixed-la",
@@ -213,7 +213,7 @@
     "groups": 2,
     "itemsEach": 5,
     "split": true,
-    "calls": 8,
+    "calls": 9,
     "selfTest": {
       "ok": true,
       "hasErrors": false,
@@ -221,10 +221,10 @@
       "gapCount": 0,
       "error": null,
       "mode": "secure",
-      "ranAt": 1789979539268
+      "ranAt": 1790693915772
     },
     "ok": true,
-    "seconds": 1.49
+    "seconds": 1.83
   },
   {
     "case": "oversized-eight-complex-blocked-before-AI",

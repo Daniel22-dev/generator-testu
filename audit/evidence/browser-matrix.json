@@ -29,9 +29,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980007542
+        "ranAt": 1790693613900
       },
-      "seconds": 2.49
+      "seconds": 2.02
     },
     {
       "language": "en",
@@ -61,483 +61,483 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980009446
-      },
-      "seconds": 1.9
-    },
-    {
-      "language": "en",
-      "mode": "instant",
-      "types": [
-        "listening comprehension",
-        "odd one out",
-        "multiple matching",
-        "banked cloze",
-        "key word transformation",
-        "synonym choice",
-        "antonym choice",
-        "choose the correct response",
-        "match word to definition",
-        "verb form"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980011110
-      },
-      "seconds": 1.67
-    },
-    {
-      "language": "en",
-      "mode": "instant",
-      "types": [
-        "preposition gap-fill",
-        "question formation",
-        "word family",
-        "short answer",
-        "paraphrase the sentence",
-        "heading matching",
-        "gist question",
-        "summary cloze"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 96,
-        "total": 96
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980012414
-      },
-      "seconds": 1.31
-    },
-    {
-      "language": "en",
-      "mode": "secureOffline",
-      "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980015580
-      },
-      "seconds": 3.18
-    },
-    {
-      "language": "en",
-      "mode": "secureOffline",
-      "types": [
-        "translation",
-        "true/false",
-        "error correction",
-        "error-tagging",
-        "cloze text",
-        "sentence transformation",
-        "reading comprehension",
-        "dialogue completion",
-        "categorization",
-        "word formation"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980018274
-      },
-      "seconds": 2.68
-    },
-    {
-      "language": "en",
-      "mode": "secureOffline",
-      "types": [
-        "listening comprehension",
-        "odd one out",
-        "multiple matching",
-        "banked cloze",
-        "key word transformation",
-        "synonym choice",
-        "antonym choice",
-        "choose the correct response",
-        "match word to definition",
-        "verb form"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980020834
-      },
-      "seconds": 2.56
-    },
-    {
-      "language": "en",
-      "mode": "secureOffline",
-      "types": [
-        "preposition gap-fill",
-        "question formation",
-        "word family",
-        "short answer",
-        "paraphrase the sentence",
-        "heading matching",
-        "gist question",
-        "summary cloze"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 96,
-        "total": 96
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980023100
-      },
-      "seconds": 2.27
-    },
-    {
-      "language": "es",
-      "mode": "instant",
-      "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980024633
-      },
-      "seconds": 1.53
-    },
-    {
-      "language": "es",
-      "mode": "instant",
-      "types": [
-        "translation",
-        "true/false",
-        "error correction",
-        "error-tagging",
-        "cloze text",
-        "sentence transformation",
-        "reading comprehension",
-        "dialogue completion",
-        "categorization",
-        "word formation"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980025843
-      },
-      "seconds": 1.21
-    },
-    {
-      "language": "es",
-      "mode": "instant",
-      "types": [
-        "listening comprehension",
-        "odd one out",
-        "multiple matching",
-        "banked cloze",
-        "key word transformation",
-        "synonym choice",
-        "antonym choice",
-        "choose the correct response",
-        "match word to definition",
-        "verb form"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980027226
-      },
-      "seconds": 1.39
-    },
-    {
-      "language": "es",
-      "mode": "instant",
-      "types": [
-        "preposition gap-fill",
-        "question formation",
-        "word family",
-        "short answer",
-        "paraphrase the sentence",
-        "heading matching",
-        "gist question",
-        "summary cloze"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 96,
-        "total": 96
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980028306
-      },
-      "seconds": 1.07
-    },
-    {
-      "language": "es",
-      "mode": "secureOffline",
-      "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980030832
-      },
-      "seconds": 2.54
-    },
-    {
-      "language": "es",
-      "mode": "secureOffline",
-      "types": [
-        "translation",
-        "true/false",
-        "error correction",
-        "error-tagging",
-        "cloze text",
-        "sentence transformation",
-        "reading comprehension",
-        "dialogue completion",
-        "categorization",
-        "word formation"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980033272
-      },
-      "seconds": 2.44
-    },
-    {
-      "language": "es",
-      "mode": "secureOffline",
-      "types": [
-        "listening comprehension",
-        "odd one out",
-        "multiple matching",
-        "banked cloze",
-        "key word transformation",
-        "synonym choice",
-        "antonym choice",
-        "choose the correct response",
-        "match word to definition",
-        "verb form"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980035522
-      },
-      "seconds": 2.25
-    },
-    {
-      "language": "es",
-      "mode": "secureOffline",
-      "types": [
-        "preposition gap-fill",
-        "question formation",
-        "word family",
-        "short answer",
-        "paraphrase the sentence",
-        "heading matching",
-        "gist question",
-        "summary cloze"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 96,
-        "total": 96
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980037762
-      },
-      "seconds": 2.24
-    },
-    {
-      "language": "de",
-      "mode": "instant",
-      "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980039352
+        "ranAt": 1790693615483
       },
       "seconds": 1.59
     },
     {
+      "language": "en",
+      "mode": "instant",
+      "types": [
+        "listening comprehension",
+        "odd one out",
+        "multiple matching",
+        "banked cloze",
+        "key word transformation",
+        "synonym choice",
+        "antonym choice",
+        "choose the correct response",
+        "match word to definition",
+        "verb form"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693617005
+      },
+      "seconds": 1.52
+    },
+    {
+      "language": "en",
+      "mode": "instant",
+      "types": [
+        "preposition gap-fill",
+        "question formation",
+        "word family",
+        "short answer",
+        "paraphrase the sentence",
+        "heading matching",
+        "gist question",
+        "summary cloze"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 96,
+        "total": 96
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693618242
+      },
+      "seconds": 1.24
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693621088
+      },
+      "seconds": 2.86
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "types": [
+        "translation",
+        "true/false",
+        "error correction",
+        "error-tagging",
+        "cloze text",
+        "sentence transformation",
+        "reading comprehension",
+        "dialogue completion",
+        "categorization",
+        "word formation"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693623750
+      },
+      "seconds": 2.66
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "types": [
+        "listening comprehension",
+        "odd one out",
+        "multiple matching",
+        "banked cloze",
+        "key word transformation",
+        "synonym choice",
+        "antonym choice",
+        "choose the correct response",
+        "match word to definition",
+        "verb form"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693626385
+      },
+      "seconds": 2.64
+    },
+    {
+      "language": "en",
+      "mode": "secureOffline",
+      "types": [
+        "preposition gap-fill",
+        "question formation",
+        "word family",
+        "short answer",
+        "paraphrase the sentence",
+        "heading matching",
+        "gist question",
+        "summary cloze"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 96,
+        "total": 96
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693628871
+      },
+      "seconds": 2.49
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693630550
+      },
+      "seconds": 1.66
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "types": [
+        "translation",
+        "true/false",
+        "error correction",
+        "error-tagging",
+        "cloze text",
+        "sentence transformation",
+        "reading comprehension",
+        "dialogue completion",
+        "categorization",
+        "word formation"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693632023
+      },
+      "seconds": 1.47
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "types": [
+        "listening comprehension",
+        "odd one out",
+        "multiple matching",
+        "banked cloze",
+        "key word transformation",
+        "synonym choice",
+        "antonym choice",
+        "choose the correct response",
+        "match word to definition",
+        "verb form"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693633465
+      },
+      "seconds": 1.44
+    },
+    {
+      "language": "es",
+      "mode": "instant",
+      "types": [
+        "preposition gap-fill",
+        "question formation",
+        "word family",
+        "short answer",
+        "paraphrase the sentence",
+        "heading matching",
+        "gist question",
+        "summary cloze"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 96,
+        "total": 96
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693634621
+      },
+      "seconds": 1.16
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693637439
+      },
+      "seconds": 2.82
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "types": [
+        "translation",
+        "true/false",
+        "error correction",
+        "error-tagging",
+        "cloze text",
+        "sentence transformation",
+        "reading comprehension",
+        "dialogue completion",
+        "categorization",
+        "word formation"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693640287
+      },
+      "seconds": 2.85
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "types": [
+        "listening comprehension",
+        "odd one out",
+        "multiple matching",
+        "banked cloze",
+        "key word transformation",
+        "synonym choice",
+        "antonym choice",
+        "choose the correct response",
+        "match word to definition",
+        "verb form"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693643053
+      },
+      "seconds": 2.77
+    },
+    {
+      "language": "es",
+      "mode": "secureOffline",
+      "types": [
+        "preposition gap-fill",
+        "question formation",
+        "word family",
+        "short answer",
+        "paraphrase the sentence",
+        "heading matching",
+        "gist question",
+        "summary cloze"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 96,
+        "total": 96
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693645527
+      },
+      "seconds": 2.47
+    },
+    {
+      "language": "de",
+      "mode": "instant",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693647295
+      },
+      "seconds": 1.76
+    },
+    {
       "language": "de",
       "mode": "instant",
       "types": [
@@ -565,9 +565,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980040636
+        "ranAt": 1790693648856
       },
-      "seconds": 1.27
+      "seconds": 1.56
     },
     {
       "language": "de",
@@ -597,9 +597,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980041920
+        "ranAt": 1790693650273
       },
-      "seconds": 1.28
+      "seconds": 1.41
     },
     {
       "language": "de",
@@ -627,9 +627,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980042890
+        "ranAt": 1790693651457
       },
-      "seconds": 0.97
+      "seconds": 1.19
     },
     {
       "language": "de",
@@ -659,9 +659,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980045256
+        "ranAt": 1790693654400
       },
-      "seconds": 2.37
+      "seconds": 2.96
     },
     {
       "language": "de",
@@ -691,9 +691,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980047471
+        "ranAt": 1790693657284
       },
-      "seconds": 2.22
+      "seconds": 2.88
     },
     {
       "language": "de",
@@ -723,9 +723,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980049650
+        "ranAt": 1790693659831
       },
-      "seconds": 2.18
+      "seconds": 2.54
     },
     {
       "language": "de",
@@ -753,7 +753,39 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980051435
+        "ranAt": 1790693662227
+      },
+      "seconds": 2.4
+    },
+    {
+      "language": "fr",
+      "mode": "instant",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693664020
       },
       "seconds": 1.78
     },
@@ -761,38 +793,6 @@
       "language": "fr",
       "mode": "instant",
       "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980052734
-      },
-      "seconds": 1.29
-    },
-    {
-      "language": "fr",
-      "mode": "instant",
-      "types": [
         "translation",
         "true/false",
         "error correction",
@@ -817,9 +817,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980053817
+        "ranAt": 1790693665561
       },
-      "seconds": 1.08
+      "seconds": 1.54
     },
     {
       "language": "fr",
@@ -849,9 +849,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980054899
+        "ranAt": 1790693667061
       },
-      "seconds": 1.08
+      "seconds": 1.5
     },
     {
       "language": "fr",
@@ -879,201 +879,201 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980055682
-      },
-      "seconds": 0.79
-    },
-    {
-      "language": "fr",
-      "mode": "secureOffline",
-      "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980057915
-      },
-      "seconds": 2.23
-    },
-    {
-      "language": "fr",
-      "mode": "secureOffline",
-      "types": [
-        "translation",
-        "true/false",
-        "error correction",
-        "error-tagging",
-        "cloze text",
-        "sentence transformation",
-        "reading comprehension",
-        "dialogue completion",
-        "categorization",
-        "word formation"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980060047
-      },
-      "seconds": 2.14
-    },
-    {
-      "language": "fr",
-      "mode": "secureOffline",
-      "types": [
-        "listening comprehension",
-        "odd one out",
-        "multiple matching",
-        "banked cloze",
-        "key word transformation",
-        "synonym choice",
-        "antonym choice",
-        "choose the correct response",
-        "match word to definition",
-        "verb form"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980062116
-      },
-      "seconds": 2.07
-    },
-    {
-      "language": "fr",
-      "mode": "secureOffline",
-      "types": [
-        "preposition gap-fill",
-        "question formation",
-        "word family",
-        "short answer",
-        "paraphrase the sentence",
-        "heading matching",
-        "gist question",
-        "summary cloze"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 96,
-        "total": 96
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "secure",
-        "ranAt": 1789980063967
-      },
-      "seconds": 1.85
-    },
-    {
-      "language": "la",
-      "mode": "instant",
-      "types": [
-        "multiple choice",
-        "multi-select",
-        "fill-in-the-blank",
-        "matching",
-        "word order",
-        "ordering",
-        "highlight-evidence",
-        "categorisation-board",
-        "table-completion",
-        "transformation-chain"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980065184
-      },
-      "seconds": 1.21
-    },
-    {
-      "language": "la",
-      "mode": "instant",
-      "types": [
-        "translation",
-        "true/false",
-        "error correction",
-        "error-tagging",
-        "cloze text",
-        "sentence transformation",
-        "reading comprehension",
-        "dialogue completion",
-        "categorization",
-        "word formation"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980066342
+        "ranAt": 1790693668212
       },
       "seconds": 1.15
     },
     {
+      "language": "fr",
+      "mode": "secureOffline",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693671121
+      },
+      "seconds": 2.91
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "types": [
+        "translation",
+        "true/false",
+        "error correction",
+        "error-tagging",
+        "cloze text",
+        "sentence transformation",
+        "reading comprehension",
+        "dialogue completion",
+        "categorization",
+        "word formation"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693673961
+      },
+      "seconds": 2.84
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "types": [
+        "listening comprehension",
+        "odd one out",
+        "multiple matching",
+        "banked cloze",
+        "key word transformation",
+        "synonym choice",
+        "antonym choice",
+        "choose the correct response",
+        "match word to definition",
+        "verb form"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693676671
+      },
+      "seconds": 2.71
+    },
+    {
+      "language": "fr",
+      "mode": "secureOffline",
+      "types": [
+        "preposition gap-fill",
+        "question formation",
+        "word family",
+        "short answer",
+        "paraphrase the sentence",
+        "heading matching",
+        "gist question",
+        "summary cloze"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 96,
+        "total": 96
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "secure",
+        "ranAt": 1790693679097
+      },
+      "seconds": 2.42
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "types": [
+        "multiple choice",
+        "multi-select",
+        "fill-in-the-blank",
+        "matching",
+        "word order",
+        "ordering",
+        "highlight-evidence",
+        "categorisation-board",
+        "table-completion",
+        "transformation-chain"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693680832
+      },
+      "seconds": 1.73
+    },
+    {
+      "language": "la",
+      "mode": "instant",
+      "types": [
+        "translation",
+        "true/false",
+        "error correction",
+        "error-tagging",
+        "cloze text",
+        "sentence transformation",
+        "reading comprehension",
+        "dialogue completion",
+        "categorization",
+        "word formation"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693682286
+      },
+      "seconds": 1.45
+    },
+    {
       "language": "la",
       "mode": "instant",
       "types": [
@@ -1101,9 +1101,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980067390
+        "ranAt": 1790693683863
       },
-      "seconds": 1.05
+      "seconds": 1.58
     },
     {
       "language": "la",
@@ -1131,9 +1131,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980068260
+        "ranAt": 1790693685007
       },
-      "seconds": 0.87
+      "seconds": 1.13
     },
     {
       "language": "la",
@@ -1163,9 +1163,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980070643
+        "ranAt": 1790693687746
       },
-      "seconds": 2.39
+      "seconds": 2.75
     },
     {
       "language": "la",
@@ -1195,9 +1195,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980072924
+        "ranAt": 1790693690413
       },
-      "seconds": 2.28
+      "seconds": 2.65
     },
     {
       "language": "la",
@@ -1227,9 +1227,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980075240
+        "ranAt": 1790693693097
       },
-      "seconds": 2.31
+      "seconds": 2.69
     },
     {
       "language": "la",
@@ -1257,9 +1257,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980077253
+        "ranAt": 1790693695569
       },
-      "seconds": 2.02
+      "seconds": 2.47
     },
     {
       "language": "cs",
@@ -1289,9 +1289,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980078709
+        "ranAt": 1790693697290
       },
-      "seconds": 1.44
+      "seconds": 1.71
     },
     {
       "language": "cs",
@@ -1321,74 +1321,74 @@
         "gapCount": 0,
         "error": null,
         "mode": "instant",
-        "ranAt": 1789980079908
+        "ranAt": 1790693698775
+      },
+      "seconds": 1.48
+    },
+    {
+      "language": "cs",
+      "mode": "instant",
+      "types": [
+        "listening comprehension",
+        "odd one out",
+        "multiple matching",
+        "banked cloze",
+        "key word transformation",
+        "synonym choice",
+        "antonym choice",
+        "choose the correct response",
+        "match word to definition",
+        "verb form"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 120,
+        "total": 120
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693700289
+      },
+      "seconds": 1.51
+    },
+    {
+      "language": "cs",
+      "mode": "instant",
+      "types": [
+        "preposition gap-fill",
+        "question formation",
+        "word family",
+        "short answer",
+        "paraphrase the sentence",
+        "heading matching",
+        "gist question",
+        "summary cloze"
+      ],
+      "countPerExercise": 2,
+      "ok": true,
+      "score": {
+        "earned": 96,
+        "total": 96
+      },
+      "selfTest": {
+        "ok": true,
+        "hasErrors": false,
+        "hasGaps": false,
+        "gapCount": 0,
+        "error": null,
+        "mode": "instant",
+        "ranAt": 1790693701487
       },
       "seconds": 1.2
     },
     {
       "language": "cs",
-      "mode": "instant",
-      "types": [
-        "listening comprehension",
-        "odd one out",
-        "multiple matching",
-        "banked cloze",
-        "key word transformation",
-        "synonym choice",
-        "antonym choice",
-        "choose the correct response",
-        "match word to definition",
-        "verb form"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 120,
-        "total": 120
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980081097
-      },
-      "seconds": 1.19
-    },
-    {
-      "language": "cs",
-      "mode": "instant",
-      "types": [
-        "preposition gap-fill",
-        "question formation",
-        "word family",
-        "short answer",
-        "paraphrase the sentence",
-        "heading matching",
-        "gist question",
-        "summary cloze"
-      ],
-      "countPerExercise": 2,
-      "ok": true,
-      "score": {
-        "earned": 96,
-        "total": 96
-      },
-      "selfTest": {
-        "ok": true,
-        "hasErrors": false,
-        "hasGaps": false,
-        "gapCount": 0,
-        "error": null,
-        "mode": "instant",
-        "ranAt": 1789980082024
-      },
-      "seconds": 0.92
-    },
-    {
-      "language": "cs",
       "mode": "secureOffline",
       "types": [
         "multiple choice",
@@ -1415,9 +1415,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980084335
+        "ranAt": 1790693704500
       },
-      "seconds": 2.32
+      "seconds": 3.02
     },
     {
       "language": "cs",
@@ -1447,9 +1447,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980086350
+        "ranAt": 1790693707315
       },
-      "seconds": 2.01
+      "seconds": 2.81
     },
     {
       "language": "cs",
@@ -1479,9 +1479,9 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980088430
+        "ranAt": 1790693710080
       },
-      "seconds": 2.08
+      "seconds": 2.77
     },
     {
       "language": "cs",
@@ -1509,10 +1509,10 @@
         "gapCount": 0,
         "error": null,
         "mode": "secure",
-        "ranAt": 1789980090388
+        "ranAt": 1790693712640
       },
-      "seconds": 1.95
+      "seconds": 2.56
     }
   ],
-  "seconds": 87.24
+  "seconds": 102.7
 }

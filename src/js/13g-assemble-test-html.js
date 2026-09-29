@@ -1,6 +1,6 @@
 async function assembleTestHtml(st, genData) {
   const sourceState=JSON.parse(JSON.stringify(st));
-  sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','ucitelJmeno'].map(id=>[id,trim(id)]));
+  sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','ucitelJmeno','latka','zadaniText','poznamky'].map(id=>[id,trim(id)]));
   sourceState.__roster=Array.isArray(st.__roster)?JSON.parse(JSON.stringify(st.__roster)):rosterForVerifier();
   sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
   st=sourceState;

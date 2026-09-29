@@ -497,6 +497,12 @@ async function generateTest(){
     const proceed = await uiConfirm('Jde o místní vývojové spuštění (file:// nebo localhost). Pokračuj jen pro technický test; tento balíček NEPOUŽÍVEJ pro skutečné známkování. Pokračovat?', 'Vývojové spuštění — ostrý test', true);
     if (!proceed) return;
   }
+  // Hotový test se nesmí nahradit omylem: velké tlačítko generování zůstává nad výsledkem.
+  if(lastGenData&&(generatedTestHtml||generatedPackage)&&!(typeof generationResumeCheckpoint!=='undefined'&&generationResumeCheckpoint)){
+    const reviewed=Object.values(exportChecklist||{}).some(Boolean)||!!lastSelfTest||!!lastKeyCheck;
+    const replace=await uiConfirm('Hotový test se nahradí novým'+(reviewed?' a jeho kontroly se zahodí':'')+'. Spotřebuje to další AI požadavky. Pro drobné změny použij editor.','Vytvořit nový test místo hotového?');
+    if(!replace)return;
+  }
   // Když uživatel klíč napsal, ale nezvolil žádné tlačítko (relace/trvale), vezmeme ho
   // automaticky pro tuto relaci — ať generování nezačne padat jen kvůli nekliknutí.
   if(!genAiAvailable()){
@@ -512,12 +518,13 @@ async function generateTest(){
   } else {
     geminiClearCooldown();
   }
-  const previousOutput={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,seq:variantSeq,slug:variantSlug};
+  // Kontroly patří k artefaktu. Když nový test nevznikne, obnoví se původní test i jeho kontroly.
+  const previousOutput={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,seq:variantSeq,slug:variantSlug,checklist:exportChecklist,selfTest:lastSelfTest,gaps:secureGapsAcknowledged,keyCheck:lastKeyCheck,keyAck:keyDiffsAcknowledged,stale:selfTestStaleReason};
   let cp=null;
   geminiCancelRequested=false;genBeginAiWorkflow();lockGenerationInputs(true);
   variantSeq=0;variantSlug='';if($('variantNote'))$('variantNote').classList.add('hidden');
   generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; lastSelfTest=null; secureGapsAcknowledged=false;
-  resetKeyCheckState();
+  resetKeyCheckState(); selfTestStaleReason='';
   resetVerificationReports();
   setGenUI('loading');setGenMsg('Kontroluji soubory a připravuji zdroje…');
   try{
@@ -613,7 +620,7 @@ async function generateTest(){
     recordGeneratorTelemetry(cancelled?'cancelled':'error');
     setGenErr((e?.message||String(e))+resume);
     setGenUI('error');
-    if(previousOutput.assembled){lastAssembled=previousOutput.assembled;lastGenData=previousOutput.data;generatedTestHtml=previousOutput.html;generatedPackage=previousOutput.pack;generatedIntegrity=previousOutput.integrity;variantSeq=previousOutput.seq;variantSlug=previousOutput.slug;exportChecklist={};lastSelfTest=null;resetKeyCheckState();resetVerificationReports();setGenUI('done');renderExportChecklist(true);$('genError').classList.remove('hidden');$('genError').textContent='Nový test nebyl vytvořen. Původní výstup zůstal zachován. '+(e?.message||String(e))+resume;}
+    if(previousOutput.assembled){lastAssembled=previousOutput.assembled;lastGenData=previousOutput.data;generatedTestHtml=previousOutput.html;generatedPackage=previousOutput.pack;generatedIntegrity=previousOutput.integrity;variantSeq=previousOutput.seq;variantSlug=previousOutput.slug;exportChecklist=previousOutput.checklist||{};lastSelfTest=previousOutput.selfTest;secureGapsAcknowledged=!!previousOutput.gaps;resetKeyCheckState();lastKeyCheck=previousOutput.keyCheck;keyDiffsAcknowledged=!!previousOutput.keyAck;selfTestStaleReason=previousOutput.stale||'';resetVerificationReports();renderSelfTestStaleNote();setGenUI('done');renderExportChecklist(true);renderQualityDiagnostics();updateSecureDownloadGate();$('genError').classList.remove('hidden');setErrorTextWithHttpHelp($('genError'),'Nový test nevznikl; původní test i jeho kontroly zůstaly. '+(e?.message||String(e))+resume);if(lastKeyCheck&&lastKeyCheck.closedDiffs>0&&!keyDiffsAcknowledged)ghrabGeneratorFeatureLoader('previewEditor','./features/preview-editor.js').then(a=>a.renderKeyCheckAfterCommit('')).catch(()=>{});}
   } finally { genEndAiWorkflow();lockGenerationInputs(false); }
 }
 

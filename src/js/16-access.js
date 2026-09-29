@@ -75,53 +75,6 @@ function auditCommentHtml(cfg){
   catch (_e) { return ''; }
 }
 
-function formatExpiry(seconds){
-  if (!seconds) return 'neuvedena';
-  try { return new Date(Number(seconds) * 1000).toLocaleString('cs-CZ'); } catch (_e) { return 'neuvedena'; }
-}
-function closeCentralAccountModal(){
-  const old = document.getElementById('centralAccessAccountModal');
-  if (old) old.remove();
-}
-function openAccountModal(){
-  closeCentralAccountModal();
-  const p = Access.profile || {};
-  const modal = document.createElement('div');
-  modal.id = 'centralAccessAccountModal';
-  modal.className = 'ui-modal-backdrop';
-  modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true'); modal.setAttribute('aria-label','Přístup AI Studio GHRAB');
-  modal.innerHTML = '<div class="ui-modal" style="max-width:620px">'
-    + '<div class="ui-modal-head"><div><b>Přístup AI Studio GHRAB</b><div class="muted" style="font-size:12px">Centrálně ověřené oprávnění</div></div><button type="button" class="ui-modal-x" data-close aria-label="Zavřít">✕</button></div>'
-    + '<div class="ui-modal-body"><div class="ok"><b>'+esc(p.displayName||'Uživatel')+'</b><br>Role: '+esc(p.role||'—')+' · ID: '+esc(p.userId||'—')+'<br>Platnost do: '+esc(formatExpiry(p.expiresAt))+'</div>'
-    + '<p class="muted">Přístup byl aktivován jednou v AI Studiu a je sdílen se všemi dílčími aplikacemi na této doméně.</p>'
-    + '<div class="actions"><a class="btn-primary" href="'+STUDIO_ROOT+'">Otevřít AI Studio</a>'
-    + (accIsAdmin()?'<a class="btn-outline" href="'+STUDIO_ROOT+'tools/access-issuer/">Vydat přístup</a>':'')
-    + '<button type="button" class="btn-outline" data-lock>Odebrat přístup z tohoto zařízení</button>'
-    + '<button type="button" class="btn-outline" data-end-work>Ukončit práci a smazat místní data</button></div>'
-    + '<p class="muted" style="margin-top:10px">Na sdíleném zařízení použij po práci druhé tlačítko. Smaže data Generátoru, lokální/session AI klíč a centrální permit; nesmaže data jiných aplikací AI Studia.</p></div></div>';
-  document.body.appendChild(modal);
-  modal.addEventListener('click', async function(e){
-    if (e.target === modal || e.target.closest('[data-close]')) { closeCentralAccountModal(); return; }
-    const lock = e.target.closest('[data-lock]');
-    if (lock) { accLockNow(); return; }
-    const endWork = e.target.closest('[data-end-work]');
-    if (endWork) {
-      const ok = typeof uiConfirm === 'function'
-        ? await uiConfirm('Smazat z tohoto prohlížeče rozpracovaný stav, šablony, historii, lokální bezpečnostní hodnoty, AI klíč pro tuto relaci a centrální permit? Data jiných aplikací AI Studia se nesmažou.', 'Ukončit práci na sdíleném zařízení?', true)
-        : window.confirm('Ukončit práci a smazat místní data Generátoru?');
-      if (ok) generatorEndWork();
-    }
-  });
-}
-function openAdminPanel(){
-  if (!accIsAdmin()) { if (typeof uiAlert === 'function') uiAlert('Správa přístupů je dostupná pouze správci.', 'AI Studio GHRAB'); return; }
-  location.href = STUDIO_ROOT + 'tools/access-issuer/';
-}
-function accLockNow(){
-  try { localStorage.removeItem(STUDIO_ACCESS_KEY); } catch (_e) {}
-  location.href = STUDIO_ROOT + 'access/';
-}
-
 // Privacy/shared-device control. Suite cleanup is owned by the unprotected
 // lifecycle bootstrap, which runs even when the central Studio permit has already
 // been revoked. Manual local end-work reuses the same ownership rules.
@@ -167,7 +120,7 @@ function generatorClearRuntimeState(){
   try { generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; } catch(_e) {}
   try { rosterEntries=[]; variantSeq=0; variantSlug=''; } catch(_e) {}
   try { lastSelfTest=null; secureGapsAcknowledged=false; } catch(_e) {}
-  try { akvWeakRows=[]; lastKeyCheck=null; keyDiffsAcknowledged=false; } catch(_e) {}
+  try { akvWeakRows=[]; lastKeyCheck=null; keyDiffsAcknowledged=false; selfTestStaleReason=''; } catch(_e) {}
   try { _liAiDraft=null; _rcAiDraft=null; } catch(_e) {}
   try { exportChecklist={}; } catch(_e) {}
   try { if(typeof gaState==='object'&&gaState){ gaState.ai=null; gaState.loading=false; gaState.query=''; } } catch(_e) {}

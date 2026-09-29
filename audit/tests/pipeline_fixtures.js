@@ -17,6 +17,8 @@ window.auditReset=function(types,mode,lang){
  for(const id of ['ageGroupCustom','testPurpose','vlastniTyp','vlastniSkala'])if($(id))$(id).value='';
  if($('zadaniText'))$('zadaniText').value=state.zadaniText;
  __calls=[];__providerBehavior='valid';
+ // Každý případ je nový test; hotový výstup z předchozího případu se nepřebírá.
+ generatedTestHtml='';generatedPackage=null;lastGenData=null;lastAssembled=null;
  applyVisualState();validate();goTo(4);
  return {gates:[0,1,2,3].map(n=>$('next'+n).disabled),state};
 };

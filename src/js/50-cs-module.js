@@ -568,7 +568,7 @@
       + '<div class="ui-modal-head"><span class="flag flag-cz" aria-hidden="true"></span> Modul Český jazyk</div>'
       + '<div class="ui-modal-body">Čeština má vlastní průvodce pro ročník, oblast učiva, konkrétní jev, obtížnost, typy úloh a kontrolu hodnocení. Otevřením modulu se přeskočí běžné cizojazyčné nastavení CEFR a typů úloh. Volba „Zůstat zde“ slouží jen pro návrat zpět bez otevření českého průvodce.</div>'
       + '<div class="ui-modal-actions">'
-      + '<button type="button" class="ui-modal-btn" data-cs-stay>Zavřít</button>'
+      + '<button type="button" class="ui-modal-btn" data-cs-stay>Zůstat zde</button>'
       + '<button type="button" class="ui-modal-btn primary" data-cs-open>Otevřít modul ČJ</button>'
       + '</div></div>';
     document.body.appendChild(backdrop);

@@ -19,12 +19,16 @@ try:
  p.add_script_tag(content=(TESTS/'fixtures.js').read_text())
  def preview():
   build();p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")')
+  assert 'hotovo' in p.locator('#resultTab1 .result-step-status').text_content().lower()
   for key in ['pvW360','pvW768','pvWfull']:p.locator('#'+key).click();assert p.locator('#'+key).get_attribute('class').find('active')>=0
   p.keyboard.press('Escape');assert not p.locator('#previewModal').is_visible();return '3 widths and Escape'
  record('lazy-preview',preview)
  def preview_code():
-  p.evaluate("""async()=>{auditConfigure(['multiple choice'],'secureOffline','en');state.identityMode='oneTimeCode';window.eval('rosterEntries.length=0;rosterEntries.push({name:"QA Student",code:"QA-CODE-7"})');const data=auditFixtures(state,'en');lastGenData=data;const built=await assembleTestHtml(state,data);generatedPackage=built;generatedTestHtml='';generatedIntegrity=null;lastSelfTest=null;exportChecklist={};resetKeyCheckState();setGenUI('done');renderExportChecklist(true)}""")
-  p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';p.keyboard.press('Escape');return 'one-time code is injected only into teacher preview'
+  for mode in ['secureOffline','instant']:
+   p.evaluate("""async mode=>{auditConfigure(['multiple choice'],mode,'en');state.identityMode='oneTimeCode';rosterEntries.length=0;rosterEntries.push({name:'QA Student',code:'QA-CODE-7'});const data=auditFixtures(state,'en');lastGenData=data;const built=await assembleTestHtml(state,data);generatedPackage=mode==='secureOffline'?built:null;generatedTestHtml=generatedPackage?'':String(built);generatedIntegrity=null;lastSelfTest=null;exportChecklist={};resetKeyCheckState();setGenUI('done');renderExportChecklist(true);goTo(4)}""",mode)
+   artifact=p.evaluate('generatedPackage?generatedPackage.studentHtml:generatedTestHtml');assert 'QA-CODE-7' not in artifact
+   p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';p.evaluate('closeTestPreview()')
+  return 'one-time code works in secure + instant teacher preview and never enters student artefact'
  record('preview-one-time-code',preview_code)
  def edit_counts():
   build(['fill-in-the-blank']);p.locator('#btnEdit').click();p.wait_for_function('!$("editorModal").classList.contains("hidden")');click_attr(p,'onclick','edAddItem(0)');assert p.locator('.ed-item').count()==3
@@ -48,7 +52,11 @@ try:
  record('proposal-check-and-accept',proposals)
  def stale_proposal():
   build();p.locator('#resultTab3').click();p.evaluate('callGeminiJSON=async()=>({items:[{id:0,alts:["water STALE"]}]})');p.locator('#btnEnrich').click();p.wait_for_function('document.querySelectorAll(".en-pick").length===1');p.locator('.en-pick').check()
-  p.evaluate('async()=>{const st=outputStamp();await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),st)}');p.locator('#btnAcceptProposals').click();assert 'STALE' not in p.evaluate('JSON.stringify(lastGenData)');return 'stale proposal refused'
+  p.evaluate('async()=>{const st=outputStamp();await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),st)}')
+  # Since 7.1.59 (F-28) stale proposals are disabled right after the change; the stamp guard still refuses a direct call.
+  assert p.locator('#btnAcceptProposals').is_disabled() and 'nejde použít' in p.evaluate("document.getElementById('enApplyStatus').innerText")
+  p.evaluate('()=>{document.querySelectorAll(".en-pick").forEach(c=>{c.disabled=false;c.checked=true})}');p.evaluate('async()=>{try{await enAcceptSelected()}catch(e){}}');p.wait_for_timeout(300)
+  assert 'STALE' not in p.evaluate('JSON.stringify(lastGenData)');return 'stale proposal disabled and refused'
  record('stale-proposals',stale_proposal)
  # Correct solutions are supplied only across the AI boundary; real comparison/UI are retained.
  p.add_script_tag(content='''window.auditKeyAnswer=(ex,it)=>{const t=ex.type;if(t==='matching')return ex.items.map(x=>x.right);if(['multiple choice','dialogue completion','reading comprehension','listening comprehension','multi-select','true/false','highlight-evidence'].includes(t))return it.correct;if(t==='ordering')return it.correct_order;if(t==='categorisation-board')return it.entries.map(x=>x.category);if(t==='table-completion')return it.rows.map(r=>r.map(c=>typeof c==='object'?c.answer:c));if(t==='transformation-chain')return it.transformations.map(x=>x.answer);if(t==='error-tagging')return {token:it.error_token_index,etype:it.error_type,corr:it.correction};if(t==='categorization')return it.correct_category;if(t==='fill-in-the-blank'||t==='cloze text')return it.answers||[it.answer];return it.correction||it.correct_sentence||it.answer;};window.__keyPrompt=akvBuildPrompt;akvBuildPrompt=function(units){window.__keyUnits=units;return __keyPrompt(units)};''')
@@ -78,7 +86,7 @@ try:
  record('key-error-clears-old-green',key_failure)
  def quota_error_help():
   build(['translation']);p.locator('#resultTab3').click();p.evaluate('genAiAvailable=()=>true;callGeminiJSON=async()=>{throw new Error("Kvóta AI služby byla vyčerpána. Technicky: HTTP 429 · QUOTA_EXCEEDED")}')
-  p.locator('#btnEnrich').click();p.wait_for_function('!enBusy');b=p.locator('#answerProposalReport button');assert b.count()==1 and b.text_content()=='429';b.click();p.wait_for_selector('#uiModal');assert p.locator('#uiModal .ui-modal-head').text_content()=='HTTP 429';p.locator('#uiModal [data-ui-ok]').click();return '429 is clickable and explained'
+  p.locator('#btnEnrich').click();b=p.locator('#answerProposalReport button');b.wait_for();assert b.count()==1 and b.text_content()=='429';b.click();p.wait_for_selector('#uiModal');assert p.locator('#uiModal .ui-modal-head').text_content()=='HTTP 429';p.locator('#uiModal [data-ui-ok]').click();return '429 is clickable and explained'
  record('quota-429-clickable-help',quota_error_help)
  def frozen_variant():
   build(['translation']);p.evaluate('window.__beforeVariant=outputStamp();state.jazyk="latina";state.body=900;$("nazev").value="OTHER TEST";$("ucitelPin").value="OTHER-ACCESS-CODE";lastSelfTest={ok:true};exportChecklist={content:true,answers:true,grading:true,distribution:true}')

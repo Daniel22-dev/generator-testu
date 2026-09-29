@@ -772,7 +772,7 @@ body:not(.simple-mode) .simple-only { display: none !important; }
 .quality-panel[open] summary::before, .export-checklist[open] summary::before { transform: rotate(90deg); }
 .quality-panel .quality-list, .export-checklist .check-list { margin-top: 9px; }
 .enrich-row { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
-.enrich-row .btn-edit { flex: 1; margin: 0; }
+.enrich-row .btn-edit { flex: 1; margin: 0; min-width: 0; white-space: normal; }
 .enrich-help { flex-shrink: 0; width: 30px; height: 30px; }
 
 /* ── API hardening additions ─────────────────────────────────────────────── */
@@ -2163,6 +2163,7 @@ body.generator-editor-open .ghrab-error-reporter { --ghrab-reporter-bottom:12px 
 .result-step-number{display:grid;place-items:center;width:28px;height:28px;border:1px solid currentColor;border-radius:50%;font-weight:800}
 .result-step-status{font-size:12px;color:var(--t2);margin-top:auto}
 .result-step-card.is-complete .result-step-number{background:var(--ok);color:#071018}
+.result-step-card.is-attention{border-color:var(--acc)}.result-step-card.is-attention .result-step-number{background:var(--acc);color:#071018}.result-step-card.is-attention .result-step-status{color:var(--acc);font-weight:700}
 .result-step-panel{padding:18px;border:1px solid var(--bdr);border-radius:14px;min-width:0}
 .result-step-intro{color:var(--t2);line-height:1.65;margin:10px 0 18px}
 .result-step-nav{display:flex;justify-content:flex-end;margin-top:22px}

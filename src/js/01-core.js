@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.58',
-  date:    '2026-09-28',
+  version: '7.1.59',
+  date:    '2026-09-29',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
     'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové dávky a Reading analýza se při chybě zachovají a další pokus naváže. AI dávka má jeden timeout a běžné typy se zbytečně netříští.',
     'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
     'AI DOSTUPNOST (7.1.56): aktualizovány profily Gemini a stabilní fallbacky. Chyby AI nově uvádějí bezpečný HTTP stav a interní kód pro přesnější diagnostiku.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'READING TOPIC PRIORITY (7.1.50): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
     'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
     'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
-    'AI CORE + WORKFLOW CLEANUP (7.1.45): běžné UI už neodhaluje konkrétní AI modely a používá profily economy/balanced/quality; Poradce dostává relevantní KB + aktuální stav a validuje opory; AI připojení je zjednodušené; Google Forms jsou oddělené jako cesta předání secure výsledků; legacy týmový bezpečnostní kód a jeho povinná validace byly odstraněny jako kryptograficky neúčinná vrstva.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -379,12 +379,16 @@ function uiAlert(message, title='Upozornění', boxClass=''){
 function uiConfirm(message, title='Potvrzení', danger=false){
   return uiModal({title, message, okText:'Ano, pokračovat', cancelText:'Zrušit', danger}).then(Boolean);
 }
-function uiPrompt(title, defaultValue=''){
-  return uiModal({title, message:'Zadej název a potvrď.', input:true, defaultValue, okText:'Uložit', cancelText:'Zrušit'});
+function uiPrompt(title, defaultValue='', message='Zadej název a potvrď.'){
+  return uiModal({title, message, input:true, defaultValue, okText:'Uložit', cancelText:'Zrušit'});
 }
 const HTTP_CZ={400:'Požadavek má neplatný tvar nebo obsah.',401:'Služba neověřila přístup.',403:'Služba tento přístup nepovolila.',404:'Služba nebo zdroj nebyly nalezeny.',408:'Požadavek vypršel.',413:'Požadavek je příliš velký.',422:'Obsah nelze v této podobě zpracovat.',429:'Byl dosažen limit AI požadavků nebo kvóta. Počkej na obnovení limitu a akci zopakuj.',500:'Služba narazila na interní chybu.',502:'Navazující služba vrátila chybnou odpověď.',503:'Služba je dočasně nedostupná nebo přetížená.',504:'Navazující služba nestihla odpovědět.'};
-function httpErrorExplain(code){const n=Number(code),m=HTTP_CZ[n]||(n>=500?'Chyba vznikla na straně služby. Zkus akci později.':'Požadavek byl službou odmítnut. Zkontroluj doprovodnou hlášku.');return uiAlert(m+'\n\nRozpracovaný test tím sám o sobě není změněn.','HTTP '+n);}
-function setErrorTextWithHttpHelp(el,msg){if(!el)return;const s=String(msg),m=s.match(/\bHTTP\s*([45]\d{2})\b/i);if(!m){el.textContent=s;return;}el.textContent=s.slice(0,m.index)+'HTTP ';const b=document.createElement('button');b.type='button';b.textContent=m[1];b.title='Vysvětlit HTTP '+m[1];b.style='all:unset;color:var(--acc);font-weight:700;text-decoration:underline;cursor:pointer';b.onclick=()=>httpErrorExplain(m[1]);el.append(b,document.createTextNode(s.slice(m.index+m[0].length)));}
+// Co má učitel udělat dál – podle HTTP kódu nebo technického kódu chyby (AI Core texty jsou obecné).
+const HTTP_NEXT={400:'uprav zadání (zkrať text, odeber problematickou přílohu nebo URL) a zkus to znovu.',401:'zkontroluj AI připojení (API klíč) na první stránce; ve školním režimu kontaktuj správce.',404:'zkus to později; když se chyba opakuje, kontaktuj správce aplikace.',408:'zkus to znovu; když se to opakuje, sniž počet cvičení nebo položek a zkrať podklady.',413:'zmenši nebo odeber přílohy, případně zkrať text, a zkus to znovu.',429:'počkej aspoň minutu a akci zopakuj jen jednou; další klikání limit dál spotřebovává.',500:'počkej chvíli a zkus to znovu; když se chyba opakuje, kontaktuj správce.'};
+HTTP_NEXT[422]=HTTP_NEXT[400];HTTP_NEXT[403]=HTTP_NEXT[401];HTTP_NEXT[504]=HTTP_NEXT[408];HTTP_NEXT[502]=HTTP_NEXT[503]=HTTP_NEXT[500];
+function errorNextStep(msg){const s=String(msg||''),m=s.match(/\bHTTP\s*([45]\d{2})\b/i);if(m)return HTTP_NEXT[Number(m[1])]||'';if(/INVALID_OUTPUT|mimo zadání|poškozený JSON/i.test(s))return 'spusť generování znovu; když se to opakuje, sniž počet cvičení nebo položek.';if(/neplatné nebo duplicitní ID|AI nevrátila/i.test(s))return 'spusť akci znovu; když se to opakuje, zkontroluj položky ručně v editoru.';return '';}
+function httpErrorExplain(code){const n=Number(code),m=HTTP_CZ[n]||(n>=500?'Chyba vznikla na straně služby. Zkus akci později.':'Požadavek byl službou odmítnut. Zkontroluj doprovodnou hlášku.'),next=HTTP_NEXT[n];return uiAlert(m+(next?'\n\nCo dál: '+next:'')+'\n\nRozpracovaný test tím sám o sobě není změněn.','HTTP '+n);}
+function setErrorTextWithHttpHelp(el,msg){if(!el)return;const next=errorNextStep(msg),s=String(msg)+(next&&!/Co dál:/.test(String(msg))?'\nCo dál: '+next:''),m=s.match(/\bHTTP\s*([45]\d{2})\b/i);if(!m){el.textContent=s;return;}el.textContent=s.slice(0,m.index)+'HTTP ';const b=document.createElement('button');b.type='button';b.textContent=m[1];b.title='Vysvětlit HTTP '+m[1];b.style='all:unset;color:var(--acc);font-weight:700;text-decoration:underline;cursor:pointer';b.onclick=()=>httpErrorExplain(m[1]);el.append(b,document.createTextNode(s.slice(m.index+m[0].length)));}
 
 /* Generator Assistant — lokální poradce ke generátoru (KB + UI + volitelné AI). */
 // Generator Assistant
@@ -1362,9 +1366,13 @@ async function setAppMode(mode){
   } else {
     state.appMode = 'simple';
     state.workPreset = 'quick';
-    // Při vědomém přepnutí do Simple začni s kompaktním zavřeným panelem.
-    // Další otevření/zavření už applySimpleDefaults nesmí přepisovat.
+    // Při vědomém přepnutí do Simple skutečně odstraň Advanced-only stav.
+    // Nestačí jej jen skrýt: staré skupiny, roster kódů ani detailní konfigurace
+    // se po pozdějším návratu do Advanced nesmějí nečekaně znovu objevit.
     state.exerciseDetail = false;
+    state.exerciseConfig = [];
+    state.skupiny = [];
+    try { if (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries)) rosterEntries.length = 0; } catch(_) {}
     applySimpleDefaults();
   }
   enforceModeConstraints();
