@@ -19,12 +19,16 @@ try:
  p.add_script_tag(content=(TESTS/'fixtures.js').read_text())
  def preview():
   build();p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")')
+  assert 'hotovo' in p.locator('#resultTab1 .result-step-status').text_content().lower()
   for key in ['pvW360','pvW768','pvWfull']:p.locator('#'+key).click();assert p.locator('#'+key).get_attribute('class').find('active')>=0
   p.keyboard.press('Escape');assert not p.locator('#previewModal').is_visible();return '3 widths and Escape'
  record('lazy-preview',preview)
  def preview_code():
-  p.evaluate("""async()=>{auditConfigure(['multiple choice'],'secureOffline','en');state.identityMode='oneTimeCode';window.eval('rosterEntries.length=0;rosterEntries.push({name:"QA Student",code:"QA-CODE-7"})');const data=auditFixtures(state,'en');lastGenData=data;const built=await assembleTestHtml(state,data);generatedPackage=built;generatedTestHtml='';generatedIntegrity=null;lastSelfTest=null;exportChecklist={};resetKeyCheckState();setGenUI('done');renderExportChecklist(true)}""")
-  p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';p.keyboard.press('Escape');return 'one-time code is injected only into teacher preview'
+  for mode in ['secureOffline','instant']:
+   p.evaluate("""async mode=>{auditConfigure(['multiple choice'],mode,'en');state.identityMode='oneTimeCode';rosterEntries.length=0;rosterEntries.push({name:'QA Student',code:'QA-CODE-7'});const data=auditFixtures(state,'en');lastGenData=data;const built=await assembleTestHtml(state,data);generatedPackage=mode==='secureOffline'?built:null;generatedTestHtml=generatedPackage?'':String(built);generatedIntegrity=null;lastSelfTest=null;exportChecklist={};resetKeyCheckState();setGenUI('done');renderExportChecklist(true);goTo(4)}""",mode)
+   artifact=p.evaluate('generatedPackage?generatedPackage.studentHtml:generatedTestHtml');assert 'QA-CODE-7' not in artifact
+   p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';p.evaluate('closeTestPreview()')
+  return 'one-time code works in secure + instant teacher preview and never enters student artefact'
  record('preview-one-time-code',preview_code)
  def edit_counts():
   build(['fill-in-the-blank']);p.locator('#btnEdit').click();p.wait_for_function('!$("editorModal").classList.contains("hidden")');click_attr(p,'onclick','edAddItem(0)');assert p.locator('.ed-item').count()==3
@@ -78,7 +82,7 @@ try:
  record('key-error-clears-old-green',key_failure)
  def quota_error_help():
   build(['translation']);p.locator('#resultTab3').click();p.evaluate('genAiAvailable=()=>true;callGeminiJSON=async()=>{throw new Error("Kvóta AI služby byla vyčerpána. Technicky: HTTP 429 · QUOTA_EXCEEDED")}')
-  p.locator('#btnEnrich').click();p.wait_for_function('!enBusy');b=p.locator('#answerProposalReport button');assert b.count()==1 and b.text_content()=='429';b.click();p.wait_for_selector('#uiModal');assert p.locator('#uiModal .ui-modal-head').text_content()=='HTTP 429';p.locator('#uiModal [data-ui-ok]').click();return '429 is clickable and explained'
+  p.locator('#btnEnrich').click();b=p.locator('#answerProposalReport button');b.wait_for();assert b.count()==1 and b.text_content()=='429';b.click();p.wait_for_selector('#uiModal');assert p.locator('#uiModal .ui-modal-head').text_content()=='HTTP 429';p.locator('#uiModal [data-ui-ok]').click();return '429 is clickable and explained'
  record('quota-429-clickable-help',quota_error_help)
  def frozen_variant():
   build(['translation']);p.evaluate('window.__beforeVariant=outputStamp();state.jazyk="latina";state.body=900;$("nazev").value="OTHER TEST";$("ucitelPin").value="OTHER-ACCESS-CODE";lastSelfTest={ok:true};exportChecklist={content:true,answers:true,grading:true,distribution:true}')
