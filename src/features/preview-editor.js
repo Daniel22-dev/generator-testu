@@ -1,16 +1,25 @@
 (function (global) {
   'use strict';
 // ═══ Náhled testu před stažením ════════════════════════════════════════════════
+function teacherPreviewCode(){
+  if((state.identityMode||'name')!=='oneTimeCode'||typeof rosterEntries==='undefined'||!Array.isArray(rosterEntries))return '';
+  const r=rosterEntries.find(x=>x&&String(x.code||'').trim());
+  return r?String(r.code):'';
+}
+function teacherPreviewHtml(html,code){
+  if(!code)return String(html||'');
+  const value=String(code).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(html||'').replace(/<input(?=[^>]*\bid=["']studentName["'])[^>]*>/i,tag=>{
+    const clean=tag.replace(/\s+type=(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'').replace(/\s+value=(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'');
+    return clean.replace(/^<input/i,'<input type="password"').replace(/>$/,' value="'+value+'">');
+  });
+}
 function getPreviewHtml(){
+  const previewCode=teacherPreviewCode();
   if(generatedPackage&&generatedPackage.mode==='secureOffline'&&generatedPackage.studentHtml){
-    let html=generatedPackage.studentHtml,injected=false;
-    if((state.identityMode||'name')==='oneTimeCode'&&typeof rosterEntries!=='undefined'&&Array.isArray(rosterEntries)){
-      const r=rosterEntries.find(x=>x&&String(x.code||'').trim());
-      if(r){const c=JSON.stringify(String(r.code)).replace(/</g,'\\u003c'),j='<script>(function(){var f=function(){var e=document.getElementById("studentName");if(e){e.value='+c+';e.type="password"}};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",f,{once:true}):f()})();<\\/script>';html=html.includes('</body>')?html.replace('</body>',j+'</body>'):html+j;injected=true;}
-    }
-    return {html,secure:true,previewCodeInjected:injected};
+    return {html:teacherPreviewHtml(generatedPackage.studentHtml,previewCode),secure:true,previewCode};
   }
-  if(generatedTestHtml)return {html:generatedTestHtml,secure:false};
+  if(generatedTestHtml)return {html:teacherPreviewHtml(generatedTestHtml,previewCode),secure:false,previewCode};
   return null;
 }
 function previewEscHandler(e){ if (e && e.key === 'Escape') closeTestPreview(); }
@@ -27,11 +36,12 @@ function openTestPreview(){
   const pv = getPreviewHtml();
   const modal = $('previewModal'), frame = $('previewFrame'), note = $('previewNote');
   if (!pv || !pv.html) { uiAlert('Nejdřív vygeneruj test, pak ho můžeš zobrazit v náhledu.'); return; }
-  if(note)note.textContent=pv.secure&&state.identityMode==='oneTimeCode'&&pv.previewCodeInjected?'Učitelský náhled: platný kód je předvyplněn pouze zde; studentský soubor se nemění.':pv.secure?'Studentský test bez správných odpovědí. Správnost klíče zkontroluješ v učitelském verifieru.':'Hotový interaktivní test tak, jak ho uvidí studenti.';
+  if(note)note.textContent=state.identityMode==='oneTimeCode'&&pv.previewCode?'Učitelský náhled: platný kód je předvyplněn pouze zde; studentský soubor se nemění.':pv.secure?'Studentský test bez správných odpovědí. Správnost klíče zkontroluješ v učitelském verifieru.':'Hotový interaktivní test tak, jak ho uvidí studenti.';
   setPreviewWidth(360);
   if (frame) frame.srcdoc = pv.html;
   exportChecklist.preview = true;
   renderExportChecklist();
+  if(typeof updateSecureDownloadGate==='function')updateSecureDownloadGate();
   if (modal) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
   document.addEventListener('keydown', previewEscHandler);
 }
