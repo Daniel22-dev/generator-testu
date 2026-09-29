@@ -62,6 +62,5 @@ function safeInitStep(name, fn){
   safeInitStep('validate', validate);
   safeInitStep('updateProgress', updateProgress);
   safeInitStep('enhanceA11y', enhanceA11y);
-  safeInitStep('initHttpErrorExplainer', initHttpErrorExplainer);
   setTimeout(function(){ safeInitStep('initTooltips', initTooltips); }, 100);
 })();
