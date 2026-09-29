@@ -853,4 +853,4 @@ function cancelGeneration(){
 }
 
 function setGenMsg(msg) { const el = $('genProgressMsg'); if (el) el.textContent = msg; }
-function setGenErr(msg) { const el = $('genError'); if (el) el.textContent = '❌ ' + msg; setGenUI('error'); }
+function setGenErr(msg) { const el = $('genError'); if (el) setErrorTextWithHttpHelp(el,'❌ '+msg); setGenUI('error'); }
