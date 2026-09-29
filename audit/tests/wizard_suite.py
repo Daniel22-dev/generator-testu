@@ -21,7 +21,7 @@ try:
   p.evaluate('()=>{auditReset(["translation"],"instant","en");state.identityMode="oneTimeCode";state.diferencovany="ANO";state.splitGenerate=true;state.layout="scroll";state.instrJazyk="mixed";state.exerciseConfig[0].pocetOtazek=7;applyVisualState();goTo(0)}')
   before=p.evaluate('JSON.stringify(state)');click_attr(p,'onclick',"setAppMode('simple')");p.locator('#uiModal [data-ui-cancel]').click();assert p.evaluate('JSON.stringify(state)')==before
   click_attr(p,'onclick',"setAppMode('simple')");p.locator('#uiModal [data-ui-ok]').click();p.wait_for_function('state.appMode==="simple"');d=p.evaluate('({identity:state.identityMode,diff:state.diferencovany,split:state.splitGenerate,layout:state.layout,instr:state.instrJazyk,detail:state.exerciseDetail,topic:$("latka").value})');assert d['identity']=='name'and d['diff']=='NE'and not d['split']and d['layout']=='tabs'and d['instr']=='target'and not d['detail'],d
-  click_attr(p,'onclick',"setAppMode('advanced')");assert p.evaluate('state.appMode')=='advanced';row.update(ok=True,defaults=d)
+  p.locator('#appModeBtns [data-val="advanced"]').click();assert p.evaluate('state.appMode')=='advanced';row.update(ok=True,defaults=d)
  except Exception as e:row.update(ok=False,error=str(e),trace=traceback.format_exc())
  rows.append(row);print(row,flush=True);(TESTS.parent/'evidence/wizard-suite.json').write_text(json.dumps(rows,indent=2))
 finally:h.close()
