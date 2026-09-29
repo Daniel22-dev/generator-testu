@@ -709,6 +709,14 @@ ok('export checklist je zkrácen na 0 / 4 položky podle režimu',()=>{
   assert(items.every(x=>x[2]===true),'secure checklist obsahuje nepovinné klikání');
   w.eval("generatedPackage=null");
 });
+ok('finální učitelský workflow má regresní pojistky',()=>{
+  const f=fs.readFileSync('dist/features/preview-editor.js','utf8');
+  assert(f.includes('previewCodeInjected'),'náhled nemá učitelské předvyplnění jednorázového kódu');
+  assert(f.includes('akvApplyClosedReview'),'AI rozdíly nemají akční rozhodnutí učitele');
+  assert(f.includes('enProgressPct'),'rozšíření odpovědí nemá průběh');
+  assert(html.includes('setErrorTextWithHttpHelp'),'HTTP chyby nemají klikatelné vysvětlení');
+  assert(html.includes('exportChecklist=keepChecklist'),'přestavění stejného testu maže učitelskou kontrolu');
+});
 
 // 25) Jednorázový device lock lze znovu povolit stejným učitelským přístupovým kódem.
 await okAsync('učitelský přístupový kód odemkne další spuštění na stejném zařízení', async()=>{

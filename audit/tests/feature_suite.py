@@ -22,12 +22,21 @@ try:
   for key in ['pvW360','pvW768','pvWfull']:p.locator('#'+key).click();assert p.locator('#'+key).get_attribute('class').find('active')>=0
   p.keyboard.press('Escape');assert not p.locator('#previewModal').is_visible();return '3 widths and Escape'
  record('lazy-preview',preview)
+ def preview_code():
+  p.evaluate("""async()=>{auditConfigure(['multiple choice'],'secureOffline','en');state.identityMode='oneTimeCode';window.eval('rosterEntries.length=0;rosterEntries.push({name:"QA Student",code:"QA-CODE-7"})');const data=auditFixtures(state,'en');lastGenData=data;const built=await assembleTestHtml(state,data);generatedPackage=built;generatedTestHtml='';generatedIntegrity=null;lastSelfTest=null;exportChecklist={};resetKeyCheckState();setGenUI('done');renderExportChecklist(true)}""")
+  p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';p.keyboard.press('Escape');return 'one-time code is injected only into teacher preview'
+ record('preview-one-time-code',preview_code)
  def edit_counts():
   build(['fill-in-the-blank']);p.locator('#btnEdit').click();p.wait_for_function('!$("editorModal").classList.contains("hidden")');click_attr(p,'onclick','edAddItem(0)');assert p.locator('.ed-item').count()==3
   p.locator('.ed-item').nth(2).locator('textarea').fill('Write ___');p.locator('.ed-item').nth(2).locator('.ed-correct').fill('water');p.locator('#btnEditorApply').click();wait_edit();assert not p.locator('#editorModal').is_visible(),p.locator('#editorError').text_content();assert p.evaluate('lastAssembled.variants.__default[0].items.length')==3
   p.locator('#btnEdit').click();click_attr(p,'onclick','edDelItem(0,2)');p.locator('#btnEditorApply').click();wait_edit();assert p.evaluate('lastAssembled.variants.__default[0].items.length')==2
   return '2 -> 3 -> 2'
  record('editor-add-remove',edit_counts)
+ def checklist_survives_same_test_rebuild():
+  build(['translation']);p.evaluate('exportChecklist={content:true,answers:true,grading:true,distribution:true}')
+  checks=p.evaluate('async()=>{await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),outputStamp());return exportChecklist}')
+  assert all(checks.get(k) is True for k in ['content','answers','grading','distribution']),checks;return checks
+ record('teacher-checklist-persists-on-rebuild',checklist_survives_same_test_rebuild)
  def invalid_editor():
   build(['matching']);old=p.evaluate('generatedTestHtml');p.locator('#btnEdit').click();click_attr(p,'onclick','edDelItem(0,1)');p.locator('#btnEditorApply').click();wait_edit();assert p.locator('#editorError').is_visible();assert p.evaluate('generatedTestHtml')==old;p.locator('[onclick="closeTestEditor()"]').first.click();return '1-pair rejected; original package unchanged'
  record('editor-invalid-rollback',invalid_editor)
@@ -54,12 +63,23 @@ try:
   p.locator('#keyCheckReport summary').click() if not p.locator('.akv-pick').first.is_visible() else None
   click_attr(p,'onclick','akvApplySelected()');assert 'KEYALTERNATIVE' not in p.evaluate('JSON.stringify(lastGenData)');p.locator('.akv-pick').first.check();click_attr(p,'onclick','akvApplySelected()');p.wait_for_function('!outputMutationBusy && lastGenData.exercises[0].items[0].alt_answers.includes("water KEYALTERNATIVE")');assert 'KEYALTERNATIVE' not in json.dumps(p.evaluate('lastGenData.exercises[0].items[1]'));return 'checked one of two alternatives applied'
  record('key-weak-accept',weak_key)
+ def closed_key_decision():
+  build(['true/false']);p.locator('#resultTab3').click();p.evaluate('callGeminiJSON=async()=>({answers:__keyUnits.map(u=>({i:u.i,a:false}))})');p.locator('#btnKeyCheck').click();p.wait_for_function('!akvBusy')
+  if not p.locator('input[name="akvDiff0"]').first.is_visible():p.locator('#keyCheckReport summary').click()
+  assert p.locator('input[name="akvDiff0"]').count()==2 and p.locator('input[name="akvDiff1"]').count()==2
+  p.locator('input[name="akvDiff0"][value="ai"]').check();p.locator('input[name="akvDiff1"][value="keep"]').check();click_attr(p,'onclick','akvApplyClosedReview()');p.wait_for_function('!outputMutationBusy')
+  vals=p.evaluate('[lastGenData.exercises[0].items[0].correct,lastGenData.exercises[0].items[1].correct]');assert vals==[False,True],vals;return vals
+ record('key-closed-diff-actionable',closed_key_decision)
  def incomplete():
   build(['multiple choice']);p.locator('#resultTab3').click();p.evaluate('callGeminiJSON=async()=>({answers:[]})');p.locator('#btnKeyCheck').click();p.wait_for_function('!akvBusy');d=p.evaluate('lastKeyCheck');assert d['missing']==2 and d['checked']==0;return d
  record('key-missing-not-green',incomplete)
  def key_failure():
   build(['multiple choice']);p.locator('#resultTab3').click();p.evaluate('()=>{lastKeyCheck={checked:2};callGeminiJSON=async()=>{throw new Error("provider failed") };}');p.locator('#btnKeyCheck').click();p.wait_for_function('!akvBusy');assert p.evaluate('lastKeyCheck') is None;return 'old verification cleared'
  record('key-error-clears-old-green',key_failure)
+ def quota_error_help():
+  build(['translation']);p.locator('#resultTab3').click();p.evaluate('genAiAvailable=()=>true;callGeminiJSON=async()=>{throw new Error("Kvóta AI služby byla vyčerpána. Technicky: HTTP 429 · QUOTA_EXCEEDED")}')
+  p.locator('#btnEnrich').click();p.wait_for_function('!enBusy');b=p.locator('#answerProposalReport button');assert b.count()==1 and b.text_content()=='429';b.click();p.wait_for_selector('#uiModal');assert p.locator('#uiModal .ui-modal-head').text_content()=='HTTP 429';p.locator('#uiModal [data-ui-ok]').click();return '429 is clickable and explained'
+ record('quota-429-clickable-help',quota_error_help)
  def frozen_variant():
   build(['translation']);p.evaluate('window.__beforeVariant=outputStamp();state.jazyk="latina";state.body=900;$("nazev").value="OTHER TEST";$("ucitelPin").value="OTHER-ACCESS-CODE";lastSelfTest={ok:true};exportChecklist={content:true,answers:true,grading:true,distribution:true}')
   p.evaluate('async()=>await makeVariantForNextGroup()');d=p.evaluate('({same:lastAssembled===__beforeVariant,id:lastAssembled.cfg.testId,prev:__beforeVariant.cfg.testId,lang:lastAssembled.cfg.uiLang,total:lastAssembled.variants.__default[0].points_total,self:lastSelfTest,checks:exportChecklist,slug:variantSlug})');assert not d['same'] and d['id']!=d['prev'] and d['lang']=='en' and d['self'] is None and d['checks']=={} and d['slug'];return d

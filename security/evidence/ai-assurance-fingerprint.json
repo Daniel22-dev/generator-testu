@@ -6,12 +6,12 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "5de92e2fcdbe94a8386a6cf6563507b8cda1efcfe9e97e9fb528b96bf00e3194",
+  "fingerprint": "f0bdedb442d9aaac1c4fd7a94cfff15cd7124a7d5d7abb2ef38c29e22c251587",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 159275,
-      "sha256": "980292d4d795476db2c3dcc280b398afdc3b9208d44bd2fa3b7d45fe3767ca01"
+      "size": 160659,
+      "sha256": "499d8f0d3670dcea7532f7c15034f8878cfbda5943023524a98b663e44d258f9"
     },
     {
       "path": "src/js/03-ui-render.js",
@@ -25,8 +25,8 @@
     },
     {
       "path": "src/js/07-gemini.js",
-      "size": 54447,
-      "sha256": "67042ff307d90b826d9b11999cec117aced755dc29d74567171bca35b8749cf7"
+      "size": 54457,
+      "sha256": "f6e2e59ceeb246b67fa4803aa406275460b0e9415acb56f54e56f5fd951585cc"
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
@@ -40,8 +40,8 @@
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
-      "size": 53902,
-      "sha256": "2b684ce3718d88d3400c825fe2ab9ddb17c0d3a82e2d20ddcda6c977423ae275"
+      "size": 52700,
+      "sha256": "c195b64a7e1952fd57030a5932b06e5677812fa9fc6ed2e860e640d78e45d38d"
     },
     {
       "path": "src/js/12-prompt-builder.js",
@@ -60,8 +60,8 @@
     },
     {
       "path": "src/features/preview-editor.js",
-      "size": 53320,
-      "sha256": "206b3bbf2354e4db93148336d0b7e68e43fccc6045f9022f98a1e96e5868a125"
+      "size": 60725,
+      "sha256": "b503452f55bbe360f884854599dc2cb9226aaf25625ec34d5dcb991845ee18ff"
     },
     {
       "path": "src/features/testlab.js",

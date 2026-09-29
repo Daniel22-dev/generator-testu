@@ -382,6 +382,9 @@ function uiConfirm(message, title='Potvrzení', danger=false){
 function uiPrompt(title, defaultValue=''){
   return uiModal({title, message:'Zadej název a potvrď.', input:true, defaultValue, okText:'Uložit', cancelText:'Zrušit'});
 }
+const HTTP_CZ={400:'Požadavek má neplatný tvar nebo obsah.',401:'Služba neověřila přístup.',403:'Služba tento přístup nepovolila.',404:'Služba nebo zdroj nebyly nalezeny.',408:'Požadavek vypršel.',413:'Požadavek je příliš velký.',422:'Obsah nelze v této podobě zpracovat.',429:'Byl dosažen limit AI požadavků nebo kvóta. Počkej na obnovení limitu a akci zopakuj.',500:'Služba narazila na interní chybu.',502:'Navazující služba vrátila chybnou odpověď.',503:'Služba je dočasně nedostupná nebo přetížená.',504:'Navazující služba nestihla odpovědět.'};
+function httpErrorExplain(code){const n=Number(code),m=HTTP_CZ[n]||(n>=500?'Chyba vznikla na straně služby. Zkus akci později.':'Požadavek byl službou odmítnut. Zkontroluj doprovodnou hlášku.');return uiAlert(m+'\n\nRozpracovaný test tím sám o sobě není změněn.','HTTP '+n);}
+function setErrorTextWithHttpHelp(el,msg){if(!el)return;const s=String(msg),m=s.match(/\bHTTP\s*([45]\d{2})\b/i);if(!m){el.textContent=s;return;}el.textContent=s.slice(0,m.index)+'HTTP ';const b=document.createElement('button');b.type='button';b.textContent=m[1];b.title='Vysvětlit HTTP '+m[1];b.style='all:unset;color:var(--acc);font-weight:700;text-decoration:underline;cursor:pointer';b.onclick=()=>httpErrorExplain(m[1]);el.append(b,document.createTextNode(s.slice(m.index+m[0].length)));}
 
 /* Generator Assistant — lokální poradce ke generátoru (KB + UI + volitelné AI). */
 // Generator Assistant

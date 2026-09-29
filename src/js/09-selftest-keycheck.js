@@ -340,10 +340,11 @@ async function aiVerifyKey(){
       units.push({i:units.length+1,type:ex.type,q:JSON.stringify({left:ex.items.map(it=>it.left),rightOptions:right}),variant:key,ex0:ei,qi0:0,exObj:ex,itObj:ex.items[0]});
     }else (ex.items||[]).forEach((it,qi)=>units.push({i:units.length+1,type:ex.type,q:akvQuestionText(ex,it),variant:key,ex0:ei,qi0:qi,exObj:ex,itObj:it}));
   }));
-  resetKeyCheckState();akvBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.textContent='Ov\u011b\u0159uji '+units.length+' \u00faloh ve '+keys.length+' variant\u00e1ch\u2026';}
+  const batches=boundedReviewBatches(units,x=>x.q.length);
+  resetKeyCheckState();akvBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.innerHTML='<b>Ověření klíče druhým průchodem</b><br><progress id="keyCheckProgress" max="100" value="5" style="width:100%"></progress> <span id="keyCheckPct">5 %</span>';}
   try{
     const answers=new Map();
-    for(const batch of boundedReviewBatches(units,x=>x.q.length)){
+    for(let bi=0;bi<batches.length;bi++){const batch=batches[bi],pct=Math.round(10+80*bi/batches.length),pg=$('keyCheckProgress'),pt=$('keyCheckPct');if(pg)pg.value=pct;if(pt)pt.textContent=pct+' %';
       const data=await callGeminiJSON(akvBuildPrompt(batch),[],{operation:'answer-key-verification'});requireOutputStamp(stamp);
       if(!data||!Array.isArray(data.answers))throw new Error('AI nevr\u00e1tila pole odpov\u011bd\u00ed.');
       const valid=new Set(batch.map(x=>x.i));
@@ -359,22 +360,11 @@ async function aiVerifyKey(){
     akvSourceStamp=stamp;akvWeakRows=weaks;akvVariantKey=keys.join(', ');
     lastKeyCheck={closedDiffs:diffs.length,openWeaks:weaks.length,checked,missing,invalid,total:units.length,variants:keys,ranAt:Date.now()};keyDiffsAcknowledged=false;
     const incomplete=missing+invalid>0||!checked,title=incomplete?'AI kontrola je ne\u00fapln\u00e1':diffs.length||weaks.length?'AI kontrola: n\u00e1lezy k posouzen\u00ed':'AI odpov\u011bdi se shoduj\u00ed s ulo\u017een\u00fdm kl\u00ed\u010dem';
-    if(out)out.innerHTML=collapsibleResultHtml(title,incomplete||diffs.length||weaks.length?'is-warn':'is-pass',akvRender(keys.join(', '),checked,missing+invalid,diffs,weaks));
+    const api=await ghrabGeneratorFeatureLoader('previewEditor','./features/preview-editor.js');
+    if(out)out.innerHTML=collapsibleResultHtml(title,incomplete||diffs.length||weaks.length?'is-warn':'is-pass',api.keyReview(keys.join(', '),checked,missing+invalid,diffs,weaks,stamp));
     updateSecureDownloadGate();
-  }catch(error){if(out)out.textContent='Kontrola selhala; nen\u00ed dokladem spr\u00e1vnosti kl\u00ed\u010de. '+error.message;}
+  }catch(error){if(out)setErrorTextWithHttpHelp(out,'Kontrola selhala; není dokladem správnosti klíče. '+(error&&error.message?error.message:String(error)));}
   finally{akvBusy=false;if(btn)btn.disabled=false;}
-}
-function akvRender(variant,checked,missing,diffs,weaks){
-  let html='<p>Varianty: '+H(variant)+'. Ov\u011b\u0159eno '+checked+' \u00faloh; chyb\u011bj\u00edc\u00ed nebo neplatn\u00e9 odpov\u011bdi: '+missing+'. Shoda nen\u00ed d\u016fkaz spr\u00e1vnosti, neshoda nen\u00ed d\u016fkaz chyby.</p>';
-  if(diffs.length)html+='<h4>Uzav\u0159en\u00e9 odpov\u011bdi k revizi</h4>'+diffs.map(d=>akvCard(d,'diff')).join('');
-  if(weaks.length)html+='<h4>Otev\u0159en\u00e9 odpov\u011bdi k posouzen\u00ed</h4>'+weaks.map((d,i)=>akvCard(d,'weak',i)).join('');
-  if(weaks.some(akvCanAdd))html+='<button type="button" class="akv-apply-btn" onclick="akvApplySelected()">P\u0159idat za\u0161krtnut\u00e9 odpov\u011bdi a p\u0159esestavit</button><div id="akvApplyStatus" role="status"></div>';
-  if(!checked||missing)html+='<p><b>Ne\u00fapln\u00e1 kontrola. Zb\u00fdvaj\u00edc\u00ed \u00falohy zkontroluj ru\u010dn\u011b; tento v\u00fdsledek neozna\u010duje cel\u00fd kl\u00ed\u010d za ov\u011b\u0159en\u00fd.</b></p>';
-  return html;
-}
-function akvCard(d,kind,index){
-  const pick=kind==='weak'&&akvCanAdd(d)?'<label class="akv-pick-row"><input type="checkbox" class="akv-pick" data-wi="'+index+'">P\u0159ijmout tuto odpov\u011b\u010f jako alternativu</label>':'<p>Rozd\u00edl posu\u010f v editoru; u tohoto form\u00e1tu se alternativy automaticky nep\u0159id\u00e1vaj\u00ed.</p>';
-  return '<div class="akv-item '+kind+'"><b>'+H(d.variant)+' \u00b7 cv. '+d.ex+' / pol. '+d.q+' \u00b7 '+H(d.type)+'</b><p>'+H(d.question)+'</p><p>Kl\u00ed\u010d: <b>'+H(d.key)+'</b></p><p>AI: <b>'+H(akvDisplay(d.ai))+'</b></p>'+pick+'</div>';
 }
 function akvAddAltToItem(it,ai,type){
   if(!it)return false;

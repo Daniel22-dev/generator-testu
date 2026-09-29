@@ -42,7 +42,7 @@ async function commitAnswerData(data,stamp,sourceState){
   requireOutputStamp(stamp);
   if(outputMutationBusy)throw new Error('Pr\u00e1v\u011b prob\u00edh\u00e1 jin\u00e1 \u00faprava testu.');
   outputMutationBusy=true;
-  const previous={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,checklist:exportChecklist,selfTest:lastSelfTest,gaps:secureGapsAcknowledged,diffs:keyDiffsAcknowledged};
+  const previous={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,checklist:exportChecklist,selfTest:lastSelfTest,gaps:secureGapsAcknowledged,diffs:keyDiffsAcknowledged},keepChecklist=exportChecklist;
   try{
     const built=await assembleTestHtml(sourceState||outputEditState(),data);
     if(built&&built.mode==='secureOffline')await validateSecurePackageSmoke(built);else await validateGeneratedHtmlSmoke(String(built||''));
@@ -50,7 +50,7 @@ async function commitAnswerData(data,stamp,sourceState){
     generatedTestHtml=generatedPackage?'':String(built||'');lastGenData=data;
     generatedIntegrity=null;generatedIntegrity=integrityDataForCurrentOutput();
     if(generatedIntegrity&&generatedTestHtml)generatedIntegrity.studentHtmlSha256=await sha256HexText(generatedTestHtml);
-    exportChecklist={};lastSelfTest=null;secureGapsAcknowledged=false;keyDiffsAcknowledged=false;
+    exportChecklist=keepChecklist;lastSelfTest=null;secureGapsAcknowledged=false;keyDiffsAcknowledged=false;
     resetKeyCheckState();resetVerificationReports();renderExportChecklist(true);renderQualityDiagnostics();updateSecureDownloadGate();
     return true;
   }catch(error){lastAssembled=previous.assembled;lastGenData=previous.data;generatedTestHtml=previous.html;generatedPackage=previous.pack;generatedIntegrity=previous.integrity;exportChecklist=previous.checklist;lastSelfTest=previous.selfTest;secureGapsAcknowledged=previous.gaps;keyDiffsAcknowledged=previous.diffs;throw error;}
