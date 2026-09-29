@@ -65,6 +65,12 @@ jobs:
           git add -A
           git commit -m "release: Generator testu 7.1.59"
 
+      - name: Upload verified release patch
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-7.1.59-verified-patch
+          path: /tmp/release-7159.xz
+
       - name: Fail closed if candidate moved, then push release
         shell: bash
         env:
