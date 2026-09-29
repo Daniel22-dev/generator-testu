@@ -7,6 +7,7 @@ SPECS={
  'config_matrix':('config-matrix.json',None),
  'config_extra_suite':('config-extra-suite.json',301),
  'wizard_suite':('wizard-suite.json',16),
+ 'state_transition_suite':('state-transition-suite.json',8),
  'czech_suite':('czech-suite.json',39),
  'manual_suite':('manual-suite.json',9),
  'pipeline_matrix':('pipeline-matrix.json',380),
