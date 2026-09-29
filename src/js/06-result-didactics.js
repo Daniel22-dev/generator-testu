@@ -84,11 +84,16 @@ function analyzeDidactics(st, data){
   const base = sets[0] ? sets[0].exercises : (data && Array.isArray(data.exercises) ? data.exercises : []);
   const fnAgg = { recognition:{pts:0,items:0}, controlled:{pts:0,items:0}, freer:{pts:0,items:0}, comprehension:{pts:0,items:0}, other:{pts:0,items:0} };
   let totalPts = 0, totalItems = 0;
-  (base || []).forEach(ex => {
+  // Body ber ze sestaveného testu (stejné item_points jako ve studentském souboru).
+  const assembledBase = (typeof lastAssembled !== 'undefined' && lastAssembled && lastAssembled.variants && data === lastGenData)
+    ? (Object.values(lastAssembled.variants)[0] || null) : null;
+  (base || []).forEach((ex, ei) => {
     const fn = pedagogyOf(exerciseType(ex));
     const items = exerciseItems(ex);
+    const aex = assembledBase && assembledBase[ei];
+    const src = aex && Array.isArray(aex.item_points) && aex.item_points.length === items.length ? aex : ex;
     items.forEach((it, i) => {
-      const pts = stPointOf(ex, i);
+      const pts = stPointOf(src, i);
       fnAgg[fn].pts += pts; fnAgg[fn].items += 1;
       totalPts += pts; totalItems += 1;
     });

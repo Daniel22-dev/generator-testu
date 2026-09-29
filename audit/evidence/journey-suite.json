@@ -1,0 +1,103 @@
+[
+  {
+    "case": "simple-instant-teacher-to-student",
+    "didactic": "15 položek · 30 b",
+    "label": [
+      "YOUR FULL NAME",
+      "Enter your first and last name"
+    ],
+    "points": "2 pts",
+    "ok": true
+  },
+  {
+    "case": "teacher-name-is-not-preset",
+    "placeholder": "Tvoje jméno a příjmení",
+    "ok": true
+  },
+  {
+    "case": "step3-missing-teacher-name-is-explained",
+    "hint": "Doplň jméno pro učitelský mód.",
+    "ok": true
+  },
+  {
+    "case": "simple-strict-teacher-student-verifier",
+    "verifier": "Jana Nováková\tAMUMSG8AMD1KI3I1I3M\t30/30\t100 %\t1\tzákladní",
+    "ok": true
+  },
+  {
+    "case": "ai-key-diffs-decided-per-item",
+    "banner": "í odemčeno. AI ověření klíče: rozdíly vyřešeny tvým rozhodnutím (převzato 1, ponecháno 1).",
+    "ok": true
+  },
+  {
+    "case": "pending-key-diffs-survive-alternatives",
+    "carried": true,
+    "ok": true
+  },
+  {
+    "case": "editor-changes-keep-review-and-pending-diffs",
+    "c": 0,
+    "older": true,
+    "mc": 2,
+    "ok": true
+  },
+  {
+    "case": "failed-regeneration-keeps-reviewed-test",
+    "modals": [
+      "Vytvořit nový test místo hotového?"
+    ],
+    "httpHelp": "Byl dosažen limit AI požadavků nebo kvóta. Počkej na obnoven",
+    "ok": true
+  },
+  {
+    "case": "error-recovery-is-actionable",
+    "400": "uprav zadání (zkrať text, odeber problem",
+    "413": "zmenši nebo odeber přílohy, případně zkr",
+    "401": "zkontroluj AI připojení (API klíč) na pr",
+    "malformed": "spusť generování znovu; když se to opaku",
+    "ok": true
+  },
+  {
+    "case": "advanced-one-time-code-to-verifier",
+    "codes": 2,
+    "ok": true
+  },
+  {
+    "case": "narrow-screen-and-live-regions",
+    "overflow": 0,
+    "ok": true
+  },
+  {
+    "case": "template-save-dialogs-are-clear",
+    "second": "K čemu šablona slouží (nepovinné)",
+    "ok": true
+  },
+  {
+    "case": "enrichment-proposals-clear-and-expire",
+    "accepted": true,
+    "ok": true
+  },
+  {
+    "case": "incomplete-key-check-is-not-success",
+    "step3": "3 Druhý pohled AI Volitelné · neúplné",
+    "ok": true
+  },
+  {
+    "case": "settings-changed-after-generation",
+    "pts": 50,
+    "cas": 45,
+    "q": "Edited",
+    "grading": false,
+    "calls": 1,
+    "ok": true
+  },
+  {
+    "case": "student-language-and-small-texts",
+    "tabs": [
+      "multiple choice",
+      "fill-in-the-blank",
+      "true/false"
+    ],
+    "ok": true
+  }
+]

@@ -52,7 +52,11 @@ try:
  record('proposal-check-and-accept',proposals)
  def stale_proposal():
   build();p.locator('#resultTab3').click();p.evaluate('callGeminiJSON=async()=>({items:[{id:0,alts:["water STALE"]}]})');p.locator('#btnEnrich').click();p.wait_for_function('document.querySelectorAll(".en-pick").length===1');p.locator('.en-pick').check()
-  p.evaluate('async()=>{const st=outputStamp();await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),st)}');p.locator('#btnAcceptProposals').click();assert 'STALE' not in p.evaluate('JSON.stringify(lastGenData)');return 'stale proposal refused'
+  p.evaluate('async()=>{const st=outputStamp();await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),st)}')
+  # Since 7.1.59 (F-28) stale proposals are disabled right after the change; the stamp guard still refuses a direct call.
+  assert p.locator('#btnAcceptProposals').is_disabled() and 'nejde použít' in p.evaluate("document.getElementById('enApplyStatus').innerText")
+  p.evaluate('()=>{document.querySelectorAll(".en-pick").forEach(c=>{c.disabled=false;c.checked=true})}');p.evaluate('async()=>{try{await enAcceptSelected()}catch(e){}}');p.wait_for_timeout(300)
+  assert 'STALE' not in p.evaluate('JSON.stringify(lastGenData)');return 'stale proposal disabled and refused'
  record('stale-proposals',stale_proposal)
  # Correct solutions are supplied only across the AI boundary; real comparison/UI are retained.
  p.add_script_tag(content='''window.auditKeyAnswer=(ex,it)=>{const t=ex.type;if(t==='matching')return ex.items.map(x=>x.right);if(['multiple choice','dialogue completion','reading comprehension','listening comprehension','multi-select','true/false','highlight-evidence'].includes(t))return it.correct;if(t==='ordering')return it.correct_order;if(t==='categorisation-board')return it.entries.map(x=>x.category);if(t==='table-completion')return it.rows.map(r=>r.map(c=>typeof c==='object'?c.answer:c));if(t==='transformation-chain')return it.transformations.map(x=>x.answer);if(t==='error-tagging')return {token:it.error_token_index,etype:it.error_type,corr:it.correction};if(t==='categorization')return it.correct_category;if(t==='fill-in-the-blank'||t==='cloze text')return it.answers||[it.answer];return it.correction||it.correct_sentence||it.answer;};window.__keyPrompt=akvBuildPrompt;akvBuildPrompt=function(units){window.__keyUnits=units;return __keyPrompt(units)};''')

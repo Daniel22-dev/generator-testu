@@ -423,12 +423,16 @@ function replaceStateFromUntrusted(raw){
   state = Object.assign(JSON.parse(JSON.stringify(DEFAULT)), sanitizeStateForLoad(raw));
   return state;
 }
+const LEGACY_DEFAULT_TEACHER_NAME = 'Daniel Baláž';
 function safeDomEntries(raw){
   const source = cloneSafeStoredValue(raw || {});
   if (!source || Array.isArray(source) || typeof source !== 'object') throw new TypeError('Uložená pole formuláře musí být objekt.');
   return DOM_FIELDS.filter(id => Object.hasOwn(source, id)).map(id => {
     const value = source[id];
     if (value !== null && !['string','number','boolean'].includes(typeof value)) throw new TypeError('Uložené pole formuláře má neplatný tvar.');
+    // Do 7.1.58 bylo jméno pro učitelský mód předvyplněné jménem autora aplikace.
+    // Taková uložená hodnota nebyla volbou učitele – vyprázdni ji, ať si každý vyplní své jméno.
+    if (id === 'ucitelJmeno' && String(value || '').trim() === LEGACY_DEFAULT_TEACHER_NAME) return [id, ''];
     return [id, value];
   });
 }
@@ -585,7 +589,7 @@ const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinov
 function getTemplatePrefill(){const p={};TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));p.skupinyCount=(state.skupiny||[]).length;p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||'');return p}
 function applyTemplatePrefill(p){if(!p)return;TEMPLATE_PREFILL_KEYS.forEach(k=>{if(p[k]!==undefined)state[k]=cloneSafeStoredValue(p[k])});const n=Math.max(0,Math.min(12,Number(p.skupinyCount)||0)),names=Array.isArray(p.skupinyNazvy)?p.skupinyNazvy:[];state.skupiny=[];if((state.diferencovany||'NE')==='ANO')for(let i=0;i<n;i++)state.skupiny.push({id:groupIdCounter++,nazev:names[i]||('Skupina '+(i+1)),podminky:'',studenti:[]})}
 function finishTemplateLoad(msg,type='ok'){normalizeLoadedState(state);enforceModeConstraints();maxStep=0;goTo(0);applyVisualState();if(typeof renderGroups==='function')renderGroups();if(typeof renderTeacherMapping==='function')renderTeacherMapping();validate();saveSnapshot();uiToast(msg,type,5000)}
-async function saveTemplate(){const name=await uiPrompt('Název šablony',trim('nazev')||'Moje šablona');if(!name)return;const why=await uiPrompt('Logika šablony (nepovinné)',''),t=loadTemplates();t.push({id:Date.now(),name,why:why||'',format:'prefill_v2',prefill:getTemplatePrefill(),ts:Date.now()});if(!saveTemplates(t))return;renderTemplates();flashSave();uiToast('Šablona uložena a připravena k předvyplnění.','ok',4500)}
+async function saveTemplate(){const name=await uiPrompt('Název šablony',trim('nazev')||'Moje šablona');if(!name)return;const why=await uiPrompt('K čemu šablona slouží (nepovinné)','','Krátce popiš použití, nebo nech prázdné a ulož.'),t=loadTemplates();t.push({id:Date.now(),name,why:why||'',format:'prefill_v2',prefill:getTemplatePrefill(),ts:Date.now()});if(!saveTemplates(t))return;renderTemplates();flashSave();uiToast('Šablona uložena a připravena k předvyplnění.','ok',4500)}
 function loadTemplate(id){const t=loadTemplates().find(x=>x.id===id);if(!t)return;if(t.format==='prefill_v2'){applyTemplatePrefill(cloneSafeStoredValue(t.prefill));finishTemplateLoad('Šablona „'+esc(t.name)+'“ načtena.');return}if(t.format==='profile_v1'){applyTemplatePrefill(cloneSafeStoredValue(t.profile));finishTemplateLoad('Starší profil načten. Pro plné předvyplnění jej ulož znovu.','warn');return}replaceStateFromUntrusted(t.state);if(!state.urls?.length)state.urls=[''];fileObjects=[];fileReadPromises=[];state.fileNames=[];showFileError('');if(state.zadaniTab==='file')state.zadaniTab='text';if(!state.layout)state.layout='tabs';if(!state.resultMode)state.resultMode='instant';safeDomEntries(t.dom).forEach(([k,v])=>setVal(k,v));SENSITIVE_FIELD_IDS.forEach(x=>setVal(x,''));finishTemplateLoad('Starší šablona načtena; citlivá pole byla vyčištěna.')}
 // Přenos očištěného zadání mezi kolegy.
 function buildZadaniExport(){const dom={};DOM_FIELDS.forEach(id=>dom[id]=val(id));return{__type:'generator-testu-zadani',formatVersion:1,appVersion:RELEASE.version,exportedAt:new Date().toISOString(),dom,state:getStoredState()}}

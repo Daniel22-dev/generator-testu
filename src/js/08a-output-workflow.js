@@ -38,22 +38,36 @@ function lockGenerationInputs(lock){
 function outputStamp(){return lastAssembled;}
 function requireOutputStamp(stamp){if(!stamp||lastAssembled!==stamp)throw new Error('Test se mezit\u00edm zm\u011bnil. Spus\u0165 kontrolu znovu nad aktu\u00e1ln\u00ed verz\u00ed.');}
 function outputEditState(){return JSON.parse(JSON.stringify(lastAssembled&&lastAssembled.sourceState||state));}
-async function commitAnswerData(data,stamp,sourceState){
+// Jediné místo, kde se mění hotový test. Pravidla stavu:
+// • učitelská kontrola (exportChecklist) se u téhož testu zachovává;
+// • technické výsledky (self-test, potvrzené mezery) se invalidují a učitel vidí proč;
+// • nevyřešené rozdíly z AI ověření klíče se NEZAHAZUJÍ, dokud se klíč dotčené položky
+//   nezmění nebo o nich učitel výslovně nerozhodne (opts.keyResolution);
+// • opts.freshArtifact (nová varianta) = nový test, nic se nepřenáší.
+async function commitAnswerData(data,stamp,sourceState,opts){
+  opts=opts||{};
   requireOutputStamp(stamp);
   if(outputMutationBusy)throw new Error('Pr\u00e1v\u011b prob\u00edh\u00e1 jin\u00e1 \u00faprava testu.');
   outputMutationBusy=true;
-  const previous={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,checklist:exportChecklist,selfTest:lastSelfTest,gaps:secureGapsAcknowledged,diffs:keyDiffsAcknowledged},keepChecklist=exportChecklist;
+  const previous={assembled:lastAssembled,data:lastGenData,html:generatedTestHtml,pack:generatedPackage,integrity:generatedIntegrity,checklist:exportChecklist,selfTest:lastSelfTest,gaps:secureGapsAcknowledged,diffs:keyDiffsAcknowledged,keyCheck:lastKeyCheck,stale:selfTestStaleReason},keepChecklist=exportChecklist;
   try{
+    const review=previous.keyCheck&&!opts.freshArtifact?await ghrabGeneratorFeatureLoader('previewEditor','./features/preview-editor.js'):null;
     const built=await assembleTestHtml(sourceState||outputEditState(),data);
     if(built&&built.mode==='secureOffline')await validateSecurePackageSmoke(built);else await validateGeneratedHtmlSmoke(String(built||''));
     generatedPackage=built&&built.mode==='secureOffline'?built:null;
     generatedTestHtml=generatedPackage?'':String(built||'');lastGenData=data;
     generatedIntegrity=null;generatedIntegrity=integrityDataForCurrentOutput();
     if(generatedIntegrity&&generatedTestHtml)generatedIntegrity.studentHtmlSha256=await sha256HexText(generatedTestHtml);
-    exportChecklist=keepChecklist;lastSelfTest=null;secureGapsAcknowledged=false;keyDiffsAcknowledged=false;
-    resetKeyCheckState();resetVerificationReports();renderExportChecklist(true);renderQualityDiagnostics();updateSecureDownloadGate();
+    exportChecklist=keepChecklist;lastSelfTest=null;secureGapsAcknowledged=false;
+    resetKeyCheckState();
+    if(review){const next=review.keyCheckAfterCommit(previous.keyCheck,previous.diffs,previous.data,data,opts.keyResolution);lastKeyCheck=next.check;keyDiffsAcknowledged=next.ack;}
+    selfTestStaleReason=previous.selfTest||previous.stale?(opts.reason||'Test se změnil.'):'';
+    resetVerificationReports();renderSelfTestStaleNote();renderExportChecklist(true);renderQualityDiagnostics();updateSecureDownloadGate();
+    if(review)review.renderKeyCheckAfterCommit(opts.note||'');
+    const stale=document.querySelectorAll('#answerProposalReport .en-pick:not(:disabled),#btnAcceptProposals');
+    if(stale.length){stale.forEach(e=>e.disabled=true);const st=$('enApplyStatus');if(st)st.textContent='Test se změnil; tyto návrhy už nejde použít. Požádej o nové.';}
     return true;
-  }catch(error){lastAssembled=previous.assembled;lastGenData=previous.data;generatedTestHtml=previous.html;generatedPackage=previous.pack;generatedIntegrity=previous.integrity;exportChecklist=previous.checklist;lastSelfTest=previous.selfTest;secureGapsAcknowledged=previous.gaps;keyDiffsAcknowledged=previous.diffs;throw error;}
+  }catch(error){lastAssembled=previous.assembled;lastGenData=previous.data;generatedTestHtml=previous.html;generatedPackage=previous.pack;generatedIntegrity=previous.integrity;exportChecklist=previous.checklist;lastSelfTest=previous.selfTest;secureGapsAcknowledged=previous.gaps;keyDiffsAcknowledged=previous.diffs;lastKeyCheck=previous.keyCheck;selfTestStaleReason=previous.stale;throw error;}
   finally{outputMutationBusy=false;}
 }
 function resultStep(n,focus){
@@ -62,9 +76,18 @@ function resultStep(n,focus){
 }
 function resultStepKey(event,n){let next=n;if(event.key==='ArrowRight')next=n%4+1;else if(event.key==='ArrowLeft')next=(n+2)%4+1;else if(event.key==='Home')next=1;else if(event.key==='End')next=4;else return;event.preventDefault();resultStep(next,true);}
 function renderResultSteps(){
+  renderSettingsDrift();
   const secure=isSecurePackage(), complete=[secure?teacherReviewSatisfied():!!exportChecklist.preview,!!(lastSelfTest&&lastSelfTest.ok),!!lastKeyCheck,secureDownloadAllowed()];
   const heading=$('genResultTitle');if(heading)heading.textContent=secure&&!secureDownloadAllowed()?'Test vytvořen — dokončete povinné kontroly':'Test vytvořen — zkontrolujte obsah a stáhněte soubory';
-  document.querySelectorAll('[data-result-step]').forEach(b=>{const i=Number(b.dataset.resultStep)-1;const status=b.querySelector('.result-step-status');if(!status)return;status.textContent=i===2?'Voliteln\u00e9':i===3?(complete[i]?'Lze st\u00e1hnout':'Zat\u00edm uzam\u010deno'):((secure?'Povinn\u00e9':'Doporu\u010den\u00e9')+(complete[i]?' \u00b7 hotovo':''));b.classList.toggle('is-complete',complete[i]);});
+  const keyPending=!!(lastKeyCheck&&lastKeyCheck.closedDiffs>0&&!keyDiffsAcknowledged);
+  complete[2]=!!lastKeyCheck&&!keyPending&&!lastKeyCheck.olderVersion&&!lastKeyCheck.incomplete;
+  const stepStatus=i=>{
+    if(i===2)return keyPending?'\u010cek\u00e1 na tv\u00e9 rozhodnut\u00ed':(lastKeyCheck&&lastKeyCheck.olderVersion?'Voliteln\u00e9 \u00b7 star\u0161\u00ed verze':lastKeyCheck&&lastKeyCheck.incomplete?'Voliteln\u00e9 \u00b7 ne\u00fapln\u00e9':'Voliteln\u00e9'+(complete[2]?' \u00b7 hotovo':''));
+    if(i===3)return complete[3]?'Lze st\u00e1hnout':'Zat\u00edm uzam\u010deno';
+    if(i===1&&!complete[1]&&selfTestStaleReason)return (secure?'Povinn\u00e9':'Doporu\u010den\u00e9')+' \u00b7 spustit znovu';
+    return (secure?'Povinn\u00e9':'Doporu\u010den\u00e9')+(complete[i]?' \u00b7 hotovo':'');
+  };
+  document.querySelectorAll('[data-result-step]').forEach(b=>{const i=Number(b.dataset.resultStep)-1;const status=b.querySelector('.result-step-status');if(!status)return;status.textContent=stepStatus(i);b.classList.toggle('is-complete',complete[i]);b.classList.toggle('is-attention',i===2&&keyPending);});
 }
 function renderGenerationEstimate(){
   const el=$('generationEstimate');if(!el)return;
@@ -76,4 +99,35 @@ function boundedReviewBatches(items,lengthOf){
   const out=[];let batch=[],size=0;
   for(const item of items){const length=lengthOf(item);if(length>24000)throw new Error('Jedna \u00faloha je pro dopl\u0148kovou AI kontrolu p\u0159\u00edli\u0161 dlouh\u00e1. Zkontroluj ji ru\u010dn\u011b v editoru.');if(batch.length&&(batch.length>=12||size+length>24000)){out.push(batch);batch=[];size=0;}batch.push(item);size+=length;}
   if(batch.length)out.push(batch);return out;
+}
+
+// Nastavení změněné po vygenerování se do hotového testu samo nepropíše. Učitel to musí
+// vidět u stažení a u změn bez vlivu na obsah je může použít bez nového AI generování.
+const DRIFT_SETTINGS=[['body','body'],['cas','čas'],['gradeTyp','stupnice'],['testMode','účel testu'],['resultMode','způsob výsledku'],['identityMode','identita studenta'],['feedbackMode','zpětná vazba'],['layout','rozložení'],['randomizace','pořadí otázek'],['tema','vzhled'],['zolicek','žolík'],['fuzzyTolerance','tolerance překlepů'],['odevzdavani','odevzdávání'],['screenGuard','hlídání obrazovky']];
+const DRIFT_FIELDS=[['nazev','název'],['proKoho','pro koho'],['vlastniSkala','stupnice'],['ucitelJmeno','jméno učitele'],['ucitelPin','učitelský kód']];
+const DRIFT_CONTENT=['jazyk','instrJazyk','uroven','kombinovat','diferencovany','skupiny','sourceUseMode'];
+function settingsDrift(){
+  const src=lastAssembled&&lastAssembled.sourceState;if(!src||!lastGenData||window.__GHRAB_GENERATOR_WORKFLOW_ID__)return null;
+  const same=(a,b)=>JSON.stringify(a==null?null:a)===JSON.stringify(b==null?null:b),out=new Set();
+  DRIFT_SETTINGS.forEach(([k,l])=>{if(!same(src[k],state[k]))out.add(l);});
+  DRIFT_FIELDS.forEach(([id,l])=>{if(String((src.__outputFields||{})[id]||'')!==trim(id))out.add(l);});
+  let content=DRIFT_CONTENT.some(k=>!same(src[k],state[k]))||['latka','zadaniText','poznamky'].some(id=>String((src.__outputFields||{})[id]||'')!==trim(id));
+  try{const now=generationPlan(state),was=buildExerciseSpecs(src);if(now.specs.map(x=>x.type).join()!==was.map(x=>x.type).join())content=true;else if(now.config.map(c=>c.body).join()!==was.map(x=>x.pts).join())out.add('body');}catch(_){content=true;}
+  return out.size||content?{settings:[...out],content}:null;
+}
+function renderSettingsDrift(){
+  const el=$('settingsDriftBanner');if(!el)return;const d=settingsDrift();
+  if(!d){el.classList.add('hidden');el.textContent='';return;}
+  el.classList.remove('hidden');
+  el.innerHTML=d.content?'⚠️ <b>Obsah zadání se od vytvoření testu změnil.</b> Stažený test odpovídá původnímu zadání; pro nový obsah test vytvoř znovu.'
+    :'⚠️ <b>Po vytvoření testu jsi změnil(a): '+esc(d.settings.join(', '))+'.</b> Stažený test má zatím původní nastavení. <button type="button" class="gate-run-btn" onclick="applySettingsWithoutAi()">Použít nové nastavení (bez AI)</button>';
+}
+async function applySettingsWithoutAi(){
+  const d=settingsDrift();if(!d||d.content||outputMutationBusy)return;
+  const st=JSON.parse(JSON.stringify(state)),plan=generationPlan(st),v=lastGenData.group_variants?Object.values(lastGenData.group_variants)[0]:lastGenData,exs=(Array.isArray(v)?v:v.exercises)||[];
+  st.exerciseDetail=true;st.pocet=plan.config.length;st.exerciseConfig=plan.config.map((c,i)=>Object.assign({},c,{pocetOtazek:exs[i]&&exs[i].items?exs[i].items.length:c.pocetOtazek}));
+  try{await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),outputStamp(),st,{reason:'Změnilo se nastavení testu ('+d.settings.join(', ')+').'});
+    if(d.settings.some(x=>x==='body'||x==='stupnice')){exportChecklist.grading=false;renderExportChecklist();updateSecureDownloadGate();}
+  }catch(e){const g=$('genError');if(g){g.classList.remove('hidden');setErrorTextWithHttpHelp(g,'Nastavení se nepodařilo použít: '+(e&&e.message||e));}}
+  renderSettingsDrift();
 }

@@ -222,6 +222,7 @@ async function runScoringSelfTest(){
   }
   if(lastAssembled!==stamp){if(out)out.textContent='Test se během kontroly změnil. Spusť self-test znovu.';return null;}
   lastSelfTest = summarizeSelfTest(report);
+  selfTestStaleReason='';
   updateSecureDownloadGate();
   return lastSelfTest;
 }
@@ -324,7 +325,13 @@ function akvBuildPrompt(items){
 }
 let akvBusy=false,akvWeakRows=[],akvVariantKey='__default',akvSourceStamp=null;
 let lastKeyCheck=null,keyDiffsAcknowledged=false;
+// Proč předchozí výsledek self-testu přestal platit (prázdné = nebyl ještě spuštěn nebo platí).
+let selfTestStaleReason='';
 function resetKeyCheckState(){lastKeyCheck=null;keyDiffsAcknowledged=false;akvWeakRows=[];akvSourceStamp=null;}
+function renderSelfTestStaleNote(){
+  const out=$('selfTestReport');if(!out||!selfTestStaleReason)return;
+  out.classList.remove('hidden');out.innerHTML='<div class="st-box st-warn" role="status">🔁 <b>Starý výsledek self-testu už neplatí.</b> '+esc(selfTestStaleReason)+' Spusť ho znovu; učitelská kontrola zůstává.</div>';
+}
 function akvDisplay(value){return typeof value==='string'?value:JSON.stringify(value);}
 function akvCanAdd(row){return ['fill-in-the-blank','cloze text','word order','word formation','error correction','translation','sentence transformation'].includes(row.type)||(row.type==='dialogue completion'&&typeof row.ai==='string');}
 async function aiVerifyKey(){
@@ -350,18 +357,18 @@ async function aiVerifyKey(){
       const valid=new Set(batch.map(x=>x.i));
       for(const answer of data.answers){if(!answer||!Number.isInteger(answer.i)||!valid.has(answer.i)||answers.has(answer.i))throw new Error('AI vr\u00e1tila neplatn\u00e9 nebo duplicitn\u00ed ID odpov\u011bdi.');answers.set(answer.i,answer.a);}
     }
-    const diffs=[],weaks=[];let checked=0,missing=0,invalid=0;
-    for(const u of units){if(!answers.has(u.i)){missing++;continue;}
-      const ai=answers.get(u.i),verdict=akvCompare(u.exObj,u.itObj,ai);if(verdict==='invalid'){invalid++;continue;}checked++;
+    const diffs=[],weaks=[],unchecked=[];let checked=0,missing=0,invalid=0;
+    for(const u of units){if(!answers.has(u.i)){missing++;unchecked.push({variant:u.variant,ex:u.ex0+1,q:u.qi0+1,type:u.type});continue;}
+      const ai=answers.get(u.i),verdict=akvCompare(u.exObj,u.itObj,ai);if(verdict==='invalid'){invalid++;unchecked.push({variant:u.variant,ex:u.ex0+1,q:u.qi0+1,type:u.type});continue;}checked++;
       const key=u.type==='matching'?u.exObj.items.map(it=>it.right):akvCorrectText(u.exObj,u.itObj);
       const row={variant:u.variant,ex:u.ex0+1,q:u.qi0+1,ex0:u.ex0,qi0:u.qi0,type:u.type,key:akvDisplay(key),ai,question:u.q};
       if(verdict==='diff')diffs.push(row);else if(verdict==='weak')weaks.push(row);
     }
     akvSourceStamp=stamp;akvWeakRows=weaks;akvVariantKey=keys.join(', ');
-    lastKeyCheck={closedDiffs:diffs.length,openWeaks:weaks.length,checked,missing,invalid,total:units.length,variants:keys,ranAt:Date.now()};keyDiffsAcknowledged=false;
+    lastKeyCheck={closedDiffs:diffs.length,openWeaks:weaks.length,checked,missing,invalid,total:units.length,variants:keys,ranAt:Date.now(),diffRows:diffs,unchecked,incomplete:missing+invalid>0||!checked};keyDiffsAcknowledged=false;
     const incomplete=missing+invalid>0||!checked,title=incomplete?'AI kontrola je ne\u00fapln\u00e1':diffs.length||weaks.length?'AI kontrola: n\u00e1lezy k posouzen\u00ed':'AI odpov\u011bdi se shoduj\u00ed s ulo\u017een\u00fdm kl\u00ed\u010dem';
     const api=await ghrabGeneratorFeatureLoader('previewEditor','./features/preview-editor.js');
-    if(out)out.innerHTML=collapsibleResultHtml(title,incomplete||diffs.length||weaks.length?'is-warn':'is-pass',api.keyReview(keys.join(', '),checked,missing+invalid,diffs,weaks,stamp));
+    if(out)out.innerHTML=collapsibleResultHtml(title,incomplete||diffs.length||weaks.length?'is-warn':'is-pass',api.keyReview(keys.join(', '),checked,missing+invalid,diffs,weaks,stamp,unchecked));
     updateSecureDownloadGate();
   }catch(error){if(out)setErrorTextWithHttpHelp(out,'Kontrola selhala; není dokladem správnosti klíče. '+(error&&error.message?error.message:String(error)));}
   finally{akvBusy=false;if(btn)btn.disabled=false;}
@@ -387,8 +394,7 @@ async function akvApplySelected(){
       const ex=exs&&exs[row.ex0],it=ex&&ex.items[row.qi0];if(akvAddAltToItem(it,row.ai,row.type))applied++;
     }
     if(!applied){if(status)status.textContent='Nic nov\u00e9ho k p\u0159id\u00e1n\u00ed.';return;}
-    await commitAnswerData(data,akvSourceStamp);akvSourceStamp=null;picks.forEach(cb=>cb.disabled=true);
-    const out=$('keyCheckReport');if(out){out.classList.remove('hidden');out.innerHTML='<p>P\u0159id\u00e1no '+applied+' alternativ. P\u0159ed sta\u017een\u00edm znovu zkontroluj obsah a spus\u0165 self-test.</p>'+(lastKeyCheck&&lastKeyCheck.closedDiffs?'<p>P\u0159edchoz\u00ed uzav\u0159en\u00e9 rozd\u00edly st\u00e1le vy\u017eaduj\u00ed posouzen\u00ed nebo novou AI kontrolu.</p>':'');}
+    await commitAnswerData(data,akvSourceStamp,undefined,{reason:'Byly přidány uznatelné alternativy.',note:'<p class="akv-note"><b>Přidané alternativy: '+applied+'.</b></p>'});akvSourceStamp=null;picks.forEach(cb=>cb.disabled=true);
   }catch(error){if(status)status.textContent='Zm\u011bny nebyly ulo\u017eeny: '+error.message;}
 }
 
@@ -411,6 +417,7 @@ function secureDownloadAllowed(){
 }
 function updateSecureDownloadGate(){
   if(typeof renderResultSteps==='function')renderResultSteps();
+  const lockHint=$('lockUnlockHint');if(lockHint)lockHint.classList.toggle('hidden',!(lastAssembled&&lastAssembled.cfg&&lastAssembled.cfg.lockOnLeave));
   const banner=$('secureGateBanner');
   const btnMain=$('btnDownloadMain'), btnStu=$('btnDownloadStudent'), btnTea=$('btnDownloadTeacher');
   if(!isSecurePackage()){
@@ -424,7 +431,7 @@ function updateSecureDownloadGate(){
   banner.classList.remove('hidden');
   if(!lastSelfTest){
     banner.className='st-box st-warn';
-    banner.innerHTML='🔒 <strong>Před stažením klasifikovaného testu spusť self-test bodování.</strong> Ověří, že se body počítají správně — špatná známka je horší než nespustitelný test. <button type="button" class="gate-run-btn" onclick="runScoringSelfTest()" title="Spustí vygenerovaný test proti reálnému kódu hodnocení a ověří, že 100 % správných odpovědí dá 100 % bodů a 0 % správných dá 0. Bez úspěšného běhu se stažení neodemkne.">🧪 Spustit self-test</button>';
+    banner.innerHTML=(selfTestStaleReason?'🔁 <strong>Test se změnil — spusť self-test znovu.</strong> '+esc(selfTestStaleReason)+' ':'🔒 <strong>Před stažením klasifikovaného testu spusť self-test bodování.</strong> Ověří, že se body počítají správně — špatná známka je horší než nespustitelný test. ')+'<button type="button" class="gate-run-btn" onclick="runScoringSelfTest()" title="Spustí vygenerovaný test proti reálnému kódu hodnocení a ověří, že 100 % správných odpovědí dá 100 % bodů a 0 % správných dá 0. Bez úspěšného běhu se stažení neodemkne.">🧪 Spustit self-test</button>';
   } else if(lastSelfTest.hasErrors){
     banner.className='st-box st-fail';
     banner.innerHTML='⛔ <strong>Self-test našel chybu v bodování — stažení je zablokované.</strong> Oprav klíče/odpovědi v editoru a spusť self-test znovu.'+(lastSelfTest.error?'<br>Detail: '+esc(lastSelfTest.error):'');
@@ -438,17 +445,20 @@ function updateSecureDownloadGate(){
     banner.innerHTML='👁️ <strong>Self-test prošel — teď ještě obsahový teacher review.</strong> Stroj ověřil, že bodování počítá podle klíče správně, ale jestli ten klíč obsahově sedí, musí potvrdit učitel (AI může vyrobit krásný test s chybnou správnou odpovědí). Otevři krok 1 a potvrď obsahovou kontrolu ('+reqDone+'/'+items.length+').';
   } else if(lastKeyCheck && lastKeyCheck.closedDiffs>0 && !keyDiffsAcknowledged){
     banner.className='st-box st-fail';
-    banner.innerHTML='🔑 <strong>AI ověření klíče našlo '+lastKeyCheck.closedDiffs+' rozdíl'+(lastKeyCheck.closedDiffs>=5?'ů':(lastKeyCheck.closedDiffs>=2?'y':''))+' v uzavřených úlohách — stažení je zatím zavřené.</strong> U úloh s jednou správnou odpovědí (výběr, true/false…) AI odpověděla jinak než tvůj klíč. Jde o neshodu k posouzení, nikoli o důkaz chyby. Projdi je v kroku 3 a oprav v editoru (po úpravě spusť self-test znovu) — nebo, pokud je tvůj klíč správný, vědomě potvrď. <button type="button" class="gate-run-btn" onclick="acknowledgeKeyDiffs()" title="Potvrzením říkáš „rozdíly jsem prošel/prošla a klíč ponechávám záměrně". Tím se odemkne stažení. Otevřené (překlady/transformace) úlohy stažení neblokují.">Klíč jsem prošel/prošla, ponechávám</button>';
+    banner.innerHTML='🔑 <strong>AI ověření klíče našlo '+lastKeyCheck.closedDiffs+' rozdíl'+(lastKeyCheck.closedDiffs>=5?'ů':(lastKeyCheck.closedDiffs>=2?'y':''))+' v uzavřených úlohách — stažení je zatím zavřené.</strong> U úloh s jednou správnou odpovědí (výběr, true/false…) AI odpověděla jinak než tvůj klíč. Jde o neshodu k posouzení, nikoli o důkaz chyby. U každého rozdílu v kroku 3 zvol „Ponechat klíč“ nebo „Převzít návrh AI“ a potvrď tlačítkem „Použít moje rozhodnutí“. <button type="button" class="gate-run-btn" onclick="openKeyDecisionStep()">Otevřít rozhodnutí v kroku 3</button>';
   } else {
     banner.className='st-box st-pass';
     let kc;
     if(!lastKeyCheck) kc=' <span class="gate-subnote">AI ověření klíče: nespuštěno (volitelné — u prvního ostrého nasazení doporučeno).</span>';
+    else if(lastKeyCheck.incomplete&&!lastKeyCheck.closedDiffs) kc=' <span class="gate-subnote">AI ověření klíče je neúplné: '+((lastKeyCheck.missing||0)+(lastKeyCheck.invalid||0))+' položek neověřeno – zkontroluj je ručně nebo ověření spusť znovu.</span>';
+    else if(lastKeyCheck.olderVersion) kc=' <span class="gate-subnote">AI ověření klíče proběhlo nad starší verzí testu (volitelně zopakuj).</span>';
+    else if(lastKeyCheck.resolvedByTeacher) kc=' <span class="gate-subnote">AI ověření klíče: rozdíly vyřešeny tvým rozhodnutím (převzato '+lastKeyCheck.resolvedByTeacher.changed+', ponecháno '+lastKeyCheck.resolvedByTeacher.kept+').</span>';
     else if(lastKeyCheck.closedDiffs>0) kc=' <span class="gate-subnote">AI verifier: '+lastKeyCheck.closedDiffs+' rozdíl(y) v uzavřených úlohách potvrzen(y), klíč ponechán.</span>';
     else kc=' <span class="gate-subnote">AI verifier: u uzavřených úloh se shoduje s klíčem.</span>';
     banner.innerHTML='✅ <strong>Self-test prošel a teacher review hotov — stažení odemčeno.</strong>'+(lastSelfTest.hasGaps?' (mezery potvrzeny k ruční opravě).':'')+kc;
   }
 }
-function acknowledgeKeyDiffs(){ keyDiffsAcknowledged=true; updateSecureDownloadGate(); }
+function openKeyDecisionStep(){ resultStep(3,true); const r=$('keyCheckReport'); if(r){ r.classList.remove('hidden'); r.scrollIntoView({block:'start'}); } }
 function acknowledgeSecureGaps(){ secureGapsAcknowledged=true; updateSecureDownloadGate(); }
 // Vrátí false a zobrazí důvod, když gate brání stažení. Volá se na začátku secure stažení.
 function enforceSecureGate(){
@@ -459,7 +469,7 @@ function enforceSecureGate(){
   else if(lastSelfTest.hasErrors) uiAlert('Self-test našel chybu v bodování. Stažení je zablokované, dokud ji neopravíš a self-test znovu neproběhne bez chyb.','Bodování má chybu');
   else if(lastSelfTest.hasGaps && !secureGapsAcknowledged) uiAlert('Self-test našel položky bez klíče správné odpovědi. Doplň je v editoru, nebo potvrď, že je budeš opravovat ručně.','Potvrď mezery');
   else if(!teacherReviewSatisfied()) uiAlert('Stroj ověřil technické bodování, ale obsahovou správnost musí potvrdit učitel. Dokonči čtyři krátké body v učitelské kontrole (obsah, klíč, bodování a bezpečné sdílení).','Učitelská kontrola je povinná');
-  else if(lastKeyCheck && lastKeyCheck.closedDiffs>0 && !keyDiffsAcknowledged) uiAlert('AI ověření klíče našlo '+lastKeyCheck.closedDiffs+' rozdíl(y) v uzavřených úlohách — tam, kde je jen jedna správná odpověď, odpověděla AI jinak než tvůj klíč. Projdi je a oprav v editoru, nebo (pokud je tvůj klíč správný) potvrď „klíč ponechávám".','Zkontroluj rozdíly v klíči');
+  else if(lastKeyCheck && lastKeyCheck.closedDiffs>0 && !keyDiffsAcknowledged){ openKeyDecisionStep(); uiAlert('AI ověření klíče našlo '+lastKeyCheck.closedDiffs+' rozdíl(y) v uzavřených úlohách — tam, kde je jen jedna správná odpověď, odpověděla AI jinak než tvůj klíč. V kroku 3 u každého rozdílu zvol „Ponechat klíč“ nebo „Převzít návrh AI“ a potvrď „Použít moje rozhodnutí“.','Rozhodni o rozdílech v klíči'); }
   return false;
 }
 

@@ -646,7 +646,8 @@ await okAsync('practice po výsledku automaticky ukáže chybu i správné řeš
     const panel=gd.window.document.getElementById('answersPanel');
     assert(panel&&!panel.classList.contains('hidden'),'detail chyb zůstal po practice výsledku schovaný');
     const txt=panel.textContent||'';
-    assert(txt.includes('Chyba'),'chybí označení chybné odpovědi');
+    const wrongLabel=w.eval("getLabels(getUiLang('target',state.jazyk)).fbWrong")||'Chyba';
+    assert(txt.includes(wrongLabel),'chybí označení chybné odpovědi v jazyce testu ('+wrongLabel+')');
     assert(txt.includes('RIGHT_ANSWER'),'chybí správná odpověď');
     // showResult() dopočítává report seal asynchronně přes WebCrypto. Nezavírat JSDOM,
     // dokud tato větev neskončí; jinak pending Promise po window.close() sáhne na
@@ -711,7 +712,14 @@ ok('export checklist je zkrácen na 0 / 4 položky podle režimu',()=>{
 });
 ok('finální učitelský workflow má regresní pojistky',()=>{
   const f=fs.readFileSync('dist/features/preview-editor.js','utf8');
-  assert(f.includes('previewCodeInjected'),'náhled nemá učitelské předvyplnění jednorázového kódu');
+  // Behaviorálně: učitelský náhled s jednorázovým kódem musí mít kód předvyplněný,
+  // ale studentský soubor se nesmí změnit (dřív jen hledání názvu proměnné v souboru).
+  w.eval(f);
+  w.eval("state.identityMode='oneTimeCode';rosterEntries.length=0;rosterEntries.push({email:'s@example.invalid',label:'S',code:'QX7P2K'});generatedPackage=null;generatedTestHtml='<html><body><input type=\"text\" id=\"studentName\" class=\"name-inp\"></body></html>'");
+  const pv=w.getPreviewHtml();
+  assert(pv&&/<input type="password"[^>]*id="studentName"[^>]*value="QX7P2K"/.test(pv.html),'náhled nemá učitelské předvyplnění jednorázového kódu');
+  assert(!/QX7P2K/.test(w.eval('generatedTestHtml')),'předvyplnění kódu v náhledu změnilo studentský soubor');
+  w.eval("state.identityMode='name';rosterEntries.length=0;generatedTestHtml=''");
   assert(f.includes('akvApplyClosedReview'),'AI rozdíly nemají akční rozhodnutí učitele');
   assert(f.includes('enProgressPct'),'rozšíření odpovědí nemá průběh');
   assert(html.includes('setErrorTextWithHttpHelp'),'HTTP chyby nemají klikatelné vysvětlení');

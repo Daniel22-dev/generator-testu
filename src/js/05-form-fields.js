@@ -542,13 +542,6 @@ function initTooltips() {
 
 // ═══ Validation ═══════════════════════════════════════════════════════════════
 function onInput() { validate(); renderSourceMeters(); saveSnapshot(); }
-function onCustomTypeInput(){
-  syncExerciseConfigFromGlobalTypes();
-  renderSmartTimeTip();
-  onInput();
-}
-
-
 // Blokuje notoricky slabá tajemství. Cílem není dokonalý slovníkový test, ale
 // odchytit nejčastější chyby (sekvence, opakování, jméno učitele, „heslo/test").
 const WEAK_SECRET_LIST = ['123456','1234567','12345678','123456789','1234567890','000000','00000000','111111','11111111','password','passwd','heslo','heslo123','admin','administrator','ucitel','učitel','teacher','test','test123','qwerty','qwertz','asdfgh','letmein','iloveyou','abc123','aaaaaa','zzzzzz'];
@@ -691,12 +684,14 @@ function validate() {
   $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
   if (!rosterOk) msg.push('Identita „individuální kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
+  if (!trim('ucitelJmeno')) msg.push('Doplň jméno pro učitelský mód.');
   if (!accessCode) msg.push('Doplň učitelský přístupový kód.');
   if (accessCode && accessCode.length < 12) msg.push('Učitelský přístupový kód musí mít aspoň 12 znaků (slabý kód jde offline uhádnout).');
   else if (accessCode && isWeakSecret(accessCode)) msg.push('Učitelský přístupový kód je příliš běžný — zvol méně odhadnutelný.');
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
   if(!groupLogic.ok) msg.push(...groupLogic.messages);
   $('validHint3').textContent = Array.from(new Set(msg)).join(' ');
+  if (typeof renderSettingsDrift === 'function') renderSettingsDrift();
 }
 
 // ═══ Joker text helper ════════════════════════════════════════════════════════

@@ -46,7 +46,7 @@ function getTestBaseCSS() {
 '.tabs-nav::-webkit-scrollbar{display:none}' +
 '.tab-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--muted);font-size:12px;cursor:pointer;min-height:44px;min-width:58px;transition:all .15s}' +
 '.tab-btn.tab-active{border-color:var(--accent);color:var(--accent)}' +
-'.tab-name{font-size:10px;white-space:nowrap}.tab-done{color:var(--ok);font-size:10px}' +
+'.tab-name{font-size:10px;max-width:13ch;text-align:center;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.tab-done{color:var(--ok);font-size:10px}' +
 /* Exercise area */
 '.ex-area{padding:12px;max-width:720px;margin:0 auto}' +
 '.ex-hdr{margin-bottom:16px;padding:12px 14px;background:var(--card);border-radius:12px;border:1px solid var(--border)}' +

@@ -39,7 +39,7 @@ try:
   p.evaluate('__providerBehavior="valid";__calls=[]');start();done();s=status();assert s['output'] and not s['error'],s;return s
  case('retry-after-cancel',retry)
  def preserve():
-  prev=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');p.evaluate('__providerBehavior="throw";__calls=[]');start();done();s=status();now=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');assert prev==now and s['output'] and not s['disabled'],s;return {'oldOutputUnchanged':True}
+  prev=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');p.evaluate('__providerBehavior="throw";__calls=[]');start();p.locator('#uiModal [data-ui-ok]').click();done();s=status();assert s['calls']>=1,('regeneration must really be attempted after confirmation',s);now=p.evaluate('({html:generatedTestHtml,id:lastAssembled.cfg.testId})');assert prev==now and s['output'] and not s['disabled'],s;return {'oldOutputUnchanged':True}
  case('failed-regeneration-preserves-output',preserve)
  def mixed(lang,groups,split):
   types=['translation','listening comprehension','cloze text','matching','ordering','word formation','table-completion','reading comprehension'];reset(types,'secureOffline',lang)

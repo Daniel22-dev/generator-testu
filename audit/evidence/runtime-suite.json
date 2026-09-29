@@ -13,7 +13,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.13
+    "seconds": 1.35
   },
   {
     "config": {
@@ -29,7 +29,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.26
+    "seconds": 1.4
   },
   {
     "config": {
@@ -45,7 +45,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.92
+    "seconds": 1.25
   },
   {
     "config": {
@@ -61,7 +61,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.09
+    "seconds": 1.39
   },
   {
     "config": {
@@ -77,7 +77,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.94
+    "seconds": 1.18
   },
   {
     "config": {
@@ -93,7 +93,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.86
+    "seconds": 2.17
   },
   {
     "config": {
@@ -109,7 +109,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.88
+    "seconds": 2.01
   },
   {
     "config": {
@@ -125,7 +125,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.15
+    "seconds": 1.19
   },
   {
     "config": {
@@ -141,7 +141,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.99
+    "seconds": 1.09
   },
   {
     "config": {
@@ -157,7 +157,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.91
+    "seconds": 1.08
   },
   {
     "config": {
@@ -173,7 +173,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.11
+    "seconds": 1.23
   },
   {
     "config": {
@@ -189,7 +189,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.93
+    "seconds": 1.16
   },
   {
     "config": {
@@ -205,7 +205,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.09
+    "seconds": 1.23
   },
   {
     "config": {
@@ -221,7 +221,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.93
+    "seconds": 1.08
   },
   {
     "config": {
@@ -237,7 +237,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.76
+    "seconds": 2.12
   },
   {
     "config": {
@@ -253,7 +253,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.78
+    "seconds": 2.14
   },
   {
     "config": {
@@ -262,6 +262,54 @@
       "testMode": "procviceci",
       "resultMode": "instant",
       "feedbackMode": "learning",
+      "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.29
+  },
+  {
+    "config": {
+      "layout": "tabs",
+      "randomizace": "NE",
+      "testMode": "procviceci",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.06
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "none",
+      "odevzdavani": "B"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 0.98
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "brief",
       "odevzdavani": "A"
     },
     "ok": true,
@@ -273,54 +321,6 @@
   },
   {
     "config": {
-      "layout": "tabs",
-      "randomizace": "NE",
-      "testMode": "procviceci",
-      "resultMode": "instant",
-      "feedbackMode": "learning",
-      "odevzdavani": "B"
-    },
-    "ok": true,
-    "score": {
-      "earned": 48,
-      "total": 48
-    },
-    "seconds": 1.02
-  },
-  {
-    "config": {
-      "layout": "scroll",
-      "randomizace": "ANO",
-      "testMode": "bezny",
-      "resultMode": "instant",
-      "feedbackMode": "none",
-      "odevzdavani": "B"
-    },
-    "ok": true,
-    "score": {
-      "earned": 48,
-      "total": 48
-    },
-    "seconds": 0.8
-  },
-  {
-    "config": {
-      "layout": "scroll",
-      "randomizace": "ANO",
-      "testMode": "bezny",
-      "resultMode": "instant",
-      "feedbackMode": "brief",
-      "odevzdavani": "A"
-    },
-    "ok": true,
-    "score": {
-      "earned": 48,
-      "total": 48
-    },
-    "seconds": 0.97
-  },
-  {
-    "config": {
       "layout": "scroll",
       "randomizace": "ANO",
       "testMode": "bezny",
@@ -333,7 +333,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.88
+    "seconds": 1.05
   },
   {
     "config": {
@@ -343,6 +343,22 @@
       "resultMode": "instant",
       "feedbackMode": "learning",
       "odevzdavani": "A"
+    },
+    "ok": true,
+    "score": {
+      "earned": 48,
+      "total": 48
+    },
+    "seconds": 1.09
+  },
+  {
+    "config": {
+      "layout": "scroll",
+      "randomizace": "ANO",
+      "testMode": "bezny",
+      "resultMode": "instant",
+      "feedbackMode": "learning",
+      "odevzdavani": "B"
     },
     "ok": true,
     "score": {
@@ -356,22 +372,6 @@
       "layout": "scroll",
       "randomizace": "ANO",
       "testMode": "bezny",
-      "resultMode": "instant",
-      "feedbackMode": "learning",
-      "odevzdavani": "B"
-    },
-    "ok": true,
-    "score": {
-      "earned": 48,
-      "total": 48
-    },
-    "seconds": 0.79
-  },
-  {
-    "config": {
-      "layout": "scroll",
-      "randomizace": "ANO",
-      "testMode": "bezny",
       "resultMode": "secureOffline",
       "feedbackMode": "none",
       "odevzdavani": "B"
@@ -381,7 +381,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.66
+    "seconds": 1.91
   },
   {
     "config": {
@@ -397,7 +397,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.6
+    "seconds": 1.95
   },
   {
     "config": {
@@ -413,7 +413,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.9
+    "seconds": 1.25
   },
   {
     "config": {
@@ -429,7 +429,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.81
+    "seconds": 1.04
   },
   {
     "config": {
@@ -445,7 +445,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.83
+    "seconds": 0.97
   },
   {
     "config": {
@@ -461,7 +461,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.91
+    "seconds": 1.04
   },
   {
     "config": {
@@ -477,7 +477,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.77
+    "seconds": 0.97
   },
   {
     "config": {
@@ -493,7 +493,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.88
+    "seconds": 1.08
   },
   {
     "config": {
@@ -509,7 +509,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.78
+    "seconds": 0.97
   },
   {
     "config": {
@@ -525,7 +525,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.68
+    "seconds": 1.78
   },
   {
     "config": {
@@ -541,7 +541,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 1.65
+    "seconds": 1.95
   },
   {
     "config": {
@@ -557,7 +557,7 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.98
+    "seconds": 1.09
   },
   {
     "config": {
@@ -573,6 +573,6 @@
       "earned": 48,
       "total": 48
     },
-    "seconds": 0.83
+    "seconds": 0.97
   }
 ]
