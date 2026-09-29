@@ -44,7 +44,7 @@ try:
  def mixed(lang,groups,split):
   types=['translation','listening comprehension','cloze text','matching','ordering','word formation','table-completion','reading comprehension'];reset(types,'secureOffline',lang)
   p.evaluate('a=>{state.exerciseConfig.forEach(e=>e.pocetOtazek=5);state.splitGenerate=a.split;if(a.groups>1){state.diferencovany="ANO";state.skupiny=Array.from({length:a.groups},(_,i)=>({nazev:"G"+i,podminky:"Specific group "+i,studenti:["QA"+i]}));}validate();}',{'groups':groups,'split':split})
-  planned=p.evaluate('generationPlan(state)');start();done();s=status();assert s['output'] and not s['error'] and len(s['types'])==groups and all(x==types for x in s['types']),s;assert s['calls']==len(planned['batches']),s
+  planned=p.evaluate('generationPlan(state)');start();done();s=status();assert s['output'] and not s['error'] and len(s['types'])==groups and all(x==types for x in s['types']),s;assert s['calls']==planned['plannedAiCalls'],(s,planned)
   st=p.evaluate('async()=>await runScoringSelfTest()');assert st['ok'] and not st['hasGaps'],st
   return {'lang':lang,'groups':groups,'itemsEach':5,'split':split,'calls':s['calls'],'selfTest':st}
  for lang,groups,split in [('es',1,False),('fr',3,False),('la',2,True)]:case('eight-mixed-'+lang,lambda l=lang,g=groups,s=split:mixed(l,g,s))
