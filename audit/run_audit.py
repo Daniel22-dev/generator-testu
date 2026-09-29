@@ -12,7 +12,7 @@ SPECS={
  'pipeline_matrix':('pipeline-matrix.json',380),
  'browser_matrix':('browser-matrix.json',48),
  'editor_suite':('editor-suite.json',76),
- 'feature_suite':('feature-suite.json',15),
+ 'feature_suite':('feature-suite.json',19),
  'integration_suite':('integration-suite.json',17),
  'runtime_suite':('runtime-suite.json',36),
  'language_suite':('language-suite.json',53),
