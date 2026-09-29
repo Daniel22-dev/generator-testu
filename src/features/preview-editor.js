@@ -1,26 +1,16 @@
 (function (global) {
   'use strict';
 // ═══ Náhled testu před stažením ════════════════════════════════════════════════
-function previewRosterCode(){
-  if((state.identityMode||'name')!=='oneTimeCode')return '';
-  if(typeof rosterEntries==='undefined'||!Array.isArray(rosterEntries))return '';
-  const entry=rosterEntries.find(e=>e&&String(e.code||'').trim());
-  return entry?String(entry.code).trim():'';
-}
-function secureTeacherPreviewHtml(html){
-  const code=previewRosterCode();
-  if(!code)return {html,previewCodeInjected:false};
-  const codeJson=JSON.stringify(code).replace(/</g,'\\u003c');
-  const helper='<script>(function(){var apply=function(){var i=document.getElementById("studentName");if(!i)return;i.value='+codeJson+';i.type="password";i.autocomplete="off";i.setAttribute("aria-label","Platný studentský kód předvyplněný pouze pro učitelský náhled");i.title="Kód je předvyplněn pouze v učitelském náhledu. Stažený studentský soubor se nemění.";};if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",apply,{once:true});else apply();})();<\/script>';
-  const out=/<\/body>/i.test(html)?html.replace(/<\/body>/i,helper+'</body>'):html+helper;
-  return {html:out,previewCodeInjected:true};
-}
 function getPreviewHtml(){
-  if (generatedPackage && generatedPackage.mode === 'secureOffline' && generatedPackage.studentHtml) {
-    const preview=secureTeacherPreviewHtml(generatedPackage.studentHtml);
-    return { html: preview.html, secure: true, previewCodeInjected: preview.previewCodeInjected };
+  if(generatedPackage&&generatedPackage.mode==='secureOffline'&&generatedPackage.studentHtml){
+    let html=generatedPackage.studentHtml,injected=false;
+    if((state.identityMode||'name')==='oneTimeCode'&&typeof rosterEntries!=='undefined'&&Array.isArray(rosterEntries)){
+      const r=rosterEntries.find(x=>x&&String(x.code||'').trim());
+      if(r){const c=JSON.stringify(String(r.code)).replace(/</g,'\\u003c'),j='<script>(function(){var f=function(){var e=document.getElementById("studentName");if(e){e.value='+c+';e.type="password"}};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",f,{once:true}):f()})();<\\/script>';html=html.includes('</body>')?html.replace('</body>',j+'</body>'):html+j;injected=true;}
+    }
+    return {html,secure:true,previewCodeInjected:injected};
   }
-  if (generatedTestHtml) return { html: generatedTestHtml, secure: false, previewCodeInjected:false };
+  if(generatedTestHtml)return {html:generatedTestHtml,secure:false};
   return null;
 }
 function previewEscHandler(e){ if (e && e.key === 'Escape') closeTestPreview(); }
@@ -37,17 +27,7 @@ function openTestPreview(){
   const pv = getPreviewHtml();
   const modal = $('previewModal'), frame = $('previewFrame'), note = $('previewNote');
   if (!pv || !pv.html) { uiAlert('Nejdřív vygeneruj test, pak ho můžeš zobrazit v náhledu.'); return; }
-  if (note) {
-    if(pv.secure && (state.identityMode||'name')==='oneTimeCode'){
-      note.textContent = pv.previewCodeInjected
-        ? 'Učitelský náhled studentského testu. Jeden platný kód je předvyplněn pouze v tomto dočasném náhledu (je skrytý); stažený studentský soubor se nemění. Klikni na Začít test a projdi zadání jako student.'
-        : 'Studentský test používá individuální kódy. V tomto náhledu už není dostupný původní seznam kódů v paměti, proto je pro spuštění potřeba zadat některý platný studentský kód. Stažený studentský soubor se nemění.';
-    }else{
-      note.textContent = pv.secure
-        ? 'Studentský test (bez správných odpovědí). Vidíš zadání, otázky, nabídku odpovědí i design přesně jako studenti. Správnost klíče zkontroluješ v učitelském verifieru.'
-        : 'Hotový test tak, jak ho uvidí studenti. Náhled je interaktivní — můžeš si projít cvičení.';
-    }
-  }
+  if(note)note.textContent=pv.secure&&state.identityMode==='oneTimeCode'&&pv.previewCodeInjected?'Učitelský náhled: platný kód je předvyplněn pouze zde; studentský soubor se nemění.':pv.secure?'Studentský test bez správných odpovědí. Správnost klíče zkontroluješ v učitelském verifieru.':'Hotový interaktivní test tak, jak ho uvidí studenti.';
   setPreviewWidth(360);
   if (frame) frame.srcdoc = pv.html;
   exportChecklist.preview = true;
@@ -543,12 +523,10 @@ async function enrichAltAnswers(){
   const stamp=outputStamp(),work=JSON.parse(JSON.stringify(lastGenData)),flat=enCollectFlat(work),btn=$('btnEnrich'),out=$('answerProposalReport');
   if(!flat.length){await uiAlert('Tento test nemá podporované psané odpovědi. U výběru možností se alternativy nepřidávají.');return;}
   const batches=boundedReviewBatches(flat,r=>r.prompt.length+r.correct.length);
-  enBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.innerHTML=aiReviewProgressHtml('answerProposalProgress','Hledání přijatelných odpovědí',batches.length);}
+  enBusy=true;if(btn)btn.disabled=true;if(out){out.classList.remove('hidden');out.innerHTML='<b>Hledání přijatelných odpovědí</b><br><progress id="enProgress" max="100" value="5" style="width:100%"></progress> <span id="enProgressPct">5 %</span>';}
   try{
     const candidates=[];
-    for(let bi=0;bi<batches.length;bi++){
-      const batch=batches[bi];
-      aiReviewProgressUpdate('answerProposalProgress',Math.max(12,Math.round(12+(bi/batches.length)*76)),'AI zpracovává dávku '+(bi+1)+'/'+batches.length+' · '+batch.length+' položek…');
+    for(let bi=0;bi<batches.length;bi++){const batch=batches[bi],pct=Math.round(10+80*bi/batches.length),pg=$('enProgress'),pt=$('enProgressPct');if(pg)pg.value=pct;if(pt)pt.textContent=pct+' %';
       const data=await callGeminiJSON(enBuildPrompt(batch),[],{operation:'acceptable-answer-enrichment'});requireOutputStamp(stamp);
       if(!data||!Array.isArray(data.items))throw new Error('AI nevr\u00e1tila seznam n\u00e1vrh\u016f.');
       const ids=new Set(batch.map(r=>r.id)),seen=new Set();
@@ -559,12 +537,20 @@ async function enrichAltAnswers(){
         merged.arr.slice((Array.isArray(old)?old:[]).length).forEach(value=>candidates.push({refId:item.id,value}));
       }
     }
-    aiReviewProgressUpdate('answerProposalProgress',95,'Skládám návrhy k učitelskému schválení…');
     enReview={stamp,work,flat,candidates};
     if(out){out.innerHTML='<p><b>'+candidates.length+' n\u00e1vrh\u016f. Nic nebylo automaticky p\u0159id\u00e1no.</b> Za\u0161krtni pouze obsahov\u011b spr\u00e1vn\u00e9 alternativy.</p>'+candidates.map((c,i)=>{const r=flat[c.refId];return '<label class="answer-proposal"><input type="checkbox" class="en-pick" data-pi="'+i+'">'+H(c.value)+'<span class="answer-proposal-context">'+H(r.variant)+' \u00b7 cv. '+(r.ei+1)+' / '+(r.ii+1)+' \u00b7 '+H(r.type)+'<br>Kl\u00ed\u010d: '+H(r.correct)+'<br>'+H(r.prompt)+'</span></label>';}).join('')+(candidates.length?'<button type="button" class="btn-edit" id="btnAcceptProposals" onclick="enAcceptSelected()">P\u0159idat vybran\u00e9 odpov\u011bdi a p\u0159esestavit</button>':'')+'<div id="enApplyStatus" role="status"></div>';}
   }catch(error){enReview=null;if(out)setErrorTextWithHttpHelp(out,'✨ Rozšíření přijatelných odpovědí se nepodařilo dokončit. Test zůstal beze změny. '+(error&&error.message?error.message:String(error)));}
   finally{enBusy=false;if(btn)btn.disabled=false;}
 }
+let keyReviewState=null;
+function krTarget(data,r){const v=r.variant==='__default'?data:data.group_variants&&data.group_variants[r.variant],xs=Array.isArray(v)?v:v&&v.exercises,ex=xs&&xs[r.ex0];return {ex,it:ex&&ex.items&&ex.items[r.qi0]};}
+function krValue(r,v){if(r.type==='true/false')return v===true||v==='true'?'true (PRAVDA)':v===false||v==='false'?'false (NEPRAVDA)':akvDisplay(v);const t=krTarget(lastGenData,r),o=t.it&&t.it.options;if(Number.isInteger(v)&&o&&o[v]!=null)return String.fromCharCode(65+v)+') '+o[v];return akvDisplay(v);}
+function krCanSet(r){return ['matching','true/false','multiple choice','reading comprehension','listening comprehension','dialogue completion','multi-select','ordering','highlight-evidence','categorisation-board','error-tagging','categorization'].includes(r.type);}
+function krSet(data,r){const t=krTarget(data,r),ex=t.ex,it=t.it,a=r.ai,k=r.type;if(!ex||!it)return false;if(k==='matching'){if(!Array.isArray(a)||a.length!==ex.items.length)return false;ex.items.forEach((x,i)=>x.right=String(a[i]));return true;}if(['multiple choice','reading comprehension','listening comprehension','dialogue completion'].includes(k)){let i=Number.isInteger(a)?a:-1;if(i<0&&typeof a==='string'){const z=a.trim();i=/^[A-Za-z]$/.test(z)?z.toUpperCase().charCodeAt(0)-65:/^\d+$/.test(z)?Number(z):(it.options||[]).findIndex(x=>akvNorm(x)===akvNorm(z));}if(i<0||!it.options||i>=it.options.length)return false;it.correct=i;return true;}if(k==='true/false'){const v=typeof a==='string'&&/^(true|false)$/i.test(a)?a.toLowerCase()==='true':a;if(typeof v!=='boolean')return false;it.correct=v;return true;}if(k==='multi-select'){if(!Array.isArray(a))return false;it.correct=a.slice();return true;}if(k==='ordering'){if(!Array.isArray(a))return false;it.correct_order=a.slice();return true;}if(k==='highlight-evidence'){if(!Number.isInteger(a))return false;it.correct=a;return true;}if(k==='categorisation-board'){if(!Array.isArray(a)||a.length!==it.entries.length)return false;it.entries.forEach((x,i)=>x.category=String(a[i]));return true;}if(k==='error-tagging'){if(!a||!Number.isInteger(a.token))return false;it.error_token_index=a.token;it.error_type=String(a.etype||'');it.correction=String(a.corr||'');return true;}if(k==='categorization'){it.correct_category=String(a);return true;}return false;}
+function keyReviewHtml(variant,checked,missing,diffs,weaks,stamp){keyReviewState={diffs,stamp};let h='<p class="akv-note"><b>Co s výsledkem:</b> u uzavřených úloh AI navrhuje jiný správný klíč. U každého nálezu rozhodni; nic se samo neopraví.</p><div class="akv-legend"><span class="akv-leg-item"><span class="akv-dot key"></span><b>Klíč testu</b></span><span class="akv-leg-item"><span class="akv-dot ai"></span><b>Návrh AI</b> = druhý názor</span></div><p class="akv-note">Ověřeno '+checked+' úloh · chybějící/neplatné: '+missing+'.</p>';if(diffs.length){h+='<div class="akv-section-head diff">Uzavřené odpovědi — rozhodni ('+diffs.length+')</div>'+diffs.map((r,i)=>krCard(r,'diff',i)).join('')+'<div class="akv-apply-row"><button type="button" class="akv-apply-btn" onclick="akvApplyClosedReview()">Použít moje rozhodnutí</button><button type="button" class="btn-edit" onclick="openTestEditor()">Upravit ručně</button><div id="akvClosedReviewStatus" class="akv-apply-status">0/'+diffs.length+' rozhodnuto</div></div>';}if(weaks.length)h+='<div class="akv-section-head weak">Otevřené odpovědi — možné další varianty</div>'+weaks.map((r,i)=>krCard(r,'weak',i)).join('');if(weaks.some(akvCanAdd))h+='<div class="akv-apply-row"><button type="button" class="akv-apply-btn" onclick="akvApplySelected()">Přidat zaškrtnuté alternativy</button><div id="akvApplyStatus" class="akv-apply-status"></div></div>';if(!checked||missing)h+='<p><b>Kontrola je neúplná; zbytek zkontroluj ručně.</b></p>';return h;}
+function krCard(r,k,i){const cmp='<div class="akv-cmp"><div class="akv-cmp-row key"><span class="akv-cmp-label">Klíč testu</span><span class="akv-cmp-val">'+H(krValue(r,r.key))+'</span></div><div class="akv-cmp-row ai"><span class="akv-cmp-label">Návrh AI</span><span class="akv-cmp-val">'+H(krValue(r,r.ai))+'</span></div></div>';let a;if(k==='diff')a=krCanSet(r)?'<label class="akv-pick-row"><input type="radio" name="akvDiff'+i+'" value="keep" onchange="akvKeyReviewCount()"><span><b>Ponechat klíč</b> — AI se podle mě mýlí.</span></label><label class="akv-pick-row akv-pick-diff"><input type="radio" name="akvDiff'+i+'" value="ai" onchange="akvKeyReviewCount()"><span><b>Převzít návrh AI</b> — změnit správnou odpověď.</span></label>':'<p class="akv-more">Tento typ uprav ručně v editoru.</p>';else a=akvCanAdd(r)?'<label class="akv-pick-row"><input type="checkbox" class="akv-pick" data-wi="'+i+'"><span><b>Přijmout jako další uznatelnou odpověď</b></span></label>':'<p class="akv-more">Nález posuď ručně.</p>';return '<div class="akv-item '+k+'"><div class="akv-item-head">'+H(r.variant)+' · cv. '+r.ex+' / pol. '+r.q+' · '+H(r.type)+'</div><div class="akv-q-full">'+H(r.question)+'</div>'+cmp+a+'</div>';}
+function akvKeyReviewCount(){const e=$('akvClosedReviewStatus'),n=document.querySelectorAll('#keyCheckReport input[type=radio]:checked').length;if(e)e.textContent=n+'/'+(keyReviewState?keyReviewState.diffs.length:0)+' rozhodnuto';}
+async function akvApplyClosedReview(){const st=keyReviewState,s=$('akvClosedReviewStatus');if(!st)return;const d=st.diffs.map((r,i)=>{const e=document.querySelector('input[name="akvDiff'+i+'"]:checked');return e&&e.value;});if(d.some(x=>!x)){if(s)s.textContent='Nejdřív rozhodni u všech nálezů.';return;}const use=d.map((x,i)=>x==='ai'?i:-1).filter(i=>i>=0);if(!use.length){keyDiffsAcknowledged=true;if(s)s.textContent='Původní klíč ponechán.';updateSecureDownloadGate();return;}try{requireOutputStamp(st.stamp);const data=JSON.parse(JSON.stringify(lastGenData));for(const i of use)if(!krSet(data,st.diffs[i]))throw new Error('Tento návrh uprav ručně.');await commitAnswerData(data,st.stamp);const o=$('keyCheckReport');if(o)o.innerHTML=collapsibleResultHtml('Klíč upraven podle tvého rozhodnutí','is-pass','<p>Změněno '+use.length+' položek. Spusť znovu self-test bodování.</p>');}catch(e){if(s)s.textContent='Změny nebyly uloženy: '+e.message;}}
 async function enAcceptSelected(){
   const out=$('enApplyStatus'),btn=$('btnAcceptProposals');if(!enReview||outputMutationBusy)return;
   const picks=Array.from(document.querySelectorAll('.en-pick:checked')).map(el=>Number(el.dataset.pi));
@@ -673,6 +659,9 @@ async function enAcceptSelected(){
   global.GHRABGeneratorFeatures.previewEditor = Object.freeze({
     openPreview: openTestPreview,
     openEditor: openTestEditor,
-    enrichAnswers: enrichAltAnswers
+    enrichAnswers: enrichAltAnswers,
+    keyReview: keyReviewHtml
   });
+  global.akvKeyReviewCount=akvKeyReviewCount;
+  global.akvApplyClosedReview=akvApplyClosedReview;
 })(window);
