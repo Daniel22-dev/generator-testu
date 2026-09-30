@@ -400,18 +400,116 @@ function wrapUntrustedUrls(urls){
   const lines=(Array.isArray(urls)?urls:[]).map((url,i)=>(i+1)+'. '+String(url||''));
   return wrapUntrustedSource('REFERENCE URLS AND ANY CONTENT RETRIEVED FROM THEM', lines.join('\n'));
 }
-// Ořízne zdroj na limit pro AI podle zvoleného režimu (začátek = od začátku, konec = od konce).
-function sliceSourceForAI(text){
-  const s=String(text==null?'':text);
-  if(s.length<=MAX_SOURCE_CHARS_FOR_AI) return s;
-  return (state.sourceSliceMode==='end') ? s.slice(s.length-MAX_SOURCE_CHARS_FOR_AI) : s.slice(0,MAX_SOURCE_CHARS_FOR_AI);
+// Dlouhé zdroje se nezkracují na pouhý začátek/konec. Rozdělíme je na
+// překrývající se části, vybereme tematicky relevantní pasáže a zároveň držíme
+// několik kotev rovnoměrně napříč celým dokumentem. Výsledkem je reprezentativní
+// kontext v bezpečném prompt budgetu bez dalších AI požadavků.
+const SOURCE_STOPWORDS = new Set([
+  'a','i','ale','ani','aby','asi','bez','bude','by','co','do','je','jako','jak','jsou','kdy','kter','má','na','nad','ne','nebo','od','po','pod','pro','se','si','s','tak','ten','to','u','ve','v','z','za',
+  'the','and','for','from','into','with','this','that','these','those','have','has','had','will','would','should','could','about','your','their','there','then','than','when','where','which','while','what','who','why','how',
+  'test','zdroj','source','document','dokument','material','materiál','exercise','cvičení','student','studenti'
+]);
+function sourceFold(value){
+  return String(value==null?'':value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 }
-// Důvěryhodná poznámka MIMO blok zdroje: model má vědět, že vidí jen výřez, ať netvoří
-// otázky k částem, které nedostal.
+function sourceIntentText(){
+  const bits=[
+    trim('latka'),trim('nazev'),trim('poznamky'),trim('zadaniFileNote'),trim('zadaniUrlNote'),
+    trim('readingTopicCustom'),state.rcTopic||'',(state.typyCviceni||[]).join(' ')
+  ];
+  return bits.filter(Boolean).join(' ');
+}
+function sourceKeywords(){
+  const counts=new Map();
+  const words=sourceFold(sourceIntentText()).match(/[a-z0-9][a-z0-9_-]{2,}/g)||[];
+  for(const w of words){
+    if(w.length<4||SOURCE_STOPWORDS.has(w))continue;
+    counts.set(w,(counts.get(w)||0)+1);
+  }
+  return Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]||b[0].length-a[0].length).slice(0,28).map(x=>x[0]);
+}
+function chunkSourceText(text){
+  const s=String(text==null?'':text);
+  if(!s)return[];
+  const size=Math.max(1000,Number(SOURCE_CHUNK_CHARS)||5200);
+  const overlap=Math.max(0,Math.min(size-300,Number(SOURCE_CHUNK_OVERLAP)||500));
+  const out=[];let start=0,index=0;
+  while(start<s.length){
+    let end=Math.min(s.length,start+size);
+    if(end<s.length){
+      const minBreak=start+Math.floor(size*.62);
+      const para=s.lastIndexOf('\n\n',end);
+      const line=s.lastIndexOf('\n',end);
+      const sentence=Math.max(s.lastIndexOf('. ',end),s.lastIndexOf('? ',end),s.lastIndexOf('! ',end));
+      const cut=[para,line,sentence].find(p=>p>=minBreak);
+      if(cut>=minBreak)end=cut+(cut===sentence?2:1);
+    }
+    if(end<=start)end=Math.min(s.length,start+size);
+    out.push({index,start,end,text:s.slice(start,end).trim()});
+    if(end>=s.length)break;
+    start=Math.max(start+1,end-overlap);
+    index++;
+  }
+  return out.filter(c=>c.text);
+}
+function sourceChunkScore(chunk,keywords){
+  if(!keywords.length)return 0;
+  const hay=sourceFold(chunk.text);let score=0;
+  for(const kw of keywords){
+    let pos=0,hits=0;
+    while((pos=hay.indexOf(kw,pos))>=0&&hits<8){hits++;pos+=kw.length;}
+    if(hits)score+=hits*(kw.length>=8?3:2);
+  }
+  return score;
+}
+function distributedSourceIndexes(n,count){
+  if(n<=0||count<=0)return[];
+  if(n<=count)return Array.from({length:n},(_,i)=>i);
+  const out=[];
+  for(let i=0;i<count;i++)out.push(Math.round(i*(n-1)/(count-1)));
+  return Array.from(new Set(out));
+}
+function sliceSourceForAI(text){
+  const full=String(text==null?'':text);
+  if(full.length<=MAX_SOURCE_CHARS_FOR_AI)return full;
+  const chunks=chunkSourceText(full);
+  if(!chunks.length)return full.slice(0,MAX_SOURCE_CHARS_FOR_AI);
+
+  const maxParts=Math.max(4,Math.floor((MAX_SOURCE_CHARS_FOR_AI-1800)/(SOURCE_CHUNK_CHARS+90)));
+  const anchorCount=Math.min(4,maxParts);
+  const selected=new Set(distributedSourceIndexes(chunks.length,anchorCount));
+  const keywords=sourceKeywords();
+  const ranked=chunks.map(c=>({index:c.index,score:sourceChunkScore(c,keywords)}))
+    .sort((a,b)=>b.score-a.score||a.index-b.index);
+  for(const row of ranked){
+    if(selected.size>=maxParts)break;
+    selected.add(row.index);
+  }
+  if(selected.size<maxParts){
+    for(const idx of distributedSourceIndexes(chunks.length,maxParts)){
+      if(selected.size>=maxParts)break;
+      selected.add(idx);
+    }
+  }
+
+  const ordered=Array.from(selected).sort((a,b)=>a-b);
+  const parts=[];let used=0;
+  for(const idx of ordered){
+    const c=chunks[idx];
+    const label='[SOURCE PART '+(idx+1)+'/'+chunks.length+' · chars '+(c.start+1)+'–'+c.end+']\n';
+    const remaining=MAX_SOURCE_CHARS_FOR_AI-used-label.length-(parts.length?2:0);
+    if(remaining<=180)break;
+    const body=c.text.length>remaining?c.text.slice(0,remaining):c.text;
+    parts.push(label+body);
+    used+=label.length+body.length+(parts.length>1?2:0);
+    if(used>=MAX_SOURCE_CHARS_FOR_AI-180)break;
+  }
+  return parts.join('\n\n').slice(0,MAX_SOURCE_CHARS_FOR_AI);
+}
+// Důvěryhodná poznámka MIMO blok zdroje: model má vědět, že u dlouhého zdroje
+// dostal průřez napříč dokumentem, nikoli celý text, a nesmí si domýšlet vynechané detaily.
 function aiTruncationNote(total, used){
-  const where=(state.sourceSliceMode==='end')?'last':'first';
-  return '(NOTE TO MODEL: the source above was truncated — only the '+where+' '+used+' of '+total
-    +' characters were included. Build the test only from the text shown above; do not invent or assume content beyond it.)';
+  return '(NOTE TO MODEL: the source is longer than one request budget. The application processed the available document in overlapping chunks and supplied a '+used+'-character cross-document selection from '+total+' source characters, combining topic-relevant passages with distributed coverage from across the document. Treat only the supplied passages as evidence; do not invent details from omitted passages.)';
 }
 function pseudonymizeDifferentiationConditions(condition, students, groupIndex){
   let out=String(condition||'');
