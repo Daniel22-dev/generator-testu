@@ -238,6 +238,7 @@ const DOM_FIELDS = ['nazev','proKoho','latka','zadaniText',
 const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin'];
 const LEGACY_SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
 const GOOGLE_FORMS_SUBMISSION_URL_KEY = 'sestavovac_google_forms_submission_url_v1';
+const GOOGLE_FORMS_METADATA_CONFIG_KEY = 'sestavovac_google_forms_metadata_v1';
 const MAX_FILES = 12;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const MAX_IMAGE_PREVIEW_SIZE = 4 * 1024 * 1024;
