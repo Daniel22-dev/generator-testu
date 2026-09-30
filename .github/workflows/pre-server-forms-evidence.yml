@@ -1,0 +1,42 @@
+name: Pre-server Forms evidence refresh
+
+on:
+  push:
+    branches: [pre-server-forms-workflow]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pre-server-forms-evidence
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Refresh derived AI assurance evidence
+        run: node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json
+      - name: Commit evidence if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- security/evidence/ai-assurance-fingerprint.json; then
+            echo "No evidence change required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add security/evidence/ai-assurance-fingerprint.json
+          git commit -m "chore(qa): refresh AI assurance fingerprint"
+          git push origin HEAD:pre-server-forms-workflow
