@@ -151,10 +151,29 @@ function uniqueDisplayName(name) {
 }
 function isTextEmbeddableFile(f) {
   const ext = fileExt(f?.name);
-  return !!(f && ((f.type || '').startsWith('text/') || TEXT_EMBED_EXT.includes(ext)));
+  return !!(f && ((f.type || '').startsWith('text/') || TEXT_EMBED_EXT.includes(ext) || ext === 'docx'));
 }
 function normalizeFileText(text) {
   return String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\u0000/g, '');
+}
+function cleanEmbeddedSourceText(text, ext) {
+  let s = normalizeFileText(text);
+  if (ext === 'html' || ext === 'htm') {
+    try {
+      const doc = new DOMParser().parseFromString(s, 'text/html');
+      doc.querySelectorAll('script,style,noscript,template,svg,canvas').forEach(el => el.remove());
+      s = (doc.body?.innerText || doc.body?.textContent || '').trim();
+    } catch (_) {
+      s = s.replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ');
+    }
+  }
+  return normalizeFileText(s)
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
 }
 function readBlobAsText(blob) {
   return new Promise((resolve, reject) => {
@@ -176,14 +195,21 @@ function prepareFileObject(obj) {
 
   obj.embedStatus = 'reading';
   obj.readPending = true;
+  const ext = fileExt(f.name);
   const blob = f.size > MAX_EMBEDDED_TEXT_BYTES ? f.slice(0, MAX_EMBEDDED_TEXT_BYTES) : f;
-  const promise = readBlobAsText(blob)
+  const readPromise = ext === 'docx'
+    ? (typeof extractDocxText === 'function'
+        ? extractDocxText(f)
+        : Promise.reject(new Error('DOCX parser zatím není připraven. Obnov stránku a soubor nahraj znovu.')))
+    : readBlobAsText(blob);
+  const promise = readPromise
     .then(text => {
-      const normalized = normalizeFileText(text);
+      const normalized = cleanEmbeddedSourceText(text, ext);
+      obj.sourceCharsTotal = normalized.length;
       obj.textContent = normalized.length > MAX_EMBEDDED_TEXT_CHARS
         ? normalized.slice(0, MAX_EMBEDDED_TEXT_CHARS)
         : normalized;
-      obj.textTruncated = f.size > MAX_EMBEDDED_TEXT_BYTES || normalized.length > MAX_EMBEDDED_TEXT_CHARS;
+      obj.textTruncated = (ext !== 'docx' && f.size > MAX_EMBEDDED_TEXT_BYTES) || normalized.length > MAX_EMBEDDED_TEXT_CHARS;
       obj.embedStatus = obj.textTruncated ? 'embedded-partial' : 'embedded';
       return obj;
     })
@@ -206,8 +232,8 @@ function areFileReadsPending() {
 function fileStatusLabel(obj) {
   if (!obj) return { text:'', cls:'' };
   if (obj.embedStatus === 'reading') return { text:'načítám text…', cls:'warn' };
-  if (obj.embedStatus === 'embedded') return { text:'v promptu', cls:'' };
-  if (obj.embedStatus === 'embedded-partial') return { text:'část v promptu', cls:'warn' };
+  if (obj.embedStatus === 'embedded') return { text:'text připraven', cls:'' };
+  if (obj.embedStatus === 'embedded-partial') return { text:'text částečně načten', cls:'warn' };
   if (obj.embedStatus === 'error') return { text:'nelze načíst', cls:'err' };
   if ((obj.file?.type||'').startsWith('audio/') || (obj.file?.type||'').startsWith('video/')) return { text:'audio/video zdroj', cls:'' };
   return { text:'přiložit ručně', cls:'warn' };
@@ -223,7 +249,7 @@ function fileTransferWarningHtml() {
   const external = getExternalFileObjects();
   const parts = [];
   if (embedded.length) {
-    parts.push(`✅ Obsah textových souborů je už vložený přímo v promptu: <strong>${embedded.map(o => esc(o.displayName)).join(', ')}</strong>.`);
+    parts.push(`✅ Textové zdroje jsou připravené ke zpracování: <strong>${embedded.map(o => esc(o.displayName)).join(', ')}</strong>. U delších materiálů generátor projde celý dostupný text po částech a do AI sestaví reprezentativní průřez.`);
   }
   if (external.length) {
     const names = `<strong>${external.map(o => esc(o.displayName)).join(', ')}</strong>`;
