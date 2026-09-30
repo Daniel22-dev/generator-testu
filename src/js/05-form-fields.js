@@ -1033,6 +1033,13 @@ function updateExField(i, field, value) {
   state.exerciseConfig[i][field] = field === 'typ' ? value
     : BOOL_FIELDS.includes(field) ? !!value
     : (String(value).trim()===''?0:Number(value));
+  if (field === 'pocetOtazek') {
+    const canonical=normalizeType(state.exerciseConfig[i].typ||'');
+    if(canonical==='reading comprehension')state.readingQuestionCount=Math.max(1,Math.min(30,Number(state.exerciseConfig[i].pocetOtazek)||4));
+    if(canonical==='listening comprehension')state.listeningQuestionCount=Math.max(1,Math.min(30,Number(state.exerciseConfig[i].pocetOtazek)||4));
+    const id=canonical==='reading comprehension'?'readingQuestionCount':canonical==='listening comprehension'?'listeningQuestionCount':'';
+    if(id&&document.getElementById(id))document.getElementById(id).value=String(state[id]);
+  }
   if (field === 'typ') { renderSmartTimeTip();
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;
     renderExerciseConfig();
