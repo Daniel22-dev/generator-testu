@@ -14,12 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.59',
-  date:    '2026-09-29',
+  version: '7.1.60',
+  date:    '2026-09-30',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
-    'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
+    'PŘEDSERVEROVÉ FORMS WORKFLOW (7.1.60): jeden univerzální Google Form může sbírat výsledky celý školní rok; metadata testu se předvyplní automaticky, teacher verifier umí z celého CSV kryptograficky vybrat jen svůj test, hlídá metadata mismatch, duplicity a více pokusů a nabízí oddělený export výsledků a odevzdání.',\n    'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
     'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové dávky a Reading analýza se při chybě zachovají a další pokus naváže. AI dávka má jeden timeout a běžné typy se zbytečně netříští.',
     'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
     'AI DOSTUPNOST (7.1.56): aktualizovány profily Gemini a stabilní fallbacky. Chyby AI nově uvádějí bezpečný HTTP stav a interní kód pro přesnější diagnostiku.',
