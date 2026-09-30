@@ -19,6 +19,7 @@ const RELEASE = Object.freeze({
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'DLOUHÉ ZDROJE (7.1.60): Generátor nyní načítá textové podklady výrazně ve větším rozsahu, HTML před použitím čistí na viditelný obsah a DOCX převádí na text. Zdroj delší než jeden AI kontext se už neřeže jen na začátek nebo konec — rozdělí se na překrývající se části a do AI se sestaví tematicky relevantní i rovnoměrně rozprostřený průřez napříč dokumentem. Rozhraní tento režim transparentně označí a extrémní lokální zkrácení nikdy nezůstane skryté.',
     'PŘEDSERVEROVÉ FORMS WORKFLOW (7.1.60): jeden univerzální Google Form může sbírat výsledky celý školní rok; metadata testu se předvyplní automaticky, teacher verifier umí z celého CSV kryptograficky vybrat jen svůj test, hlídá metadata mismatch, duplicity a více pokusů a nabízí oddělený export výsledků a odevzdání.',
     'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
     'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové dávky a Reading analýza se při chybě zachovají a další pokus naváže. AI dávka má jeden timeout a běžné typy se zbytečně netříští.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'ÚKLID A ZRYCHLENÍ (7.1.54): service worker ověřuje stránku aplikace u serveru podmíněným dotazem, takže nezměněnou stránku (~1,4 MB) při otevření znovu nestahuje; čerstvost verze a offline záloha zůstávají stejné. Odstraněno 17 nevolaných funkcí (přežitky starého přístupu a nahrazené pomocné funkce); sestavovací skript přepsán čitelně se shodným výstupem. Bez změny rozhraní, bodování, secure runtime, AI promptů a bezpečnostního modelu.',
     'UX HOTFIX (7.1.53): opraveno otevírání a sbalování nastavení položek/bodů v Simple režimu, po sbalení se vracejí karty typů cvičení; hover nápověda se otevírá přednostně vedle karty a má neprůhledné pozadí; profily Procvičování/Běžný/Přísný stručně a věcně popisují skutečné chování testu.',
     'READING TOPIC PRIORITY (7.1.50): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
-    'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
