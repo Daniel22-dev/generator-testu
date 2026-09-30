@@ -266,28 +266,30 @@ function renderDiffLevelNote(){
   note.innerHTML = html;
 }
 
-// ── Měřič délky zdroje + volba začátek/konec ─────────────────────────────────
-// Učitel musí vidět, z čeho AI skutečně tvořila test. Když je zdroj delší než limit
-// pro AI, hlásíme přesně „použito X / Y znaků" a nabídneme přepnutí výřezu.
+// ── Měřič délky zdroje + transparentní long-document workflow ────────────────
+// Učitel vidí, zda jde do AI celý text, nebo reprezentativní průřez napříč
+// dlouhým dokumentem. Už nenabízíme zavádějící volbu „začátek / konec".
 function csNum(n){ try{ return Number(n).toLocaleString('cs-CZ'); }catch(_){ return String(n); } }
 function joinedFileCharsForAI(){
   const emb=fileObjects.filter(f=>f&&f.textContent&&(f.embedStatus==='embedded'||f.embedStatus==='embedded-partial'));
   if(!emb.length) return 0;
   return emb.map(f=>'['+(f.displayName||f.name)+']\n'+f.textContent).join('\n\n').length;
 }
-function sliceToggleHtml(){
-  const m=(state.sourceSliceMode==='end')?'end':'start';
-  return '<div class="slice-toggle">Část pro AI:'
-    +'<button type="button" class="slice-btn'+(m==='start'?' active':'')+'" onclick="pickSourceSlice(\'start\')">začátek</button>'
-    +'<button type="button" class="slice-btn'+(m==='end'?' active':'')+'" onclick="pickSourceSlice(\'end\')">konec</button></div>';
+function fileSourceLocalLimitNote(){
+  const partial=fileObjects.filter(f=>f&&f.embedStatus==='embedded-partial');
+  if(!partial.length)return '';
+  const names=partial.map(f=>esc(f.displayName||f.file?.name||'soubor')).join(', ');
+  return '<div class="meter-warn" style="margin-top:7px"><strong>⚠️ Velmi rozsáhlý soubor:</strong> '
+    +'u '+names+' byl dosažen lokální bezpečnostní limit načtení. Generátor zpracuje celý dostupný text, '
+    +'ale část za tímto limitem není v prohlížeči načtena. Nic se nezahazuje potichu.</div>';
 }
 function sourceMeterHtml(total){
   const lim=MAX_SOURCE_CHARS_FOR_AI;
-  if(total<=lim) return '<div class="meter-ok">✅ Do AI půjde celý zdroj ('+csNum(total)+' znaků).</div>';
-  const where=(state.sourceSliceMode==='end')?'konec':'začátek';
-  return '<div class="meter-warn"><strong>⚠️ Zdroj je delší, než se vejde do AI.</strong><br>'
-    +'Použito '+csNum(lim)+' / '+csNum(total)+' znaků ('+where+'). Zbytek ('+csNum(total-lim)+' znaků) se do Gemini neodešle '
-    +'— test se tvoří jen z této části.</div>'+sliceToggleHtml();
+  if(total<=lim) return '<div class="meter-ok">✅ Do AI půjde celý dostupný text ('+csNum(total)+' znaků).</div>';
+  return '<div class="meter-long"><strong>📚 Delší zdroj — zpracuje se automaticky po částech.</strong><br>'
+    +'Generátor projde celý dostupný text ('+csNum(total)+' znaků), rozdělí ho na překrývající se části '
+    +'a do jednoho AI požadavku sestaví průřez do '+csNum(lim)+' znaků: tematicky relevantní pasáže '
+    +'+ části rozprostřené od začátku do konce. Zdroj se už neřeže jen na začátek nebo konec.</div>';
 }
 function renderSourceMeters(){
   const tEl=$('textSourceMeter');
@@ -299,11 +301,14 @@ function renderSourceMeters(){
   const fEl=$('fileSourceMeter');
   if(fEl){
     const f=joinedFileCharsForAI();
-    if(state.zadaniTab==='file' && f>0){ fEl.classList.remove('hidden'); fEl.innerHTML=sourceMeterHtml(f); }
-    else { fEl.classList.add('hidden'); fEl.innerHTML=''; }
+    if(state.zadaniTab==='file' && f>0){
+      fEl.classList.remove('hidden');
+      fEl.innerHTML=sourceMeterHtml(f)+fileSourceLocalLimitNote();
+    } else { fEl.classList.add('hidden'); fEl.innerHTML=''; }
   }
 }
-function pickSourceSlice(v){ state.sourceSliceMode=(v==='end')?'end':'start'; renderSourceMeters(); saveSnapshot(); }
+// Zpětná kompatibilita se starými snapshoty/onclicky; volba výřezu už workflow neřídí.
+function pickSourceSlice(){ state.sourceSliceMode='auto'; renderSourceMeters(); saveSnapshot(); }
 
 function toggleType(t) {
   const currentTypes = sanitizeExerciseTypeList(state.typyCviceni || []);
