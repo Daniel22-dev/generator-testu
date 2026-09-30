@@ -514,6 +514,8 @@ input:focus, textarea:focus { border-color: var(--acc-b); }
 .file-note { margin-top: 8px; color: var(--t4); font-size: 12.5px; line-height: 1.5; }
 .source-meter { margin-top: 8px; font-size: 12.5px; line-height: 1.55; }
 .source-meter .meter-ok { color: var(--ok); }
+.source-meter .meter-long { background: var(--bg2); border: 1px solid var(--bdr2); border-radius: 8px; padding: 9px 11px; color: var(--t3); }
+.source-meter .meter-long strong { color: var(--acc); }
 .source-meter .meter-warn { background: var(--acc-d); border: 1px solid var(--acc-b); border-radius: 8px; padding: 9px 11px; color: var(--acc); }
 .slice-toggle { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 12.5px; color: var(--t3); flex-wrap: wrap; }
 .slice-btn { padding: 4px 12px; border-radius: 7px; border: 1px solid var(--bdr); background: transparent; color: var(--t3); font-family: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
