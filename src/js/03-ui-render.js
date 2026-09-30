@@ -160,6 +160,8 @@ function applyVisualState() {
   const rb = $('readingBlock');
   if (rb) rb.classList.toggle('hidden', !usesReadingComprehension());
   document.querySelectorAll('#rcLenBtns .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === (state.rcLength || 'medium')));
+  const rcCount=$('readingQuestionCount');if(rcCount)rcCount.value=String(Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4)));
+  const liCount=$('listeningQuestionCount');if(liCount)liCount.value=String(Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4)));
   renderRcTopics();
 
   // ── Šablona jako autorita: zamkni (zašedni) volby, které šablona řídí ──────────
@@ -345,6 +347,15 @@ function pickJazyk(v) {
 
 function pickTheme(t) { state.tema=t; applyVisualState(); saveSnapshot(); }
 function pickRcLength(v){ state.rcLength = v; applyVisualState(); saveSnapshot(); }
+function setComprehensionQuestionCount(type,value){
+  const canonical=normalizeType(type),n=Math.max(1,Math.min(30,parseInt(value,10)||4));
+  const key=canonical==='reading comprehension'?'readingQuestionCount':'listeningQuestionCount';
+  state[key]=n;
+  if(state.exerciseDetail&&Array.isArray(state.exerciseConfig))state.exerciseConfig.forEach(ex=>{if(normalizeType(ex.typ||'')===canonical)ex.pocetOtazek=n});
+  const el=document.getElementById(key);if(el)el.value=String(n);
+  if(typeof renderExerciseConfig==='function'&&state.exerciseDetail)renderExerciseConfig();
+  validate();saveSnapshot();
+}
 
 // ═══ PRÁCE SE ZDROJOVÝM MATERIÁLEM ═══════════════════════════════════════════════
 const SOURCE_USE_MODES=Object.freeze({
@@ -400,7 +411,7 @@ async function analyzeReadingSourceForAi(fileParts,lvl){
   if(!activeSourceMaterialPresent())return null;
   const mode=normalizeSourceUseMode(state.sourceUseMode),context=buildReadingSourceContextForAi(),topic=rcEffectiveTopic();
   const prompt='Analyze the teacher source for a new reading-comprehension task.\nTarget language: '+(state.jazyk||'angličtina')+'. Target CEFR: '+lvl+'.\n'+sourceUsePolicyPrompt(mode,{cefr:lvl,reading:true,readingTopic:!!topic})+'\n\n'+(topic?wrapUntrustedField('READING TOPIC',topic)+'\n\n':'')+(context?context+'\n\n':'')+'Return ONLY JSON: {"summary":"short factual summary","target_vocabulary":["actual source item"],"grammar_targets":["actual source structure"],"content_points":["actual source point"],"task_style_notes":["brief note"]}. Only list source-supported material; when a Reading topic is present, prefer vocabulary that fits it naturally.';
-  return await callGeminiJSON(prompt,fileParts,{urlContext:state.zadaniTab==='url',operation:'reading-source-analysis'});
+  return await callGeminiJSON(prompt,fileParts,{urlContext:buildGeminiUrlPartsForApi(state).useUrlContext,operation:'reading-source-analysis'});
 }
 
 // ═══ READING COMPREHENSION — téma dle CEFR + AI návrh ══════════════════════════
@@ -481,11 +492,12 @@ async function aiSuggestListeningQuestions(){
     return;
   }
   let fileParts = [];
-  try { const fp = await buildGeminiFilePartsForApi(); fileParts = (fp && fp.parts) || []; } catch(_){ fileParts = []; }
+  let urlPack = {parts:[],useUrlContext:false};
+  try { const fp = await buildGeminiFilePartsForApi(); fileParts = (fp && fp.parts) || []; urlPack=buildGeminiUrlPartsForApi(state); fileParts=fileParts.concat(urlPack.parts||[]); } catch(_){ fileParts = []; urlPack={parts:[],useUrlContext:false}; }
   const old = btn ? btn.textContent : '';
   if (btn){ btn.disabled = true; btn.textContent = '⏳ Generuji…'; }
   renderLiAiPreview({ loading:true });
-  const n = 5;
+  const n = Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4));
   const prompt =
     'Jsi pomocník učitele jazyků. Navrhni ' + n + ' otázek k poslechu s porozuměním pro školní test.\n' +
     'Jazyk otázek: ' + jazyk + '. Úroveň CEFR: ' + lvl + '.\n' +
@@ -496,7 +508,7 @@ async function aiSuggestListeningQuestions(){
     'Otázky musí být auto-opravitelné (krátká, jednoznačná odpověď), přiměřené úrovni a vhodné pro školu. Piš je v jazyce ' + jazyk + '.\n' +
     'Vrať POUZE JSON: {"questions":[{"q":"...","a":"..."}]} bez dalšího textu.';
   try {
-    const out = await callGeminiJSON(prompt, fileParts, {operation:'listening-question-suggestions'});
+    const out = await callGeminiJSON(prompt, fileParts, {urlContext:!!urlPack.useUrlContext,operation:'listening-question-suggestions'});
     const qs = (out && Array.isArray(out.questions))
       ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)
       : [];
@@ -553,7 +565,7 @@ async function aiSuggestReading(){
     return;
   }
   const words = rcLenWords();
-  const nQ = state.rcLength === 'short' ? 3 : state.rcLength === 'long' ? 5 : 4;
+  const nQ = Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4));
   const latka = trim('latka');
   const sourcePresent = activeSourceMaterialPresent();
   const sourceMode = normalizeSourceUseMode(state.sourceUseMode);
@@ -567,6 +579,8 @@ async function aiSuggestReading(){
     if(typeof waitForFileReads==='function') await waitForFileReads();
     const fp = await buildGeminiFilePartsForApi();
     fileParts = (fp && fp.parts) || [];
+    const urlPack = buildGeminiUrlPartsForApi(state);
+    fileParts = fileParts.concat(urlPack.parts||[]);
 
     if(sourcePresent){
       sourceAnalysis = await analyzeReadingSourceForAi(fileParts,lvl);
@@ -603,7 +617,7 @@ async function aiSuggestReading(){
       (topic?'READING TOPIC musí zůstat hlavním tématem; nepoužívej zdrojové prvky, které do něj přirozeně nezapadají.\n':'')+'Použij jen vhodnou část skutečně analyzované target_vocabulary; nevymýšlej další zdrojová slova.\n' +
       'Vrať POUZE JSON: {"passage":"...","questions":[{"q":"...","a":"..."}],"used_target_vocabulary":["položka skutečně použitá v textu"]} bez dalšího textu.';
 
-    const out = await callGeminiJSON(prompt, fileParts, {urlContext:state.zadaniTab==='url',operation:'reading-package-suggestion'});
+    const out = await callGeminiJSON(prompt, fileParts, {urlContext:buildGeminiUrlPartsForApi(state).useUrlContext,operation:'reading-package-suggestion'});
     const passage = String(out && out.passage || '').trim();
     const qs = (out && Array.isArray(out.questions))
       ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)

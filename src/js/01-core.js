@@ -259,7 +259,7 @@ const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','
 const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
-  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', sourceSliceMode:'start', sourceUseMode:'auto',
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, sourceSliceMode:'start', sourceUseMode:'auto',
   cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
   body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfig:[],
   fuzzyTolerance:'off',
@@ -553,8 +553,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:"sablony",title:"Šablony",status:"reseno",
   keywords:["sablona", "sablony", "template", "ulozit nastaveni", "znovu pouzit nastaveni", "predloha"],
-  simple:"Šablona funguje jako předvyplňovací vzor: ukládá jazyk, CEFR, typy cvičení, počet, čas, body, režim, hodnocení a bezpečné didaktické volby. Neobsahuje text zadání, přílohy, jména studentů ani přístupové kódy.",
-  detailed:"Formát prefill_v2 ukládá bezpečnou konfiguraci formuláře: pracovní režim, jazyk a CEFR, typy a počet cvičení, čas, body, vzhled, způsob výsledku a zpětné vazby, toleranci, známkování a pouze počet/názvy diferenciačních skupin. Neukládá název a látku testu, zdrojové texty, URL, přílohy, podmínky skupin, jména studentů ani přístupové údaje. Starší profile_v1 lze načíst, ale obsahuje jen původní omezený pedagogický profil.",
+  simple:"Šablona funguje jako znovupoužitelný předvyplňovací vzor: ukládá bezpečné nastavení i vyplněná textová pole formuláře, aby se po načtení test skutečně předvyplnil. Neukládá binární přílohy, jména studentů ani přístupové kódy.",
+  detailed:"Formát prefill_v3 ukládá bezpečnou konfiguraci formuláře i běžná textová pole (název, třídu, látku, zdrojový text/URL, Reading/Listening zadání, poznámky a stupnici). Přílohy, podmínky skupin, identity studentů, PINy a hesla se neukládají. Starší prefill_v2/profile_v1 zůstávají načitatelné, ale obsahují méně údajů.",
   evidence:["TEMPLATE_PREFILL_KEYS", "getTemplatePrefill()", "applyTemplatePrefill()", "saveTemplate()", "SENSITIVE_FIELD_IDS"]},
 
  {id:"historie",title:"Historie",status:"reseno",

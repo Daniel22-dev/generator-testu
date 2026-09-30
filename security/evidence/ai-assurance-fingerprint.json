@@ -6,37 +6,37 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "a326a5e7ee0363b8806df5843b68023cd594244d0179d34affaeece09436e4d2",
+  "fingerprint": "83e8d7c048b9e68262c3f80321882da0b054315b428201ab9132643f07c7c0d4",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 163216,
-      "sha256": "759eb964996376f3373f26503eddbcc9a75d522fc08e93db053850447f1b0a3f"
+      "size": 163175,
+      "sha256": "098e678f6e71b22023b0e2f416cdb737963bc4a1ee3dcced1429c767303f5878"
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 49467,
-      "sha256": "816fc97f913b7f14cd02a9bbb33fe1450e3e070228a23b2e7467d365ec0b226d"
+      "size": 50793,
+      "sha256": "5a3d203c564d02c260cf015a56d8f30f4b05da1d45626acafd4e23fa31c53685"
     },
     {
       "path": "src/js/05-form-fields.js",
-      "size": 116572,
-      "sha256": "082202026fa7a24ee1fadd17c24d49cdcc2a1a941c2a8c936215fe56d955daf2"
+      "size": 117198,
+      "sha256": "badb996e01df569770fd5753848fddb94b9b7a694dfc67fd33069dec3e68ebea"
     },
     {
       "path": "src/js/07-gemini.js",
-      "size": 54632,
-      "sha256": "b2404bb648759a75f0b3a2090f1c1e917407ed9767a905a192d5616174bfa6bb"
+      "size": 55451,
+      "sha256": "2a6480e034c2d128a4fd3abd127e4b0d99a59ec22850a17ef432aaea03adaf32"
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
-      "size": 13420,
-      "sha256": "478776756754f7abf10886b3a4b680f3b8e66262ff15f6e4e3254d68b34c182c"
+      "size": 13912,
+      "sha256": "72e38f9c2da482c7fcca163289b0fc5a898f2f4b24c6bd210e9e009f243aca40"
     },
     {
       "path": "src/js/08-manual-editor.js",
-      "size": 67881,
-      "sha256": "6819f938f9027c129cd4d63d73baf0645b9bb57d84db0c2d554438d376cff87d"
+      "size": 67944,
+      "sha256": "23491cd582880c3e7c26c1d269bdc0d9ca03b59d477722b0dca7db071da8e150"
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
@@ -45,8 +45,8 @@
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 58926,
-      "sha256": "aac559797590b2e059fb55fc593d624be21623f3b58841284a8bc901386d9584"
+      "size": 60718,
+      "sha256": "85729c4af42f319d1cba5d0cc07cd710e20e611ee9980696aa702aa7f5223548"
     },
     {
       "path": "src/js/13a-secure-helpers.js",

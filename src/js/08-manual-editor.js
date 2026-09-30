@@ -530,7 +530,9 @@ async function generateTest(){
   try{
     await waitForFileReads();
     const filePack=await buildGeminiFilePartsForApi();
-    const useUrlContext=workState.zadaniTab==='url'&&Array.isArray(workState.urls)&&workState.urls.some(u=>String(u||'').trim());
+    const urlPack=buildGeminiUrlPartsForApi(workState);
+    if(urlPack.parts?.length)filePack.parts=(filePack.parts||[]).concat(urlPack.parts);
+    const useUrlContext=!!urlPack.useUrlContext;
     if(!plan.manual)cp=generationCheckpoint(generationResumeKey(workState,plan,filePack),plan.batches.length);
     const readingWithSource = plan.specs.some(s=>s.type==='reading comprehension')
       && typeof activeSourceMaterialPresent==='function' && activeSourceMaterialPresent();

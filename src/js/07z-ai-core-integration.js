@@ -33,9 +33,11 @@ function genEnsureAiCore(){
   window.GHRAB_AI.configure({app:GEN_AI_APP,runtimeConfig:genCreateAiRuntimeConfig({timeoutMs:GEMINI_TIMEOUT_MS,maxRequestBytes:18*1024*1024,maxPartBytes:14*1024*1024}),operations:GEN_AI_OPERATIONS,outputSchemas:GEN_AI_SCHEMAS,credentialProvider:async({mode})=>mode==='direct-gemini'?{apiKey:String(geminiApiKey||'')}:null,authProvider:async()=>null,telemetrySink:()=>{}});
 }
 function genWorkflowId(opts={}){return opts.workflowId||window.__GHRAB_GENERATOR_WORKFLOW_ID__||undefined}
+function genHasExternalFileData(parts){return (Array.isArray(parts)?parts:[]).some(part=>{const fd=part?.file_data||part?.fileData;return !!(fd?.file_uri||fd?.fileUri)})}
 async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   if(!(await ensureGeminiDataNotice()))throw new Error('AI požadavek byl zrušen před odesláním dat.');
   if(genSchoolMode()&&opts.urlContext)throw Object.assign(new Error('URL Context zatím školní AI brána nepodporuje. Vlož obsah stránky jako text nebo soubor, případně použij přímý GitHub režim.'),{code:'FEATURE_UNSUPPORTED'});
+  if(genSchoolMode()&&genHasExternalFileData(extraParts))throw Object.assign(new Error('Školní AI brána zatím nepřijímá externí video URI (např. YouTube). Pro tuto chvíli nahraj audio/video soubor v přímém režimu nebo vlož transkript.'),{code:'FEATURE_UNSUPPORTED'});
   const mediaParts=Array.isArray(extraParts)?extraParts:[];
   if(genSchoolMode()&&mediaParts.some(part=>{const inline=part?.inline_data||part?.inlineData;const mime=String(inline?.mime_type||inline?.mimeType||'');return mime.startsWith('audio/')||mime.startsWith('video/')}))throw Object.assign(new Error('Školní AI brána v P1 nepřijímá zvuk ani video. Použij přepis, PDF, dokument nebo obrázek.'),{code:'FEATURE_UNSUPPORTED'});
   genEnsureAiCore();const operation=opts.operation||'test-generation';const registration=GEN_AI_OPERATIONS.operations[operation];if(!registration)throw Object.assign(new Error('Neznámá AI operace: '+operation),{code:'UNREGISTERED_OPERATION'});
@@ -60,7 +62,7 @@ callGeminiJSON=async function callGeminiJSONThroughCore(prompt,extraParts=[],opt
   if(opts.__legacyTest===true||window.__TEST_USE_LEGACY_GEMINI__)return genLegacyCallGeminiJSON(prompt,extraParts,opts);
   // GHRAB AI Core 1.0.0 nemá kontrakt pro providerové nástroje. URL Context proto
   // zůstává pouze v přímém Gemini režimu; školní brána jej výše výslovně odmítne.
-  if(!genSchoolMode()&&opts.urlContext)return genLegacyCallGeminiJSON(prompt,extraParts,opts);
+  if(!genSchoolMode()&&(opts.urlContext||genHasExternalFileData(extraParts)))return genLegacyCallGeminiJSON(prompt,extraParts,opts);
   try{return await genCallCoreResilient(prompt,extraParts,opts)}catch(error){
     if(window.GHRAB_AI?.formatUserError){
       const base=window.GHRAB_AI.formatUserError(error,'cs-CZ');

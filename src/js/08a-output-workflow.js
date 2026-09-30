@@ -105,13 +105,14 @@ function boundedReviewBatches(items,lengthOf){
 // vidět u stažení a u změn bez vlivu na obsah je může použít bez nového AI generování.
 const DRIFT_SETTINGS=[['body','body'],['cas','čas'],['gradeTyp','stupnice'],['testMode','účel testu'],['resultMode','způsob výsledku'],['identityMode','identita studenta'],['feedbackMode','zpětná vazba'],['layout','rozložení'],['randomizace','pořadí otázek'],['tema','vzhled'],['zolicek','žolík'],['fuzzyTolerance','tolerance překlepů'],['odevzdavani','odevzdávání'],['screenGuard','hlídání obrazovky']];
 const DRIFT_FIELDS=[['nazev','název'],['proKoho','pro koho'],['vlastniSkala','stupnice'],['ucitelJmeno','jméno učitele'],['ucitelPin','učitelský kód']];
-const DRIFT_CONTENT=['jazyk','instrJazyk','uroven','kombinovat','diferencovany','skupiny','sourceUseMode'];
+const DRIFT_CONTENT=['jazyk','instrJazyk','uroven','kombinovat','diferencovany','skupiny','zadaniTab','urls','sourceUseMode','rcLength','rcTopic','readingQuestionCount','listeningQuestionCount','differentiationLevel','ageGroup','ageGroupCustom'];
+const DRIFT_CONTENT_FIELDS=['latka','zadaniText','zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','poznamky'];
 function settingsDrift(){
   const src=lastAssembled&&lastAssembled.sourceState;if(!src||!lastGenData||window.__GHRAB_GENERATOR_WORKFLOW_ID__)return null;
   const same=(a,b)=>JSON.stringify(a==null?null:a)===JSON.stringify(b==null?null:b),out=new Set();
   DRIFT_SETTINGS.forEach(([k,l])=>{if(!same(src[k],state[k]))out.add(l);});
   DRIFT_FIELDS.forEach(([id,l])=>{if(String((src.__outputFields||{})[id]||'')!==trim(id))out.add(l);});
-  let content=DRIFT_CONTENT.some(k=>!same(src[k],state[k]))||['latka','zadaniText','poznamky'].some(id=>String((src.__outputFields||{})[id]||'')!==trim(id));
+  let content=DRIFT_CONTENT.some(k=>!same(src[k],state[k]))||DRIFT_CONTENT_FIELDS.some(id=>String((src.__outputFields||{})[id]||'')!==trim(id));
   try{const now=generationPlan(state),was=buildExerciseSpecs(src);if(now.specs.map(x=>x.type).join()!==was.map(x=>x.type).join())content=true;else if(now.config.map(c=>c.body).join()!==was.map(x=>x.pts).join())out.add('body');}catch(_){content=true;}
   return out.size||content?{settings:[...out],content}:null;
 }
