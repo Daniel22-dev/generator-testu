@@ -483,6 +483,7 @@ function sliceSourceForAI(text){
     .sort((a,b)=>b.score-a.score||a.index-b.index);
   for(const row of ranked){
     if(selected.size>=maxParts)break;
+    if(row.score<=0)break;
     selected.add(row.index);
   }
   if(selected.size<maxParts){
