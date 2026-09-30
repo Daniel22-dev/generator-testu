@@ -131,7 +131,15 @@ check(studentRuntimeSource.includes('function formsOpenUrl()')&&studentRuntimeSo
 check(verifierSource.includes("if(pack.testId!==CONFIG.testId)")&&verifierSource.includes("if(pack.manifestHash!==CONFIG.manifestHash)")&&verifierSource.includes("pack.studentHtmlSha256!==CONFIG.studentHtmlSha256"),'Verifier filters imported submissions by cryptographic test identity');
 check(verifierSource.includes('payloadHits*1000')&&verifierSource.includes("startsWith('SECURE-ANSWERS-V1')"),'Verifier locates payload column by content rather than fixed CSV position');
 
-// 9 Mandatory negative control: weaken a disposable source copy
+// 9 Full-year Forms verifier contract
+check(verifierSource.includes("classification:'other-test'")&&verifierSource.includes("fullYearCsv:true"),'Full-year CSV import classifies other tests without adding them to current results');
+check(verifierSource.includes('metadataMismatchFor')&&verifierSource.includes('METADATA MISMATCH'),'Forms metadata mismatches are visible but non-authoritative');
+check(verifierSource.includes('exactDuplicate')&&verifierSource.includes('ATTEMPT_DECISIONS'),'Exact duplicates are suppressed and distinct attempts require an explicit teacher decision');
+check(verifierSource.includes('downloadResultsCsv')&&verifierSource.includes('downloadSubmissionsCsv'),'Verifier exposes separate current-test result and submission exports');
+check(verifierSource.includes('effectiveResults()')&&verifierSource.includes('unresolvedAttemptConflicts()'),'Analytics/export path uses deduplicated explicitly resolved effective results');
+check(verifierSource.includes('setFormsProgress')&&verifierSource.includes("setTimeout(r,0)"),'Large CSV import yields to the browser and reports progress');
+
+// 10 Mandatory negative control: weaken a disposable source copy
 {
   const weakened=suiteSource.replace("const owned = ownsGeneratorStorageKey(key);","const owned = false;");const w=makeRealm({suite:weakened});w.localStorage.setItem('ghrab.generator.state.v1',`negative-${CANARY}`);const ended=w.GHRAB_PLATFORM.session.end({reason:'negative-control'});await wait(30);const weakenedWouldPass=w.localStorage.getItem('ghrab.generator.state.v1')===null&&w.localStorage.getItem(SEEN)===ended.generation;check(weakenedWouldPass===false,'Negative control detects disabled cleanup (weakened copy fails as required)');
 }
