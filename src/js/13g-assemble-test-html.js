@@ -3,6 +3,7 @@ async function assembleTestHtml(st, genData) {
   sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','ucitelJmeno','latka','zadaniText','poznamky'].map(id=>[id,trim(id)]));
   sourceState.__roster=Array.isArray(st.__roster)?JSON.parse(JSON.stringify(st.__roster)):rosterForVerifier();
   sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
+  sourceState.__formsMetadata=(st.__formsMetadata&&typeof st.__formsMetadata==='object')?JSON.parse(JSON.stringify(st.__formsMetadata)):(typeof configuredGoogleFormsMetadata==='function'?(configuredGoogleFormsMetadata()||null):null);
   st=sourceState;
   const field=id=>sourceState.__outputFields[id]??trim(id);
   const outputCefr=CEFR_LEVELS.filter(l=>(st.uroven||[]).includes(l)).join(' / ');
@@ -37,7 +38,8 @@ async function assembleTestHtml(st, genData) {
     cas: st.cas||45, tema: st.tema||'examBlue', testMode: st.testMode||'bezny',
     randomizace: st.randomizace==='ANO', overeni: st.overeni==='ANO', identityMode: st.identityMode||'name',
     zolicek: st.zolicek==='ANO', layout: st.layout||'tabs', odevzdavani: st.odevzdavani||'B', resultMode: st.resultMode || 'instant',
-    formsSubmissionUrl: (st.resultMode || 'instant') === 'secureOffline' ? st.__formsSubmissionUrl : '', 
+    formsSubmissionUrl: (st.resultMode || 'instant') === 'secureOffline' ? st.__formsSubmissionUrl : '',
+    formsMetadata: (st.resultMode || 'instant') === 'secureOffline' ? (st.__formsMetadata || null) : null, 
     gradeTyp: st.gradeTyp||'skola', gradeScaleRaw: customScaleRaw,
     fuzzyTolerance: (st.fuzzyTolerance==='mild'||st.fuzzyTolerance==='strict')?st.fuzzyTolerance:'off',
     feedbackMode: (['none','brief','learning'].indexOf(st.feedbackMode)!==-1)?st.feedbackMode:'brief',
@@ -97,6 +99,7 @@ async function assembleTestHtml(st, genData) {
     odevzdavani: configForHash.odevzdavani,
     resultMode: configForHash.resultMode,
     formsSubmissionUrl: configForHash.formsSubmissionUrl || '',
+    formsMetadata: configForHash.formsMetadata || null,
     gradeTyp: configForHash.gradeTyp,
     fuzzyTolerance: configForHash.fuzzyTolerance,
     feedbackMode: configForHash.feedbackMode,
