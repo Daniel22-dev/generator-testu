@@ -128,7 +128,7 @@ check(shellSource.includes('GIT_TEST_ID')&&shellSource.includes('GIT_TEST_NAME')
 check(stateSource.includes('parseGoogleFormsPrefilledMetadataUrl')&&stateSource.includes("['testId','testName','group']"),'Forms onboarding derives and requires Test ID/name/group entry IDs');
 check(assembleSource.includes('formsMetadata: configForHash.formsMetadata || null'),'Secure test seals Forms metadata mapping into generated config');
 check(studentRuntimeSource.includes('function formsOpenUrl()')&&studentRuntimeSource.includes("u.searchParams.set('entry.'+meta.entries[k]"),'Student runtime prefills per-test metadata without manual student entry');
-check(verifierSource.includes("if(pack.testId!==CONFIG.testId)")&&verifierSource.includes("if(pack.manifestHash!==CONFIG.manifestHash)")&&verifierSource.includes("pack.studentHtmlSha256!==CONFIG.studentHtmlSha256"),'Verifier filters imported submissions by cryptographic test identity');
+check(verifierSource.includes("String(payload.testId||'')!==String(CONFIG.testId)")&&verifierSource.includes("payload.manifestHash!==CONFIG.manifestHash")&&verifierSource.includes("payload.studentHtmlSha256!==CONFIG.studentHtmlSha256"),'Verifier filters imported submissions by cryptographically decrypted payload identity');
 check(verifierSource.includes('payloadHits*1000')&&verifierSource.includes("startsWith('SECURE-ANSWERS-V1')"),'Verifier locates payload column by content rather than fixed CSV position');
 
 // 9 Full-year Forms verifier contract
