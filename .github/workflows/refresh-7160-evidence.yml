@@ -1,0 +1,38 @@
+name: Refresh 7.1.60 AI evidence
+
+on:
+  push:
+    branches: [pre-server-forms-workflow]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generator-7160-evidence-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - name: Refresh AI assurance fingerprint
+        run: node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json
+      - name: Commit refreshed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- security/evidence/ai-assurance-fingerprint.json; then
+            echo "Fingerprint already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add security/evidence/ai-assurance-fingerprint.json
+          git commit -m "chore(release): refresh 7.1.60 AI assurance fingerprint"
+          git push origin HEAD:pre-server-forms-workflow
