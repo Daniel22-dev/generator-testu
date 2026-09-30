@@ -7,6 +7,10 @@ const platformSource=fs.readFileSync('vendor/ghrab-platform-1.1.2/ghrab-platform
 const suiteSource=fs.readFileSync('public/access/suite-session-cleanup.js','utf8');
 const shellSource=fs.readFileSync('src/shell.html','utf8');
 const accessSource=fs.readFileSync('src/js/16-access.js','utf8');
+const stateSource=fs.readFileSync('src/js/02-state-persistence.js','utf8');
+const assembleSource=fs.readFileSync('src/js/13g-assemble-test-html.js','utf8');
+const studentRuntimeSource=fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8');
+const verifierSource=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8');
 const expectedHash='199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c';
 const actualHash=crypto.createHash('sha256').update(platformSource).digest('hex');
 const CANARY='GARP-STUDENT-CANARY-SYNTHETIC-ONLY';
@@ -119,7 +123,15 @@ check(shellSource.includes('id="btnEndWorkCleanup"')&&shellSource.includes('oncl
 check(accessSource.includes("async function confirmGeneratorEndWork()")&&accessSource.includes("await uiConfirm(")&&accessSource.includes("generatorEndWork();"),'G-01 cleanup button requires confirmation before invoking generatorEndWork');
 check(!accessSource.includes('localStorage.clear(')&&!accessSource.includes('sessionStorage.clear('),'G-01 implementation does not use broad browser storage clear');
 
-// 8 Mandatory negative control: weaken a disposable source copy
+// 8 Pre-server Google Forms contract: one-time metadata mapping + cryptographic verifier selection
+check(shellSource.includes('GIT_TEST_ID')&&shellSource.includes('GIT_TEST_NAME')&&shellSource.includes('GIT_GROUP'),'Forms onboarding documents required metadata placeholders');
+check(stateSource.includes('parseGoogleFormsPrefilledMetadataUrl')&&stateSource.includes("['testId','testName','group']"),'Forms onboarding derives and requires Test ID/name/group entry IDs');
+check(assembleSource.includes('formsMetadata: configForHash.formsMetadata || null'),'Secure test seals Forms metadata mapping into generated config');
+check(studentRuntimeSource.includes('function formsOpenUrl()')&&studentRuntimeSource.includes("u.searchParams.set('entry.'+meta.entries[k]"),'Student runtime prefills per-test metadata without manual student entry');
+check(verifierSource.includes("if(pack.testId!==CONFIG.testId)")&&verifierSource.includes("if(pack.manifestHash!==CONFIG.manifestHash)")&&verifierSource.includes("pack.studentHtmlSha256!==CONFIG.studentHtmlSha256"),'Verifier filters imported submissions by cryptographic test identity');
+check(verifierSource.includes('payloadHits*1000')&&verifierSource.includes("startsWith('SECURE-ANSWERS-V1')"),'Verifier locates payload column by content rather than fixed CSV position');
+
+// 9 Mandatory negative control: weaken a disposable source copy
 {
   const weakened=suiteSource.replace("const owned = ownsGeneratorStorageKey(key);","const owned = false;");const w=makeRealm({suite:weakened});w.localStorage.setItem('ghrab.generator.state.v1',`negative-${CANARY}`);const ended=w.GHRAB_PLATFORM.session.end({reason:'negative-control'});await wait(30);const weakenedWouldPass=w.localStorage.getItem('ghrab.generator.state.v1')===null&&w.localStorage.getItem(SEEN)===ended.generation;check(weakenedWouldPass===false,'Negative control detects disabled cleanup (weakened copy fails as required)');
 }
