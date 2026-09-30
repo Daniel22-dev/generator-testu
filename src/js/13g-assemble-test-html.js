@@ -3,7 +3,8 @@ async function assembleTestHtml(st, genData) {
   sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','ucitelJmeno','latka','zadaniText','poznamky'].map(id=>[id,trim(id)]));
   sourceState.__roster=Array.isArray(st.__roster)?JSON.parse(JSON.stringify(st.__roster)):rosterForVerifier();
   sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
-  sourceState.__formsMetadata=(st.__formsMetadata&&typeof st.__formsMetadata==='object')?JSON.parse(JSON.stringify(st.__formsMetadata)):(typeof configuredGoogleFormsMetadata==='function'?(configuredGoogleFormsMetadata()||null):null);
+  const formsMetaCandidate=(st.__formsMetadata&&typeof st.__formsMetadata==='object')?st.__formsMetadata:(typeof configuredGoogleFormsMetadata==='function'?(configuredGoogleFormsMetadata()||null):null);
+  sourceState.__formsMetadata=formsMetaCandidate?(typeof normalizeStoredGoogleFormsMetadata==='function'?normalizeStoredGoogleFormsMetadata(formsMetaCandidate):null):null;
   st=sourceState;
   const field=id=>sourceState.__outputFields[id]??trim(id);
   const outputCefr=CEFR_LEVELS.filter(l=>(st.uroven||[]).includes(l)).join(' / ');
