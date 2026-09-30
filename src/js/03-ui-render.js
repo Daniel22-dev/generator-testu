@@ -345,6 +345,15 @@ function pickJazyk(v) {
 
 function pickTheme(t) { state.tema=t; applyVisualState(); saveSnapshot(); }
 function pickRcLength(v){ state.rcLength = v; applyVisualState(); saveSnapshot(); }
+function setComprehensionQuestionCount(type,value){
+  const canonical=normalizeType(type),n=Math.max(1,Math.min(30,parseInt(value,10)||4));
+  const key=canonical==='reading comprehension'?'readingQuestionCount':'listeningQuestionCount';
+  state[key]=n;
+  if(state.exerciseDetail&&Array.isArray(state.exerciseConfig))state.exerciseConfig.forEach(ex=>{if(normalizeType(ex.typ||'')===canonical)ex.pocetOtazek=n});
+  const el=document.getElementById(key);if(el)el.value=String(n);
+  if(typeof renderExerciseConfig==='function'&&state.exerciseDetail)renderExerciseConfig();
+  validate();saveSnapshot();
+}
 
 // ═══ PRÁCE SE ZDROJOVÝM MATERIÁLEM ═══════════════════════════════════════════════
 const SOURCE_USE_MODES=Object.freeze({
@@ -485,7 +494,7 @@ async function aiSuggestListeningQuestions(){
   const old = btn ? btn.textContent : '';
   if (btn){ btn.disabled = true; btn.textContent = '⏳ Generuji…'; }
   renderLiAiPreview({ loading:true });
-  const n = 5;
+  const n = Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4));
   const prompt =
     'Jsi pomocník učitele jazyků. Navrhni ' + n + ' otázek k poslechu s porozuměním pro školní test.\n' +
     'Jazyk otázek: ' + jazyk + '. Úroveň CEFR: ' + lvl + '.\n' +
@@ -553,7 +562,7 @@ async function aiSuggestReading(){
     return;
   }
   const words = rcLenWords();
-  const nQ = state.rcLength === 'short' ? 3 : state.rcLength === 'long' ? 5 : 4;
+  const nQ = Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4));
   const latka = trim('latka');
   const sourcePresent = activeSourceMaterialPresent();
   const sourceMode = normalizeSourceUseMode(state.sourceUseMode);
