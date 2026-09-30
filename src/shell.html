@@ -389,6 +389,10 @@
           <div class="tip-title">Shrnutí funkčnosti</div>
           <div class="tip-body">Můžeš současně nahrát audio/video nebo vložit URL a tady určit, na co se mají otázky ptát. Pokud máš vlastní otázky, transkript nebo hotové cvičení, vlož je sem — generátor je pošle do Gemini společně s aktivním zdrojem. Teacher verifier dostane transkript/audio script a správné odpovědi; student uvidí jen informaci, že poslech pustí učitel.</div>
         </div>
+        <div class="rc-sub-label">Počet otázek <button class="tt-icon" data-tip="Tento počet je společný pro AI návrh i finální Listening cvičení. Pokud používáš podrobné nastavení, změna se propíše i tam.">?</button></div>
+        <select id="listeningQuestionCount" onchange="setComprehensionQuestionCount('listening comprehension',this.value)" style="max-width:220px;margin-bottom:10px">
+          <option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option>
+        </select>
         <textarea id="listeningFocus" rows="3" placeholder="Na co se má poslech ptát? Např. hlavní myšlenka, konkrétní údaje, postoje mluvčích, důvody rozhodnutí, pořadí událostí..." oninput="onInput()"></textarea>
         <div class="ai-suggest-row">
           <button type="button" class="ai-suggest-btn" id="liAiBtn" onclick="aiSuggestListeningQuestions()">✨ Nechat AI navrhnout otázky</button>
@@ -410,6 +414,10 @@
           <button class="tag-btn" data-val="long" onclick="pickRcLength('long')">Delší (~240–340 slov)</button>
         </div>
         <div class="small-muted" style="margin-top:8px">Delší text doporučujeme spárovat s vyšším počtem otázek (4–6), aby se čtení vyplatilo. Skutečná délka se může mírně lišit podle tématu a úrovně CEFR.</div>
+        <div class="rc-sub-label">Počet otázek <button class="tt-icon" data-tip="Tento počet je společný pro AI návrh i finální Reading cvičení. Volíš ho ty; délka textu je jen doporučení.">?</button></div>
+        <select id="readingQuestionCount" onchange="setComprehensionQuestionCount('reading comprehension',this.value)" style="max-width:220px;margin-bottom:10px">
+          <option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option>
+        </select>
 
         <div class="rc-sub-label">Téma / obor textu <button class="tt-icon" data-tip="Vyber téma textu. Nabídka se přizpůsobuje zvolené úrovni CEFR — s vyšší úrovní jsou témata abstraktnější. Můžeš zadat i vlastní téma. Téma se předá AI při generování i návrhu textu.">?</button></div>
         <div class="btn-row" id="rcTopicBtns"></div>
