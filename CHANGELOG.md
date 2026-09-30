@@ -1,3 +1,17 @@
+## 7.1.60 — 2026-09-30 — poslední předserverová etapa / celoroční Forms workflow
+
+- jeden univerzální Google Form a jeden Response Sheet mohou sloužit pro více testů a skupin během školního roku;
+- metadata Test ID, název testu a skupina se nastaví jednorázově z předvyplněného Forms odkazu a student je nemusí ručně opisovat;
+- teacher verifier umí načíst celé společné CSV a vybrat z něj pouze ověřené výsledky konkrétního testu;
+- změněná Forms metadata jsou viditelně označena, ale neřídí výsledek;
+- identické duplicity se počítají jednou, zatímco dva různé validní pokusy stejného studenta vyžadují rozhodnutí učitele;
+- přidány oddělené exporty výsledků a odevzdání aktuálního testu;
+- zachovány individuální studentské kódy, SECURE-ANSWERS-V1, answers.txt fallback a původní workflow bez metadata konfigurace;
+- přidány browser E2E a performance scénáře pro 100, 1 000, 3 000 a 5 000 odevzdání;
+- build zůstává pod původními performance budgets bez zvýšení limitů;
+- přidána učitelská dokumentace, live classroom acceptance plán a závěrečný audit;
+- GARP 2.7 policy/inventory/trust anchor a CI piny jsou synchronizovány s verzí 7.1.60.
+
 ## 7.1.59 — 2026-09-29 — workflow / user-journey audit
 
 - učitel už neuvízne bez vysvětlení: prázdné jméno pro učitelský mód má hlášku; pole se nepředvyplňuje jménem autora (starší uložená hodnota se vyprázdní);
