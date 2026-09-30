@@ -390,7 +390,33 @@ try:
   assert 'beta@ghrabuvka.cz' in tb and 'alpha@ghrabuvka.cz' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
   assert re.search(r'jiné testy\s+[1-9]',tb,re.I),('verifier B must classify TEST-A rows as other tests',tb[:1000])
   vb.close()
-  return {'testA':test_a,'testB':test_b,'unicodePrefill':True,'metadataMismatch':True,'sameCsvTwoVerifiers':True}
+
+  # Real-browser long-run benchmark: actual verifier + WebCrypto + yielding UI.
+  perf=[]
+  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600)
+  try:
+   for size in (100,1000,3000,5000):
+    big=io.StringIO();w=csv.writer(big);w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
+    current=0
+    for i in range(size):
+     is_a=(i%20==0)
+     if is_a:current+=1
+     w.writerow(['30.9.2026 09:00:00',('alpha'+str(i)+'@ghrabuvka.cz') if is_a else ('beta'+str(i)+'@ghrabuvka.cz'),test_a if is_a else test_b,name_a if is_a else name_b,group_a if is_a else group_b,backup_a1 if is_a else backup_b])
+    bf=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);bf.write(big.getvalue());bf.close()
+    va2.evaluate("()=>{clearInterval(window.__formsHbTimer);window.__formsHb=0;window.__formsHbTimer=setInterval(()=>window.__formsHb++,25)}")
+    t0=time.time();va2.set_input_files('#formsCsvFile',bf.name)
+    va2.wait_for_function("(n)=>document.getElementById('formsImportSummary').innerText.includes('načteno '+n)",arg=size,timeout=180000)
+    elapsed=round(time.time()-t0,3);txt=va2.locator('#formsImportSummary').inner_text()
+    hb=va2.evaluate("()=>{clearInterval(window.__formsHbTimer);return window.__formsHb}")
+    heap=va2.evaluate("()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null")
+    assert re.search(r'platné výsledky tohoto testu\s+'+str(current)+r'\b',txt,re.I),(size,current,txt)
+    assert re.search(r'jiné testy\s+'+str(size-current)+r'\b',txt,re.I),(size,txt)
+    assert 'neplatné/poškozené 0' in txt,(size,txt)
+    assert hb>0,('large CSV import must yield to browser event loop',size,hb)
+    perf.append({'rows':size,'seconds':elapsed,'heartbeat':hb,'heapMiB':heap})
+  finally:
+   va2.close()
+  return {'testA':test_a,'testB':test_b,'unicodePrefill':True,'metadataMismatch':True,'sameCsvTwoVerifiers':True,'browserPerformance':perf}
  record('pre-server-forms-full-year-workflow',pre_server_forms_full_year_workflow)
 
  def narrow_screen_and_live_regions(j):
