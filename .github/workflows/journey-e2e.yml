@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: generator-journeys-${{ github.ref }}
+  group: generator-journeys-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
