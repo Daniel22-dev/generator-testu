@@ -5,6 +5,8 @@ import crypto from 'node:crypto';
 
 const platformSource=fs.readFileSync('vendor/ghrab-platform-1.1.2/ghrab-platform.js','utf8');
 const suiteSource=fs.readFileSync('public/access/suite-session-cleanup.js','utf8');
+const shellSource=fs.readFileSync('src/shell.html','utf8');
+const accessSource=fs.readFileSync('src/js/16-access.js','utf8');
 const expectedHash='199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c';
 const actualHash=crypto.createHash('sha256').update(platformSource).digest('hex');
 const CANARY='GARP-STUDENT-CANARY-SYNTHETIC-ONLY';
@@ -98,7 +100,26 @@ check(actualHash===expectedHash,'Platform 1.1.2 exact vendor SHA-256',actualHash
 {
   const bad='ghrab.generator.state.v1';const w=makeRealm({failRemoveKey:bad});w.localStorage.setItem(bad,`failure-${CANARY}`);const ended=w.GHRAB_PLATFORM.session.end({reason:'test-fail-closed'});await wait(35);check(w.localStorage.getItem(bad)!==null,'Fail-closed synthetic delete failure is observable');check(w.localStorage.getItem(SEEN)!==ended.generation,'Fail-closed does not falsely acknowledge');const st=JSON.parse(w.localStorage.getItem(STATUS)||'{}');check(Boolean(st.cleanupFailedAt)&&Array.isArray(st.failures)&&st.failures.length>0,'Fail-closed status records failure');
 }
-// 6 Mandatory negative control: weaken a disposable source copy
+// 6 Manual end-work is scoped to Generator data and shared permit
+{
+  const w=makeRealm();seedCanaries(w);
+  w.localStorage.setItem('ghrab.access.permit.v2','synthetic-permit');
+  w.localStorage.setItem(GEN,'synthetic-generation-manual');
+  const result=w.__GHRAB_GENERATOR_SUITE_SESSION__.manualEndWork({includeSharedPermit:true});
+  check(result.ok===true,'Manual end-work reports successful cleanup');
+  check(ownedGone(w),'Manual end-work clears Generator-owned local/session data and targeted handoff');
+  check(w.localStorage.getItem('ghrab.access.permit.v2')===null,'Manual end-work removes shared access permit');
+  check(w.localStorage.getItem('ghrab.other-app.state')==='must-survive','Manual end-work preserves other app namespace');
+  check(w.localStorage.getItem('ghrab.pilot.events.v2')!==null,'Manual end-work preserves unrelated telemetry');
+  check(w.localStorage.getItem(GEN)==='synthetic-generation-manual','Manual end-work preserves global suite generation tombstone');
+}
+
+// 7 UI regression: destructive action is explicit, confirmed and wired to generatorEndWork
+check(shellSource.includes('id="btnEndWorkCleanup"')&&shellSource.includes('onclick="confirmGeneratorEndWork()"'),'G-01 settings UI exposes explicit end-work cleanup button');
+check(accessSource.includes("async function confirmGeneratorEndWork()")&&accessSource.includes("await uiConfirm(")&&accessSource.includes("generatorEndWork();"),'G-01 cleanup button requires confirmation before invoking generatorEndWork');
+check(!accessSource.includes('localStorage.clear(')&&!accessSource.includes('sessionStorage.clear('),'G-01 implementation does not use broad browser storage clear');
+
+// 8 Mandatory negative control: weaken a disposable source copy
 {
   const weakened=suiteSource.replace("const owned = ownsGeneratorStorageKey(key);","const owned = false;");const w=makeRealm({suite:weakened});w.localStorage.setItem('ghrab.generator.state.v1',`negative-${CANARY}`);const ended=w.GHRAB_PLATFORM.session.end({reason:'negative-control'});await wait(30);const weakenedWouldPass=w.localStorage.getItem('ghrab.generator.state.v1')===null&&w.localStorage.getItem(SEEN)===ended.generation;check(weakenedWouldPass===false,'Negative control detects disabled cleanup (weakened copy fails as required)');
 }
