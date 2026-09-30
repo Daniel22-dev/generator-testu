@@ -92,6 +92,7 @@ function securePublicCfg(cfg, keyInfo) {
     releaseStatus:cfg.releaseStatus,
     resultMode:'secureOffline',
     formsSubmissionUrl:cfg.formsSubmissionUrl||'',
+    formsMetadata:cfg.formsMetadata?{v:1,responderUrl:String(cfg.formsMetadata.responderUrl||''),entries:Object.fromEntries(Object.entries(cfg.formsMetadata.entries||{}).filter(([k,v])=>['testId','testName','group','generatorVersion','generatedAt'].includes(k)&&/^\d{1,20}$/.test(String(v||''))).map(([k,v])=>[k,String(v)]))}:null,
     formsPayloadSafeChars:24000,
     creatorId:cfg.creatorId,
     creatorRole:cfg.creatorRole,
