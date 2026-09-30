@@ -297,6 +297,102 @@ try:
   return {'codes':len(codes)}
  record('advanced-one-time-code-to-verifier',advanced_one_time_code_to_verifier)
 
+ def pre_server_forms_full_year_workflow(j):
+  import csv,io,tempfile,json as pyjson
+  p=j.p
+  # Actual metadata parser: bad host and missing required placeholder must fail.
+  bad=p.evaluate("""()=>({
+   host:(()=>{try{parseGoogleFormsPrefilledMetadataUrl('https://evil.example/forms/d/e/X/viewform?entry.1=GIT_TEST_ID&entry.2=GIT_TEST_NAME&entry.3=GIT_GROUP');return false}catch(e){return true}})(),
+   missing:(()=>{try{parseGoogleFormsPrefilledMetadataUrl('https://docs.google.com/forms/d/e/X/viewform?entry.1=GIT_TEST_ID&entry.2=GIT_TEST_NAME');return false}catch(e){return true}})()
+  })""")
+  assert bad['host'] and bad['missing'],('invalid Forms metadata config must fail closed',bad)
+  assert p.evaluate("()=>{localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);return configuredGoogleFormsMetadata()===null}"),'missing metadata config must stay optional'
+  pre='https://docs.google.com/forms/d/e/FORM_A/viewform?usp=pp_url&entry.111=GIT_TEST_ID&entry.222=GIT_TEST_NAME&entry.333=GIT_GROUP&entry.444=GIT_GENERATOR_VERSION&entry.555=GIT_GENERATED_AT'
+  cfg=p.evaluate("""u=>{const c=parseGoogleFormsPrefilledMetadataUrl(u);localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);return c}""",pre)
+  assert cfg['entries']['testId']=='111' and cfg['entries']['testName']=='222' and cfg['entries']['group']=='333',cfg
+
+  def build_secure(jj,name,group):
+   q=jj.p;q.fill('#geminiKeyInput','AIzaTEST-forms-000000000000000000');q.click('#btnUseKeySession')
+   q.get_by_role('button',name=re.compile('Pokročilá nastavení')).first.click()
+   q.fill('#nazev',name);q.fill('#proKoho',group);q.locator('#jazykBtns [data-val="angličtina"]').click();q.fill('#latka','Present perfect');q.click('#next0')
+   for typ in ('multiple choice','fill-in-the-blank','true/false'):q.locator('#typyBtns').get_by_role('button',name=typ,exact=True).first.click()
+   q.locator('#simpleTemplateBtns').get_by_role('button',name=re.compile('Běžný test')).click();q.locator('#cefrBtns [data-val=B1]').click();q.fill('#zadaniText','Present perfect.');q.click('#next1')
+   q.locator('#resultModeBtns [data-val=secureOffline]').click();q.locator('#identityModeBtns [data-val=name]').click();q.click('#next2');q.fill('#ucitelJmeno','Jana Učitelová')
+   if not q.input_value('#ucitelPin'):q.fill('#ucitelPin','AUDIT-FORMS-482957')
+   q.click('#next3');jj.generate();jj.selftest();jj.checklist()
+   return jj.download('#btnDownloadStudent'),jj.download('#btnDownloadTeacher')
+
+  name_a='Přítomný čas – čárky & A+B';group_a='1.A / skupina B'
+  stu_a,tea_a=build_secure(j,name_a,group_a)
+
+  def student_submission(stu,student):
+   sp=h.new_page(stu['text']);sp.wait_for_timeout(600)
+   url=sp.evaluate('formsOpenUrl()')
+   sp.fill('#studentName',student);sp.get_by_role('button',name=re.compile('Start')).first.click();answer_secure(sp)
+   sp.get_by_role('button',name=re.compile('Submit and create')).click();sp.wait_for_timeout(250)
+   y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
+   if y.count():y.first.click()
+   sp.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")',timeout=10000)
+   backup=sp.locator('#answerBackup').input_value();sp.close();return url,backup
+
+  url_a,backup_a1=student_submission(stu_a,'Student Alpha')
+  _,backup_a2=student_submission(stu_a,'Student Alpha')
+  ua=p.evaluate("u=>{const x=new URL(u);return {id:x.searchParams.get('entry.111'),name:x.searchParams.get('entry.222'),group:x.searchParams.get('entry.333')}}",url_a)
+  pack_a=pyjson.loads(re.sub(r'^SECURE-ANSWERS-V1\s*','',backup_a1))
+  test_a=pack_a['testId']
+  assert ua=={'id':test_a,'name':name_a,'group':group_a},('prefilled metadata must preserve Unicode/special chars',ua,test_a)
+  assert backup_a1!=backup_a2,'two valid attempts must produce distinct secure payloads'
+
+  # Generate TEST-B with another group but the same universal Form mapping.
+  j2=Journey(h)
+  try:
+   j2.ev("(c)=>{localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl)}",cfg)
+   name_b='Vocabulary B';group_b='2.B'
+   stu_b,tea_b=build_secure(j2,name_b,group_b)
+  finally:
+   j2.p.close()
+  url_b,backup_b=student_submission(stu_b,'Student Beta')
+  pack_b=pyjson.loads(re.sub(r'^SECURE-ANSWERS-V1\s*','',backup_b));test_b=pack_b['testId']
+  assert test_a!=test_b,'two generated tests must have different Test IDs'
+  ub=p.evaluate("u=>{const x=new URL(u);return {id:x.searchParams.get('entry.111'),name:x.searchParams.get('entry.222'),group:x.searchParams.get('entry.333')}}",url_b)
+  assert ub=={'id':test_b,'name':name_b,'group':group_b},ub
+
+  corrupt=pyjson.loads(re.sub(r'^SECURE-ANSWERS-V1\s*','',backup_a1));d=corrupt['payload']['data'];corrupt['payload']['data']=('A' if d[:1]!='A' else 'B')+d[1:]
+  corrupt_txt='SECURE-ANSWERS-V1\n'+pyjson.dumps(corrupt,separators=(',',':'))
+  rows=[
+   ['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'],
+   ['30.9.2026 08:00:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,backup_a1],
+   ['30.9.2026 08:01:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,backup_a1],
+   ['30.9.2026 08:02:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,backup_a2],
+   ['30.9.2026 08:03:00','alpha@ghrabuvka.cz','EDITED-BY-STUDENT',name_a,'4.Z WRONG',backup_a1],
+   ['30.9.2026 08:04:00','beta@ghrabuvka.cz',test_b,name_b,group_b,backup_b],
+   ['30.9.2026 08:05:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,corrupt_txt]
+  ]
+  buf=io.StringIO();csv.writer(buf).writerows(rows);tmp=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);tmp.write(buf.getvalue());tmp.close()
+
+  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
+  ta=va.evaluate('document.body.innerText')
+  assert 'alpha@ghrabuvka.cz' in ta and 'beta@ghrabuvka.cz' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
+  assert 'METADATA MISMATCH' in ta,('tampered Forms metadata must warn, not hide valid payload',ta[:1000])
+  assert 'VÍCE RŮZNÝCH POKUSŮ' in ta,('two distinct valid attempts require explicit teacher decision',ta[:1000])
+  assert re.search(r'jiné testy\s+1',ta,re.I),('full CSV must classify TEST-B as another test',ta[:1000])
+  assert re.search(r'neplatné/poškozené\s+1',ta,re.I),('corrupt current-test payload must be invalid',ta[:1000])
+  assert re.search(r'Duplicity:\s*[1-9]',ta),('identical payload must be duplicate',ta[:1000])
+  va.evaluate("()=>{const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate);chooseAttemptByDigest(r.submissionDigest)}")
+  va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await (await fetch(__downloads.at(-1).href)).text()")
+  assert res_csv.count('\n')==1,('resolved results export must contain one effective student row',res_csv)
+  va.evaluate('downloadSubmissionsCsv()');sub_csv=va.evaluate("async()=>await (await fetch(__downloads.at(-1).href)).text()")
+  assert test_b not in sub_csv and 'beta@ghrabuvka.cz' not in sub_csv,('submissions export must exclude other tests',sub_csv[:500])
+  va.close()
+
+  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
+  tb=vb.evaluate('document.body.innerText')
+  assert 'beta@ghrabuvka.cz' in tb and 'alpha@ghrabuvka.cz' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
+  assert re.search(r'jiné testy\s+[1-9]',tb,re.I),('verifier B must classify TEST-A rows as other tests',tb[:1000])
+  vb.close()
+  return {'testA':test_a,'testB':test_b,'unicodePrefill':True,'metadataMismatch':True,'sameCsvTwoVerifiers':True}
+ record('pre-server-forms-full-year-workflow',pre_server_forms_full_year_workflow)
+
  def narrow_screen_and_live_regions(j):
   j.p.set_viewport_size({'width':360,'height':740})
   j.new_test('Přísný test');j.selftest();j.checklist();j.keycheck({'2':2})
