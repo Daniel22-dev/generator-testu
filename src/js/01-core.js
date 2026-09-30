@@ -242,12 +242,17 @@ const GOOGLE_FORMS_METADATA_CONFIG_KEY = 'sestavovac_google_forms_metadata_v1';
 const MAX_FILES = 12;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const MAX_IMAGE_PREVIEW_SIZE = 4 * 1024 * 1024;
-const MAX_EMBEDDED_TEXT_BYTES = 300 * 1024;
-const MAX_EMBEDDED_TEXT_CHARS = 24000;
-// Strop délky zdrojového textu vkládaného do promptu pro AI (Gemini). Sjednoceno s limitem
-// načítání souborů (MAX_EMBEDDED_TEXT_CHARS), aby nevznikala past, kdy se soubor tváří jako
-// „celý v promptu", ale do AI jde jen jeho část. Když je zdroj delší, UI to hlasitě hlásí.
-const MAX_SOURCE_CHARS_FOR_AI = 24000;
+// Textové přílohy držíme v prohlížeči výrazně delší než finální AI kontext.
+// 8 MB pokrývá i velmi dlouhé učitelské materiály, ale stále brání neomezenému
+// načítání do RAM. Po normalizaci držíme nejvýše 2 mil. znaků na soubor.
+const MAX_EMBEDDED_TEXT_BYTES = 8 * 1024 * 1024;
+const MAX_EMBEDDED_TEXT_CHARS = 2_000_000;
+// Finální kontext jednoho AI požadavku zůstává omezený. Delší zdroj se už
+// NEŘEŽE na začátek/konec: rozdělí se na překrývající se úseky, všechny se
+// prohledají a sestaví se průřez relevantních + rozprostřených částí.
+const MAX_SOURCE_CHARS_FOR_AI = 50000;
+const SOURCE_CHUNK_CHARS = 5200;
+const SOURCE_CHUNK_OVERLAP = 500;
 const TEXT_EMBED_EXT = ['txt','md','markdown','csv','tsv','json','rtf','html','htm','xml','yaml','yml','srt'];
 const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','html','htm','xml','yaml','yml','srt','docx','png','jpg','jpeg','gif','webp','heic','mp3','wav','m4a','ogg','aac','flac','mp4','mov','m4v','webm'];
 
@@ -896,7 +901,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"prilohy-typy-a-limity",title:"Přílohy — podporované typy a limity",status:"reseno",
   keywords:["prilohy", "přílohy", "typy souboru", "limit souboru", "pdf docx audio video", "kolik souboru"],
   simple:"Lze přidat nejvýše 12 souborů, každý do 20 MB. Podporovány jsou PDF, DOCX, textové a datové formáty, běžné obrázky, audio a vybraná videa; starý DOC, AVI a MKV podporovány nejsou.",
-  detailed:"Povolené přípony: pdf, docx, txt/md/csv/tsv/json/rtf/html/xml/yaml/yml/srt, png/jpg/jpeg/gif/webp/heic, mp3/wav/m4a/ogg/aac/flac a mp4/mov/m4v/webm. Text vložený do promptu je omezen na 24 000 znaků a obrázky se před API požadavkem zmenšují. I povolený velký mediální soubor může narazit na limit služby nebo timeout; pro spolehlivost používej menší a pedagogicky relevantní podklady.",
+  detailed:"Povolené přípony: pdf, docx, txt/md/csv/tsv/json/rtf/html/xml/yaml/yml/srt, png/jpg/jpeg/gif/webp/heic, mp3/wav/m4a/ogg/aac/flac a mp4/mov/m4v/webm. Textové zdroje se načítají ve výrazně větším rozsahu; HTML se před zpracováním čistí na viditelný text. Pokud zdroj přesáhne kontext jednoho požadavku, generátor jej rozdělí na překrývající se úseky, projde celý dostupný text a sestaví průřez tematicky relevantních i rovnoměrně rozprostřených částí. Do jednoho AI požadavku jde nejvýše 50 000 znaků vybraného kontextu. Extrémně velký text nad lokální limit je v UI výslovně označen; nic se nesmí zahodit potichu. Obrázky se před API požadavkem zmenšují.",
   evidence:["MAX_FILES", "MAX_FILE_SIZE", "MAX_EMBEDDED_TEXT_CHARS", "ALLOWED_FILE_EXT", "prepareInlineDataPart()"]},
 
  {id:'url-kontext',title:'Použití URL jako vstupního kontextu',status:'reseno',
