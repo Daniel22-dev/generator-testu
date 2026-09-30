@@ -74,22 +74,12 @@ function compactJsWhitespace(source, file) {
   } catch (error) {
     fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
   }
-  let out = '', end = 0, prev = '';
-  const word = ch => /[A-Za-z0-9_$]/.test(ch || '');
-  const needSpace = (a,b) => {
-    const x=a.slice(-1), y=b[0]||'';
-    return (word(x)&&word(y))||(x==='+'&&y==='+')||(x==='-'&&y==='-')||(x==='/'&&(y==='/'||y==='*'))||(x==='.'&&/\d/.test(y))||(/\d/.test(x)&&y==='.');
-  };
+  let out = '', end = 0;
   for (const token of tokens) {
-    const raw = clean.slice(token.start, token.end);
     const gap = clean.slice(end, token.start);
-    if (out) {
-      if (/\r|\n/.test(gap)) out += '\n';
-      else if (gap.length && needSpace(prev,raw)) out += ' ';
-      else if (!gap.length && needSpace(prev,raw)) out += ' ';
-    }
-    out += raw;
-    prev = raw;
+    if (/\r|\n/.test(gap)) out += '\n'.repeat(Math.max(1, (gap.match(/\r\n|\r|\n/g) || []).length));
+    else if (gap.length) out += ' ';
+    out += clean.slice(token.start, token.end);
     end = token.end;
   }
   return out;
