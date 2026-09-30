@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { parse } from 'acorn';
+import { parse, tokenizer } from 'acorn';
 
 const APP_ID = 'generator';
 const CORE_VERSION = '1.0.0';
@@ -54,6 +54,45 @@ function stripJsComments(source, file) {
     cursor = comment.end;
   }
   return out + source.slice(cursor);
+}
+
+function compactJsWhitespace(source, file) {
+  const clean = stripJsComments(source, file);
+  let scan;
+  try {
+    scan = tokenizer(clean, { ecmaVersion:'latest', sourceType:'script', allowAwaitOutsideFunction:true });
+  } catch (error) {
+    fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
+  }
+  const tokens = [];
+  try {
+    for (;;) {
+      const token = scan.getToken();
+      if (token.type.label === 'eof') break;
+      tokens.push(token);
+    }
+  } catch (error) {
+    fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
+  }
+  let out = '', end = 0, prev = '';
+  const word = ch => /[A-Za-z0-9_$]/.test(ch || '');
+  const needSpace = (a,b) => {
+    const x=a.slice(-1), y=b[0]||'';
+    return (word(x)&&word(y))||(x==='+'&&y==='+')||(x==='-'&&y==='-')||(x==='/'&&(y==='/'||y==='*'))||(x==='.'&&/\d/.test(y))||(/\d/.test(x)&&y==='.');
+  };
+  for (const token of tokens) {
+    const raw = clean.slice(token.start, token.end);
+    const gap = clean.slice(end, token.start);
+    if (out) {
+      if (/\r|\n/.test(gap)) out += '\n';
+      else if (gap.length && needSpace(prev,raw)) out += ' ';
+      else if (!gap.length && needSpace(prev,raw)) out += ' ';
+    }
+    out += raw;
+    prev = raw;
+    end = token.end;
+  }
+  return out;
 }
 
 // Odstraní CSS komentáře mimo řetězce.
@@ -206,7 +245,7 @@ const jsFiles = fs.readdirSync(jsDir)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 const mainParts = jsFiles.filter(f => !f.startsWith('50-') && !f.startsWith('60-'));
 
-const inlineScriptTag = file => `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${stripJsComments(fs.readFileSync(path.join(jsDir, file), 'utf8'), file)}\n</script>`;
+const inlineScriptTag = file => `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(fs.readFileSync(path.join(jsDir, file), 'utf8'), file)}\n</script>`;
 const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
 const jsCsTag = inlineScriptTag('50-cs-module.js');
