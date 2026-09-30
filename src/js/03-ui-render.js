@@ -160,6 +160,8 @@ function applyVisualState() {
   const rb = $('readingBlock');
   if (rb) rb.classList.toggle('hidden', !usesReadingComprehension());
   document.querySelectorAll('#rcLenBtns .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === (state.rcLength || 'medium')));
+  const rcCount=$('readingQuestionCount');if(rcCount)rcCount.value=String(Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4)));
+  const liCount=$('listeningQuestionCount');if(liCount)liCount.value=String(Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4)));
   renderRcTopics();
 
   // ── Šablona jako autorita: zamkni (zašedni) volby, které šablona řídí ──────────
