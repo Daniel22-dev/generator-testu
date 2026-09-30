@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { parse } from 'acorn';
+import { parse, tokenizer } from 'acorn';
 
 const APP_ID = 'generator';
 const CORE_VERSION = '1.0.0';
@@ -54,6 +54,35 @@ function stripJsComments(source, file) {
     cursor = comment.end;
   }
   return out + source.slice(cursor);
+}
+
+function compactJsWhitespace(source, file) {
+  const clean = stripJsComments(source, file);
+  let scan;
+  try {
+    scan = tokenizer(clean, { ecmaVersion:'latest', sourceType:'script', allowAwaitOutsideFunction:true });
+  } catch (error) {
+    fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
+  }
+  const tokens = [];
+  try {
+    for (;;) {
+      const token = scan.getToken();
+      if (token.type.label === 'eof') break;
+      tokens.push(token);
+    }
+  } catch (error) {
+    fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
+  }
+  let out = '', end = 0;
+  for (const token of tokens) {
+    const gap = clean.slice(end, token.start);
+    if (/\r|\n/.test(gap)) out += '\n'.repeat(Math.max(1, (gap.match(/\r\n|\r|\n/g) || []).length));
+    else if (gap.length) out += ' ';
+    out += clean.slice(token.start, token.end);
+    end = token.end;
+  }
+  return out;
 }
 
 // Odstraní CSS komentáře mimo řetězce.
@@ -206,7 +235,7 @@ const jsFiles = fs.readdirSync(jsDir)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 const mainParts = jsFiles.filter(f => !f.startsWith('50-') && !f.startsWith('60-'));
 
-const inlineScriptTag = file => `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${stripJsComments(fs.readFileSync(path.join(jsDir, file), 'utf8'), file)}\n</script>`;
+const inlineScriptTag = file => `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(fs.readFileSync(path.join(jsDir, file), 'utf8'), file)}\n</script>`;
 const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
 const jsCsTag = inlineScriptTag('50-cs-module.js');

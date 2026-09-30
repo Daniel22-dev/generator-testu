@@ -8,13 +8,13 @@ name: Workflow journeys E2E
 on:
   workflow_dispatch:
   push:
-    branches: [candidate, main]
+    branches: [pre-server-forms-workflow, candidate, main]
 
 permissions:
   contents: read
 
 concurrency:
-  group: generator-journeys-${{ github.ref }}
+  group: generator-journeys-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:

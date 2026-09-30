@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.59">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.60">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
@@ -982,6 +982,17 @@
         <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
           <button type="button" class="btn-mini" onclick="saveGoogleFormsUrlLocal()">💾 Používat Google Forms</button>
           <button type="button" class="btn-mini" onclick="forgetGoogleFormsUrlLocal()">↩ Používat jen answers.txt</button>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr)">
+          <div class="field-label">🏷️ Automatická metadata z předvyplněného odkazu</div>
+          <div class="field-hint">Jednorázově vlož předvyplněný Google Forms odkaz, ve kterém mají pole hodnoty <code>GIT_TEST_ID</code>, <code>GIT_TEST_NAME</code> a <code>GIT_GROUP</code>. Volitelně můžeš přidat <code>GIT_GENERATOR_VERSION</code> a <code>GIT_GENERATED_AT</code>. Generátor z odkazu bezpečně odvodí entry ID; student metadata ručně nevypisuje.</div>
+          <div class="secure-mode-box" id="generatorSettingsMetadataStatus" role="status"></div>
+          <input type="url" id="generatorSettingsPrefilledInput" style="margin-top:10px" placeholder="Předvyplněný odkaz z docs.google.com/forms/.../viewform?usp=pp_url&entry..." autocomplete="off">
+          <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn-mini" onclick="saveGoogleFormsMetadataFromPrefilledUrl()">✨ Nastavit metadata z odkazu</button>
+            <button type="button" class="btn-mini" onclick="forgetGoogleFormsMetadataLocal()">Vypnout automatická metadata</button>
+          </div>
+          <div class="small-muted" style="margin-top:8px"><strong>Bezpečnost:</strong> metadata ve Formu jsou pouze provozní orientace. Známka a identita testu se dál určují z kryptograficky ověřeného <code>SECURE-ANSWERS-V1</code> payloadu.</div>
         </div>
         <details class="forms-howto" style="margin-top:14px">
           <summary><strong>Jak Google Forms nastavit a používat — krok za krokem</strong></summary>

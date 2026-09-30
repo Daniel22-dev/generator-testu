@@ -287,7 +287,8 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
     const tw=teacherDom.window;
     if(!tw.document.getElementById('formsCsvFile')) throw new Error('chybí CSV import ovladač');
     const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
-    const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:'WRONG',manifestHash:'WRONG',payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
+    const currentPack=JSON.parse(stage3Fixture.answerTxt.replace(/^SECURE-ANSWERS-V1\s*/,''));
+    const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({...currentPack,payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
     const csv=['Časové razítko,E-mailová adresa,Odevzdávací kód,Poznámka',
       [q('15. 9. 2026 19:20:00'),q('student-one'),q(stage3Fixture.answerTxt),q('valid')].join(','),
       [q('15. 9. 2026 19:21:00'),q('student-one'),q(stage3Fixture.answerTxt),q('duplicate')].join(','),
@@ -297,11 +298,11 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
     if(parsed.delimiter!==','||parsed.identityIndex!==1||parsed.timestampIndex!==0||parsed.payloadIndex!==2) throw new Error('detekce Google Forms CSV');
     const summary=await tw.importFormsCsvText(csv,'forms-export.csv');
     const results=tw.eval('RESULTS');
-    if(summary.rows!==4||summary.ok!==2||summary.missing!==1||summary.invalid!==1||summary.ambiguous!==0) throw new Error('špatný import summary '+JSON.stringify(summary));
-    if(summary.duplicates.students!==1||summary.duplicates.attempts!==1) throw new Error('duplicity nebyly zachyceny');
-    if(results.length!==4||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student-one'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
-    if(results[2].status!=='CHYBA'||!/chybí celý odevzdávací blok/.test(results[2].error||'')) throw new Error('chybějící payload není explicitně označen');
-    if(results[3].status!=='CHYBA') throw new Error('poškozený/cizí payload nebyl odmítnut');
+    if(summary.rows!==4||summary.ok!==2||summary.missing!==1||summary.invalid!==1||summary.otherTests!==0||summary.ambiguous!==0) throw new Error('špatný import summary '+JSON.stringify(summary));
+    if(summary.duplicates.exact!==1||summary.duplicates.conflicts!==0) throw new Error('duplicity nebyly zachyceny');
+    if(results.length!==2||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student-one'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
+    if(!results[1].exactDuplicate) throw new Error('identická duplicita nebyla označena');
+    if(results.some(r=>r.status!=='OK')) throw new Error('celoroční import nesmí plnit výsledkovou sadu neplatnými řádky');
     const semi='Timestamp;Email Address;Result\n'+[q('x'),q('student-two'),q(stage3Fixture.answerTxt)].join(';')+'\n';
     const p2=tw.parseFormsCsvText(semi);
     if(p2.delimiter!==';'||p2.identityIndex!==1||p2.payloadIndex!==2) throw new Error('středníkový CSV export');

@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.59',
-  date:    '2026-09-29',
+  version: '7.1.60',
+  date:    '2026-09-30',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'PŘEDSERVEROVÉ FORMS WORKFLOW (7.1.60): jeden univerzální Google Form může sbírat výsledky celý školní rok; metadata testu se předvyplní automaticky, teacher verifier umí z celého CSV kryptograficky vybrat jen svůj test, hlídá metadata mismatch, duplicity a více pokusů a nabízí oddělený export výsledků a odevzdání.',
     'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
     'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové dávky a Reading analýza se při chybě zachovají a další pokus naváže. AI dávka má jeden timeout a běžné typy se zbytečně netříští.',
     'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'UX HOTFIX (7.1.53): opraveno otevírání a sbalování nastavení položek/bodů v Simple režimu, po sbalení se vracejí karty typů cvičení; hover nápověda se otevírá přednostně vedle karty a má neprůhledné pozadí; profily Procvičování/Běžný/Přísný stručně a věcně popisují skutečné chování testu.',
     'READING TOPIC PRIORITY (7.1.50): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
     'UI ZDROJŮ (7.1.48): Simple režim používá vždy Automaticky. Advanced nahrazuje rozbalovací seznam šesti kartami s krátkým vysvětlením přímo na kartě, plným tooltipem a jasným aktivním stavem; logika generování a jazyková pravidla zůstávají beze změny.',
-    'AUDIT 7.1.47: opravy bodování a ručních formulářů, FR/LA rozhraní, bezpečné přijímání alternativ, druhá kontrola klíče, menší dávky generování, transakční editor a varianty, čtyři přehledné kroky před stažením. Lokální audit s testovacími odpověďmi AI; čeká na původní CI a provozní zkoušku.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -238,6 +238,7 @@ const DOM_FIELDS = ['nazev','proKoho','latka','zadaniText',
 const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin'];
 const LEGACY_SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
 const GOOGLE_FORMS_SUBMISSION_URL_KEY = 'sestavovac_google_forms_submission_url_v1';
+const GOOGLE_FORMS_METADATA_CONFIG_KEY = 'sestavovac_google_forms_metadata_v1';
 const MAX_FILES = 12;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const MAX_IMAGE_PREVIEW_SIZE = 4 * 1024 * 1024;
