@@ -101,8 +101,11 @@ requireText(persistence, /const TEMPLATE_PREFILL_KEYS[\s\S]*jazyk[\s\S]*uroven[\
 const templatePrefillStart = persistence.indexOf('const TEMPLATE_PREFILL_KEYS');
 const templatePrefillEnd = persistence.indexOf('\n', templatePrefillStart);
 const templatePrefillBlock = templatePrefillStart >= 0 && templatePrefillEnd > templatePrefillStart ? persistence.slice(templatePrefillStart, templatePrefillEnd) : '';
-forbidText(templatePrefillBlock, /zadaniText|readingText|listeningTranscript|fileNames|urls|studenti|podminky|heslo|ucitelPin/, 'Šablona nesmí ukládat obsah zadání, přílohy, URL, identity/podmínky studentů ani přístupové kódy.');
-requireText(persistence, /format:\s*['"]prefill_v2['"][\s\S]*getTemplatePrefill\(\)/, 'Nové šablony se neukládají ve formátu prefill_v2.');
+forbidText(templatePrefillBlock, /fileNames|studenti|podminky|heslo|ucitelPin/, 'Šablona nesmí ukládat binární přílohy, identity/podmínky studentů ani přístupové kódy.');
+requireText(persistence, /format:\s*['"]prefill_v3['"][\s\S]*getTemplatePrefill\(\)[\s\S]*getTemplateDomPrefill\(\)/, 'Nové šablony se neukládají ve formátu prefill_v3 s bezpečným stavem a textovými poli.');
+requireText(persistence, /function getTemplateDomPrefill\(\)[\s\S]*DOM_FIELDS[\s\S]*!SENSITIVE_FIELD_IDS\.includes\(id\)/, 'prefill_v3 nemá explicitní filtr citlivých DOM polí.');
+requireText(persistence, /function clearTemplateTransientFiles\(\)[\s\S]*fileObjects=\[\][\s\S]*state\.fileNames=\[\]/, 'Načtení šablony nečistí binární přílohy a jejich názvy.');
+forbidText(persistence, /getTemplateDomPrefill\(\)[\s\S]{0,500}(?:ucitelPin|heslo)/, 'prefill_v3 nesmí přímo zahrnout PIN nebo heslo.');
 requireText(aiIntegration, /async function genCallCoreResilient[\s\S]*status!==503[\s\S]*setTimeout\(r,2000\)[\s\S]*providerRequests=/, 'Přímý Gemini transport nemá omezený backoff retry pro přechodnou HTTP 503.');
 requireText(aiIntegration, /GEN_LOGICAL_REQUEST_TIMEOUT_MS[\s\S]*hardTimedOut[\s\S]*code:'TIMEOUT'/, 'AI Core integrace nemá společný časový strop logické dávky.');
 requireText(generationWorkflow, /generationResumeCheckpoint[\s\S]*cp\.r[\s\S]*cp\.p=parts\.slice\(\)[\s\S]*Zachováno/, 'Generování nezachovává hotové dávky a Reading analýzu pro bezpečné navázání.');
