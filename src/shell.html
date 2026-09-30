@@ -997,6 +997,14 @@
           <div class="small-muted"><strong>Důležité:</strong> krátký jednorázový studentský kód není odevzdávací payload. Studentský kód pouze identifikuje studenta; do Forms patří celý <code>SECURE-ANSWERS-V1</code> blok. Pokud je blok nezvykle dlouhý nebo formulář není dostupný, test nabídne <code>answers.txt</code>.</div>
         </details>
       </div>
+
+      <div class="field" style="margin-top:18px;margin-bottom:0">
+        <div class="field-label">🧹 Sdílený školní počítač</div>
+        <div class="field-hint">Po skončení práce můžeš z tohoto zařízení odstranit místní data Generátoru. Smažou se pouze data patřící Generátoru a jeho přístupový permit; data jiných aplikací ani ostatní data prohlížeče se nemažou.</div>
+        <div class="ex-action" style="margin-top:8px">
+          <button type="button" class="btn-mini btn-dl-danger" id="btnEndWorkCleanup" onclick="confirmGeneratorEndWork()">Ukončit práci a smazat místní data</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
