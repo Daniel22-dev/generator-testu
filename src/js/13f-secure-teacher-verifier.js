@@ -28,6 +28,7 @@ function metadataMismatchFor(sm){const out=[];if(sm.formTestId&&normMeta(sm.form
 async function verifyText(name,txt,meta){const sm=verifierSourceMeta(meta);const fullYear=!!(meta&&meta.fullYearCsv);let pack=null;let digest='';try{pack=parseTxt(txt);digest=await sha256HexText(txt);}catch(e){if(fullYear)return {classification:'invalid',error:String(e&&e.message?e.message:e)};RESULTS.push(Object.assign({file:name,status:'CHYBA',error:String(e&&e.message?e.message:e),student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:txt},sm));return {classification:'invalid'};}
   let payload;
   try{payload=await decryptPayload(pack);}catch(e){
+    if(fullYear&&pack&&String(pack.testId||'')&&String(pack.testId)!==String(CONFIG.testId))return {classification:'other-test',hintTestId:String(pack.testId||'')};
     const msg=String(e&&e.message?e.message:e);
     if(fullYear)return {classification:'invalid',error:msg};
     RESULTS.push(Object.assign({file:name,status:'CHYBA',error:msg,student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:txt},sm));return {classification:'invalid'};
