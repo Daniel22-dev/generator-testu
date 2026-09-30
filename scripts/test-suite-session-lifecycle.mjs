@@ -126,7 +126,8 @@ check(!accessSource.includes('localStorage.clear(')&&!accessSource.includes('ses
 // 8 Pre-server Google Forms contract: one-time metadata mapping + cryptographic verifier selection
 check(shellSource.includes('GIT_TEST_ID')&&shellSource.includes('GIT_TEST_NAME')&&shellSource.includes('GIT_GROUP'),'Forms onboarding documents required metadata placeholders');
 check(stateSource.includes('parseGoogleFormsPrefilledMetadataUrl')&&stateSource.includes("['testId','testName','group']"),'Forms onboarding derives and requires Test ID/name/group entry IDs');
-check(assembleSource.includes('formsMetadata: configForHash.formsMetadata || null'),'Secure test seals Forms metadata mapping into generated config');
+check(assembleSource.includes('formsMetadata: configForHash.formsMetadata || null')&&assembleSource.includes('normalizeStoredGoogleFormsMetadata(formsMetaCandidate)'),'Secure test validates and seals Forms metadata mapping into generated config');
+check(fs.readFileSync('src/js/13c-secure-package.js','utf8').includes("formsMetadata:cfg.formsMetadata?{v:1,responderUrl:"),'Secure student public config carries only the validated Forms metadata mapping');
 check(studentRuntimeSource.includes('function formsOpenUrl()')&&studentRuntimeSource.includes("u.searchParams.set('entry.'+meta.entries[k]"),'Student runtime prefills per-test metadata without manual student entry');
 check(verifierSource.includes("String(payload.testId||'')!==String(CONFIG.testId)")&&verifierSource.includes("payload.manifestHash!==CONFIG.manifestHash")&&verifierSource.includes("payload.studentHtmlSha256!==CONFIG.studentHtmlSha256"),'Verifier filters imported submissions by cryptographically decrypted payload identity');
 check(verifierSource.includes('payloadHits*1000')&&verifierSource.includes("startsWith('SECURE-ANSWERS-V1')"),'Verifier locates payload column by content rather than fixed CSV position');
