@@ -283,9 +283,75 @@ function configuredGoogleFormsUrl(){
   try { return normalizeGoogleFormsResponderUrl(storedGoogleFormsUrlValue()); }
   catch(_) { return ''; }
 }
+const GOOGLE_FORMS_METADATA_PLACEHOLDERS = Object.freeze({
+  testId:'GIT_TEST_ID',
+  testName:'GIT_TEST_NAME',
+  group:'GIT_GROUP',
+  generatorVersion:'GIT_GENERATOR_VERSION',
+  generatedAt:'GIT_GENERATED_AT'
+});
+function validGoogleFormsEntryId(value){ return /^\d{1,20}$/.test(String(value||'')); }
+function storedGoogleFormsMetadataValue(){
+  try { return localStorage.getItem(GOOGLE_FORMS_METADATA_CONFIG_KEY) || ''; }
+  catch(_) { return ''; }
+}
+function normalizeStoredGoogleFormsMetadata(value){
+  const raw = value && typeof value === 'object' ? value : {};
+  const responderUrl = normalizeGoogleFormsResponderUrl(raw.responderUrl || '');
+  if (!responderUrl || !/^https:\/\/docs\.google\.com\/forms\//i.test(responderUrl)) throw new TypeError('Metadata vyžadují plný responder odkaz docs.google.com/forms.');
+  const entries = raw.entries && typeof raw.entries === 'object' ? raw.entries : {};
+  const cleanEntries = {};
+  for (const key of Object.keys(GOOGLE_FORMS_METADATA_PLACEHOLDERS)) {
+    const id = String(entries[key] || '');
+    if (id) {
+      if (!validGoogleFormsEntryId(id)) throw new TypeError('Neplatné Google Forms entry ID pro '+key+'.');
+      cleanEntries[key] = id;
+    }
+  }
+  for (const required of ['testId','testName','group']) {
+    if (!cleanEntries[required]) throw new TypeError('Chybí povinné metadata pole '+required+'.');
+  }
+  return {v:1,responderUrl,entries:cleanEntries};
+}
+function configuredGoogleFormsMetadata(){
+  try {
+    const raw = storedGoogleFormsMetadataValue();
+    if (!raw) return null;
+    return normalizeStoredGoogleFormsMetadata(JSON.parse(raw));
+  } catch(_) { return null; }
+}
+function parseGoogleFormsPrefilledMetadataUrl(raw){
+  const text=String(raw||'').trim();
+  if(!text) throw new TypeError('Vlož předvyplněný odkaz z Google Forms.');
+  let u; try{u=new URL(text);}catch(_){throw new TypeError('Předvyplněný Google Forms odkaz není platná URL.');}
+  if(u.protocol!=='https:'||String(u.hostname||'').toLowerCase()!=='docs.google.com') throw new TypeError('Pro načtení metadata polí použij plný předvyplněný odkaz z docs.google.com/forms.');
+  if(!/^\/forms\/(?:u\/\d+\/)?d(?:\/e)?\/[^/]+\/viewform\/?$/i.test(u.pathname||'')) throw new TypeError('Použij předvyplněný responder odkaz Google Forms končící /viewform.');
+  const found={};
+  for(const [param,value] of u.searchParams.entries()){
+    const m=/^entry\.(\d{1,20})$/.exec(param);
+    if(!m) continue;
+    const clean=String(value||'').trim();
+    for(const [key,placeholder] of Object.entries(GOOGLE_FORMS_METADATA_PLACEHOLDERS)){
+      if(clean===placeholder){
+        if(found[key]&&found[key]!==m[1]) throw new TypeError('Placeholder '+placeholder+' je v odkazu vícekrát.');
+        found[key]=m[1];
+      }
+    }
+  }
+  for(const required of ['testId','testName','group']){
+    if(!found[required]) throw new TypeError('V předvyplněném odkazu chybí placeholder '+GOOGLE_FORMS_METADATA_PLACEHOLDERS[required]+'.');
+  }
+  const base=new URL(u.toString());
+  [...base.searchParams.keys()].forEach(k=>{ if(/^entry\.\d+$/.test(k)) base.searchParams.delete(k); });
+  base.searchParams.delete('usp');
+  return normalizeStoredGoogleFormsMetadata({v:1,responderUrl:base.toString(),entries:found});
+}
 function syncGeneratorSettingsFormsInput(){
   const input = $('generatorSettingsFormsInput');
   if (input) input.value = storedGoogleFormsUrlValue();
+  const metaInput = $('generatorSettingsPrefilledInput');
+  if (metaInput) metaInput.value = '';
+  updateGeneratorSettingsMetadataStatus();
 }
 function updateGeneratorSettingsFormsStatus(){
   const status = $('generatorSettingsFormsStatus');
@@ -306,6 +372,19 @@ function updateGeneratorSettingsFormsStatus(){
     status.textContent = '🔴 ' + String(e && e.message ? e.message : e);
   }
 }
+function updateGeneratorSettingsMetadataStatus(){
+  const status=$('generatorSettingsMetadataStatus');
+  if(!status) return;
+  const cfg=configuredGoogleFormsMetadata();
+  if(cfg){
+    const optional=['generatorVersion','generatedAt'].filter(k=>cfg.entries[k]).length;
+    status.textContent='🟢 Automatická metadata jsou nastavena: Test ID, název testu, skupina'+(optional?' + '+optional+' volitelné pole/pole.':'.');
+    status.className='secure-mode-box';
+    return;
+  }
+  status.textContent='⚪ Automatická metadata nejsou nastavena. Secure test použije současný Forms workflow bez metadata.';
+  status.className='secure-mode-box';
+}
 async function saveGoogleFormsUrlLocal(){
   const input = $('generatorSettingsFormsInput');
   const raw = input ? input.value : '';
@@ -315,16 +394,44 @@ async function saveGoogleFormsUrlLocal(){
   if (!clean) { await uiAlert('Vlož responder odkaz na Google Form. Pokud chceš používat answers.txt, zvol „Používat jen answers.txt“.', 'Chybí odkaz'); return; }
   try {
     if(!generatorPersistenceAllowed()) return;
+    const oldMeta=configuredGoogleFormsMetadata();
     localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY, clean);
+    if(oldMeta&&oldMeta.responderUrl!==clean) localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);
     if (input) input.value = clean;
     updateGeneratorSettingsFormsStatus();
+    updateGeneratorSettingsMetadataStatus();
     if (typeof updateSecurityGuideUI === 'function') updateSecurityGuideUI();
     uiToast('Google Forms jsou nastavené jako primární cesta pro nově generované secure testy. answers.txt zůstává záloha.', 'ok', 5200);
   } catch(_) { await uiAlert('Odkaz se nepodařilo uložit. Prohlížeč možná blokuje localStorage.'); }
 }
+async function saveGoogleFormsMetadataFromPrefilledUrl(){
+  const input=$('generatorSettingsPrefilledInput');
+  let cfg;
+  try{cfg=parseGoogleFormsPrefilledMetadataUrl(input?input.value:'');}
+  catch(e){await uiAlert(String(e&&e.message?e.message:e),'Metadata Google Forms');updateGeneratorSettingsMetadataStatus();return;}
+  try{
+    if(!generatorPersistenceAllowed()) return;
+    localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(cfg));
+    localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,cfg.responderUrl);
+    const urlInput=$('generatorSettingsFormsInput'); if(urlInput) urlInput.value=cfg.responderUrl;
+    if(input) input.value='';
+    updateGeneratorSettingsFormsStatus();
+    updateGeneratorSettingsMetadataStatus();
+    if(typeof updateSecurityGuideUI==='function') updateSecurityGuideUI();
+    uiToast('Metadata Google Forms jsou nastavena jednorázově pro další secure testy.','ok',5200);
+  }catch(_){await uiAlert('Nastavení metadata polí se nepodařilo uložit.');}
+}
+async function forgetGoogleFormsMetadataLocal(){
+  try{
+    localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);
+    updateGeneratorSettingsMetadataStatus();
+    uiToast('Automatická metadata Google Forms byla vypnuta. Základní Forms workflow zůstává aktivní.','ok',4200);
+  }catch(_){await uiAlert('Nastavení metadata polí se nepodařilo změnit.');}
+}
 async function forgetGoogleFormsUrlLocal(){
   try {
     localStorage.removeItem(GOOGLE_FORMS_SUBMISSION_URL_KEY);
+    localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);
     syncGeneratorSettingsFormsInput();
     updateGeneratorSettingsFormsStatus();
     if (typeof updateSecurityGuideUI === 'function') updateSecurityGuideUI();
