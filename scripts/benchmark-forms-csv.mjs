@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+import { performance } from 'node:perf_hooks';
+const sizes=[100,1000,3000,5000], TEST_ID='test-current-2026', OTHER_ID='test-other-2026';
+const payload='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:TEST_ID,manifestHash:'m'.repeat(64),studentHtmlSha256:'s'.repeat(64),ciphertext:'x'.repeat(1800)});
+const other='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:OTHER_ID,manifestHash:'o'.repeat(64),studentHtmlSha256:'q'.repeat(64),ciphertext:'y'.repeat(1800)});
+function csvCell(v){const s=String(v??'');return /[;"\n\r]/.test(s)?'"'+s.replaceAll('"','""')+'"':s;}
+function makeCsv(n){const rows=[['Timestamp','Email Address','Test ID','Test name','Group','Secure submission']];for(let i=0;i<n;i++){const cur=i%4===0;rows.push(['2026-09-30 08:00:00','student'+i+'@example.invalid',cur?TEST_ID:OTHER_ID,cur?'Current':'Other','G'+(i%8),cur?payload:other]);}return rows.map(r=>r.map(csvCell).join(';')).join('\n');}
+function parseDelimited(text,d=';'){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'&&text[i+1]==='"'){cell+='"';i++;}else if(ch==='"')q=false;else cell+=ch;}else if(ch==='"')q=true;else if(ch===d){row.push(cell);cell='';}else if(ch==='\n'){row.push(cell);rows.push(row);row=[];cell='';}else if(ch!=='\r')cell+=ch;}row.push(cell);rows.push(row);return rows;}
+function classify(rows){let current=0,otherCount=0,missing=0;for(const r of rows.slice(1)){const txt=String(r[5]||'').trim();if(!txt.startsWith('SECURE-ANSWERS-V1')){missing++;continue;}const pack=JSON.parse(txt.slice(txt.indexOf('\n')+1));if(pack.testId===TEST_ID)current++;else otherCount++;}return {current,other:otherCount,missing};}
+function mem(){return Math.round(process.memoryUsage().heapUsed/1048576*10)/10;}
+const results=[];
+for(const n of sizes){global.gc?.();const before=mem(),t0=performance.now(),csv=makeCsv(n),t1=performance.now(),rows=parseDelimited(csv),t2=performance.now(),counts=classify(rows),t3=performance.now();results.push({rows:n,csvMiB:Math.round(Buffer.byteLength(csv)/1048576*100)/100,generateMs:+(t1-t0).toFixed(1),parseMs:+(t2-t1).toFixed(1),classifyMs:+(t3-t2).toFixed(1),totalMs:+(t3-t0).toFixed(1),heapBeforeMiB:before,heapAfterMiB:mem(),counts});}
+console.log(JSON.stringify({kind:'synthetic-csv-parser-classifier-benchmark',note:'CSV generation/parsing/classification only; cryptographic decrypt and browser rendering are not simulated.',node:process.version,results},null,2));
