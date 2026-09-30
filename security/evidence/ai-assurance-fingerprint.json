@@ -6,12 +6,12 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "02466c1c889b59b5868fef9f4c9f674cf3ac378ac10f7d9807ff643c8698782d",
+  "fingerprint": "a326a5e7ee0363b8806df5843b68023cd594244d0179d34affaeece09436e4d2",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 162975,
-      "sha256": "c22e78221319e5f4ce00e792d153a1aa21160772fafd5eee479a1cff91636736"
+      "size": 163216,
+      "sha256": "759eb964996376f3373f26503eddbcc9a75d522fc08e93db053850447f1b0a3f"
     },
     {
       "path": "src/js/03-ui-render.js",
