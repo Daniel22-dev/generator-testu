@@ -8,7 +8,7 @@ name: Workflow journeys E2E
 on:
   workflow_dispatch:
   push:
-    branches: [pre-server-forms-workflow, candidate, main]
+    branches: [candidate, main]
 
 permissions:
   contents: read
