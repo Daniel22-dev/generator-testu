@@ -411,7 +411,7 @@ async function analyzeReadingSourceForAi(fileParts,lvl){
   if(!activeSourceMaterialPresent())return null;
   const mode=normalizeSourceUseMode(state.sourceUseMode),context=buildReadingSourceContextForAi(),topic=rcEffectiveTopic();
   const prompt='Analyze the teacher source for a new reading-comprehension task.\nTarget language: '+(state.jazyk||'angličtina')+'. Target CEFR: '+lvl+'.\n'+sourceUsePolicyPrompt(mode,{cefr:lvl,reading:true,readingTopic:!!topic})+'\n\n'+(topic?wrapUntrustedField('READING TOPIC',topic)+'\n\n':'')+(context?context+'\n\n':'')+'Return ONLY JSON: {"summary":"short factual summary","target_vocabulary":["actual source item"],"grammar_targets":["actual source structure"],"content_points":["actual source point"],"task_style_notes":["brief note"]}. Only list source-supported material; when a Reading topic is present, prefer vocabulary that fits it naturally.';
-  return await callGeminiJSON(prompt,fileParts,{urlContext:state.zadaniTab==='url',operation:'reading-source-analysis'});
+  return await callGeminiJSON(prompt,fileParts,{urlContext:buildGeminiUrlPartsForApi(state).useUrlContext,operation:'reading-source-analysis'});
 }
 
 // ═══ READING COMPREHENSION — téma dle CEFR + AI návrh ══════════════════════════
