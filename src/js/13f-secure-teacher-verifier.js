@@ -1,6 +1,4 @@
 function buildSecureTeacherVerifierHtml(cfg, variants) {
-  // Učitelský verifier je záměrně vždy česky. Jazyk studentského testu (uiLang)
-  // se sem nepropaguje, protože verifier je pracovní nástroj učitele.
   const safeCfg = {v:1,mode:'secureOfflineVerifier',generatorVersion:cfg.generatorVersion,buildHash:cfg.buildHash,releaseDate:cfg.releaseDate,releaseStatus:cfg.releaseStatus||'',generatedAt:cfg.generatedAt||'',resultMode:'secureOffline',creatorId:cfg.creatorId||'',creatorName:cfg.creatorName||'',creatorRole:cfg.creatorRole||'',testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:cfg.studentHtmlSha256||'',nazev:cfg.nazev,proKoho:cfg.proKoho,isSpanish:!!cfg.isSpanish,isCzech:!!cfg.isCzech,csScoringPolicy:cfg.csScoringPolicy||{},cefr:cfg.cefr||'',cefrLevels:cfg.cefrLevels||[],cefrCombined:!!cfg.cefrCombined,totalBody:cfg.totalBody,gradeTyp:cfg.gradeTyp,gradeScale:cfg.gradeScale,gradeScaleRaw:cfg.gradeScaleRaw,fuzzyTolerance:cfg.fuzzyTolerance||'off',cas:Number(cfg.cas)||0,identityMode:cfg.identityMode||'name',roster:Array.isArray(cfg.roster)?cfg.roster:[],privateKey:cfg.privateKey};
   return '<!DOCTYPE html>\n<html lang="cs"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+H(cfg.nazev)+' — teacher verifier</title><style>'+secureCss()+'.v-toast-stack{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:9999;max-width:92vw;align-items:center}.v-toast{background:#1f2937;color:#fff;padding:11px 16px;border-radius:10px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;max-width:480px}.v-toast.show{opacity:1;transform:translateY(0)}.v-toast.ok{background:#15803d}.v-toast.warn{background:#b45309}.v-toast.err{background:#b91c1c}.v-modal-bd{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:10000;padding:18px}.v-modal-box{background:#fff;border-radius:14px;max-width:440px;width:100%;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}.v-modal-head{font-size:17px;font-weight:700;margin-bottom:8px;color:#111}.v-modal-body{font-size:14px;line-height:1.5;margin-bottom:16px;color:#374151}.v-modal-act{display:flex;gap:8px;justify-content:flex-end}.v-modal-btn{padding:9px 16px;border-radius:9px;border:1px solid #d1d5db;background:#fff;cursor:pointer;font-size:14px;font-family:inherit}.v-modal-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}</style></head><body>'+
     auditCommentHtml(safeCfg)+'<div class="wrap"><section class="card"><h1>Učitelský verifier</h1><div class="muted">'+H(cfg.nazev)+' · Test ID: '+H(cfg.testId)+(cfg.cefr?' · CEFR: '+H(cfg.cefr):'')+'</div><div class="muted" style="font-size:12px;opacity:.85;margin-top:2px">Creator ID: '+H(safeCfg.creatorId||'—')+(safeCfg.creatorName?' · '+H(safeCfg.creatorName):'')+' · role: '+H(safeCfg.creatorRole||'—')+' · generátor v'+H(safeCfg.generatorVersion||'')+' ('+H(safeCfg.releaseStatus||'')+') · build '+H(safeCfg.buildHash||'')+' · vygenerováno '+H(safeCfg.generatedAt||'—')+' · režim: secureOffline</div><div class="archive-note"><b>Kontrola integrity:</b> očekávaný SHA-256 studentského HTML: <code style="word-break:break-all">'+H(safeCfg.studentHtmlSha256||'—')+'</code><br>Verifier přijímá jen answers.txt se stejným Test ID a manifestem: <code>'+H(safeCfg.testId)+'</code> / <code style="word-break:break-all">'+H(safeCfg.manifestHash||'')+'</code>.</div><div class="ok">Přetáhni nebo vyber všechny studentské answers.txt najednou. Verifier spočítá známky, CSV, individuální zpětnou vazbu a archivní balíček pro školní úložiště.</div><div class="danger"><b>⚠️ Pouze pro učitele:</b> tento soubor obsahuje správné odpovědi, soukromý dešifrovací klíč, učitelský náhled testu a archivní nástroje. <b>Nikdy neposílej teacher_verifier.html studentům.</b> Studentům patří pouze student_test.html.</div>'+
@@ -13,10 +11,6 @@ let LAST_FORMS_IMPORT=null;
 const ATTEMPT_DECISIONS=new Map();
 const $=id=>document.getElementById(id);
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-// Vlastní toast + potvrzovací modal místo nativních prohlížečových dialogů —
-// stejně jako v generátoru. Důvod: nativní dialogy se na mobilu a školních
-// zařízeních chovají rušivě a nekonzistentně napříč prohlížeči a komplikují
-// automatické E2E testy.
 function vToast(msg,type){var st=document.getElementById('vToastStack');if(!st){st=document.createElement('div');st.id='vToastStack';st.className='v-toast-stack';document.body.appendChild(st);}var el=document.createElement('div');el.className='v-toast '+(type||'ok');el.setAttribute('role','status');el.textContent=String(msg||'');st.appendChild(el);requestAnimationFrame(function(){el.classList.add('show');});setTimeout(function(){el.classList.remove('show');setTimeout(function(){el.remove();},220);},3200);}
 function vConfirm(msg,title){return new Promise(function(resolve){var bd=document.createElement('div');bd.className='v-modal-bd';bd.setAttribute('role','dialog');bd.setAttribute('aria-modal','true');bd.innerHTML='<div class="v-modal-box"><div class="v-modal-head">'+esc(title||'Potvrzení')+'</div><div class="v-modal-body">'+esc(msg||'')+'</div><div class="v-modal-act"><button type="button" class="v-modal-btn" data-c>Zrušit</button><button type="button" class="v-modal-btn primary" data-o>Pokračovat</button></div></div>';document.body.appendChild(bd);function done(v){document.removeEventListener('keydown',onkey);bd.remove();resolve(v);}function onkey(e){if(e.key==='Escape')done(false);else if(e.key==='Enter')done(true);}bd.querySelector('[data-o]').addEventListener('click',function(){done(true);});bd.querySelector('[data-c]').addEventListener('click',function(){done(false);});bd.addEventListener('click',function(e){if(e.target===bd)done(false);});document.addEventListener('keydown',onkey);setTimeout(function(){var o=bd.querySelector('[data-o]');if(o)o.focus();},0);});}
 function __isSpanish(){return !!(typeof CONFIG!=='undefined'&&CONFIG&&CONFIG.isSpanish);}
@@ -34,7 +28,6 @@ function metadataMismatchFor(sm){const out=[];if(sm.formTestId&&normMeta(sm.form
 async function verifyText(name,txt,meta){const sm=verifierSourceMeta(meta);const fullYear=!!(meta&&meta.fullYearCsv);let pack=null;let digest='';try{pack=parseTxt(txt);digest=await sha256HexText(txt);}catch(e){if(fullYear)return {classification:'invalid',error:String(e&&e.message?e.message:e)};RESULTS.push(Object.assign({file:name,status:'CHYBA',error:String(e&&e.message?e.message:e),student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:txt},sm));return {classification:'invalid'};}
   let payload;
   try{payload=await decryptPayload(pack);}catch(e){
-    if(fullYear&&pack&&String(pack.testId||'')&&String(pack.testId)!==String(CONFIG.testId))return {classification:'other-test',hintTestId:String(pack.testId||'')};
     const msg=String(e&&e.message?e.message:e);
     if(fullYear)return {classification:'invalid',error:msg};
     RESULTS.push(Object.assign({file:name,status:'CHYBA',error:msg,student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:txt},sm));return {classification:'invalid'};
@@ -169,10 +162,6 @@ function rosterLabel(r){if(!rosterIsCodeMode())return '';var m=rosterMap();var c
 function rosterHasCode(r){if(!rosterIsCodeMode())return true;var m=rosterMap();return Object.prototype.hasOwnProperty.call(m,submittedCode(r).toUpperCase());}
 function displayStudent(r){if(!r)return '';var base=r.student||r.file||'';if(!rosterIsCodeMode())return base;var c=submittedCode(r);var lab=rosterLabel(r);if(lab)return lab+(c?' (kód '+c+')':'');return (c?('kód '+c):base)+' — není v seznamu';}
 function securitySignalsFor(r,info){if(!r||r.status!=='OK')return [];info=info||duplicateInfo();const out=[];const add=(code,label,detail,sev)=>out.push({code,label,detail:detail||'',sev:(sev==='hard'?'hard':'soft')});const ev=r.securityEvents||[];
-  // Opuštění okna rozdělujeme na MĚKKÝ a TVRDÝ signál. Technická detekce odchodu z okna není
-  // 100% (na mobilu ji spustí notifikace, příchozí hovor, systémová lišta, uspání displeje),
-  // proto ojedinělé krátké přepnutí je jen měkký signál. Tvrdší je: pagehide, reload, zámek,
-  // opakované opuštění nebo prokazatelně dlouhý odchod (z měření délky v novějších souborech).
   const leaveSoftTypes=['visibility-hidden','blur-away','left-window'];
   const leaveCount=eventCount(r,leaveSoftTypes);
   const pagehide=eventCount(r,['pagehide']);
@@ -193,8 +182,6 @@ function securitySignalsFor(r,info){if(!r||r.status!=='OK')return [];info=info||
   duplicateWarningsFor(r,info).forEach(w=>add('duplicate','opakovaný pokus / stejný kód',w,'hard'));
   const changes=answerChangeTotal(r);const qn=(r.details||[]).length||1;const changeLimit=Math.max(30,qn*5);if(changes>changeLimit)add('many-changes','neobvykle mnoho změn odpovědí',changes+' změn u '+qn+' položek','soft');
   const st=r.answerChangeStats||{};const maxOne=Math.max(0,...Object.keys(st).map(k=>Number(st[k])||0));if(maxOne>12)add('many-changes-one','neobvykle mnoho změn u jedné odpovědi','max. '+maxOne+' změn u jedné položky','soft');
-  // Indikátor rozdělené obrazovky — měkký signál. Zobraz jen když okno bylo malé/rozdělené
-  // po nezanedbatelnou část testu (≥25 %), ať jednorázové zmenšení nedělá šum.
   var split=ev.filter(e=>String(e&&e.type||'')==='split-window');
   if(split.length){var sp=Math.max.apply(null,split.map(e=>Number(e.pct)||0));if(sp>=25)add('split-window','test běžel v malém / rozděleném okně',sp+' % času — možný split screen (okno vedle). Na mobilu může jít o rozdělenou obrazovku.','soft');}
   if(CONFIG.identityMode==='oneTimeCode' && (CONFIG.roster||[]).length && !rosterHasCode(r)){add('unknown-code','kód není v seznamu (roster)','zadáno: '+(submittedCode(r)||'—')+' — ověř přidělený kód studenta, může jít o překlep nebo cizí kód.','hard');}
@@ -205,10 +192,6 @@ function renderSecuritySignals(){const box=$('securitySignals');if(!box)return;c
 let duplicateWarnShown=false;
 function flagDuplicateSubmissions(){if(duplicateWarnShown)return;const info=duplicateInfo();if(info.dupStudentKeys.length||info.dupAttemptKeys.length){duplicateWarnShown=true;vToast('Verifier našel možné duplicity: '+info.dupStudentKeys.length+' duplicitních jmen/kódů, '+info.dupAttemptKeys.length+' duplicitních ID pokusu. Zkontroluj oranžové řádky ve výsledcích.','warn');}}
 function afterResultsChanged(){renderTable();refreshStudentSelect();renderSecuritySignals();renderProblemSummary();renderItemAnalysis();renderFeedback();flagDuplicateSubmissions();flagFullNameIdentifiers();}
-// Defenzivní vrstva nad provozním pravidlem „používej kódy, ne jména". Když nahraná
-// data vypadají jako celá jména (mezera + 2+ tokeny ≥3 znaků, např. „Jan Novák"),
-// jednorázově upozorníme učitele — výsledky/feedback/CSV ponesou osobní údaje a je
-// třeba je ukládat jen do zabezpečeného školního úložiště, ne posílat e-mailem.
 let nameWarnShown = false;
 function looksLikeFullName(s){
   const v=String(s||'').trim();
@@ -282,7 +265,6 @@ function itemAnalysisRows(){var ok=RESULTS.filter(function(r){return r.status===
 function iaDiffLabel(p){if(p<0.3)return 'těžká';if(p>0.9)return 'podezřele snadná';if(p>0.85)return 'snadná';return 'střední';}
 function iaDiscVerdict(row){if(row.n<3)return {txt:'málo dat',bad:false};if(row.D==null)return {txt:'—',bad:false};if(row.D<0)return {txt:'⚠ záporná — zkontroluj klíč',bad:true};if(row.D<0.15)return {txt:'⚠ slabě rozlišuje',bad:true};if(row.D<0.3)return {txt:'hraniční',bad:false};return {txt:'OK',bad:false};}
 function iaTopWrongAnswers(wrongAnswers, n){
-  // Agreguje nejčastější špatné odpovědi, vrátí top-n s počtem výskytů
   var counts = {};
   wrongAnswers.forEach(function(a){ var k = String(a||'').trim(); if(k) counts[k] = (counts[k]||0)+1; });
   return Object.keys(counts)
@@ -292,10 +274,8 @@ function iaTopWrongAnswers(wrongAnswers, n){
     .map(function(k){ return {answer:k, count:counts[k]}; });
 }
 function analysisHtml(forExport){var ok=RESULTS.filter(function(r){return r.status==='OK';});if(!ok.length)return '<div class="muted">Zatím nejsou načtené žádné opravené výsledky.</div>';var s=distributionStats();var html='';html+='<div class="archive-note"><b>Souhrn třídy:</b> '+s.n+' studentů · průměr <b>'+s.mean+' %</b> · medián '+s.median+' % · rozsah '+s.min+'–'+s.max+' %</div>';var gkeys=Object.keys(s.grades).sort(iaGradeCmp);var maxc=0;gkeys.forEach(function(g){if(s.grades[g]>maxc)maxc=s.grades[g];});html+='<div style="margin:10px 0">';gkeys.forEach(function(g){var c=s.grades[g];var w=maxc?Math.round(c/maxc*100):0;html+='<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:64px;font-weight:800">Známka '+esc(g)+'</div><div style="flex:1;background:#eef2ff;border-radius:6px;overflow:hidden"><div style="width:'+w+'%;min-width:2px;background:#1d4ed8;color:#fff;padding:2px 6px;font-size:12px;font-weight:800;border-radius:6px;text-align:right">'+c+'</div></div></div>';});html+='</div>';var rows=itemAnalysisRows();var hasGroups=false;var seen={};ok.forEach(function(r){seen[r.groupKey||'__default']=1;});hasGroups=Object.keys(seen).length>1;html+='<div class="archive-note" style="margin-top:14px"><b>Položková analýza.</b> Obtížnost p = průměrná úspěšnost (0–100 %). Diskriminace = korelace položky s celkovým skóre: vysoká = dobří studenti ji řeší lépe; nízká nebo záporná = položka pravděpodobně chybná, dvojznačná nebo špatně oklíčovaná, ne jen těžká. Sloupec <b>Časté chyby</b> ukazuje nejčastější špatné odpovědi — pokud se opakuje stejná, zvaž uznání alternativy.</div>';html+='<div style="overflow:auto"><table class="tbl"><tr>'+(hasGroups?'<th>Skupina</th>':'')+'<th>Položka</th><th>Typ</th><th>n</th><th>Obtížnost p</th><th>Diskriminace</th><th>Hodnocení</th><th>Časté chyby / doporučení</th></tr>';rows.forEach(function(row){var v=iaDiscVerdict(row);var dtxt=(row.D==null||row.n<3)?'—':(Math.round(row.D*100)/100).toFixed(2);
-  // Signál vysoké úspěšnosti
   var diffCls=''; var diffTxt='<b>'+Math.round(row.p*100)+' %</b> <span class="small muted">('+iaDiffLabel(row.p)+')</span>';
   if(row.p>0.9&&row.n>=3) diffTxt='<b style="color:#b45309">'+Math.round(row.p*100)+' %</b> <span class="small" style="color:#b45309">⚠ podezřele snadná</span>';
-  // Špatné odpovědi a doporučení
   var wrongHtml='—';
   if(row.topWrong&&row.topWrong.length){
     var parts=row.topWrong.map(function(w){
