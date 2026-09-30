@@ -492,7 +492,8 @@ async function aiSuggestListeningQuestions(){
     return;
   }
   let fileParts = [];
-  try { const fp = await buildGeminiFilePartsForApi(); fileParts = (fp && fp.parts) || []; } catch(_){ fileParts = []; }
+  let urlPack = {parts:[],useUrlContext:false};
+  try { const fp = await buildGeminiFilePartsForApi(); fileParts = (fp && fp.parts) || []; urlPack=buildGeminiUrlPartsForApi(state); fileParts=fileParts.concat(urlPack.parts||[]); } catch(_){ fileParts = []; urlPack={parts:[],useUrlContext:false}; }
   const old = btn ? btn.textContent : '';
   if (btn){ btn.disabled = true; btn.textContent = '⏳ Generuji…'; }
   renderLiAiPreview({ loading:true });
@@ -507,7 +508,7 @@ async function aiSuggestListeningQuestions(){
     'Otázky musí být auto-opravitelné (krátká, jednoznačná odpověď), přiměřené úrovni a vhodné pro školu. Piš je v jazyce ' + jazyk + '.\n' +
     'Vrať POUZE JSON: {"questions":[{"q":"...","a":"..."}]} bez dalšího textu.';
   try {
-    const out = await callGeminiJSON(prompt, fileParts, {operation:'listening-question-suggestions'});
+    const out = await callGeminiJSON(prompt, fileParts, {urlContext:!!urlPack.useUrlContext,operation:'listening-question-suggestions'});
     const qs = (out && Array.isArray(out.questions))
       ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)
       : [];
@@ -578,6 +579,8 @@ async function aiSuggestReading(){
     if(typeof waitForFileReads==='function') await waitForFileReads();
     const fp = await buildGeminiFilePartsForApi();
     fileParts = (fp && fp.parts) || [];
+    const urlPack = buildGeminiUrlPartsForApi(state);
+    fileParts = fileParts.concat(urlPack.parts||[]);
 
     if(sourcePresent){
       sourceAnalysis = await analyzeReadingSourceForAi(fileParts,lvl);
@@ -614,7 +617,7 @@ async function aiSuggestReading(){
       (topic?'READING TOPIC musí zůstat hlavním tématem; nepoužívej zdrojové prvky, které do něj přirozeně nezapadají.\n':'')+'Použij jen vhodnou část skutečně analyzované target_vocabulary; nevymýšlej další zdrojová slova.\n' +
       'Vrať POUZE JSON: {"passage":"...","questions":[{"q":"...","a":"..."}],"used_target_vocabulary":["položka skutečně použitá v textu"]} bez dalšího textu.';
 
-    const out = await callGeminiJSON(prompt, fileParts, {urlContext:state.zadaniTab==='url',operation:'reading-package-suggestion'});
+    const out = await callGeminiJSON(prompt, fileParts, {urlContext:buildGeminiUrlPartsForApi(state).useUrlContext,operation:'reading-package-suggestion'});
     const passage = String(out && out.passage || '').trim();
     const qs = (out && Array.isArray(out.questions))
       ? out.questions.map(x => ({ q:String(x && x.q || '').trim(), a:String(x && x.a || '').trim() })).filter(x => x.q)
