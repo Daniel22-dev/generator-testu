@@ -329,7 +329,7 @@ try:
    sp=h.new_page(stu['text']);sp.wait_for_timeout(600)
    url=sp.evaluate('formsOpenUrl()')
    sp.fill('#studentName',student);sp.get_by_role('button',name=re.compile('Start')).first.click();answer_secure(sp)
-   sp.get_by_role('button',name=re.compile('Submit and create')).click();sp.wait_for_timeout(250)
+   sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(250)
    y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
    if y.count():y.first.click()
    sp.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")',timeout=10000)
