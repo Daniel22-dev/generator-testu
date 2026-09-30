@@ -25,6 +25,8 @@ function normalizeLoadedState(s) {
   if (typeof s.screenGuard !== 'boolean') s.screenGuard = false;
   if (['none','brief','learning'].indexOf(s.feedbackMode) === -1) s.feedbackMode = 'brief';
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
+  s.readingQuestionCount = Math.max(1, Math.min(30, parseInt(s.readingQuestionCount,10) || 4));
+  s.listeningQuestionCount = Math.max(1, Math.min(30, parseInt(s.listeningQuestionCount,10) || 4));
   if (s.exercisePedagogyMap === undefined) s.exercisePedagogyMap = null;
   if (s.didacticReview === undefined) s.didacticReview = null;
   if (s.splitGenerate === undefined) s.splitGenerate = false;
