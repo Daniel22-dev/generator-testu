@@ -157,6 +157,16 @@ function generatorEndWork(options={}){
   }
   return report;
 }
+async function confirmGeneratorEndWork(){
+  const confirmed=await uiConfirm(
+    'Tímto smažeš místní data Generátoru na tomto zařízení (rozpracovaný stav, historii, šablony, lokální nastavení Generátoru, případný lokální AI klíč a přístupový permit). Data jiných aplikací ani běžná data prohlížeče se nemažou. Tuto akci nelze vrátit.',
+    'Ukončit práci a smazat místní data',
+    true
+  );
+  if(!confirmed) return false;
+  generatorEndWork();
+  return true;
+}
 
 const _generatorSuiteLifecycle=generatorSuiteSessionApi();
 if(_generatorSuiteLifecycle&&typeof _generatorSuiteLifecycle.registerRuntimeCleanup==='function'){
