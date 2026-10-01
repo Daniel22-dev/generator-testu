@@ -3,7 +3,7 @@ name: Stage B full validation
 
 on:
   push:
-    branches: [audit/stage-b-teacher-verifier-2-2026-10-01]
+    branches: [audit/stage-b-teacher-verifier-2-2026-10-01, audit/stage-b-teacher-verifier-2-integrated-2026-10-01]
 
 permissions:
   contents: read
