@@ -1,3 +1,14 @@
+## 7.1.61 — 2026-10-01 — Etapa A / funkční opravy
+
+- šablony používají bezpečný formát `prefill_v3` a po načtení skutečně obnoví běžná textová pole a konfiguraci;
+- PINy, hesla, identity studentů, podmínky skupin a binární přílohy se do šablon neukládají;
+- Reading a Listening mají jeden učitelem řízený počet otázek napříč UI, AI návrhem, detailním nastavením a finálním generováním;
+- úroveň podpory/náročnosti `basic / standard / challenge` se propisuje do hlavního generovacího promptu bez změny testovaného kurikula, počtů položek a bodů;
+- YouTube vstupy jsou oddělené od URL Contextu a v přímém Gemini režimu se posílají jako video input; školní AI režim tuto schopnost zatím odmítá fail-closed;
+- změna relevantního obsahu a parametrů nově správně označí předchozí výstup jako obsahově zastaralý;
+- doplněny regresní testy pro šablony, počty otázek, diferenciaci a YouTube routing;
+- release identita a GARP 2.7 metadata jsou synchronizovány na 7.1.61.
+
 ## 7.1.60 — 2026-09-30 — poslední předserverová etapa / celoroční Forms workflow
 
 - jeden univerzální Google Form a jeden Response Sheet mohou sloužit pro více testů a skupin během školního roku;
