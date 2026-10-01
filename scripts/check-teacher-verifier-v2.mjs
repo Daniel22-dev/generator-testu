@@ -13,10 +13,12 @@ const need=(re,m)=>re.test(s)?pass(m):fail(m);
 const forbid=(re,m)=>re.test(s)?fail(m):pass(m);
 
 need(/Teacher Verifier 2\.0/,'Teacher Verifier 2.0 shell exists.');
-for (const id of ['dashboard','results','analysis','security','test','export','tech']) {
-  need(new RegExp('data-v2-panel=["\\\']'+id+'["\\\']'),'Navigation contains '+id+'.');
-  need(new RegExp('aria-controls=["\\\']v2-'+id+'["\\\']'),'Navigation '+id+' has aria-controls.');
-}
+const expectedPanels=['dashboard','results','analysis','security','test','export','tech'];
+const panelMatch=ui.match(/VERIFIER_PANEL_IDS=\[([^\]]+)\]/);
+const panels=(panelMatch?.[1].match(/'([^']+)'/g)||[]).map(x=>x.slice(1,-1));
+panels.length===expectedPanels.length&&expectedPanels.every((id,i)=>panels[i]===id)?pass('Navigation contains all seven Stage B panels in canonical order.'):fail('Stage B panel registry is incomplete or reordered.');
+need(/data-v2-panel=["']\+i\+["'][\s\S]*aria-controls=["']v2-["']\+i/,'Generated navigation binds panel id and aria-controls.');
+need(/id=["']v2-["']\+i[\s\S]*aria-hidden=["']true["']/,'Generated panels expose aria-hidden state.');
 need(/function showVerifierPanel\([\s\S]*aria-current/,'Panel switching marks the active navigation item.');
 need(/function showVerifierPanel\([\s\S]*aria-hidden/,'Panel switching exposes hidden/visible regions to accessibility APIs.');
 need(/function setupVerifierNavigationKeyboard\([\s\S]*ArrowRight[\s\S]*ArrowLeft[\s\S]*Home[\s\S]*End/,'Keyboard navigation is present.');
