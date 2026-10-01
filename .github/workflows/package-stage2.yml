@@ -1,0 +1,26 @@
+name: Stage 2 source package
+on:
+  push:
+    branches:
+      - package/stage2-7.1.62-2026-10-01
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Create clean Stage 2 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/package-stage2.yml
+          rm -rf .git
+          zip -rq GIT-ETAPA-2-7.1.62-KOMPLET.zip .             -x "GIT-ETAPA-2-7.1.62-KOMPLET.zip"             -x "node_modules/*"             -x "dist/*"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: GIT-ETAPA-2-7.1.62-KOMPLET
+          path: GIT-ETAPA-2-7.1.62-KOMPLET.zip
+          retention-days: 7
