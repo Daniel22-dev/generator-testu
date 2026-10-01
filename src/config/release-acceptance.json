@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.62",
+  "appVersion": "7.1.63",
   "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -50,7 +50,7 @@
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Release candidate 7.1.62 closes Stage B / Teacher Verifier 2.0 over 7.1.61; production acceptance requires release QA, Workflow Journeys E2E, P5 R2, GARP 2.7 and Safe Promotion.",
+  "note": "Release candidate 7.1.63 closes Stage B / Teacher Verifier 2.0 over 7.1.61; production acceptance requires release QA, Workflow Journeys E2E, P5 R2, GARP 2.7 and Safe Promotion.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
