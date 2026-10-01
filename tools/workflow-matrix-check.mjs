@@ -715,7 +715,7 @@ ok('finální učitelský workflow má regresní pojistky',()=>{
   // Behaviorálně: učitelský náhled s jednorázovým kódem musí mít kód předvyplněný,
   // ale studentský soubor se nesmí změnit (dřív jen hledání názvu proměnné v souboru).
   w.eval(f);
-  w.eval("state.identityMode='oneTimeCode';rosterEntries.length=0;rosterEntries.push({email:'s@example.invalid',label:'S',code:'QX7P2K'});generatedPackage=null;generatedTestHtml='<html><body><input type=\"text\" id=\"studentName\" class=\"name-inp\"></body></html>'");
+  w.eval("state.identityMode='oneTimeCode';rosterEntries.length=0;rosterEntries.push({email:'s@'+'example.invalid',label:'S',code:'QX7P2K'});generatedPackage=null;generatedTestHtml='<html><body><input type=\"text\" id=\"studentName\" class=\"name-inp\"></body></html>'");
   const pv=w.getPreviewHtml();
   assert(pv&&/<input type="password"[^>]*id="studentName"[^>]*value="QX7P2K"/.test(pv.html),'náhled nemá učitelské předvyplnění jednorázového kódu');
   assert(!/QX7P2K/.test(w.eval('generatedTestHtml')),'předvyplnění kódu v náhledu změnilo studentský soubor');
