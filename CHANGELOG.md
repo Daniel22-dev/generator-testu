@@ -1,3 +1,16 @@
+## 7.1.62 — 2026-10-01 — Etapa 2 / Teacher Verifier 2.0
+
+- Teacher verifier dostal novou informační architekturu Dashboard → Výsledky → Analýza → Bezpečnost → Test & PDF → Export → Technické údaje;
+- přidán responzivní shell, fullscreen, světlý/tmavý režim, klávesová navigace a stavové KPI;
+- import answers.txt, Google Forms CSV a nouzový SECURE-ANSWERS-V1 backup jsou oddělené a jasně popsané;
+- verifier zobrazuje kryptograficky platné, započtené, neplatné a duplicitní pokusy a blokuje export výsledků, dokud učitel nerozhodne mezi více rozdílnými platnými pokusy stejného studenta;
+- bezpečnostní signály lze filtrovat podle studenta/pokusu a zůstávají explicitně interpretovány jako signály ke kontrole, nikoli automatické obvinění;
+- analýza zachovává problematické položky, distribuci výsledků, obtížnost a diskriminační sílu;
+- exportní workflow odděluje výsledkové CSV, submission audit, studentský feedback a učitelský archiv pro zabezpečené školní úložiště;
+- Test & PDF zachovává teacher preview, prázdný tisk/PDF a verzi s klíčem pouze pro učitele;
+- scoring, RSA-OAEP/AES-GCM dešifrování, SECURE-ANSWERS-V1, Forms kryptografická selekce a datové kontrakty nebyly změněny;
+- doplněny statické kontrakty, real-browser journey coverage, accessibility/visual/critical QA a release gate pro Teacher Verifier 2.0.
+
 ## 7.1.61 — 2026-10-01 — Etapa A / funkční opravy
 
 - šablony používají bezpečný formát `prefill_v3` a po načtení skutečně obnoví běžná textová pole a konfiguraci;
