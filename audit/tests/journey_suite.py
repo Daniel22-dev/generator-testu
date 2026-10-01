@@ -181,11 +181,28 @@ try:
   sp.wait_for_timeout(900);done=sp.evaluate('document.body.innerText');backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
   assert backup.startswith('SECURE-ANSWERS-V1'),backup[:40]
   assert 'Use only if Google Forms' not in done and 'Emergency backup' not in done and 'Download answers.txt' in done,('answers.txt is the only channel without Forms (F-13)',done[:400])
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
-  t=vp.evaluate('document.body.innerText');vp.close()
-  row=re.search(r'Jana Nováková\t\S+\t30/30\t100 %\t1\t([^\t]+)\t',t);assert row,('verifier result',t[:600])
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700)
+  assert 'Teacher Verifier 2.0' in vp.locator('.v2-brand').inner_text(), 'Teacher Verifier 2.0 shell missing'
+  assert vp.locator('#v2-dashboard').is_visible() and not vp.locator('#v2-results').is_visible(), 'dashboard must be the default panel'
+  vp.get_by_role('button',name='Výsledky').click();vp.wait_for_timeout(100)
+  assert vp.locator('#v2-results').is_visible() and vp.locator('#pasteBox').is_visible(), 'results workflow must be reachable from navigation'
+  vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
+  t=vp.locator('#v2-results').inner_text()
+  row=re.search(r'Jana Nováková\\t\\S+\\t30/30\\t100 %\\t1\\t([^\\t]+)\\t',t);assert row,('verifier result',t[:600])
   assert row.group(1)!='__default' and 'plánovaných ? min' not in t,('verifier labels/time (F-14/F-15)',row.group(1))
-  return {'verifier':row.group(0).strip()}
+  before_theme=vp.evaluate("document.body.classList.contains('v2-light')")
+  vp.get_by_role('button',name='Přepnout světlý nebo tmavý režim').click();vp.wait_for_timeout(100)
+  assert vp.evaluate("document.body.classList.contains('v2-light')")!=before_theme,'theme toggle must change verifier theme'
+  vp.get_by_role('button',name='Analýza').click();assert vp.locator('#v2-analysis').is_visible() and vp.locator('#itemAnalysis').is_visible(),'analysis panel missing'
+  vp.get_by_role('button',name='Bezpečnost').click();assert vp.locator('#v2SecurityFilter').is_visible(),'security filter missing'
+  vp.fill('#v2SecurityFilter','Jana');assert vp.input_value('#v2SecurityFilter')=='Jana','security filter must accept query'
+  vp.get_by_role('button',name='Test & PDF').click();assert vp.locator('#teacherPreviewDetails').is_visible(),'teacher preview must live in Test & PDF'
+  vp.get_by_role('button',name='Export').click();et=vp.locator('#v2-export').inner_text();assert 'Pro studenty' in et and 'Pouze učitel / školní úložiště' in et,('export routes must separate student and teacher outputs',et[:500])
+  vp.get_by_role('button',name='Technické údaje').click();tt=vp.locator('#v2-tech').inner_text();assert 'Test ID' in tt and 'Student HTML SHA-256' in tt,('technical identity panel missing',tt[:500])
+  vp.set_viewport_size({'width':390,'height':844});vp.wait_for_timeout(100)
+  assert vp.evaluate("getComputedStyle(document.querySelector('.v2-nav')).display")=='flex','mobile verifier navigation must become horizontal'
+  vp.close()
+  return {'verifier':row.group(0).strip(),'teacherVerifier2':True}
  record('simple-strict-teacher-student-verifier',simple_strict_to_verifier)
 
  def key_decision_is_actionable(j):
