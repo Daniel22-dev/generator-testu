@@ -35,7 +35,9 @@ need(/function parseTxt\(txt\)[\s\S]*SECURE-ANSWERS-V1/,'SECURE-ANSWERS-V1 parse
 need(/function effectiveResults\(\)[\s\S]*exactDuplicate[\s\S]*ATTEMPT_DECISIONS/,'Effective results still exclude exact duplicates and require explicit attempt decisions.');
 need(/function downloadResultsCsv\(\)[\s\S]*unresolvedAttemptConflicts\(\)[\s\S]*Nejdřív vyber pokus/,'Results CSV remains blocked on unresolved attempt conflicts.');
 need(/function renderTable\(\)[\s\S]*METADATA MISMATCH/,'Metadata mismatch remains visible in results.');
-need(/function analysisHtml\(forExport\)[\s\S]*Diskriminace[\s\S]*Obtížnost/,'Item analysis remains available.');
+need(/function analysisHtml\(forExport\)\{var ok=effectiveResults\(\)[\s\S]*Diskriminace[\s\S]*Obtížnost/,'Item analysis remains available and uses effective results.');
+need(/function distributionStats\(\)\{var ok=effectiveResults\(\)/,'Distribution analytics use effective results.');
+need(/function itemAnalysisRows\(\)\{var ok=effectiveResults\(\)/,'Item analytics use effective results.');
 need(/function renderSecuritySignals\(\)[\s\S]*VERIFIER_SECURITY_QUERY/,'Security filtering is display-only over existing signals.');
 forbid(/function\s+scoreSubmissionV2|function\s+decryptPayloadV2/,'Stage B did not introduce a parallel scoring/decryption authority.');
 if (ui.includes('function scoreItemSecure') || ui.includes('async function decryptPayload')) fail('V2 UI module nesmí obsahovat scoring/decryption authority.');

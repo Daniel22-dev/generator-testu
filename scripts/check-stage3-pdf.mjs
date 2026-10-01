@@ -7,9 +7,11 @@ const checks=[
  ['teacher direct PDF',teacher.includes('downloadDirectPdf(true)')],
  ['binary PDF header',teacher.includes("'%PDF-1.4\\n'")],
  ['application/pdf blob',teacher.includes("type:'application/pdf'")],
+ ['origin-clean DOM rasterizer',teacher.includes('pdf3Rasterize')&&!teacher.includes('<foreignObject')&&!teacher.includes('foreignObject width=')],
+ ['safe pagination',teacher.includes('pdf3PageCuts')&&teacher.includes('pdf3SafeBlockCut')&&teacher.includes('pdf3SafeTextCut')],
  ['print fallback',teacher.includes('openPrint(false)')&&teacher.includes('openPrint(true)')],
  ['embedded school logo config',teacher.includes('schoolLogoDataUri')&&pkg.includes('secureSchoolLogoDataUri')],
- ['Czech labels',teacher.includes('Jméno:')&&teacher.includes('Známka:')&&teacher.includes('uložit jako PDF')],
+ ['Czech labels',teacher.includes('Jméno:')&&teacher.includes('Známka:')&&teacher.includes('uložit jako PDF')&&teacher.includes('Výchozí věta:')&&teacher.includes('Vysvětlení:')&&!teacher.includes('Vychozi veta:')&&!teacher.includes('Vysvetleni:')],
  ['student filename',teacher.includes("'student_'")],
  ['teacher filename',teacher.includes("'ucitel_klic_'")],
 ];

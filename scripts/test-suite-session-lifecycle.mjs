@@ -137,7 +137,7 @@ check(verifierSource.includes("classification:'other-test'")&&verifierSource.inc
 check(verifierSource.includes('metadataMismatchFor')&&verifierSource.includes('METADATA MISMATCH'),'Forms metadata mismatches are visible but non-authoritative');
 check(verifierSource.includes('exactDuplicate')&&verifierSource.includes('ATTEMPT_DECISIONS'),'Exact duplicates are suppressed and distinct attempts require an explicit teacher decision');
 check(verifierSource.includes('downloadResultsCsv')&&verifierSource.includes('downloadSubmissionsCsv'),'Verifier exposes separate current-test result and submission exports');
-check(verifierSource.includes('effectiveResults()')&&verifierSource.includes('unresolvedAttemptConflicts()'),'Analytics/export path uses deduplicated explicitly resolved effective results');
+check(verifierSource.includes('function distributionStats(){var ok=effectiveResults()')&&verifierSource.includes('function itemAnalysisRows(){var ok=effectiveResults()')&&verifierSource.includes('function analysisHtml(forExport){var ok=effectiveResults()')&&verifierSource.includes('unresolvedAttemptConflicts()'),'Analytics/export path uses deduplicated explicitly resolved effective results');
 check(verifierSource.includes('setFormsProgress')&&verifierSource.includes("setTimeout(r,0)"),'Large CSV import yields to the browser and reports progress');
 
 // 10 Mandatory negative control: weaken a disposable source copy

@@ -14,11 +14,13 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.63',
+  version: '7.1.66',
   date:    '2026-10-01',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'D2 / EFFECTIVE ANALYTICS (7.1.66): rozložení výsledků, známkové rozložení a položková analýza Teacher Verifieru používají jedinou autoritu effectiveResults(). Identické duplicity se nezapočítávají a různé validní pokusy stejného studenta se do analytiky dostanou až po explicitním výběru učitele. Scoring, dešifrování, export submissions, bezpečnostní signály a D1 PDF renderer se nemění.',
+    'D1 / PDF RUNTIME HOTFIX (7.1.64): přímé studentské i učitelské PDF ve Teacher Verifieru již nepoužívá SVG foreignObject cestu, která v Chromium vedla k tainted-canvas SecurityError. Renderer kreslí připravený tiskový DOM lokálně do origin-clean canvasu a zachovává přímý PDF download bez tiskového dialogu. Scoring, analytika, kryptografie, SECURE-ANSWERS-V1, GARP hranice a klasický tiskový fallback se nemění.',
     'ETAPA 3 / PŘÍMÉ PDF (7.1.63): Teacher Verifier umí přímo stáhnout skutečné studentské PDF i učitelské PDF s klíčem bez tiskového dialogu. PDF je generováno lokálně v prohlížeči, zachovává českou diakritiku přes browserové vykreslení, vkládá školní logo přímo do výstupu a klasický tisk zůstává jako záložní cesta. Export nemění scoring, kryptografii ani SECURE-ANSWERS-V1.',
     'TEACHER VERIFIER 2.0 (7.1.62): učitelský verifier má novou sedmidílnou informační architekturu Dashboard / Výsledky / Analýza / Bezpečnost / Test & PDF / Export / Technické údaje, responzivní navigaci, light/dark a fullscreen, stavové KPI, přehled importních cest, filtrování bezpečnostních signálů a jasné oddělení studentských feedbacků od učitelského archivu. Scoring, RSA/AES dešifrování, Forms kryptografická selekce a práce s duplicitními pokusy zůstávají zachované a nově chráněné samostatným production contractem.',
     'ETAPA A / FUNKČNÍ OPRAVY (7.1.61): šablony prefill_v3 znovu skutečně předvyplní bezpečná pole; Reading a Listening mají učitelem řízený jednotný počet otázek; differentiationLevel se propisuje do hlavního AI promptu; YouTube se předává jako video vstup místo URL Contextu; změny relevantního obsahu správně označí starý výstup jako zastaralý.',

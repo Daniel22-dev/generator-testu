@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.63",
+  "appVersion": "7.1.66",
   "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -38,19 +38,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "STAGE-B-TEACHER-VERIFIER-2-2026-10-01",
+  "revision": "D1-PDF-RUNTIME-HOTFIX-2026-10-01",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "Teacher Verifier 2.0 release candidate; exact-lockfile GitHub CI/deployment pending",
-    "note": "Stage B redesigns the teacher verifier information architecture and UX while preserving the existing scoring, RSA-OAEP/AES-GCM decryption, SECURE-ANSWERS-V1 parser, Google Forms cryptographic selection, duplicate-attempt decisions and export data contracts. A dedicated verifier-v2 production contract and real-browser journey coverage are required before promotion.",
+    "note": "D1 replaces the tainted SVG foreignObject-to-canvas PDF path with an origin-clean local DOM rasterizer. Student/teacher PDF download is the only intended functional change; scoring, cryptography, submission handling and analytics are unchanged.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Release candidate 7.1.63 closes Stage B / Teacher Verifier 2.0 over 7.1.61; production acceptance requires release QA, Workflow Journeys E2E, P5 R2, GARP 2.7 and Safe Promotion.",
+  "note": "Release candidate 7.1.66 is the surgical D2 Teacher Verifier analytics correction over D1 7.1.64. It changes only analytics population selection and its regression coverage: distribution, grade histogram and item analysis now use effectiveResults(), excluding exact duplicates and unresolved attempts. D1 PDF runtime, scoring, crypto and student artifacts remain unchanged.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

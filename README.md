@@ -1,3 +1,5 @@
+> **7.1.66 — D3 / PDF kvalita.** Přímé PDF z D1 nyní používá bezpečné obsahové zlomy stran bez řezu přes běžnou otázku nebo textový řádek, opravuje české popisky „Výchozí věta“ / „Vysvětlení“ a zachovává striktní oddělení studentské a učitelské verze. D2 analytika zůstává beze změny. Viz RELEASE-NOTES-7.1.66.md.
+
 > **7.1.63 — Etapa 3 / přímé PDF.** Teacher Verifier umí přímo stáhnout studentské PDF i učitelské PDF s klíčem bez tiskového dialogu, zachovává tiskový fallback, českou diakritiku a vložené školní logo. Součástí release je také rekalibrovaný statický performance budget; scoring, kryptografie a secure submission kontrakty zůstávají beze změny. Viz RELEASE-NOTES-7.1.63.md.
 
 > **7.1.62 — Teacher Verifier 2.0 / Etapa 2.** New dashboard-based verifier UX with separated Results, Analysis, Security, Test & PDF, Export and Technical sections; scoring, cryptography and secure submission contracts remain unchanged. See RELEASE-NOTES-7.1.62.md.
@@ -16,7 +18,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.63
+**Aktuální verze:** 7.1.66
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 
