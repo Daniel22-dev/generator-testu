@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.61",
-  "releaseStatus": "stage-a-functional-fixes-release-candidate",
+  "appVersion": "7.1.62",
+  "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -38,19 +38,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "STAGE-A-FUNCTIONAL-FIXES-2026-10-01",
+  "revision": "STAGE-B-TEACHER-VERIFIER-2-2026-10-01",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "Stage A source candidate; exact-lockfile GitHub CI/deployment pending",
-    "note": "Stage A adds secure template prefill_v3, teacher-controlled Reading/Listening counts, differentiation prompt propagation, corrected YouTube routing and content-drift detection. Exact pinned-dependency CI, live deployment and AI Studio update remain required before production acceptance.",
+    "transport": "Teacher Verifier 2.0 release candidate; exact-lockfile GitHub CI/deployment pending",
+    "note": "Stage B redesigns the teacher verifier information architecture and UX while preserving the existing scoring, RSA-OAEP/AES-GCM decryption, SECURE-ANSWERS-V1 parser, Google Forms cryptographic selection, duplicate-attempt decisions and export data contracts. A dedicated verifier-v2 production contract and real-browser journey coverage are required before promotion.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Release candidate 7.1.61 closes Stage A functional fixes over 7.1.60; production acceptance requires the existing Safe Promotion, P5 R2 and deployment chain.",
+  "note": "Release candidate 7.1.62 closes Stage B / Teacher Verifier 2.0 over 7.1.61; production acceptance requires release QA, Workflow Journeys E2E, P5 R2, GARP 2.7 and Safe Promotion.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
