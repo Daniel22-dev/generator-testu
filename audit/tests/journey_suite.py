@@ -184,7 +184,7 @@ try:
   vp=h.new_page(tea['text']);vp.wait_for_timeout(700)
   assert 'Teacher Verifier 2.0' in vp.locator('.v2-brand').inner_text(), 'Teacher Verifier 2.0 shell missing'
   assert vp.locator('#v2-dashboard').is_visible() and not vp.locator('#v2-results').is_visible(), 'dashboard must be the default panel'
-  vp.get_by_role('button',name='Výsledky').click();vp.wait_for_timeout(100)
+  vp.locator('[data-v2-panel="results"]').click();vp.wait_for_timeout(100)
   assert vp.locator('#v2-results').is_visible() and vp.locator('#pasteBox').is_visible(), 'results workflow must be reachable from navigation'
   vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.locator('#v2-results').inner_text()
@@ -302,13 +302,13 @@ try:
   y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
   if y.count():y.first.click()
   sp.wait_for_timeout(900);backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
   assert re.search(r'novak \(kód '+codes[0]+r'\)\t\S+\t30/30\t100 %\t1\t',t),('verifier resolves the code to the roster e-mail',t[:500])
   import csv,io,tempfile
   buf=io.StringIO();csv.writer(buf).writerows([['Časová značka','E-mailová adresa','Odevzdávací kód'],['29.9.2026 10:00:00','novak@ghrabuvka.cz',backup],['29.9.2026 10:05:00','novak@ghrabuvka.cz',backup.replace('"attemptId"','"attemptId"')]])
   f=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);f.write(buf.getvalue());f.close()
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
   assert 'novak@ghrabuvka.cz' in t and re.search(r'Duplicity: [1-9]',t),('Forms CSV import + repeated code must be flagged',t[t.find('Načteno'):t.find('Načteno')+200])
   return {'codes':len(codes)}
@@ -387,7 +387,7 @@ try:
   ]
   buf=io.StringIO();csv.writer(buf).writerows(rows);tmp=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);tmp.write(buf.getvalue());tmp.close()
 
-  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
+  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
   ta=va.evaluate('document.body.innerText')
   assert 'alpha@ghrabuvka.cz' in ta and 'beta@ghrabuvka.cz' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
   assert 'METADATA MISMATCH' in ta,('tampered Forms metadata must warn, not hide valid payload',ta[:1000])
@@ -402,7 +402,7 @@ try:
   assert test_b not in sub_csv and 'beta@ghrabuvka.cz' not in sub_csv,('submissions export must exclude other tests',sub_csv[:500])
   va.close()
 
-  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
+  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
   tb=vb.evaluate('document.body.innerText')
   assert 'beta@ghrabuvka.cz' in tb and 'alpha@ghrabuvka.cz' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
   assert re.search(r'jiné testy\s+[1-9]',tb,re.I),('verifier B must classify TEST-A rows as other tests',tb[:1000])
@@ -410,7 +410,7 @@ try:
 
   # Real-browser long-run benchmark: actual verifier + WebCrypto + yielding UI.
   perf=[]
-  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600)
+  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click()
   try:
    for size in (100,1000,3000,5000):
     big=io.StringIO();w=csv.writer(big);w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
