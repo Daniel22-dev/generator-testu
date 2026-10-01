@@ -31,3 +31,7 @@ Verze 7.1.62 nemění scoringovou autoritu, RSA-OAEP/AES-GCM dešifrování, for
 ## QA
 
 Etapa 2 obsahuje samostatný Teacher Verifier 2.0 kontrakt, browser journey coverage, accessibility/visual/critical QA a plnou pre-production validaci včetně P5 R2 a GARP 2.7.
+
+## Stage 2 closure hotfix
+
+Před přechodem na Etapu 3 byl prezentační shell Teacher Verifieru zkompaktován bez změny scoringu/dešifrování, technický panel doplnil `Student HTML SHA-256` a build nově kompaktně zapisuje pouze nasazované JSON/webmanifest soubory, aby zůstal uvnitř stávajícího performance budgetu bez navyšování limitů.
