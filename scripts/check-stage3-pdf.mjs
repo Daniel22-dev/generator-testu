@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-const teacher=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8');
+const teacher=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8')+'\n'+fs.readFileSync('src/js/13fa-secure-teacher-verifier-pdf.js','utf8');
 const pkg=fs.readFileSync('src/js/13c-secure-package.js','utf8');
 const checks=[
  ['contract',teacher.includes("PDF_STAGE3_CONTRACT='ghrab-verifier-pdf-v1'")],
