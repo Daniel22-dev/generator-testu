@@ -12,12 +12,17 @@ if (!fs.existsSync(fixture)) {
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 
+const logoPath = path.resolve('public/assets/brand/school-logo.png');
+if (!fs.existsSync(logoPath)) throw new Error('chybí public/assets/brand/school-logo.png');
+const logoDataUri = `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`;
+
 function patchFixture(html) {
   const configMatch = html.match(/^const CONFIG=(.*);$/m);
   if (!configMatch) throw new Error('CONFIG nebyl ve verifier fixture nalezen');
   const config = JSON.parse(configMatch[1]);
   config.nazev = 'Český PDF audit – Příliš žluťoučký kůň';
   config.proKoho = '3. ročník – QA';
+  config.schoolLogoDataUri = logoDataUri;
   html = html.replace(configMatch[0], `const CONFIG=${JSON.stringify(config)};`);
 
   const mcItems = Array.from({ length: 18 }, (_, i) => ({
@@ -79,6 +84,8 @@ try {
     const root = stage.attachShadow({ mode: 'open' });
     root.innerHTML = '<style>'+prtCss()+'.toolbar{display:none!important}.page{box-sizing:border-box;width:'+W+'px;max-width:none;padding:22px;font-family:Georgia,serif;color:#000;background:#fff;line-height:1.5}.variant{page-break-after:auto}</style><div class="page">'+prtVariantHtml('__default', true, false)+'</div>';
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const logo = root.querySelector('.school-logo');
+    if (logo && typeof logo.decode === 'function') { try { await logo.decode(); } catch {} }
     const paper = root.querySelector('.page');
     const rr = paper.getBoundingClientRect();
     const cuts = pdf3PageCuts(paper, H);
@@ -102,7 +109,6 @@ try {
         range.detach?.();
       }
     }
-    const logo = root.querySelector('.school-logo');
     const logoRect = logo?.getBoundingClientRect();
     const logoOk = !!(logo && logo.naturalWidth > 0 && logo.naturalHeight > 0 && logoRect.width > 0 && logoRect.height > 0);
     stage.remove();

@@ -5,9 +5,9 @@ import argparse,json,subprocess,sys,time
 BASE=Path(__file__).resolve().parent
 SPECS={
  'config_matrix':('config-matrix.json',None),
- 'config_extra_suite':('config-extra-suite.json',301),
+ 'config_extra_suite':('config-extra-suite.json',305),
  'wizard_suite':('wizard-suite.json',16),
- 'state_transition_suite':('state-transition-suite.json',8),
+ 'state_transition_suite':('state-transition-suite.json',10),
  'journey_suite':('journey-suite.json',17),
  'czech_suite':('czech-suite.json',39),
  'manual_suite':('manual-suite.json',9),

@@ -22,3 +22,11 @@ D7 nepřidává novou uživatelskou funkcionalitu. Uzavírá auditní TEST GAPy 
 
 ## Hranice
 D7 nemění scoring, kryptografii, secure student runtime, PDF renderer, D2 analytiku, D4 theme/fullscreen logiku, D5 security model ani D6 prompt/prefill chování. Změny jsou omezeny na CI wiring, testovací harnessy, evidence hygiene a release metadata.
+
+## R1 — CI certification hotfix
+
+- PDF quality fixture now injects the real bundled school logo and waits for image decode before checking renderability.
+- Journey D5 metadata-mismatch assertion reads Security KPI DOM values instead of relying on whitespace-sensitive `innerText`.
+- Audit suite cardinalities are updated for the D6 scenarios: state transition 10 and config-extra 305.
+- README current-version metadata is synchronized to 7.1.70.
+- No production runtime behavior is changed.
