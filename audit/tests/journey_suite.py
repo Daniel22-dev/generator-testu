@@ -188,8 +188,9 @@ try:
   assert vp.locator('#v2-results').is_visible() and vp.locator('#pasteBox').is_visible(), 'results workflow must be reachable from navigation'
   vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.locator('#v2-results').inner_text()
-  row=re.search(r'Jana Nováková\\t\\S+\\t30/30\\t100 %\\t1\\t([^\\t]+)\\t',t);assert row,('verifier result',t[:600])
-  assert row.group(1)!='__default' and 'plánovaných ? min' not in t,('verifier labels/time (F-14/F-15)',row.group(1))
+  cells=vp.locator('#resultTable tr').nth(1).locator('td').all_inner_texts()
+  assert len(cells)>=8 and cells[0].startswith('Jana Nováková') and cells[2]=='30/30' and cells[3]=='100 %' and cells[4]=='1',('verifier result cells',cells)
+  assert cells[5]!='__default' and 'plánovaných ? min' not in t,('verifier labels/time (F-14/F-15)',cells[5])
   before_theme=vp.evaluate("document.body.classList.contains('v2-light')")
   vp.get_by_role('button',name='Přepnout světlý nebo tmavý režim').click();vp.wait_for_timeout(100)
   assert vp.evaluate("document.body.classList.contains('v2-light')")!=before_theme,'theme toggle must change verifier theme'
@@ -202,7 +203,7 @@ try:
   vp.set_viewport_size({'width':390,'height':844});vp.wait_for_timeout(100)
   assert vp.evaluate("getComputedStyle(document.querySelector('.v2-nav')).display")=='flex','mobile verifier navigation must become horizontal'
   vp.close()
-  return {'verifier':row.group(0).strip(),'teacherVerifier2':True}
+  return {'verifier':' | '.join(cells[:6]),'teacherVerifier2':True}
  record('simple-strict-teacher-student-verifier',simple_strict_to_verifier)
 
  def key_decision_is_actionable(j):
