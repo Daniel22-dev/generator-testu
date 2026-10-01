@@ -14,7 +14,8 @@ for (const id of ['dashboard','results','analysis','security','test','export','t
   need(new RegExp('data-v2-panel=["\\\']'+id+'["\\\']'),'Navigation contains '+id+'.');
   need(new RegExp('aria-controls=["\\\']v2-'+id+'["\\\']'),'Navigation '+id+' has aria-controls.');
 }
-need(/function showVerifierPanel\([\s\S]*aria-current[\s\S]*aria-hidden/,'Panel switching exposes accessible active state.');
+need(/function showVerifierPanel\([\s\S]*aria-current/,'Panel switching marks the active navigation item.');
+need(/function showVerifierPanel\([\s\S]*aria-hidden/,'Panel switching exposes hidden/visible regions to accessibility APIs.');
 need(/function setupVerifierNavigationKeyboard\([\s\S]*ArrowRight[\s\S]*ArrowLeft[\s\S]*Home[\s\S]*End/,'Keyboard navigation is present.');
 need(/function toggleVerifierTheme\([\s\S]*VERIFIER_THEME_KEY/,'Theme toggle persists preference.');
 need(/function toggleVerifierFullscreen\([\s\S]*requestFullscreen/,'Fullscreen toggle is present.');
