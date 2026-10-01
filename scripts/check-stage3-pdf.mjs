@@ -1,0 +1,19 @@
+import fs from 'node:fs';
+const teacher=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8');
+const pkg=fs.readFileSync('src/js/13c-secure-package.js','utf8');
+const checks=[
+ ['contract',teacher.includes("PDF_STAGE3_CONTRACT='ghrab-verifier-pdf-v1'")],
+ ['student direct PDF',teacher.includes('downloadDirectPdf(false)')],
+ ['teacher direct PDF',teacher.includes('downloadDirectPdf(true)')],
+ ['binary PDF header',teacher.includes("'%PDF-1.4\\n'")],
+ ['application/pdf blob',teacher.includes("type:'application/pdf'")],
+ ['print fallback',teacher.includes('openPrint(false)')&&teacher.includes('openPrint(true)')],
+ ['embedded school logo config',teacher.includes('schoolLogoDataUri')&&pkg.includes('secureSchoolLogoDataUri')],
+ ['Czech labels',teacher.includes('Jméno:')&&teacher.includes('Známka:')&&teacher.includes('uložit jako PDF')],
+ ['student filename',teacher.includes("'student_'")],
+ ['teacher filename',teacher.includes("'ucitel_klic_'")],
+];
+let bad=0;
+for(const [name,ok] of checks){console.log(`${ok?'PASS':'FAIL'} ${name}`);if(!ok)bad++;}
+if(bad)process.exit(1);
+console.log('PASS Stage 3 PDF contract');

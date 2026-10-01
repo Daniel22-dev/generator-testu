@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.62',
+  version: '7.1.63',
   date:    '2026-10-01',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'ETAPA 3 / PŘÍMÉ PDF (7.1.63): Teacher Verifier umí přímo stáhnout skutečné studentské PDF i učitelské PDF s klíčem bez tiskového dialogu. PDF je generováno lokálně v prohlížeči, zachovává českou diakritiku přes browserové vykreslení, vkládá školní logo přímo do výstupu a klasický tisk zůstává jako záložní cesta. Export nemění scoring, kryptografii ani SECURE-ANSWERS-V1.',
     'TEACHER VERIFIER 2.0 (7.1.62): učitelský verifier má novou sedmidílnou informační architekturu Dashboard / Výsledky / Analýza / Bezpečnost / Test & PDF / Export / Technické údaje, responzivní navigaci, light/dark a fullscreen, stavové KPI, přehled importních cest, filtrování bezpečnostních signálů a jasné oddělení studentských feedbacků od učitelského archivu. Scoring, RSA/AES dešifrování, Forms kryptografická selekce a práce s duplicitními pokusy zůstávají zachované a nově chráněné samostatným production contractem.',
     'ETAPA A / FUNKČNÍ OPRAVY (7.1.61): šablony prefill_v3 znovu skutečně předvyplní bezpečná pole; Reading a Listening mají učitelem řízený jednotný počet otázek; differentiationLevel se propisuje do hlavního AI promptu; YouTube se předává jako video vstup místo URL Contextu; změny relevantního obsahu správně označí starý výstup jako zastaralý.',
     'DLOUHÉ ZDROJE (7.1.60): Generátor nyní načítá textové podklady výrazně ve větším rozsahu, HTML před použitím čistí na viditelný obsah a DOCX převádí na text. Zdroj delší než jeden AI kontext se už neřeže jen na začátek nebo konec — rozdělí se na překrývající se části a do AI se sestaví tematicky relevantní i rovnoměrně rozprostřený průřez napříč dokumentem. Rozhraní tento režim transparentně označí a extrémní lokální zkrácení nikdy nezůstane skryté.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'ŠABLONY + AI RETRY (7.1.57): uložená šablona znovu funguje jako skutečný předvyplňovací vzor pro jazyk, CEFR, cvičení, počet, čas, body, režim a hodnocení, ale nadále neukládá obsah zadání, přílohy, identity studentů ani přístupové kódy. Přímé Gemini volání při HTTP 503 po prvním kole fallbacků krátce počká a providerové kolo jednou zopakuje.',
     'AI DOSTUPNOST (7.1.56): aktualizovány profily Gemini a stabilní fallbacky. Chyby AI nově uvádějí bezpečný HTTP stav a interní kód pro přesnější diagnostiku.',
     'O APLIKACI (7.1.55): hlavní hlavička nově používá jednotný vstup O aplikaci. Karta shrnuje účel Generátoru, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a nápovědu; dosavadní changelog je přesunut dovnitř jako rozbalovací Katalog změn včetně samostatně verzovaného modulu Český jazyk.',
-    'ÚKLID A ZRYCHLENÍ (7.1.54): service worker ověřuje stránku aplikace u serveru podmíněným dotazem, takže nezměněnou stránku (~1,4 MB) při otevření znovu nestahuje; čerstvost verze a offline záloha zůstávají stejné. Odstraněno 17 nevolaných funkcí (přežitky starého přístupu a nahrazené pomocné funkce); sestavovací skript přepsán čitelně se shodným výstupem. Bez změny rozhraní, bodování, secure runtime, AI promptů a bezpečnostního modelu.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.

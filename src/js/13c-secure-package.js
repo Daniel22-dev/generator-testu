@@ -136,13 +136,26 @@ function securePublicCfg(cfg, keyInfo) {
     publicKey:keyInfo.publicJwk
   };
 }
+async function secureSchoolLogoDataUri(){
+  try{
+    const r=await fetch('./assets/brand/school-logo.png',{cache:'force-cache'});
+    if(!r.ok)return '';
+    const b=await r.blob();
+    return await new Promise(function(resolve,reject){
+      const fr=new FileReader();
+      fr.onload=function(){resolve(String(fr.result||''));};
+      fr.onerror=function(){reject(fr.error||new Error('logo read failed'));};
+      fr.readAsDataURL(b);
+    });
+  }catch(_e){return '';}
+}
 async function assembleSecureOfflinePackage(st, cfg, variants) {
   const keyInfo = await generateSecureKeyPair();
   const studentVariants = stripVariantsForStudent(variants);
   const publicCfg = securePublicCfg(cfg, keyInfo);
   const studentHtml = buildSecureStudentHtml(publicCfg, studentVariants);
   const studentHtmlSha256 = await sha256HexText(studentHtml);
-  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256 });
+  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256, schoolLogoDataUri:await secureSchoolLogoDataUri() });
   const teacherHtml = buildSecureTeacherVerifierHtml(teacherCfg, variants);
   const teacherHtmlSha256 = await sha256HexText(teacherHtml);
   return {
