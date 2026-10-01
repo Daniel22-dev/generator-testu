@@ -148,6 +148,7 @@ try {
   summary.checks.dark = dark;
 
   await client.eval(`toggleVerifierTheme()`);
+  await sleep(180); // body/card intentionally animate theme colors for 120 ms
   const light = await client.eval(themeSnapshot);
   const expectedLight = { theme: 'light', body: 'rgb(244, 246, 251)', card: 'rgb(255, 255, 255)', nav: 'rgb(243, 244, 246)', input: 'rgb(255, 255, 255)', modal: 'rgb(255, 255, 255)' };
   assert(JSON.stringify(light) === JSON.stringify(expectedLight), `light theme ma samostatnou svetlou paletu ${JSON.stringify(light)}`);
