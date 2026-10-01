@@ -1,0 +1,55 @@
+name: Stage B full validation
+
+on:
+  push:
+    branches: [audit/stage-b-teacher-verifier-2-2026-10-01]
+
+permissions:
+  contents: read
+
+jobs:
+  full-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Install pinned Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Install pinned Python audit tools
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/audit-venv"
+          "$RUNNER_TEMP/audit-venv/bin/pip" install --disable-pip-version-check -r audit/requirements-audit.txt
+      - name: Production contract
+        run: npm run check:production
+      - name: Build
+        run: npm run build
+      - name: Release QA and platform
+        run: |
+          npm run qa:release
+          npm run qa:platform
+      - name: P5 R2 plus GARP
+        run: npm run qa:p5:ci
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: 3448bd4dae672087beaaee84dd15b64fda2e7b45fcc0d92bd52a1b2d46dbf55c
+      - name: Teacher/student/verifier and Forms journeys
+        shell: bash
+        env:
+          CHROMIUM_EXECUTABLE: ${{ env.CHROMIUM_EXECUTABLE }}
+        run: |
+          echo "CHROMIUM_EXECUTABLE=$(node -e "process.stdout.write(require('playwright').chromium.executablePath())")" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/audit-venv/bin/python" audit/run_audit.py             --suite journey_suite --suite integration_suite --suite identity_suite             --suite state_transition_suite --suite feature_suite --suite accessibility_forms_suite             --suite visual_suite --suite stress_suite
+      - name: Upload audit evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage-b-full-validation-${{ github.sha }}
+          path: audit/evidence/
+          retention-days: 14
