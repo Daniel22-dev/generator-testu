@@ -17,11 +17,11 @@ const expectedPanels=['dashboard','results','analysis','security','test','export
 const panelMatch=ui.match(/VERIFIER_PANEL_IDS=\[([^\]]+)\]/);
 const panels=(panelMatch?.[1].match(/'([^']+)'/g)||[]).map(x=>x.slice(1,-1));
 panels.length===expectedPanels.length&&expectedPanels.every((id,i)=>panels[i]===id)?pass('Navigation contains all seven Stage B panels in canonical order.'):fail('Stage B panel registry is incomplete or reordered.');
-need(/data-v2-panel=["']\+i\+["'][\s\S]*aria-controls=["']v2-["']\+i/,'Generated navigation binds panel id and aria-controls.');
+ui.includes(`data-v2-panel="'+i+'" aria-controls="v2-'+i+'"`)?pass('Generated navigation binds panel id and aria-controls.'):fail('Generated navigation must bind panel id and aria-controls.');
 need(/id=["']v2-["']\+i[\s\S]*aria-hidden=["']true["']/,'Generated panels expose aria-hidden state.');
 need(/function showVerifierPanel\([\s\S]*aria-current/,'Panel switching marks the active navigation item.');
 need(/function showVerifierPanel\([\s\S]*aria-hidden/,'Panel switching exposes hidden/visible regions to accessibility APIs.');
-need(/function setupVerifierNavigationKeyboard\([\s\S]*ArrowRight[\s\S]*ArrowLeft[\s\S]*Home[\s\S]*End/,'Keyboard navigation is present.');
+(ui.includes('/Arrow(Right|Down)/')&&ui.includes('/Arrow(Left|Up)/')&&ui.includes("e.key==='Home'")&&ui.includes("e.key==='End'"))?pass('Keyboard navigation is present.'):fail('Keyboard navigation is incomplete.');
 need(/function toggleVerifierTheme\([\s\S]*VERIFIER_THEME_KEY/,'Theme toggle persists preference.');
 need(/function toggleVerifierFullscreen\([\s\S]*requestFullscreen/,'Fullscreen toggle is present.');
 need(/v2ResultHealth[\s\S]*nevyřešené pokusy/,'Results health summary exposes unresolved attempts.');
