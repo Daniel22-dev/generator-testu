@@ -252,6 +252,11 @@ out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
 fs.writeFileSync(DIST, out, 'utf8');
 
 copyDir(PUBLIC_DIR, DIST_DIR);
+// JSON konfigurace se v dist ukládají kompaktně; zdrojové soubory zůstávají čitelné a byte-stable pro audit.
+for (const file of (function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)])})(DIST_DIR)) {
+  if (!/\.(?:json|webmanifest)$/i.test(file)) continue;
+  try { fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file,'utf8')))+'\n'); } catch {}
+}
 copyDir(path.resolve('src', 'features'), path.join(DIST_DIR, 'features'));
 fs.mkdirSync(path.join(DIST_DIR, 'vendor'), { recursive: true });
 fs.copyFileSync(ACORN_BROWSER, path.join(DIST_DIR,'vendor','acorn.js'));
