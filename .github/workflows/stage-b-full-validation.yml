@@ -38,10 +38,27 @@ jobs:
         run: npm run check:production
       - name: Build
         run: npm run build
-      - name: Release QA and platform
+      - name: Release QA
+        id: release_qa
+        continue-on-error: true
+        run: npm run qa:release
+      - name: Print release QA failure evidence
+        if: always()
+        shell: bash
         run: |
-          npm run qa:release
-          npm run qa:platform
+          if [ -f qa-results/visual.json ]; then
+            echo "===== VISUAL ====="
+            cat qa-results/visual.json
+          fi
+          if [ -f qa-results/critical.json ]; then
+            echo "===== CRITICAL ====="
+            cat qa-results/critical.json
+          fi
+      - name: Enforce release QA
+        if: steps.release_qa.outcome != 'success'
+        run: exit 1
+      - name: Platform QA
+        run: npm run qa:platform
       - name: P5 R2 plus GARP
         run: npm run qa:p5:ci
         env:
