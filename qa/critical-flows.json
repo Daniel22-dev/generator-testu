@@ -102,11 +102,15 @@
       "name": "Učitelský verifier se otevře",
       "type": "browser",
       "url": "/qa-results/qa-fixtures/teacher_verifier.html",
-      "expectedText": "Učitelský verifier",
+      "expectedText": "Teacher Verifier 2.0",
       "steps": [
         {
           "action": "assertVisible",
-          "selector": "body"
+          "selector": ".v2-brand"
+        },
+        {
+          "action": "assertVisible",
+          "selector": "#v2-dashboard"
         }
       ]
     },
