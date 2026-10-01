@@ -13,6 +13,7 @@ const requiredOrder = [
   '13e-secure-student-runtime.js',
   '13eb-secure-teacher-verifier-v2-ui.js',
   '13f-secure-teacher-verifier.js',
+  '13fa-secure-teacher-verifier-pdf.js',
   '13g-assemble-test-html.js',
   '14a-test-html-builders.js',
   '14b-instant-test-runtime.js',

@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.63",
+  "appVersion": "7.1.66",
   "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -38,19 +38,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "STAGE-B-TEACHER-VERIFIER-2-2026-10-01",
+  "revision": "D1-D3-CERTIFICATION-R1-2026-10-01",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "Teacher Verifier 2.0 release candidate; exact-lockfile GitHub CI/deployment pending",
-    "note": "Stage B redesigns the teacher verifier information architecture and UX while preserving the existing scoring, RSA-OAEP/AES-GCM decryption, SECURE-ANSWERS-V1 parser, Google Forms cryptographic selection, duplicate-attempt decisions and export data contracts. A dedicated verifier-v2 production contract and real-browser journey coverage are required before promotion.",
+    "note": "D1-D3 are implemented. R1 changes certification infrastructure only: the visible release changelog is capped at 10 entries and the existing P5 Chromium harness now waits for a page CDP target before connecting. Application runtime behavior is unchanged by R1.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Release candidate 7.1.63 closes Stage B / Teacher Verifier 2.0 over 7.1.61; production acceptance requires release QA, Workflow Journeys E2E, P5 R2, GARP 2.7 and Safe Promotion.",
+  "note": "Release candidate 7.1.66 contains D1 PDF runtime repair, D2 effective-results analytics and D3 PDF quality/pagination. R1 only repairs release certification: RELEASE.changes is capped at 10 and the unchanged P5 runtime harness is hardened against a transient missing Chromium page target.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
