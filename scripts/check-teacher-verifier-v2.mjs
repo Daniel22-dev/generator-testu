@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 
-const file='src/js/13f-secure-teacher-verifier.js';
-const s=fs.readFileSync(file,'utf8');
+const authorityFile='src/js/13f-secure-teacher-verifier.js';
+const uiFile='src/js/13eb-secure-teacher-verifier-v2-ui.js';
+const authority=fs.readFileSync(authorityFile,'utf8');
+const ui=fs.readFileSync(uiFile,'utf8');
+const s=ui+'\n'+authority;
 let failed=0;
 const pass=m=>console.log('✅  '+m);
 const fail=m=>{failed++;console.error('❌ '+m);};
@@ -33,6 +36,8 @@ need(/function renderTable\(\)[\s\S]*METADATA MISMATCH/,'Metadata mismatch remai
 need(/function analysisHtml\(forExport\)[\s\S]*Diskriminace[\s\S]*Obtížnost/,'Item analysis remains available.');
 need(/function renderSecuritySignals\(\)[\s\S]*VERIFIER_SECURITY_QUERY/,'Security filtering is display-only over existing signals.');
 forbid(/function\s+scoreSubmissionV2|function\s+decryptPayloadV2/,'Stage B did not introduce a parallel scoring/decryption authority.');
+if (ui.includes('function scoreItemSecure') || ui.includes('async function decryptPayload')) fail('V2 UI module nesmí obsahovat scoring/decryption authority.');
+else pass('V2 UI module contains presentation/orchestration only.');
 
 if(failed) process.exit(1);
 console.log('Teacher Verifier 2.0 contract PASS.');
