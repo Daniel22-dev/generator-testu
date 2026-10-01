@@ -184,6 +184,8 @@ try:
   vp=h.new_page(tea['text']);vp.wait_for_timeout(700)
   assert 'Teacher Verifier 2.0' in vp.locator('.v2-brand').inner_text(), 'Teacher Verifier 2.0 shell missing'
   assert vp.locator('#v2-dashboard').is_visible() and not vp.locator('#v2-results').is_visible(), 'dashboard must be the default panel'
+  dt=vp.locator('#v2-dashboard').inner_text();assert 'Technické údaje' in dt and 'Creator ID' not in dt and 'Student HTML SHA-256' not in dt and 'Kontrola integrity:' not in dt,('dashboard must stay task-focused; low-level metadata belongs to tech panel',dt[:500])
+  assert vp.locator('.v2-nav .v2-nav-icon').count()==7,'all seven verifier navigation items must expose visual hierarchy icons'
   vp.locator('[data-v2-panel="results"]').click();vp.wait_for_timeout(100)
   assert vp.locator('#v2-results').is_visible() and vp.locator('#pasteBox').is_visible(), 'results workflow must be reachable from navigation'
   vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
@@ -191,15 +193,27 @@ try:
   cells=vp.locator('#resultTable tr').nth(1).locator('td').all_inner_texts()
   assert len(cells)>=8 and cells[0].startswith('Jana Nováková') and cells[2]=='30/30' and cells[3]=='100 %' and cells[4]=='1',('verifier result cells',cells)
   assert cells[5]!='__default' and 'plánovaných ? min' not in t,('verifier labels/time (F-14/F-15)',cells[5])
-  before_theme=vp.evaluate("document.body.classList.contains('v2-light')")
-  vp.get_by_role('button',name='Přepnout světlý nebo tmavý režim').click();vp.wait_for_timeout(100)
-  assert vp.evaluate("document.body.classList.contains('v2-light')")!=before_theme,'theme toggle must change verifier theme'
+  dark_theme=vp.evaluate("""()=>{const c=s=>getComputedStyle(document.querySelector(s)).backgroundColor,m=document.createElement('div');m.className='v-modal-box';document.body.appendChild(m);const out={theme:document.body.dataset.verifierTheme,body:c('body'),card:c('.card'),nav:c('.v2-nav'),input:c('input'),modal:getComputedStyle(m).backgroundColor};m.remove();return out}""")
+  assert dark_theme=={'theme':'dark','body':'rgb(11, 18, 32)','card':'rgb(17, 24, 39)','nav':'rgb(16, 24, 39)','input':'rgb(15, 23, 42)','modal':'rgb(17, 24, 39)'},('verifier dark palette must be real',dark_theme)
+  vp.get_by_role('button',name='Přepnout na světlý režim').click();vp.wait_for_timeout(180)
+  light_theme=vp.evaluate("""()=>{const c=s=>getComputedStyle(document.querySelector(s)).backgroundColor,m=document.createElement('div');m.className='v-modal-box';document.body.appendChild(m);const out={theme:document.body.dataset.verifierTheme,body:c('body'),card:c('.card'),nav:c('.v2-nav'),input:c('input'),modal:getComputedStyle(m).backgroundColor};m.remove();return out}""")
+  assert light_theme=={'theme':'light','body':'rgb(244, 246, 251)','card':'rgb(255, 255, 255)','nav':'rgb(243, 244, 246)','input':'rgb(255, 255, 255)','modal':'rgb(255, 255, 255)'},('verifier light palette must cover surfaces',light_theme)
+  assert vp.get_by_role('button',name='Přepnout na tmavý režim').get_attribute('aria-pressed')=='true','theme control must expose active light state'
+  vp.evaluate("""()=>{window.__qaFullscreen=null;Object.defineProperty(document,'fullscreenElement',{configurable:true,get:()=>window.__qaFullscreen});Object.defineProperty(document.documentElement,'requestFullscreen',{configurable:true,value:async()=>{window.__qaFullscreen=document.documentElement;document.dispatchEvent(new Event('fullscreenchange'))}});Object.defineProperty(document,'exitFullscreen',{configurable:true,value:async()=>{window.__qaFullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))}})}""")
+  fs=vp.locator('#v2FullscreenBtn');fs.click();vp.wait_for_timeout(80)
+  assert fs.get_attribute('aria-pressed')=='true' and 'Ukončit' in fs.inner_text(),('fullscreen control must show active state',fs.inner_text())
+  vp.evaluate("()=>{window.__qaFullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))}");vp.wait_for_timeout(50)
+  assert fs.get_attribute('aria-pressed')=='false' and 'Celá obrazovka' in fs.inner_text(),'fullscreenchange/Esc-equivalent must restore inactive state'
+  vp.evaluate("""()=>{Object.defineProperty(document.documentElement,'requestFullscreen',{configurable:true,value:undefined});Object.defineProperty(document.documentElement,'webkitRequestFullscreen',{configurable:true,value:undefined});Object.defineProperty(document.documentElement,'msRequestFullscreen',{configurable:true,value:undefined})}""")
+  fs.click();vp.wait_for_timeout(50)
+  assert 'není v tomto prohlížeči dostupný' in vp.locator('#v2UiStatus').inner_text(),'unsupported fullscreen must provide feedback'
   vp.get_by_role('button',name='Analýza').click();assert vp.locator('#v2-analysis').is_visible() and vp.locator('#itemAnalysis').is_visible(),'analysis panel missing'
   vp.get_by_role('button',name='Bezpečnost').click();assert vp.locator('#v2SecurityFilter').is_visible(),'security filter missing'
   vp.fill('#v2SecurityFilter','Jana');assert vp.input_value('#v2SecurityFilter')=='Jana','security filter must accept query'
   vp.get_by_role('button',name='Test & PDF').click();assert vp.locator('#teacherPreviewDetails').is_visible(),'teacher preview must live in Test & PDF'
   vp.get_by_role('button',name='Export').click();et=vp.locator('#v2-export').inner_text();assert 'Pro studenty' in et and 'Pouze učitel / školní úložiště' in et,('export routes must separate student and teacher outputs',et[:500])
-  vp.get_by_role('button',name='Technické údaje').click();tt=vp.locator('#v2-tech').inner_text();assert 'Test ID' in tt and 'Student HTML SHA-256' in tt,('technical identity panel missing',tt[:500])
+  vp.get_by_role('button',name='Technické údaje').click();tt=vp.locator('#v2-tech').inner_text();assert all(x in tt for x in ['Creator ID','Generator','Build','Test ID','Manifest SHA-256','Student HTML SHA-256','Kontrola integrity:']),('technical identity/integrity panel missing',tt[:800])
+  vp.evaluate("""()=>{const base=RESULTS.find(r=>r&&r.status==='OK');if(!base)throw new Error('missing valid verifier result');RESULTS.splice(0,RESULTS.length,Object.assign({},base,{attemptId:'D5META',submissionDigest:'d5-meta-only',startedAt:'',submittedAt:'',securityEvents:[],answerChangeStats:{},totalAnswerChanges:0,metadataMismatch:['název ve formuláři neodpovídá ověřenému testu'],envelopeMismatch:[]}));ATTEMPT_DECISIONS.clear();afterResultsChanged()}""");vp.get_by_role('button',name='Bezpečnost').click();vp.fill('#v2SecurityFilter','D5META');vp.wait_for_timeout(80);st=vp.locator('#v2-security').inner_text();cards=vp.locator('#v2-security .signal-card');assert cards.count()>=3,('security KPI cards missing',cards.count());hard=cards.nth(0).locator('b').inner_text().strip();soft=cards.nth(1).locator('b').inner_text().strip();assert 'METADATA MISMATCH — metadata Google Forms' in st and 'název ve formuláři neodpovídá ověřenému testu' in st and hard=='0' and soft=='1',('metadata mismatch must be one soft Security signal',{'hard':hard,'soft':soft,'text':st[-900:]})
   vp.set_viewport_size({'width':390,'height':844});vp.wait_for_timeout(100)
   assert vp.evaluate("getComputedStyle(document.querySelector('.v2-nav')).display")=='flex','mobile verifier navigation must become horizontal'
   vp.close()

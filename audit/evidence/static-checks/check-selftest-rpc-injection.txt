@@ -1,1 +1,0 @@
-✅ Self-test RPC bridge: poslední </body> + fallback bez body PASS.

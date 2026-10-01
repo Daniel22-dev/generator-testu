@@ -1642,9 +1642,9 @@ function buildPrompt() {
   // BOD 7 — úroveň diferenciace (míra podpory / náročnost)
   const dl = state.differentiationLevel || 'standard';
   const diffLevelBody = {
-    basic:'Úroveň: ZÁKLADNÍ PODPORA. Uprav formu směrem k nižší zátěži zpracování: méně nebo kratší položky, jednodušší a jasnější instrukce, více kontextu/příkladů, méně distraktorů, klidnější tempo (volitelně delší čas). NESMÍŠ snížit ani změnit hlavní cíl testu ani měřenou látku — jde o odstranění bariér, ne o testování jiného/lehčího učiva.',
-    challenge:'Úroveň: CHALLENGE. Uprav formu směrem k vyšší náročnosti zpracování: náročnější (blízké) distractory, méně nápovědy a scaffoldingu, vyšší podíl produkčních úloh (transformace, překlad), delší a komplexnější věty/texty. Měřená látka MUSÍ zůstat stejná jako u standardu — náročnější je forma a hloubka zpracování, NE jiné nebo pokročilejší učivo.',
-    standard:''
+    basic:'Úroveň: ZÁKLADNÍ PODPORA. Zachovej STEJNOU měřenou látku, cílovou CEFR/SERR úroveň, typy cvičení, počty položek i celkové bodové součty. Sniž zátěž zpracování pouze uvnitř těchto pevných omezení: použij jasnější a kratší instrukce a zadání, více podpůrného kontextu, méně záludné distraktory a méně zbytečné jazykové zátěže. NESMÍŠ měnit počet položek, typy cvičení, bodování ani testované učivo.',
+    challenge:'Úroveň: CHALLENGE. Zachovej STEJNOU měřenou látku, cílovou CEFR/SERR úroveň, typy cvičení, počty položek i celkové bodové součty. Zvyš hloubku zpracování pouze uvnitř těchto pevných omezení: použij bližší věrohodné distraktory, méně scaffoldingu, více inference a syntakticky bohatší, ale stále CEFR-přiměřené formulace. NESMÍŠ zavádět jiné nebo pokročilejší učivo ani měnit počet položek, typy cvičení či bodování.',
+    standard:'Úroveň: STANDARD. Zachovej požadovanou měřenou látku, cílovou CEFR/SERR úroveň, typy cvičení, počty položek i celkové bodové součty a použij vyváženou školní formulaci, distraktory a zátěž zpracování odpovídající věku a zvolené úrovni.'
   }[dl];
   const diffLevelBlock = diffLevelBody
     ? diffLevelBody

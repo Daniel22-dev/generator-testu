@@ -1,3 +1,11 @@
+## 7.1.70 — 2026-10-01 — D7 / CI a regresní hardening
+
+- P5 release gate povinně spouští D7 regresní runner pro Verifier, effective analytics, IA/security, přímé PDF runtime/quality a dark/light/fullscreen runtime;
+- Safe Promotion vyžaduje zelený `p5-release-gate` i `journey-e2e` pro tentýž certifikovaný SHA;
+- Journey E2E před během čistí staré evidence, artifact váže na SHA a nově zahrnuje `config_extra_suite`;
+- D7 evidence artifacty obsahují pouze neškodné JSON souhrny, teacher fixture a vygenerované PDF se po testu mažou;
+- uživatelský runtime D1-D6 se v D7 nemění.
+
 ## 7.1.62 — 2026-10-01 — Etapa 2 / Teacher Verifier 2.0
 
 - Teacher verifier dostal novou informační architekturu Dashboard → Výsledky → Analýza → Bezpečnost → Test & PDF → Export → Technické údaje;

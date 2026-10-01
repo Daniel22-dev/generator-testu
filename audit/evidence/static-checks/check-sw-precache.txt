@@ -1,1 +1,0 @@
-✅  Service worker precache je konzistentní (23/23 souborů existuje).

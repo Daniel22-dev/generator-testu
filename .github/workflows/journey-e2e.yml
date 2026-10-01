@@ -1,9 +1,8 @@
 name: Workflow journeys E2E
 
-# Klikací regresní sady uživatelských cest (audit/run_audit.py). Do 7.1.58 je
-# nespouštěl žádný workflow ani npm test, takže regrese v nich nic nestřežily.
-# Po prvním zeleném běhu v CI zařaďte job `journey-e2e` mezi povinné kontroly
-# (ruleset větve / Safe Promotion), aby selhání blokovalo povýšení do main.
+# Klikací regresní sady uživatelských cest (audit/run_audit.py).
+# D7: Safe Promotion vyžaduje zelený journey-e2e pro stejny certifikovany SHA.
+# Evidence adresar se pred kazdym runem cisti, aby artifact neobsahoval stare soubory.
 
 on:
   workflow_dispatch:
@@ -40,18 +39,24 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/audit-venv"
           "$RUNNER_TEMP/audit-venv/bin/pip" install --disable-pip-version-check -r audit/requirements-audit.txt
+      - name: Clean run-specific audit evidence
+        shell: bash
+        run: |
+          rm -rf audit/evidence
+          mkdir -p audit/evidence
       - name: Build
         run: npm run build
       - name: Run workflow journey suites
         shell: bash
         run: |
           "$RUNNER_TEMP/audit-venv/bin/python" audit/run_audit.py \
-            --suite journey_suite --suite state_transition_suite --suite feature_suite \
-            --suite integration_suite --suite identity_suite --suite wizard_suite
+            --suite journey_suite --suite state_transition_suite --suite config_extra_suite \
+            --suite feature_suite --suite integration_suite --suite identity_suite --suite wizard_suite
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: journey-e2e-evidence
+          name: journey-e2e-evidence-${{ github.sha }}
           path: audit/evidence/
           retention-days: 14
+          if-no-files-found: error

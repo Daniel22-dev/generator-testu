@@ -1,6 +1,6 @@
 {
   "name": "generator-testu",
-  "version": "7.1.66",
+  "version": "7.1.70",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
@@ -47,8 +47,8 @@
     "qa:a11y": "node scripts/qa-p5-runtime.mjs",
     "qa:p4": "npm run qa:p5",
     "qa:p4:ci": "npm run qa:p5:ci",
-    "qa:p5": "npm run qa:lock && npm run qa:garp23 && npm run build && npm run garp25:prep-static && npm run qa:garp27:static && npm run verify:platform && npm run qa:quality && npm run qa:browser && npm run qa:runtime && npm run qa:xss && node scripts/qa-p5-release.mjs && node scripts/qa-p5-acceptance.mjs",
-    "qa:p5:ci": "npm run qa:lock && npm run qa:garp23 && npm run build && npm run garp25:prep-static && npm run qa:garp27:static && npm run verify:platform && npm run qa:quality && npm run qa:browser && npm run qa:runtime && npm run qa:xss && npm run qa:axe && AXE_REQUIRED=1 node scripts/qa-p5-release.mjs && node scripts/qa-p5-acceptance.mjs",
+    "qa:p5": "npm run qa:lock && npm run qa:garp23 && npm run build && npm run qa:d7:ci && npm run garp25:prep-static && npm run qa:garp27:static && npm run verify:platform && npm run qa:quality && npm run qa:browser && npm run qa:runtime && npm run qa:xss && node scripts/qa-p5-release.mjs && node scripts/qa-p5-acceptance.mjs",
+    "qa:p5:ci": "npm run qa:lock && npm run qa:garp23 && npm run build && npm run qa:d7:ci && npm run garp25:prep-static && npm run qa:garp27:static && npm run verify:platform && npm run qa:quality && npm run qa:browser && npm run qa:runtime && npm run qa:xss && npm run qa:axe && AXE_REQUIRED=1 node scripts/qa-p5-release.mjs && node scripts/qa-p5-acceptance.mjs",
     "test:p5": "npm run qa:p5",
     "qa:runtime": "node scripts/qa-p5-runtime.mjs",
     "qa:xss": "node scripts/qa-p5-xss-sinks.mjs",
@@ -63,8 +63,8 @@
     "garp25:selftest": "node security/garp25/tools/selftest-garp251.mjs",
     "garp25:sw": "node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json",
     "garp25:leaks": "node security/garp25/tools/scan-deployment-leaks.mjs dist",
-    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.66.cdx.json",
-    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.66.cdx.json --check",
+    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.70.cdx.json",
+    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.70.cdx.json --check",
     "garp25:prep-static": "npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks",
     "garp25:ai-evidence": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json",
     "garp25:ai-evidence:check": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check",
@@ -88,7 +88,11 @@
     "precheck:stage3-pdf-runtime": "npm run build && node scripts/qa-generate-fixtures.mjs",
     "check:stage3-pdf-runtime": "node scripts/check-stage3-pdf-runtime.mjs",
     "check:verifier-analytics": "node scripts/check-verifier-effective-analytics.mjs",
-    "check:stage3-pdf-quality": "node scripts/check-stage3-pdf-quality.mjs"
+    "check:stage3-pdf-quality": "node scripts/check-stage3-pdf-quality.mjs",
+    "check:verifier-ia-security": "node scripts/check-verifier-ia-security.mjs",
+    "check:verifier-ui-runtime": "node scripts/check-verifier-ui-runtime.mjs",
+    "qa:d7:ci": "node scripts/qa-d7-regressions.mjs",
+    "check:d7-ci-wiring": "node scripts/check-d7-ci-wiring.mjs"
   },
   "engines": {
     "node": ">=18"

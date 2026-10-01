@@ -98,6 +98,12 @@ requireText(aiIntegration, /allowedModes:\s*\['direct-gemini'\]/, 'Veřejný AI 
 requireText(aiIntegration, /allowedModes:\s*\['school-gateway'\]/, 'Školní AI profil není omezen na school-gateway.');
 requireText(aiIntegration, /schoolServerConnected===true/, 'Školní AI brána není blokována do potvrzeného připojení serveru.');
 requireText(persistence, /const TEMPLATE_PREFILL_KEYS[\s\S]*jazyk[\s\S]*uroven[\s\S]*pocet[\s\S]*typyCviceni[\s\S]*cas[\s\S]*body[\s\S]*exerciseConfig/, 'Uživatelská šablona nepředvyplňuje klíčová nastavení formuláře.');
+requireText(persistence, /const TEMPLATE_PREFILL_KEYS[^\n]*rcTopic/, 'prefill_v3 neukládá předdefinované Reading téma rcTopic.');
+requireText(persistence, /attachmentWasPresent=state\.zadaniTab===['"]file['"][\s\S]{0,500}attachmentWasPresent/, 'Nová šablona neeviduje, že původní zadání používalo přílohu.');
+requireText(persistence, /Původní příloha se do šablony neukládá[^']*připoj ji znovu/, 'Načtení šablony s přílohou neupozorňuje učitele na nutnost přílohu znovu připojit.');
+requireText(formFields, /ZÁKLADNÍ PODPORA[\s\S]{0,800}typy cvičení, počty položek i celkové bodové součty/, 'Legacy buildPrompt() nedrží u Basic stejnou strukturu testu.');
+requireText(formFields, /CHALLENGE[\s\S]{0,800}typy cvičení, počty položek i celkové bodové součty/, 'Legacy buildPrompt() nedrží u Challenge stejnou strukturu testu.');
+forbidText(formFields, /méně nebo kratší položky|vyšší podíl produkčních úloh/, 'Legacy buildPrompt() stále dovoluje měnit počet nebo typy úloh podle diferenciace.');
 const templatePrefillStart = persistence.indexOf('const TEMPLATE_PREFILL_KEYS');
 const templatePrefillEnd = persistence.indexOf('\n', templatePrefillStart);
 const templatePrefillBlock = templatePrefillStart >= 0 && templatePrefillEnd > templatePrefillStart ? persistence.slice(templatePrefillStart, templatePrefillEnd) : '';

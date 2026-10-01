@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.66",
+  "appVersion": "7.1.70",
   "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -17,6 +17,7 @@
     "requiredChecks": [
       "project-tests",
       "p5-release-gate",
+      "journey-e2e",
       "live-pages-smoke",
       "pwa-update-from-previous-release"
     ]
@@ -38,19 +39,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "D1-D3-CERTIFICATION-R1-2026-10-01",
+  "revision": "D7-CI-REGRESSION-HARDENING-2026-10-01",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "Teacher Verifier 2.0 release candidate; exact-lockfile GitHub CI/deployment pending",
-    "note": "D1-D3 are implemented. R1 changes certification infrastructure only: the visible release changelog is capped at 10 entries and the existing P5 Chromium harness now waits for a page CDP target before connecting. Application runtime behavior is unchanged by R1.",
+    "transport": "D4-D7 consolidated source candidate; targeted local static/runtime contracts complete, exact-lockfile GitHub P5 and full Journey E2E remain final promotion authority",
+    "note": "D7 makes the new verifier/PDF regression suites part of qa:p5:ci, requires independent p5-release-gate and journey-e2e for the exact certified SHA, cleans stale Journey evidence, adds config_extra_suite coverage, and removes sensitive teacher fixtures/PDF files before CI artifact upload. D4-D6 functionality is retained.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Release candidate 7.1.66 contains D1 PDF runtime repair, D2 effective-results analytics and D3 PDF quality/pagination. R1 only repairs release certification: RELEASE.changes is capped at 10 and the unchanged P5 runtime harness is hardened against a transient missing Chromium page target.",
+  "note": "Candidate 7.1.70 contains D4-D6 functional fixes plus D7 CI/regression hardening. GitHub candidate CI remains the final promotion authority.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

@@ -1,1 +1,0 @@
-✅  Lockfile používá veřejný npm registr (113 resolved URL, 0 interních).
