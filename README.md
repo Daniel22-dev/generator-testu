@@ -1,3 +1,5 @@
+> **7.1.62 — Teacher Verifier 2.0 / Etapa 2.** New dashboard-based verifier UX with separated Results, Analysis, Security, Test & PDF, Export and Technical sections; scoring, cryptography and secure submission contracts remain unchanged. See RELEASE-NOTES-7.1.62.md.
+
 > **7.1.61 — Stage A functional fixes.** Secure template prefill v3, teacher-controlled Reading/Listening counts, differentiation propagation, corrected YouTube routing and content-drift detection. See RELEASE-NOTES-7.1.61.md.
 
 > **7.1.60 — final pre-server Forms workflow.** See RELEASE-NOTES-7.1.60.md.
@@ -12,7 +14,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.61
+**Aktuální verze:** 7.1.62
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 
