@@ -1,0 +1,24 @@
+name: Stage 3 working snapshot
+on:
+  push:
+    branches:
+      - work/stage3-pdf-7.1.63
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Package working tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/package-stage3-source.yml
+          rm -rf .git
+          zip -rq stage3-working.zip . -x "stage3-working.zip" -x "node_modules/*" -x "dist/*"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage3-working
+          path: stage3-working.zip
+          retention-days: 2
