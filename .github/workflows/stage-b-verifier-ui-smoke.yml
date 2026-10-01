@@ -1,0 +1,48 @@
+name: Stage B verifier UI smoke
+
+on:
+  push:
+    branches: [audit/stage-b-teacher-verifier-2-2026-10-01]
+
+permissions:
+  contents: read
+
+jobs:
+  verifier-ui-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Version and build
+        run: |
+          npm run check:versions
+          npm run build
+      - name: Verify Teacher Verifier 2.0 shell contract
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8');
+          const required=[
+            'Teacher Verifier 2.0',
+            "data-v2-panel=\"dashboard\"",
+            "data-v2-panel=\"results\"",
+            "data-v2-panel=\"analysis\"",
+            "data-v2-panel=\"security\"",
+            "data-v2-panel=\"test\"",
+            "data-v2-panel=\"export\"",
+            "data-v2-panel=\"tech\"",
+            'toggleVerifierFullscreen',
+            'toggleVerifierTheme',
+            'initVerifierV2'
+          ];
+          const missing=required.filter(x=>!s.includes(x));
+          if(missing.length){console.error({missing});process.exit(1);}
+          console.log('Teacher Verifier 2.0 shell contract present.');
+          NODE
+      - name: Headless dist smoke
+        run: npm run test:headless:dist
