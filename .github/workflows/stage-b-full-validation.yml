@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: stage-b-full-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   full-validation:
     runs-on: ubuntu-latest
