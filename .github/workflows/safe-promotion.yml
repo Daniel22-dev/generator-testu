@@ -84,7 +84,7 @@ jobs:
       - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 56e150355b0067cadee6149eff5689e9f6eec1b0a9e8a2bb6aa4c024ae2fd037
+          GARP27_EXTERNAL_TRUST_SHA256: 6b171bbae2a6883eeeda32e5c8f8f94f510bc07910a5381a46aea7fbacd54a74
 
       - name: Upload candidate QA evidence
         if: always()
@@ -223,7 +223,7 @@ jobs:
         if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 56e150355b0067cadee6149eff5689e9f6eec1b0a9e8a2bb6aa4c024ae2fd037
+          GARP27_EXTERNAL_TRUST_SHA256: 6b171bbae2a6883eeeda32e5c8f8f94f510bc07910a5381a46aea7fbacd54a74
 
       - name: Upload PR certification evidence
         if: always() && steps.pr_freshness.outputs.current == 'true'
@@ -282,7 +282,7 @@ jobs:
             echo "eligible=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Require independent p5-release-gate for exact certified SHA
+      - name: Require independent P5 and Journey E2E for exact certified SHA
         if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
@@ -290,25 +290,27 @@ jobs:
           CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 80); do
+          for attempt in $(seq 1 120); do
             checks="$(gh api -H 'Accept: application/vnd.github+json' "repos/$GITHUB_REPOSITORY/commits/$CERTIFIED_SHA/check-runs?per_page=100")"
-            success_count="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and .conclusion == "success")] | length' <<<"$checks")"
-            if [ "$success_count" -gt 0 ]; then
-              echo "Independent p5-release-gate is GREEN for exact SHA $CERTIFIED_SHA."
-              exit 0
-            fi
-            terminal_failure="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure"))] | length' <<<"$checks")"
-            if [ "$terminal_failure" -gt 0 ]; then
-              echo "::error::Independent p5-release-gate is terminal RED for exact SHA $CERTIFIED_SHA."
+            p5_green="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and .conclusion == "success")] | length' <<<"$checks")"
+            journey_green="$(jq '[.check_runs[] | select(.name == "journey-e2e" and .conclusion == "success")] | length' <<<"$checks")"
+            p5_red="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure"))] | length' <<<"$checks")"
+            journey_red="$(jq '[.check_runs[] | select(.name == "journey-e2e" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure"))] | length' <<<"$checks")"
+            if [ "$p5_red" -gt 0 ] || [ "$journey_red" -gt 0 ]; then
+              echo "::error::Required independent release check is RED for exact SHA $CERTIFIED_SHA (p5_red=$p5_red journey_red=$journey_red)."
               exit 1
             fi
-            echo "Waiting for independent p5-release-gate on exact SHA $CERTIFIED_SHA (attempt $attempt/80)."
+            if [ "$p5_green" -gt 0 ] && [ "$journey_green" -gt 0 ]; then
+              echo "Independent p5-release-gate and journey-e2e are GREEN for exact SHA $CERTIFIED_SHA."
+              exit 0
+            fi
+            echo "Waiting for independent release checks on exact SHA $CERTIFIED_SHA (attempt $attempt/120; p5_green=$p5_green journey_green=$journey_green)."
             sleep 15
           done
-          echo "::error::Independent p5-release-gate did not reach GREEN for exact SHA $CERTIFIED_SHA within the bounded wait."
+          echo "::error::Required independent P5/Journey checks did not both reach GREEN for exact SHA $CERTIFIED_SHA within the bounded wait."
           exit 1
 
-      - name: Recheck candidate and PR after required P5
+      - name: Recheck candidate and PR after required release checks
         if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
@@ -320,7 +322,7 @@ jobs:
           pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
           current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
           if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::error::Candidate or promotion PR moved while waiting for required P5; refusing merge."
+            echo "::error::Candidate or promotion PR moved while waiting for required release checks; refusing merge."
             exit 1
           fi
 

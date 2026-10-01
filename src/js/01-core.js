@@ -14,21 +14,21 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.66',
+  version: '7.1.70',
   date:    '2026-10-01',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'D7 / CI + REGRESSION HARDENING (7.1.70): P5 release gate nyní povinně spouští samostatný D7 regression runner pro Teacher Verifier, effective analytics, IA/security, skutečné browserové PDF runtime/quality a dark/light/fullscreen runtime. Safe Promotion vyžaduje zelený p5-release-gate i journey-e2e pro stejný certifikovaný SHA; Journey čistí staré evidence, zahrnuje config_extra_suite a ukládá SHA-bound artifact. Citlivé teacher fixtures/PDF se po D7 testech odstraní a zůstávají jen JSON souhrny.',
+    'D6 / GENERATOR PREFILL + DIFERENCIACE (7.1.69): prefill_v3 ukládá a obnovuje i předdefinované Reading téma rcTopic; šablona si pamatuje, zda původní zadání používalo soubor, a po načtení výslovně vyžádá jeho nové připojení bez ukládání názvu či binárních dat. Aktivní prompt cesty i UI nyní drží pro Basic/Standard/Challenge stejné učivo, CEFR, typy cvičení, počty položek a body; mění se pouze míra podpory a hloubka zpracování.',
+    'D5 / VERIFIER IA + SECURITY UX (7.1.69): Dashboard je zjednodušen na pracovní přehled; Creator ID, build, manifest a Student HTML SHA-256 jsou soustředěny v panelu Technické údaje. Google Forms metadata mismatch je sjednocen s bezpečnostním modelem jako měkký signál, zobrazuje se v Security i Results bez duplicitního varování a dashboardový počet signálů používá effectiveResults(). Navigace má výraznější aktivní stav a ikonovou hierarchii.',
+    'D4 / THEME + FULLSCREEN (7.1.67): Teacher Verifier 2.0 má skutečný tmavý a světlý motiv napříč hlavními surfaces včetně karet, tabulek, formulářů a modalů. Fullscreen ovládání sleduje browserový fullscreenchange, mění aria-pressed i viditelný stav tlačítka a při nepodporovaném nebo odmítnutém API nabídne explicitní hlášku a F11 fallback.',
     'D3 / PDF KVALITA (7.1.66): přímé studentské i učitelské PDF používá bezpečné A4 stránkování, které preferuje hranice celých otázek a jako pojistku neřeže přes textové řádky. Opravena česká diakritika a mezery mezi formátovanými částmi; studentská verze zůstává bez klíče a učitelského transcriptu, školní logo zachovává proporce.',
     'D2 / EFFECTIVE ANALYTICS (7.1.65): rozložení výsledků, známkové rozložení a položková analýza Teacher Verifieru používají jedinou autoritu effectiveResults(). Identické duplicity se nezapočítávají a různé validní pokusy stejného studenta se do analytiky dostanou až po explicitním výběru učitele. Scoring, dešifrování a export submissions se nemění.',
     'D1 / PDF RUNTIME HOTFIX (7.1.64): přímé studentské i učitelské PDF ve Teacher Verifieru již nepoužívá SVG foreignObject cestu, která v Chromium vedla k tainted-canvas SecurityError. Renderer kreslí připravený tiskový DOM lokálně do origin-clean canvasu a zachovává přímý PDF download bez tiskového dialogu.',
     'ETAPA 3 / PŘÍMÉ PDF (7.1.63): Teacher Verifier umí přímo stáhnout skutečné studentské PDF i učitelské PDF s klíčem bez tiskového dialogu. PDF je generováno lokálně v prohlížeči, zachovává českou diakritiku přes browserové vykreslení, vkládá školní logo přímo do výstupu a klasický tisk zůstává jako záložní cesta. Export nemění scoring, kryptografii ani SECURE-ANSWERS-V1.',
     'TEACHER VERIFIER 2.0 (7.1.62): učitelský verifier má novou sedmidílnou informační architekturu Dashboard / Výsledky / Analýza / Bezpečnost / Test & PDF / Export / Technické údaje, responzivní navigaci, light/dark a fullscreen, stavové KPI, přehled importních cest, filtrování bezpečnostních signálů a jasné oddělení studentských feedbacků od učitelského archivu.',
     'ETAPA A / FUNKČNÍ OPRAVY (7.1.61): šablony prefill_v3 znovu skutečně předvyplní bezpečná pole; Reading a Listening mají učitelem řízený jednotný počet otázek; differentiationLevel se propisuje do hlavního AI promptu; YouTube se předává jako video vstup místo URL Contextu; změny relevantního obsahu správně označí starý výstup jako zastaralý.',
-    'DLOUHÉ ZDROJE (7.1.60): Generátor nyní načítá textové podklady výrazně ve větším rozsahu, HTML před použitím čistí na viditelný obsah a DOCX převádí na text. Zdroj delší než jeden AI kontext se už neřeže jen na začátek nebo konec.',
-    'PŘEDSERVEROVÉ FORMS WORKFLOW (7.1.60): jeden univerzální Google Form může sbírat výsledky celý školní rok; metadata testu se předvyplní automaticky, teacher verifier umí z celého CSV kryptograficky vybrat jen svůj test, hlídá metadata mismatch, duplicity a více pokusů.',
-    'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
-    'ODOLNÉ GENEROVÁNÍ (7.1.58): hotové dávky a Reading analýza se při chybě zachovají a další pokus naváže. AI dávka má jeden timeout a běžné typy se zbytečně netříští.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.

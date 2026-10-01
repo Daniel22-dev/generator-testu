@@ -45,6 +45,7 @@ try {
   }
 
   if (pageErrors.length) throw new Error(`browser pageerror: ${pageErrors.join(' | ')}`);
+  fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify({ schema: 'ghrab-stage3-pdf-runtime-v1', status: 'passed', results }, null, 2) + '\n');
   for (const result of results) console.log(`PASS ${result.file} ${result.bytes} B`);
   console.log('PASS Stage 3 direct PDF real-browser runtime');
 } finally {

@@ -113,6 +113,7 @@ try {
   if (pagination.brokenLines.length) throw new Error(`stránkování řeže textový řádek: ${JSON.stringify(pagination.brokenLines)}`);
   if (!pagination.logoOk) throw new Error('školní logo není v PDF DOM skutečně vykreslitelné');
 
+  const pdfResults = [];
   for (const test of [{ withKey: false, prefix: 'student_' }, { withKey: true, prefix: 'ucitel_klic_' }]) {
     const downloadPromise = page.waitForEvent('download', { timeout: 60_000 });
     await page.evaluate(withKey => downloadDirectPdf(withKey), test.withKey);
@@ -120,9 +121,11 @@ try {
     const file = path.join(outDir, download.suggestedFilename());
     await download.saveAs(file);
     const info = assertPdf(file, test.prefix);
+    pdfResults.push({ file: path.basename(file), ...info, withKey: test.withKey });
     console.log(`PASS ${path.basename(file)} ${info.bytes} B / ${info.pages} stran`);
   }
   if (pageErrors.length) throw new Error(`browser pageerror: ${pageErrors.join(' | ')}`);
+  fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify({ schema: 'ghrab-stage3-pdf-quality-v1', status: 'passed', contract, pagination: { cuts: pagination.cuts, brokenQuestions: pagination.brokenQuestions.length, brokenLines: pagination.brokenLines.length, logoOk: pagination.logoOk }, pdfResults }, null, 2) + '\n');
   console.log(`PASS pagination cuts: ${pagination.cuts.join(', ')}`);
   console.log('PASS Stage 3 PDF quality');
 } finally {

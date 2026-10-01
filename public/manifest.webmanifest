@@ -34,7 +34,7 @@
       "purpose": "maskable"
     }
   ],
-  "version": "7.1.66",
+  "version": "7.1.70",
   "ghrab_platform": {
     "contract": "ghrab-platform-v1",
     "version": "1.1.2",

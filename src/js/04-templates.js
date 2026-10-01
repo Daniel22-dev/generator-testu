@@ -236,9 +236,9 @@ function renderFeedbackModeNote(){
 }
 // ── BOD 7: Úroveň diferenciace (míra podpory / náročnost) ─────────────────────
 const DIFF_LEVEL_NOTE = {
-  basic:'🤝 <strong>Základní podpora:</strong> méně/kratší položky, jednodušší instrukce, více kontextu, méně distraktorů, volitelně delší čas. <strong>Cíl testu i měřená látka zůstávají stejné</strong> — odstraňují se bariéry, netestuje se jiné učivo.',
+  basic:'🤝 <strong>Základní podpora:</strong> stejné učivo, CEFR, typy cvičení, počty položek i body; uvnitř této stejné struktury jsou jasnější instrukce, více podpůrného kontextu a méně záludné distraktory. <strong>Odstraňují se bariéry, nemění se rozsah ani měřená látka.</strong>',
   standard:'⚖️ <strong>Standard:</strong> běžná verze pro většinu třídy — standardní délka i bodování.',
-  challenge:'🚀 <strong>Challenge:</strong> náročnější distractory, méně nápovědy, vyšší podíl produkčních úloh, delší/komplexnější věty. <strong>Měřená látka je stejná jako u standardu</strong> — náročnější je forma zpracování, ne jiné učivo.'
+  challenge:'🚀 <strong>Challenge:</strong> stejné učivo, CEFR, typy cvičení, počty položek i body; uvnitř této stejné struktury jsou bližší distraktory, méně scaffoldingu, více inference a syntakticky bohatší formulace. <strong>Náročnější je hloubka zpracování, ne jiné učivo ani jiná struktura testu.</strong>'
 };
 function renderResultModeNote(){
   var note = $('resultModeNote');
