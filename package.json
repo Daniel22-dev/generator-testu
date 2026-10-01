@@ -1,6 +1,6 @@
 {
   "name": "generator-testu",
-  "version": "7.1.61",
+  "version": "7.1.62",
   "description": "Generátor testů pro učitele – build systém",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "node scripts/lint.mjs",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
-    "check:production": "node scripts/check-production-readiness.mjs",
+    "check:production": "node scripts/check-production-readiness.mjs && npm run check:verifier-v2",
     "check:csp": "node scripts/check-csp.mjs",
     "test:workflow": "node tools/run-workflow-audit.mjs dist/index.html",
     "pretest:headless": "npm run build",
@@ -63,8 +63,8 @@
     "garp25:selftest": "node security/garp25/tools/selftest-garp251.mjs",
     "garp25:sw": "node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json",
     "garp25:leaks": "node security/garp25/tools/scan-deployment-leaks.mjs dist",
-    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.61.cdx.json",
-    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.61.cdx.json --check",
+    "garp25:sbom": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.62.cdx.json",
+    "garp25:sbom:check": "node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.62.cdx.json --check",
     "garp25:prep-static": "npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks",
     "garp25:ai-evidence": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json",
     "garp25:ai-evidence:check": "node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check",
@@ -82,7 +82,8 @@
     "qa:garp27": "npm run build && npm run garp25:prep-static && npm run qa:garp27:static",
     "qa:garp27:foundation": "node scripts/garp27/foundation-gate.mjs",
     "check:ai-operations": "node scripts/check-ai-operation-registry.mjs",
-    "check:exercise-help": "node scripts/check-exercise-type-help.mjs"
+    "check:exercise-help": "node scripts/check-exercise-type-help.mjs",
+    "check:verifier-v2": "node scripts/check-teacher-verifier-v2.mjs"
   },
   "engines": {
     "node": ">=18"
