@@ -400,9 +400,10 @@
       "id": "export-teacher-verifier",
       "name": "Exportovaný učitelský verifier",
       "url": "/qa-results/qa-fixtures/teacher_verifier.html",
-      "expectedText": "Učitelský verifier",
+      "expectedText": "Teacher Verifier 2.0",
       "mustVisible": [
-        "body"
+        ".v2-brand",
+        "#v2-dashboard"
       ],
       "steps": [
         {
