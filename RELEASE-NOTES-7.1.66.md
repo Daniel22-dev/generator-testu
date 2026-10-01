@@ -30,3 +30,11 @@ Verze 7.1.66 navazuje na D1 / 7.1.64 a D2 / 7.1.65. D3 nemění scoring, dešifr
 ### Záměrně mimo D3
 
 D3 neřeší dark mode, fullscreen, dashboard/security UX ani generator prefill. Ty zůstávají pro D4–D6.
+
+## R1 – certifikační hotfix po prvním candidate CI
+
+První upload 7.1.66 měl zelený Workflow journeys E2E, ale dvě certifikační workflow skončila červeně ze dvou nezávislých infrastrukturních důvodů. Produkční D1–D3 funkcionalita se v R1 nemění.
+
+- `RELEASE.changes` je znovu omezen na posledních 10 položek; původních 12 způsobilo jediný headless FAIL a následně nevznikly QA fixtures, takže Visual/Critical brány kaskádově hlásily chybějící exportní HTML soubory.
+- `qa-p5-runtime.mjs` po dostupnosti Chromium debug endpointu čeká také na skutečný `page` CDP target. Odstraňuje se latentní race condition, při které `/json/version` už odpovídal, ale `/json` ještě krátce neobsahoval stránku.
+- AI assurance fingerprint byl regenerován pouze kvůli změně release metadata v `01-core.js`.

@@ -38,19 +38,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "D1-PDF-RUNTIME-HOTFIX-2026-10-01",
+  "revision": "D1-D3-CERTIFICATION-R1-2026-10-01",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "Teacher Verifier 2.0 release candidate; exact-lockfile GitHub CI/deployment pending",
-    "note": "D1 replaces the tainted SVG foreignObject-to-canvas PDF path with an origin-clean local DOM rasterizer. Student/teacher PDF download is the only intended functional change; scoring, cryptography, submission handling and analytics are unchanged.",
+    "note": "D1-D3 are implemented. R1 changes certification infrastructure only: the visible release changelog is capped at 10 entries and the existing P5 Chromium harness now waits for a page CDP target before connecting. Application runtime behavior is unchanged by R1.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Release candidate 7.1.66 is the surgical D2 Teacher Verifier analytics correction over D1 7.1.64. It changes only analytics population selection and its regression coverage: distribution, grade histogram and item analysis now use effectiveResults(), excluding exact duplicates and unresolved attempts. D1 PDF runtime, scoring, crypto and student artifacts remain unchanged.",
+  "note": "Release candidate 7.1.66 contains D1 PDF runtime repair, D2 effective-results analytics and D3 PDF quality/pagination. R1 only repairs release certification: RELEASE.changes is capped at 10 and the unchanged P5 runtime harness is hardened against a transient missing Chromium page target.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
