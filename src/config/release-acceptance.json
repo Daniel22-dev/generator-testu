@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.60",
-  "releaseStatus": "pre-release-source-attestation",
+  "appVersion": "7.1.61",
+  "releaseStatus": "stage-a-functional-fixes-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -38,19 +38,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "PRE-SERVER-FORMS-FINAL-2026-09-30",
+  "revision": "STAGE-A-FUNCTIONAL-FIXES-2026-10-01",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "source-only pre-release attestation; exact-lockfile GitHub CI/deployment pending",
-    "note": "Local isolated Chromium click tests, deterministic AI fixtures and Node WebCrypto bridge. Exact pinned-dependency CI, live AI linguistic quality, hosting/auth/CSP/PWA and real Studio integration still require acceptance. See audit/REPORT.md.",
+    "transport": "Stage A source candidate; exact-lockfile GitHub CI/deployment pending",
+    "note": "Stage A adds secure template prefill_v3, teacher-controlled Reading/Listening counts, differentiation prompt propagation, corrected YouTube routing and content-drift detection. Exact pinned-dependency CI, live deployment and AI Studio update remain required before production acceptance.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Source-only P5 acceptance input for Generator 7.1.60. It must not be interpreted as live deployment status.",
+  "note": "Release candidate 7.1.61 closes Stage A functional fixes over 7.1.60; production acceptance requires the existing Safe Promotion, P5 R2 and deployment chain.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

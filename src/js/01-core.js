@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.60',
-  date:    '2026-09-30',
+  version: '7.1.61',
+  date:    '2026-10-01',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'ETAPA A / FUNKČNÍ OPRAVY (7.1.61): šablony prefill_v3 znovu skutečně předvyplní bezpečná pole; Reading a Listening mají učitelem řízený jednotný počet otázek; differentiationLevel se propisuje do hlavního AI promptu; YouTube se předává jako video vstup místo URL Contextu; změny relevantního obsahu správně označí starý výstup jako zastaralý.',
     'DLOUHÉ ZDROJE (7.1.60): Generátor nyní načítá textové podklady výrazně ve větším rozsahu, HTML před použitím čistí na viditelný obsah a DOCX převádí na text. Zdroj delší než jeden AI kontext se už neřeže jen na začátek nebo konec — rozdělí se na překrývající se části a do AI se sestaví tematicky relevantní i rovnoměrně rozprostřený průřez napříč dokumentem. Rozhraní tento režim transparentně označí a extrémní lokální zkrácení nikdy nezůstane skryté.',
     'PŘEDSERVEROVÉ FORMS WORKFLOW (7.1.60): jeden univerzální Google Form může sbírat výsledky celý školní rok; metadata testu se předvyplní automaticky, teacher verifier umí z celého CSV kryptograficky vybrat jen svůj test, hlídá metadata mismatch, duplicity a více pokusů a nabízí oddělený export výsledků a odevzdání.',
     'WORKFLOW AUDIT (7.1.59): učitel dokončí test bez hádání – rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení, studentské texty v jazyce testu.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'O APLIKACI (7.1.55): hlavní hlavička nově používá jednotný vstup O aplikaci. Karta shrnuje účel Generátoru, autora a vývojového garanta, školní projekt, určení a přístup, technický stav, provozní zásady a nápovědu; dosavadní changelog je přesunut dovnitř jako rozbalovací Katalog změn včetně samostatně verzovaného modulu Český jazyk.',
     'ÚKLID A ZRYCHLENÍ (7.1.54): service worker ověřuje stránku aplikace u serveru podmíněným dotazem, takže nezměněnou stránku (~1,4 MB) při otevření znovu nestahuje; čerstvost verze a offline záloha zůstávají stejné. Odstraněno 17 nevolaných funkcí (přežitky starého přístupu a nahrazené pomocné funkce); sestavovací skript přepsán čitelně se shodným výstupem. Bez změny rozhraní, bodování, secure runtime, AI promptů a bezpečnostního modelu.',
     'UX HOTFIX (7.1.53): opraveno otevírání a sbalování nastavení položek/bodů v Simple režimu, po sbalení se vracejí karty typů cvičení; hover nápověda se otevírá přednostně vedle karty a má neprůhledné pozadí; profily Procvičování/Běžný/Přísný stručně a věcně popisují skutečné chování testu.',
-    'READING TOPIC PRIORITY (7.1.50): pokud učitel explicitně zvolí téma Readingu, je povinným tematickým rámcem. Zdroj už téma nepřepisuje; podle zvoleného režimu může dodat jen přirozeně slučitelnou slovní zásobu, obsah, gramatiku nebo vzor úloh. Neslučitelné prvky se nevnucují.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.

@@ -37,11 +37,11 @@ jobs:
       - name: Run P5 R2 release gate
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: ae0471cef1c3e5203989f6ed234a6e3e5355e3249b818c2fa94bc34d49844556
+          GARP27_EXTERNAL_TRUST_SHA256: 3448bd4dae672087beaaee84dd15b64fda2e7b45fcc0d92bd52a1b2d46dbf55c
       - name: Enforce GARP 2.7 foundation admission and legacy regressions
         run: npm run qa:garp27:foundation
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: ae0471cef1c3e5203989f6ed234a6e3e5355e3249b818c2fa94bc34d49844556
+          GARP27_EXTERNAL_TRUST_SHA256: 3448bd4dae672087beaaee84dd15b64fda2e7b45fcc0d92bd52a1b2d46dbf55c
       - name: Upload audit evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -1,3 +1,5 @@
+> **7.1.61 — Stage A functional fixes.** Secure template prefill v3, teacher-controlled Reading/Listening counts, differentiation propagation, corrected YouTube routing and content-drift detection. See RELEASE-NOTES-7.1.61.md.
+
 > **7.1.60 — final pre-server Forms workflow.** See RELEASE-NOTES-7.1.60.md.
 
 > **7.1.59 — workflow / user-journey audit.** Učitel dokončí test bez hádání: rozdíly AI klíče se rozhodují po položkách a nezmizí, chyby AI říkají „Co dál“, změny nastavení po vygenerování jdou použít bez AI, přísný test vysvětluje odemčení a studentské texty odpovídají jazyku testu. Viz RELEASE-NOTES-7.1.59.md.
@@ -10,7 +12,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.60
+**Aktuální verze:** 7.1.61
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 
