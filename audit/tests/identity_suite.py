@@ -26,7 +26,7 @@ try:
    else:
     click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt)
     # Real verifier import validates IDs, manifests and encrypted payload; importing twice warns.
-    v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('RESULTS.length===1');assert v.evaluate('RESULTS[0].status')=='OK',v.evaluate('RESULTS[0]')
+    v.locator('[data-v2-panel="results"]').click();v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('RESULTS.length===1');assert v.evaluate('RESULTS[0].status')=='OK',v.evaluate('RESULTS[0]')
     dup=v.evaluate('async txt=>{await verifyText("second.txt",txt);return duplicateInfo()}',txt);assert len(dup['dupStudentKeys'])==len(dup['dupAttemptKeys'])==1,dup
     bad=v.evaluate('async txt=>{const q=parseTxt(txt);q.testId="WRONG";await verifyText("wrong.txt","SECURE-ANSWERS-V1\\n"+JSON.stringify(q));return RESULTS.at(-1).status}',txt);assert bad!='OK',bad
     corrupt=v.evaluate('async txt=>{const q=parseTxt(txt);q.payload.data=(q.payload.data[0]==="A"?"B":"A")+q.payload.data.slice(1);await verifyText("tamper.txt","SECURE-ANSWERS-V1\\n"+JSON.stringify(q));return RESULTS.at(-1).status}',txt);assert corrupt!='OK',corrupt
