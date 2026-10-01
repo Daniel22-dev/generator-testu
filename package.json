@@ -10,7 +10,7 @@
     "lint": "node scripts/lint.mjs",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
-    "check:production": "node scripts/check-production-readiness.mjs",
+    "check:production": "node scripts/check-production-readiness.mjs && npm run check:verifier-v2",
     "check:csp": "node scripts/check-csp.mjs",
     "test:workflow": "node tools/run-workflow-audit.mjs dist/index.html",
     "pretest:headless": "npm run build",
@@ -82,7 +82,8 @@
     "qa:garp27": "npm run build && npm run garp25:prep-static && npm run qa:garp27:static",
     "qa:garp27:foundation": "node scripts/garp27/foundation-gate.mjs",
     "check:ai-operations": "node scripts/check-ai-operation-registry.mjs",
-    "check:exercise-help": "node scripts/check-exercise-type-help.mjs"
+    "check:exercise-help": "node scripts/check-exercise-type-help.mjs",
+    "check:verifier-v2": "node scripts/check-teacher-verifier-v2.mjs"
   },
   "engines": {
     "node": ">=18"
