@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.70",
+  "appVersion": "7.1.71",
   "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -39,19 +39,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "D7-CI-REGRESSION-HARDENING-2026-10-01",
+  "revision": "D8-FINAL-AUDIT-CLEANUP-2026-10-02",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "D4-D7 consolidated source candidate; targeted local static/runtime contracts complete, exact-lockfile GitHub P5 and full Journey E2E remain final promotion authority",
-    "note": "D7 makes the new verifier/PDF regression suites part of qa:p5:ci, requires independent p5-release-gate and journey-e2e for the exact certified SHA, cleans stale Journey evidence, adds config_extra_suite coverage, and removes sensitive teacher fixtures/PDF files before CI artifact upload. D4-D6 functionality is retained.",
+    "transport": "D8 final source candidate over certified 7.1.70 baseline; local static contracts complete, exact-lockfile GitHub P5 and full Journey E2E remain final promotion authority for 7.1.71",
+    "note": "D8 adds a mandatory final A-D audit gate, removes only proven-dead legacy helpers/state and corrects stale long-source guidance while preserving backward migration of old saved template IDs. D1-D7 runtime/security contracts remain intact.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Candidate 7.1.70 contains D4-D6 functional fixes plus D7 CI/regression hardening. GitHub candidate CI remains the final promotion authority.",
+  "note": "Candidate 7.1.71 closes D1-D8 with final A-D audit and conservative dead/stale cleanup. GitHub candidate CI remains the final promotion authority for this new SHA.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

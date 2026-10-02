@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.70',
-  date:    '2026-10-01',
+  version: '7.1.71',
+  date:    '2026-10-02',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'D8 / FINÁLNÍ AUDIT + CLEANUP (7.1.71): finální průřez A–D má povinný 29bodový kontrakt v P5. Odstraněny byly pouze prokazatelně mrtvé legacy profily/helpery, nevyužívané sourceSliceMode/pedagogicalPreset a zastaralá nápověda k dlouhým zdrojům; migrace starých uložených profilů zůstává zachována. Split-screen je výslovně veden jako měkká heuristika, nikoli důkaz.',
     'D7 / CI + REGRESSION HARDENING (7.1.70): P5 release gate nyní povinně spouští samostatný D7 regression runner pro Teacher Verifier, effective analytics, IA/security, skutečné browserové PDF runtime/quality a dark/light/fullscreen runtime. Safe Promotion vyžaduje zelený p5-release-gate i journey-e2e pro stejný certifikovaný SHA; Journey čistí staré evidence, zahrnuje config_extra_suite a ukládá SHA-bound artifact. Citlivé teacher fixtures/PDF se po D7 testech odstraní a zůstávají jen JSON souhrny.',
     'D6 / GENERATOR PREFILL + DIFERENCIACE (7.1.69): prefill_v3 ukládá a obnovuje i předdefinované Reading téma rcTopic; šablona si pamatuje, zda původní zadání používalo soubor, a po načtení výslovně vyžádá jeho nové připojení bez ukládání názvu či binárních dat. Aktivní prompt cesty i UI nyní drží pro Basic/Standard/Challenge stejné učivo, CEFR, typy cvičení, počty položek a body; mění se pouze míra podpory a hloubka zpracování.',
     'D5 / VERIFIER IA + SECURITY UX (7.1.69): Dashboard je zjednodušen na pracovní přehled; Creator ID, build, manifest a Student HTML SHA-256 jsou soustředěny v panelu Technické údaje. Google Forms metadata mismatch je sjednocen s bezpečnostním modelem jako měkký signál, zobrazuje se v Security i Results bez duplicitního varování a dashboardový počet signálů používá effectiveResults(). Navigace má výraznější aktivní stav a ikonovou hierarchii.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'D1 / PDF RUNTIME HOTFIX (7.1.64): přímé studentské i učitelské PDF ve Teacher Verifieru již nepoužívá SVG foreignObject cestu, která v Chromium vedla k tainted-canvas SecurityError. Renderer kreslí připravený tiskový DOM lokálně do origin-clean canvasu a zachovává přímý PDF download bez tiskového dialogu.',
     'ETAPA 3 / PŘÍMÉ PDF (7.1.63): Teacher Verifier umí přímo stáhnout skutečné studentské PDF i učitelské PDF s klíčem bez tiskového dialogu. PDF je generováno lokálně v prohlížeči, zachovává českou diakritiku přes browserové vykreslení, vkládá školní logo přímo do výstupu a klasický tisk zůstává jako záložní cesta. Export nemění scoring, kryptografii ani SECURE-ANSWERS-V1.',
     'TEACHER VERIFIER 2.0 (7.1.62): učitelský verifier má novou sedmidílnou informační architekturu Dashboard / Výsledky / Analýza / Bezpečnost / Test & PDF / Export / Technické údaje, responzivní navigaci, light/dark a fullscreen, stavové KPI, přehled importních cest, filtrování bezpečnostních signálů a jasné oddělení studentských feedbacků od učitelského archivu.',
-    'ETAPA A / FUNKČNÍ OPRAVY (7.1.61): šablony prefill_v3 znovu skutečně předvyplní bezpečná pole; Reading a Listening mají učitelem řízený jednotný počet otázek; differentiationLevel se propisuje do hlavního AI promptu; YouTube se předává jako video vstup místo URL Contextu; změny relevantního obsahu správně označí starý výstup jako zastaralý.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -259,7 +259,7 @@ const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','
 const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
-  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, sourceSliceMode:'start', sourceUseMode:'auto',
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, sourceUseMode:'auto',
   cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
   body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfig:[],
   fuzzyTolerance:'off',
@@ -270,7 +270,6 @@ const DEFAULT = {
   // ── Pedagogicko-didaktická vrstva (BOD 5/6/7/8/15) ──
   ageGroup:'', ageGroupCustom:'',           // BOD 15 — věková skupina / ročník
   testPurpose:'',                            // pedagogický účel testu (label presetu)
-  pedagogicalPreset:'',                      // BOD 6 — zvolený systémový preset
   simpleTemplate:'',                         // interní profil účelu testu; v simple řídí skryté technické volby, v advanced pouze předvyplňuje
   screenGuard:false,                         // hlídání obrazovky (zámek při opuštění) nezávisle na testMode
   feedbackMode:'brief',                      // BOD 8 — none | brief | learning

@@ -1,3 +1,14 @@
+## 7.1.71 — 2026-10-02 — D8 / finální audit a konzervativní cleanup
+
+- přidán povinný finální audit A–D (`check:d8-final-audit`) s 29 kontrolami a zapojen do `qa:p5` i `qa:p5:ci`;
+- potvrzeny generátorové kontrakty šablon, Reading/Listening count, multimodální routing, diferenciace a content drift;
+- potvrzeny Teacher Verifier IA/theme/fullscreen/effective analytics/security kontrakty a PDF runtime/quality;
+- split-window zůstává výslovně měkkou browserovou heuristikou, ne automatickým důkazem;
+- odstraněny pouze prokazatelně mrtvé přímé legacy profily/helpery, `pedagogicalPreset`, `sourceSliceMode` a `pickSourceSlice()`;
+- kompatibilní migrace starých uložených ID `fl_homework`, `fl_graded_quick`, `cs_text` zůstává zachována;
+- nápověda dlouhého zdroje nyní popisuje skutečný reprezentativní chunking napříč zdrojem namísto historického tvrzení o začátku/konci;
+- školní serverová LIVE validace zůstává odložena rozhodnutím vlastníka; GARP 2.7 správně hlásí `FOUNDATION_PASS_LIVE_NOT_TESTED`.
+
 ## 7.1.70 — 2026-10-01 — D7 / CI a regresní hardening
 
 - P5 release gate povinně spouští D7 regresní runner pro Verifier, effective analytics, IA/security, přímé PDF runtime/quality a dark/light/fullscreen runtime;

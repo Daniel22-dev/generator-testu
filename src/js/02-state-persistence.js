@@ -15,7 +15,6 @@ function normalizeLoadedState(s) {
   if (typeof s.ageGroup !== 'string') s.ageGroup = '';
   if (typeof s.ageGroupCustom !== 'string') s.ageGroupCustom = '';
   if (typeof s.testPurpose !== 'string') s.testPurpose = '';
-  if (typeof s.pedagogicalPreset !== 'string') s.pedagogicalPreset = '';
   if (typeof s.simpleTemplate !== 'string') s.simpleTemplate = '';
   const legacyPurposeMap = { fl_homework:'fl_practice', fl_graded_quick:'fl_standard', cs_text:'cs_practice' };
   if (legacyPurposeMap[s.simpleTemplate]) s.simpleTemplate = legacyPurposeMap[s.simpleTemplate];

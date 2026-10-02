@@ -394,10 +394,13 @@ check('stage1 advanced: účel předvyplní, ale technické volby nezamkne', () 
   return 'fl_standard + ručně změněný feedback';
 });
 
-// Legacy ID zůstávají načitatelné kvůli starým snapshotům, ale nové UI je nenabízí.
-for (const [lang, ids] of [['angličtina', ['fl_practice','fl_homework','fl_graded_quick','fl_strict']], ['čeština', ['cs_practice','cs_text','cs_strict']]]) {
-  w.eval(`pickJazyk('${lang}')`);
-  for (const id of ids) check('legacy profil ' + id, () => { w.eval(`chooseSimpleTemplate('${id}')`); return w.eval('state.testMode+"/"+state.resultMode+"/"+state.feedbackMode'); });
+// Staré interní ID už nemají vlastní profil; kompatibilitu zajišťuje migrace uloženého stavu.
+for (const [legacy, current] of Object.entries({fl_homework:'fl_practice', fl_graded_quick:'fl_standard', cs_text:'cs_practice'})) {
+  check('legacy migrace ' + legacy, () => {
+    const migrated=w.eval(`normalizeLoadedState({appMode:'simple',workPreset:'quick',simpleTemplate:'${legacy}',sourceUseMode:'auto',readingQuestionCount:4,listeningQuestionCount:4})`);
+    if(migrated.simpleTemplate!==current) throw new Error(legacy+' -> '+migrated.simpleTemplate+' místo '+current);
+    return migrated.simpleTemplate;
+  });
 }
 
 // Zdrojový materiál + Reading: CEFR musí být explicitní a podklad musí projít až do promptu.

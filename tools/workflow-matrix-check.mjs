@@ -120,21 +120,28 @@ for(const screenGuard of domains.screenGuard)for(const diferencovany of domains.
 }
 ok('kartézská matice režimů bez rozporu',()=>matrixCount+' kombinací');
 
-// 2) Všech sedm šablon v obou režimech.
+// 2) Všechny aktivní účely v obou režimech.
 let tplCount=0;
 for(const mode of ['simple','advanced']){
-  for(const [lang,ids] of [['angličtina',['fl_practice','fl_homework','fl_graded_quick','fl_strict']],['čeština',['cs_practice','cs_text','cs_strict']]]){
-    for(const id of ids){
-      w.eval(`Object.assign(state,{appMode:'${mode}',workPreset:'${mode==='simple'?'quick':'advanced'}',jazyk:'${lang}',simpleTemplate:''}); chooseSimpleTemplate('${id}');`);
-      const s=JSON.parse(w.eval('JSON.stringify(state)'));
-      assert(s.simpleTemplate===id,'šablona se neaktivovala: '+id);
-      assert(!(s.testMode==='prisny'&&s.resultMode!=='secureOffline'),'šablona '+id+' porušila strict invariant');
-      assert(!(s.testMode==='procviceci'&&(s.feedbackMode!=='learning'||s.resultMode!=='instant')),'šablona '+id+' porušila practice invariant');
+  for(const lang of ['angličtina','čeština']){
+    for(const purpose of ['practice','standard','strict']){
+      w.eval(`Object.assign(state,{appMode:'${mode}',workPreset:'${mode==='simple'?'quick':'advanced'}',jazyk:'${lang}',simpleTemplate:''}); chooseSimplePurpose('${purpose}');`);
+      const st=JSON.parse(w.eval('JSON.stringify(state)'));
+      const expected=(lang==='čeština'?'cs_':'fl_')+purpose;
+      assert(st.simpleTemplate===expected,'účel se neaktivoval: '+expected);
+      assert(!(st.testMode==='prisny'&&st.resultMode!=='secureOffline'),'účel '+expected+' porušil strict invariant');
+      assert(!(st.testMode==='procviceci'&&(st.feedbackMode!=='learning'||st.resultMode!=='instant')),'účel '+expected+' porušil practice invariant');
       tplCount++;
     }
   }
 }
-ok('šablony v simple i advanced',()=>tplCount+' průchodů');
+ok('aktivní účely v simple i advanced',()=>tplCount+' průchodů');
+// Staré interní ID jsou kompatibilní pouze přes migraci uloženého stavu.
+for(const [legacy,current] of Object.entries({fl_homework:'fl_practice',fl_graded_quick:'fl_standard',cs_text:'cs_practice'})){
+  const migrated=JSON.parse(w.eval(`JSON.stringify(normalizeLoadedState({appMode:'simple',workPreset:'quick',simpleTemplate:'${legacy}',sourceUseMode:'auto',readingQuestionCount:4,listeningQuestionCount:4}))`));
+  assert(migrated.simpleTemplate===current,'legacy účel se nemigroval: '+legacy+' -> '+current);
+}
+ok('legacy ID se migrují bez mrtvých profilů',()=> '3 migrace');
 
 // 3) Karta Bez šablony musí opravdu otevřít ruční režim.
 resetBase();
@@ -580,7 +587,7 @@ await okAsync('Stage 6: instant teacher-login + screen-guard unlock jedním kód
 
 // 19) v7.1.45: legacy týmový bezpečnostní kód je odstraněn; Nastavení řeší jen předání secure výsledků.
 resetBase();
-w.eval("Access.profile={role:'trainedTeacher',userId:'TEACHER',displayName:'Teacher',status:'active'};Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimpleTemplate('fl_strict');updateAppModeUI();validate();");
+w.eval("Access.profile={role:'trainedTeacher',userId:'TEACHER',displayName:'Teacher',status:'active'};Object.assign(state,{appMode:'simple',workPreset:'quick',jazyk:'angličtina'});chooseSimplePurpose('strict');updateAppModeUI();validate();");
 ok('legacy týmový bezpečnostní kód už není v UI ani formuláři',()=>{
   assert(!w.document.getElementById('bezpKod'),'legacy #bezpKod stále existuje');
   assert(!w.document.getElementById('securityWorkplaceField'),'legacy Bezpečnost pracoviště stále existuje');
