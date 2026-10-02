@@ -55,8 +55,7 @@ function analyzeGeneratedTestQuality(st, data){
   {
     const srcChars = st.zadaniTab==='text' ? trim('zadaniText').length : (st.zadaniTab==='file' ? joinedFileCharsForAI() : 0);
     if (srcChars > MAX_SOURCE_CHARS_FOR_AI) {
-      const where = (state.sourceSliceMode==='end') ? 'konec' : 'začátek';
-      add('warn','Zdroj byl delší než limit pro AI',`Do AI šlo jen ${csNum(MAX_SOURCE_CHARS_FOR_AI)} z ${csNum(srcChars)} znaků (${where}). Pozdější části materiálu se do testu nepromítly — zvaž přepnutí výřezu (začátek/konec) nad zdrojem, zkrácení textu, nebo rozdělení na víc testů.`);
+      add('warn','Zdroj byl delší než kontext jednoho AI požadavku',`Generátor z ${csNum(srcChars)} znaků sestavil reprezentativní průřez do ${csNum(MAX_SOURCE_CHARS_FOR_AI)} znaků: tematicky relevantní pasáže a části rozprostřené napříč celým zdrojem. Nejde o prosté uříznutí začátku nebo konce; u velmi dlouhých materiálů přesto zvaž zúžení tématu nebo rozdělení na více testů.`);
       score -= 1;
     }
   }

@@ -18,16 +18,6 @@ const SIMPLE_TEMPLATES = {
       desc:'Student po odevzdání hned vidí body, procenta a známku; zpětná vazba zůstává stručná.',
       locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
-    fl_homework: {
-      icon:'🏠', label:'Domácí procvičení', purpose:'samostatné domácí procvičení',
-      desc:'Samostatná práce doma. Měkčí tolerance překlepů, učící zpětná vazba.',
-      locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'learning', fuzzyTolerance:'mild', differentiationLevel:'standard', gradeTyp:'skola' }
-    },
-    fl_graded_quick: {
-      icon:'🧾', label:'Test na známku (jen screenshot)', purpose:'klasifikace (rychlá, bez verifieru)',
-      desc:'Jednodušší klasifikace. Student dostane známku, skóre a screenshot hned — bez souboru a verifieru. Méně bezpečné, ale rychlé.',
-      locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola', screenGuard:true }
-    },
     fl_strict: {
       icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
       desc:'Student nevidí okamžitou známku. Opuštění testu uzamkne pokus a výsledek zpracuje učitel ve verifieru.',
@@ -44,11 +34,6 @@ const SIMPLE_TEMPLATES = {
       icon:'✅', label:'Běžný test', purpose:'běžné ověření znalostí',
       desc:'Student po odevzdání hned vidí body, procenta a známku; zpětná vazba zůstává stručná.',
       locks:{ testMode:'bezny', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
-    },
-    cs_text: {
-      icon:'📖', label:'Práce s textem', purpose:'čtenářská gramotnost a porozumění textu',
-      desc:'Čtenářská gramotnost a porozumění. Stručná zpětná vazba po odevzdání.',
-      locks:{ testMode:'procviceci', resultMode:'instant', feedbackMode:'brief', fuzzyTolerance:'off', differentiationLevel:'standard', gradeTyp:'skola' }
     },
     cs_strict: {
       icon:'🔒', label:'Ostrý test pod dohledem', purpose:'ostrý test pod dohledem',
@@ -69,7 +54,6 @@ const SIMPLE_LOCK_ORDER = ['testMode','resultMode','feedbackMode','fuzzyToleranc
 // Historické mapy zachováváme kvůli kompatibilitě starších snapshotů a pomocných
 // funkcí. Od 7.1.47 ale společný účel testu v pokročilém režimu nic nezamyká —
 // pouze předvyplní doporučené technické hodnoty.
-const TEMPLATE_GOVERNED_KEYS = ['testMode','resultMode','feedbackMode','fuzzyTolerance','differentiationLevel','gradeTyp','screenGuard'];
 const TEMPLATE_LOCK_FIELD_MAP = {
   testMode:'testModeBtns', resultMode:'resultModeBtns', feedbackMode:'feedbackModeBtns',
   fuzzyTolerance:'fuzzyBtns', differentiationLevel:'diffLevelBtns', gradeTyp:'gradeOptions', screenGuard:'screenGuardBtns'
@@ -89,23 +73,9 @@ function activeTemplateDef(){
 // typy a čas zůstávají na učiteli; počet cvičení se odvozuje 1:1 od zvolených typů. V jednoduchém režimu se volby šablony
 // skryjí, v pokročilém zůstanou viditelné a editovatelné. Staré wrappery choosePreset/
 // applyPreset/clearPreset byly odstraněny v 6.11.70 (nic je nevolalo).
-// ═══ PROFILY ÚČELU TESTU — kompatibilní obslužné funkce ═══════════════════════
-// Starší veřejné helpery ponecháváme kvůli snapshotům/QA; nové UI používá tři
-// společné účely přes chooseSimplePurpose(). V advanced režimu se hodnoty nezamykají.
-function chooseSimpleTemplate(id){
-  const t = simpleTemplateById(id);
-  if (!t) return;
-  if (state.simpleTemplate === id){ openSimpleTemplateDetail(id); return; }
-  state.simpleTemplate = id;
-  applyTemplateValues(id);          // zapíše hodnoty (funguje v obou režimech)
-  enforceModeConstraints();
-  applyVisualState(); validate(); saveSnapshot();
-  renderSimpleTemplates();
-  const msg = isSimpleMode()
-    ? ('Šablona: ' + t.label + '. Režim a hodnocení jsou nastavené — doplň látku a typy; počet cvičení se dopočítá automaticky.')
-    : ('Profil: ' + t.label + '. Výchozí technické hodnoty jsou předvyplněné a můžeš je dále upravit.');
-  uiToast(msg, 'ok', 4200);
-}
+// ═══ PROFILY ÚČELU TESTU — aktivní obslužné funkce ═══════════════════════════
+// UI používá tři společné účely přes chooseSimplePurpose(). Staré interní ID se
+// migrují při načtení uloženého stavu v normalizeLoadedState().
 function clearSimpleTemplate(){
   const wasSimple = isSimpleMode();
   state.simpleTemplate = '';
@@ -119,21 +89,6 @@ function clearSimpleTemplate(){
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
   renderSimpleTemplates();
-}
-// Sestaví výčet zamčených hodnot pro detail karty (lidsky čitelně).
-function simpleTemplateLockList(t){
-  const L = t.locks || {};
-  const out = [];
-  SIMPLE_LOCK_ORDER.forEach(function(k){
-    if (!Object.prototype.hasOwnProperty.call(L,k)) return;
-    const dict = SIMPLE_LOCK_LABELS[k]; if (!dict) return;
-    const lab = dict[L[k]]; if (!lab) return;
-    out.push(lab);
-  });
-  // Hlídání obrazovky (zámek při opuštění testu) — přidáme do výčtu, ať je viditelné.
-  if (L.screenGuard) out.push('Hlídání obrazovky: zámek při opuštění testu (odemyká učitel)');
-  // Přísný režim zamyká vždy ze své podstaty — u něj guard neuvádíme zvlášť.
-  return out;
 }
 // Vykreslí karty jednoduchých šablon podle aktuálního jazyka. Volá se při změně
 // jazyka i při výběru šablony (kvůli zvýraznění aktivní karty).
@@ -194,27 +149,6 @@ function renderSimpleTemplates(){
     html += '<div class="purpose-profile-note">ℹ️ Účel testu je společný pro oba režimy. V pokročilém režimu předvyplní bezpečné výchozí hodnoty; podrobnosti upravíš v dalších sekcích.</div>';
   }
   wrap.innerHTML = html;
-}
-function openSimpleTemplateDetail(id){
-  const t = simpleTemplateById(id);
-  if (!t) return;
-  const simple = isSimpleMode();
-  const locks = simpleTemplateLockList(t);
-  let body = '<div class="stpl-detail">';
-  body += '<p class="stpl-detail-desc">' + esc(t.desc) + '</p>';
-  body += '<div class="stpl-detail-h">' + (simple ? 'Tento účel automaticky nastaví:' : 'Tento účel předvyplní:') + '</div><ul class="stpl-detail-list">';
-  locks.forEach(function(l){ body += '<li>' + esc(l) + '</li>'; });
-  body += '</ul>';
-  body += '<div class="stpl-detail-h">Doplníš sám:</div><ul class="stpl-detail-list stpl-detail-open">'
-    + '<li>Látku / téma testu</li><li>Typy cvičení</li><li>Počet otázek</li><li>Čas a body</li>'
-    + (String(state.jazyk||'').toLowerCase()==='čeština' ? '' : '<li>Úroveň CEFR</li>')
-    + '</ul>';
-  body += '<p class="stpl-detail-foot">' + (simple
-      ? 'Tyto volby se v jednoduchém režimu neukazují, aby nešlo nic omylem rozladit. Chceš-li je měnit ručně, přepni nahoře na <strong>Pokročilý režim</strong>.'
-      : 'V pokročilém režimu jsou technické volby viditelné a můžeš je dál upravit. Účel testu zůstává společným pedagogickým profilem.')
-    + '</p>';
-  body += '</div>';
-  uiModal({ title: t.icon + ' ' + t.label, message: body, html:true, okText:'Rozumím', cancelText:null }).then(function(){});
 }
 // ── BOD 8: Režim zpětné vazby ─────────────────────────────────────────────────
 const FEEDBACK_MODE_NOTE = {
@@ -307,8 +241,6 @@ function renderSourceMeters(){
     } else { fEl.classList.add('hidden'); fEl.innerHTML=''; }
   }
 }
-// Zpětná kompatibilita se starými snapshoty/onclicky; volba výřezu už workflow neřídí.
-function pickSourceSlice(){ state.sourceSliceMode='auto'; renderSourceMeters(); saveSnapshot(); }
 
 function toggleType(t) {
   const currentTypes = sanitizeExerciseTypeList(state.typyCviceni || []);

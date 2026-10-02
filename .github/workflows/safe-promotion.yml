@@ -84,7 +84,7 @@ jobs:
       - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 6b171bbae2a6883eeeda32e5c8f8f94f510bc07910a5381a46aea7fbacd54a74
+          GARP27_EXTERNAL_TRUST_SHA256: 91b43520bcb5a6c70575a5c8bea211c5b837b6133d3812e138cdcc18ec65c99e
 
       - name: Upload candidate QA evidence
         if: always()
@@ -223,7 +223,7 @@ jobs:
         if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 6b171bbae2a6883eeeda32e5c8f8f94f510bc07910a5381a46aea7fbacd54a74
+          GARP27_EXTERNAL_TRUST_SHA256: 91b43520bcb5a6c70575a5c8bea211c5b837b6133d3812e138cdcc18ec65c99e
 
       - name: Upload PR certification evidence
         if: always() && steps.pr_freshness.outputs.current == 'true'
