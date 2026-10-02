@@ -1,6 +1,6 @@
 async function assembleTestHtml(st, genData) {
   const sourceState=JSON.parse(JSON.stringify(st));
-  sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','ucitelJmeno','latka','zadaniText','poznamky'].map(id=>[id,trim(id)]));
+  sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','recoveryCode','ucitelJmeno','latka','zadaniText','poznamky'].map(id=>[id,trim(id)]));
   sourceState.__roster=Array.isArray(st.__roster)?JSON.parse(JSON.stringify(st.__roster)):rosterForVerifier();
   sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
   const formsMetaCandidate=(st.__formsMetadata&&typeof st.__formsMetadata==='object')?st.__formsMetadata:(typeof configuredGoogleFormsMetadata==='function'?(configuredGoogleFormsMetadata()||null):null);
@@ -66,9 +66,15 @@ async function assembleTestHtml(st, genData) {
   // nepřidával skutečnou bezpečnost. Report seal proto používá náhodný per-test secret.
   const verifySecret=makeVerifySecret();
   const teacherAccessCode=field('ucitelPin')||'';
-  // Stage 6: jeden kód pro učitele, ale doménově oddělené PBKDF2 hashe podle účelu.
-  const teacherPinHash=await deriveSecretHash('teacher-pin', teacherAccessCode, testId);
-  const unlockHash=await deriveSecretHash('unlock-password', teacherAccessCode, testId);
+  const classroomRecoveryCode=field('recoveryCode')||'';
+  const credentialErrors=credentialPolicyErrors(teacherAccessCode,classroomRecoveryCode,configForHash.lockOnLeave,field('ucitelJmeno')||'');
+  if(credentialErrors.length){
+    throw new Error('Test nebyl sestaven: '+credentialErrors.join(' '));
+  }
+  // E2: dva nezávislé vstupy a dvě doménově oddělené PBKDF2 větve.
+  // Teacher/Admin secret se nikdy nepoužívá k odvození recovery hashe a naopak.
+  const teacherPinHash=teacherAccessCode ? await deriveSecretHash('teacher-pin', teacherAccessCode, testId) : '';
+  const recoveryCodeHash=classroomRecoveryCode ? await deriveSecretHash('recovery-code', classroomRecoveryCode, testId) : '';
   const cfg={
     nazev: configForHash.nazev,
     proKoho: configForHash.proKoho,
@@ -89,8 +95,8 @@ async function assembleTestHtml(st, genData) {
     zolicek: configForHash.zolicek,
     ucitelJmeno: field('ucitelJmeno')||'',
     ucitelPinHash: teacherPinHash,
-    hesloHash: unlockHash,
-    hasUnlock: !!teacherAccessCode,
+    recoveryCodeHash,
+    hasRecoveryUnlock: !!classroomRecoveryCode,
     verifySecret,
     securityMode: 'random-per-test',
     securitySalt,

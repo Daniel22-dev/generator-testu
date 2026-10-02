@@ -1,4 +1,10 @@
-> **7.1.71 — D8 / finální audit a cleanup.** A–D audit je nyní povinnou P5 bránou (29/29 kontraktů). Odstraněny jsou jen prokazatelně mrtvé legacy cesty a zastaralá nápověda; kompatibilní migrace starých uložených profilů zůstává. Viz RELEASE-NOTES-7.1.71.md.
+> **7.1.75 — bezpečnostní rozdělení credentialů.** Teacher/Admin secret je tajný privilegovaný údaj pouze pro učitele; Classroom Recovery Code je per-test provozní kód pouze pro odemknutí aktuálního zámku. Obě větve mají oddělenou kryptografickou doménu, Recovery Code nemůže otevřít teacher panel/retry/reset a raw credentialy se neukládají do studentského HTML, historie, šablon, exportu zadání ani AI/manual promptů. Viz RELEASE-NOTES-7.1.75.md.
+
+> **7.1.74 — zpevnění workflow žolíka.** Po spuštění bezpečného testu se volba žolíka, identita pokusu, attempt ID, deadline a stav zámku lokálně zapečetí; běžný reload už nemůže změnit volbu ani resetovat čas. Verifier žolíkový pokus zachová pro kontrolu a bezpečnost, ale vyřadí jej z klasifikačních statistik; CSV obsahuje explicitní stav žolíka/klasifikace. D7 navíc obsahuje klikací Chromium regresní test tohoto workflow. Viz RELEASE-NOTES-7.1.74.md.
+
+> **7.1.73 — iPadOS klávesnice + workflow Verifieru.** Zavření softwarové klávesnice systémovým tlačítkem na iPadu už nemá vyvolat falešný zámek testu; skutečné opuštění stránky a split-screen monitoring zůstávají aktivní. Teacher Verifier nyní nabízí Google Forms CSV jako první a doporučenou cestu, nouzovou zálohu až pod ní a po importu/exportu zobrazuje viditelné potvrzení. Viz RELEASE-NOTES-7.1.73.md.
+
+> **7.1.72 — GARP 2.8 hardening + PDF layout.** Bezpečnostní workflow mají oddělené minimální pravomoci, přidán frame guard a další redakce citlivých klíčů. Přímé student/teacher PDF nyní používá konzistentní horní/dolní okraj a nenechává nadpis nového cvičení osamocený na konci stránky. Viz RELEASE-NOTES-7.1.72.md.
 
 > **7.1.70 — D7 / CI hardening.** Povinná release cesta nově zahrnuje reálné PDF runtime/quality kontroly, D2/D4/D5 regresní testy a Safe Promotion čeká na zelené P5 i Journey E2E pro stejný SHA. D4–D6 produkční logika zůstává beze změny. Viz RELEASE-NOTES-7.1.70.md.
 
@@ -22,7 +28,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.71
+**Aktuální verze:** 7.1.76
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

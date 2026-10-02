@@ -279,6 +279,7 @@ function pick(key, value) {
     try { uiToast('Bezpečný offline verifier se s procvičováním neslučuje — účel testu byl přepnut na Běžný test.', 'warn', 5200); } catch(_){}
   }
   enforceModeConstraints();
+  if (key === 'testMode' && typeof ensureRecoveryCodeForGuard === 'function') ensureRecoveryCodeForGuard();
   unmarkTemplateIfDiverged(key);
   applyVisualState(); validate(); saveSnapshot();
 }
@@ -287,12 +288,12 @@ function pick(key, value) {
 // neodpovídá aktivní šabloně, zrušíme zvýraznění šablony — byla jen startem a teď
 // si učitel jede po svém. V jednoduchém režimu k tomu nedojde (volby jsou skryté).
 // Ruční přepínač hlídání obrazovky (pokročilý režim). Funguje nezávisle na šabloně
-// i režimu testu. Při zapnutí zajistí učitelský přístupový kód (jinak by se zámek neaktivoval).
+// i režimu testu. Při zapnutí zajistí samostatný per-test Recovery kód.
 function setScreenGuard(on){
   // V pokročilém režimu je hlídání obrazovky technický detail a lze ho upravit
   // nezávisle na společně zvoleném účelu testu.
   state.screenGuard = !!on;
-  if (on) ensureUnlockPasswordForGuard();
+  if (on) ensureRecoveryCodeForGuard();
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
 }

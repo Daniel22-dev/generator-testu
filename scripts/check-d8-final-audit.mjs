@@ -92,8 +92,8 @@ check('C','6','safe pagination and print fallback remain present',
 // D — Release gates/evidence hardening.
 check('D','1','P5 mandatory path includes D7 browser/PDF regression runner',
   pkg.scripts?.['qa:p5:ci']?.includes('npm run qa:d7:ci') && pkg.scripts?.['qa:p5']?.includes('npm run qa:d7:ci'));
-check('D','2','D7 runner covers analytics, IA/security, PDF runtime/quality and verifier UI runtime',
-  ['check-verifier-effective-analytics.mjs','check-verifier-ia-security.mjs','check-stage3-pdf-runtime.mjs','check-stage3-pdf-quality.mjs','check-verifier-ui-runtime.mjs'].every(x=>files.d7Runner.includes(x)));
+check('D','2','D7 runner covers analytics, IA/security, joker browser workflow, PDF runtime/quality and verifier UI runtime',
+  ['check-verifier-effective-analytics.mjs','check-verifier-ia-security.mjs','check-joker-workflow-browser.mjs','check-stage3-pdf-runtime.mjs','check-stage3-pdf-quality.mjs','check-verifier-ui-runtime.mjs'].every(x=>files.d7Runner.includes(x)));
 check('D','3','Journey clears stale evidence, covers config/state flows and binds artifact to exact SHA',
   /rm -rf audit\/evidence[\s\S]*mkdir -p audit\/evidence/.test(files.journey) &&
   has(files.journey,'--suite state_transition_suite','--suite config_extra_suite','journey-e2e-evidence-${{ github.sha }}'));

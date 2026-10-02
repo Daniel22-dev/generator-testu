@@ -332,6 +332,8 @@ function sanitizeTechnicalText(value, max = 420) {
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[e-mail odstraněn]")
     .replace(/(?:bearer\s+)[A-Z0-9._~+\/-]+/gi, "Bearer [token odstraněn]")
     .replace(/((?:api[_ -]?key|authorization|access[_ -]?token|refresh[_ -]?token|password|heslo)\s*[:=]\s*)[^,;\s]+/gi, "$1[odstraněno]")
+    .replace(/AIza[0-9A-Za-z_-]{35}/g, "[klíč odstraněn]")
+    .replace(/([?&](?:key|api_key|apikey)=)[^&#\s]+/gi, "$1[odstraněno]")
     .replace(/((?:prompt|puvodni text|původní text|original text|working text|pracovni text|pracovní text|model response|odpoved modelu|odpověď modelu|document content|obsah dokumentu|student data|data zaka|data žáka)\s*[:=]\s*)(?:["'`][^"'`\n]*["'`]|[^,;\n]+)/gi, "$1[obsah odstraněn]")
     .replace(/(["'`])[^\n]{120,}\1/g, "[dlouhý obsah odstraněn]");
   return clipText(text, max);

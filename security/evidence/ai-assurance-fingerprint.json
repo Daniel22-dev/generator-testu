@@ -1,57 +1,57 @@
 {
   "schema": "ghrab-ai-assurance-fingerprint-v1",
   "appId": "generator",
-  "appVersion": "7.1.71",
+  "appVersion": "7.1.76",
   "coreVersion": "1.0.0",
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "235570675df914850c7692c71d11c0e48f2e97516e33efe25dc3104885f21099",
+  "fingerprint": "5b3e79dc7639c3837f529d47fcda6dbef4b098658976067088cbfccdc933943f",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 163818,
-      "sha256": "86985960cf87d8a5768793d5e5ad6f8b403cb3871445aeaf08574c0ec004a622"
+      "size": 166138,
+      "sha256": "98e61fe351637dc4916dfe2496a16061f51cc118148095ca2ce89bde74bb3d80"
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 50793,
-      "sha256": "5a3d203c564d02c260cf015a56d8f30f4b05da1d45626acafd4e23fa31c53685"
+      "size": 50870,
+      "sha256": "2037d0fc170f49489b968968ca5c279e58f4fc62c87246804f2be6bb05b49f46"
     },
     {
       "path": "src/js/05-form-fields.js",
-      "size": 117598,
-      "sha256": "f3936e6548fa8284eaacdf4aa2277e9dede02a334924db76be2dec9e8b15843f"
+      "size": 119434,
+      "sha256": "03366972fed01a4575a288604895dcbd4fc41cc42a8cc447141ee72a9637df8d"
     },
     {
       "path": "src/js/07-gemini.js",
-      "size": 55451,
-      "sha256": "2a6480e034c2d128a4fd3abd127e4b0d99a59ec22850a17ef432aaea03adaf32"
+      "size": 55618,
+      "sha256": "341efea694ee3523fb88c55b36ec1728fca3510f2303d4e86642f6047d5f5b6b"
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
       "size": 13912,
-      "sha256": "ea2f61817903cf2f14f6865a6626841f4992d8aa06b4cad2a71e55407810b698"
+      "sha256": "6821f1a08f9c7d1ab949f86d3b84afa1f92643995871ede5072eca9bfe7adfe4"
     },
     {
       "path": "src/js/08-manual-editor.js",
-      "size": 67944,
-      "sha256": "23491cd582880c3e7c26c1d269bdc0d9ca03b59d477722b0dca7db071da8e150"
+      "size": 67973,
+      "sha256": "50248faa5b29570ab761b47fdda1384f3b3513a4122e9b17505b23104991f3e8"
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
-      "size": 54073,
-      "sha256": "a940039952831423a1a8ede63c70ed3bc7d538105e146165eebd4cc6ffc72814"
+      "size": 55962,
+      "sha256": "4d6fd22a34a944f7e542cfc1d56b2019f50c7b9a1207927f6b5f5c72e3f8bed9"
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 60718,
-      "sha256": "85729c4af42f319d1cba5d0cc07cd710e20e611ee9980696aa702aa7f5223548"
+      "size": 61594,
+      "sha256": "1c92ff5c37d51188f1bf1fd76119979b3b63dd8cab41cb559e2c2ed4942bb14a"
     },
     {
       "path": "src/js/13a-secure-helpers.js",
-      "size": 35741,
-      "sha256": "29d72cbb502218a405ee3522f76c2b88ddfc7893bcfe5e828139140742efc5ad"
+      "size": 35859,
+      "sha256": "a32104f2c3c3c7ba34e649fe1b15de5fee8cc154480401a1a5f1757e81719312"
     },
     {
       "path": "src/js/50-cs-module.js",
@@ -71,7 +71,7 @@
     {
       "path": "public/ai-operations.json",
       "size": 5571,
-      "sha256": "2fd0821575516cb11ec04c9f91167478f95bb8ce6f9483c691d638c98a4b7587"
+      "sha256": "8525a3cae8300f7adcbfd803e501c27100fd6b985541605f7150581da880a4f1"
     },
     {
       "path": "ghrab-ai-core.consumer.json",

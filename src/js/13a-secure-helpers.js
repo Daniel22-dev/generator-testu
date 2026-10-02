@@ -15,7 +15,7 @@ function safeJsonForScript(obj){
 }
 function b64UrlFromBuffer(buf){let bin='';const bytes=new Uint8Array(buf);for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 // ── Tvrdá brána pro ostrý (klasifikovaný) režim ──────────────────────────────
-// Bezpečnostní kryptografie (manifest hash, per-test secret, PIN/heslo, přístupový kód,
+// Bezpečnostní kryptografie (manifest hash, per-test secret, Teacher/Admin secret, Recovery Code,
 // RSA klíč verifieru) NESMÍ tiše spadnout na slabý fallback (FNV / Math.random).
 // Pravidlo platí pro všechny exportované testy včetně instant režimu: bez WebCrypto
 // se generování zastaví s jasnou hláškou.
@@ -74,7 +74,8 @@ async function buildPublicDiffGroups(groups,salt){
 // takže slabší PIN šel offline uhádnout. Stejná funkce je i v emitovaném studentu/verifieru,
 // aby hash sedl. Prefix 'pbkdf2-v1$' odlišuje formát od starého SHA-256 hashe.
 async function deriveSecretHash(kind, secret, testId){
-  const norm = (kind==='teacher-pin'||kind==='unlock-password') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
+  // Teacher/Admin i Recovery credential jsou case-insensitive, ale používají zcela oddělené PBKDF2 domény.
+  const norm = (kind==='teacher-pin'||kind==='recovery-code') ? String(secret||'').trim().toUpperCase() : String(secret||'').trim();
   requireWebCrypto('Hash hesla/PINu');
   const enc=new TextEncoder();
   const key=await crypto.subtle.importKey('raw',enc.encode(norm),{name:'PBKDF2'},false,['deriveBits']);

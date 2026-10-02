@@ -104,7 +104,7 @@ function boundedReviewBatches(items,lengthOf){
 // Nastavení změněné po vygenerování se do hotového testu samo nepropíše. Učitel to musí
 // vidět u stažení a u změn bez vlivu na obsah je může použít bez nového AI generování.
 const DRIFT_SETTINGS=[['body','body'],['cas','čas'],['gradeTyp','stupnice'],['testMode','účel testu'],['resultMode','způsob výsledku'],['identityMode','identita studenta'],['feedbackMode','zpětná vazba'],['layout','rozložení'],['randomizace','pořadí otázek'],['tema','vzhled'],['zolicek','žolík'],['fuzzyTolerance','tolerance překlepů'],['odevzdavani','odevzdávání'],['screenGuard','hlídání obrazovky']];
-const DRIFT_FIELDS=[['nazev','název'],['proKoho','pro koho'],['vlastniSkala','stupnice'],['ucitelJmeno','jméno učitele'],['ucitelPin','učitelský kód']];
+const DRIFT_FIELDS=[['nazev','název'],['proKoho','pro koho'],['vlastniSkala','stupnice'],['ucitelJmeno','jméno učitele'],['ucitelPin','učitelský/admin kód'],['recoveryCode','Recovery kód']];
 const DRIFT_CONTENT=['jazyk','instrJazyk','uroven','kombinovat','diferencovany','skupiny','zadaniTab','urls','sourceUseMode','rcLength','rcTopic','readingQuestionCount','listeningQuestionCount','differentiationLevel','ageGroup','ageGroupCustom'];
 const DRIFT_CONTENT_FIELDS=['latka','zadaniText','zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','poznamky'];
 function settingsDrift(){
@@ -119,12 +119,19 @@ function settingsDrift(){
 function renderSettingsDrift(){
   const el=$('settingsDriftBanner');if(!el)return;const d=settingsDrift();
   if(!d){el.classList.add('hidden');el.textContent='';return;}
+  const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno')):[];
   el.classList.remove('hidden');
+  if(!d.content&&credentialErrors.length){
+    el.innerHTML='⚠️ <b>Po vytvoření testu jsi změnil(a): '+esc(d.settings.join(', '))+'.</b> Nové nastavení nelze použít, dokud nejsou credentialy platné. '+esc(credentialErrors.join(' '));
+    return;
+  }
   el.innerHTML=d.content?'⚠️ <b>Obsah zadání se od vytvoření testu změnil.</b> Stažený test odpovídá původnímu zadání; pro nový obsah test vytvoř znovu.'
     :'⚠️ <b>Po vytvoření testu jsi změnil(a): '+esc(d.settings.join(', '))+'.</b> Stažený test má zatím původní nastavení. <button type="button" class="gate-run-btn" onclick="applySettingsWithoutAi()">Použít nové nastavení (bez AI)</button>';
 }
 async function applySettingsWithoutAi(){
   const d=settingsDrift();if(!d||d.content||outputMutationBusy)return;
+  const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno')):[];
+  if(credentialErrors.length){const g=$('genError');if(g){g.classList.remove('hidden');setErrorTextWithHttpHelp(g,'Nastavení se nepodařilo použít: '+credentialErrors.join(' '));}renderSettingsDrift();return;}
   const st=JSON.parse(JSON.stringify(state)),plan=generationPlan(st),v=lastGenData.group_variants?Object.values(lastGenData.group_variants)[0]:lastGenData,exs=(Array.isArray(v)?v:v.exercises)||[];
   st.exerciseDetail=true;st.pocet=plan.config.length;st.exerciseConfig=plan.config.map((c,i)=>Object.assign({},c,{pocetOtazek:exs[i]&&exs[i].items?exs[i].items.length:c.pocetOtazek}));
   try{await commitAnswerData(JSON.parse(JSON.stringify(lastGenData)),outputStamp(),st,{reason:'Změnilo se nastavení testu ('+d.settings.join(', ')+').'});

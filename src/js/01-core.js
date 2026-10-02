@@ -14,21 +14,21 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.71',
+  version: '7.1.76',
   date:    '2026-10-02',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
-    'D8 / FINÁLNÍ AUDIT + CLEANUP (7.1.71): finální průřez A–D má povinný 29bodový kontrakt v P5. Odstraněny byly pouze prokazatelně mrtvé legacy profily/helpery, nevyužívané sourceSliceMode/pedagogicalPreset a zastaralá nápověda k dlouhým zdrojům; migrace starých uložených profilů zůstává zachována. Split-screen je výslovně veden jako měkká heuristika, nikoli důkaz.',
+    'SECURITY CREDENTIAL SPLIT (7.1.76): Teacher/Admin secret a Classroom Recovery Code jsou samostatné per-test credentialy s oddělenými PBKDF2 doménami a privilege boundary. Recovery Code umí pouze odemknout aktuální bezpečnostní lock, nemůže otevřít teacher panel, povolit retry ani resetovat pokus jiné identity. Recovery unlock zachovává attemptId, deadline, identitu, variantu, žolíka i auditní historii; Verifier jej eviduje jako auditní informaci. Raw credentialy jsou blokovány ve studentském HTML, persistenci, šablonách, historii, exportu zadání i AI/manual workflow.',
+    'ŽOLÍK WORKFLOW (7.1.74): bezpečný studentský runtime při prvním startu lokálně zapečetí identitu pokusu, volbu žolíka, attempt ID, absolutní deadline a stav zámku; běžný reload tak nemůže změnit volbu ani resetovat čas a rozpracovaný pokus jiné identity vyžaduje učitelský kód. Žolík se před startem explicitně potvrzuje. Teacher Verifier drží žolíkové pokusy pro kontrolu a bezpečnostní audit, ale vyřazuje je z klasifikačních statistik a položkové analýzy; CSV nese explicitní stav žolíka a klasifikace.',
+    'IPADOS + VERIFIER UX (7.1.73): iPadOS/WebKit zavření softwarové klávesnice již nevyvolá falešný zámek testu, pokud stránka zůstává viditelná a blur bezprostředně navazuje na editaci nebo změnu visualViewport; skutečné visibility/pagehide opuštění a split-screen monitoring zůstávají aktivní. Teacher Verifier staví Google Forms CSV jako hlavní importní cestu, nouzové answers.txt/vložený blok odsouvá do záložní sekce a po importech/exportech dává viditelné potvrzení.',
+    'GARP 2.8 + PDF LAYOUT (7.1.72): bezpečnostní workflow sync-ghrab-ai-core odděluje read-only ověření od jediného publish jobu se zápisem; Safe Promotion používá minimální oprávnění po jobech, přidán frame guard, kontrola zdroje postMessage a redakce Google API klíčů. Přímé student/teacher PDF má konzistentní horní a dolní okraj na každé stránce a stránkování přesouvá pozdně začínající cvičení na další stránku místo osamoceného nadpisu.',
+    'D8 / FINÁLNÍ AUDIT + CLEANUP (7.1.72): finální průřez A–D má povinný 29bodový kontrakt v P5. Odstraněny byly pouze prokazatelně mrtvé legacy profily/helpery, nevyužívané sourceSliceMode/pedagogicalPreset a zastaralá nápověda k dlouhým zdrojům; migrace starých uložených profilů zůstává zachována. Split-screen je výslovně veden jako měkká heuristika, nikoli důkaz.',
     'D7 / CI + REGRESSION HARDENING (7.1.70): P5 release gate nyní povinně spouští samostatný D7 regression runner pro Teacher Verifier, effective analytics, IA/security, skutečné browserové PDF runtime/quality a dark/light/fullscreen runtime. Safe Promotion vyžaduje zelený p5-release-gate i journey-e2e pro stejný certifikovaný SHA; Journey čistí staré evidence, zahrnuje config_extra_suite a ukládá SHA-bound artifact. Citlivé teacher fixtures/PDF se po D7 testech odstraní a zůstávají jen JSON souhrny.',
     'D6 / GENERATOR PREFILL + DIFERENCIACE (7.1.69): prefill_v3 ukládá a obnovuje i předdefinované Reading téma rcTopic; šablona si pamatuje, zda původní zadání používalo soubor, a po načtení výslovně vyžádá jeho nové připojení bez ukládání názvu či binárních dat. Aktivní prompt cesty i UI nyní drží pro Basic/Standard/Challenge stejné učivo, CEFR, typy cvičení, počty položek a body; mění se pouze míra podpory a hloubka zpracování.',
     'D5 / VERIFIER IA + SECURITY UX (7.1.69): Dashboard je zjednodušen na pracovní přehled; Creator ID, build, manifest a Student HTML SHA-256 jsou soustředěny v panelu Technické údaje. Google Forms metadata mismatch je sjednocen s bezpečnostním modelem jako měkký signál, zobrazuje se v Security i Results bez duplicitního varování a dashboardový počet signálů používá effectiveResults(). Navigace má výraznější aktivní stav a ikonovou hierarchii.',
     'D4 / THEME + FULLSCREEN (7.1.67): Teacher Verifier 2.0 má skutečný tmavý a světlý motiv napříč hlavními surfaces včetně karet, tabulek, formulářů a modalů. Fullscreen ovládání sleduje browserový fullscreenchange, mění aria-pressed i viditelný stav tlačítka a při nepodporovaném nebo odmítnutém API nabídne explicitní hlášku a F11 fallback.',
     'D3 / PDF KVALITA (7.1.66): přímé studentské i učitelské PDF používá bezpečné A4 stránkování, které preferuje hranice celých otázek a jako pojistku neřeže přes textové řádky. Opravena česká diakritika a mezery mezi formátovanými částmi; studentská verze zůstává bez klíče a učitelského transcriptu, školní logo zachovává proporce.',
-    'D2 / EFFECTIVE ANALYTICS (7.1.65): rozložení výsledků, známkové rozložení a položková analýza Teacher Verifieru používají jedinou autoritu effectiveResults(). Identické duplicity se nezapočítávají a různé validní pokusy stejného studenta se do analytiky dostanou až po explicitním výběru učitele. Scoring, dešifrování a export submissions se nemění.',
-    'D1 / PDF RUNTIME HOTFIX (7.1.64): přímé studentské i učitelské PDF ve Teacher Verifieru již nepoužívá SVG foreignObject cestu, která v Chromium vedla k tainted-canvas SecurityError. Renderer kreslí připravený tiskový DOM lokálně do origin-clean canvasu a zachovává přímý PDF download bez tiskového dialogu.',
-    'ETAPA 3 / PŘÍMÉ PDF (7.1.63): Teacher Verifier umí přímo stáhnout skutečné studentské PDF i učitelské PDF s klíčem bez tiskového dialogu. PDF je generováno lokálně v prohlížeči, zachovává českou diakritiku přes browserové vykreslení, vkládá školní logo přímo do výstupu a klasický tisk zůstává jako záložní cesta. Export nemění scoring, kryptografii ani SECURE-ANSWERS-V1.',
-    'TEACHER VERIFIER 2.0 (7.1.62): učitelský verifier má novou sedmidílnou informační architekturu Dashboard / Výsledky / Analýza / Bezpečnost / Test & PDF / Export / Technické údaje, responzivní navigaci, light/dark a fullscreen, stavové KPI, přehled importních cest, filtrování bezpečnostních signálů a jasné oddělení studentských feedbacků od učitelského archivu.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -235,7 +235,7 @@ const THEME_SPECS = {
 
 const DOM_FIELDS = ['nazev','proKoho','latka','zadaniText',
   'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
-const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin'];
+const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin','recoveryCode'];
 const LEGACY_SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
 const GOOGLE_FORMS_SUBMISSION_URL_KEY = 'sestavovac_google_forms_submission_url_v1';
 const GOOGLE_FORMS_METADATA_CONFIG_KEY = 'sestavovac_google_forms_metadata_v1';
@@ -426,8 +426,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'prisny-rezim',title:'Přísný režim',status:'reseno',
   keywords:['prisny rezim','prisny test','zamek','zamyka','lock','uzamknuti','dohled','pod dohledem'],
-  simple:'Přísný režim test při skutečném opuštění zamkne a pokračovat lze jen přes učitelský přístupový kód. Slouží pro známkovanou práci pod dohledem.',
-  detailed:'Přísný režim napojuje lock screen na state.locked. Skutečné opuštění (visibilitychange hidden, pagehide, reload, přepnutí aplikace/okna) nastaví state.locked + lockReason, zapíše do securityEvents a uloží stav; po návratu se zobrazí zámek. Zámková obrazovka neukazuje rovnou pole pro heslo — student vidí jen 🔒 a výzvu „Kontaktuj učitele"; pole se odkryje až 5× poklepáním na zámek během ~2 s. Odemčení se loguje. Ve výsledku jsou počty varování, zámků i odemčení.',
+  simple:'Přísný režim test při skutečném opuštění zamkne a pokračovat lze jen přes samostatný Recovery kód konkrétního testu. Tajný učitelský/admin kód zůstává oddělený. Slouží pro známkovanou práci pod dohledem.',
+  detailed:'Přísný režim napojuje lock screen na state.locked. Skutečné opuštění (visibilitychange hidden, pagehide, reload, přepnutí aplikace/okna) nastaví state.locked + lockReason, zapíše do securityEvents a uloží stav; po návratu se zobrazí zámek. Zámková obrazovka neukazuje rovnou pole pro kód — student vidí jen 🔒 a výzvu „Kontaktuj učitele"; pole pro samostatný Recovery kód se odkryje až 5× poklepáním na zámek během ~2 s. Tajný učitelský/admin kód je jiný credential. Odemčení se loguje. Ve výsledku jsou počty varování, zámků i odemčení.',
   evidence:['getCompactTestModeBlock() / getCompactSecurityBlock() větev prisny','state.locked + lockReason','odkrytí hesla 5× tapem na 🔒','testMode==="prisny"']},
 
  {id:'bezny-rezim',title:'Běžný režim',status:'reseno',
@@ -517,7 +517,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'ucitelsky-soubor',title:'Učitelský soubor / teacher export',status:'reseno',
   keywords:['ucitelsky soubor','teacher export','soubor pro ucitele','ucitelska verze','klic pro ucitele','ucitelsky balicek'],
   simple:'Vedle studentského souboru se generuje učitelský soubor (s klíčem / verifier). Je jen pro tebe, nedávej ho studentům.',
-  detailed:'V bezpečném režimu se generuje teacher_verifier.html s privátním klíčem a plnými variantami pro opravu. Učitelský mód uvnitř testu (intro tlačítko „Učitelský režim") chrání PIN. Bezpečnostní skener i názvové kontroly hlídají, aby se učitelský obsah nedostal do studentského exportu.',
+  detailed:'V bezpečném režimu se generuje teacher_verifier.html s privátním klíčem a plnými variantami pro opravu. Učitelský mód uvnitř testu (intro tlačítko „Učitelský režim") chrání samostatný Teacher/Admin secret. Bezpečnostní skener i názvové kontroly hlídají, aby se učitelský obsah nedostal do studentského exportu.',
   evidence:['secureTeacherScript() / teacher_verifier.html','učitelský přístupový kód (ucitelPin)','SecretScanner blokuje učitelský obsah ve studentském souboru']},
 
  {id:'listening',title:'Listening comprehension (poslech)',status:'reseno',
@@ -553,12 +553,12 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"sablony",title:"Šablony",status:"reseno",
   keywords:["sablona", "sablony", "template", "ulozit nastaveni", "znovu pouzit nastaveni", "predloha"],
   simple:"Šablona funguje jako znovupoužitelný předvyplňovací vzor: ukládá bezpečné nastavení i vyplněná textová pole formuláře, aby se po načtení test skutečně předvyplnil. Neukládá binární přílohy, jména studentů ani přístupové kódy.",
-  detailed:"Formát prefill_v3 ukládá bezpečnou konfiguraci formuláře i běžná textová pole (název, třídu, látku, zdrojový text/URL, Reading/Listening zadání, poznámky a stupnici). Přílohy, podmínky skupin, identity studentů, PINy a hesla se neukládají. Starší prefill_v2/profile_v1 zůstávají načitatelné, ale obsahují méně údajů.",
+  detailed:"Formát prefill_v3 ukládá bezpečnou konfiguraci formuláře i běžná textová pole (název, třídu, látku, zdrojový text/URL, Reading/Listening zadání, poznámky a stupnici). Přílohy, podmínky skupin, identity studentů, Teacher/Admin secret ani Recovery kód se neukládají. Starší prefill_v2/profile_v1 zůstávají načitatelné, ale obsahují méně údajů.",
   evidence:["TEMPLATE_PREFILL_KEYS", "getTemplatePrefill()", "applyTemplatePrefill()", "saveTemplate()", "SENSITIVE_FIELD_IDS"]},
 
  {id:"historie",title:"Historie",status:"reseno",
   keywords:["historie", "minule testy", "posledni prompty", "vratit se k testu", "drive vygenerovane", "log promptu"],
-  simple:"Historie uchovává nejvýše pět posledních očištěných promptů a nastavení. Hotový test, přílohy, hesla, PINy ani skutečná jména studentů neukládá.",
+  simple:"Historie uchovává nejvýše pět posledních očištěných promptů a nastavení. Hotový test, přílohy, Teacher/Admin secret, Recovery kód ani skutečná jména studentů neukládá.",
   detailed:"pushHistory() deduplikuje položky podle hashe a ukládá posledních pět. Prompt je už při sestavení pseudonymizovaný a před uložením znovu sanitizovaný; stav skupin obsahuje pouze kódy Student A1… Načtení z historie obnoví formulář, ale vyčistí přílohy a citlivá pole. Výsledný HTML test je nutné znovu vygenerovat.",
   evidence:["pushHistory()", "sanitizePromptForStorage()", "getStoredState()", "loadFromHistory()", "hist.slice(0, 5)"]},
 
@@ -605,10 +605,10 @@ const GENERATOR_ASSISTANT_KB = [
   detailed:'Studentský bezpečný výstup má textový formát začínající SECURE-ANSWERS-V1. Teacher verifier obsahuje pole „Nouzová záloha“, kam lze celý text vložit, a tlačítko „Načíst vloženou zálohu“ volající bulkVerifyPasted(). Je to záložní cesta pro situaci, kdy prohlížeč nebo zařízení blokuje stažení souboru.',
   evidence:['SECURE-ANSWERS-V1','teacher_verifier.html: „Nouzová záloha“','pasteBox','bulkVerifyPasted()','downloadAnswers()']},
 
- {id:'hromadne-vyhodnoceni',title:'Hromadné vyhodnocení, CSV, feedback a archiv',status:'reseno',
+ {id:'hromadne-vyhodnoceni',title:'Načtení výsledků: Google Forms, nouzová záloha, feedback a archiv',status:'reseno',
   keywords:['hromadne vyhodnoceni','hromadné vyhodnocení','csv','excel','tabulka vysledku','feedback','individualni zpetna vazba','archiv','polozkova analyza','položková analýza'],
   simple:'Ano. Teacher verifier umí hromadně načíst více answers.txt, spočítat výsledky, stáhnout CSV, vygenerovat feedback a uložit archiv.',
-  detailed:'V teacher_verifier.html je sekce Hromadné vyhodnocení: učitel přetáhne nebo vybere více answers.txt a verifier je opraví. K dispozici jsou exporty „Stáhnout CSV“, „Stáhnout feedback HTML“, individuální feedback pro vybraného studenta i jednotlivé feedbacky. Verifier obsahuje také souhrn problematických otázek, položkovou analýzu, bezpečnostní signály a archivní HTML/JSON pro školní úložiště.',
+  detailed:'V teacher_verifier.html je v panelu Výsledky hlavní cesta import CSV z Google Forms. Pokud se export stáhne jako ZIP, nejprve ho rozbal; samotný .csv není nutné otevírat v Excelu ani mít ve Windows přiřazenou excelovskou ikonu, verifier čte obsah přímo. answers.txt a ručně vložený SECURE-ANSWERS-V1 blok jsou schované jako nouzová cesta. Po každém importu a exportu dostane učitel viditelné potvrzení. K dispozici jsou exporty výsledků, odevzdání, feedbacku a archivu, plus souhrn problematických otázek, položková analýza a bezpečnostní signály.',
   evidence:['bulkVerifyFiles()','downloadCsv()','downloadFeedbackHtml()','downloadSelectedFeedbackHtml()','downloadIndividualFeedbacks()','renderProblemSummary()','renderItemAnalysis()','downloadArchiveHtml()','downloadArchiveJson()']},
 
  {id:'zpetna-vazba',title:'Zpětná vazba a zobrazení správných odpovědí',status:'reseno',
@@ -840,7 +840,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"zmena-pinu-hesla",title:"Změna přístupu nebo učitelského přístupového kódu",status:"reseno",
   keywords:["zmena pinu","zmena hesla","novy pristup","odemykaci heslo","ucitelsky pin"],
   simple:"Přístup do Generátoru se mění vydáním nového oprávnění v AI Studiu. Učitelský přístupový kód konkrétního testu změníš pouze novým sestavením výstupu.",
-  detailed:"Generátor již nemá vlastní místní přístupový PIN. Pokud uživatel ztratí osobní přístupový soubor nebo získá další školení, správce v AI Studiu vydá nový kumulativní přístup. Učitelský přístupový kód vložený do konkrétního testu nelze po exportu bezpečně přepsat bez změny integrity; uprav je v generátoru a vytvoř nový student_test.html i teacher_verifier.html.",
+  detailed:"Generátor již nemá vlastní místní přístupový PIN. Pokud uživatel ztratí osobní přístupový soubor nebo získá další školení, správce v AI Studiu vydá nový kumulativní přístup. Teacher/Admin secret ani Recovery kód konkrétního testu nelze po exportu bezpečně přepsat bez změny integrity; uprav je v generátoru a vytvoř nový student_test.html i teacher_verifier.html.",
   evidence:["AI Studio Můj přístup","Vydání přístupu","teacher_verifier.html","student_test.html"]},
 
  {id:'ai-profily',title:'AI profily — úsporný, vyvážený a nejvyšší kvalita',status:'reseno',
@@ -870,7 +870,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"sablony-ulozeni",title:"Co přesně ukládá šablona",status:"reseno",
   keywords:["co uklada sablona", "co ukládá šablona", "ulozeni sablony", "uložení šablony", "template profile", "pedagogicky profil"],
   simple:"Šablona ukládá bezpečné předvyplnění konfigurace formuláře, ale neukládá vlastní obsah zadání ani citlivé údaje.",
-  detailed:"Ukládají se mimo jiné jazyk, CEFR, typy cvičení, počet, čas, body, režim testu a výsledků, feedback, tolerance, známkování, vzhled a bezpečná struktura diferenciace. Neukládají se název/látka testu, zdrojové texty, URL, přílohy, podmínky skupin, seznam studentů, API klíč ani učitelský přístupový kód. Pro přenos celého očištěného zadání mezi kolegy použij export zadání JSON.",
+  detailed:"Ukládají se mimo jiné jazyk, CEFR, typy cvičení, počet, čas, body, režim testu a výsledků, feedback, tolerance, známkování, vzhled a bezpečná struktura diferenciace. Neukládají se název/látka testu, zdrojové texty, URL, přílohy, podmínky skupin, seznam studentů, API klíč, Teacher/Admin secret ani Recovery kód. Pro přenos celého očištěného zadání mezi kolegy použij export zadání JSON.",
   evidence:["TEMPLATE_PREFILL_KEYS", "getTemplatePrefill()", "prefill_v2", "exportZadani()", "buildZadaniExport()"]},
 
  {id:"historie-snapshoty",title:"Co přesně ukládá historie a snapshot",status:"reseno",
@@ -1265,30 +1265,53 @@ function randomChunk(chars){
   }
   return out;
 }
+function normalizeCredentialInput(value){ return String(value||'').trim().toUpperCase(); }
 function teacherAccessCodeValue(){ return trim('ucitelPin'); }
+function recoveryCodeValue(){ return trim('recoveryCode'); }
+function requiresRecoveryCode(){ return state.testMode === 'prisny' || !!state.screenGuard; }
 function syncTeacherAccessCode(){
   const el=$('ucitelPin');
   if(!el) return '';
-  // Jeden zapamatovatelný kód; držíme ho v kanonickém uppercase tvaru, aby
-  // teacher-pin (historicky case-insensitive) a unlock-password použily shodný vstup.
-  const normalized=String(el.value||'').trim().toUpperCase();
+  const normalized=normalizeCredentialInput(el.value);
   if(el.value!==normalized) el.value=normalized;
-  const legacy=$('heslo'); if(legacy) legacy.value=normalized; // interní mirror pro starší pomocné cesty
+  return normalized;
+}
+function syncRecoveryCode(){
+  const el=$('recoveryCode');
+  if(!el) return '';
+  const normalized=normalizeCredentialInput(el.value);
+  if(el.value!==normalized) el.value=normalized;
   return normalized;
 }
 function onTeacherAccessCodeInput(){ syncTeacherAccessCode(); updateSimpleSecretsHelper(); onInput(); }
+function onRecoveryCodeInput(){ syncRecoveryCode(); updateSimpleSecretsHelper(); onInput(); }
 function setTeacherAccessCode(value){
-  setVal('ucitelPin', String(value||'').trim().toUpperCase());
+  setVal('ucitelPin', normalizeCredentialInput(value));
   syncTeacherAccessCode();
   updateSimpleSecretsHelper();
 }
-function fillSimpleSecrets(){
-  if(teacherAccessCodeValue()){syncTeacherAccessCode();uiToast('Kód už je vyplněný; nic jsem nepřepsal. Pro nový kód nejdřív vyprázdni pole.','info',4200);return;}
-  if (!teacherAccessCodeValue()) setTeacherAccessCode('TEACH-' + randomChunk(6) + '-' + randomChunk(6));
-  else syncTeacherAccessCode();
-  updateSimpleSecretsHelper(); validate(); saveSnapshot();
-  uiToast('Vygenerováno. Učitelský přístupový kód si před použitím testu poznamenej. Do historie ani šablon se neukládá.', 'warn', 5200);
+function setRecoveryCode(value){
+  setVal('recoveryCode', normalizeCredentialInput(value));
+  syncRecoveryCode();
+  updateSimpleSecretsHelper();
 }
+function fillTeacherAdminSecret(){
+  if(teacherAccessCodeValue()){syncTeacherAccessCode();uiToast('Tajný učitelský/admin kód už je vyplněný; nic jsem nepřepsal. Pro nový kód nejdřív pole vyprázdni.','info',4200);return;}
+  setTeacherAccessCode('TEACH-' + randomChunk(6) + '-' + randomChunk(6));
+  updateSimpleSecretsHelper(); validate(); saveSnapshot();
+  uiToast('Vygenerováno. Tento učitelský/admin kód ponech tajný a nesděluj jej studentům. Do historie ani šablon se neukládá.', 'warn', 5200);
+}
+function fillRecoveryCode(){
+  if(recoveryCodeValue()){syncRecoveryCode();uiToast('Recovery kód už je vyplněný; nic jsem nepřepsal. Pro nový kód nejdřív pole vyprázdni.','info',4200);return;}
+  let code='';
+  do { code='REC-' + randomChunk(4) + '-' + randomChunk(4); } while(code===teacherAccessCodeValue());
+  setRecoveryCode(code);
+  updateSimpleSecretsHelper(); validate(); saveSnapshot();
+  uiToast('Vygenerován nový per-test Recovery kód. Můžeš jej použít pro odemčení zámku; tajný učitelský/admin kód zůstává oddělený.', 'info', 5200);
+}
+// Kompatibilitní alias pro starší interní volání. Generuje pouze teacher/admin secret,
+// nikdy Recovery kód a oba credentialy nijak nepropojuje.
+function fillSimpleSecrets(){ return fillTeacherAdminSecret(); }
 function applySimpleDefaults(){
   if (!isSimpleMode()) return;
   state.testMode = 'bezny';
@@ -1337,19 +1360,23 @@ function applyTemplateValues(id){
   // nezůstal viset z předchozí šablony — pokud ho nová šablona chce, locks ho zapne.
   state.screenGuard = false;
   for (const k in L){ if (Object.prototype.hasOwnProperty.call(L,k)) state[k] = L[k]; }
-  ensureUnlockPasswordForGuard();
+  ensureRecoveryCodeForGuard();
 }
-// Hlídání obrazovky potřebuje učitelský přístupový kód — bez něj by se zámek
-// neaktivoval (jen by se zaznamenalo varování). Když je guard zapnutý a kód
-// prázdný, vygenerujeme bezpečný učitelský kód automaticky, ať guard funguje i v jednoduchém
-// režimu bez nutnosti cokoli zadávat. Kód se objeví v pokynech pro učitele.
-function ensureUnlockPasswordForGuard(){
-  if (!state.screenGuard) return;
+// Přísný test i volitelné hlídání obrazovky potřebují samostatný per-test Recovery
+// kód. Chybějící kód vytvoříme pomocí WebCrypto; teacher/admin secret se tím nikdy
+// nenahrazuje ani nemění.
+function ensureRecoveryCodeForGuard(){
+  if (!requiresRecoveryCode()) return;
   try {
-    if (!teacherAccessCodeValue()) setTeacherAccessCode('TEACH-' + randomChunk(6) + '-' + randomChunk(6));
-    else syncTeacherAccessCode();
+    if (!recoveryCodeValue()) {
+      let code='';
+      do { code='REC-' + randomChunk(4) + '-' + randomChunk(4); } while(code===teacherAccessCodeValue());
+      setRecoveryCode(code);
+    } else syncRecoveryCode();
   } catch(_){}
 }
+// Dočasný kompatibilitní alias pro starší volající; semantics jsou už recovery-only.
+function ensureUnlockPasswordForGuard(){ return ensureRecoveryCodeForGuard(); }
 async function setAppMode(mode){
   if(mode!=='advanced'&&state.appMode==='advanced'){
     if(String(state.jazyk||'').toLowerCase()==='čeština'&&!state.simpleTemplate){uiToast('Modul češtiny používá pokročilé nastavení. Pro jednoduchý režim nejdřív vyber šablonu.','info',5000);return;}

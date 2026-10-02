@@ -17,6 +17,15 @@ Generátor běží jako klientská PWA bez školního backendu. Je technicky př
 - verzovaný PWA cache systém bez automatického reloadu práce,
 - kompletní CI bránu před nasazením.
 
+## Credential model konkrétního testu
+
+Aktuální bezpečnostní balíček odděluje dva nezávislé per-test credentialy:
+
+- **Teacher/Admin secret** je tajný údaj učitele. Autorizuje učitelský login a další privilegované operace, například povolení dalšího pokusu nebo reset cizího rozpracovaného pokusu.
+- **Classroom Recovery Code** je provozní kód pro jedinou pravomoc: odemknout právě aktuálně zamčený studentský pokus. Může být v konkrétní hodině sdělen studentovi nebo celé třídě a nesmí otevřít učitelský panel ani provést retry/reset.
+
+Oba údaje se odvozují samostatně pro konkrétní `testId` (`teacher-pin|<testId>` a `recovery-code|<testId>`). Do studentského HTML patří pouze odvozené hash hodnoty. Raw credentialy se nesmí ukládat do snapshotů, šablon, historie ani exportu zadání. Manuální/externí AI workflow používá pouze placeholdery `__TEACHER_ADMIN_SECRET_DOPLN_LOKALNE__` a `__CLASSROOM_RECOVERY_CODE_DOPLN_LOKALNE__`; skutečné hodnoty se do AI promptu neposílají.
+
 ## Identity v diferenciaci
 
 Do promptu se místo skutečných identit posílají kódy `Student A1…`. Studentský soubor obsahuje náhodnou sůl testu a SHA-256 `studentHashes`, nikoli čitelný roster. Protože je sůl veřejná, běžná jména lze teoreticky hádat slovníkovým útokem; pro ostré testy se proto používají náhodné jednorázové kódy.

@@ -12,6 +12,7 @@ const steps = [
   ['verifier-v2-contract', 'scripts/check-teacher-verifier-v2.mjs'],
   ['verifier-effective-analytics', 'scripts/check-verifier-effective-analytics.mjs'],
   ['verifier-ia-security', 'scripts/check-verifier-ia-security.mjs'],
+  ['joker-workflow-real-browser', 'scripts/check-joker-workflow-browser.mjs'],
   ['stage3-pdf-contract', 'scripts/check-stage3-pdf.mjs'],
   ['generate-verifier-fixtures', 'scripts/qa-generate-fixtures.mjs'],
   ['stage3-pdf-real-browser', 'scripts/check-stage3-pdf-runtime.mjs'],

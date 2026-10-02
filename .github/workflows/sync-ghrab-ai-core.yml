@@ -5,21 +5,24 @@ on:
     types: [ghrab-ai-core-released]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 env:
   TRUSTED_STUDIO_ORIGIN: https://daniel22-dev.github.io
   TRUSTED_MANIFEST_PREFIX: /AI-Studio-GHRAB/ai-core/releases/
 
 jobs:
-  sync-core:
+  verify-core:
+    # Read-only job: validates the dispatch, installs/tests untrusted dependency code without repository credentials, then exports only reviewed sync paths.
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -50,8 +53,13 @@ jobs:
           curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location --max-time 30 \
             "$MANIFEST_URL" -o /tmp/core-manifest.json
 
-      - name: Install dependencies from lockfile
-        run: npm ci --registry=https://registry.npmjs.org
+      - name: Install dependencies from lockfile without lifecycle scripts
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+
+      - name: Install pinned Playwright Chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Synchronize signed artifacts
         env:
@@ -64,12 +72,50 @@ jobs:
       - name: Conformance and application release gate
         run: npm test
 
+      - name: Prepare reviewed synchronization artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/core-sync-artifact
+          mkdir -p /tmp/core-sync-artifact/scripts
+          cp -R vendor /tmp/core-sync-artifact/vendor
+          cp ghrab-ai-core.consumer.json /tmp/core-sync-artifact/ghrab-ai-core.consumer.json
+          cp scripts/sync-ghrab-ai-core.mjs /tmp/core-sync-artifact/scripts/sync-ghrab-ai-core.mjs
+
+      - name: Upload synchronized files for publishing job
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ghrab-ai-core-sync-${{ github.run_id }}
+          path: /tmp/core-sync-artifact
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: verify-core
+    # Write access exists only here, after the read-only verification job has passed; this job never installs dependencies or executes artifact code.
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified synchronization artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ghrab-ai-core-sync-${{ github.run_id }}
+          path: .
+
       - name: Create review branch and draft pull request
         env:
           GH_TOKEN: ${{ github.token }}
           CORE_VERSION: ${{ github.event.client_payload.coreVersion }}
         run: |
-          if git diff --quiet; then
+          set -euo pipefail
+          if git diff --quiet -- vendor ghrab-ai-core.consumer.json scripts/sync-ghrab-ai-core.mjs; then
             echo 'No changes to publish.'
             exit 0
           fi

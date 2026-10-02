@@ -1,17 +1,18 @@
 GARP 2.5.1 – SCA / DEPENDENCY SUMMARY
-Application: generator 7.1.24
-Date: 2026-09-08
+Application: generator 7.1.76
+Date: 2026-10-02
 
-INDEPENDENT ROUND-2 EVIDENCE:
-- exact npm ci: PASS (112 packages installed from unchanged package-lock).
-- npm audit: PASS, 0 vulnerabilities reported in the auditor environment on 2026-09-08.
-- Acorn exact version 8.17.0 present in that run.
-- GitHub Actions pinning: PASS, 18 external uses pinned to full commit SHA.
-- CycloneDX 1.7 SBOM: 113 components, 113/113 unique purl, 113/113 lockfile integrity hashes.
+CURRENT R6 LOCKFILE REMEDIATION:
+- `brace-expansion`: 5.0.12 (was 5.0.9); satisfies minimatch ^5.0.5.
+- `undici`: 7.29.1 (was 7.29.0); satisfies jsdom ^7.25.0.
+- production runtime dependency surface remains static HTML; these packages are dev-toolchain transitive dependencies.
+- CycloneDX SBOM is regenerated from the exact package-lock after these resolutions.
 
-ROUND-3 NOTE:
-- package-lock.json is unchanged from the independently audited round-2 candidate.
-- local npm ci re-run is NOT TESTED because registry.npmjs.org returns EAI_AGAIN in this environment.
-- local surrogate build uses preinstalled Acorn 8.15.0 only for structural build/vendored checks; it is not shipped and is not claimed as exact-lockfile evidence.
+LOCAL ENVIRONMENT BOUNDARY:
+- exact `npm ci`: NOT RUN to completion; outbound npm registry access times out in the sandbox.
+- `npm audit`: NOT RUN against the new lockfile for the same network reason.
+- no claim of 0 vulnerabilities is made locally.
+- independent/CI promotion must run exact lockfile install and `npm audit --audit-level=high`.
 
-Legal/license clearance is not inferred from package metadata. Brand/icon rights remain a separate owner-attestation item.
+Known 2026-10-02 remediation target: the lockfile no longer pins the versions identified by the 7.1.75 independent audit.
+Legal/license clearance is not inferred from package metadata.

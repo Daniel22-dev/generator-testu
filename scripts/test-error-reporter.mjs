@@ -51,6 +51,8 @@ const CHROMIUM = findChromium();
 const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
 const packageJson = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 const TEST_SENSITIVE_EMAIL = ['student.fixture', 'example.test'].join(String.fromCharCode(64));
+const TEST_GOOGLE_KEY = 'AI' + 'za' + 'x'.repeat(35);
+const TEST_QUERY_KEY = 'REPORTER_QUERY_SECRET';
 const results = [];
 const failures = [];
 
@@ -712,7 +714,7 @@ async function runBrowserTests() {
       try { await fetch('/network-failure'); } catch {}
       window.GHRABErrorReporter.recordTechnicalError({
         type: 'custom',
-        message: 'OLD_DRAFT_MARKER ' + ${JSON.stringify(TEST_SENSITIVE_EMAIL)} + ' api_key=ANON_KEY_TOKEN prompt: ANON_PROMPT_TOKEN',
+        message: 'OLD_DRAFT_MARKER ' + ${JSON.stringify(TEST_SENSITIVE_EMAIL)} + ' api_key=ANON_KEY_TOKEN prompt: ANON_PROMPT_TOKEN ' + ${JSON.stringify(TEST_GOOGLE_KEY)} + ' https://example.invalid/path?key=' + ${JSON.stringify(TEST_QUERY_KEY)},
         source: location.origin + '/private/' + encodeURIComponent(${JSON.stringify(TEST_SENSITIVE_EMAIL)}) + '?token=SECRET_QUERY',
       });
       await wait(80);
@@ -800,7 +802,7 @@ async function runBrowserTests() {
       expectedScreenshots: 5,
       requiredTypes: ['javascript', 'promise', 'http', 'network'],
       forbidden: [
-        TEST_SENSITIVE_EMAIL, 'ANON_KEY_TOKEN', 'ANON_PROMPT_TOKEN',
+        TEST_SENSITIVE_EMAIL, 'ANON_KEY_TOKEN', 'ANON_PROMPT_TOKEN', TEST_GOOGLE_KEY, TEST_QUERY_KEY,
         'ANON_ORIGINAL_TEXT_TOKEN', 'ANON_MODEL_OUTPUT_TOKEN',
         'ANON_DOCUMENT_TOKEN', 'ANON_PERSON_TOKEN', 'SECRET_HASH_FIXTURE', 'SECRET_QUERY',
       ],
@@ -859,7 +861,7 @@ async function runBrowserTests() {
     const secondDownload = await waitForZipDownload(downloadDir, secondDownloadSnapshot, 'Chromium fyzicky nestáhl druhý ZIP');
     const zip2 = inspectZip(secondDownload.base64, 'second-draft', {
       expectedScreenshots: 1,
-      forbidden: ['OLD_DRAFT_MARKER', TEST_SENSITIVE_EMAIL, 'ANON_KEY_TOKEN', 'ANON_PROMPT_TOKEN'],
+      forbidden: ['OLD_DRAFT_MARKER', TEST_SENSITIVE_EMAIL, 'ANON_KEY_TOKEN', 'ANON_PROMPT_TOKEN', TEST_GOOGLE_KEY, TEST_QUERY_KEY],
     });
     check('Smazané technické chyby ani původní ID se nevrátily', !zip2.allText.includes('OLD_DRAFT_MARKER') && zip2.metadata.reportId === reset.newId);
     const beforeSecondTargets = new Set((await waitJson(`http://127.0.0.1:${debugPort}/json`)).filter((item) => item.type === 'page').map((item) => item.id));

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.71">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.76">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
+<script src="./frame-guard.js?v=7.1.76"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generátor testů</title>
 <meta name="theme-color" content="#f59e0b">
@@ -112,7 +113,7 @@
           <input type="file" id="zadaniImportFile" accept="application/json,.json" style="display:none" onchange="importZadaniFile(this)">
         </label>
       </div>
-      <div class="share-note">Přenese všechna nastavení a texty (látku, typy cvičení, čas, body, poslech i čtení včetně tématu a navrženého textu) — <b>kromě hesel/PINů a nahraných souborů</b>. Audio, PDF a obrázky se do souboru nevejdou; ty pošli kolegovi zvlášť a po načtení je znovu přilož. Smysl: kolega bez volných AI požadavků vyplní zadání, exportuje ho a pošle tobě — ty ho načteš a test vytvoříš na svém klíči.</div>
+      <div class="share-note">Přenese všechna nastavení a texty (látku, typy cvičení, čas, body, poslech i čtení včetně tématu a navrženého textu) — <b>kromě Teacher/Admin secretu, Recovery kódu a nahraných souborů</b>. Audio, PDF a obrázky se do souboru nevejdou; ty pošli kolegovi zvlášť a po načtení je znovu přilož. Smysl: kolega bez volných AI požadavků vyplní zadání, exportuje ho a pošle tobě — ty ho načteš a test vytvoříš na svém klíči.</div>
     </div>
   </details>
 
@@ -469,7 +470,7 @@
         <div class="field-hint">Zvol, jestli má výsledný test sloužit hlavně ke klasifikaci, přísné kontrole, nebo procvičování.</div>
         <div class="btn-row preset-card-grid mode-preset-grid" id="testModeBtns">
           <button class="tag-btn preset-card active" data-val="bezny" onclick="pick('testMode','bezny')"><span class="preset-card-top"><span class="preset-card-emoji">✅</span><span class="preset-card-text"><span class="preset-card-title">Běžný test</span><span class="preset-card-desc">Standardní známkovaný režim. Opuštění testu se jen zapíše do bezpečnostního záznamu a do výsledku.</span></span></span><span class="preset-card-mode flex">Bez zámku, se záznamem</span></button>
-          <button class="tag-btn preset-card" data-val="prisny" onclick="pick('testMode','prisny')"><span class="preset-card-top"><span class="preset-card-emoji">🔒</span><span class="preset-card-text"><span class="preset-card-title">Přísný test</span><span class="preset-card-desc">Pro kontrolované psaní. Při skutečném opuštění testu se pokus uzamkne a odemkne ho jen učitel.</span></span></span><span class="preset-card-mode strict">Zámek + učitelské odemčení</span></button>
+          <button class="tag-btn preset-card" data-val="prisny" onclick="pick('testMode','prisny')"><span class="preset-card-top"><span class="preset-card-emoji">🔒</span><span class="preset-card-text"><span class="preset-card-title">Přísný test</span><span class="preset-card-desc">Pro kontrolované psaní. Při skutečném opuštění testu se pokus uzamkne a pokračování vyžaduje Recovery kód konkrétního testu.</span></span></span><span class="preset-card-mode strict">Zámek + Recovery kód</span></button>
           <button class="tag-btn preset-card" data-val="procviceci" onclick="pick('testMode','procviceci')"><span class="preset-card-top"><span class="preset-card-emoji">💬</span><span class="preset-card-text"><span class="preset-card-title">Procvičovací</span><span class="preset-card-desc">Učící režim s měkčími pravidly, přívětivější zpětnou vazbou a bez stresujících bezpečnostních zásahů.</span></span></span><span class="preset-card-mode instant">Tréninkový režim</span></button>
         </div>
       </div>
@@ -498,11 +499,11 @@
       </div>
 
       <div class="field advanced-only" id="screenGuardField">
-        <div class="field-label">🛡️ Hlídání obrazovky <button class="tt-icon" data-tip="Nezávisle na režimu testu zapne zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí). Po porušení student vidí 🔒 a pokračuje až po zadání učitelského přístupového kódu učitelem. Vhodné i pro méně důležité testy. Přísný režim toto má vždy zapnuté. Vyžaduje učitelský přístupový kód — pokud žádný nezadáš, vygeneruje se automaticky.">?</button></div>
+        <div class="field-label">🛡️ Hlídání obrazovky <button class="tt-icon" data-tip="Nezávisle na režimu testu zapne zámek při opuštění testu (přepnutí aplikace/karty, minimalizace, ztráta fokusu, opuštění celé obrazovky, podezřelé zmrznutí). Po porušení student vidí 🔒 a pokračuje až po zadání samostatného Recovery kódu pro tento test. Recovery kód nemá otevírat učitelský režim ani povolovat další pokus. Přísný režim zámek používá vždy. Když Recovery kód chybí, Generátor jej bezpečně vytvoří automaticky.">?</button></div>
         <div class="field-hint">Zámek při opuštění testu — funguje u běžného i procvičovacího režimu. Porušení vyhodnocuje učitel.</div>
         <div class="btn-row choice-card-grid two-col" id="screenGuardBtns">
           <button class="tag-btn active" data-val="off" onclick="setScreenGuard(false)"><span class="choice-card-title">Vypnuto</span><span class="choice-card-desc">Opuštění testu se jen zaznamená (běžný režim), nebo ignoruje (procvičování).</span></button>
-          <button class="tag-btn" data-val="on" onclick="setScreenGuard(true)"><span class="choice-card-title">🛡️ Zapnuto</span><span class="choice-card-desc">Opuštění testu uzamkne pokus; odemkne ho jen učitel heslem.</span></button>
+          <button class="tag-btn" data-val="on" onclick="setScreenGuard(true)"><span class="choice-card-title">🛡️ Zapnuto</span><span class="choice-card-desc">Opuštění testu uzamkne pokus; pokračování vyžaduje Recovery kód tohoto testu.</span></button>
         </div>
       </div>
 
@@ -772,20 +773,29 @@
 
     <!-- ═══════════════════════════ STEP 3 ═══════════════════════════ -->
     <div id="step3" class="hidden">
-      <div class="simple-helper" id="simpleSecretsHelper">Doplň níže jeden učitelský přístupový kód. Můžeš jej napsat, nebo použít tlačítko u pole.</div>
+      <div class="simple-helper" id="simpleSecretsHelper">Nastav dva oddělené přístupy: tajný učitelský/admin kód a samostatný Recovery kód pro zámek. Recovery kód se u Přísného testu nebo hlídání obrazovky vytvoří automaticky, pokud ho nevyplníš.</div>
       <div class="field">
-        <div class="field-label">👤 Jméno pro učitelský mód <button class="tt-icon" data-tip="Učitelský mód se nově neaktivuje jen jménem. Vyžaduje jméno učitele + učitelský přístupový kód, aby student nemohl snadno zobrazit správné odpovědi.">?</button></div>
+        <div class="field-label">👤 Jméno pro učitelský mód <button class="tt-icon" data-tip="Učitelský mód se neaktivuje jen jménem. Vyžaduje jméno učitele + tajný učitelský/admin kód, aby student nemohl otevřít privilegované funkce.">?</button></div>
         <input type="text" id="ucitelJmeno" value="" placeholder="Tvoje jméno a příjmení" autocomplete="off" oninput="onInput()">
       </div>
       <div class="field" id="teacherAccessCodeField">
-        <div class="field-label">🔐 Učitelský přístupový kód <button class="tt-icon" data-tip="Jediný kód pro učitelský mód, odemčení bezpečnostního zámku a povolení dalšího pokusu na stejném zařízení. Uvnitř testu se z něj pro jednotlivé účely odvozují oddělené PBKDF2 hashe, takže se nesdílí jeden hash. Kód se neukládá do historie, šablon ani rozpracované relace.">?</button></div>
+        <div class="field-label">🔐 Učitelský / administrátorský kód — TAJNÝ <button class="tt-icon" data-tip="Tajný údaj pouze pro učitele. Slouží pro učitelský režim a další privilegované zásahy, například povolení dalšího pokusu nebo zrušení rozpracovaného pokusu jiné identity. Studentům jej nesděluj. Musí mít alespoň 12 znaků a nesmí být snadno odhadnutelný.">?</button></div>
         <div class="input-wrap">
-          <input type="password" id="ucitelPin" placeholder="Zadej učitelský přístupový kód..." autocomplete="new-password" oninput="onTeacherAccessCodeInput()">
-          <button type="button" class="btn-eye" onclick="toggleSecret('ucitelPin', this)" aria-label="Zobrazit nebo skrýt učitelský přístupový kód">👁</button>
+          <input type="password" id="ucitelPin" placeholder="Zadej tajný učitelský/admin kód..." autocomplete="new-password" oninput="onTeacherAccessCodeInput()">
+          <button type="button" class="btn-eye" onclick="toggleSecret('ucitelPin', this)" aria-label="Zobrazit nebo skrýt učitelský / administrátorský kód">👁</button>
         </div>
-        <button type="button" class="btn-helper" onclick="fillSimpleSecrets()">🎲 Doplnit náhodný kód do tohoto pole</button>
+        <button type="button" class="btn-helper" onclick="fillTeacherAdminSecret()">🎲 Vygenerovat tajný učitelský kód</button>
+        <div class="small-muted">Tento kód zůstává pouze učiteli. Nikdy ho nesděluj studentům jako odemykací kód.</div>
+      </div>
+      <div class="field" id="recoveryCodeField">
+        <div class="field-label">🛟 Recovery kód pro odemknutí testu <button class="tt-icon" data-tip="Samostatný per-test kód pro jediný účel: odemknout právě zamčený studentský pokus. Můžeš jej v konkrétní hodině sdělit studentovi nebo celé třídě. Nemá dávat přístup do učitelského režimu, povolit další pokus ani resetovat jiného studenta. Pro Přísný test a hlídání obrazovky je povinný; chybějící kód Generátor bezpečně vytvoří automaticky.">?</button></div>
+        <div class="input-wrap">
+          <input type="password" id="recoveryCode" placeholder="Např. REC-AB12-CD34" autocomplete="new-password" oninput="onRecoveryCodeInput()">
+          <button type="button" class="btn-eye" onclick="toggleSecret('recoveryCode', this)" aria-label="Zobrazit nebo skrýt Recovery kód">👁</button>
+        </div>
+        <button type="button" class="btn-helper" onclick="fillRecoveryCode()">🎲 Vygenerovat náhodný Recovery kód</button>
+        <div class="small-muted">Recovery kód je provozní údaj konkrétního testu. Pro každý nový test používej nový kód; nesmí být stejný jako tajný učitelský/admin kód.</div>
         <input type="hidden" id="heslo" value="" aria-hidden="true">
-        <div class="small-muted">Používáš jeden kód. Generátor z něj interně vytvoří oddělený hash pro učitelský mód a oddělený hash pro odemčení.</div>
       </div>
       <!-- overeni bylo odstraněno z UI; state.overeni=NE vynucuje normalizeLoadedState() -->
       <div class="field" id="jokerField">
@@ -887,7 +897,7 @@
 </div><div class="hidden" id="keyCheckReport" aria-live="polite"></div><div id="answerProposalReport" class="hidden" aria-live="polite"></div><div class="result-step-nav"><button type="button" class="btn-next" onclick="resultStep(4,true)">Další krok →</button></div></section><section id="resultPanel4" data-result-panel="4" role="tabpanel" aria-labelledby="resultTab4" class="result-step-panel hidden"><h3>4. Stáhnout a předat</h3><p class="result-step-intro">Studentům předej jen studentský soubor. Učitelský verifier s klíčem zůstává soukromý.</p><div class="hidden" id="secureGateBanner" aria-live="polite"></div><button class="btn-dl-test" id="btnDownloadMain" onclick="downloadGeneratedTest()">⬇ Stáhnout test (.html)</button><div class="dl-student-block hidden" id="dlStudentBlock">
 <button class="btn-dl-test" id="btnDownloadStudent" onclick="downloadGeneratedStudentTest()" title="Studentský soubor bez správných odpovědí; před stažením projde bezpečnostní kontrolou.">⬇ Stáhnout studentský test</button>
 <div class="dl-safe-note">✅ <strong>Soubor pro studenty:</strong> <code>student_test.html</code>. Publikuj jen tento soubor.</div>
-</div><p id="lockUnlockHint" class="small-muted hidden">🔒 Když se test studentovi zamkne, odemkneš ho na jeho zařízení: 5× rychle klepni na ikonu zámku a zadej svůj učitelský přístupový kód.</p><div class="dl-teacher-block hidden" id="dlTeacherBlock">
+</div><p id="lockUnlockHint" class="small-muted hidden">🔒 Když se test studentovi zamkne, na jeho zařízení 5× rychle klepni na ikonu zámku a zadej <strong>Recovery kód tohoto testu</strong>. Tajný učitelský/admin kód k běžnému odemčení nepoužívej ani nesděluj.</p><div class="dl-teacher-block hidden" id="dlTeacherBlock">
 <div class="dl-teacher-head">🔒 Jen pro učitele — nikdy nepublikovat</div>
 <div class="warn-box" id="teacherFileWarning"><strong>⚠️ Jen pro učitele:</strong> verifier obsahuje správné odpovědi a soukromý klíč. Nikdy ho nepublikuj ani neposílej studentům.</div>
 <button class="btn-dl-secondary btn-dl-danger" id="btnDownloadTeacher" onclick="downloadGeneratedTeacherVerifier()" title="Obsahuje správné odpovědi a soukromý klíč. Nikdy neposílat studentům ani nepublikovat.">⬇ Stáhnout učitelský verifier — NEPOSÍLAT STUDENTŮM</button>

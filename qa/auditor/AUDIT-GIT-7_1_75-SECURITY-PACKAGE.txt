@@ -1,0 +1,367 @@
+AUDIT GIT 7.1.75 — SECURITY PACKAGE (oddělení Teacher/Admin a Classroom Recovery credentialu)
+==========================================================================================
+Auditor: Claude (nezávislá kontrola, neopravuje balíček)
+Datum: 2026-10-02
+Vstup: generator-testu-7_1_75-SECURITY-FINAL.zip
+SHA-256 ZIPu: cdf24436b56955c04c410e2f49a22530ebd5f55d028454670db0b197aea96837 — SHODA s očekávaným
+Prostředí: Node 22.22.2, npm 10.9.7, čisté `npm ci` z lockfile (112 balíčků, Acorn 8.17.0),
+  jsdom 29.1.1; Chromium 141.0.7390.37 přes Playwright 1.61.1. Přesnou revizi 1228 (Chromium 149)
+  sandbox stáhnout nemohl, proto browser výsledky platí pro Chromium 141, ne pro přesnou revizi.
+
+Důkazní politika: PASS uvádím jen tam, kde je spustitelný důkaz. Čtení kódu je vždy označeno
+„(čtení kódu)“. Behaviorální důkazy pochází z vlastního harnessu GIT-7_1_75-adversarial-harness.mjs.
+Harness spouští skutečný generátor z dist/index.html a skutečně vygenerované instant, secure
+a Verifier HTML v jsdom se skutečnou PBKDF2 (120 000 iterací).
+
+
+1. VERDIKT
+----------
+NOT READY
+
+Hlavní důvody:
+- Teacher Verifier se v balíčku vůbec nespustí. Hlavní skript obsahuje DVĚ syntaktické chyby
+  (zmizelé escape sekvence v 13f). Dešifrování, import, Google Forms, CSV ani PDF nefungují.
+- Kryptografické oddělení obou kódů v runtime funguje, ale politiku credentialů lze v generátoru
+  obejít tlačítkem „Použít nové nastavení (bez AI)“. Behaviorálně ověřeno: vznikne test,
+  v němž Recovery kód otevře učitelský panel. To je přesně zranitelnost 7.1.74.
+- Povinná sada neprochází: npm test exit 1, qa:d7:ci exit 1, npm audit exit 1.
+  Regresní test test:workflow navíc stále tvrdí starý zranitelný model.
+
+Pozitivní: privilege graph ve studentských runtime (secure i instant) je správný a byl
+behaviorálně ověřen ve všech klíčových bodech. Oprava kritické chyby je dvouřádková. S ní
+a s aktualizovanou fixture prochází D7 včetně PDF a Verifier real-browser testů.
+
+
+2. SKÓRE (0–10)
+---------------
+architektura / oddělení odpovědností .................... 7
+správnost privilege boundary ............................ 7   (runtime 9; generátor má obejitelnou politiku)
+kryptografické oddělení credentialů ..................... 9
+persistence / secret hygiene ............................ 8
+forenzní log / sémantika Verifieru ...................... 2   (návrh 8, dodaný Verifier nefunguje)
+zpětná kompatibilita / regresní bezpečnost .............. 2
+kvalita testů ........................................... 3
+release / supply-chain konzistence ...................... 6
+udržovatelnost .......................................... 4   (jednořádkové funkce o 3 000+ znacích ve String.raw)
+celková kvalita bezpečnostního balíčku .................. 4
+
+
+3. NÁLEZY
+---------
+
+[CRITICAL-1] Teacher Verifier: hlavní skript je syntakticky neplatný
+  Soubor: src/js/13f-secure-teacher-verifier.js
+
+  a) Řádek 185, renderTable() (uvnitř String.raw):
+       onclick="chooseAttemptByDigest(''+esc(r.submissionDigest)+'')"
+     Dva sousední řetězce vedou na SyntaxError „Unexpected string“.
+     Správně (stejná konvence jako renderTeacherPreview ve stejném souboru):
+       onclick="chooseAttemptByDigest(\''+esc(r.submissionDigest)+'\')"
+
+  b) Řádky 187–188, downloadResultsCsv():
+       .join('<skutečný LF>'),'results_'+...
+     Escape \n se změnil ve skutečný konec řádku, což dává „Unterminated string constant“.
+     Správně: .join('\n'),'results_'+...
+     Řádek 189 má správnou podobu ('\n').
+
+  Dopad: celý <script> Verifieru se nenaparsuje. Nedefinované zůstanou renderTable,
+    downloadDirectPdf, parseFormsCsvText, bulkVerifyPasted, downloadResultsCsv a další.
+    Učitel nemůže dešifrovat ani vyhodnotit žádný výsledek secure testu.
+  Prerekvizita / aktér: žádná, nastává vždy.
+  Runtime: Verifier (secure režim). Student a instant HTML se parsují bez chyb (ověřeno Acornem).
+  Důkazy:
+    - npm test → tools/headless-check.mjs: „SyntaxError: Unexpected string“ a
+      „FAIL stage3 verifier … tw.parseFormsCsvText is not a function“.
+    - Chromium 141: pageerror „Unexpected string“; typeof renderTable / downloadDirectPdf /
+      downloadResultsCsv === 'undefined'.
+    - Acorn nad vygenerovaným teacher_verifier.html: chyba (a). Po opravě (a) se objeví chyba (b).
+      Po opravě obou: 0 chyb.
+  Původ: oba řádky obsahují nové funkce 7.1.75 (securityAuditText/AUDIT, recovery_unlock_count,
+    security_event_timeline). Téměř jistě jde o poškození při přepisu těchto řádků ve 7.1.75.
+    Bez ZIPu 7.1.74 to nelze dokázat.
+  Minimální oprava: dvě úpravy výše. Lepší je nahradit inline onclick atributem data-digest
+    a delegovaným posluchačem.
+  Regresní test: nová brána, která naparsuje Acornem všechny inline <script> ve vygenerovaném
+    student, instant i Verifier HTML a v Chromiu vyžaduje 0× pageerror po načtení Verifieru.
+    Acorn už je v devDependencies.
+  Ověření opravy (scratch kopie, ne dodaný balíček): s oběma opravami a aktualizovanou fixture
+    qa:d7:ci = exit 0. Prochází mimo jiné stage3-pdf-real-browser, stage3-pdf-quality
+    a verifier-ui-real-browser.
+
+[HIGH-1] Politiku credentialů lze obejít přes „Použít nové nastavení (bez AI)“
+  Soubory:
+    src/js/08a-output-workflow.js:126–133   applySettingsWithoutAi()
+    src/js/08a-output-workflow.js:107       DRIFT_FIELDS obsahuje ucitelPin a recoveryCode
+    src/js/08a-output-workflow.js:120–124   renderSettingsDrift() ukáže tlačítko bez ohledu na validate()
+    src/js/13g-assemble-test-html.js:68–76  assembleTestHtml hlídá jen přítomnost Recovery u lockOnLeave
+  Cesta:
+    1. Učitel vygeneruje test.
+    2. Změní učitelský/admin kód na hodnotu Recovery kódu (nebo na slabý kód).
+    3. validate() zablokuje next3 a zobrazí hlášku.
+    4. Banner drift přesto nabídne „Použít nové nastavení (bez AI)“.
+    5. commitAnswerData() → assembleTestHtml() přestaví test bez kontroly délky, seznamu slabých
+       hesel i rozdílnosti obou kódů.
+  Behaviorální důkaz (harness, originální dist):
+    next3.disabled=true, drift={"settings":["učitelský/admin kód"]}, přestavěno s Teacher==Recovery=true,
+    Recovery otevřel teacher panel=true.
+    Druhý běh: test přestavěn se šestimístným Teacher kódem „123456“.
+  Prerekvizita / aktér: chyba učitele v nastavení po vygenerování. Následně kdokoli, komu byl
+    sdělen Recovery kód (podle modelu i celá třída), získá učitelský panel. V instant režimu to
+    znamená správné odpovědi; v secure retry a reset cizích pokusů.
+  Dopad: lokálně se vrací privilege coupling 7.1.74. Neplatí tvrzení Q, že validace stejný
+    plaintext odmítne.
+  Runtime: generátor. Výsledný test v obou režimech.
+  Minimální oprava: jedna sdílená funkce credentialPolicyErrors(teacher, recovery, recoveryRequired)
+    pro normalizované porovnání, délku ≥12, slabé kódy, Recovery ≥8 a povinnost Recovery.
+    Volat ji ve validate() i jako fail-closed throw v assembleTestHtml(), tedy pro každou cestu
+    sestavení (první build, applySettingsWithoutAi, ruční editor, nová varianta).
+    Volitelně skrýt tlačítko drift, dokud validate() neprojde.
+  Regresní test: behaviorálně vygenerovat test, nastavit ucitelPin=recoveryCode, zavolat
+    applySettingsWithoutAi(). Musí skončit výjimkou a lastAssembled se nesmí změnit.
+    Totéž se slabým kódem.
+
+[HIGH-2] Regresní sada je v rozporu s novým modelem a jedna brána tvrdí zranitelnost
+  a) scripts/qa-generate-fixtures.mjs:61–62 nastavuje legacy `heslo` a šestimístný `ucitelPin`,
+     `recoveryCode` chybí. Sestavení správně fail-closed spadne, takže celé qa:d7:ci spadne
+     dřív, než otestuje Verifier a PDF. Proto CRITICAL-1 nikdo nezachytil.
+  b) tools/workflow-matrix-check.mjs (npm test → test:workflow):
+     - ř. 70 resetBase nastavuje `heslo`, ne `recoveryCode`;
+     - ř. 78–86 „UI má jeden učitelský kód a skrytý legacy mirror“ (FAIL na novém modelu);
+     - ř. 87–97 „jeden kód vytváří dva různé PBKDF2 hashe“ s doménou 'unlock-password' (FAIL);
+     - ř. 540–548 výstupová matice se screenGuard bez Recovery → výjimka, běh skončí;
+     - ř. 560–585 „instant teacher-login + screen-guard unlock JEDNÍM KÓDEM“. Test výslovně
+       vyžaduje, aby učitelský kód odemkl zámek, tedy pozitivně tvrdí zranitelnost 7.1.74.
+  c) scripts/check-security-adversarial-e6.mjs:14–15 hledá funkce authorizeSubmittedRetry
+     a authorizeActiveAttemptReset, které ve zdroji neexistují (grep = 0). Negované regexy jsou
+     proto vždy pravdivé a dvě PASS hlášky nic neověřují.
+  d) E1, E4, E5 a E6 jsou převážně kontroly řetězců ve zdroji. E2 a E3 mají dynamické testy
+     jen na úrovni extrahovaných matcherů, ne celých toků (login, retry, reset, unlock).
+     Všech šest bran prošlo, přestože Verifier je nespustitelný a generátorovou politiku lze obejít.
+  Dopad: bez úprav nemůže npm test ani qa:d7:ci projít. Návrat ke staré logice by naopak
+    zezelenal test v (b).
+  Oprava: (a) fixture s novými credentialy; (b) resetBase s recoveryCode a přepsání tří testů
+    Stage 6 na negativní (Teacher NESMÍ odemknout, Recovery NESMÍ přihlásit); (c) odstranit
+    vakuové regexy; (d) přidat behaviorální bránu E7 (základ: přiložený harness).
+
+[MEDIUM-1] npm audit --audit-level=high: exit 1
+  brace-expansion 5.0.9 (eslint → minimatch) a undici 7.29.0 (jsdom), obě high.
+  Jen dev toolchain: `npm audit --omit=dev` hlásí 0 a do nasazeného HTML se nedostávají.
+  Povinná brána ze zadání ale neprošla.
+  security/SCA-SUMMARY.txt je zastaralý (popisuje 7.1.24 a audit z 2026-09-08).
+  Oprava: aktualizovat lockfile podle `npm audit fix`, pak regenerovat SBOM 7.1.75,
+    AI fingerprint a SHA256SUMS a aktualizovat SCA-SUMMARY.
+
+[LOW-1] tryUnlock nemá guard na zamčený stav ani na souběh
+  Soubory: src/js/13e-secure-student-runtime.js:304, src/js/14b-instant-test-runtime.js:471
+  Harness:
+    - Správný kód při nezamčeném testu zapíše další „recovery-unlock“ (secure 1→2, instant 2→3).
+    - Dvojí odeslání (Enter + klik během asynchronní PBKDF2) vytvoří pro jeden zámek
+      2 záznamy „recovery-unlock“.
+  Dopad: navýšený recovery_unlock_count a šum v časové ose. Attempt ani deadline se nemění.
+  Runtime: oba.
+  Oprava: na začátek tryUnlock dát `if(!LOCKED||UNLOCK_BUSY)return;` (instant: `locked`)
+    a busy flag s try/finally.
+  Test: Promise.all([tryUnlock(),tryUnlock()]) nad jedním zámkem musí dát právě 1 záznam.
+
+[LOW-2] Instant: recovery-unlock (a každá událost) zvyšuje „warnings“ v OVR4
+  14b: recordSecurityEvent nastavuje warningCount=securityEvents.length a buildVerify posílá
+  warnings:warningCount. Harness: warningCount=5 při securityCounts().warnings=0.
+  securityCounts je správně, pole warnings ne. Totéž číslo je v textu lock screen.
+  Oprava: warnings brát ze securityCounts().warnings.
+
+[LOW-3] Pečeť drží jen posledních 120 bezpečnostních událostí (13e persistActiveAttemptSeal)
+  Při mnoha cyklech LOCK→UNLOCK a následném reloadu se ztratí nejstarší části časové osy.
+  Rekonstruovatelnost tvrzená v O je tím omezená. Dlouhodobě: kompaktní souhrn (počty
+  a první/poslední lock) mimo ořezávané pole.
+
+[LOW-4] Verifier řadí „bad-unlock“ mezi tvrdé signály (13f:150)
+  Překlep učitele při zadávání Recovery kódu na studentově zařízení vytvoří tvrdý signál.
+  Doporučení: severity „soft“ nebo „info“, s počtem.
+
+[LOW-5] check-joker-workflow-browser.mjs: pevné cesty k Chromiu a nestabilita při zátěži
+  Bez CHROMIUM_PATH končí „Chromium není dostupné“; Playwright browser nepoužívá.
+  Samostatně 6/6 PASS. Uvnitř qa:d7:ci jednou spadl na null elementu po reloadu iframe
+  (race) a při opakování prošel.
+
+[INFO]
+  - security/SHA256SUMS.txt (181/181 OK) nepokrývá src/ ani scripts/, takže neatestuje
+    zdrojový kód aplikace.
+  - ucitelPinHash i recoveryCodeHash jsou ve studentském HTML (PBKDF2-SHA256, 120k iterací,
+    sůl doména|testId). Offline hádání Teacher kódu brzdí délka ≥12 a seznam slabých kódů;
+    vygenerovaný TEACH-XXXXXX-XXXXXX je bezpečný. Serverless hranice, ne vada.
+  - Instant runtime bez recoveryCodeHash při lockOnLeave nezamyká, jen zapíše varování
+    (fail-open v runtime). Generátor takový výstup nevytvoří (ověřeno), nastane jen
+    při ruční úpravě HTML.
+  - Raw credentialy zůstávají do reloadu v paměti v lastAssembled.sourceState.__outputFields
+    (detekce driftu). Do úložiště se nedostanou (ověřeno). Akceptovatelné.
+  - Secure tryUnlock po neúspěchu nevyprázdní #unlockInp (kosmetické).
+  - Lint: 1 warning (tools/headless-check.mjs:265, nepoužitá proměnná), 0 errors.
+
+
+4. TABULKA TVRZENÍ
+------------------
+Kryptografický kontrakt
+ 1 Teacher hash jen z Teacher secretu ............. PASS  (13g:75; harness F/C)
+ 2 Recovery hash jen z Recovery kódu .............. PASS  (13g:76; harness A/H)
+ 3 unlock-password není živá větev ................ PASS  (grep: žádná derivace; ve zdroji jen sanitizace)
+ 4 stejný plaintext nepřejde mezi rolemi .......... PARTIAL (kryptograficky PASS; generátor lze obejít → HIGH-1)
+ 5 Recovery nepřenositelný mezi testy ............. PASS  (harness P-crypto, P instant)
+ 6 secure a instant mají stejné oddělení .......... PASS  (shodné domény a normalizace; behaviorálně oba)
+ 7 raw secrety nejsou ve student CFG/HTML ......... PASS  (harness S/T secure + instant, obě velikosti písmen)
+ 8 strict/guard bez Recovery fail-closed .......... PASS  (assembleTestHtml výjimka; harness R + pád fixture)
+
+Adversariální matice A–AI
+ A správný Recovery odemkne ....................... PASS  secure + instant (behav.)
+ B špatný Recovery neodemkne ...................... PASS  oba (behav.)
+ C Recovery neotevře teacher panel ................ PASS  oba (behav.)
+ D Recovery nepovolí retry ........................ PASS  secure (behav.); instant retry nemá
+ E Recovery nezruší cizí aktivní pokus ............ PASS  secure (behav.)
+ F Teacher → login ................................ PASS  oba (behav.)
+ G Teacher → retry/reset .......................... PASS  secure (behav.)
+ H Teacher nenahradí Recovery při unlocku ......... PASS  oba (behav.)
+ I attemptId zachován ............................. PASS  oba (behav.)
+ J deadline zachován .............................. PASS  secure (behav., i po reloadu)
+ K identityHash zachován .......................... PASS  secure (behav.)
+ L activeKey/varianta zachována ................... PASS  secure (behav.)
+ M stav žolíka zachován ........................... PASS  secure (behav.) + check:joker-browser
+ N odpovědi/startedAt/securityEvents .............. PASS  secure + instant (behav.)
+ O opakované cykly uspořádané a provázané ......... PASS  instant (behav., lockAt → předchozí lock); secure PARTIAL (LOW-1, LOW-3)
+ P kód z testu A selže v testu B .................. PASS  (behav.)
+ Q stejný plaintext odmítnut validací ............. FAIL  krok 3 ano, přestavba drift ne (HIGH-1)
+ R chybějící Recovery fail-closed ................. PASS
+ S raw Teacher není ve student HTML ............... PASS
+ T raw Recovery není ve student HTML .............. PASS
+ U nic raw v šablonách/historii/exportu/snapshotu . PASS  (behav.: snapshot, stav, šablona, export JSON, sanitizeStoredRecord)
+ V legacy heslo/unlockPassword neobejde graf ...... PASS  (čtení kódu: heslo je jen skryté pole a sanitizace)
+ W legacy import neklonuje kód do dvou rolí ....... PASS  (behav.: oba credentialy po importu prázdné)
+ X AI/manual prompt bez credentialů ............... PASS  (behav.: buildPrompt + buildContentPrompt jen s placeholdery)
+ Y error/debug/export bez úniku ................... PARTIAL (export a úložiště čisté; error-reporter netrasován)
+ Z 5× poklepání jen odhalí pole ................... PASS  (čtení kódu: lockTap jen zobrazí unlockReveal)
+ AA reload/persistence ............................ PASS  (behav.: reload po unlocku zachová pokus i deadline; reload zamčeného zámek drží)
+ AB race/dvojklik ................................. FAIL  (LOW-1: duplicitní auditní záznamy; pokus se nepoškodí)
+ AC audit nepotlačí původní lock .................. PASS*  (behav. s opraveným 13f: lock=hard, recovery=info)
+ AD recovery není obvinění ........................ PASS*  (behav. s opraveným 13f: nezvyšuje securityIssueCount)
+ AE secure ≡ instant .............................. PARTIAL (graf shodný; liší se bad-unlock a warnings, LOW-2)
+ AF ochrana žolíka 7.1.74 ......................... PASS  (check:joker-browser 19× PASS, Chromium 141)
+ AG iPad keyboard-dismiss 7.1.73 .................. PARTIAL (zdrojová brána check:runtime-ux PASS; behaviorálně netestováno)
+ AH Google Forms / import do Verifieru ............ FAIL  v balíčku (CRITICAL-1); s opravou PASS (D7 verifier-ui-real-browser)
+ AI PDF kontrakty 7.1.72 .......................... FAIL  v balíčku (runtime); s opravou PASS (stage3 runtime + quality)
+ * Platí pro opravený Verifier. V dodaném balíčku se Verifier nespustí, efektivně tedy FAIL.
+
+Release / supply-chain
+ verze 7.1.75 všude (check:versions) .............. PASS
+ SW cache + manifesty 7.1.75 ...................... PASS  (ghrab-generator-v7.1.75; check:studio-manifest)
+ package-lock root 7.1.75 ......................... PASS
+ Acorn pin 8.17.0 (exact) ......................... PASS
+ SBOM odpovídá lockfile ........................... PASS  (garp25:sbom:check v npm test)
+ AI assurance fingerprint aktuální ................ PASS  (garp25:ai-evidence:check)
+ security/SHA256SUMS.txt .......................... PASS  (181/181 OK; nepokrývá src/)
+ GARP 2.7 trust anchor = cf5a65…4615 .............. PASS  (sha256 souboru sedí)
+ GARP 2.7 static, CI pin .......................... PASS  (exit 0; negativní kontrola se špatným pinem exit 1)
+ ZIP bez node_modules/dist/archive/cache/tajemství . PASS  (633 položek)
+ žádný test oslaben jen kvůli průchodu ............ PARTIAL (oslaben ne, ale staré testy nebyly aktualizovány a E6 má vakuové kontroly, HIGH-2)
+ npm audit high ................................... FAIL  (MEDIUM-1)
+
+
+5. VÝSLEDKY TESTŮ (dodaný balíček, beze změn)
+---------------------------------------------
+ npm ci ............................................ exit 0
+ npm run check:versions ............................ exit 0
+ npm run prebuild .................................. exit 0   (E1–E6 PASS; viz HIGH-2 c/d)
+ npm test .......................................... exit 1
+     prošlo vše až po garp25:prep-static (lint 0 chyb, sensitive, runtime-ux, joker-workflow,
+     garp23, build, SBOM/AI evidence, SW freeze, vendored, leaks);
+     test:headless:dist: 1 FAIL (Verifier SyntaxError);
+     check:precache a test:workflow se nespustily.
+ npm run check:joker-browser ....................... exit 1 bez CHROMIUM_PATH; s CHROMIUM_PATH exit 0 (19 PASS)
+ npm run qa:d7:ci .................................. exit 1   (generate-verifier-fixtures: chybí Recovery)
+ npm audit --audit-level=high ...................... exit 1   (2 high, dev)
+ CI=true GARP27_EXTERNAL_TRUST_SHA256=cf5a65… npm run qa:garp27:static ... exit 0
+ negativní kontrola GARP (špatný pin) .............. exit 1   (správně odmítnuto)
+ sha256sum -c security/SHA256SUMS.txt .............. 181/181 OK
+ Behaviorální harness (originální dist) ............ 32 PASS / 7 FAIL / 1 ERROR
+     FAIL: AB ×3, warnings, Verifier funkce, bypass ×2. ERROR: Verifier parse.
+
+Diagnostika (scratch kopie, NE dodaný balíček; jen pro ověření rozsahu oprav)
+ + oprava 13f (dvě escape) + fixture s novými credentialy:
+     qa:d7:ci ...................................... exit 0  (všech 10 kroků vč. PDF a Verifier real-browser)
+     npm test ...................................... exit 1  headless PASS, precache PASS (24/24),
+                                                    test:workflow FAIL (HIGH-2 b)
+     harness ....................................... 34 PASS / 6 FAIL / 0 ERROR (zbývají HIGH-1 a LOW-1/2)
+
+
+6. PRIVILEGE GRAPH PO REVIZI
+----------------------------
+ Teacher/Admin secret → teacher login ............ secure + instant          (ověřeno)
+ Teacher/Admin secret → povolení dalšího pokusu .. secure                    (ověřeno; instant tuto cestu nemá)
+ Teacher/Admin secret → reset cizího pokusu ...... secure                    (ověřeno)
+ Teacher/Admin secret → tryUnlock ................ NE (oba)                  (ověřeno)
+ Classroom Recovery Code → tryUnlock ............. ANO, jen aktuální pokus   (ověřeno; nevytváří nový pokus)
+ Classroom Recovery Code → cokoli jiného ......... NE (oba)                  (ověřeno)
+ Výjimka: generátor dovolí přestavět test s Teacher == Recovery (HIGH-1).
+   V takovém výstupu Recovery → teacher login = ANO (ověřeno).
+
+
+7. DATOVÉ TOKY CREDENTIALŮ
+--------------------------
+Teacher/Admin secret
+ vstup:      #ucitelPin (type=password, autocomplete=new-password) → syncTeacherAccessCode()
+             normalizuje trim + velká písmena přímo v poli
+ validace:   validate(): ≥12 znaků, slabé kódy, ≠ Recovery (jen UI krok 3; viz HIGH-1)
+ paměť:      lastAssembled.sourceState.__outputFields.ucitelPin (raw, do reloadu; detekce driftu)
+ derivace:   deriveSecretHash('teacher-pin', secret, testId) → CFG.ucitelPinHash
+             (13g:75; 13c:130 pro secure balík)
+ výstupy:    student HTML / instant HTML / Verifier jen hash (ověřeno, obě velikosti písmen)
+ snapshot:   DOM_FIELDS credential neobsahuje; getStoredState() rekurzivně odstraní klíče
+             (normalizované názvy včetně legacy) — ověřeno
+ šablony:    getTemplateDomPrefill() vynechá SENSITIVE_FIELD_IDS — ověřeno
+ historie:   sanitizeStoredRecord(): klíče + redakce hodnot + regex v promptu — ověřeno
+ export:     exportZadani() JSON — ověřeno čisté
+ import:     applyImportedZadani() → sanitizeStoredRecord + safeDomEntries (jen DOM_FIELDS)
+             → legacy heslo/ucitelPin/unlockPassword se nepřenese — ověřeno
+ AI/manual:  buildPrompt() jen placeholder __TEACHER_ADMIN_SECRET_DOPLN_LOKALNE__ — ověřeno
+ výmaz:      „Ukončit práci a smazat místní data“ vyprázdní SENSITIVE_FIELD_IDS (02:726, 02:852)
+ netrasováno: error-reporter (public/access/error-reporter.js) — NOT TESTED
+
+Classroom Recovery Code
+ vstup:      #recoveryCode → syncRecoveryCode() (trim + velká písmena); generování REC-XXXX-XXXX
+             přes WebCrypto (ensureRecoveryCodeForGuard), nikdy z Teacher secretu
+ derivace:   deriveSecretHash('recovery-code', code, testId) → CFG.recoveryCodeHash
+             + hasRecoveryUnlock (13g:76, 98)
+ runtime:    #unlockInp → tryUnlock() → recoveryCodeMatches(); po úspěchu se pole vyprázdní
+ persistence, export, import, prompt, výmaz: stejně jako Teacher (všechny body ověřeny)
+
+Legacy jeden kód (heslo / unlockPassword)
+ #heslo je skryté prázdné pole. Pro derivaci ani autorizaci se nepoužívá, jen v sanitizačních
+ seznamech. Import ho na nové credentialy nepovýší (ověřeno).
+
+
+8. MINIMÁLNÍ PLÁN OPRAV (pořadí)
+--------------------------------
+ 1. CRITICAL-1: v 13f opravit ř. 185 na chooseAttemptByDigest(\''+esc(r.submissionDigest)+'\')
+    a ř. 187–188 na .join('\n').
+ 2. HIGH-2 a: scripts/qa-generate-fixtures.mjs → ucitelPin ≥12 znaků, recoveryCode, bez heslo.
+ 3. Nová brána (do prebuild/test): Acorn parse všech inline skriptů vygenerovaného student,
+    instant a Verifier HTML; Playwright načtení Verifieru s 0× pageerror.
+ 4. HIGH-1: credentialPolicyErrors() sdílená validate() a assembleTestHtml() (throw);
+    tlačítko drift jen při platné politice.
+ 5. HIGH-2 b–d: workflow-matrix-check (resetBase s recoveryCode; tři testy Stage 6 přepsat
+    na negativní), odstranit vakuové regexy v E6, přidat behaviorální E7 (základ: přiložený harness).
+ 6. MEDIUM-1: npm audit fix (dev deps) → regenerovat SBOM, AI fingerprint, SHA256SUMS,
+    aktualizovat SCA-SUMMARY.
+ 7. LOW-1 a LOW-2 (malé): guard v tryUnlock; instant warnings ze securityCounts().
+    LOW-3 a LOW-4 lze odložit.
+ 8. Vydat jako 7.1.76 (nový ZIP hash a nový trust anchor, protože anchor váže appVersion
+    a hashe adaptérů). Znovu spustit: npm ci, npm test, check:joker-browser, qa:d7:ci,
+    npm audit, GARP static s novým pinem a harness.
+    Cíl: harness 0 FAIL kromě vědomě přijatých LOW.
+
+Server-deferred hranice (serverový stav pokusu, spotřeba kódů, autoritativní telemetrie,
+identity, anti-DevTools, centrální limity žolíka, Moje skupiny) nejsou hodnoceny jako vady.
+Rozdělení credentialů je nezhoršuje ani netvrdí, že je řeší.
+
+
+PŘÍLOHA: GIT-7_1_75-adversarial-harness.mjs
+ Spuštění z kořene repozitáře po `npm ci && npm run build`:
+   node GIT-7_1_75-adversarial-harness.mjs
+ Výsledky zapisuje do qa-results/adversarial-harness.json; exit 1 při jakémkoli FAIL/ERROR.

@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+const secure=fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8');
+const instant=fs.readFileSync('src/js/14b-instant-test-runtime.js','utf8');
+const verifier=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8');
+const v2=fs.readFileSync('src/js/13eb-secure-teacher-verifier-v2-ui.js','utf8');
+let failed=0;const need=(src,re,msg)=>{if(re.test(src))console.log('PASS '+msg);else{failed++;console.error('FAIL '+msg);}};
+need(secure,/loadActiveAttemptSeal\(\)[\s\S]*activeAttempt/, 'secure runtime has persistent active-attempt seal');
+need(secure,/activeAttemptIdentityHash[\s\S]*GIT-ACTIVE-ATTEMPT-V1/, 'active attempt is bound to hashed student identity');
+need(secure,/confirmJokerCommit\(\)[\s\S]*jokerConfirmBody/, 'joker requires an explicit confirmation before first start');
+need(secure,/if\(seal&&seal\.identityHash&&seal\.identityHash!==identityHash\)[\s\S]*showActiveAttemptLocked/, 'different identity cannot reuse the active attempt without teacher reset');
+need(secure,/JOKER_USED=!!seal\.jokerUsed[\s\S]*ATTEMPT_ID=seal\.attemptId[\s\S]*TIMER_DEADLINE=Number\(seal\.timerDeadline\)/, 'reload restores committed joker choice, attempt id and deadline');
+need(secure,/attempt-resumed-after-reload/, 'reload is preserved as an audit event');
+need(secure,/LOCKED=!!seal\.locked[\s\S]*lockScreen/, 'reload cannot bypass a persisted locked state');
+need(secure,/localStorage\.setItem\(key,raw\)[\s\S]*localStorage\.getItem\(key\)===raw[\s\S]*if\(!persistActiveAttemptSeal\(\)\)[\s\S]*activeAttemptStorageError/, 'active-attempt persistence is verified fail-closed before rendering the test');
+need(secure,/setSubmittedLocked\(\);clearActiveAttemptSeal\(\)/, 'successful submission clears active-attempt seal only after output is created');
+need(instant,/confirmJokerStartInstant\(\)[\s\S]*jokerConfirmBody/, 'instant runtime also asks for explicit joker confirmation');
+need(verifier,/function resolvedResults\([\s\S]*function effectiveResults\(\)\{return resolvedResults\(\)\.filter\(r=>!r\.jokerUsed\);\}/, 'Verifier separates reviewable results from classification results');
+need(verifier,/function renderSecuritySignals\([\s\S]*const ok=resolvedResults\(\)/, 'security review still includes joker attempts');
+need(verifier,/classification_status[\s\S]*joker_used[\s\S]*joker_selected_at/, 'results CSV carries explicit joker and classification metadata');
+need(verifier,/JOKER_EXCLUDED[\s\S]*COUNTED/, 'CSV marks joker rows as excluded from classification');
+need(verifier,/ŽOLÍK — MIMO KLASIFIKACI/, 'Verifier visibly labels joker as outside classification');
+need(verifier,/const mins=durationMinutes\(r\);const planned=Number\(CONFIG\.cas\)\|\|0;if\(mins!=null\)\{/, 'short-time signal is evaluated for joker attempts too');
+need(v2,/žolík mimo klasifikaci/, 'Verifier dashboard reports joker exclusion explicitly');
+if(failed)process.exit(1);console.log('PASS joker workflow regression contract');
