@@ -202,7 +202,7 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
   await T('secure: test běží a pečeť existuje', async () => { must(s0 && s0.attemptId, 'bez pečeti'); return s0.attemptId; });
   x.eval("setResp('0_0',0)");
   const lockShown = () => !x.document.getElementById('lockScreen').classList.contains('hidden');
-  const unlock = async v => { x.document.getElementById('unlockInp').value = v; await x.tryUnlock(); };
+  const unlock = async v => { x.document.getElementById('unlockInp').value = v; await x.tryUnlock(); await x.flushPendingAttemptWrites(); };
   x.eval("lockTest('adv-lock-1')"); await sleep(20);
   await T('C secure: Recovery neotevře teacher panel', async () => {
     x.document.getElementById('teacherName').value = TEACHER_NAME; x.document.getElementById('teacherPin').value = REC;
