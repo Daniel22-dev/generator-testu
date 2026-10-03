@@ -459,8 +459,9 @@ function generatorSettingsBackdropClick(event){
 function updateSimpleSecretsHelper(){
   const helper = $('simpleSecretsHelper');
   if (!helper) return;
-  const missing = !teacherAccessCodeValue();
-  helper.classList.toggle('hidden', !isSimpleMode() || !missing);
+  const teacherMissing = !teacherAccessCodeValue();
+  const recoveryMissing = typeof requiresRecoveryCode === 'function' && requiresRecoveryCode() && !recoveryCodeValue();
+  helper.classList.toggle('hidden', !isSimpleMode() || (!teacherMissing && !recoveryMissing));
 }
 function clearLegacySchoolSecurityCode(){
   try { localStorage.removeItem(LEGACY_SCHOOL_SECURITY_CODE_KEY); } catch(_){}
@@ -474,7 +475,7 @@ function anonymizeGroupsForStorage(groups){
   }));
 }
 function getStoredState(){
-  const clean = JSON.parse(JSON.stringify(state));
+  const clean = stripSensitiveKeysDeep(JSON.parse(JSON.stringify(state)));
   clean.fileNames = [];
   if (Array.isArray(clean.skupiny)) clean.skupiny = anonymizeGroupsForStorage(clean.skupiny);
   return clean;
@@ -521,7 +522,7 @@ function cloneSafeStoredValue(value, depth=0, budget={nodes:0}){
   return out;
 }
 function sanitizeStateForLoad(raw){
-  const source = cloneSafeStoredValue(raw);
+  const source = stripSensitiveKeysDeep(cloneSafeStoredValue(raw));
   if (!source || Array.isArray(source) || typeof source !== 'object') throw new TypeError('Uložený stav musí být objekt.');
   const clean = {};
   for (const [key, value] of Object.entries(source)) if (LOADABLE_STATE_KEYS.has(key)) clean[key] = value;
@@ -532,6 +533,46 @@ function replaceStateFromUntrusted(raw){
   return state;
 }
 const LEGACY_DEFAULT_TEACHER_NAME = 'Daniel Baláž';
+const SENSITIVE_STORAGE_KEY_NAMES = new Set([
+  'heslo','ucitelpin','recoverycode','teacheraccesscode','teacheradminsecret',
+  'teachersecret','classroomrecoverycode','unlockpassword','unlockcode'
+]);
+function isSensitiveStorageKey(key){
+  return SENSITIVE_STORAGE_KEY_NAMES.has(String(key||'').replace(/[_\-\s]/g,'').toLowerCase());
+}
+function stripSensitiveKeysDeep(value){
+  if (Array.isArray(value)) return value.map(stripSensitiveKeysDeep);
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  for (const [key, item] of Object.entries(value)) {
+    if (isSensitiveStorageKey(key)) continue;
+    out[key] = stripSensitiveKeysDeep(item);
+  }
+  return out;
+}
+function activeRawCredentialValues(){
+  return [...new Set([trim('heslo'), trim('ucitelPin'), trim('recoveryCode')].map(v=>String(v||'').trim()).filter(Boolean))];
+}
+function redactCredentialValuesDeep(value, secretValues=activeRawCredentialValues()){
+  if (typeof value === 'string') {
+    let out = value;
+    for (const secret of secretValues) out = out.split(secret).join('[NEULOŽENO]');
+    return out;
+  }
+  if (Array.isArray(value)) return value.map(item=>redactCredentialValuesDeep(item, secretValues));
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  for (const [key, item] of Object.entries(value)) out[key] = redactCredentialValuesDeep(item, secretValues);
+  return out;
+}
+function sanitizeStoredRecord(record){
+  const clean = redactCredentialValuesDeep(stripSensitiveKeysDeep(cloneSafeStoredValue(record)));
+  if (clean && !Array.isArray(clean) && typeof clean === 'object' && typeof clean.prompt === 'string') clean.prompt = sanitizePromptForStorage(clean.prompt);
+  return clean;
+}
+function sanitizeStoredArray(items){
+  return (Array.isArray(items)?items:[]).map(sanitizeStoredRecord);
+}
 function safeDomEntries(raw){
   const source = cloneSafeStoredValue(raw || {});
   if (!source || Array.isArray(source) || typeof source !== 'object') throw new TypeError('Uložená pole formuláře musí být objekt.');
@@ -547,17 +588,16 @@ function safeDomEntries(raw){
 function sanitizePromptForStorage(prompt){
   let out = String(prompt || '');
   out = out.replace(
-    /(?:Heslo pro odemčení(?: bezpečnostního zámku)?|Odemykací heslo(?: zámkové obrazovky)?|Učitelský přístupový kód)\s*:\s*.*$/gm,
-    'Učitelský přístupový kód: [NEULOŽENO]'
+    /(?:Učitelský přístupový kód|Učitelský \/ administrátorský kód|Teacher\s*\/\s*Admin secret|Teacher\/Admin secret|PIN pro učitelský mód|PIN učitele)\s*:\s*.*$/gmi,
+    'Učitelský / administrátorský kód: __TEACHER_ADMIN_SECRET_DOPLN_LOKALNE__'
   );
   out = out.replace(
-    /(?:PIN pro učitelský mód|PIN učitele)\s*:\s*.*$/gm,
-    'Učitelský přístupový kód: [NEULOŽENO]'
+    /(?:Recovery kód(?: pro odemknutí testu)?|Classroom Recovery Code|Heslo pro odemčení(?: bezpečnostního zámku)?|Odemykací heslo(?: zámkové obrazovky)?)\s*:\s*.*$/gmi,
+    'Recovery kód pro odemknutí testu: __CLASSROOM_RECOVERY_CODE_DOPLN_LOKALNE__'
   );
-  out = out.replace(/Učitelský přístup\s*:\s*.*$/gm, 'Učitelský přístup: [NEULOŽENO]');
-  const secretValues = [trim('heslo'), trim('ucitelPin')].filter(v => v && v.length > 0);
+  out = out.replace(/Učitelský přístup\s*:\s*.*$/gmi, 'Učitelský přístup: __TEACHER_ADMIN_SECRET_DOPLN_LOKALNE__');
+  const secretValues = [trim('heslo'), trim('ucitelPin'), trim('recoveryCode')].filter(v => v && v.length > 0);
   secretValues.forEach(secret => { out = out.split(secret).join('[NEULOŽENO]'); });
-  // Jména studentů jsou v historii vždy anonymizovaná — viz pushHistory()
   return out;
 }
 function clearOldUnsafeStorage(){
@@ -587,40 +627,48 @@ function safeSetItem(key, value){
 }
 
 function readArr(key){
-  try { const a = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(a) ? a : []; }
+  try { const a = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(a) ? sanitizeStoredArray(a) : []; }
   catch(_){ return []; }
 }
 
 // Idempotentní migrace starých šablon a historie.
 function migrateStorage(){
   try {
+    // E5: vyčisti i aktuální snapshot, ne pouze data při jejich pozdějším načtení.
+    // Starší verze mohly mít credential pod legacy názvem uvnitř DOM/state objektu.
+    try {
+      const rawSnap = localStorage.getItem(SAVE_KEY);
+      if (rawSnap) safeSetItem(SAVE_KEY, JSON.stringify(sanitizeStoredRecord(JSON.parse(rawSnap))));
+    } catch(_) { try { localStorage.removeItem(SAVE_KEY); } catch(__){} }
+
     const seenTpl = new Set();
     const mergedTpl = [];
     for (const arr of [readArr(TPL_KEY), ...LEGACY_TPL_KEYS.map(readArr)]) {
-      for (const t of arr) {
+      for (const raw of arr) {
+        const t = sanitizeStoredRecord(raw);
         const id = t && t.id != null ? String(t.id) : null;
         if (id && seenTpl.has(id)) continue;
         if (id) seenTpl.add(id);
         mergedTpl.push(t);
       }
     }
-    if (mergedTpl.length) safeSetItem(TPL_KEY, JSON.stringify(mergedTpl));
+    // Přepiš current key i tehdy, když zdroj byl pouze current storage: tím se raw legacy credential fyzicky odstraní.
+    if (mergedTpl.length || localStorage.getItem(TPL_KEY)) safeSetItem(TPL_KEY, JSON.stringify(mergedTpl));
 
     const seenHist = new Set();
     const mergedHist = [];
     for (const arr of [readArr(HIST_KEY), ...LEGACY_HIST_KEYS.map(readArr)]) {
-      for (const h of arr) {
+      for (const raw of arr) {
+        const h = sanitizeStoredRecord(raw);
         const key = h && (h.hash != null ? 'h:'+h.hash : (h.ts != null ? 't:'+h.ts : null));
         if (key && seenHist.has(key)) continue;
         if (key) seenHist.add(key);
         mergedHist.push(h);
       }
     }
-    if (mergedHist.length) {
-      mergedHist.sort((a,b) => (b && b.ts || 0) - (a && a.ts || 0));
-      safeSetItem(HIST_KEY, JSON.stringify(mergedHist.slice(0, 50)));
-    }
-  } catch(_){}
+    mergedHist.sort((a,b) => (b && b.ts || 0) - (a && a.ts || 0));
+    if (mergedHist.length || localStorage.getItem(HIST_KEY)) safeSetItem(HIST_KEY, JSON.stringify(mergedHist.slice(0, 50)));
+  } catch(_){ }
 }
 
 // ═══ Light / Dark mode ════════════════════════════════════════════════════════
@@ -692,7 +740,7 @@ function flashSave() {
 
 // ═══ Templates ════════════════════════════════════════════════════════════════
 function loadTemplates(){return readArr(TPL_KEY)}
-function saveTemplates(t){return safeSetItem(TPL_KEY,JSON.stringify(t))}
+function saveTemplates(t){return safeSetItem(TPL_KEY,JSON.stringify(sanitizeStoredArray(t)))}
 const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni zadaniTab urls rcLength rcTopic readingQuestionCount listeningQuestionCount sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard feedbackMode differentiationLevel'.split(' ');
 function getTemplatePrefill(){const p={};TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));p.skupinyCount=(state.skupiny||[]).length;p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||'');return p}
 function getTemplateDomPrefill(){const dom={};DOM_FIELDS.forEach(id=>{if(!SENSITIVE_FIELD_IDS.includes(id))dom[id]=cloneSafeStoredValue(val(id))});return dom}
@@ -702,10 +750,10 @@ function finishTemplateLoad(msg,type='ok'){normalizeLoadedState(state);enforceMo
 async function saveTemplate(){const name=await uiPrompt('Název šablony',trim('nazev')||'Moje šablona');if(!name)return;const why=await uiPrompt('K čemu šablona slouží (nepovinné)','','Krátce popiš použití, nebo nech prázdné a ulož.'),t=loadTemplates(),attachmentWasPresent=state.zadaniTab==='file'&&((Array.isArray(state.fileNames)&&state.fileNames.length>0)||fileObjects.length>0);t.push({id:Date.now(),name,why:why||'',format:'prefill_v3',prefill:getTemplatePrefill(),dom:getTemplateDomPrefill(),attachmentWasPresent,ts:Date.now()});if(!saveTemplates(t))return;renderTemplates();flashSave();uiToast('Šablona uložena včetně vyplněných polí; přílohy a citlivé údaje se neukládají.','ok',5000)}
 function loadTemplate(id){const t=loadTemplates().find(x=>x.id===id);if(!t)return;if(t.format==='prefill_v3'){const attachmentWasPresent=t.attachmentWasPresent===true||(t.attachmentWasPresent==null&&t.prefill?.zadaniTab==='file');applyTemplatePrefill(cloneSafeStoredValue(t.prefill));safeDomEntries(t.dom).forEach(([k,v])=>setVal(k,v));clearTemplateTransientFiles();SENSITIVE_FIELD_IDS.forEach(x=>setVal(x,''));finishTemplateLoad(attachmentWasPresent?'Šablona „'+esc(t.name)+'“ načtena a formulář předvyplněn. Původní příloha se do šablony neukládá — připoj ji znovu.':'Šablona „'+esc(t.name)+'“ načtena a formulář předvyplněn.',attachmentWasPresent?'warn':'ok');return}if(t.format==='prefill_v2'){applyTemplatePrefill(cloneSafeStoredValue(t.prefill));clearTemplateTransientFiles();finishTemplateLoad('Starší šablona „'+esc(t.name)+'“ načtena. Textová pole v tomto formátu uložena nebyla.','warn');return}if(t.format==='profile_v1'){applyTemplatePrefill(cloneSafeStoredValue(t.profile));clearTemplateTransientFiles();finishTemplateLoad('Starší profil načten. Pro plné předvyplnění jej ulož znovu.','warn');return}replaceStateFromUntrusted(t.state);if(!state.urls?.length)state.urls=[''];clearTemplateTransientFiles();if(state.zadaniTab==='file')state.zadaniTab='text';if(!state.layout)state.layout='tabs';if(!state.resultMode)state.resultMode='instant';safeDomEntries(t.dom).forEach(([k,v])=>setVal(k,v));SENSITIVE_FIELD_IDS.forEach(x=>setVal(x,''));finishTemplateLoad('Starší šablona načtena; citlivá pole byla vyčištěna.')}
 // Přenos očištěného zadání mezi kolegy.
-function buildZadaniExport(){const dom={};DOM_FIELDS.forEach(id=>dom[id]=val(id));return{__type:'generator-testu-zadani',formatVersion:1,appVersion:RELEASE.version,exportedAt:new Date().toISOString(),dom,state:getStoredState()}}
+function buildZadaniExport(){const dom={};DOM_FIELDS.forEach(id=>dom[id]=val(id));return sanitizeStoredRecord({__type:'generator-testu-zadani',formatVersion:1,appVersion:RELEASE.version,exportedAt:new Date().toISOString(),dom,state:getStoredState()})}
 function exportZadani(){try{const data=buildZadaniExport(),slug=(trim('nazev')||'zadani').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'zadani',ts=new Date().toISOString().slice(0,10);downloadBlobFile(JSON.stringify(data,null,2),'zadani_'+slug+'_'+ts+'.json','application/json;charset=utf-8');const files=Array.isArray(state.fileNames)&&state.fileNames.length>0;uiToast(files?'Zadání exportováno. Přílohy pošli zvlášť.':'Zadání exportováno. Pošli JSON kolegovi.',files?'warn':'ok',5500)}catch(err){uiToast('Export zadání selhal: '+(err?.message||err),'warn')}}
-async function importZadaniFile(inp){const f=inp?.files?.[0];if(!f)return;try{if(f.size>MAX_ZADANI_IMPORT_BYTES)throw new Error('Soubor zadání je větší než 512 kB.');const data=JSON.parse(await readBlobAsText(f));if(!data||data.__type!=='generator-testu-zadani'||data.formatVersion!==1||!data.state){uiToast('Tento soubor není platné exportované zadání.','warn',5500);return}if(!await uiConfirm('Načíst zadání a přepsat aktuální formulář?','Načíst zadání od kolegy?',true))return;applyImportedZadani(data);uiToast('Zadání načteno'+(data.appVersion?' (verze '+esc(String(data.appVersion))+')':'')+'. Přístupový kód ani přílohy se nepřenášejí.','ok',6500)}catch(err){uiToast('Soubor se nepodařilo načíst: '+(err?.message||err),'warn',5500)}finally{if(inp)inp.value=''}}
-function applyImportedZadani(data){replaceStateFromUntrusted(data.state);if(!state.urls?.length)state.urls=[''];fileObjects=[];fileReadPromises=[];state.fileNames=[];if(state.zadaniTab==='file')state.zadaniTab='text';if(!state.exerciseConfig)state.exerciseConfig=[];if(typeof state.exerciseDetail!=='boolean')state.exerciseDetail=false;if(!state.tema)state.tema='modern';if(!state.resultMode)state.resultMode='instant';if(!state.layout)state.layout='tabs';normalizeLoadedState(state);enforceModeConstraints();safeDomEntries(data.dom).forEach(([k,v])=>setVal(k,v));SENSITIVE_FIELD_IDS.forEach(id=>setVal(id,''));if(typeof showFileError==='function')showFileError('');maxStep=0;goTo(0);applyVisualState();if(typeof renderGroups==='function')renderGroups();if(typeof renderTeacherMapping==='function')renderTeacherMapping();validate();saveSnapshot()}
+async function importZadaniFile(inp){const f=inp?.files?.[0];if(!f)return;try{if(f.size>MAX_ZADANI_IMPORT_BYTES)throw new Error('Soubor zadání je větší než 512 kB.');const data=JSON.parse(await readBlobAsText(f));if(!data||data.__type!=='generator-testu-zadani'||data.formatVersion!==1||!data.state){uiToast('Tento soubor není platné exportované zadání.','warn',5500);return}if(!await uiConfirm('Načíst zadání a přepsat aktuální formulář?','Načíst zadání od kolegy?',true))return;applyImportedZadani(data);uiToast('Zadání načteno'+(data.appVersion?' (verze '+esc(String(data.appVersion))+')':'')+'. Teacher/Admin secret, Recovery kód ani přílohy se nepřenášejí.','ok',6500)}catch(err){uiToast('Soubor se nepodařilo načíst: '+(err?.message||err),'warn',5500)}finally{if(inp)inp.value=''}}
+function applyImportedZadani(data){const cleanData=sanitizeStoredRecord(data);replaceStateFromUntrusted(cleanData.state);if(!state.urls?.length)state.urls=[''];fileObjects=[];fileReadPromises=[];state.fileNames=[];if(state.zadaniTab==='file')state.zadaniTab='text';if(!state.exerciseConfig)state.exerciseConfig=[];if(typeof state.exerciseDetail!=='boolean')state.exerciseDetail=false;if(!state.tema)state.tema='modern';if(!state.resultMode)state.resultMode='instant';if(!state.layout)state.layout='tabs';normalizeLoadedState(state);enforceModeConstraints();safeDomEntries(cleanData.dom).forEach(([k,v])=>setVal(k,v));SENSITIVE_FIELD_IDS.forEach(id=>setVal(id,''));if(typeof showFileError==='function')showFileError('');maxStep=0;goTo(0);applyVisualState();if(typeof renderGroups==='function')renderGroups();if(typeof renderTeacherMapping==='function')renderTeacherMapping();validate();saveSnapshot()}
 async function deleteTemplate(id){if(!await uiConfirm('Smazat šablonu?','Smazat šablonu?',true))return;saveTemplates(loadTemplates().filter(t=>t.id!==id));renderTemplates()}
 function renderTemplates(){const t=loadTemplates(),s=$('templatesStrip'),l=$('tplList'),c=$('tplCount');if(!t.length){s.classList.add('hidden');return}s.classList.remove('hidden');c.textContent='('+t.length+')';const R={instant:'⚡ okamžitá známka',secureOffline:'🔒 verifier'},F={none:'bez zpět. vazby',brief:'stručná zpět. vazba',learning:'učící zpět. vazba'},D={basic:'podpora',challenge:'challenge'};l.innerHTML=t.map(x=>{const a=x.format==='prefill_v3'||x.format==='prefill_v2',p=x.format==='profile_v1',n=a||p,v=(a?x.prefill:x.profile)||{},bad=[];if(n){if(R[v.resultMode])bad.push(R[v.resultMode]);if(F[v.feedbackMode])bad.push(F[v.feedbackMode]);if(D[v.differentiationLevel])bad.push(D[v.differentiationLevel]);if(v.diferencovany==='ANO'&&v.skupinyCount>0)bad.push(v.skupinyCount+' skupiny')}return '<div class="tpl-card"><div class="tpl-card-head"><span class="tpl-card-name">'+esc(x.name)+'</span><div class="tpl-card-btns"><button class="tpl-load" onclick="loadTemplate('+x.id+')" title="Načíst šablonu">'+(a?'📄 Načíst':p?'📄 Načíst profil':'📄 Načíst starou')+'</button><button class="tpl-del" onclick="deleteTemplate('+x.id+')" title="Smazat šablonu">✕</button></div></div>'+(bad.length?'<div class="tpl-badges">'+bad.map(y=>'<span class="tpl-badge">'+esc(y)+'</span>').join('')+'</div>':'')+(x.why?'<div class="preset-modal-why" style="margin-top:7px"><strong>Logika šablony:</strong> '+esc(x.why)+'</div>':'')+(p?'<div class="tpl-old-note">Starší profil — ulož znovu pro plné předvyplnění.</div>':!n?'<div class="tpl-old-note">Starý formát — po načtení ulož znovu.</div>':'')+'</div>'}).join('')}
 // ═══ History ══════════════════════════════════════════════════════════════════
@@ -727,7 +775,7 @@ function pushHistory(prompt) {
   } catch(_){ }
 }
 function saveHistory(hist) {
-  return safeSetItem(HIST_KEY, JSON.stringify(hist));
+  return safeSetItem(HIST_KEY, JSON.stringify(sanitizeStoredArray(hist)));
 }
 async function clearHistory() {
   const ok = await uiConfirm('Vymazat historii promptů v tomto prohlížeči?', 'Vymazat historii?', true);
@@ -776,7 +824,7 @@ function copyHistItem(i) {
   if (!h) return;
   const text = h.prompt || '';
   if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(text).then(() => uiToast('Očištěný prompt zkopírován. Hesla/PIN nejsou v historii uložené.', 'ok', 4200)).catch(() => fallbackCopy(text));
+    navigator.clipboard.writeText(text).then(() => uiToast('Očištěný prompt zkopírován. Teacher/Admin secret ani Recovery kód nejsou v historii uložené.', 'ok', 4200)).catch(() => fallbackCopy(text));
   } else { fallbackCopy(text); }
 }
 
@@ -790,7 +838,7 @@ async function loadFromHistory(i) {
   if (!ok) return;
   replaceStateFromUntrusted(h.state);
   if (!state.urls?.length) state.urls = [''];
-  // Historie neukládá přílohy ani hesla/PIN — vyčistíme runtime stav i UI.
+  // Historie neukládá přílohy ani raw Teacher/Admin/Recovery credentialy — vyčistíme runtime stav i UI.
   fileObjects = [];
   fileReadPromises = [];
   state.fileNames = [];

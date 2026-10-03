@@ -47,7 +47,7 @@ def run():
        click_attr(s,'onclick','confirmSubmit()');click_attr(s,'onclick','doSubmit()');s.wait_for_function('!document.getElementById("resultScreen").classList.contains("hidden")')
       else:
        click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('typeof ANSWER_TXT==="string" && ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt);assert sc['earned']==sc['total']==12*len(chunk),sc
-       v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('document.getElementById("resultTable").textContent.includes("QA")')
+       v.locator('[data-v2-panel="results"]').click();v.locator('#fallbackImportDetails').evaluate('el=>{el.open=true}');v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('document.getElementById("resultTable").textContent.includes("QA")')
       assert s.evaluate('__errors')==[],s.evaluate('__errors')
       st=p.evaluate('async()=>await runScoringSelfTest()');assert st['ok'] and not st['hasGaps'],st
       row.update(ok=True,score={'earned':sc['earned'],'total':sc['total']},selfTest=st)

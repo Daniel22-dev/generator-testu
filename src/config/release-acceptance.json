@@ -2,8 +2,8 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.71",
-  "releaseStatus": "stage-b-teacher-verifier-2-release-candidate",
+  "appVersion": "7.1.76",
+  "releaseStatus": "security-remediation-r6-release-candidate",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
@@ -39,19 +39,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "D8-FINAL-AUDIT-CLEANUP-2026-10-02",
+  "revision": "SECURITY-REMEDIATION-R6-2026-10-02",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "D8 final source candidate over certified 7.1.70 baseline; local static contracts complete, exact-lockfile GitHub P5 and full Journey E2E remain final promotion authority for 7.1.71",
-    "note": "D8 adds a mandatory final A-D audit gate, removes only proven-dead legacy helpers/state and corrects stale long-source guidance while preserving backward migration of old saved template IDs. D1-D7 runtime/security contracts remain intact.",
+    "transport": "7.1.76 remediation candidate over independently audited 7.1.75; R0-R5 fixes are integrated, dependency-free gates and diagnostic Chromium validation run locally. Exact-lockfile npm ci/npm test and CI/deployment remain external promotion authority because registry access is blocked in this sandbox.",
+    "note": "7.1.76 fixes the 7.1.75 Verifier syntax break, closes applySettingsWithoutAi credential-policy bypass, repairs stale regression fixtures, adds real adversarial gates, serializes Recovery unlock, corrects instant warning semantics, and refreshes known vulnerable dev-toolchain transitive resolutions. Unavailable exact-lockfile/deployment checks are not claimed as PASS.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "Candidate 7.1.71 closes D1-D8 with final A-D audit and conservative dead/stale cleanup. GitHub candidate CI remains the final promotion authority for this new SHA.",
+  "note": "7.1.76 R6 source candidate prepared for independent exact-lockfile verification. Promotion requires npm ci, npm test, qa:d7:ci, R5 adversarial 0 FAIL/0 ERROR and post-deploy checks.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

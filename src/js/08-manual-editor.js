@@ -653,7 +653,7 @@ function stRpcBridgeHtml(html, nonce){
   const allowed=['scorePayload','decryptPayload','parseTxt','correctIndex','encryptPayloadForTeacher','calcScore','calcScoreFromAnswers','scoreItem'];
   const cfg=JSON.stringify({nonce:String(nonce),allowed}).replace(/</g,'\\u003C');
   const bridge='<script>(function(){"use strict";const C='+cfg+';const A=new Set(C.allowed);'
-    +'addEventListener("message",async function(ev){const d=ev.data;if(!d||d.__ghrabSelfTestRpc!==C.nonce||!d.id)return;'
+    +'addEventListener("message",async function(ev){if(ev.source!==parent)return;const d=ev.data;if(!d||d.__ghrabSelfTestRpc!==C.nonce||!d.id)return;'
     +'let ok=true,result=null,error="";try{if(d.name==="__has__"){const names=Array.isArray(d.args&&d.args[0])?d.args[0]:[];result=names.every(function(n){return A.has(n)&&typeof window[n]==="function";});}'
     +'else{if(!A.has(d.name)||typeof window[d.name]!=="function")throw new Error("RPC function is not allowed");result=await window[d.name].apply(window,Array.isArray(d.args)?d.args:[]);}}'
     +'catch(e){ok=false;error=String(e&&e.message?e.message:e);}parent.postMessage({__ghrabSelfTestRpc:C.nonce,id:d.id,ok:ok,result:result,error:error},"*");});})();<\/script>';

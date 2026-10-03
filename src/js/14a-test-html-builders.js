@@ -367,7 +367,7 @@ function buildModalsHtml(cfg) {
     '<div id="messageModal" class="modal-ov hidden"><div class="modal-box">' +
     '<div class="modal-title" id="messageTitle"></div><div id="messageBody" class="modal-body"></div>' +
     '<div class="modal-btn-row"><button class="btn-modal-ok" onclick="closeModal(\'messageModal\')">' + H(L.ok) + '</button></div></div></div>' +
-    ((cfg.hasUnlock || cfg.testMode === 'prisny') ?
+    ((cfg.hasRecoveryUnlock || cfg.testMode === 'prisny') ?
       '<div id="lockScreen" class="lock-ov hidden"><div class="lock-card">' +
       '<div class="lock-icon" id="lockIcon" onclick="lockTap()" style="cursor:pointer;user-select:none;-webkit-user-select:none">&#128274;</div><div class="lock-title">' + H(L.locked) + '</div>' +
       '<div class="lock-reason" id="lockContactMsg">' + H(L.lockContact || 'Kontaktuj učitele.') + '</div>' +

@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
-  actions: write
+  contents: read
 
 concurrency:
   group: generator-safe-promotion
@@ -17,6 +15,11 @@ concurrency:
 jobs:
   candidate-gate:
     name: candidate-gate
+    # Needs actions:write to cancel superseded runs and pull-requests:write to create/reuse the promotion PR; repository contents remain read-only.
+    permissions:
+      contents: read
+      actions: write
+      pull-requests: write
     if: github.ref == 'refs/heads/candidate'
     runs-on: ubuntu-latest
     outputs:
@@ -84,7 +87,7 @@ jobs:
       - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 91b43520bcb5a6c70575a5c8bea211c5b837b6133d3812e138cdcc18ec65c99e
+          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
 
       - name: Upload candidate QA evidence
         if: always()
@@ -153,6 +156,10 @@ jobs:
 
   pr-certification:
     name: pr-certification
+    # Certification only reads the exact PR/SHA and repository contents; it does not mutate either.
+    permissions:
+      contents: read
+      pull-requests: read
     needs: candidate-gate
     if: needs.candidate-gate.outputs.fresh == 'true' && needs.candidate-gate.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
@@ -223,7 +230,7 @@ jobs:
         if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 91b43520bcb5a6c70575a5c8bea211c5b837b6133d3812e138cdcc18ec65c99e
+          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
 
       - name: Upload PR certification evidence
         if: always() && steps.pr_freshness.outputs.current == 'true'
@@ -253,6 +260,11 @@ jobs:
 
   promote:
     name: promote-certified-pr
+    # Final promotion must read Actions status, merge the certified PR, and synchronize candidate to the resulting main SHA.
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
     needs: [candidate-gate, pr-certification]
     if: needs.candidate-gate.outputs.fresh == 'true' && needs.pr-certification.outputs.eligible == 'true'
     runs-on: ubuntu-latest

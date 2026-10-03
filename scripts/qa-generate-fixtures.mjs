@@ -58,8 +58,9 @@ function configure(name, secure) {
   setField("proKoho", "2.A – QA");
   setField("latka", "Present Perfect a čtení s porozuměním");
   setField("ucitelJmeno", "QA učitel");
-  setField("ucitelPin", "482915");
-  setField("heslo", "QA-LOCK-2026");
+  setField("ucitelPin", "TEACH-QA-123456");
+  setField("recoveryCode", "REC-QA12-3456");
+  setField("heslo", "");
   w.eval(`Object.assign(state, {
     appMode:'advanced', jazyk:'angličtina', instrJazyk:'cs', uroven:['B1'], kombinovat:false,
     pocet:1, typyCviceni:['multiple choice'], cas:15, odevzdavani:'B', randomizace:'NE',

@@ -1,5 +1,8 @@
 // Deterministic test data. These fixtures replace ONLY the AI provider boundary.
 // They do not claim to validate a live model's linguistic or didactic quality.
+// F2 / 7.1.76: audit credentials mirror the production privilege model: Teacher/Admin and Recovery are independent.
+window.AUDIT_TEACHER_SECRET='AUDIT-TEACH-482957';
+window.AUDIT_RECOVERY_CODE='AUDIT-RECOVERY-847362';
 window.auditFixtureItem=function(type,index,language){
  const lex={en:['water','river'],es:['agua','r\u00edo'],de:['Wasser','Fluss'],fr:['eau','rivi\u00e8re'],la:['aqua','flumen'],cs:['voda','\u0159eka']};
  const [a,b]=lex[language]||lex.en, explain='Audit fixture '+index;
@@ -37,7 +40,7 @@ window.auditFixtures=function(st,language){
 };
 window.auditConfigure=function(types,mode,lang,instr,count){
  Object.assign(state,{appMode:'advanced',simpleTemplate:'',jazyk:({en:'angli\u010dtina',es:'\u0161pan\u011bl\u0161tina',de:'n\u011bm\u010dina',fr:'francouz\u0161tina',la:'latina',cs:'\u010de\u0161tina'})[lang||'en'],instrJazyk:instr||'target',uroven:['B1'],kombinovat:false,pocet:types.length,typyCviceni:types,cas:30,odevzdavani:'B',randomizace:'NE',testMode:'bezny',layout:'scroll',resultMode:mode||'instant',identityMode:'name',body:types.length*12,feedbackMode:'brief',screenGuard:false,tema:'examBlue',zolicek:'NE',diferencovany:'NE',skupiny:[],overeni:'NE',anonymizace:'ANO',fuzzyTolerance:'off',exerciseDetail:true,exerciseConfig:types.map(t=>({typ:t,pocetOtazek:scoringTypeFor(t)==='categorisation-board'?1:(count||2),body:12})),splitGenerate:false,formsSubmissionUrl:''});
- for(const [id,val] of Object.entries({nazev:'AUDIT TEST',proKoho:'QA',latka:'Language fixture test',ucitelJmeno:'Audit Teacher',ucitelPin:'AUDIT-TEACH-482957',heslo:'AUDIT-TEACH-482957',vlastniSkala:'',vlastniTyp:'',listeningTranscript:'water river'})){const el=$(id);if(el)el.value=val;}
+ for(const [id,val] of Object.entries({nazev:'AUDIT TEST',proKoho:'QA',latka:'Language fixture test',ucitelJmeno:'Audit Teacher',ucitelPin:window.AUDIT_TEACHER_SECRET,recoveryCode:window.AUDIT_RECOVERY_CODE,heslo:'',vlastniSkala:'',vlastniTyp:'',listeningTranscript:'water river'})){const el=$(id);if(el)el.value=val;}
  state.listeningTranscript='water river';
 };
 window.auditBuild=async function(types,mode,lang,instr,count){

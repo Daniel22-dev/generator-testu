@@ -1,4 +1,52 @@
-## 7.1.71 — 2026-10-02 — D8 / finální audit a konzervativní cleanup
+## 7.1.76 — 2026-10-02 — remediation po nezávislém auditu 7.1.75
+
+- opraven Teacher Verifier: generované inline skripty znovu syntakticky validní; nový generated-script gate by původní 7.1.75 shodil;
+- credential policy je centralizovaná a fail-closed v UI, `applySettingsWithoutAi()` i `assembleTestHtml()`, takže Teacher/Admin secret nelze přes drift cestu sjednotit s Recovery kódem ani oslabit;
+- D7 fixture a workflow regression matrix odpovídají novému dvou-credential modelu; E6 vakuové kontroly byly nahrazeny skutečnými runtime cestami;
+- přidán behaviorální adversarial gate nad generátorem, instant/secure runtime a Verifierem;
+- Recovery unlock je serializován locked/busy guardem, takže dvojklik ani odemknutí nezamčeného testu nevytváří falešné auditní události;
+- instant `warningCount` nyní počítá pouze warning-class události, nikoli všechny security/audit eventy;
+- dev-toolchain lockfile posouvá `brace-expansion` 5.0.9 → 5.0.12 a `undici` 7.29.0 → 7.29.1 v rámci stávajících transitive semver rozsahů;
+- sandbox nemá přístup k npm registru, proto exact-lockfile `npm ci/npm test` není lokálně vydáváno za PASS a zůstává povinnou externí promotion gate.
+
+## 7.1.75 — 2026-10-02 — oddělení Teacher/Admin a Classroom Recovery credentialů
+
+- původní společný učitelský/odemykací secret je rozdělen na dva nezávislé per-test credentialy; Teacher/Admin secret zůstává soukromý a Classroom Recovery Code má jedinou pravomoc odemknout aktuální bezpečnostní lock;
+- derivace používá oddělené PBKDF2 domény `teacher-pin|<testId>` a `recovery-code|<testId>`; recovery kód jiného testu ani stejné plaintextové heslo v jiné roli nepřekračuje autentizační hranici;
+- secure i instant runtime používají role-specific ověřování; Recovery Code neotevře teacher panel, nepovolí další pokus a nezruší rozpracovaný pokus jiné identity;
+- recovery unlock zachovává `attemptId`, absolutní deadline, identity hash, variantu, žolíka, odpovědi a předchozí securityEvents; opakované LOCK → RECOVERY UNLOCK cykly jsou forenzně rekonstruovatelné;
+- Teacher Verifier vykazuje úspěšný Recovery Unlock jako auditní informaci, nikoli automatický důkaz podvodu, a exportuje jeho počet i časovou osu;
+- persistence, legacy migrace, šablony, historie, export zadání a manual/AI workflow rekurzivně sanitizují Teacher/Admin i Recovery raw hodnoty; AI workflow používá pouze lokální placeholdery;
+- přidány regresní gate E1–E6 včetně adversarial privilege/replay/leak testů; existující žolík, iPadOS keyboard-dismiss, Google Forms/Verifier a PDF kontrakty zůstávají součástí release matice;
+- sandbox nemohl provést síťový `npm ci`, takže exact-lockfile `npm test` a build-dependent runtime gates nejsou v lokálním reportu vydávány za PASS a musí být potvrzeny nezávisle/CI.
+
+## 7.1.74 — 2026-10-02 — zpevnění workflow žolíka
+
+- bezpečný studentský runtime po prvním startu zapečetí do lokálního stavu identitu pokusu, volbu žolíka, `attemptId`, absolutní časový limit a stav případného zámku;
+- běžný reload/znovuotevření proto obnoví tentýž pokus a původní volbu žolíka; nelze přejít z „Dělám test“ na „Beru si žolíka“ po spatření otázek ani restartovat časovač;
+- pokus se stejným testem, ale jinou identitou na témže zařízení vyžaduje explicitní učitelský reset; pokud prohlížeč nedovolí stav pokusu spolehlivě uložit, bezpečný test se fail-closed nespustí;
+- volba „Beru si žolíka“ má před startem vlastní potvrzovací krok;
+- Teacher Verifier rozlišuje kryptograficky platné/reviewable výsledky od klasifikačních výsledků: žolík zůstává dohledatelný a bezpečnostně auditovatelný, ale nevstupuje do průměru, distribuce známek ani položkové analýzy;
+- výsledkové CSV zachovává žolíkové řádky, ale přidává `classification_status`, `joker_used` a `joker_selected_at`, takže se informace při exportu neztratí;
+- bezpečnostní signál podezřele krátkého času se vyhodnocuje i u žolíka a nový regresní kontrakt hlídá celé workflow;
+- D7 nově obsahuje samostatný klikací Chromium regresní test žolíka: reload nesmí změnit volbu ani deadline/attempt ID, jiná identita je blokována a selhání persistence je fail-closed.
+
+## 7.1.73 — 2026-10-02 — iPadOS klávesnice + workflow Verifieru
+
+- iPadOS/WebKit zavření softwarové klávesnice systémovým tlačítkem už v přísném ani rychlém runtime nevyvolá falešný zámek, pokud stránka zůstává viditelná a blur bezprostředně navazuje na editaci/změnu `visualViewport`;
+- skutečné `visibilitychange=hidden`, `pagehide`, `beforeunload` a split-screen monitoring zůstávají aktivní;
+- Teacher Verifier řadí Google Forms CSV jako první a doporučenou cestu, zatímco `answers.txt` / vložená záloha je druhá nouzová cesta;
+- rozhraní vysvětluje ZIP → rozbalit → vybrat `.csv`; Excel ani asociace/ikona souboru ve Windows nejsou pro import potřeba;
+- importy a exporty dávají viditelnou zpětnou vazbu a nový `check-runtime-ux-regressions` hlídá tyto kontrakty v `npm test`.
+
+## 7.1.72 — 2026-10-02 — GARP 2.8 hardening + PDF layout
+
+- `sync-ghrab-ai-core.yml`: read-only verify job oddělen od jediného publish jobu se zápisem; `npm ci` běží bez lifecycle skriptů a checkout bez přetrvávajícího tokenu.
+- `safe-promotion.yml`: oprávnění jsou minimální po jednotlivých jobech.
+- Přidán same-origin frame guard, `postMessage` bridge kontroluje rodičovský zdroj a error reporter rediguje holé Google API klíče i `?key=` parametry.
+- Přímé PDF používá konzistentní horní/dolní okraj na každé stránce a nové cvičení nezačne osamoceným nadpisem těsně před koncem stránky.
+
+## 7.1.72 — 2026-10-02 — D8 / finální audit a konzervativní cleanup
 
 - přidán povinný finální audit A–D (`check:d8-final-audit`) s 29 kontrolami a zapojen do `qa:p5` i `qa:p5:ci`;
 - potvrzeny generátorové kontrakty šablon, Reading/Listening count, multimodální routing, diferenciace a content drift;

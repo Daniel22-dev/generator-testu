@@ -516,6 +516,15 @@ const SecretScanner = (function(){
     {rule:'openai-key', re:/sk-[A-Za-z0-9_-]{20,}/, msg:'API klíč (sk-…)'},
     {rule:'inline-credential', re:/(apiKey|api_key|token|secret|password)\s*[:=]\s*["'](?=[^"']*\d)[^"'\s]{12,}["']/i, msg:'inline přihlašovací údaj'}
   ];
+  // E5: tyto hodnoty nesmí být v žádném distribuovaném HTML jako raw credential.
+  // Hashové názvy (ucitelPinHash/recoveryCodeHash) jsou záměrně povolené; reguláry
+  // cílí jen na přesné raw field/variable names nebo lokální placeholdery.
+  const RAW_TEST_CREDENTIAL_REGEXES = [
+    {rule:'raw-teacher-admin-credential', re:/(?:["']?(?:ucitelPin|teacherAccessCode|teacherAdminSecret|teacherSecret)["']?\s*[:=]\s*["'][^"']+["'])/i, msg:'raw Teacher/Admin credential'},
+    {rule:'raw-recovery-credential', re:/(?:["']?(?:recoveryCode|classroomRecoveryCode)["']?\s*[:=]\s*["'][^"']+["'])/i, msg:'raw Classroom Recovery credential'},
+    {rule:'raw-legacy-unlock-credential', re:/(?:["']?(?:heslo|unlockPassword|unlockCode)["']?\s*[:=]\s*["'][^"']+["'])/i, msg:'raw legacy unlock credential'},
+    {rule:'credential-placeholder-leak', re:/__(?:TEACHER_ADMIN_SECRET|CLASSROOM_RECOVERY_CODE)_DOPLN_LOKALNE__/i, msg:'lokální credential placeholder'}
+  ];
 
   function finding(severity, rule, message, needle){ return {severity, rule, message, needle}; }
   function has(content, needle){ return content.indexOf(needle) >= 0; }
@@ -532,6 +541,10 @@ const SecretScanner = (function(){
         if (target === 'teacher' && r.rule === 'pem-private-key') return;
         out.push(finding('BLOCK', r.rule, 'Vypadá to jako '+r.msg+' v exportovaném souboru.', r.msg));
       }
+    });
+
+    RAW_TEST_CREDENTIAL_REGEXES.forEach(r=>{
+      if (r.re.test(content)) out.push(finding('BLOCK', r.rule, 'Export obsahuje '+r.msg+'. Do distribuovaného souboru patří pouze odvozené per-test hash hodnoty.', r.msg));
     });
 
     MASTERKEY_NEEDLES.forEach(n=>{ if (has(content, n)) out.push(finding('BLOCK','master-key','Export obsahuje název master/root klíče („'+n+'“). Master klíč se nesmí dostat do žádného souboru.', n)); });
@@ -623,6 +636,10 @@ const SecretScanner = (function(){
       {n:'R8: GitHub token blokuje ve studentském souboru',target:'student',fn:'student_test.html',c:'const t="'+fakeGithubToken+'";',expect:false},
       {n:'R9: běžná věta z textu (secret: s mezerami) studentský soubor NEblokuje',target:'student',fn:'student_test.html',c:'<div class="src">The agent revealed the secret: "the meeting is tonight" and left.</div>',expect:true},
       {n:'R10: reálný inline klíč (apiKey bez mezer, s číslicí) blokuje',target:'student',fn:'student_test.html',c:'const cfg={apiKey:"'+fakeInlineCredential+'"};',expect:false},
+      {n:'R11: raw Teacher/Admin credential ve studentském HTML blokuje',target:'student',fn:'student_test.html',c:'const ucitelPin="TEACH-RAW-123456";',expect:false},
+      {n:'R12: raw Recovery Code ve studentském HTML blokuje',target:'student',fn:'student_test.html',c:'const recoveryCode="REC-AB12-CD34";',expect:false},
+      {n:'R13: lokální credential placeholder ve studentském HTML blokuje',target:'student',fn:'student_test.html',c:'const x="__CLASSROOM_RECOVERY_CODE_DOPLN_LOKALNE__";',expect:false},
+      {n:'R14: odvozené hash fieldy jsou povolené',target:'student',fn:'student_test.html',c:'const cfg={ucitelPinHash:"abc",recoveryCodeHash:"def"};',expect:true},
     ];
     var pass=0, fail=0;
     var results = cases.map(function(tc){

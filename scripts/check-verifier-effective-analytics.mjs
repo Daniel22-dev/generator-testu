@@ -42,6 +42,7 @@ const names = [
   'normStudentKey',
   'rebuildDuplicateState',
   'duplicateInfo',
+  'resolvedResults',
   'effectiveResults',
   'unresolvedAttemptConflicts',
   'iaPearson',
@@ -55,10 +56,10 @@ const names = [
 const ctx = vm.createContext({ console });
 vm.runInContext(`var RESULTS=[]; var ATTEMPT_DECISIONS=new Map();\n${names.map(extractFunction).join('\n')}`, ctx);
 
-function row({student, digest, attempt, pct, grade, earned, group='__default', ok=true, answer='x'}) {
+function row({student, digest, attempt, pct, grade, earned, group='__default', ok=true, answer='x', jokerUsed=false}) {
   return {
     status: 'OK', student, submissionDigest: digest, attemptId: attempt,
-    pct, grade, earned, total: 10, groupKey: group,
+    pct, grade, earned, total: 10, groupKey: group, jokerUsed,
     details: [{ex:1,q:1,prompt:'Q1',type:'multiple choice',pts:ok?1:0,total:1,ok,student:answer}],
   };
 }
@@ -111,6 +112,17 @@ assert(s.unresolved.length === 0, 'resolved attempt: konflikt po výběru zmizí
 assert(s.effective.length === 2 && s.effective.includes('a-new') && !s.effective.includes('a-old'), 'resolved attempt: započítá se jen zvolený pokus');
 assert(s.distribution.n === 2 && s.distribution.mean === 75, 'resolved attempt: distribuce používá zvolený pokus');
 assert(s.items.length === 1 && s.items[0].n === 2, 'resolved attempt: položková analýza používá zvolený pokus');
+
+// 4) Joker remains reviewable but is excluded from classification analytics.
+load([
+  row({student:'Alice',digest:'a1',attempt:'A1',pct:80,grade:2,earned:8,ok:true}),
+  row({student:'Bob',digest:'b-joker',attempt:'BJ',pct:20,grade:5,earned:2,ok:false,answer:'z',jokerUsed:true}),
+]);
+s = snap();
+assert(ctx.resolvedResults().length === 2, 'joker: resolvedResults zachová žolíkový výsledek pro kontrolu');
+assert(s.effective.length === 1 && s.effective[0] === 'a1', 'joker: effectiveResults vyřadí žolíka z klasifikace');
+assert(s.distribution.n === 1 && s.distribution.mean === 80, 'joker: třídní statistika žolíka nezapočítá');
+assert(s.items.length === 1 && s.items[0].n === 1, 'joker: položková analýza žolíka nezapočítá');
 
 // Contract guard: all analytics entry points must use the same authority.
 const distributionSource = extractFunction('distributionStats');

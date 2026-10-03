@@ -294,7 +294,7 @@ async function validateGeneratedHtmlSmoke(html) {
   if (smokeHasExternalDep(text)) errors.push('obsahuje externí závislost; studentský test má být offline bez CDN/API');
   if (/\"type\"\s*:\s*\"(?:open answer|image description)\"/i.test(text)) errors.push('obsahuje vypnutý ručně hodnotitelný typ cvičení');
   if (/\"type\"\s*:\s*\"listening comprehension\"/i.test(text) && !/(transcript|audio_prompt|audio_source_note)/i.test(text)) errors.push('listening comprehension nemá transcript/audio_prompt/audio_source_note pro učitelskou kontrolu');
-  if (/\"ucitelPin\"\s*:|\"heslo\"\s*:|CFG\.ucitelPin\b|CFG\.heslo\b/.test(text)) errors.push('v HTML zůstalo staré raw pole pro PIN/heslo; má se používat pouze hash');
+  if (/\"ucitelPin\"\s*:|\"recoveryCode\"\s*:|\"heslo\"\s*:|CFG\.ucitelPin\b|CFG\.recoveryCode\b|CFG\.heslo\b|__(?:TEACHER_ADMIN_SECRET|CLASSROOM_RECOVERY_CODE)_DOPLN_LOKALNE__/.test(text)) errors.push('v HTML zůstalo raw pole nebo lokální placeholder pro Teacher/Admin či Recovery credential; smí se používat pouze odvozený hash');
   const scripts = [];
   text.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, (_, code) => { scripts.push(code); return ''; });
   if (!scripts.length) errors.push('chybí <script> s logikou testu');

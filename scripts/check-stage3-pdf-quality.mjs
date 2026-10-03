@@ -77,24 +77,33 @@ try {
   if (!contract.czechLabels) throw new Error('PDF markup neobsahuje očekávané české diakritické popisky');
 
   const pagination = await page.evaluate(async () => {
-    const W = 794, H = 1123;
+    const W = 794, H = 1123, M = 40, contentH = H - (M * 2);
     const stage = document.createElement('div');
     stage.style.cssText = 'position:fixed;left:-100000px;top:0;width:'+W+'px;background:#fff;z-index:-1';
     document.body.appendChild(stage);
     const root = stage.attachShadow({ mode: 'open' });
-    root.innerHTML = '<style>'+prtCss()+'.toolbar{display:none!important}.page{box-sizing:border-box;width:'+W+'px;max-width:none;padding:22px;font-family:Georgia,serif;color:#000;background:#fff;line-height:1.5}.variant{page-break-after:auto}</style><div class="page">'+prtVariantHtml('__default', true, false)+'</div>';
+    root.innerHTML = '<style>'+prtCss()+'.toolbar{display:none!important}.page{box-sizing:border-box;width:'+W+'px;max-width:none;padding:0 22px;font-family:Georgia,serif;color:#000;background:#fff;line-height:1.5}.variant{page-break-after:auto}</style><div class="page">'+prtVariantHtml('__default', true, false)+'</div>';
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     const logo = root.querySelector('.school-logo');
     if (logo && typeof logo.decode === 'function') { try { await logo.decode(); } catch {} }
     const paper = root.querySelector('.page');
     const rr = paper.getBoundingClientRect();
-    const cuts = pdf3PageCuts(paper, H);
+    const cuts = pdf3PageCuts(paper, contentH);
     const brokenQuestions = [];
     const brokenLines = [];
+    const orphanExerciseStarts = [];
     for (const cut of cuts.slice(1, -1)) {
       for (const el of paper.querySelectorAll('.q')) {
         const r = el.getBoundingClientRect(), top = r.top - rr.top, bottom = r.bottom - rr.top;
         if (top + 2 < cut && bottom - 2 > cut && r.height < H * 0.94) brokenQuestions.push({ cut, top, bottom });
+      }
+      for (const ex of paper.querySelectorAll('.ex')) {
+        const r = ex.getBoundingClientRect(), top = r.top - rr.top, bottom = r.bottom - rr.top;
+        if (!(top < cut && bottom > cut)) continue;
+        const first = ex.querySelector('.q,.match,.tbl,.src,.num-line,.ans-line');
+        if (!first) continue;
+        const fr = first.getBoundingClientRect(), firstBottom = fr.bottom - rr.top;
+        if (top + 2 < cut && firstBottom - 2 > cut) orphanExerciseStarts.push({ cut, top, firstBottom });
       }
       const walker = document.createTreeWalker(paper, NodeFilter.SHOW_TEXT);
       let node;
@@ -112,11 +121,13 @@ try {
     const logoRect = logo?.getBoundingClientRect();
     const logoOk = !!(logo && logo.naturalWidth > 0 && logo.naturalHeight > 0 && logoRect.width > 0 && logoRect.height > 0);
     stage.remove();
-    return { cuts, brokenQuestions, brokenLines, logoOk };
+    return { cuts, brokenQuestions, brokenLines, orphanExerciseStarts, logoOk, verticalMarginPx: M, contentHeightPx: contentH };
   });
   if (pagination.cuts.length < 3) throw new Error('quality fixture nevytvořila vícestránkový dokument');
   if (pagination.brokenQuestions.length) throw new Error(`stránkování řeže otázky: ${JSON.stringify(pagination.brokenQuestions)}`);
   if (pagination.brokenLines.length) throw new Error(`stránkování řeže textový řádek: ${JSON.stringify(pagination.brokenLines)}`);
+  if (pagination.orphanExerciseStarts.length) throw new Error(`stránkování nechává nadpis cvičení oddělený od prvního obsahu: ${JSON.stringify(pagination.orphanExerciseStarts)}`);
+  if (pagination.verticalMarginPx < 32) throw new Error(`vertikální PDF okraj je příliš malý: ${pagination.verticalMarginPx}px`);
   if (!pagination.logoOk) throw new Error('školní logo není v PDF DOM skutečně vykreslitelné');
 
   const pdfResults = [];
@@ -131,7 +142,7 @@ try {
     console.log(`PASS ${path.basename(file)} ${info.bytes} B / ${info.pages} stran`);
   }
   if (pageErrors.length) throw new Error(`browser pageerror: ${pageErrors.join(' | ')}`);
-  fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify({ schema: 'ghrab-stage3-pdf-quality-v1', status: 'passed', contract, pagination: { cuts: pagination.cuts, brokenQuestions: pagination.brokenQuestions.length, brokenLines: pagination.brokenLines.length, logoOk: pagination.logoOk }, pdfResults }, null, 2) + '\n');
+  fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify({ schema: 'ghrab-stage3-pdf-quality-v1', status: 'passed', contract, pagination: { cuts: pagination.cuts, brokenQuestions: pagination.brokenQuestions.length, brokenLines: pagination.brokenLines.length, orphanExerciseStarts: pagination.orphanExerciseStarts.length, verticalMarginPx: pagination.verticalMarginPx, contentHeightPx: pagination.contentHeightPx, logoOk: pagination.logoOk }, pdfResults }, null, 2) + '\n');
   console.log(`PASS pagination cuts: ${pagination.cuts.join(', ')}`);
   console.log('PASS Stage 3 PDF quality');
 } finally {
