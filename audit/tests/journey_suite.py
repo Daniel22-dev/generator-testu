@@ -377,7 +377,7 @@ try:
    sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(250)
    y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
    if y.count():y.first.click()
-   sp.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")',timeout=10000)
+   sp.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1") && !document.getElementById("done").classList.contains("hidden")',timeout=10000)
    backup=sp.locator('#answerBackup').input_value();sp.close();return url,backup
 
   url_a,backup_a1=student_submission(stu_a,'Student Alpha')
