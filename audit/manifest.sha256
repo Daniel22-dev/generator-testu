@@ -480,7 +480,7 @@ f770492edaab705df0b762da25f71c2f72b0a4b33fdf5eb2502bbfed35a08aa4  src/js/06-resu
 341efea694ee3523fb88c55b36ec1728fca3510f2303d4e86642f6047d5f5b6b  src/js/07-gemini.js
 6821f1a08f9c7d1ab949f86d3b84afa1f92643995871ede5072eca9bfe7adfe4  src/js/07z-ai-core-integration.js
 50248faa5b29570ab761b47fdda1384f3b3513a4122e9b17505b23104991f3e8  src/js/08-manual-editor.js
-5307e2ef388eb6e31a6ba31c8e5be9c01c9e29a081df38eff3d4296646d7d695  src/js/08a-output-workflow.js
+647b715c095be807cc13071d456f5687ca2ba964a77e2d61656794e419ad3e18  src/js/08a-output-workflow.js
 4d6fd22a34a944f7e542cfc1d56b2019f50c7b9a1207927f6b5f5c72e3f8bed9  src/js/09-selftest-keycheck.js
 0776bc578a3ef509f3f0ab323f8535a9ef7da007181496b11683d3f2d5010d06  src/js/10-testlab.js
 ba2c8b8ebe3c8aae84183f9fb1a1f6dbd9f4b007232cf8084601d396608c4647  src/js/11-preview-editor.js
@@ -491,7 +491,7 @@ a32104f2c3c3c7ba34e649fe1b15de5fee8cc154480401a1a5f1757e81719312  src/js/13a-sec
 cbf135fbc071f58cbba2c59874a1d429e00239935b4b36a3fcb645c826cb6b56  src/js/13b-secure-shared-scoring.js
 b7310cead6aa70649cd0827f4303467d68efd6d5d9b85fc6c5441ecced661c6f  src/js/13c-secure-package.js
 52b47d51a1ad9ff07c94b30a4d7b2f2d0946ef4a9ce5817a07ec9882a418e7fd  src/js/13d-secure-student-shell.js
-c73a92ba34168a8985b9f90cf2cece877243ac30d3fe6154f6596ea5ad74b80c  src/js/13e-secure-student-runtime.js
+7679d72e625d4686a0ae23e2ea0eb9046528a5ff26b771795e6a036a1ac8f49c  src/js/13e-secure-student-runtime.js
 1b3a6f77eac9f090ab4f8e5e00c444af62ab029db431a69f6d86781eb2d6cb5e  src/js/13ea-secure-verifier-forms.js
 8b70a26791849692f50e322d4e2bd69f3b857b5de4e3c8468ec6b7c562ec1daa  src/js/13eb-secure-teacher-verifier-v2-ui.js
 b346bbbffa0558d6173f99f7a2fc010ef6a95f759ccfb227cae470d6d5f98ecd  src/js/13f-secure-teacher-verifier.js
@@ -499,7 +499,7 @@ b346bbbffa0558d6173f99f7a2fc010ef6a95f759ccfb227cae470d6d5f98ecd  src/js/13f-sec
 ca94ee475d28b9f570891230e75972a968f55ed2bf91b89ffa803619395258db  src/js/13g-assemble-test-html.js
 260b63e483ed1aebbbffb370ff6843fb33fa715db3ae548ec925b13f8adfddd7  src/js/14-test-html-builders.js
 709ab72a3485ff2f36e95c47b9f4ef50bd0f473d7ca47ef51d699f0a2ba32643  src/js/14a-test-html-builders.js
-51f3b38e56886d6b747539704bcd04744f9de736c1d02c132f5106225ea26637  src/js/14b-instant-test-runtime.js
+f4aa43bacfcee1f04ab6226ad7f7a8e62db4d324abaaf81174bfe5c01205ab67  src/js/14b-instant-test-runtime.js
 df54a9e2afe8198f1606fc6656f4e47008fa4935d0b690b9df07ec5026699c33  src/js/14c-test-css.js
 47025b55d755b3408b6f68ac75aff84f8e25c0217827e77823dc221562ad979c  src/js/14d-generator-release-guides.js
 06303c2b3ef5a6c33d8cb31d0dd4a9e0128098d01f78947172cf41b9726cbb25  src/js/16-access.js

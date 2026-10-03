@@ -122,7 +122,11 @@ function renderSettingsDrift(){
   const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno')):[];
   el.classList.remove('hidden');
   if(!d.content&&credentialErrors.length){
-    el.innerHTML='⚠️ <b>Po vytvoření testu jsi změnil(a): '+esc(d.settings.join(', '))+'.</b> Nové nastavení nelze použít, dokud nejsou credentialy platné. '+esc(credentialErrors.join(' '));
+    el.textContent='';
+    el.append(document.createTextNode('⚠️ '));
+    const strong=document.createElement('b');
+    strong.textContent='Po vytvoření testu jsi změnil(a): '+d.settings.join(', ')+'.';
+    el.append(strong,document.createTextNode(' Nové nastavení nelze použít, dokud nejsou credentialy platné. '+credentialErrors.join(' ')));
     return;
   }
   el.innerHTML=d.content?'⚠️ <b>Obsah zadání se od vytvoření testu změnil.</b> Stažený test odpovídá původnímu zadání; pro nový obsah test vytvoř znovu.'
