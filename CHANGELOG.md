@@ -1,4 +1,13 @@
-## 7.1.76 — 2026-10-02 — remediation po nezávislém auditu 7.1.75
+## 7.1.76 — 2026-10-03 — R7 / E1 persistence + Verifier binding remediation
+
+- E1: active-attempt persistence pouziva podepsane HMAC zaznamy s monotoni revizi a sekundarni IndexedDB autoritou; tamper, local deletion a stale replay se fail-closed zablokuji;
+- E1: submitted attempt guard prezije smazani bezneho localStorage markeru a submit nejdriv flushne pending active zapis, aby nevznikl race se starsi revizi;
+- E1: rozpracovane odpovedi a answer-change stav se po legitimnim reloadu obnovi do interního stavu i viditelnych ovladacich prvku;
+- E1: Teacher Verifier pred scoringem overuje identity/code -> groupKey vazbu a odmitne cizi/neexistujici variantu;
+- E1: pridany staticky a isolated-browser adversarial regression gate; Teacher/Recovery privilege model zustava beze zmeny;
+- E1: uplne smazani vsech browser dat, jiny profil/zarizeni a arbitrary same-origin DevTools JS jsou explicitne platform limitation; real-browser file/offline compatibility zustava promotion gate.
+
+### R6 baseline — 2026-10-02
 
 - opraven Teacher Verifier: generované inline skripty znovu syntakticky validní; nový generated-script gate by původní 7.1.75 shodil;
 - credential policy je centralizovaná a fail-closed v UI, `applySettingsWithoutAi()` i `assembleTestHtml()`, takže Teacher/Admin secret nelze přes drift cestu sjednotit s Recovery kódem ani oslabit;

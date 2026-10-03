@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+import vm from 'node:vm';
+import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { setTimeout as sleep } from 'node:timers/promises';
+
+const ROOT=new URL('../',import.meta.url);
+const source=fs.readFileSync(new URL('src/js/13e-secure-student-runtime.js',ROOT),'utf8');
+const x=vm.createContext({});
+vm.runInContext(source+'\n;globalThis.__runtime=secureStudentScript();',x);
+const runtime=x.__runtime;
+if(typeof runtime!=='string'||!runtime.includes('loadSignedRecord'))throw new Error('secure runtime extraction failed');
+
+const oneTimeHash=createHash('sha256').update('GIT-IDENTITY-CODE-V1|qa-salt|code-1234').digest('base64url');
+function cfgFor(s){return {testId:'E1-REMED-'+s,manifestHash:'manifest-'+s,nazev:'E1 remediation',proKoho:'QA',cas:30,identityMode:s==='submitted'?'oneTimeCode':'name',identityCodeHashes:s==='submitted'?[oneTimeHash]:[],diffRosterSalt:'qa-salt',diffGroups:[],zolicek:true,randomizace:false,layout:'classic',publicKey:{kty:'RSA'},lockOnLeave:true,secureLabels:{jokerSelectedYes:'YES',jokerSelectedNo:'NO',jokerConfirmTitle:'confirm',jokerConfirmBody:'confirm joker',jokerConfirmUse:'yes',jokerConfirmBack:'back',jokerSealedChoice:'sealed',activeAttemptTitle:'active locked',activeAttemptHint:'active locked',activeAttemptReset:'reset',activeAttemptResetDone:'reset done',activeAttemptStorageError:'storage error',jokerReport:'JOKER',exercise:'Exercise',cryptoRequired:'WebCrypto required',deviceSelected:'Device',deviceAutoDetected:'Detected',deviceManuallySelected:'Selected',desktop:'PC',apple:'Apple',android:'Android',auto:'Auto',textEncoding:'Text',txtCreation:'TXT',crypto:'WebCrypto',env:'Environment',ok:'OK',usable:'Usable',risky:'Risky',unusable:'Bad',unsupported:'Unsupported',unavailable:'Unavailable',lockReason:'Reason',lockedEvent:'left',retryCode:'Teacher code',retryBad:'Bad code',close:'Close',invalidIdentityCode:'Invalid code',codeVerification:'Code verification'}};}
+const shim=`(function(){
+ var host=(parent&&parent!==window)?parent:window;
+ if(!host.__qaLocalStorage)host.__qaLocalStorage={};
+ if(!host.__qaIDBRecords)host.__qaIDBRecords={};
+ var local={getItem:function(k){return Object.prototype.hasOwnProperty.call(host.__qaLocalStorage,k)?String(host.__qaLocalStorage[k]):null;},setItem:function(k,v){host.__qaLocalStorage[k]=String(v);},removeItem:function(k){delete host.__qaLocalStorage[k];},clear:function(){host.__qaLocalStorage={};}};
+ Object.defineProperty(window,'localStorage',{value:local,configurable:true});
+ function makeDb(){return {
+   objectStoreNames:{contains:function(n){return n==='records';}},
+   createObjectStore:function(){return {};},
+   transaction:function(){
+     var tx={oncomplete:null,onerror:null,onabort:null,error:null};
+     tx.objectStore=function(){return {
+       get:function(k){var r={result:undefined,onsuccess:null,onerror:null};setTimeout(function(){try{r.result=host.__qaIDBRecords[k];if(r.onsuccess)r.onsuccess();}catch(e){if(r.onerror)r.onerror(e);}},0);return r;},
+       put:function(v,k){host.__qaIDBRecords[k]=JSON.parse(JSON.stringify(v));setTimeout(function(){if(tx.oncomplete)tx.oncomplete();},0);},
+       delete:function(k){delete host.__qaIDBRecords[k];setTimeout(function(){if(tx.oncomplete)tx.oncomplete();},0);}
+     };};
+     return tx;
+   }
+ };}
+ Object.defineProperty(window,'indexedDB',{value:{open:function(){var r={result:null,onupgradeneeded:null,onsuccess:null,onerror:null,error:null};setTimeout(function(){try{r.result=makeDb();if(r.onupgradeneeded)r.onupgradeneeded();if(r.onsuccess)r.onsuccess();}catch(e){r.error=e;if(r.onerror)r.onerror();}},0);return r;}},configurable:true});
+ function hashBytes(data,seed){var a=new Uint8Array(data),out=new Uint8Array(32),h=(2166136261^(seed||0))>>>0;for(var i=0;i<a.length;i++){h^=a[i];h=Math.imul(h,16777619)>>>0;h^=h>>>13;}for(var j=0;j<32;j++){h^=(j+1)*0x9e3779b1;h=Math.imul(h,0x5bd1e995)>>>0;out[j]=(h>>>((j%4)*8))&255;}return out;}
+ var keySeq=0;
+ var subtle={
+   digest:async function(_,data){return hashBytes(data,0).buffer;},
+   generateKey:async function(){return {__qaHmac:'K'+(++keySeq)+'-'+Date.now(),extractable:false};},
+   sign:async function(_,key,data){var kb=new TextEncoder().encode(String(key&&key.__qaHmac||'')),db=new Uint8Array(data),mix=new Uint8Array(kb.length+db.length);mix.set(kb);mix.set(db,kb.length);return hashBytes(mix.buffer,17).buffer;},
+   verify:async function(_,key,sig,data){var expected=new Uint8Array(await subtle.sign('HMAC',key,data)),got=new Uint8Array(sig);if(expected.length!==got.length)return false;var d=0;for(var i=0;i<got.length;i++)d|=expected[i]^got[i];return d===0;}
+ };
+ var qaCrypto={subtle:subtle,getRandomValues:function(a){for(var i=0;i<a.length;i++)a[i]=((Date.now()+i*2654435761)>>>0);return a;}};
+ Object.defineProperty(window,'crypto',{value:qaCrypto,configurable:true});
+})();`
+function htmlFor(s){const cfg=cfgFor(s);const variants=s==='responses'?{__default:[{type:'word order',title:'Word order',items:[{words:['Hello','world']}]},{type:'categorization',title:'Category',items:[{text:'Item',categories:['A','B']}]},{type:'multiple choice',title:'Choice',items:[{question:'Pick',options:['X','Y']}]},{type:'fill-in-the-blank',title:'Fill',items:[{sentence:'I ___ here.'}]}]}:{__default:[]};return `<!doctype html><html><head><meta charset="utf-8"><style>.hidden{display:none!important}.s-modal-bd{position:fixed;inset:0;background:#0008;z-index:99}.selected{outline:2px solid green}</style></head><body><section id="intro"><div id="envWarning" class="hidden"></div><div id="deviceDetectedTag"></div><div id="deviceChoice"><button class="device-btn" data-device="auto"></button></div><div id="deviceInstructions"></div><div id="deviceStatus"></div><button id="jokerNo" onclick="chooseJokerStart(false)">NO</button><button id="jokerYes" onclick="chooseJokerStart(true)">YES</button><div id="jokerChoiceConfirm"></div><input id="studentName"><button id="startBtn" onclick="startTest()">Start</button></section><section id="test" class="hidden"><span id="timer"></span><div id="a11yNote" class="hidden"></div><div id="jokerWatermark" class="hidden"></div><div id="exerciseArea"></div><div id="secureSubmitCard"></div><div id="submitError" class="hidden"></div></section><section id="done" class="hidden"><div id="jokerDoneBox" class="hidden"></div><textarea id="answerBackup"></textarea><div id="formsSubmissionBox"></div><div id="formsPayloadWarning"></div></section><div id="teacherModal" class="hidden"></div><div id="lockScreen" class="hidden"><div id="lockReasonBox"></div><div id="unlockReveal" class="hidden"></div><input id="unlockInp"></div><script>${shim}<\/script><script>'use strict';const CFG=${JSON.stringify(cfg)};const STUDENT_VARIANTS=${JSON.stringify(variants)};${runtime}<\/script></body></html>`;}
+
+function chromiumPath(){for(const p of ['/usr/bin/chromium','/usr/lib/chromium/chromium','/usr/bin/google-chrome'])if(fs.existsSync(p))return p;throw new Error('Chromium unavailable');}
+async function waitJson(url){for(let i=0;i<200;i++){try{const r=await fetch(url);if(r.ok)return await r.json();}catch{}await sleep(50);}throw new Error('Chromium debug timeout');}
+class Cdp{constructor(url){this.ws=new WebSocket(url);this.seq=0;this.pending=new Map();this.ready=new Promise((r,j)=>{this.ws.onopen=r;this.ws.onerror=j});this.ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&this.pending.has(m.id)){const p=this.pending.get(m.id);this.pending.delete(m.id);clearTimeout(p.t);m.error?p.j(new Error(JSON.stringify(m.error))):p.r(m.result);}}}async call(method,params={}){await this.ready;return new Promise((r,j)=>{const id=++this.seq,t=setTimeout(()=>{this.pending.delete(id);j(new Error('CDP timeout '+method));},30000);this.pending.set(id,{r,j,t});this.ws.send(JSON.stringify({id,method,params}));});}async eval(expression){const z=await this.call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true,userGesture:true});if(z.exceptionDetails)throw new Error(z.exceptionDetails.exception?.description||z.exceptionDetails.text);return z.result?.value;}close(){try{this.ws.close()}catch{}}}
+const must=(v,m)=>{if(!v)throw new Error('E1 BROWSER FAIL: '+m)};
+const pass=(m)=>console.log('PASS',m);
+async function wait(c,expr){for(let i=0;i<200;i++){if(await c.eval(expr))return true;await sleep(40);}return false;}
+const W="document.getElementById('qaFrame').contentWindow",D=W+'.document';
+const ce=(code)=>`${W}.eval(${JSON.stringify(code)})`;
+
+const debugPort=15500+(process.pid%300),profile=`/tmp/git-e1-remed-${process.pid}`;fs.rmSync(profile,{recursive:true,force:true});
+const chrome=spawn(chromiumPath(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--disable-extensions','--no-first-run','--remote-allow-origins=*',`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore',detached:true});
+let c;
+async function load(s){await c.eval(`document.getElementById('qaFrame').srcdoc=${JSON.stringify(htmlFor(s))}`);must(await wait(c,`${W}&&${ce("typeof startTest==='function'")}`),'runtime load '+s);}
+async function unload(){await c.eval(`document.getElementById('qaFrame').srcdoc='<html><body>blank</body></html>'`);await sleep(100);}
+async function fresh(s){await unload();await c.eval(`window.__qaLocalStorage={};window.__qaIDBRecords={};`);await load(s);}
+async function start(name,choose=true){await c.eval(`${D}.getElementById('studentName').value=${JSON.stringify(name)};${choose?`${D}.getElementById('jokerNo').click();`:''}${D}.getElementById('startBtn').click()`);must(await wait(c,`!${D}.getElementById('test').classList.contains('hidden')||!!${D}.querySelector('.s-modal-bd')`),'start outcome');}
+async function active(){return c.eval(ce(`(async()=>{await PERSIST_CHAIN;return {attempt:ATTEMPT_ID,deadline:TIMER_DEADLINE,locked:LOCKED,resp:RESP,local:JSON.parse(localStorage.getItem(storageKey('activeAttempt'))),key:storageKey('activeAttempt'),shadow:storageKey('activeAttemptShadow'),guard:storageKey('attemptGuard'),submitted:storageKey('submitted')}})()`));}
+async function quietUnload(){await c.eval(ce(`(async()=>{SUBMITTED=true;clearTimeout(TIMER_ID);if(PERSIST_TIMER){clearTimeout(PERSIST_TIMER);PERSIST_TIMER=null;}await PERSIST_CHAIN;return true})()`));await unload();}
+try{
+ await waitJson(`http://127.0.0.1:${debugPort}/json/version`);const targets=await waitJson(`http://127.0.0.1:${debugPort}/json`);c=new Cdp(targets.find(v=>v.type==='page'&&v.webSocketDebuggerUrl).webSocketDebuggerUrl);await c.call('Runtime.enable');await c.call('Page.enable');const tree=await c.call('Page.getFrameTree');await c.call('Page.setDocumentContent',{frameId:tree.frameTree.frame.id,html:'<!doctype html><html><body><iframe id="qaFrame"></iframe></body></html>'});
+
+ await fresh('tamper');await start('Alice');let a=await active();const origAttempt=a.attempt,origDeadline=a.deadline;await quietUnload();await c.eval(`(()=>{const k=${JSON.stringify(a.key)},r=JSON.parse(window.__qaLocalStorage[k]);r.body.timerDeadline+=86400000;r.body.locked=false;window.__qaLocalStorage[k]=JSON.stringify(r);delete window.__qaLocalStorage[${JSON.stringify(a.shadow)}];})()`);await load('tamper');await start('Alice',false);let t=await c.eval(ce(`({attempt:ATTEMPT_ID,deadline:TIMER_DEADLINE,locked:LOCKED,integrity:PERSIST_INTEGRITY_BLOCK,events:SEC_EVENTS.map(e=>e.type)})`));must(t.attempt===origAttempt,'tamper changed attempt identity');must(t.deadline<=origDeadline,'tamper extended timer');must(t.locked&&t.integrity&&t.events.includes('persistence-integrity'),'tamper was not fail-closed');pass('localStorage tamper is detected and cannot unlock/extend attempt');
+
+ await fresh('delete');await start('Bob');a=await active();const delAttempt=a.attempt,delDeadline=a.deadline;await quietUnload();await c.eval(`delete window.__qaLocalStorage[${JSON.stringify(a.key)}];delete window.__qaLocalStorage[${JSON.stringify(a.shadow)}];delete window.__qaLocalStorage[${JSON.stringify(a.guard)}];`);await load('delete');await start('Bob',false);t=await c.eval(ce(`({attempt:ATTEMPT_ID,deadline:TIMER_DEADLINE})`));must(t.attempt===delAttempt,'local deletion created fresh attempt');must(t.deadline===delDeadline,'local deletion created fresh timer');pass('deleting localStorage active state does not create fresh attempt/timer');
+
+ await fresh('replay');await start('Carol');a=await active();const oldRecord=a.local,replayAttempt=a.attempt;await c.eval(ce(`(async()=>{RESP={exercise1:{q1:'LATEST-ANSWER'}};await persistActiveAttemptSeal();await PERSIST_CHAIN;return true})()`));const newer=await active();must(Number(newer.local.rev)>Number(oldRecord.rev),'newer signed revision missing');await quietUnload();await c.eval(`window.__qaLocalStorage[${JSON.stringify(a.key)}]=${JSON.stringify(JSON.stringify(oldRecord))};delete window.__qaLocalStorage[${JSON.stringify(a.shadow)}];`);await load('replay');await start('Carol',false);t=await c.eval(ce(`({attempt:ATTEMPT_ID,locked:LOCKED,integrity:PERSIST_INTEGRITY_BLOCK,resp:RESP})`));must(t.attempt===replayAttempt,'replay changed attempt');must(t.locked&&t.integrity,'stale replay not flagged');must(t.resp&&t.resp.exercise1&&t.resp.exercise1.q1==='LATEST-ANSWER','stale replay replaced newer response');pass('stale signed replay cannot replace a newer revision');
+
+ await fresh('responses');await start('Dana');a=await active();const respAttempt=a.attempt;await c.eval(ce(`(async()=>{RESP={'0_0':'hello world','1_0':'A','2_0':1,'3_0':['filled']};await persistActiveAttemptSeal();await PERSIST_CHAIN;return true})()`));await quietUnload();await load('responses');await start('Dana',false);t=await c.eval(ce(`({attempt:ATTEMPT_ID,resp:RESP})`));must(t.attempt===respAttempt,'response restore created another attempt');must(t.resp&&t.resp['0_0']==='hello world'&&t.resp['1_0']==='A'&&t.resp['2_0']===1&&t.resp['3_0'][0]==='filled','responses not restored');const ui=await c.eval(ce(`({text:document.querySelector('input[data-qid=\"0_0\"]')?.value,cat:document.querySelector('select[data-qid=\"1_0\"]')?.value,choice:document.querySelector('button[data-qid=\"2_0\"][data-val=\"1\"]')?.classList.contains('selected'),fill:document.querySelector('input[data-qid=\"3_0\"]')?.value})`));must(ui.text==='hello world'&&ui.cat==='A'&&ui.choice===true&&ui.fill==='filled','restored RESP was not projected back into visible controls');pass('in-progress responses survive runtime restart and restore visible controls');
+
+ await fresh('submitted');await c.eval(ce(`(async()=>{CFG.identityCodeHashes=[await identityCodeHash('CODE-1234')];return true})()`));await start('CODE-1234');a=await active();await c.eval(ce(`(async()=>{RESP={q:'last-change'};queuePersistActiveAttemptSeal();SUBMITTED=true;await flushPendingAttemptWrites();if(!(await setSubmittedLocked()))throw new Error('guard write failed');await clearActiveAttemptSeal(false);await new Promise(r=>setTimeout(r,250));return true})()`));const g=await c.eval(ce(`(async()=>({guard:(await idbGet('attemptGuard'))&&((await idbGet('attemptGuard')).body.state),active:await idbGet('activeAttempt'),sk:storageKey('submitted'),gk:storageKey('attemptGuard')}))()`));must(g.guard==='submitted'&&!g.active,'pending active write overwrote submitted guard');await unload();await c.eval(`delete window.__qaLocalStorage[${JSON.stringify(g.sk)}];delete window.__qaLocalStorage[${JSON.stringify(g.gk)}];`);await load('submitted');await start('CODE-1234');const blocked=await c.eval(ce(`(async()=>({hidden:document.getElementById('test').classList.contains('hidden'),modal:!!document.querySelector('.s-modal-bd'),guard:(await idbGet('attemptGuard'))&&((await idbGet('attemptGuard')).body.state)}))()`));must(blocked.hidden&&blocked.modal&&blocked.guard==='submitted','submitted local deletion allowed another attempt');pass('submitted guard survives localStorage deletion and submit race');
+
+ console.log('E1 REMEDIATION BROWSER ADVERSARIAL GATE PASSED');
+}finally{c?.close();if(chrome.exitCode===null){try{process.kill(-chrome.pid,'SIGTERM')}catch{}}await Promise.race([new Promise(r=>chrome.once('exit',r)),sleep(1200)]);if(chrome.exitCode===null){try{process.kill(-chrome.pid,'SIGKILL')}catch{}}fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}

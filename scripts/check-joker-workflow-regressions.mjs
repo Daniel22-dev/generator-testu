@@ -12,8 +12,8 @@ need(secure,/if\(seal&&seal\.identityHash&&seal\.identityHash!==identityHash\)[\
 need(secure,/JOKER_USED=!!seal\.jokerUsed[\s\S]*ATTEMPT_ID=seal\.attemptId[\s\S]*TIMER_DEADLINE=Number\(seal\.timerDeadline\)/, 'reload restores committed joker choice, attempt id and deadline');
 need(secure,/attempt-resumed-after-reload/, 'reload is preserved as an audit event');
 need(secure,/LOCKED=!!seal\.locked[\s\S]*lockScreen/, 'reload cannot bypass a persisted locked state');
-need(secure,/localStorage\.setItem\(key,raw\)[\s\S]*localStorage\.getItem\(key\)===raw[\s\S]*if\(!persistActiveAttemptSeal\(\)\)[\s\S]*activeAttemptStorageError/, 'active-attempt persistence is verified fail-closed before rendering the test');
-need(secure,/setSubmittedLocked\(\);clearActiveAttemptSeal\(\)/, 'successful submission clears active-attempt seal only after output is created');
+need(secure,/name:'HMAC'[\s\S]*saveSignedRecord\('activeAttempt'[\s\S]*saveSignedRecord\('attemptGuard'[\s\S]*if\(!\(await persistActiveAttemptSeal\(\)\)\)[\s\S]*activeAttemptStorageError/, 'active-attempt persistence is HMAC-protected and verified fail-closed before rendering the test');
+need(secure,/ANSWER_TXT='SECURE-ANSWERS-V1[\s\S]*await setSubmittedLocked\(\)[\s\S]*await clearActiveAttemptSeal\(false\)/, 'successful submission persists submitted guard before clearing active-attempt state');
 need(instant,/confirmJokerStartInstant\(\)[\s\S]*jokerConfirmBody/, 'instant runtime also asks for explicit joker confirmation');
 need(verifier,/function resolvedResults\([\s\S]*function effectiveResults\(\)\{return resolvedResults\(\)\.filter\(r=>!r\.jokerUsed\);\}/, 'Verifier separates reviewable results from classification results');
 need(verifier,/function renderSecuritySignals\([\s\S]*const ok=resolvedResults\(\)/, 'security review still includes joker attempts');
