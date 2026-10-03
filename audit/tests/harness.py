@@ -55,10 +55,12 @@ class Harness:
   page.on('pageerror',lambda e:self.console.append('PAGEERROR:'+str(e)))
   if html is not None:
    self.page_seq+=1
-   # Secure student persistence now requires a trustworthy origin with IndexedDB.
-   # Use an isolated HTTPS origin per fixture so tests do not leak storage into each other.
-   page.goto(f'https://audit-page-{self.page_seq}.local/__audit_blank__.html',wait_until='load')
-   page.set_content(html,wait_until='load')
+   # Secure student persistence requires a trustworthy origin with IndexedDB.
+   # Serve the exact fixture at its own URL: currentStudentHtmlSha256() refetches location.href,
+   # so a blank bootstrap document would create a false integrity mismatch in the Verifier.
+   fixture_url=f'https://audit-page-{self.page_seq}.local/__audit_fixture__.html'
+   page.route(fixture_url,lambda route,body=html: route.fulfill(body=body.encode('utf-8'),content_type='text/html; charset=utf-8',headers={'Access-Control-Allow-Origin':'*','Cache-Control':'no-store'}))
+   page.goto(fixture_url,wait_until='load')
   return page
  def app(self):
   html=(ROOT/'dist/index.html').read_text()
