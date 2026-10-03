@@ -7,7 +7,13 @@ _default_root=TESTS.parents[1] if (TESTS.parents[1]/'src/shell.html').is_file() 
 ROOT=Path(os.environ.get('GENERATOR_AUDIT_ROOT',str(_default_root))).resolve()
 PRELUDE=r'''
 (() => {
- const NativeURL=URL; window.URL=class extends NativeURL{constructor(url,base){super(url,base==='about:blank'?'https://audit.local/':base);}};
+ const NativeURL=URL;
+ const __auditDownloadBlobs=new Map();
+ window.URL=class extends NativeURL{
+  constructor(url,base){super(url,base==='about:blank'?'https://audit.local/':base);}
+  static createObjectURL(blob){const href=NativeURL.createObjectURL(blob);__auditDownloadBlobs.set(href,blob);return href;}
+  static revokeObjectURL(href){NativeURL.revokeObjectURL(href);}
+ };
  function pack(v){if(v instanceof ArrayBuffer)return {$bytes:Array.from(new Uint8Array(v))};if(ArrayBuffer.isView(v))return {$bytes:Array.from(new Uint8Array(v.buffer,v.byteOffset,v.byteLength))};if(v&&v.$key)return {$key:v.$key};if(Array.isArray(v))return v.map(pack);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,pack(x)]));return v;}
  function unpack(v){if(v&&v.$bytes)return new Uint8Array(v.$bytes).buffer;if(v&&v.$key)return v;if(Array.isArray(v))return v.map(unpack);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,unpack(x)]));return v;}
  Object.defineProperty(crypto,'subtle',{configurable:true,value:new Proxy({}, {get:(_,method)=>(...args)=>__auditCrypto({method,args:pack(args)}).then(r=>{if(!r.ok)throw new Error(r.error);return unpack(r.value);})})});
@@ -16,7 +22,8 @@ PRELUDE=r'''
  window.__GHRAB_DEPLOYMENT_CONFIG__={profile:'github-pages',authMode:'signed-permit',aiTransport:'direct-gemini',telemetryMode:'local',apiBaseUrl:'',endpoints:{aiGenerate:'ai/generate',aiHealth:'ai/health'},features:{allowLocalProviderKeys:true,serverSessionReady:false,schoolGatewayReady:false,schoolServerConnected:false}};
  window.__errors=[];addEventListener('error',e=>__errors.push(String(e.message||e.error)));addEventListener('unhandledrejection',e=>__errors.push(String(e.reason?.stack||e.reason)));
  window.__downloads=[];
- HTMLAnchorElement.prototype.click=function(){if(this.download){__downloads.push({name:this.download,href:this.href});return;}return HTMLElement.prototype.click.call(this);};
+ window.__readDownloadText=async function(index=-1){const d=__downloads.at(index);if(!d)throw new Error('Captured download not found');if(d.blob&&typeof d.blob.text==='function')return await d.blob.text();return await (await fetch(d.href)).text();};
+ HTMLAnchorElement.prototype.click=function(){if(this.download){__downloads.push({name:this.download,href:this.href,blob:__auditDownloadBlobs.get(this.href)||null});return;}return HTMLElement.prototype.click.call(this);};
 })()
 '''
 class Harness:

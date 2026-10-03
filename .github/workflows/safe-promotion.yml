@@ -264,7 +264,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      actions: read
+      actions: write
     needs: [candidate-gate, pr-certification]
     if: needs.candidate-gate.outputs.fresh == 'true' && needs.pr-certification.outputs.eligible == 'true'
     runs-on: ubuntu-latest
