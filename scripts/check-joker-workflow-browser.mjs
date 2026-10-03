@@ -46,6 +46,7 @@ try{
 
   await client.eval(childEval(`lockTest('qa-lock-before-reload')`));
   await loadFrame();
+  assert(await waitEval(client,`${D}.getElementById('jokerNo').disabled&&${D}.getElementById('jokerYes').disabled&&${childEval('JOKER_CHOICE===false')}`),'reload dokončí asynchronní obnovu zapečetěné volby žolíka');
   const pre=await client.eval(`({noDisabled:${D}.getElementById('jokerNo').disabled,yesDisabled:${D}.getElementById('jokerYes').disabled,choice:${childEval('JOKER_CHOICE')},text:${D}.getElementById('jokerChoiceConfirm').textContent})`);
   assert(pre.noDisabled&&pre.yesDisabled&&pre.choice===false&&/uzamčena/.test(pre.text),'po reloadu jsou přepínače žolíka uzamčené na původní volbě');
   await client.eval(`${D}.getElementById('jokerYes').click()`);assert((await client.eval(childEval('JOKER_CHOICE')))===false,'disabled tlačítko nemůže po reloadu přepnout NE → ANO');
