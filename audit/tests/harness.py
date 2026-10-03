@@ -59,7 +59,7 @@ class Harness:
    # Serve the exact fixture at its own URL: currentStudentHtmlSha256() refetches location.href,
    # so a blank bootstrap document would create a false integrity mismatch in the Verifier.
    fixture_url=f'https://audit-page-{self.page_seq}.local/__audit_fixture__.html'
-   page.route(fixture_url,lambda route,body=html: route.fulfill(body=body.encode('utf-8'),content_type='text/html; charset=utf-8',headers={'Access-Control-Allow-Origin':'*','Cache-Control':'no-store'}))
+   page.route(fixture_url,lambda route,request=None,body=html: route.fulfill(body=body.encode('utf-8'),content_type='text/html; charset=utf-8',headers={'Access-Control-Allow-Origin':'*','Cache-Control':'no-store'}))
    page.goto(fixture_url,wait_until='load')
   return page
  def app(self):
