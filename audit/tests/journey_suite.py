@@ -96,7 +96,7 @@ class Journey:
    if s.modal():s.ok()
    if s.ev('()=>__downloads.length')>n:break
    s.p.wait_for_timeout(150)
-  return s.ev("async()=>{const d=__downloads[__downloads.length-1];return {name:d.name,text:await (await fetch(d.href)).text()}}")
+  return s.ev("async()=>{const d=__downloads.at(-1);return {name:d.name,text:await __readDownloadText(-1)}}")
 
 def answer_instant(fr,good=lambda k:True):
  k=0
@@ -423,9 +423,9 @@ try:
   assert re.search(r'neplatné/poškozené\s+1',ta,re.I),('corrupt current-test payload must be invalid',ta[:1000])
   assert re.search(r'Duplicity:\s*[1-9]',ta),('identical payload must be duplicate',ta[:1000])
   va.evaluate("()=>{const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate);chooseAttemptByDigest(r.submissionDigest)}")
-  va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await (await fetch(__downloads.at(-1).href)).text()")
+  va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await __readDownloadText(-1)")
   assert res_csv.count('\n')==1,('resolved results export must contain one effective student row',res_csv)
-  va.evaluate('downloadSubmissionsCsv()');sub_csv=va.evaluate("async()=>await (await fetch(__downloads.at(-1).href)).text()")
+  va.evaluate('downloadSubmissionsCsv()');sub_csv=va.evaluate("async()=>await __readDownloadText(-1)")
   assert test_b not in sub_csv and 'beta@ghrabuvka.cz' not in sub_csv,('submissions export must exclude other tests',sub_csv[:500])
   va.close()
 

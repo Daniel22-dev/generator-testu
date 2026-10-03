@@ -12,7 +12,7 @@ try:
  def roster():
   p.evaluate('auditConfigure(["translation"],"secureOffline","en");state.identityMode="oneTimeCode";applyVisualState();goTo(2)')
   p.locator('#rosterEmails').fill('qa.one@example.invalid\nQA.ONE@example.invalid\nqa.two@example.invalid\nbad@@example.invalid');click_attr(p,'onclick','rosterGenerate()');r=p.evaluate('rosterEntries');assert len(r)==2 and r[0]['code']!=r[1]['code'] and all(len(x['code'])==6 for x in r),r
-  click_attr(p,'onclick','rosterDownloadCsv()');csv=p.evaluate('async()=>await (await fetch(__downloads.at(-1).href)).text()');assert 'email,student,code' in csv and r[0]['code'] in csv;return {'validDistinctEntries':2,'downloadCSV':True}
+  click_attr(p,'onclick','rosterDownloadCsv()');csv=p.evaluate('async()=>await __readDownloadText(-1)');assert 'email,student,code' in csv and r[0]['code'] in csv;return {'validDistinctEntries':2,'downloadCSV':True}
  record('roster-input-dedupe-invalid-code-csv',roster)
  def student(mode,groups):
   s=v=None
