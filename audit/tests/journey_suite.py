@@ -177,6 +177,7 @@ try:
   assert '"privateKey"' not in stu['text'] and '"d":' not in stu['text'] and 'alt_answers' not in stu['text'],'student file leaks key material'
   sp=h.new_page(stu['text']);sp.wait_for_timeout(700)
   sp.fill('#studentName','Jana Nováková');sp.get_by_role('button',name=re.compile('Start')).first.click()
+  sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")')
   for hidden in (True,False):
    sp.evaluate("(h)=>{Object.defineProperty(document,'visibilityState',{configurable:true,get:()=>h?'hidden':'visible'});document.dispatchEvent(new Event('visibilitychange',{bubbles:true}))}",hidden)
   sp.wait_for_timeout(300);assert sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'strict test must lock after leaving'
@@ -372,7 +373,7 @@ try:
   def student_submission(stu,student):
    sp=h.new_page(stu['text']);sp.wait_for_timeout(600)
    url=sp.evaluate('formsOpenUrl()')
-   sp.fill('#studentName',student);sp.get_by_role('button',name=re.compile('Start')).first.click();answer_secure(sp)
+   sp.fill('#studentName',student);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
    sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(250)
    y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
    if y.count():y.first.click()
