@@ -41,7 +41,38 @@ function configure(over, t = TEACH, r = REC) {
   setVal('ucitelPin', t); setVal('recoveryCode', r);
 }
 const build = async () => w.assembleTestHtml(w.eval('state'), JSON.parse(JSON.stringify(GEN)));
-function genDom(h, storage) {
+function fakeIndexedDb(shared=new Map()){
+  const dbs=shared;
+  function dbFor(name){if(!dbs.has(name))dbs.set(name,new Map());return dbs.get(name)}
+  function makeDb(name){
+    const stores=dbFor(name);
+    return {
+      objectStoreNames:{contains:n=>stores.has(String(n))},
+      createObjectStore(n){n=String(n);if(!stores.has(n))stores.set(n,new Map());return {};},
+      transaction(storeName){
+        storeName=String(storeName);if(!stores.has(storeName))stores.set(storeName,new Map());const store=stores.get(storeName);
+        const tx={oncomplete:null,onerror:null,onabort:null,error:null};
+        tx.objectStore=()=>({
+          get(key){const req={result:undefined,onsuccess:null,onerror:null};queueMicrotask(()=>{try{req.result=store.get(String(key));req.onsuccess&&req.onsuccess();}catch(e){req.error=e;req.onerror&&req.onerror();}});return req;},
+          put(value,key){queueMicrotask(()=>{try{store.set(String(key),value);tx.oncomplete&&tx.oncomplete();}catch(e){tx.error=e;tx.onerror&&tx.onerror();}});return {};},
+          delete(key){queueMicrotask(()=>{try{store.delete(String(key));tx.oncomplete&&tx.oncomplete();}catch(e){tx.error=e;tx.onerror&&tx.onerror();}});return {};}
+        });
+        return tx;
+      },
+      close(){}
+    };
+  }
+  return {
+    open(name){const req={result:null,error:null,onupgradeneeded:null,onsuccess:null,onerror:null};const fresh=!dbs.has(String(name));queueMicrotask(()=>{try{req.result=makeDb(String(name));if(fresh&&req.onupgradeneeded)req.onupgradeneeded();req.onsuccess&&req.onsuccess();}catch(e){req.error=e;req.onerror&&req.onerror();}});return req;},
+    deleteDatabase(name){const req={onsuccess:null,onerror:null,onblocked:null,error:null};queueMicrotask(()=>{dbs.delete(String(name));req.onsuccess&&req.onsuccess();});return req;}
+  };
+}
+function cloneIdbState(state){
+  const out=new Map();
+  for(const [dbName,stores] of (state||new Map())){const ss=new Map();for(const [storeName,entries] of stores)ss.set(storeName,new Map(entries));out.set(dbName,ss);}
+  return out;
+}
+function genDom(h, storage, idbState=new Map()) {
   const d = new JSDOM(h, {
     runScripts: 'dangerously', url: 'https://school.example/t.html', pretendToBeVisual: true,
     beforeParse(x) {
@@ -50,12 +81,15 @@ function genDom(h, storage) {
       x.scrollTo = () => {}; x.HTMLElement.prototype.scrollIntoView = () => {};
       if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
       x.URL.createObjectURL = () => 'blob:g'; x.URL.revokeObjectURL = () => {};
+      Object.defineProperty(x,'indexedDB',{value:fakeIndexedDb(idbState),configurable:true});
+      Object.defineProperty(x,'__qaIdbState',{value:idbState,configurable:true});
       if (storage) for (const [k, v] of Object.entries(storage)) x.localStorage.setItem(k, v);
     }
   });
   return d.window;
 }
 const dumpStorage = x => { const o = {}; for (let i = 0; i < x.localStorage.length; i++) { const k = x.localStorage.key(i); o[k] = x.localStorage.getItem(k); } return o; };
+const storedBody = raw => { const r = raw ? JSON.parse(raw) : null; return r && r.body ? r.body : r; };
 const rawVariants = s => [s, s.toLowerCase()];
 const containsRaw = (txt, s) => rawVariants(s).some(v => txt.includes(v));
 
@@ -157,18 +191,18 @@ await T('S/T secure: raw credentialy nejsou ve student HTML', async () => {
 await T('secure: raw credentialy nejsou ani ve Verifieru', async () => {
   must(!containsRaw(pack.teacherHtml, TEACH) && !containsRaw(pack.teacherHtml, REC), 'raw credential ve Verifieru'); return 'OK';
 });
-let submissionTxt = '', aliceStorage = null;
+let submissionTxt = '', aliceStorage = null, aliceIdb = null;
 {
   const x = genDom(pack.studentHtml); await sleep(200);
   const S = k => x.eval(k);
   x.document.getElementById('studentName').value = 'Alice';
   x.document.getElementById('jokerNo').click(); await x.startTest(); await sleep(50);
-  const seal = () => JSON.parse(x.localStorage.getItem(S("storageKey('activeAttempt')")));
+  const seal = () => storedBody(x.localStorage.getItem(S("storageKey('activeAttempt')")));
   const s0 = seal();
   await T('secure: test běží a pečeť existuje', async () => { must(s0 && s0.attemptId, 'bez pečeti'); return s0.attemptId; });
   x.eval("setResp('0_0',0)");
   const lockShown = () => !x.document.getElementById('lockScreen').classList.contains('hidden');
-  const unlock = async v => { x.document.getElementById('unlockInp').value = v; await x.tryUnlock(); };
+  const unlock = async v => { x.document.getElementById('unlockInp').value = v; await x.tryUnlock(); await x.flushPendingAttemptWrites(); };
   x.eval("lockTest('adv-lock-1')"); await sleep(20);
   await T('C secure: Recovery neotevře teacher panel', async () => {
     x.document.getElementById('teacherName').value = TEACHER_NAME; x.document.getElementById('teacherPin').value = REC;
@@ -201,24 +235,24 @@ let submissionTxt = '', aliceStorage = null;
     const after = S("SEC_EVENTS.filter(e=>e.type==='recovery-unlock').length");
     must(after - before === 1, `jeden zámek → ${after - before} recovery-unlock záznamů`); return '1 záznam';
   });
-  aliceStorage = dumpStorage(x);
+  await x.flushPendingAttemptWrites(); aliceStorage = dumpStorage(x); aliceIdb = cloneIdbState(x.__qaIdbState);
   // reload uprostřed zamčeného stavu
-  x.eval("lockTest('adv-lock-3')"); await sleep(20);
-  const lockedStorage = dumpStorage(x);
+  x.eval("lockTest('adv-lock-3')"); await x.flushPendingAttemptWrites();
+  const lockedStorage = dumpStorage(x), lockedIdb = cloneIdbState(x.__qaIdbState);
   await T('AA secure: reload po recovery unlocku nevytvoří nový pokus ani nový deadline', async () => {
-    const y = genDom(pack.studentHtml, aliceStorage); await sleep(200);
+    const y = genDom(pack.studentHtml, aliceStorage, cloneIdbState(aliceIdb)); await sleep(200);
     y.document.getElementById('studentName').value = 'Alice'; await y.startTest(); await sleep(50);
     const s = s0;
     must(y.eval('ATTEMPT_ID') === s.attemptId, 'nový attemptId'); must(Number(y.eval('TIMER_DEADLINE')) === s.timerDeadline, 'nový deadline');
     must(y.eval('LOCKED') === false, 'stav zámku nesedí'); return 'attemptId + deadline zachovány';
   });
   await T('AA secure: reload zamčeného pokusu zámek neobejde', async () => {
-    const y = genDom(pack.studentHtml, lockedStorage); await sleep(200);
+    const y = genDom(pack.studentHtml, lockedStorage, cloneIdbState(lockedIdb)); await sleep(200);
     y.document.getElementById('studentName').value = 'Alice'; await y.startTest(); await sleep(50);
     must(y.eval('LOCKED') === true && !y.document.getElementById('lockScreen').classList.contains('hidden'), 'reload odemkl'); return 'zůstává zamčeno';
   });
   await T('E secure: Recovery nezruší rozpracovaný pokus jiné identity; Teacher ano', async () => {
-    const y = genDom(pack.studentHtml, aliceStorage); await sleep(200);
+    const y = genDom(pack.studentHtml, aliceStorage, cloneIdbState(aliceIdb)); await sleep(200);
     y.document.getElementById('studentName').value = 'Bob'; y.document.getElementById('jokerNo').click(); await y.startTest(); await sleep(50);
     const box = () => y.document.querySelector('.s-modal-bd input[type=password]');
     must(box(), 'modal reset se neobjevil');
@@ -233,14 +267,14 @@ let submissionTxt = '', aliceStorage = null;
   await x.submitSecureTest(); await sleep(300);
   submissionTxt = x.document.getElementById('answerBackup').value;
   await T('D/G secure: retry po odevzdání — Recovery ne, Teacher ano', async () => {
-    must(S("submittedLocked()") === true, 'není submitted');
+    must((await x.submittedLocked()) === true, 'není submitted');
     x.document.getElementById('studentName').value = 'Alice'; await x.startTest(); await sleep(50);
     const inp = () => x.document.querySelector('[data-retry-code]');
     must(inp(), 'retry modal chybí');
     inp().value = REC; x.document.querySelector('[data-retry-ok]').click(); await sleep(900);
-    must(S("submittedLocked()") === true, 'Recovery povolil retry');
+    must((await x.submittedLocked()) === true, 'Recovery povolil retry');
     inp().value = TEACH; x.document.querySelector('[data-retry-ok]').click(); await sleep(900);
-    must(S("submittedLocked()") === false, 'Teacher retry nefunguje'); return 'Recovery ne, Teacher ano';
+    must((await x.submittedLocked()) === false, 'Teacher retry nefunguje'); return 'Recovery ne, Teacher ano';
   });
 }
 

@@ -35,13 +35,41 @@ function configure(over={},teacher=TEACH,recovery=REC){
   setVal('nazev','R3 test');setVal('proKoho','1.A');setVal('latka','x');setVal('ucitelJmeno',TEACHER_NAME);setVal('ucitelPin',teacher);setVal('recoveryCode',recovery);
 }
 const build=async()=>w.assembleTestHtml(w.eval('state'),JSON.parse(JSON.stringify(GEN)));
-function genDom(html,storage){return new JSDOM(html,{runScripts:'dangerously',url:'https://school.example/t.html',pretendToBeVisual:true,beforeParse(x){
+function fakeIndexedDb(shared=new Map()){
+  const dbs=shared;
+  function dbFor(name){if(!dbs.has(name))dbs.set(name,new Map());return dbs.get(name)}
+  function makeDb(name){
+    const stores=dbFor(name);
+    return {
+      objectStoreNames:{contains:n=>stores.has(String(n))},
+      createObjectStore(n){n=String(n);if(!stores.has(n))stores.set(n,new Map());return {};},
+      transaction(storeName){
+        storeName=String(storeName);if(!stores.has(storeName))stores.set(storeName,new Map());const store=stores.get(storeName);
+        const tx={oncomplete:null,onerror:null,onabort:null,error:null};
+        tx.objectStore=()=>({
+          get(key){const req={result:undefined,onsuccess:null,onerror:null};queueMicrotask(()=>{try{req.result=store.get(String(key));req.onsuccess&&req.onsuccess();}catch(e){req.error=e;req.onerror&&req.onerror();}});return req;},
+          put(value,key){queueMicrotask(()=>{try{store.set(String(key),value);tx.oncomplete&&tx.oncomplete();}catch(e){tx.error=e;tx.onerror&&tx.onerror();}});return {};},
+          delete(key){queueMicrotask(()=>{try{store.delete(String(key));tx.oncomplete&&tx.oncomplete();}catch(e){tx.error=e;tx.onerror&&tx.onerror();}});return {};}
+        });
+        return tx;
+      },
+      close(){}
+    };
+  }
+  return {
+    open(name){const req={result:null,error:null,onupgradeneeded:null,onsuccess:null,onerror:null};const fresh=!dbs.has(String(name));queueMicrotask(()=>{try{req.result=makeDb(String(name));if(fresh&&req.onupgradeneeded)req.onupgradeneeded();req.onsuccess&&req.onsuccess();}catch(e){req.error=e;req.onerror&&req.onerror();}});return req;},
+    deleteDatabase(name){const req={onsuccess:null,onerror:null,onblocked:null,error:null};queueMicrotask(()=>{dbs.delete(String(name));req.onsuccess&&req.onsuccess();});return req;}
+  };
+}
+function genDom(html,storage,idbState=new Map()){const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://school.example/t.html',pretendToBeVisual:true,beforeParse(x){
   if(!x.crypto||!x.crypto.subtle)Object.defineProperty(x,'crypto',{value:webcrypto});
   x.matchMedia=x.matchMedia||(()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}}));
   x.scrollTo=()=>{};x.HTMLElement.prototype.scrollIntoView=()=>{};if(x.HTMLAnchorElement)x.HTMLAnchorElement.prototype.click=()=>{};
   x.URL.createObjectURL=()=> 'blob:r3-child';x.URL.revokeObjectURL=()=>{};
+  Object.defineProperty(x,'indexedDB',{value:fakeIndexedDb(idbState),configurable:true});
+  Object.defineProperty(x,'__qaIdbState',{value:idbState,configurable:true});
   if(storage)for(const [k,v] of Object.entries(storage))x.localStorage.setItem(k,v);
-}})}
+}});return dom;}
 function dumpStorage(x){const out={};for(let i=0;i<x.localStorage.length;i++){const k=x.localStorage.key(i);out[k]=x.localStorage.getItem(k)}return out}
 
 await test('R2-direct-same-secret',async()=>{
@@ -78,7 +106,7 @@ await test('R3-secure-privilege-boundary',async()=>{
   x.document.getElementById('teacherName').value=TEACHER_NAME;x.document.getElementById('teacherPin').value=REC;await x.teacherLogin();must(x.document.getElementById('teacherPanel').classList.contains('hidden'),'Recovery opened secure teacher panel');
   x.document.getElementById('teacherPin').value=TEACH;await x.teacherLogin();must(!x.document.getElementById('teacherPanel').classList.contains('hidden'),'Teacher/Admin secure login failed');x.teacherLogout();
   x.document.getElementById('unlockInp').value=TEACH;await x.tryUnlock();must(x.eval('LOCKED')===true,'Teacher/Admin unlocked secure lock');x.document.getElementById('unlockInp').value=REC;await x.tryUnlock();must(x.eval('LOCKED')===false,'Recovery did not unlock secure lock');
-  const storage=dumpStorage(x);const activeKey=x.eval("storageKey('activeAttempt')");const y=genDom(pack.studentHtml,storage).window;await sleep(150);y.document.getElementById('studentName').value='Bob';await y.startTest();await sleep(30);const box=()=>y.document.querySelector('.s-modal-bd input[type=password]');must(box(),'active-attempt reset modal missing');box().value=REC;y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click();await sleep(850);must(y.localStorage.getItem(activeKey)!==null,'Recovery reset foreign active attempt');box().value=TEACH;y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click();await sleep(850);must(y.localStorage.getItem(activeKey)===null,'Teacher/Admin reset failed');y.close();d.window.close();return 'login/unlock/reset separated';
+  const storage=dumpStorage(x);const activeKey=x.eval("storageKey('activeAttempt')");const y=genDom(pack.studentHtml,storage,d.window.__qaIdbState).window;await sleep(150);y.document.getElementById('studentName').value='Bob';await y.startTest();await sleep(30);const box=()=>y.document.querySelector('.s-modal-bd input[type=password]');must(box(),'active-attempt reset modal missing');box().value=REC;y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click();await sleep(850);must(y.localStorage.getItem(activeKey)!==null,'Recovery reset foreign active attempt');box().value=TEACH;y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click();await sleep(850);must(y.localStorage.getItem(activeKey)===null,'Teacher/Admin reset failed');y.close();d.window.close();return 'login/unlock/reset separated';
 });
 
 fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/security-behavior-r3.json',JSON.stringify(results,null,2));

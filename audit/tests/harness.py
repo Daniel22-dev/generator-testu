@@ -36,10 +36,14 @@ class Harness:
   self.context.add_init_script(PRELUDE)
   self.context.route('**/*',self.route)
   self.console=[]
+  self.page_seq=0
  def crypto_call(self,r):
   self.crypto.stdin.write(json.dumps(r)+'\n');self.crypto.stdin.flush();return json.loads(self.crypto.stdout.readline())
  def route(self,route):
   path=unquote(urlparse(route.request.url).path).lstrip('/')
+  if path=='__audit_blank__.html':
+   route.fulfill(body=b'<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>',content_type='text/html',headers={'Access-Control-Allow-Origin':'*','Cache-Control':'no-store'})
+   return
   if path.startswith('generator-testu/'):path=path[len('generator-testu/'):]
   f=(ROOT/'dist'/path).resolve()
   if f.is_relative_to(ROOT/'dist') and f.is_file():
@@ -49,7 +53,14 @@ class Harness:
   page=self.context.new_page(); page.set_default_timeout(10000)
   page.on('console',lambda m:self.console.append(m.type+':'+m.text))
   page.on('pageerror',lambda e:self.console.append('PAGEERROR:'+str(e)))
-  if html is not None:page.set_content(html,wait_until='load')
+  if html is not None:
+   self.page_seq+=1
+   # Secure student persistence requires a trustworthy origin with IndexedDB.
+   # Serve the exact fixture at its own URL: currentStudentHtmlSha256() refetches location.href,
+   # so a blank bootstrap document would create a false integrity mismatch in the Verifier.
+   fixture_url=f'https://audit-page-{self.page_seq}.local/__audit_fixture__.html'
+   page.route(fixture_url,lambda route,request=None,body=html: route.fulfill(body=body.encode('utf-8'),content_type='text/html; charset=utf-8',headers={'Access-Control-Allow-Origin':'*','Cache-Control':'no-store'}))
+   page.goto(fixture_url,wait_until='load')
   return page
  def app(self):
   html=(ROOT/'dist/index.html').read_text()

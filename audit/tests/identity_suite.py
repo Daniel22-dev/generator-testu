@@ -20,7 +20,7 @@ try:
    x=p.evaluate('''async a=>{auditConfigure(['translation','ordering'],a.mode,'fr');state.identityMode='oneTimeCode';if(a.groups){state.diferencovany='ANO';state.skupiny=rosterEntries.map((r,i)=>({nazev:'G'+i,podminky:'Specific group '+i,studenti:[r.code]}));}const d=auditFixtures(state,'fr'),b=await assembleTestHtml(state,d);return {html:b.studentHtml||b,teacher:b.teacherHtml,code:rosterEntries[0].code,variants:lastAssembled.variants,cfg:lastAssembled.cfg}}''',{'mode':mode,'groups':groups})
    assert 'qa.one@example.invalid' not in x['html'] and x['code'] not in x['html'],'plaintext roster leaked'
    s=h.new_page(x['html']);assert s.evaluate('async()=>await identityAllowed("NOT-A-CODE")')==False
-   s.locator('#studentName').fill(x['code']);click_attr(s,'onclick','startTest()');s.wait_for_function('started' if mode=='instant' else 'STARTED_AT!==""');key=s.evaluate('CFG.activeGroupKey' if mode=='instant' else 'ACTIVE_KEY');assert bool(key and key!="__default")==groups,key
+   s.locator('#studentName').fill(x['code']);click_attr(s,'onclick','startTest()');s.wait_for_function('started' if mode=='instant' else 'STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden") && document.getElementById("exerciseArea").children.length>0');key=s.evaluate('CFG.activeGroupKey' if mode=='instant' else 'ACTIVE_KEY');assert bool(key and key!="__default")==groups,key
    for i,ex in enumerate(x['variants'][key or '__default']):answer(s,ex,i,mode,'fr')
    if mode=='instant':sc=s.evaluate('calcScore()')
    else:
@@ -59,7 +59,7 @@ try:
    # 7.1.74+ seals the joker choice only after a dedicated irreversible confirmation.
    if mode=='instant':s.locator('.modal-ov [data-jok]').click()
    else:s.locator('.s-modal-bd [data-confirm-ok]').click()
-   s.wait_for_function('started' if mode=='instant' else 'STARTED_AT!==""')
+   s.wait_for_function('started' if mode=='instant' else 'STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")')
    if mode=='instant':assert s.evaluate('jokerUsed');s.evaluate('timerDeadline=Date.now()-1;refreshInstantTimer()');s.wait_for_function('submitted')
    else:
     assert s.evaluate('JOKER_USED');s.evaluate('TIMER_DEADLINE=Date.now()-1;refreshSecureTimer()');s.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');v=h.new_page(x['teacher']);payload=v.evaluate('async txt=>await decryptPayload(parseTxt(txt))',s.locator('#answerBackup').input_value());assert payload['jokerUsed']

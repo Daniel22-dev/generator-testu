@@ -32,7 +32,34 @@ const dom = new JSDOM(html, {
 });
 const w = dom.window;
 await new Promise(r => setTimeout(r, 1200));
+function fakeIndexedDb(shared=new Map()){
+  const dbs=shared;
+  function dbFor(name){if(!dbs.has(name))dbs.set(name,new Map());return dbs.get(name);}
+  function makeDb(name){
+    const stores=dbFor(name);
+    return {
+      objectStoreNames:{contains:n=>stores.has(String(n))},
+      createObjectStore(n){n=String(n);if(!stores.has(n))stores.set(n,new Map());return {};},
+      transaction(storeName){
+        storeName=String(storeName);if(!stores.has(storeName))stores.set(storeName,new Map());
+        const store=stores.get(storeName),tx={oncomplete:null,onerror:null,onabort:null,error:null};
+        tx.objectStore=()=>({
+          get(key){const req={result:undefined,onsuccess:null,onerror:null};queueMicrotask(()=>{try{req.result=store.get(String(key));req.onsuccess&&req.onsuccess();}catch(e){req.error=e;req.onerror&&req.onerror();}});return req;},
+          put(value,key){queueMicrotask(()=>{try{store.set(String(key),value);tx.oncomplete&&tx.oncomplete();}catch(e){tx.error=e;tx.onerror&&tx.onerror();}});return {};},
+          delete(key){queueMicrotask(()=>{try{store.delete(String(key));tx.oncomplete&&tx.oncomplete();}catch(e){tx.error=e;tx.onerror&&tx.onerror();}});return {};}
+        });
+        return tx;
+      },
+      close(){}
+    };
+  }
+  return {
+    open(name){const req={result:null,error:null,onupgradeneeded:null,onsuccess:null,onerror:null};const fresh=!dbs.has(String(name));queueMicrotask(()=>{try{req.result=makeDb(String(name));if(fresh&&req.onupgradeneeded)req.onupgradeneeded();req.onsuccess&&req.onsuccess();}catch(e){req.error=e;req.onerror&&req.onerror();}});return req;},
+    deleteDatabase(name){const req={onsuccess:null,onerror:null,onblocked:null,error:null};queueMicrotask(()=>{dbs.delete(String(name));req.onsuccess&&req.onsuccess();});return req;}
+  };
+}
 async function createGeneratedDom(generatedHtml) {
+  const idbState=new Map();
   const generated = new JSDOM(generatedHtml, {
     runScripts: 'dangerously',
     url: 'https://school.example/test.html',
@@ -45,6 +72,8 @@ async function createGeneratedDom(generatedHtml) {
       if (x.HTMLAnchorElement) x.HTMLAnchorElement.prototype.click = () => {};
       x.URL.createObjectURL = () => 'blob:generated-test';
       x.URL.revokeObjectURL = () => {};
+      Object.defineProperty(x,'indexedDB',{value:fakeIndexedDb(idbState),configurable:true});
+      Object.defineProperty(x,'__workflowIdbState',{value:idbState,configurable:true});
     }
   });
   await new Promise(r => setTimeout(r, 80));
@@ -753,7 +782,8 @@ await okAsync('učitelský přístupový kód odemkne další spuštění na ste
   }finally{w.deriveSecretHash=fakeDerive;}
   const gd=await createGeneratedDom(pkg.studentHtml);
   try{
-    gd.window.storageSet('submitted','1');
+    assert(await gd.window.setSubmittedLocked(),'signed submitted guard se nepodařilo připravit');
+    assert(await gd.window.submittedLocked(),'signed submitted guard není aktivní');
     gd.window.document.getElementById('studentName').value='Student';
     await gd.window.startTest();
     const modal=gd.window.document.querySelector('.s-modal-bd');
@@ -762,7 +792,7 @@ await okAsync('učitelský přístupový kód odemkne další spuštění na ste
     modal.querySelector('[data-retry-ok]').click();
     const deadline=Date.now()+4000;
     while(Date.now()<deadline&&!gd.window.document.getElementById('intro').classList.contains('hidden'))await new Promise(r=>setTimeout(r,50));
-    assert(gd.window.storageGet('submitted')!=='1','device lock zůstal uložen');
+    assert(!(await gd.window.submittedLocked()),'device lock zůstal uložen');
     assert(gd.window.document.getElementById('intro').classList.contains('hidden'),'test se po učitelském odemčení znovu nespustil');
   }finally{gd.close();}
 });
