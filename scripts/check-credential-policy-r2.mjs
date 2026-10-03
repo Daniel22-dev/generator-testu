@@ -26,6 +26,8 @@ ok(policy('TEACH-ABCDEF-123456','',false,'Daniel Teacher').length===0,'Recovery 
 
 ok((form.match(/credentialPolicyErrors\(/g)||[]).length>=2,'UI validation uses shared credential policy');
 ok((workflow.match(/credentialPolicyErrors\(/g)||[]).length>=2,'settings drift/apply path uses shared credential policy');
+ok(assembly.includes("const liveOutputFields=Object.fromEntries(outputFieldIds.map(id=>[id,trim(id)]))"),'assembleTestHtml captures current output fields before policy evaluation');
+ok(/sourceState\.__outputFields=Object\.assign\(\{\},liveOutputFields,storedOutputFields,\{[\s\S]*?ucitelPin:liveOutputFields\.ucitelPin,[\s\S]*?recoveryCode:liveOutputFields\.recoveryCode,[\s\S]*?ucitelJmeno:liveOutputFields\.ucitelJmeno/.test(assembly),'current credential fields override stale __outputFields snapshot');
 ok(assembly.includes('credentialPolicyErrors(teacherAccessCode,classroomRecoveryCode,configForHash.lockOnLeave'),'assembleTestHtml enforces shared credential policy');
 ok(/if\(credentialErrors\.length\)\{\s*throw new Error\('Test nebyl sestaven: '/.test(assembly),'assembleTestHtml fails closed on credential policy errors');
 

@@ -56,7 +56,7 @@
     "pretest:reporter": "npm run build",
     "qa:garp23": "npm run check:ai-operations && npm run test:suite-session && node scripts/qa-garp23-security.mjs",
     "check:embedded-script-terminators": "node scripts/check-embedded-script-terminators.mjs",
-    "prebuild": "npm run check:credential-security && npm run check:security-forensics && npm run check:secret-hygiene && npm run check:security-adversarial && npm run check:r2-credential-policy && npm run check:r3-test-infrastructure && npm run check:r4-recovery-runtime && npm run check:r5-adversarial-wiring && npm run check:ai-operations && npm run check:exercise-help && npm run check:verifier-generated-syntax && npm run check:embedded-script-terminators && npm run check:studio-manifest",
+    "prebuild": "npm run check:credential-security && npm run check:security-forensics && npm run check:secret-hygiene && npm run check:security-adversarial && npm run check:r2-credential-policy && npm run check:r3-test-infrastructure && npm run check:r4-recovery-runtime && npm run check:r5-adversarial-wiring && npm run check:f0-ci-trust-pin && npm run check:f2-journey-migration && npm run check:ai-operations && npm run check:exercise-help && npm run check:verifier-generated-syntax && npm run check:embedded-script-terminators && npm run check:studio-manifest",
     "test:headless:dist": "node tools/headless-check.mjs dist/index.html",
     "check:studio-manifest": "node scripts/check-studio-manifest-template.mjs",
     "test:suite-session": "node scripts/test-suite-session-lifecycle.mjs",
@@ -107,7 +107,9 @@
     "check:r3-test-infrastructure": "node scripts/check-test-infrastructure-r3.mjs",
     "check:r4-recovery-runtime": "node scripts/check-recovery-runtime-r4.mjs",
     "check:r5-adversarial": "node scripts/check-security-adversarial-r5.mjs",
-    "check:r5-adversarial-wiring": "node scripts/check-adversarial-wiring-r5.mjs"
+    "check:r5-adversarial-wiring": "node scripts/check-adversarial-wiring-r5.mjs",
+    "check:f0-ci-trust-pin": "node scripts/check-ci-trust-pin-f0.mjs",
+    "check:f2-journey-migration": "node scripts/check-f2-journey-migration.mjs"
   },
   "engines": {
     "node": ">=18"

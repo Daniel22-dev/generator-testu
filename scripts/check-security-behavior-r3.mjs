@@ -29,9 +29,9 @@ const w=gdom.window;
 await sleep(1400);
 if(w.__errors?.length)throw new Error('generator runtime failed: '+w.__errors.join(' | '));
 function setVal(id,v){const el=w.document.getElementById(id);if(!el)throw new Error('missing #'+id);el.value=v}
-const GEN={exercises:[{title:'MC',type:'multiple choice',points_total:2,points_each:1,items:[{question:'Q1',options:['A','B'],correct:0},{question:'Q2',options:['A','B'],correct:1}]}]};
+const GEN={exercises:[{title:'MC',type:'multiple choice',points_total:5,points_each:1,items:[{question:'Q1',options:['A','B'],correct:0},{question:'Q2',options:['A','B'],correct:1},{question:'Q3',options:['A','B'],correct:0},{question:'Q4',options:['A','B'],correct:1},{question:'Q5',options:['A','B'],correct:0}]}]};
 function configure(over={},teacher=TEACH,recovery=REC){
-  w.eval(`Object.assign(state,{appMode:'advanced',jazyk:'angli\u010dtina',instrJazyk:'cs',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],cas:15,odevzdavani:'B',randomizace:'NE',layout:'classic',tema:'default',zolicek:'NE',diferencovany:'NE',overeni:'NE',anonymizace:'ANO',body:2,identityMode:'name',testMode:'bezny',resultMode:'instant',screenGuard:true,feedbackMode:'brief'},${JSON.stringify(over)});rosterEntries=[];`);
+  w.eval(`Object.assign(state,{appMode:'advanced',jazyk:'angli\u010dtina',instrJazyk:'cs',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],cas:15,odevzdavani:'B',randomizace:'NE',layout:'classic',tema:'default',zolicek:'NE',diferencovany:'NE',overeni:'NE',anonymizace:'ANO',identityMode:'name',testMode:'bezny',resultMode:'instant',screenGuard:true,feedbackMode:'brief',body:5},${JSON.stringify(over)});rosterEntries=[];`);
   setVal('nazev','R3 test');setVal('proKoho','1.A');setVal('latka','x');setVal('ucitelJmeno',TEACHER_NAME);setVal('ucitelPin',teacher);setVal('recoveryCode',recovery);
 }
 const build=async()=>w.assembleTestHtml(w.eval('state'),JSON.parse(JSON.stringify(GEN)));

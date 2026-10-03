@@ -1,6 +1,15 @@
 async function assembleTestHtml(st, genData) {
   const sourceState=JSON.parse(JSON.stringify(st));
-  sourceState.__outputFields=st.__outputFields||Object.fromEntries(['nazev','proKoho','vlastniSkala','ucitelPin','recoveryCode','ucitelJmeno','latka','zadaniText','poznamky'].map(id=>[id,trim(id)]));
+  const outputFieldIds=['nazev','proKoho','vlastniSkala','ucitelPin','recoveryCode','ucitelJmeno','latka','zadaniText','poznamky'];
+  const liveOutputFields=Object.fromEntries(outputFieldIds.map(id=>[id,trim(id)]));
+  const storedOutputFields=(st.__outputFields&&typeof st.__outputFields==='object')?st.__outputFields:{};
+  sourceState.__outputFields=Object.assign({},liveOutputFields,storedOutputFields,{
+    // F1: credentialy jsou bezpečnostně autoritativní pouze z aktuálního UI.
+    // Starý __outputFields snapshot nesmí obejít credentialPolicyErrors ani ovlivnit PBKDF2 vstupy.
+    ucitelPin:liveOutputFields.ucitelPin,
+    recoveryCode:liveOutputFields.recoveryCode,
+    ucitelJmeno:liveOutputFields.ucitelJmeno
+  });
   sourceState.__roster=Array.isArray(st.__roster)?JSON.parse(JSON.stringify(st.__roster)):rosterForVerifier();
   sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
   const formsMetaCandidate=(st.__formsMetadata&&typeof st.__formsMetadata==='object')?st.__formsMetadata:(typeof configuredGoogleFormsMetadata==='function'?(configuredGoogleFormsMetadata()||null):null);

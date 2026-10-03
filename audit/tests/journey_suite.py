@@ -65,9 +65,20 @@ class Journey:
    if not st['busy'] and (st['res'] or st['err']) and time.time()-t0>0.5:return seen
    s.p.wait_for_timeout(150)
   raise AssertionError('generation timeout '+str(seen))
+ def ensure_teacher_secret(s):
+  if not s.p.input_value('#ucitelPin'):
+   s.p.get_by_role('button',name=re.compile('Vygenerovat tajný učitelský kód')).click()
+  assert len(s.p.input_value('#ucitelPin'))>=12,'Teacher/Admin secret must satisfy current policy'
+ def ensure_recovery_if_required(s):
+  required=s.ev("()=>state.testMode==='prisny'||!!state.screenGuard")
+  if required and not s.p.input_value('#recoveryCode'):
+   s.p.get_by_role('button',name=re.compile('Vygenerovat náhodný Recovery kód')).click()
+  if required:
+   assert len(s.p.input_value('#recoveryCode'))>=8,'Recovery code is required for the active lock mode'
+   assert s.p.input_value('#recoveryCode')!=s.p.input_value('#ucitelPin'),'Teacher/Admin and Recovery credentials must stay distinct'
  def new_test(s,purpose='Běžný test'):
   s.to_step3(purpose)
-  if not s.p.input_value('#ucitelPin'):s.p.get_by_role('button',name=re.compile('Doplnit náhodný kód')).click()
+  s.ensure_teacher_secret();s.ensure_recovery_if_required()
   s.p.click('#next3');s.generate()
   assert s.text('#genResult'),'result panel not visible'
  def selftest(s):
@@ -145,7 +156,7 @@ try:
  record('simple-instant-teacher-to-student',simple_instant_to_student)
 
  def missing_teacher_name(j):
-  j.to_step3();j.p.get_by_role('button',name=re.compile('Doplnit náhodný kód')).click();j.p.fill('#ucitelJmeno','')
+  j.to_step3();j.ensure_teacher_secret();j.p.fill('#ucitelJmeno','')
   hint=j.text('#validHint3');assert j.p.locator('#next3').is_disabled() and 'jméno' in hint.lower(),('disabled step must say why (F-01)',hint)
   j.p.fill('#ucitelJmeno','Učitel');assert not j.p.locator('#next3').is_disabled()
   return {'hint':hint}
@@ -158,7 +169,7 @@ try:
  record('step3-missing-teacher-name-is-explained',missing_teacher_name)
 
  def simple_strict_to_verifier(j):
-  j.new_test('Přísný test');code=j.ev("()=>val('ucitelPin')")
+  j.new_test('Přísný test');teacher_code=j.ev("()=>val('ucitelPin')");recovery_code=j.ev("()=>val('recoveryCode')");assert teacher_code and recovery_code and teacher_code!=recovery_code
   g=j.gate();assert not g['allowed'] and 'self-test' in g['banner'],g
   j.selftest();j.checklist();g=j.gate();assert g['allowed'],g
   stu=j.download('#btnDownloadStudent');tea=j.download('#btnDownloadTeacher')
@@ -170,12 +181,12 @@ try:
    sp.evaluate("(h)=>{Object.defineProperty(document,'visibilityState',{configurable:true,get:()=>h?'hidden':'visible'});document.dispatchEvent(new Event('visibilitychange',{bubbles:true}))}",hidden)
   sp.wait_for_timeout(300);assert sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'strict test must lock after leaving'
   for _ in range(5):sp.locator('#lockIcon').click()
-  sp.fill('#unlockInp','WRONG-CODE-123456');sp.locator("[onclick='tryUnlock()']").first.click();sp.wait_for_timeout(1500)
-  assert sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'wrong code must keep the lock'
-  sp.fill('#unlockInp',code);sp.locator("[onclick='tryUnlock()']").first.click();sp.wait_for_timeout(2500)
-  assert not sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'teacher code from step 3 must unlock'
+  sp.fill('#unlockInp',teacher_code);sp.locator("[onclick='tryUnlock()']").first.click();sp.wait_for_timeout(900)
+  assert sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'Teacher/Admin secret must not unlock the student lock'
+  sp.fill('#unlockInp',recovery_code);sp.locator("[onclick='tryUnlock()']").first.click();sp.wait_for_timeout(1200)
+  assert not sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'Recovery code must unlock the current student lock'
   answer_secure(sp)
-  sp.get_by_role('button',name=re.compile('Submit and create')).click();sp.wait_for_timeout(300)
+  sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(300)
   y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
   if y.count():y.first.click()
   sp.wait_for_timeout(900);done=sp.evaluate('document.body.innerText');backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
@@ -187,7 +198,8 @@ try:
   dt=vp.locator('#v2-dashboard').inner_text();assert 'Technické údaje' in dt and 'Creator ID' not in dt and 'Student HTML SHA-256' not in dt and 'Kontrola integrity:' not in dt,('dashboard must stay task-focused; low-level metadata belongs to tech panel',dt[:500])
   assert vp.locator('.v2-nav .v2-nav-icon').count()==7,'all seven verifier navigation items must expose visual hierarchy icons'
   vp.locator('[data-v2-panel="results"]').click();vp.wait_for_timeout(100)
-  assert vp.locator('#v2-results').is_visible() and vp.locator('#pasteBox').is_visible(), 'results workflow must be reachable from navigation'
+  assert vp.locator('#v2-results').is_visible() and vp.locator('#fallbackImportDetails').is_visible(), 'results workflow must be reachable from navigation'
+  vp.locator('#fallbackImportDetails summary').click();assert vp.locator('#pasteBox').is_visible(),'emergency paste fallback must be explicitly disclosed'
   vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.locator('#v2-results').inner_text()
   cells=vp.locator('#resultTable tr').nth(1).locator('td').all_inner_texts()
@@ -277,7 +289,7 @@ try:
  record('failed-regeneration-keeps-reviewed-test',failed_regeneration_keeps_reviewed_test)
  def error_recovery_is_actionable(j):
   j.to_step3()
-  if not j.p.input_value('#ucitelPin'):j.p.get_by_role('button',name=re.compile('Doplnit náhodný kód')).click()
+  j.ensure_teacher_secret();j.ensure_recovery_if_required()
   j.p.click('#next3');out={}
   for beh,expect in [({'status':400,'apiStatus':'INVALID_ARGUMENT'},'uprav zadání'),({'status':413},'přílohy'),({'status':401,'apiStatus':'UNAUTHENTICATED'},'AI připojení'),('malformed','spusť generování znovu')]:
    j.ev("(b)=>{__aiScript.length=0;for(let i=0;i<8;i++)__aiScript.push(b)}",beh if isinstance(beh,dict) else 'malformed')
@@ -312,12 +324,12 @@ try:
   sp.fill('#studentName','ZZZZZZ');sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_timeout(500)
   msg=sp.evaluate("document.body.innerText");assert 'not valid' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with a message'
   sp.locator('button:visible',has_text=re.compile('^OK$')).first.click()
-  sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();answer_secure(sp)
-  sp.get_by_role('button',name=re.compile('Submit and create')).click();sp.wait_for_timeout(300)
+  sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
+  sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(300)
   y=sp.locator('button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
   if y.count():y.first.click()
   sp.wait_for_timeout(900);backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.locator('#fallbackImportDetails summary').click();vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
   assert re.search(r'novak \(kód '+codes[0]+r'\)\t\S+\t30/30\t100 %\t1\t',t),('verifier resolves the code to the roster e-mail',t[:500])
   import csv,io,tempfile
