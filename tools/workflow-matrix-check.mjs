@@ -250,6 +250,7 @@ await okAsync('Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsec
     {appMode:'advanced',testMode:'bezny',expected:'bezny'},
     {appMode:'advanced',testMode:'prisny',expected:'prisny'}
   ];
+  const previousNoticeAccepted=w.eval('geminiDataNoticeAcceptedInMemory');
   try{
     const registry=JSON.parse(w.eval("JSON.stringify({analysis:GEN_AI_OPERATIONS.operations['reading-source-analysis'],suggestion:GEN_AI_OPERATIONS.operations['reading-package-suggestion']})"));
     assert(registry.analysis,'reading-source-analysis chybi v runtime registru');
@@ -257,7 +258,6 @@ await okAsync('Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsec
     assert(['text','image','document'].every(t=>registry.analysis.inputTypes.includes(t)),'reading-source-analysis nema text/image/document');
     assert(['text','image','document'].every(t=>registry.suggestion.inputTypes.includes(t)),'reading-package-suggestion nema text/image/document');
     w.eval("geminiApiKey='workflow-test-key';");
-    const previousNoticeAccepted=w.eval('geminiDataNoticeAcceptedInMemory');
     w.eval('geminiDataNoticeAcceptedInMemory=true');
     for(const c of cases){
       resetBase();
