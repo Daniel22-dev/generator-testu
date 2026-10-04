@@ -16,7 +16,7 @@
   "garp27VendorFileCount": 64,
   "serverDecision": "DEFERRED_BY_OWNER_DECISION",
   "governanceAcceptance": "G-01-SEPARATE-OWNER-ACTION",
-  "note": "Generator GARP 2.7 E10 regression and CI checkpoint 7.1.87. Server LIVE remains deferred; classroom red-team readiness is explicitly not granted.",
+  "note": "Generator GARP 2.7 E10 release 7.1.87. Owner authorized controlled student red-team publication on 2026-10-04. E6 deferred, Forms owner-reported checked, physical mobile testing scheduled. Server LIVE remains deferred; exact-SHA technical CI is still required.",
   "adapterToolSha256s": {
     "scripts/garp27/architecture-integrity.mjs": "6fcf2f7a4140d31344296c2a24bb46558e21100df44128475a7239bac640540d",
     "scripts/garp27/mutation-tests.mjs": "2565d9ec1224cc5c7914812117eaea686d1fc9b6b405d792c1429889f27684f1",

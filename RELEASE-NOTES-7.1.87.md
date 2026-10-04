@@ -6,4 +6,6 @@ Klikací audity respektují skryté Teacher/Admin pole v bezpečném režimu a z
 
 README, poznámky k vydání, runtime/PWA metadata, GARP trust anchor a jeho CI piny mají aktuální verzi. Changelog zachovává deset položek od nejnovější. Vzdálené kontroly musí certifikovat přesný nový candidate SHA po čistém npm ci; starší PASS není certifikací tohoto commitu.
 
-NOT READY – BLOCKING ISSUE trvá. E7 fyzické iPhone/iPad/Android je ANALYZED / NOT TESTED, E6 historické raw/cache a soukromá rotace nejsou uzavřeny, skutečné školní Forms čeká na ověření vlastníkem. Readiness kontrola před merge/deploy zůstává povinná; main a produkce se touto opravou nemění.
+Vlastník 4. 10. 2026 výslovně schválil publikaci aktuálního GIT pro řízenou studentskou red-team zkoušku. E6 odkládá; incident tím není uzavřen. Forms potvrzuje jako zkontrolované. Fyzické E7 na iPhone/iPad/Android zůstává ANALYZED / NOT TESTED a bude ověřeno při plánované zkoušce 6. a 9. 10. 2026. Stav vydání je READY FOR CONTROLLED STUDENT RED-TEAM.
+
+Readiness kontrola před merge/deploy zůstává povinná a nově kontroluje doložené rozhodnutí vlastníka, omezený účel, odklad E6 a plán E7. Její report uvádí skutečný stav místo pevného NOT READY; admission ho váže SHA-256 na verzovaný záznam rozhodnutí. Negativní kontroly odmítají chybějící souhlas, nepotvrzené Forms, předstírané uzavření E6, vymyšlený mobilní PASS i zastaralou evidenci. Nový commit musí projít úplným vzdáleným CI na přesném SHA před chráněným merge a nasazením z main.

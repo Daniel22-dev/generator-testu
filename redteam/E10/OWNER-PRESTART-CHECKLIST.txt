@@ -1,12 +1,13 @@
 GIT E10 — vlastník před prvním studentským během
 1. Soukromý verifier, roster, answer key a privátní klíč pouze na soukromém
    PC mimo školu. Studentům patří výhradně šifrovaný student_test.html.
-2. Uzavřít E6 incident: potvrdit historické raw/cache purge a rotaci dříve
-   vystavených private credentials. Aktuální čistá main neprokazuje cache purge.
-3. Forms: školní doména, ověřený email, jedna odpověď; zachovat původní CSV
+2. E6 je rozhodnutím vlastníka z 4. 10. 2026 odloženo. Incident není
+   uzavřen; historické raw/cache purge a soukromá rotace nejsou potvrzené.
+3. Forms: vlastník 4. 10. 2026 potvrdil kontrolu. Zachovat původní CSV
    a čas publikace. V private verifieru nastavit kotvy a roster; diagnózy
    nebrat za autorizační rozhodnutí jen proto, že je payload dešifrovaný.
-4. Pro E7 ruční checklist na iPhone/iPad Safari + Android: zadat nový
+4. E7 je plánováno při řízené zkoušce 6. a 9. 10. 2026. Na iPhone/iPad
+   Safari + Android zadat nový
    startovní kód z private verifieru, zkusit wrong code a reload před/po
    startu, striktní lock, classroom recovery, odevzdání do Forms. Odpověď,
    start/deadline a attempt musí po reloadu zůstat původní. Device matrix
@@ -19,8 +20,8 @@ GIT E10 — vlastník před prvním studentským během
    Classroom unlock je oddělený kód, procedurální brzda při osobním dozoru.
 7. Připravit samostatný hlásící formulář: pokus, údajný průnik, reprodukce.
    Druhé zařízení zakázané a hlídané dozorem, technicky neviditelné.
-8. Teprve po doloženém uzavření blockerů změnit release readiness spolu
-   s novým verzovaným release kontraktem a certifikací na přesném SHA.
-   Ověřit candidate → chráněná main → deploy jen main. --require-ready
-   musí zůstat povinné před merge/deploy; NOT READY checkpoint nepublikovat
-   jako produkční experiment. Nepřepisovat stav E7 na agent-tested GREEN.
+8. Vlastník 4. 10. 2026 schválil vydání pro řízenou red-team zkoušku.
+   Rozhodnutí je verzováno v security/release-readiness-e10.json.
+   Povinné: úplné CI přesného SHA → chráněná main → deploy jen main.
+   --require-ready zůstává před merge/deploy; E7 nepřepisovat na PASS
+   bez skutečných mobilních pozorování a E6 nevydávat za uzavřené.

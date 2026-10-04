@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {releaseDecision} from './check-redteam-release-e10.mjs';
 const reports=[
   ...['e1-isolation','e1-browser','e2-trust','e2-browser','e3-verifier','e3-browser','e4-faults','e4-browser','e5-runtime','e5-browser','e6-publication','e7-mobile-protocol','e7-recorder','e8-forgery','e8-retention','e8-browser','e9-ci-contract','e9-negative','e9-restart-browser'].map(x=>'qa-results/redteam-'+x+'.json'),
   'qa-results/security-behavior-r3.json','qa-results/adversarial-harness-r5.json','qa-results/d7-regressions.json','qa-results/d8-final-audit.json','qa-results/stage3-pdf-runtime/summary.json','qa-results/stage3-pdf-quality/summary.json','qa-results/verifier-ui-runtime/summary.json',
@@ -45,5 +46,5 @@ const mutations=[
   ['failed-foundation',x=>x['audit/evidence/garp27-current/foundation-summary.json'].data.summary.failed=1],
 ];
 for(const [id,mutate] of mutations){const broken=structuredClone(records);mutate(broken);assert.throws(()=>validate(broken,version,startedAt),{name:'AssertionError'},id);}
-const report={stage:'E9',version,status:'PASS',startedAt,completedAt:new Date().toISOString(),scope:'Complete current-version process chain, report admission and SHA256 binding; local execution is not remote CI',reportCount:reports.length,reports:reports.map(file=>({file,sha256:records[file].sha256})),negativeControls:mutations.map(([id])=>({id,detected:true})),physicalMobile:'ANALYZED / NOT TESTED',releaseReadiness:'NOT READY – BLOCKING ISSUE'};
+const report={stage:'E9',version,status:'PASS',startedAt,completedAt:new Date().toISOString(),scope:'Complete current-version process chain, report admission and SHA256 binding; local execution is not remote CI',reportCount:reports.length,reports:reports.map(file=>({file,sha256:records[file].sha256})),negativeControls:mutations.map(([id])=>({id,detected:true})),physicalMobile:'ANALYZED / NOT TESTED',...releaseDecision(JSON.parse(fs.readFileSync('security/release-readiness-e10.json')),version)};
 fs.writeFileSync('qa-results/redteam-e9-evidence.json',JSON.stringify(report,null,2)+'\n');console.log('PASS E9 evidence admission:',reports.length,'reports,',mutations.length,'negative controls');

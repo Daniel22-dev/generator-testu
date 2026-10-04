@@ -3,12 +3,13 @@
   "stage": "P5",
   "appId": "generator",
   "appVersion": "7.1.87",
-  "releaseStatus": "redteam-e10-checkpoint-not-ready",
+  "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
     "offlineCapable": true,
-    "currentUseApproved": false
+    "currentUseApproved": true,
+    "useScope": "controlled-student-redteam-only"
   },
   "github": {
     "status": "not-yet-uploaded",
@@ -39,19 +40,19 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "REDTEAM-V2-E10-CI-FIX-2026-10-04",
+  "revision": "REDTEAM-V2-E10-OWNER-RELEASE-2026-10-04",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "Local exact-lockfile dependency checks, desktop Chromium reporter and fixture workflow; complete frozen E10 chain required for this candidate.",
-    "note": "7.1.87 repairs generation smoke, settings credential policy and current workflow fixtures. Remote exact-SHA certification is recorded in CI evidence; these source metadata are not a live status authority. Physical E7, E6 incident closure/rotation and live Forms owner confirmation remain pending. NOT READY.",
+    "note": "7.1.87 fixes secure generation, hidden credential settings and current workflow fixtures. Owner authorized publication on 2026-10-04: E6 deferred, Forms owner-reported checked, E7 physical mobile testing scheduled for 2026-10-06 and 2026-10-09. Exact-SHA CI and deployment verification remain required; physical devices are not certified.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false
   },
-  "note": "7.1.87 is a candidate-only E10 checkpoint. Do not promote it for the classroom experiment before the remaining acceptance criteria pass.",
+  "note": "Owner-approved release for the supervised student red-team experiment only. Current production status must be read from Actions and release identity; E6 is not closed and mobile testing is scheduled.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
