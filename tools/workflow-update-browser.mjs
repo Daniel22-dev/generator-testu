@@ -63,7 +63,7 @@ try{
   pass('Listening vyžaduje zdroj a uloží počet otázek');
   await page.evaluate(()=>{setVal('rosterEmails','a@example.invalid\nb@example.invalid');rosterRefreshParticipants();state.identityMode='oneTimeCode';applyVisualState();goTo(2);});
   await page.locator('#participantMode').selectOption('selected');
-  await page.locator('#participantList input').nth(1).check();await page.getByRole('button',{name:'🔑 Vygenerovat kódy',exact:true}).click();
+  await page.locator('#participantList input').nth(1).check();await page.getByRole('button',{name:'Připravit / doplnit kódy',exact:true}).click();
   assert.equal(await page.evaluate(()=>rosterEntries.length),1);assert.equal(await page.evaluate(()=>rosterEntries[0].email),'b@example.invalid');
   pass('Checklist vytvoří kód jen vybranému studentovi');
   await page.setViewportSize({width:390,height:844});await page.evaluate(()=>goTo(1));await page.locator('#comprehensionSummary button').first().click();

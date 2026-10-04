@@ -95,8 +95,12 @@ function resetBase(){
   w.closeComprehensionDialog(false);
   w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',jazyk:'angličtina',instrJazyk:'target',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfigSaved:false,exerciseConfig:[],body:30,gradeTyp:'skola',odevzdavani:'B',testMode:'bezny',resultMode:'instant',feedbackMode:'brief',identityMode:'name',randomizace:'NE',layout:'tabs',zolicek:'NE',diferencovany:'NE',skupiny:[],screenGuard:false,cas:30,fileNames:[],urls:[''],aiGradeScale:null,aiGradeRaw:''}); rosterEntries=[];`);
   setVal('nazev','Workflow test'); setVal('proKoho','1.A'); setVal('latka','Present simple');
+  w.eval("Object.assign(state,{participantMode:'all',readingQuestionCount:4,listeningQuestionCount:4,readingConfigured:false,listeningConfigured:false,readingSourceScope:'shared',readingSourceAction:'generate',readingProvenance:null}); rosterEntries=[]; rosterIssuedCodes=new Map(); rosterIssuedState=state; rosterSelectedEmails.clear(); rosterKnownEmails.clear();");
+  setVal('rosterEmails',''); setVal('participantSearch','');
+  setVal('readingText',''); setVal('readingQuestions',''); setVal('readingSourceText',''); setVal('readingTopicCustom','');
+  setVal('listeningTranscript',''); setVal('listeningQuestions',''); setVal('listeningFocus','');
   setVal('vlastniSkala','');
-  setVal('listeningTranscript',''); setVal('ucitelJmeno','Daniel Teacher');
+  setVal('ucitelJmeno','Daniel Teacher');
   setVal('ucitelPin','TEACH-ABCDEF-123456'); setVal('recoveryCode','REC-AB12-CD34'); setVal('heslo','');
   w.eval("Access.profile={role:'admin',userId:'TEST',displayName:'Test',status:'active'}; Access.granted=true;");
   w.enforceModeConstraints(); w.applyVisualState(); w.validate();
@@ -253,6 +257,8 @@ await okAsync('Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsec
     assert(['text','image','document'].every(t=>registry.analysis.inputTypes.includes(t)),'reading-source-analysis nema text/image/document');
     assert(['text','image','document'].every(t=>registry.suggestion.inputTypes.includes(t)),'reading-package-suggestion nema text/image/document');
     w.eval("geminiApiKey='workflow-test-key';");
+    const previousNoticeAccepted=w.eval('geminiDataNoticeAcceptedInMemory');
+    w.eval('geminiDataNoticeAcceptedInMemory=true');
     for(const c of cases){
       resetBase();
       setVal('zadaniText','Travel vocabulary source: journey, accommodation, departure.');
@@ -270,7 +276,10 @@ await okAsync('Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsec
       assert(!err,`${c.appMode}/${actualMode} skoncil chybou: ${err&&err.textContent}`);
       assert(/Synthetic B1 travel passage/.test(w.document.getElementById('rcAiPreview')?.textContent||''),`${c.appMode}/${actualMode} nedokoncil navrh Readingu`);
     }
-  }finally{w.callGeminiJSON=originalCall;}
+  }finally{
+    w.callGeminiJSON=originalCall;
+    w.eval('geminiDataNoticeAcceptedInMemory='+(previousNoticeAccepted?'true':'false'));
+  }
   return cases.length+' kombinaci x 2 AI faze';
 });
 
@@ -306,7 +315,13 @@ ok('mezera ve stupnici je zablokována',()=>{assert(!gradeCase('1 = 88-100 %\n2 
 ok('překryv stupnice je zablokován',()=>{assert(!gradeCase('1 = 88-100 %\n2 = 74-90 %\n3 = 59-73 %\n4 = 44-58 %\n5 = 0-43 %'),'překryv prošel');});
 
 // 7) Diferenciace: úplnost, duplicity a 1:1 vazba na roster.
-function setGroups(groups,identity='name',roster=[]){resetBase();w.eval(`state.diferencovany='ANO';state.identityMode='${identity}';state.skupiny=${JSON.stringify(groups)};rosterEntries=${JSON.stringify(roster)};`);w.validate();return {enabled:!w.document.getElementById('next3').disabled,hint:w.document.getElementById('validHint3').textContent};}
+function setGroups(groups,identity='name',roster=[]){
+  resetBase();
+  w.eval(`state.diferencovany='ANO';state.identityMode='${identity}';state.participantMode='all';state.skupiny=${JSON.stringify(groups)};rosterEntries=${JSON.stringify(roster)};`);
+  if(identity==='oneTimeCode') setVal('rosterEmails',roster.map(x=>x.email).join('\n'));
+  w.validate();
+  return {enabled:!w.document.getElementById('next3').disabled,hint:w.document.getElementById('validHint3').textContent};
+}
 const g1={id:1,nazev:'A',podminky:'Více opory',studenti:['STU-1']},g2={id:2,nazev:'B',podminky:'Vyšší náročnost',studenti:['STU-2']};
 ok('unikátní identifikátory skupin projdou',()=>{assert(setGroups([g1,g2]).enabled,'platné skupiny blokovány');});
 ok('duplicitní student ve skupinách je zablokován',()=>{const r=setGroups([g1,{...g2,studenti:['STU-1']}]);assert(!r.enabled,'duplicita prošla');assert(/více skupin/.test(r.hint),'chybí zpráva');});
