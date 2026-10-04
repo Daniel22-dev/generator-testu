@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.86',
+  version: '7.1.87',
   date:    '2026-10-04',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'RED-TEAM E10 CI FIX (7.1.87): smoke gate respektuje oddělený private verifier; klikací sady používají jeho startovní kód. Sjednocena dokumentace a release metadata. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E10 (7.1.86): zadání šifrované AES-GCM/PBKDF2; startovní kód 50 bitů jen učiteli. Fail-closed start, reload a offline testy; readiness brání merge/deploy. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E9 (7.1.85): společný CI řetězec, záporné kontroly exportu/zapojení/evidence a nativní obnova pokusu. GARP před P5 zachová reporty. E7 fyzicky netestováno; F7 chybí. NOT READY.',
     'RED-TEAM E8 (7.1.84): 108 forgery scénářů, negativní kontroly, skutečný CSV import a dlouhá historie po reloadu. Verifier odmítá rozporné start/joker/split události; klientské skóre přepočítá. Konzistentní forgery zůstává CLIENT-CONTROLLED / REVIEW_REQUIRED. NOT READY.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E4 / STORAGE (7.1.80): restart zachovává pokus, deadline a ciphertext outbox. Web Locks omezují souběh; poškozený stav má integrity lock. Soukromá replay evidence přežije restart. Native Chromium a negativní kontroly. Úplné smazání nebo jiný profil vyžaduje server; CLIENT-CONTROLLED.',
     'RED-TEAM E3 / VERIFIER (7.1.79): schéma a 21 typů odpovědí před bodováním; soukromé Forms účet→roster a publikace→Forms kotvy. Zálohy pouze diagnostické. Replay/konflikty vyřazeny; CSV zachovává pracovní sadu. Artefaktové/browser negativní kontroly. Runtime CLIENT-CONTROLLED.',
     'RED-TEAM E2 / TRUST BOUNDARIES (7.1.78): soukromý přepočet oddělen od původu. Hash/časy/telemetrie CLIENT-CONTROLLED; šifrování neověřuje autora. UI/CSV/archivy REVIEW_REQUIRED. Secure generátor nevyžaduje Teacher/Admin secret. Artefaktové/browser a historické negativní kontroly.',
-    'RED-TEAM E1 / STUDENT ISOLATION (7.1.77): student HTML bez teacher módu, teacher/recovery secretů, rosteru a membership hashů. Classroom-unlock má vlastní doménu a je procesní brzda. Student nemá retry/reset. Soukromý verifier kontroluje kód→e-mail a variantu. Artefaktové a negativní kontroly.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.

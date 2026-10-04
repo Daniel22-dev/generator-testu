@@ -1,0 +1,64 @@
+{
+  "stage": "E9",
+  "version": "7.1.87",
+  "status": "PASS",
+  "scope": "Static wiring contract with 14 intentional mutations; actual process evidence is separate",
+  "negativeControls": [
+    {
+      "id": "drop-VM",
+      "detected": true
+    },
+    {
+      "id": "drop-native",
+      "detected": true
+    },
+    {
+      "id": "drop-negatives",
+      "detected": true
+    },
+    {
+      "id": "local-ci-drift",
+      "detected": true
+    },
+    {
+      "id": "skip-admission",
+      "detected": true
+    },
+    {
+      "id": "wrong-order",
+      "detected": true
+    },
+    {
+      "id": "changed-source-accepted",
+      "detected": true
+    },
+    {
+      "id": "unsafe-log-path",
+      "detected": true
+    },
+    {
+      "id": "swallow-failure",
+      "detected": true
+    },
+    {
+      "id": "optional-gate",
+      "detected": true
+    },
+    {
+      "id": "unlocked-install",
+      "detected": true
+    },
+    {
+      "id": "unbound-artifact",
+      "detected": true
+    },
+    {
+      "id": "missing-evidence",
+      "detected": true
+    },
+    {
+      "id": "deploy-bypass",
+      "detected": true
+    }
+  ]
+}

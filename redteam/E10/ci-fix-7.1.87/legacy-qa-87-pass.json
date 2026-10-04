@@ -1,0 +1,792 @@
+{
+  "version": "7.1.87",
+  "sourceSnapshot": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 511,
+    "sha256": "3c327b686abea3fdc916abf36caf89421e1cb2d35ba588368a5fb8a902530b21",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "verdict": "AUTOMATED_READY",
+  "gates": {
+    "technical": {
+      "status": "PASS",
+      "details": {
+        "packageVersion": "7.1.87",
+        "node": "v24.19.0",
+        "filesChecked": 1195
+      },
+      "findingSeverities": []
+    },
+    "security": {
+      "status": "WARN",
+      "details": {
+        "filesChecked": 791,
+        "projectValidator": null
+      },
+      "findingSeverities": [
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR",
+        "MINOR"
+      ]
+    },
+    "pwa": {
+      "status": "PASS",
+      "details": {
+        "targets": 1
+      },
+      "findingSeverities": []
+    },
+    "combinatorial": {
+      "status": "PASS",
+      "details": {
+        "parameters": 6,
+        "parameterValues": {
+          "appMode": [
+            "simple",
+            "advanced"
+          ],
+          "language": [
+            "angličtina",
+            "němčina",
+            "španělština",
+            "francouzština",
+            "latina",
+            "čeština"
+          ],
+          "testMode": [
+            "procviceci",
+            "bezny",
+            "prisny"
+          ],
+          "resultMode": [
+            "instant",
+            "secureOffline"
+          ],
+          "identityMode": [
+            "name",
+            "oneTimeCode"
+          ],
+          "device": [
+            "mobile",
+            "desktop"
+          ]
+        },
+        "theoreticalCombinations": 288,
+        "executedScenarios": 19,
+        "pairwisePairs": 114,
+        "coveredPairs": 114,
+        "pairwiseCoveragePercent": 100,
+        "criticalTriples": [
+          {
+            "testMode": "procviceci",
+            "resultMode": "secureOffline",
+            "identityMode": "oneTimeCode"
+          },
+          {
+            "testMode": "prisny",
+            "resultMode": "secureOffline",
+            "identityMode": "oneTimeCode"
+          },
+          {
+            "appMode": "advanced",
+            "language": "čeština",
+            "resultMode": "secureOffline"
+          }
+        ],
+        "fixedScenarios": [
+          {
+            "appMode": "simple",
+            "language": "angličtina",
+            "testMode": "procviceci",
+            "resultMode": "instant",
+            "identityMode": "name",
+            "device": "mobile"
+          }
+        ],
+        "matrix": [
+          {
+            "id": "PW-001",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "angličtina",
+              "testMode": "procviceci",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"angličtina\",\"testMode\":\"procviceci\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"simple\",\"jazyk\":\"angličtina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=25498; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-002",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "angličtina",
+              "testMode": "procviceci",
+              "resultMode": "secureOffline",
+              "identityMode": "oneTimeCode",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"angličtina\",\"testMode\":\"procviceci\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"device\":\"mobile\"}; actual={\"appMode\":\"simple\",\"jazyk\":\"angličtina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=25498; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-003",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "angličtina",
+              "testMode": "prisny",
+              "resultMode": "secureOffline",
+              "identityMode": "oneTimeCode",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"angličtina\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"angličtina\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"anonymizace\":\"ANO\"}; prompt=27492; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-004",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "advanced",
+              "language": "čeština",
+              "testMode": "procviceci",
+              "resultMode": "secureOffline",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"advanced\",\"language\":\"čeština\",\"testMode\":\"procviceci\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"čeština\",\"testMode\":\"procviceci\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=30239; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-005",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "advanced",
+              "language": "němčina",
+              "testMode": "bezny",
+              "resultMode": "instant",
+              "identityMode": "oneTimeCode",
+              "device": "desktop"
+            },
+            "evidence": "requested={\"appMode\":\"advanced\",\"language\":\"němčina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"oneTimeCode\",\"device\":\"desktop\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"němčina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"oneTimeCode\",\"anonymizace\":\"ANO\"}; prompt=25156; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-006",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "španělština",
+              "testMode": "bezny",
+              "resultMode": "secureOffline",
+              "identityMode": "name",
+              "device": "desktop"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"španělština\",\"testMode\":\"bezny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"device\":\"desktop\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"španělština\",\"testMode\":\"bezny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=26975; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-007",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "advanced",
+              "language": "francouzština",
+              "testMode": "prisny",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "desktop"
+            },
+            "evidence": "requested={\"appMode\":\"advanced\",\"language\":\"francouzština\",\"testMode\":\"prisny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"desktop\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"francouzština\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=27507; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-008",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "francouzština",
+              "testMode": "bezny",
+              "resultMode": "secureOffline",
+              "identityMode": "oneTimeCode",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"francouzština\",\"testMode\":\"bezny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"francouzština\",\"testMode\":\"bezny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"anonymizace\":\"ANO\"}; prompt=26302; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-009",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "latina",
+              "testMode": "procviceci",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "desktop"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"latina\",\"testMode\":\"procviceci\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"desktop\"}; actual={\"appMode\":\"simple\",\"jazyk\":\"latina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=25478; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-010",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "němčina",
+              "testMode": "procviceci",
+              "resultMode": "secureOffline",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"němčina\",\"testMode\":\"procviceci\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"simple\",\"jazyk\":\"němčina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=25483; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-011",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "čeština",
+              "testMode": "bezny",
+              "resultMode": "instant",
+              "identityMode": "oneTimeCode",
+              "device": "desktop"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"čeština\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"oneTimeCode\",\"device\":\"desktop\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"čeština\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"oneTimeCode\",\"anonymizace\":\"ANO\"}; prompt=31325; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-012",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "advanced",
+              "language": "španělština",
+              "testMode": "procviceci",
+              "resultMode": "instant",
+              "identityMode": "oneTimeCode",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"advanced\",\"language\":\"španělština\",\"testMode\":\"procviceci\",\"resultMode\":\"instant\",\"identityMode\":\"oneTimeCode\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"španělština\",\"testMode\":\"procviceci\",\"resultMode\":\"instant\",\"identityMode\":\"oneTimeCode\",\"anonymizace\":\"ANO\"}; prompt=24776; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-013",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "advanced",
+              "language": "latina",
+              "testMode": "bezny",
+              "resultMode": "secureOffline",
+              "identityMode": "oneTimeCode",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"advanced\",\"language\":\"latina\",\"testMode\":\"bezny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"latina\",\"testMode\":\"bezny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"oneTimeCode\",\"anonymizace\":\"ANO\"}; prompt=26267; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-014",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "advanced",
+              "language": "angličtina",
+              "testMode": "bezny",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "desktop"
+            },
+            "evidence": "requested={\"appMode\":\"advanced\",\"language\":\"angličtina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"desktop\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"angličtina\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=25171; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-015",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "němčina",
+              "testMode": "prisny",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"němčina\",\"testMode\":\"prisny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"němčina\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=27477; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-016",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "španělština",
+              "testMode": "prisny",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"španělština\",\"testMode\":\"prisny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"španělština\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=28180; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-017",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "francouzština",
+              "testMode": "procviceci",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"francouzština\",\"testMode\":\"procviceci\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"simple\",\"jazyk\":\"francouzština\",\"testMode\":\"bezny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=25513; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-018",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "latina",
+              "testMode": "prisny",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"latina\",\"testMode\":\"prisny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"latina\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=27472; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          },
+          {
+            "id": "PW-019",
+            "status": "PASS",
+            "parameters": {
+              "appMode": "simple",
+              "language": "čeština",
+              "testMode": "prisny",
+              "resultMode": "instant",
+              "identityMode": "name",
+              "device": "mobile"
+            },
+            "evidence": "requested={\"appMode\":\"simple\",\"language\":\"čeština\",\"testMode\":\"prisny\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"device\":\"mobile\"}; actual={\"appMode\":\"advanced\",\"jazyk\":\"čeština\",\"testMode\":\"prisny\",\"resultMode\":\"secureOffline\",\"identityMode\":\"name\",\"anonymizace\":\"ANO\"}; prompt=33658; appModeSafe=true; resultSafe=true; simpleSafe=true; identitySafe=true"
+          }
+        ],
+        "limitations": [
+          "Síťová odpověď Gemini se testuje pomocí deterministického mocku v původním headless testu; skutečný externí model je součástí deployed smoke testu."
+        ]
+      },
+      "findingSeverities": []
+    },
+    "visual": {
+      "status": "PASS",
+      "details": {
+        "scenarios": 13,
+        "runs": 41,
+        "matrix": [
+          {
+            "scenario": "generator-mode-chooser",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-mode-chooser__360x800.png"
+          },
+          {
+            "scenario": "generator-mode-chooser",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-mode-chooser__1366x768.png"
+          },
+          {
+            "scenario": "generator-step-0",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-0__360x800.png"
+          },
+          {
+            "scenario": "generator-step-0",
+            "viewport": "412x915",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-0__412x915.png"
+          },
+          {
+            "scenario": "generator-step-0",
+            "viewport": "768x1024",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-0__768x1024.png"
+          },
+          {
+            "scenario": "generator-step-0",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-0__1366x768.png"
+          },
+          {
+            "scenario": "generator-step-0",
+            "viewport": "1920x1080",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-0__1920x1080.png"
+          },
+          {
+            "scenario": "generator-step-1",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-1__360x800.png"
+          },
+          {
+            "scenario": "generator-step-1",
+            "viewport": "412x915",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-1__412x915.png"
+          },
+          {
+            "scenario": "generator-step-1",
+            "viewport": "768x1024",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-1__768x1024.png"
+          },
+          {
+            "scenario": "generator-step-1",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-1__1366x768.png"
+          },
+          {
+            "scenario": "generator-step-1",
+            "viewport": "1920x1080",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-1__1920x1080.png"
+          },
+          {
+            "scenario": "generator-step-2",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-2__360x800.png"
+          },
+          {
+            "scenario": "generator-step-2",
+            "viewport": "412x915",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-2__412x915.png"
+          },
+          {
+            "scenario": "generator-step-2",
+            "viewport": "768x1024",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-2__768x1024.png"
+          },
+          {
+            "scenario": "generator-step-2",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-2__1366x768.png"
+          },
+          {
+            "scenario": "generator-step-2",
+            "viewport": "1920x1080",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-2__1920x1080.png"
+          },
+          {
+            "scenario": "generator-step-3",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-3__360x800.png"
+          },
+          {
+            "scenario": "generator-step-3",
+            "viewport": "412x915",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-3__412x915.png"
+          },
+          {
+            "scenario": "generator-step-3",
+            "viewport": "768x1024",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-3__768x1024.png"
+          },
+          {
+            "scenario": "generator-step-3",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-3__1366x768.png"
+          },
+          {
+            "scenario": "generator-step-3",
+            "viewport": "1920x1080",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-3__1920x1080.png"
+          },
+          {
+            "scenario": "generator-step-4",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-4__360x800.png"
+          },
+          {
+            "scenario": "generator-step-4",
+            "viewport": "412x915",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-4__412x915.png"
+          },
+          {
+            "scenario": "generator-step-4",
+            "viewport": "768x1024",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-4__768x1024.png"
+          },
+          {
+            "scenario": "generator-step-4",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-4__1366x768.png"
+          },
+          {
+            "scenario": "generator-step-4",
+            "viewport": "1920x1080",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-step-4__1920x1080.png"
+          },
+          {
+            "scenario": "generator-about",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-about__360x800.png"
+          },
+          {
+            "scenario": "generator-about",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-about__1366x768.png"
+          },
+          {
+            "scenario": "generator-test-lab",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-test-lab__360x800.png"
+          },
+          {
+            "scenario": "generator-test-lab",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-test-lab__1366x768.png"
+          },
+          {
+            "scenario": "generator-manual",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-manual__360x800.png"
+          },
+          {
+            "scenario": "generator-manual",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-manual__1366x768.png"
+          },
+          {
+            "scenario": "generator-long-form",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-long-form__360x800.png"
+          },
+          {
+            "scenario": "generator-long-form",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/generator-long-form__1366x768.png"
+          },
+          {
+            "scenario": "export-instant",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/export-instant__360x800.png"
+          },
+          {
+            "scenario": "export-instant",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/export-instant__1366x768.png"
+          },
+          {
+            "scenario": "export-secure-student",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/export-secure-student__360x800.png"
+          },
+          {
+            "scenario": "export-secure-student",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/export-secure-student__1366x768.png"
+          },
+          {
+            "scenario": "export-teacher-verifier",
+            "viewport": "360x800",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/export-teacher-verifier__360x800.png"
+          },
+          {
+            "scenario": "export-teacher-verifier",
+            "viewport": "1366x768",
+            "status": "PASS",
+            "message": "",
+            "screenshot": "qa-screenshots/export-teacher-verifier__1366x768.png"
+          }
+        ]
+      },
+      "findingSeverities": []
+    },
+    "critical": {
+      "status": "PASS",
+      "details": {
+        "flows": [
+          {
+            "id": "GEN-OPEN",
+            "name": "Učitel otevře Generátor",
+            "status": "PASS",
+            "evidence": [
+              "http://127.0.0.1:41593/dist/index.html"
+            ]
+          },
+          {
+            "id": "GEN-PROMPT",
+            "name": "Učitel sestaví zadání pro AI",
+            "status": "PASS",
+            "evidence": [
+              "http://127.0.0.1:41593/dist/index.html"
+            ]
+          },
+          {
+            "id": "GEN-TESTLAB",
+            "name": "Správce otevře interní Test Lab",
+            "status": "PASS",
+            "evidence": [
+              "http://127.0.0.1:41593/dist/index.html"
+            ]
+          },
+          {
+            "id": "GEN-INSTANT-EXPORT",
+            "name": "Exportovaný okamžitý test se otevře",
+            "status": "PASS",
+            "evidence": [
+              "http://127.0.0.1:41593/qa-results/qa-fixtures/instant_test.html"
+            ]
+          },
+          {
+            "id": "GEN-SECURE-EXPORT",
+            "name": "Exportovaný bezpečný test se otevře",
+            "status": "PASS",
+            "evidence": [
+              "http://127.0.0.1:41593/qa-results/qa-fixtures/student_test.html"
+            ]
+          },
+          {
+            "id": "GEN-VERIFIER",
+            "name": "Učitelský verifier se otevře",
+            "status": "PASS",
+            "evidence": [
+              "http://127.0.0.1:41593/qa-results/qa-fixtures/teacher_verifier.html"
+            ]
+          },
+          {
+            "id": "GEN-GUARD",
+            "name": "Veřejný build je fail-closed",
+            "status": "PASS",
+            "evidence": [
+              "dist/index.html: PASS",
+              "dist/index.html: PASS"
+            ]
+          },
+          {
+            "id": "GEN-SW-ISOLATION",
+            "name": "Service worker spravuje jen vlastní cache",
+            "status": "PASS",
+            "evidence": [
+              "public/sw.js: PASS"
+            ]
+          }
+        ]
+      },
+      "findingSeverities": []
+    }
+  },
+  "freshInstallLogSha256": "e90b6e48a98deb5ec1e74fa7955ce01ad07e165d908342daa560d2534c492875",
+  "scope": "Local isolated copy with fresh npm ci. Initial visual/critical run lacked the local browser override; both reran successfully with GHRAB_CHROMIUM_PATH. Synthetic generated HTML/private keys are excluded from this record."
+}

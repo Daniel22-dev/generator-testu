@@ -3,7 +3,7 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 qa:garp27:mutations
+> generator-testu@7.1.87 qa:garp27:mutations
 > node scripts/garp27/mutation-tests.mjs
 
 {

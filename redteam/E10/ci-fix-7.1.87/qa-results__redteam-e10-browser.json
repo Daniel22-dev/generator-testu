@@ -1,0 +1,41 @@
+{
+  "stage": "E10",
+  "version": "7.1.87",
+  "status": "PASS",
+  "browser": "153.0.8010.0",
+  "checks": [
+    {
+      "id": "pre-start-missing-wrong-classroom-code",
+      "status": "PASS"
+    },
+    {
+      "id": "native-correct-code",
+      "status": "PASS"
+    },
+    {
+      "id": "reload-requires-code-preserves-persisted-origin",
+      "status": "PASS"
+    },
+    {
+      "id": "reload-code-recovery-and-private-rescore",
+      "status": "PASS"
+    },
+    {
+      "id": "loaded-standalone-offline-start",
+      "status": "PASS"
+    },
+    {
+      "id": "file-protocol-existing-environment-block-preserved",
+      "status": "PASS"
+    }
+  ],
+  "negativeControls": [
+    {
+      "id": "bypassed-production-unlock",
+      "detected": true
+    }
+  ],
+  "exceptions": 0,
+  "scope": "Actual generated encrypted artifact and original exported policy on native desktop Chromium, durable IndexedDB, offline already-loaded page, existing file-protocol block, real private rescore. Test-only broken script remains executable.",
+  "physicalMobile": "ANALYZED / NOT TESTED"
+}

@@ -1,4 +1,6 @@
-> **7.1.80 — RED-TEAM v2 / E4 checkpoint.** Pokus i zašifrovaný výsledek přežijí restart ve stejném profilu. Outbox obnoví přerušené odevzdání, podporované Web Locks brání souběhu karet a soukromá replay evidence verifieru přetrvá restart. Úplné smazání storage, anonymní režim a jiný profil jsou **ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED**. Původ runtime zůstává CLIENT-CONTROLLED; známky vyžadují REVIEW_REQUIRED. **NOT READY – BLOCKING ISSUE:** E5–E10 a F7 čekají. Viz RELEASE-NOTES-7.1.80.md.
+> **7.1.87 — RED-TEAM v2 / E10 CI oprava, candidate.** Zašifrované zadání se otevře až po zadání startovního kódu z odpovídajícího soukromého verifieru. Kontrola sestavení respektuje oddělení student/učitel; klikací regresní sady ověřují aktuální workflow. **NOT READY – BLOCKING ISSUE:** fyzické E7, uzavření E6 a živé školní Forms čekají. Viz [RELEASE-NOTES-7.1.87.md](RELEASE-NOTES-7.1.87.md).
+
+> **Historický checkpoint 7.1.80 — RED-TEAM v2 / E4.** Pokus i zašifrovaný výsledek přežijí restart ve stejném profilu. Outbox obnoví přerušené odevzdání, podporované Web Locks brání souběhu karet a soukromá replay evidence verifieru přetrvá restart. Úplné smazání storage, anonymní režim a jiný profil jsou **ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED**. Původ runtime zůstává CLIENT-CONTROLLED; známky vyžadují REVIEW_REQUIRED. **NOT READY – BLOCKING ISSUE:** E5–E10 a F7 čekají. Viz RELEASE-NOTES-7.1.80.md.
 
 > **7.1.75 — bezpečnostní rozdělení credentialů.** Teacher/Admin secret je tajný privilegovaný údaj pouze pro učitele; Classroom Recovery Code je per-test provozní kód pouze pro odemknutí aktuálního zámku. Obě větve mají oddělenou kryptografickou doménu, Recovery Code nemůže otevřít teacher panel/retry/reset a raw credentialy se neukládají do studentského HTML, historie, šablon, exportu zadání ani AI/manual promptů. Viz RELEASE-NOTES-7.1.75.md.
 
@@ -30,7 +32,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.80 (E4 checkpoint, candidate)
+**Aktuální verze:** 7.1.87 (E10 CI oprava, candidate; NOT READY)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

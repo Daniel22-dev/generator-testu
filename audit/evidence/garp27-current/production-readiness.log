@@ -3,12 +3,12 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 check:production
+> generator-testu@7.1.87 check:production
 > node scripts/check-production-readiness.mjs && npm run check:verifier-v2
 
 ✅  Produkcni invariants jsou splneny.
 
-> generator-testu@7.1.86 check:verifier-v2
+> generator-testu@7.1.87 check:verifier-v2
 > node scripts/check-teacher-verifier-v2.mjs
 
 ✅  Teacher Verifier 2.0 shell exists.

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "qa:redteam:ci"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-04T10:44:15.273282+00:00",
+  "completedAt": "2026-10-04T10:49:07.094222+00:00",
+  "version": "7.1.87",
+  "logFile": "e10-ci-fix-87-verified.log",
+  "logBytes": 297,
+  "logSha256": "3d282bf62b72bc0c36808720f3de458cf109775a31f7229f9642f14cbaf172aa",
+  "scope": "Local installed exact-lockfile dependencies; no GitHub Actions or real mobile run"
+}

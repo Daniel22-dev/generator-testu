@@ -3,11 +3,11 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 garp25:prep-static
+> generator-testu@7.1.87 garp25:prep-static
 > npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks
 
 
-> generator-testu@7.1.86 garp25:selftest
+> generator-testu@7.1.87 garp25:selftest
 > node security/garp25/tools/selftest-garp251.mjs
 
 {
@@ -17,7 +17,7 @@ STDOUT
   "failed": []
 }
 
-> generator-testu@7.1.86 garp25:sync-rewrite
+> generator-testu@7.1.87 garp25:sync-rewrite
 > node scripts/test-ai-core-version-rewrite.mjs
 
 {
@@ -29,17 +29,17 @@ STDOUT
   ]
 }
 
-> generator-testu@7.1.86 garp25:sbom:check
-> node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.86.cdx.json --check
+> generator-testu@7.1.87 garp25:sbom:check
+> node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.87.cdx.json --check
 
 ✅ CycloneDX 1.7 SBOM odpovídá lockfile: 113 komponent.
 
-> generator-testu@7.1.86 garp25:ai-evidence:check
+> generator-testu@7.1.87 garp25:ai-evidence:check
 > node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check
 
-✅ AI assurance fingerprint current: 8b286d5701d7108a80f01cf25a1e0da1b1c24ca5cfed9f5dfab56a008d2caca1
+✅ AI assurance fingerprint current: 0140311457950d8da8e37fde0ad531ad2ff3c4d7a2f6e2663127229d25df62ce
 
-> generator-testu@7.1.86 garp25:sw
+> generator-testu@7.1.87 garp25:sw
 > node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json
 
 {
@@ -107,7 +107,7 @@ STDOUT
   "note": "Static bounded analysis. PASS means network-only authorization/revocation/integrity assets are never cached and route through networkOnlyNoStore, while declared freshness-sensitive offline fail-safe scripts are install-cached and route networkFirst with cache fallback. Does not replace SIM-07 browser revocation/offline tests."
 }
 
-> generator-testu@7.1.86 garp25:sw-offline
+> generator-testu@7.1.87 garp25:sw-offline
 > node scripts/test-sw-offline-failsafe.mjs
 
 PASS install-created-cache
@@ -122,11 +122,11 @@ PASS integrity-remains-network-only-no-cache-fallback
 {
   "status": "PASS",
   "checks": 9,
-  "cacheName": "ghrab-generator-v7.1.86",
+  "cacheName": "ghrab-generator-v7.1.87",
   "policy": "network-first support layers + network-only authorization/revocation/integrity"
 }
 
-> generator-testu@7.1.86 garp25:vendored
+> generator-testu@7.1.87 garp25:vendored
 > node security/garp25/tools/check-vendored-consistency.mjs security/vendored-consistency.generator.json
 
 {
@@ -188,12 +188,12 @@ PASS integrity-remains-network-only-no-cache-fallback
   "findings": []
 }
 
-> generator-testu@7.1.86 garp25:leaks
+> generator-testu@7.1.87 garp25:leaks
 > node security/garp25/tools/scan-deployment-leaks.mjs dist
 
 {
   "status": "PASS",
-  "root": "/workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/dist",
+  "root": "/workspace/scratch/ebcee4a4dd99/work-e10/ci-legacy-qa-87/dist",
   "info": [
     "INFO-binary-not-scanned:assets/brand/school-logo.png",
     "INFO-binary-not-scanned:icons/apple-touch-icon.png",

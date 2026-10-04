@@ -56,7 +56,7 @@ jobs:
       - name: Enforce E9 complete regression admission
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: c5bd32c64d8da7c57e3be5e15b02cb7d64d171a3e7893f7455b1b80b2ea78106
+          GARP27_EXTERNAL_TRUST_SHA256: 48cbd8e65a9834a64c95075ba2e6be6fe22e05a48cb316e12f25cead87b9b17b
 
       - name: Upload QA evidence
         if: always()

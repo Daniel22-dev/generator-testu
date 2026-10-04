@@ -1,5 +1,5 @@
 from harness import Harness,TESTS
-from browser_matrix import answer,click_attr
+from browser_matrix import answer,click_attr,private_start_code,enter_start_code
 import json,traceback,time
 h=Harness();rows=[]
 try:
@@ -19,18 +19,26 @@ try:
   try:
    x=p.evaluate('''async a=>{auditConfigure(['translation','ordering'],a.mode,'fr');state.identityMode='oneTimeCode';if(a.groups){state.diferencovany='ANO';state.skupiny=rosterEntries.map((r,i)=>({nazev:'G'+i,podminky:'Specific group '+i,studenti:[r.code]}));}const d=auditFixtures(state,'fr'),b=await assembleTestHtml(state,d);return {html:b.studentHtml||b,teacher:b.teacherHtml,code:rosterEntries[0].code,variants:lastAssembled.variants,cfg:lastAssembled.cfg}}''',{'mode':mode,'groups':groups})
    assert 'qa.one@example.invalid' not in x['html'] and x['code'] not in x['html'],'plaintext roster leaked'
-   s=h.new_page(x['html']);assert s.evaluate('async()=>await identityAllowed("NOT-A-CODE")')==False
+   s=h.new_page(x['html']);assert s.evaluate('async()=>await identityAllowed("!invalid!")')==False
+   if mode=='secureOffline':
+    enter_start_code(s,private_start_code(h,x['teacher']))
+    if groups:s.locator('#studentVariant').select_option(x['cfg']['diffGroups'][0]['key'])
    s.locator('#studentName').fill(x['code']);click_attr(s,'onclick','startTest()');s.wait_for_function('started' if mode=='instant' else 'STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden") && document.getElementById("exerciseArea").children.length>0');key=s.evaluate('CFG.activeGroupKey' if mode=='instant' else 'ACTIVE_KEY');assert bool(key and key!="__default")==groups,key
    for i,ex in enumerate(x['variants'][key or '__default']):answer(s,ex,i,mode,'fr')
    if mode=='instant':sc=s.evaluate('calcScore()')
    else:
-    click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt)
+    click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt)
     # Real verifier import validates IDs, manifests and encrypted payload; importing twice warns.
-    v.locator('[data-v2-panel="results"]').click();v.locator('#fallbackImportDetails').evaluate('el=>{el.open=true}');v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('RESULTS.length===1');assert v.evaluate('RESULTS[0].status')=='OK',v.evaluate('RESULTS[0]')
-    dup=v.evaluate('async txt=>{await verifyText("second.txt",txt);return duplicateInfo()}',txt);assert len(dup['dupStudentKeys'])==len(dup['dupAttemptKeys'])==1,dup
+    v.locator('[data-v2-panel="results"]').click();v.locator('#fallbackImportDetails').evaluate('el=>{el.open=true}');v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('RESULTS.length===1');assert v.evaluate('RESULTS[0].status')=='DIAGNOSTIC_ONLY',v.evaluate('RESULTS[0]')
+    dup=v.evaluate('async txt=>{await verifyText("second.txt",txt);return duplicateInfo()}',txt);assert len(dup['dupStudentKeys'])==len(dup['dupAttemptKeys'])==0,('diagnostic copies must stay outside classification',dup)
+    # A syntactically valid unknown code is checked by the private verifier, not a public membership oracle.
+    body=v.evaluate('async txt=>await decryptPayload(parseTxt(txt))',txt);body['student']=body['code']='Z9Z9Z9';assert not v.evaluate("CONFIG.roster.some(x=>x.code==='Z9Z9Z9')")
+    cipher=s.evaluate('async body=>await encryptPayloadForTeacher(body)',body)
+    unknown=v.evaluate('a=>{const q=parseTxt(a.txt);q.payload=a.cipher;return "SECURE-ANSWERS-V1\\n"+JSON.stringify(q)}',{'txt':txt,'cipher':cipher})
+    invalid=v.evaluate('async txt=>{await verifyText("unknown.txt",txt);return RESULTS.at(-1)}',unknown);assert invalid['status']=='CHYBA' and 'binding.identity-variant' in invalid['validationCodes'] and 'neni v rosteru' in invalid['error'],invalid
     bad=v.evaluate('async txt=>{const q=parseTxt(txt);q.testId="WRONG";await verifyText("wrong.txt","SECURE-ANSWERS-V1\\n"+JSON.stringify(q));return RESULTS.at(-1).status}',txt);assert bad!='OK',bad
     corrupt=v.evaluate('async txt=>{const q=parseTxt(txt);q.payload.data=(q.payload.data[0]==="A"?"B":"A")+q.payload.data.slice(1);await verifyText("tamper.txt","SECURE-ANSWERS-V1\\n"+JSON.stringify(q));return RESULTS.at(-1).status}',txt);assert corrupt!='OK',corrupt
-   assert sc['earned']==sc['total']==24,sc;return {'mode':mode,'groups':groups,'wrongCodeRefused':True,'goldenScore':24,'rosterNotInStudentFile':True,'duplicateAndTamperChecked':mode=='secureOffline'}
+   assert sc['earned']==sc['total']==24,sc;return {'mode':mode,'groups':groups,'invalidCodeFormatRefused':True,'goldenScore':24,'rosterNotInStudentFile':True,'duplicateAndTamperChecked':mode=='secureOffline'}
   finally:
    if s:s.close()
    if v:v.close()
@@ -55,14 +63,16 @@ try:
  def joker(mode):
   x=p.evaluate('async m=>{auditConfigure(["translation"],m,"es");state.zolicek="ANO";const b=await assembleTestHtml(state,auditFixtures(state,"es"));return {html:b.studentHtml||b,teacher:b.teacherHtml}}',mode);s=h.new_page(x['html']);v=None
   try:
-   s.locator('#studentName').fill('QA');click_attr(s,'onclick','chooseJokerStart(true)');click_attr(s,'onclick','startTest()')
+   s.locator('#studentName').fill('QA')
+   if mode=='secureOffline':enter_start_code(s,private_start_code(h,x['teacher']))
+   click_attr(s,'onclick','chooseJokerStart(true)');click_attr(s,'onclick','startTest()')
    # 7.1.74+ seals the joker choice only after a dedicated irreversible confirmation.
    if mode=='instant':s.locator('.modal-ov [data-jok]').click()
    else:s.locator('.s-modal-bd [data-confirm-ok]').click()
    s.wait_for_function('started' if mode=='instant' else 'STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")')
    if mode=='instant':assert s.evaluate('jokerUsed');s.evaluate('timerDeadline=Date.now()-1;refreshInstantTimer()');s.wait_for_function('submitted')
    else:
-    assert s.evaluate('JOKER_USED');s.evaluate('TIMER_DEADLINE=Date.now()-1;refreshSecureTimer()');s.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');v=h.new_page(x['teacher']);payload=v.evaluate('async txt=>await decryptPayload(parseTxt(txt))',s.locator('#answerBackup').input_value());assert payload['jokerUsed']
+    assert s.evaluate('JOKER_USED');s.evaluate('TIMER_DEADLINE=Date.now()-1;refreshSecureTimer()');s.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")');v=h.new_page(x['teacher']);payload=v.evaluate('async txt=>await decryptPayload(parseTxt(txt))',s.locator('#answerBackup').input_value());assert payload['jokerUsed']
    return {'jokerRecorded':True,'deadlineAutoSubmit':True}
   finally:
    s.close()

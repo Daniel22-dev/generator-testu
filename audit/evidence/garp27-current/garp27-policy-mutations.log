@@ -3,7 +3,7 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 qa:garp27:policy-mutations
+> generator-testu@7.1.87 qa:garp27:policy-mutations
 > node scripts/garp27/policy-admission-mutations.mjs
 
 {
@@ -21,7 +21,7 @@ STDOUT
       "expectedExit": 0,
       "actualExit": 0,
       "pass": true,
-      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"PASS\",\n  \"contract\": \"garp27-policy-v1\",\n  \"appId\": \"generator\",\n  \"appVersion\": \"7.1.86\",\n  \"inventory\": \"/workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json\"\n}",
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"PASS\",\n  \"contract\": \"garp27-policy-v1\",\n  \"appId\": \"generator\",\n  \"appVersion\": \"7.1.87\",\n  \"inventory\": \"/workspace/scratch/ebcee4a4dd99/work-e10/ci-legacy-qa-87/vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json\"\n}",
       "stderr": ""
     },
     {

@@ -3,7 +3,7 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 qa:garp27:architecture
+> generator-testu@7.1.87 qa:garp27:architecture
 > node scripts/garp27/architecture-integrity.mjs
 
 {
@@ -11,7 +11,7 @@ STDOUT
   "schema": "garp27-architecture-integrity-report-v1",
   "garpVersion": "2.7",
   "appId": "generator",
-  "appVersion": "7.1.86",
+  "appVersion": "7.1.87",
   "status": "PASS",
   "trustMode": "LOCAL_PIN",
   "scope": {

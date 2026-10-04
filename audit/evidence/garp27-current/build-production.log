@@ -3,11 +3,11 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 prebuild
+> generator-testu@7.1.87 prebuild
 > npm run check:credential-security && npm run check:security-forensics && npm run check:secret-hygiene && npm run check:security-adversarial && npm run check:e1-remediation && npm run check:r2-credential-policy && npm run check:r3-test-infrastructure && npm run check:r4-recovery-runtime && npm run check:r5-adversarial-wiring && npm run check:f0-ci-trust-pin && npm run check:f2-journey-migration && npm run check:ai-operations && npm run check:exercise-help && npm run check:verifier-generated-syntax && npm run check:embedded-script-terminators && npm run check:studio-manifest
 
 
-> generator-testu@7.1.86 check:credential-security
+> generator-testu@7.1.87 check:credential-security
 > node scripts/check-security-credential-e1.mjs && node scripts/check-security-credential-e2.mjs && node scripts/check-security-credential-e3.mjs
 
 PASS E1: teacher/admin secret field exists
@@ -93,7 +93,7 @@ PASS E3 instant dynamic: fewer than five lock taps do not reveal Recovery input
 PASS E3 instant dynamic: fifth lock tap reveals Recovery input
 PASS E3 runtime privilege-boundary gate
 
-> generator-testu@7.1.86 check:security-forensics
+> generator-testu@7.1.87 check:security-forensics
 > node scripts/check-security-forensics-e4.mjs
 
 PASS E4 secure: successful Classroom Recovery unlock has explicit recovery-unlock event
@@ -113,7 +113,7 @@ PASS E4 verifier dynamic: recovery count and linked lock reasons are visible
 PASS E4 verifier dynamic: exported timeline preserves event order
 PASS E4 forensic audit gate
 
-> generator-testu@7.1.86 check:secret-hygiene
+> generator-testu@7.1.87 check:secret-hygiene
 > node scripts/check-security-secret-hygiene-e5.mjs
 
 ✅ E5: both credential DOM fields remain marked sensitive
@@ -152,7 +152,7 @@ PASS E4 forensic audit gate
 
 ✅ E5 secret hygiene gate PASS.
 
-> generator-testu@7.1.86 check:security-adversarial
+> generator-testu@7.1.87 check:security-adversarial
 > node scripts/check-security-adversarial-e6.mjs
 
 PASS E6: secure recovery credential has one runtime authority: unlock
@@ -173,14 +173,14 @@ PASS E6: Verifier export preserves forensic timeline
 PASS E6: secure runtime retains sealed attempt/deadline persistence
 PASS E6 adversarial security gate
 
-> generator-testu@7.1.86 check:e1-remediation
+> generator-testu@7.1.87 check:e1-remediation
 > node scripts/check-e1-remediation.mjs
 
 PASS student persistence is signed, revisioned, redundant and submit-race hardened
 PASS teacher verifier rejects forged student-variant binding before scoring
 E1 REMEDIATION STATIC/DYNAMIC GATE PASSED
 
-> generator-testu@7.1.86 check:r2-credential-policy
+> generator-testu@7.1.87 check:r2-credential-policy
 > node scripts/check-credential-policy-r2.mjs
 
 PASS R2: valid distinct credentials pass
@@ -197,7 +197,7 @@ PASS R2: assembleTestHtml enforces shared credential policy
 PASS R2: assembleTestHtml fails closed on credential policy errors
 PASS R2 credential policy gate
 
-> generator-testu@7.1.86 check:r3-test-infrastructure
+> generator-testu@7.1.87 check:r3-test-infrastructure
 > node scripts/check-test-infrastructure-r3.mjs
 
 PASS R3: D7 fixture uses a policy-compliant Teacher/Admin secret
@@ -215,7 +215,7 @@ PASS R3: R3 behavioral gate has an npm script
 PASS R3: npm test requires the R3 behavioral gate after build
 PASS R3 test infrastructure gate
 
-> generator-testu@7.1.86 check:r4-recovery-runtime
+> generator-testu@7.1.87 check:r4-recovery-runtime
 > node scripts/check-recovery-runtime-r4.mjs
 
 PASS R4: secure runtime declares unlock busy state
@@ -237,7 +237,7 @@ PASS R4: instant unlock on an already unlocked attempt is a no-op
 PASS R4: instant warningCount increments only for warning-class events
 PASS R4 recovery runtime gate
 
-> generator-testu@7.1.86 check:r5-adversarial-wiring
+> generator-testu@7.1.87 check:r5-adversarial-wiring
 > node scripts/check-adversarial-wiring-r5.mjs
 
 PASS R5: behavioral R5 gate covers: Q-crypto: stejný plaintext v obou rolích
@@ -265,12 +265,12 @@ PASS R5: R4 runtime gate is defined
 PASS R5: prebuild requires the R4 recovery runtime gate
 PASS R5 adversarial wiring gate
 
-> generator-testu@7.1.86 check:f0-ci-trust-pin
+> generator-testu@7.1.87 check:f0-ci-trust-pin
 > node scripts/check-ci-trust-pin-f0.mjs
 
-PASS F0 CI trust pin gate: 7 workflow pin(s) match c5bd32c64d8da7c57e3be5e15b02cb7d64d171a3e7893f7455b1b80b2ea78106
+PASS F0 CI trust pin gate: 7 workflow pin(s) match 48cbd8e65a9834a64c95075ba2e6be6fe22e05a48cb316e12f25cead87b9b17b
 
-> generator-testu@7.1.86 check:f2-journey-migration
+> generator-testu@7.1.87 check:f2-journey-migration
 > node scripts/check-f2-journey-migration.mjs
 
 PASS F2: audit fixture declares independent Teacher/Admin secret
@@ -297,17 +297,17 @@ PASS F2: primary journey discloses Verifier emergency fallback before paste
 PASS F2: identity suite scenario cardinality stays 8
 PASS F2 journey E2E migration gate
 
-> generator-testu@7.1.86 check:ai-operations
+> generator-testu@7.1.87 check:ai-operations
 > node scripts/check-ai-operation-registry.mjs
 
 PASS ai-operations registry parity: 11 operations; runtime input types normalized to GHRAB AI Core 1.0.0.
 
-> generator-testu@7.1.86 check:exercise-help
+> generator-testu@7.1.87 check:exercise-help
 > node scripts/check-exercise-type-help.mjs
 
 PASS: 38 exercise types have complete contextual help; Simple mode exposes item/point controls without advanced manual controls.
 
-> generator-testu@7.1.86 check:verifier-generated-syntax
+> generator-testu@7.1.87 check:verifier-generated-syntax
 > node scripts/check-verifier-generated-script-syntax-r1.mjs
 
 PASS R1: inline verifier script 1/1 parses.
@@ -318,29 +318,29 @@ PASS R1: generated verifier contains bulkVerifyPasted().
 PASS R1: generated verifier contains downloadDirectPdf().
 R1 generated Teacher Verifier syntax gate PASS.
 
-> generator-testu@7.1.86 check:embedded-script-terminators
+> generator-testu@7.1.87 check:embedded-script-terminators
 > node scripts/check-embedded-script-terminators.mjs
 
 ✅ Embedded-script terminator guard: PASS (src/js, src/features)
 
-> generator-testu@7.1.86 check:studio-manifest
+> generator-testu@7.1.87 check:studio-manifest
 > node scripts/check-studio-manifest-template.mjs
 
-✅ Studio manifest template: generator 7.1.86, cache ghrab-generator-v7.1.86
+✅ Studio manifest template: generator 7.1.87, cache ghrab-generator-v7.1.87
 
-> generator-testu@7.1.86 build
+> generator-testu@7.1.87 build
 > node scripts/build.mjs
 
-✅ Generátor 7.1.86: Core 1.0.0 SHA-256 OK · 11 operací · 41 initial modulů + 2 lazy features · 1539.4 kB
-[P3] generator 7.1.86: platform 1.1.2, HTML 2, cache ghrab-generator-v7.1.86
+✅ Generátor 7.1.87: Core 1.0.0 SHA-256 OK · 11 operací · 41 initial modulů + 2 lazy features · 1539.3 kB
+[P3] generator 7.1.87: platform 1.1.2, HTML 2, cache ghrab-generator-v7.1.87
 
-> generator-testu@7.1.86 postbuild
+> generator-testu@7.1.87 postbuild
 > node scripts/ghrab-platform-conformance.mjs
 
 {
   "schema": "ghrab-platform-conformance-result-v1",
   "appId": "generator",
-  "appVersion": "7.1.86",
+  "appVersion": "7.1.87",
   "total": 115,
   "passed": 115,
   "failed": 0,
@@ -368,7 +368,7 @@ R1 generated Teacher Verifier syntax gate PASS.
     {
       "label": "package ↔ consumer version",
       "ok": true,
-      "detail": "7.1.86 / 7.1.86"
+      "detail": "7.1.87 / 7.1.87"
     },
     {
       "label": "platform contract",
@@ -408,7 +408,7 @@ R1 generated Teacher Verifier syntax gate PASS.
     {
       "label": "cache naming",
       "ok": true,
-      "detail": "ghrab-generator-v7.1.86"
+      "detail": "ghrab-generator-v7.1.87"
     },
     {
       "label": "storage migration declared",

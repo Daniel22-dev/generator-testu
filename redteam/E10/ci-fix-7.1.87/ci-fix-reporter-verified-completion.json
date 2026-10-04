@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "test:reporter"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-04T10:39:12.639879+00:00",
+  "completedAt": "2026-10-04T10:39:22.769902+00:00",
+  "version": "7.1.87",
+  "logFile": "ci-fix-reporter-verified.log",
+  "logBytes": 39628,
+  "logSha256": "2fbe1260efa11321224c3f03e3bdad057a4eff0608c0fc5bcdd8b0f6e251ff15",
+  "scope": "Local installed exact-lockfile dependencies; no GitHub Actions or real mobile run"
+}

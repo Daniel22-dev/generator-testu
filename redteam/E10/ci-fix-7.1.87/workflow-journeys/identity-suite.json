@@ -1,0 +1,86 @@
+[
+  {
+    "case": "roster-input-dedupe-invalid-code-csv",
+    "ok": true,
+    "detail": {
+      "validDistinctEntries": 2,
+      "downloadCSV": true
+    }
+  },
+  {
+    "case": "individual-code-instant-False",
+    "ok": true,
+    "detail": {
+      "mode": "instant",
+      "groups": false,
+      "invalidCodeFormatRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": false
+    }
+  },
+  {
+    "case": "individual-code-instant-True",
+    "ok": true,
+    "detail": {
+      "mode": "instant",
+      "groups": true,
+      "invalidCodeFormatRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": false
+    }
+  },
+  {
+    "case": "individual-code-secureOffline-False",
+    "ok": true,
+    "detail": {
+      "mode": "secureOffline",
+      "groups": false,
+      "invalidCodeFormatRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": true
+    }
+  },
+  {
+    "case": "individual-code-secureOffline-True",
+    "ok": true,
+    "detail": {
+      "mode": "secureOffline",
+      "groups": true,
+      "invalidCodeFormatRefused": true,
+      "goldenScore": 24,
+      "rosterNotInStudentFile": true,
+      "duplicateAndTamperChecked": true
+    }
+  },
+  {
+    "case": "teacher-admin-and-recovery-separation",
+    "ok": true,
+    "detail": {
+      "recoveryCannotTeacherLogin": true,
+      "teacherLoginWorks": true,
+      "teacherCannotRecoveryUnlock": true,
+      "recoveryUnlockWorks": true,
+      "separatePurposeHashes": true,
+      "legacyUnlockHashAbsent": true
+    }
+  },
+  {
+    "case": "joker-and-deadline-instant",
+    "ok": true,
+    "detail": {
+      "jokerRecorded": true,
+      "deadlineAutoSubmit": true
+    }
+  },
+  {
+    "case": "joker-and-deadline-secureOffline",
+    "ok": true,
+    "detail": {
+      "jokerRecorded": true,
+      "deadlineAutoSubmit": true
+    }
+  }
+]

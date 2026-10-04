@@ -3,7 +3,7 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 check:actions
+> generator-testu@7.1.87 check:actions
 > node scripts/check-action-pins.mjs
 
 ✅  Externí GitHub Actions jsou připnuté plným commit SHA (34 použití).

@@ -2,7 +2,7 @@
   "schema": "garp27-application-migration-profile-v1",
   "garpVersion": "2.7",
   "appId": "generator",
-  "appVersion": "7.1.86",
+  "appVersion": "7.1.87",
   "serverApproval": "DEFERRED_BY_OWNER_DECISION",
   "requiredComponents": [
     {
@@ -67,22 +67,22 @@
     }
   ],
   "trustedEvidence": {
-    "version-contract": "d270d1fb9d798cc391d87c90a994c0bca18ef674f96351f0b82e45613a5348d6",
-    "garp27-contracts": "aaf7e2a2a4a0c1d76914939e201128a5681fecbe662c6638959cf10a38b19438",
-    "garp27-architecture": "e96864dc27089c309da678e9e4fd24acbfc90f0292bbc2ac1587b0c11e452a18",
-    "garp27-policy-mutations": "de3164e09483c84f08a36ca8ab89f00b0bfd6e4be5d98c1d99c928e3aad7996c",
-    "garp27-mutations": "72f3211c11c9d86b4686ee1aacea5eee3be813041be0663937f5729d2be8bad7",
-    "garp27-auto-patch": "7f7201ef74500b72635a7ecb4452f68b864a2728379507a4e40fb3d16ed8b355",
-    "legacy-garp25-static": "563e7f6362550976a82b1658631064062958cd3cbad8527b67c9cfcfcc165502",
-    "production-readiness": "4aecccd0bd06336c1cd3e35164745d1ff796437718e30469793823615bf10969",
-    "action-pins": "a241b90db0a6aedf2f8b0fc88570e498889cb77c00c9eeafc459841a76c296d1",
-    "sensitive-scan": "4c3b08b9ce7f6b93a5cda9853223ff2feeb46584286f4fccce9064b364a655da"
+    "version-contract": "c040b8493f7a046f4098ccc68756786941dc41c24fda23a9ab6e960cbee7b955",
+    "garp27-contracts": "c50a6f6ebb4e31cd3a0212158121bfda0f1b44c70b5e1a17b03189fff9f2c703",
+    "garp27-architecture": "3e299f7ba36c676f7e25e6e25838fc6df49505e1ccc840afe150b91005a8a9e4",
+    "garp27-policy-mutations": "985181430de7839f622547a9df0d1efdd628c23c7104433708c08a14b831b0d9",
+    "garp27-mutations": "a6c8db5dd0bbef19e689a917786225de346c595b147e996d915af51fdc67df89",
+    "garp27-auto-patch": "1b75ceb9deb51236340d5821178a50f41907a5e4d92c7669f0e0209b7305551c",
+    "legacy-garp25-static": "3852b015e9070a0d2b284ad9c0cfa62a3bd7ab64a7e5aa0ab2e8d661dbe52d84",
+    "production-readiness": "3f2cfd8bcea10d14ff2928e2c74341c6ae6bd500a38b3b07930f12c76dba5212",
+    "action-pins": "99b1ee4a7f4ef535219efafe55dde8e765962b81437b9adcc097ec59db0e429c",
+    "sensitive-scan": "a6498bbf96bfd131c94b0ee2a8d0642d2c90ff75beea2b7c13bbf27455ad088d"
   },
   "maxEvidenceAgeHours": 168,
   "releaseIdentity": {
     "appId": "generator",
-    "appVersion": "7.1.86",
-    "sourceCommit": "b5801cccc88140ea683d9cf0278deb92c7771f8d"
+    "appVersion": "7.1.87",
+    "sourceCommit": "138d1e65d6f3f89d824f621cd74af490c224e299"
   },
   "releaseIdentityResolution": "The foundation gate replaces sourceCommit with GITHUB_SHA when available; local archive review uses a deterministic source-tree SHA-1 surrogate and labels it as such in evidence."
 }

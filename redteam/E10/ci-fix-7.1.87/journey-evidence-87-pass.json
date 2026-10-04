@@ -1,0 +1,59 @@
+{
+  "validateOnly": true,
+  "results": [
+    {
+      "suite": "journey_suite",
+      "ok": true,
+      "scenarios": 17,
+      "seconds": 0.0
+    },
+    {
+      "suite": "state_transition_suite",
+      "ok": true,
+      "scenarios": 10,
+      "seconds": 0.0
+    },
+    {
+      "suite": "config_extra_suite",
+      "ok": true,
+      "scenarios": 305,
+      "seconds": 0.0
+    },
+    {
+      "suite": "feature_suite",
+      "ok": true,
+      "scenarios": 19,
+      "seconds": 0.0
+    },
+    {
+      "suite": "integration_suite",
+      "ok": true,
+      "scenarios": 17,
+      "seconds": 0.0
+    },
+    {
+      "suite": "identity_suite",
+      "ok": true,
+      "scenarios": 8,
+      "seconds": 0.0
+    },
+    {
+      "suite": "wizard_suite",
+      "ok": true,
+      "scenarios": 16,
+      "seconds": 0.0
+    }
+  ],
+  "version": "7.1.87",
+  "scenarioCount": 392,
+  "executionScope": "Local desktop Chromium with fixture AI transport and Node WebCrypto bridge. Six unchanged suites passed in the full selected run; the journey suite reran after deterministic wait fixes. This validation-only pass checks all seven fresh result files; it does not itself execute browsers.",
+  "reportHashes": {
+    "wizard-suite.json": "780fc7507f5b33f32df0e5494db09bd2782aa1b16fbc73f6a3877231e32f699b",
+    "journey-suite.json": "0232c1cb2abe44492b29fa198df88da586ab14123d33a813f6e75d221740d2a4",
+    "identity-suite.json": "619baef59d6f353281473c95f80073a29fe70fb40efb1f149fb76b5b83177fc0",
+    "feature-suite.json": "237168db7238d610cb6a616c8788c40aac432e3588bd6a4b2651e28b026230db",
+    "state-transition-suite.json": "5cee33ebbb1931d8afb37f4964a66b81fa7bf8b5a968ca1ac60fe71f2f43639e",
+    "config-extra-suite.json": "c6568df0abf3e87ccfe5163351e4c6c8a132d69c0e023dc2b05dd64e426d18fe",
+    "integration-suite.json": "b0b30b4f982bf2c624305b605406046a3756c002969d0fa377b10f4f21e52c60"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "stage": "E7",
+  "version": "7.1.87",
+  "protocolVersion": "7.1.83",
+  "status": "PASS",
+  "scope": "Desktop Chromium verifies the offline recorder, not iPhone/iPad/Android runtime",
+  "browser": "153.0.8010.0",
+  "physicalDevicesTested": false,
+  "mobileStageStatus": "ANALYZED / NOT TESTED",
+  "checks": [
+    "Blank report includes all 146 unexecuted profile/case pairs, never mobile PASS.",
+    "Export rejects PASS without metadata/evidence/completed negative control.",
+    "Metadata and notes survive profile switching; notes cannot execute HTML.",
+    "Actual offline JSON download keeps self-reported scope and no release authorization.",
+    "Negative control: deliberately blocked UI script cannot produce a functioning recorder."
+  ],
+  "negativeControl": {
+    "id": "script-disabled",
+    "expectedRejected": true
+  }
+}

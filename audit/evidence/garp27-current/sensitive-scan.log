@@ -3,7 +3,7 @@ EXIT=0
 
 STDOUT
 
-> generator-testu@7.1.86 check:sensitive
+> generator-testu@7.1.87 check:sensitive
 > node scripts/check-sensitive-data.mjs
 
 ✅  Obecná kontrola citlivých údajů prošla (70 veřejných zdrojových souborů).
