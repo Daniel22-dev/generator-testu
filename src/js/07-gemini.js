@@ -382,9 +382,12 @@ async function validateSecurePackageSmoke(pkg) {
     throw new Error('Učitelský verifier nemá platný soukromý RSA klíč.');
   }
   const studentVariants = extractJsonConstFromHtml(pkg.studentHtml, 'STUDENT_VARIANTS');
-  assertNoStudentAnswerKeys(studentVariants);
+  if(Object.keys(studentVariants).length)throw new Error('Studentský HTML obsahuje nezašifrované zadání.');
+  const decrypted=await decryptStudentContent(extractJsonConstFromHtml(pkg.studentHtml,'ENCRYPTED_CONTENT'),pkg.startCode,studentCfg);
+  assertSecureStudentIsolation(studentCfg,decrypted,pkg.studentHtml);
+  assertNoStudentAnswerKeys(decrypted);
 
-  ['secureAnswers','downloadAnswers','encryptPayloadForTeacher','openTeacherModal','lockTest','switchExercise'].forEach(n=>{ if(!pkg.studentHtml.includes(n)) throw new Error('Studentský HTML nemá povinnou funkci: '+n); });
+  ['secureAnswers','downloadAnswers','encryptPayloadForTeacher','startTest','unlockTestContent','lockTest','switchExercise'].forEach(n=>{ if(!pkg.studentHtml.includes(n)) throw new Error('Studentský HTML nemá povinnou funkci: '+n); });
   if(/"uiLang"\s*:\s*"es"/.test(pkg.studentHtml) && /(Bezpečný offline režim|Nejdřív vyber zařízení|Začít test|Cvičení |Otázka |Pravda|Nepravda|Poslech)/.test(pkg.studentHtml)) {
     throw new Error('Španělský secure student HTML obsahuje české UI texty.');
   }

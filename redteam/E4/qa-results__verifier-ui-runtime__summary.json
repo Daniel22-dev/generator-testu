@@ -1,0 +1,43 @@
+{
+  "schema": "ghrab-verifier-ui-runtime-v1",
+  "chromium": "/workspace/scratch/ebcee4a4dd99/browser-runtime/chromium",
+  "status": "passed",
+  "checks": {
+    "dark": {
+      "theme": "dark",
+      "body": "rgb(11, 18, 32)",
+      "card": "rgb(17, 24, 39)",
+      "nav": "rgb(16, 24, 39)",
+      "input": "rgb(15, 23, 42)",
+      "modal": "rgb(17, 24, 39)"
+    },
+    "light": {
+      "theme": "light",
+      "body": "rgb(244, 246, 251)",
+      "card": "rgb(255, 255, 255)",
+      "nav": "rgb(243, 244, 246)",
+      "input": "rgb(255, 255, 255)",
+      "modal": "rgb(255, 255, 255)"
+    },
+    "fullscreen": {
+      "entered": {
+        "pressed": "true",
+        "text": "↙ Ukončit",
+        "body": true
+      },
+      "escaped": {
+        "pressed": "false",
+        "text": "⛶ Celá obrazovka",
+        "body": false
+      },
+      "unsupported": {
+        "ok": false,
+        "text": "Režim celé obrazovky není v tomto prohlížeči dostupný."
+      },
+      "rejected": {
+        "ok": false,
+        "text": "Režim celé obrazovky se nepodařilo spustit. Zkus F11 v prohlížeči."
+      }
+    }
+  }
+}

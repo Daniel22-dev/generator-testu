@@ -1,0 +1,46 @@
+{
+  "stage": "E10",
+  "version": "7.1.86",
+  "status": "PASS",
+  "startedAt": "2026-10-04T06:22:31.603Z",
+  "completedAt": "2026-10-04T06:28:53.523Z",
+  "reportCount": 38,
+  "reports": [
+    {
+      "file": "qa-results/redteam-e9-evidence.json",
+      "sha256": "ccdec630c45914085985b587198549a3412f673034f1f79d9986287773685c74"
+    },
+    {
+      "file": "qa-results/redteam-e10-content.json",
+      "sha256": "7511c27abd918e6d41bcfa6a1225ed3f2bc7e4dca154ef1e3ed884025b437f31"
+    },
+    {
+      "file": "qa-results/redteam-e10-browser.json",
+      "sha256": "51994f5b91a63adbc235f003503a2199a4a3cf9bebd0868bd1c5da6ffdb45e50"
+    },
+    {
+      "file": "qa-results/redteam-e10-release.json",
+      "sha256": "90ed9ecd09b06b31351177f6dc3acf38df753db458e94f1fc380da501586c25f"
+    }
+  ],
+  "negativeControls": [
+    {
+      "id": "stale-content",
+      "detected": true
+    },
+    {
+      "id": "reduced-entropy",
+      "detected": true
+    },
+    {
+      "id": "missing-native-negative",
+      "detected": true
+    },
+    {
+      "id": "false-release-ready",
+      "detected": true
+    }
+  ],
+  "releaseReadiness": "NOT READY – BLOCKING ISSUE",
+  "scope": "34 E9 reports plus its admission and 3 E10 reports; local evidence is not remote CI or deployment approval."
+}

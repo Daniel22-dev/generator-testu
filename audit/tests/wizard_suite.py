@@ -10,7 +10,10 @@ try:
    try:
     p.evaluate('(lang)=>{auditReset(["multiple choice","translation"],"instant",lang);state.appMode="simple";state.simpleTemplate="";state.pocet=2;state.body=24;applySimpleDefaults();applyVisualState();validate();goTo(0)}',lang)
     jaz=p.evaluate('state.jazyk');p.locator('#jazykBtns [data-val='+json.dumps(jaz,ensure_ascii=False)+']').click();p.locator('#nazev').fill('Wizard '+lang);p.locator('#proKoho').fill('QA students');p.locator('#latka').fill('Water and rivers')
-    p.locator('#next0').click();click_attr(p,'onclick',f"chooseSimplePurpose('{purpose}')");assert p.evaluate('state.appMode')=='simple';p.locator('#next1').click();assert not p.locator('#next2').is_disabled();p.locator('#next2').click();p.locator('#ucitelJmeno').fill('QA Teacher');p.locator('#ucitelPin').fill('AUDIT-TEACHER-482957');p.locator('#next3').click();p.locator('#btnGenerate').click();p.wait_for_function('!window.__GHRAB_GENERATOR_WORKFLOW_ID__',timeout=25000)
+    p.locator('#next0').click();click_attr(p,'onclick',f"chooseSimplePurpose('{purpose}')");assert p.evaluate('state.appMode')=='simple';p.locator('#next1').click();assert not p.locator('#next2').is_disabled();p.locator('#next2').click();p.locator('#ucitelJmeno').fill('QA Teacher');
+    if p.evaluate('requiresTeacherAccessCode()'):p.locator('#ucitelPin').fill('AUDIT-TEACHER-482957')
+    else:assert not p.locator('#ucitelPin').is_visible()
+    p.locator('#next3').click();p.locator('#btnGenerate').click();p.wait_for_function('!window.__GHRAB_GENERATOR_WORKFLOW_ID__',timeout=25000)
     d=p.evaluate('({error:$("genError").classList.contains("hidden")?"":$("genError").textContent,cfg:lastAssembled?.cfg,ex:lastAssembled?.variants.__default.length,calls:__calls.length,errors:__errors})');assert not d['error'] and d['ex']==2,d
     assert d['cfg']['uiLang']==lang and d['cfg']['resultMode']==('secureOffline'if purpose=='strict'else'instant'),d['cfg'];row.update(ok=True,calls=d['calls'],mode=d['cfg']['resultMode'],layout=d['cfg']['layout'])
    except Exception as e:row.update(ok=False,error=str(e),trace=traceback.format_exc());p.evaluate('closeUiModal(null)')

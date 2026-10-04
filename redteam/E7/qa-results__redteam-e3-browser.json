@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "version": "7.1.83",
+  "browser": "153.0.8010.0",
+  "syntheticOnly": true,
+  "platformScope": "desktop Chromium; real iOS/Android NOT TESTED",
+  "checks": [
+    "Native student submit -> actual CSV file input -> Forms anchors -> private score",
+    "Empty telemetry/impossible clocks/invalid answer/variant/trusted bits rejected before scoring",
+    "Wrong school account rejected",
+    "Repeated CSV import retains replay ledger and excludes duplicate",
+    "Real results/index/archive downloads preserve rejection and review status",
+    "Original CSP, real WebCrypto/IndexedDB, no pageerrors"
+  ],
+  "limits": [
+    "Live Forms settings are owner attested, not inspected",
+    "Private E4 digest observations survive same-profile restart; full wipe requires server",
+    "Runtime CLIENT-CONTROLLED even after anchors match"
+  ]
+}

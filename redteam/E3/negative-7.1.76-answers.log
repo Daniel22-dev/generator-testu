@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: multiple choice
+
+'OK' !== 'CHYBA'
+
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-verifier-e3.mjs:49:211
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-verifier-e3.mjs:18:81)
+    at async file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-verifier-e3.mjs:25:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'OK',
+  expected: 'CHYBA',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

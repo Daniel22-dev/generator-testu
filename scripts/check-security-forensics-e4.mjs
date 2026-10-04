@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
-const secure = read('src/js/13e-secure-student-runtime.js');
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant = read('src/js/14b-instant-test-runtime.js');
 const verifier = read('src/js/13f-secure-teacher-verifier.js');
 
@@ -27,10 +27,12 @@ assert(/results:RESULTS/.test(verifier), 'E4 exports: archive JSON retains resul
 {
   const els={unlockInp:makeEl(),lockScreen:makeEl(false),unlockReveal:makeEl(true),lockReasonBox:makeEl()};
   const ctx={console,setTimeout:()=>1,clearTimeout:()=>{},$:id=>els[id]||makeEl(),t:(k,f)=>f||k,
-    SEC_EVENTS:[],LOCKED:true,LOCK_REASON:'first reason',UNLOCK_BUSY:false,LOCK_TAPS:0,CFG:{},
+    SEC_EVENTS:[],LOCKED:true,LOCK_REASON:'first reason',UNLOCK_BUSY:false,LOCK_TAPS:0,PERSIST_INTEGRITY_BLOCK:false,GUARD_EPOCH:0,document:{visibilityState:"visible"},applyGuardUi:()=>{},CFG:{},
     recoveryCodeMatches:async v=>v==='REC',persistActiveAttemptSeal:()=>true};
   ctx.recordSec=function(type,detail,extra){const ev={t:'T'+(ctx.SEC_EVENTS.length+1),type,detail:detail||''};Object.assign(ev,extra||{});ctx.SEC_EVENTS.push(ev);};
-  vm.createContext(ctx); vm.runInContext(extractFunction(secure,'tryUnlock'),ctx);
+  vm.createContext(ctx);
+  vm.runInContext(fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8'),ctx);
+  vm.runInContext(vm.runInContext('SECURE_VERIFIER_TRUST_JS',ctx),ctx); vm.runInContext(extractFunction(secure,'tryUnlock'),ctx);
   ctx.SEC_EVENTS.push({t:'L1',type:'locked',detail:'first reason'}); els.unlockInp.value='REC'; await vm.runInContext('tryUnlock()',ctx);
   ctx.LOCKED=true;ctx.LOCK_REASON='second reason';ctx.SEC_EVENTS.push({t:'L2',type:'locked',detail:'second reason'});els.unlockInp.value='REC';await vm.runInContext('tryUnlock()',ctx);
   const seq=ctx.SEC_EVENTS.map(e=>e.type).join('>');
@@ -43,11 +45,13 @@ assert(/results:RESULTS/.test(verifier), 'E4 exports: archive JSON retains resul
   const ctx={console,Set,Math,Date,CONFIG:{cas:0,identityMode:'name',roster:[]},
     duplicateInfo:()=>({}),duplicateWarningsFor:()=>[],answerChangeTotal:()=>0,durationMinutes:()=>null,rosterHasCode:()=>true,submittedCode:()=>''};
   vm.createContext(ctx);
+  vm.runInContext(fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8'),ctx);
+  vm.runInContext(vm.runInContext('SECURE_VERIFIER_TRUST_JS',ctx),ctx);
   for(const fn of ['eventCount','eventTime','eventDetails','recoveryUnlockEvents','legacyUnlockEvents','securityEventTimelineText','securitySignalsFor','securityIssueCount','securitySignalText','securityAuditText']) vm.runInContext(extractFunction(verifier,fn),ctx);
   const onlyAudit={status:'OK',securityEvents:[{t:'1',type:'recovery-unlock',detail:'unlocked',lockReason:'left window'}],details:[],answerChangeStats:{}};
   ctx.r=onlyAudit;
-  assert(vm.runInContext('securityIssueCount(r)',ctx)===0,'E4 verifier dynamic: recovery unlock alone does not count as a security issue');
-  assert(vm.runInContext('securityAuditText(r,{}).length',ctx)===1,'E4 verifier dynamic: recovery unlock remains visible as audit information');
+  assert(vm.runInContext("securitySignalsFor(r,{}).filter(s=>s.code==='recovery-unlock'&&s.sev!=='info').length",ctx)===0,'E4 verifier dynamic: recovery unlock alone does not count as a security issue');
+  assert(vm.runInContext("securitySignalsFor(r,{}).filter(s=>s.code==='recovery-unlock'&&s.sev==='info').length",ctx)===1,'E4 verifier dynamic: recovery unlock remains visible as audit information');
   const cycle={status:'OK',securityEvents:[{t:'1',type:'locked',detail:'first reason'},{t:'2',type:'recovery-unlock',detail:'unlocked',lockReason:'first reason'},{t:'3',type:'locked',detail:'second reason'},{t:'4',type:'recovery-unlock',detail:'unlocked',lockReason:'second reason'}],details:[],answerChangeStats:{}};
   ctx.r=cycle;
   const sig=vm.runInContext('securitySignalText(r,{})',ctx).join(' | '), aud=vm.runInContext('securityAuditText(r,{})',ctx).join(' | '), timeline=vm.runInContext('securityEventTimelineText(r)',ctx);

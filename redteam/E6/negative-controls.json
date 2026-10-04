@@ -1,0 +1,24 @@
+{
+  "schema": "git-redteam-e6-historical-negative-v1",
+  "status": "PASS",
+  "controls": [
+    {
+      "version": "7.1.76",
+      "case": "generated-student-and-private-pair",
+      "sourceSha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "reason": "AssertionError; no missing dependency, syntax/runtime error or timeout accepted",
+      "log": "redteam/E6/negative-7.1.76.log"
+    },
+    {
+      "version": "7.1.81",
+      "case": "export-answer-derivative-rejection",
+      "sourceSha256": "e991dfd1a5a89df8b1306da2380d43a11a4f51d9a1df126bc8dc151f6fd973f3",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "reason": "AssertionError; no missing dependency, syntax/runtime error or timeout accepted",
+      "log": "redteam/E6/negative-7.1.81.log"
+    }
+  ]
+}

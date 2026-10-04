@@ -1,0 +1,45 @@
+{
+  "stage": "E5",
+  "version": "7.1.82",
+  "browser": "153.0.8010.0",
+  "status": "PASS",
+  "checks": [
+    "native-reload",
+    "native-fullscreen-exit",
+    "native-history",
+    "controlled-freeze-resume",
+    "native-inert-keyboard",
+    "native-split-persistence",
+    "controlled-pageshow-reconciliation",
+    "controlled-fullscreen-rejection"
+  ],
+  "observations": [
+    "CDP freeze/active did not dispatch lifecycle events on the visible headless page: native freeze/resume NOT TESTED.",
+    "Real viewport/screen ratio and IndexedDB reload; six sample ticks were accelerated by explicit calls, not 12 elapsed seconds.",
+    "persisted pageshow/pagehide deliberately dispatched: reconciliation proven, native BFCache eligibility NOT TESTED.",
+    "Fullscreen rejection branch uses controlled API rejection, with no unhandled pageerror."
+  ],
+  "originalCsp": true,
+  "native": [
+    "reload + beforeunload/pagehide",
+    "Fullscreen entry/exit with user gesture",
+    "same-document history traversal",
+    "inert keyboard focus exclusion",
+    "IndexedDB and Web Locks"
+  ],
+  "controlled": [
+    "freeze/resume event dispatch",
+    "sample tick acceleration",
+    "persisted pageshow reconciliation",
+    "fullscreen API rejection",
+    "lock trigger for keyboard test"
+  ],
+  "runtime": "CLIENT-CONTROLLED",
+  "mobile": "ANALYZED / NOT TESTED",
+  "otherEngines": "ANALYZED / NOT TESTED",
+  "limits": [
+    "Native freeze/resume and BFCache eligibility NOT TESTED on this platform",
+    "Viewport split/overlay detection BEST-EFFORT; no browser DRM",
+    "No screenshot, second-device or developer-tools prevention"
+  ]
+}

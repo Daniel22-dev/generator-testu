@@ -1,0 +1,12 @@
+F1 { teacherHash: false, recoveryHash: false, teacherMode: false } actual generated student HTML
+code-hashes { count: 0 } public membership-hash count; a nonzero value enables offline guessing
+F7 true questions readable in the public artifact before start
+F6-roster true private roster retains email; this does not establish Forms enforcement
+W1-W3b {
+  classification: 'current',
+  status: 'OK',
+  pct: 100,
+  runtimeAuthenticity: 'CLIENT-CONTROLLED',
+  classificationAuthorization: 'REVIEW_REQUIRED'
+} public-key encrypted forged payload, impossible times, empty telemetry, synthetic wrong Forms email; technical scoring alone is not authenticated acceptance
+duplicate current same ciphertext imported twice

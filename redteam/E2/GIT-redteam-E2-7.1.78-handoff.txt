@@ -1,0 +1,210 @@
+GIT — RED-TEAM MASTER PROMPT v2 — E2 PŘEDÁVACÍ CHECKPOINT
+Datum: 2026-10-03
+Verze: 7.1.78, lokální větev candidate
+Stav: NOT READY – BLOCKING ISSUE
+Dokončeno: E0, E1, E2. E3–E10 pending. Nejde o finální release.
+
+A. CO SE ZMĚNILO
+Verifier rozlišuje přepočtené odpovědi od důvěryhodnosti odevzdání.
+Skutečný veřejným RSA klíčem zašifrovaný podvrh se stále dešifruje a
+technicky opraví jako current/OK/100; nyní ale nese PŮVOD NEPROKÁZÁN,
+CLIENT-CONTROLLED a REVIEW_REQUIRED. E2 neopravuje všechny způsoby W1
+pouhým přejmenováním stavu. E3 musí odmítat prokazatelné nekonzistence.
+
+1. Nový 13ec-secure-verifier-trust.js je injektovaný pouze do teacher
+   verifieru. Trust assessment vytváří soukromý verifier po bindingu
+   a přepočtu; klientské serverVerified/trustAssessment/AUTHORIZED
+   příznaky nemohou udělat odevzdání autorizovaným.
+2. Veřejné RSA-OAEP/AES-GCM šifrování je DECRYPTED_NOT_AUTHENTICATED.
+   Build reference je privátní, ale studentův hash je jen tvrzení.
+   Shoda hashe = CLAIM_MATCHES_REFERENCE, nikdy potvrzení původního JS.
+3. Časy a bezpečnostní události jsou CLIENT-CONTROLLED. Prázdná,
+   chybějící a neplatná securityEvents mají samostatnou diagnostiku.
+   Přítomné události = PRESENT_UNVERIFIED. Absence hlášených problémů
+   neznamená čistý průběh; příslušná karta nedává zelené potvrzení.
+4. Results, dashboard, bezpečnost, technický panel, individuální
+   feedback včetně score-only/prostého textu a HTML/JSON archivy
+   jednotně uvádějí neprokázaný původ a návrh známky k posouzení.
+5. Results/submissions/index CSV přidávají osm trust sloupců:
+   runtime_authenticity, client_html_hash_status, client_telemetry_status,
+   client_times_trust, external_identity_status, external_time_window_status,
+   score_source, classification_authorization.
+   verified_email se přejmenovává na forms_email. Integrace musí upravit
+   hlavičku a respektovat REVIEW_REQUIRED; OK nesmí spouštět zápis známky.
+6. JSON archiv má trustContract, authorizedClassificationCount=0,
+   proposedGradeCount a explicitní classificationStatus/trustAssessment.
+   Export znovu vynutí neověřený stav i při změně uložených trusted bitů.
+   Odmítnuté řádky nedeklarují přepočet ani ověřenou build vazbu.
+7. Technické OK/current zůstalo pro kompatibilitu importu a scoringu.
+   effectiveResults je sada návrhů pro analýzu, nikoli autorizace známek.
+   Žolík zůstává JOKER_EXCLUDED; stávající výběr různých pokusů i
+   agregace identických duplicit jsou zachovány. Kompletní replay čeká E3.
+8. Secure generátor nevyžaduje nepoužívaný Teacher/Admin secret ani
+   jméno pro studentský učitelský mód; pole secretu je skryté. Assembler
+   pro secure neodvozuje teacher hash. Instant režim zachovává policy
+   i blokování shodného Teacher/Recovery secretu. Třídní unlock zůstává.
+9. Nápověda Forms už nezaměňuje dešifrování za autenticitu. Pro experiment
+   vyžaduje školní doménu, ověřený e-mail a jednu odpověď na účet.
+   Implementace párování a důvěryhodného časového okna čeká E3.
+10. Verze 7.1.78 je ve stejné dávce v RELEASE, newest-first changelogu
+    s 10 položkami, package/lockfile, PWA, QA/GARP identitách, SBOM,
+    AI fingerprintu a externích workflow pinech. Acceptance má
+    currentUseApproved=false, candidate-only, upload/deploy pending.
+
+Přesný tok trusted build → untrusted client → private verifier →
+external anchors → exporty je v redteam/E2/TRUST-BOUNDARIES.txt.
+RELEASE.status production-serverless je zachovaný profil, nikoli
+souhlas s živým experimentem; autoritou readiness je release acceptance.
+
+B. OVĚŘENÍ NA SKUTEČNÝCH ARTEFAKTECH
+check:redteam-trust testuje pět skupin: trust, telemetry, UI, exports,
+credentials. Vytváří skutečné studentské a teacher HTML, používá veřejné
+šifrování a privátní přepočet. Falešné pct=0/grade=5 nepřebijí skutečné
+skóre 100. Shoda očekávaného self-hashe ani podvržené trusted bity
+nepovolí klasifikaci. Cizí manifest/neznámý kód nadále odmítnut.
+
+check:redteam-trust-browser používá skutečný desktop Chromium,
+původní studentské i teacher CSP, WebCrypto, Forms CSV import a reálné
+Blob downloady CSV/JSON/score-only feedbacku. Podvrh má očekávaný hash,
+nemožné časy 2040→2000, prázdné události a cizí syntetický Forms e-mail.
+Skóre se přepočítá, ale UI a exporty vyžadují kontrolu původu. Žádná
+pageerror. Tato fixture nedokládá nastavení živého Google Formu.
+
+Lokální kontroly:
+- npm test: PASS; lint/build, R3, R5, GARP static, headless a workflow;
+- R5: 39 PASS / 0 FAIL / 0 ERROR; workflow: 55 PASS / 0 FAIL;
+- check:redteam-trust: PASS, 5 skupin skutečných artefaktových kontrol;
+- check:redteam-trust-browser: PASS, reálný CSV import + downloady;
+- check:redteam-isolation + browser: PASS; E1 izolace, cold parser loader,
+  odpovědi/ID/deadline při lock→reload→unlock→submit, submitted bez retry;
+- lokální qa:p5:ci: PASS, včetně D7/D8, skutečných browser PDF kontrol,
+  GARP 2.7, platform, browser/runtime/XSS a axe;
+- P5 release: 46/46; acceptance: 19/19;
+- runtime: 0 blockerů, 0 přetečení na 1280/390/320 px, 0 JS výjimek;
+- axe: 0 critical/serious/moderate/minor ve čtyřech testovaných stavech;
+- git diff --check: PASS. Lint: 0 errors / 8 warnings (podrobnosti v logu).
+
+NEGATIVNÍ KONTROLY
+Každá z pěti artefaktových skupin a nový browser test selhává s exit 1
+proti skutečně sestavenému původnímu 7.1.76 i proti E1 7.1.77 (12 kontrol).
+Trust: chybí assessment; telemetry: chybí nedůvěryhodný stav;
+UI: chybí označení původu; export: chybí runtime_authenticity;
+credentials: nepoužívaný teacher secret stále blokuje secure export;
+browser: importovaný podvrh nemá CLIENT-CONTROLLED/review stav.
+Souhrn je redteam-e2-negative-controls.json, jednotlivé logs přiloženy.
+Původní E1 negativní kontroly a exportní mutace zůstávají v E0/E1.
+
+Stávající testy byly upraveny na novou skutečnou sémantiku: VM harness
+načítá nový trust modul; recovery odemčení se nadále nezapočítává jako
+problém samo o sobě. Nové varování neověřených externích kotev a
+klientské telemetrie se nezamlčuje. Credential role testy běží v instant
+režimu, kde jsou obě role skutečně používány. Není vypnut žádný gate.
+
+P5 STARTUP / OPRAVA QA HARNESSU
+Jeden závěrečný běh P5 skončil Chromium debug timeout při startu P3 brány.
+Původní stderr byl zahazován; původní příčinu nelze zpětně prokázat.
+Samostatná diagnostická kontrola následně prošla šestkrát. Brána měla
+PID-derived port i profil, tedy riziko kolize, a žádnou startup diagnostiku.
+Nyní Chromium přiděluje volný port, brána čte jeho vlastní DevToolsActivePort,
+porovnává konkrétní browser endpoint, používá unikátní dočasný profil a
+zachovává omezený stderr/exit diagnostický výstup. Timeout není ignorován
+ani převeden na PASS; samotné assertions ani čekací limit nebyly oslabeny.
+Celý P5 byl po opravě znovu spuštěn a prošel. Původní neúspěšný log zůstává
+v evidenci. Záměrně nesprávná reference browser endpointu navíc selhala
+s exit 1 (Chromium DevTools instance mismatch). E9 má sledovat opakovatelnost na skutečném připnutém CI runneru.
+
+PROSTŘEDÍ A ROZSAH
+Node 24.19.0, npm 11.9.0, Playwright 1.61.1 dle exact lockfile,
+Chromium 153.0.8010.0 přes CHROMIUM_PATH. Šlo o lokální P5 ekvivalent;
+GitHub Actions runner/browser nebyly ověřeny. Starší runtime/axe harness
+pro inicializaci mění CSP/access gate; nový E2 browser probe běžel nad
+původní CSP. Headless desktop není iOS/Android. Reálné mobily:
+ANALYZED / NOT TESTED. Pouze syntetické .invalid identity, žádní skuteční žáci.
+
+C. F1–F8 A W1–W3
+F1 — FIXED ve zkoušeném novém secure exportu; E1 teacher/recovery/roster
+   hash izolace zachována. Unlock hash je pouze procedurální brzda.
+F2 — PARTIALLY FIXED: opraven falešný význam self-hashe ve všech zkoušených
+   cestách. Hash z klienta stále není autentizační kotvou, CLIENT-CONTROLLED.
+F3 — PARTIALLY FIXED: neověřená a prázdná telemetrie správně označena;
+   skutečný průběh/pravdivost událostí z klienta nejsou prokázány.
+F4 — PARTIALLY FIXED: testovaný běžný reload zachovává pečeť; úplný
+   restart/jiný browser/anonymní režim/reset storage čeká E4.
+F5 — STILL PRESENT: historické veřejné teacher/code hashe nezměněny.
+   E0 snapshot (12 commitů/11 blobů/4 živé student HTML) není nový audit
+   veřejného stavu; E2 neprováděla nový scan, push ani přepis historie.
+F6 — PARTIALLY FIXED: privátní roster zachovává e-mail, import rozlišuje
+   metadata a NOT_VALIDATED. Email↔roster a časové okno ještě nevynuceny.
+F7 — STILL PRESENT: otázky jsou plaintext. Povinné AES-GCM/PBKDF2 zadání
+   se startovním kódem ≥40 bitů stále musí být implementováno a otestováno.
+F8 — PARTIALLY FIXED: jednotná trust diagnostika a skutečné known-forgery
+   negativní kontroly; kompletní strukturální/time/identity/replay matice
+   a experimentální hlásící formulář čekají E3/E8.
+
+W1 — PARTIALLY FIXED: podvrh se technicky opraví, ale není prezentován
+   jako legitimní a export není autorizován k automatické klasifikaci.
+   Prokazatelně nekonzistentní podvrhy musí odmítat E3. Konzistentní
+   podvrh pod vlastní platnou identitou je ARCHITECTURAL LIMIT.
+W2 — E1 izolace zachována; širší odvozený answer-key leakage všech typů
+   a deployment/history prověří E6. Žádné globální tvrzení o cache/forks.
+W3a — BEST-EFFORT: sdílení odpovědí pod dozorem/variantami; původ znalosti
+   odpovědi software neprokáže.
+W3b — stále nepáruje Forms účet s rosterem: naivní forwarding technicky
+   projde scoringem, REVIEW_REQUIRED. Priorita E3. Přebindování na vlastní
+   platný kód zůstává CLIENT-CONTROLLED / ARCHITECTURAL LIMIT.
+
+PREVENTED: podvržené client trusted bity a pct/grade nejsou autoritou
+  v testovaném verifieru/exportním flow.
+DETECTED: prázdná, chybějící a neplatná telemetrie je diagnostikována;
+  neprokazuje to podvod ani čistý průběh.
+HARDENED: jednotné trust stavy všech ověřených výstupů a kontrolní gates.
+CLIENT-CONTROLLED: self-hash, časy, události a runtime.
+ARCHITECTURAL LIMIT: nelze ověřit původ JS na kontrolovaném zařízení.
+SERVER REQUIRED: globální autorita pokusu přes browser profily a reset
+  storage; DEFERRED – SERVER VERSION. Forms kotvy využijeme už v E3.
+BEST-EFFORT: společný třídní unlock pod osobním dozorem, varianty zadání.
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhý telefon fotící displej a AI.
+
+D. PŘESNÝ DALŠÍ KROK
+Pokračuj E3 ze zdrojů 7.1.78; zachovej E1 i E2 kontrakty:
+1. Přísné payload schema/limity a odpovědi proti soukromé struktuře,
+   test/manifest/variant/identity binding, odmítání nekonzistentních stavů.
+2. Povinný verified Forms e-mail ↔ kód v soukromém rosteru; chybějící
+   kotva musí blokovat klasifikaci. Roster ani jeho hashe nezveřejňovat.
+3. Důvěryhodná publikace → Forms timestamp kotva; časy z payloadu jsou
+   tvrzení klienta a kontrolují se pouze proti tomuto oknu. Explicitní
+   timezone a parsing Forms CSV, žádné tiché lokální Date.parse odhady.
+4. Identické i přešifrované duplicity, konflikt pokusů, vazby kódu/účtu
+   a replay ověřit na celém skutečném CSV importu i všech exportech.
+5. Negativní kontroly každé nové ochrany proti původnímu nebo záměrně
+   porušenému buildu. Nezaměnit ověřené Forms kotvy za autenticitu runtime.
+Potom povinné F7 šifrování zadání; E4–E10 dle master promptu.
+Po každé významnější etapě opět ZIP + předávací TXT.
+
+E. RELEASE A REPRODUKCE
+NOT READY – BLOCKING ISSUE. Blokují nevynucené Forms/time/schema/replay
+vazby, plaintext zadání, nezměněné historické úniky a nedokončené E3–E10.
+Lokální candidate nebyl pushnut, main nebyla změněna, deploy neproběhl.
+GARP 2.7 candidate → chráněná main → deploy pouze z main zůstává závazné.
+
+npm ci
+npm test
+npx playwright install chromium
+npm run qa:p5:ci
+Volitelně CHROMIUM_PATH=/cesta/k/chromium npm run qa:p5:ci.
+Samostatně: npm run check:redteam-trust; npm run check:redteam-trust-browser.
+Negativní kontrola: GIT_REDTEAM_GENERATOR_HTML=/cesta/k/starsimu/dist/index.html
+GIT_REDTEAM_E2_CASE=trust node scripts/check-redteam-trust-e2.mjs
+(Obě env proměnné před node ve stejném příkazu; další cases telemetry/ui/
+exports/credentials. Browser script používá jen první env + CHROMIUM_PATH.)
+Očekávej FAIL. Starší generátor sestav z dodaných E0/E1 ZIPů.
+Probe otevřených bodů: GIT_REDTEAM_BASELINE_REPORT=/tmp/e2-probe.json
+node scripts/redteam-baseline.mjs (env před node ve stejném příkazu).
+
+ZIP obsahuje úplný zdrojový projekt, historické E0/E1 evidence a nové E2
+souhrny/logs. Neobsahuje node_modules/.git/dist/qa-results, generated teacher
+verifier/student fixture, RSA private keys ani PDF s answer key. Teacher
+artefakty a roster z lokálních syntetických testů se nepublikují.
+
+SHA-256 původního vstupního ZIP:
+0c8ca337922200c154834b0fa833d3a7e9800cc65a118cfa49287704e671716c

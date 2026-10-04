@@ -1,0 +1,58 @@
+{
+  "stage": "E10",
+  "version": "7.1.86",
+  "status": "FAIL",
+  "startedAt": "2026-10-04T06:15:14.327Z",
+  "completedAt": "2026-10-04T06:21:38.048Z",
+  "environment": "local-equivalent",
+  "sourceCommit": null,
+  "node": "v24.19.0",
+  "syntheticOnly": true,
+  "sourceBefore": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 510,
+    "sha256": "78f2333cafa32a09e1cf773f998049c6db3d334ed4e1446c295b3bd64c16acc9",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "sourceAfter": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 510,
+    "sha256": "78f2333cafa32a09e1cf773f998049c6db3d334ed4e1446c295b3bd64c16acc9",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "sourceUnchanged": true,
+  "results": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "pass": true,
+      "log": "1-npm-test.log",
+      "logBytes": 78546,
+      "logSha256": "58ff4134300ffd6e09befcef456be9062e7cd0524e1adb37c42bbc2697cbe3a5",
+      "completedAt": "2026-10-04T06:17:47.190Z"
+    },
+    {
+      "command": "npm run qa:garp27:foundation",
+      "exitCode": 0,
+      "pass": true,
+      "log": "2-npm-run-qa-garp27-foundation.log",
+      "logBytes": 3849,
+      "logSha256": "e3f9969d946aafe1ecc5e5a1d5a8046406461e87c5bc6eadabd7bc78539362ca",
+      "completedAt": "2026-10-04T06:18:09.973Z"
+    },
+    {
+      "command": "npm run qa:p5:ci",
+      "exitCode": 1,
+      "pass": false,
+      "log": "3-npm-run-qa-p5-ci.log",
+      "logBytes": 144578,
+      "logSha256": "5865fe33d33a38039d9115d1a492e033965d873a9715afc747084e7ddf9aad47",
+      "completedAt": "2026-10-04T06:21:37.967Z"
+    }
+  ],
+  "limits": [
+    "Local execution is not a GitHub Actions run",
+    "Physical E7 mobile remains ANALYZED / NOT TESTED",
+    "Passing regressions does not authorize classroom release"
+  ]
+}

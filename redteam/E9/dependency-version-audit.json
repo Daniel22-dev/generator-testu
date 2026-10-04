@@ -1,0 +1,691 @@
+{
+  "status": "PASS",
+  "version": "7.1.85",
+  "scope": "Installed package versions match lockfile; no fresh npm ci success or tarball integrity verification claimed",
+  "total": 112,
+  "missing": [],
+  "packages": [
+    {
+      "package": "node_modules/@asamuzakjp/css-color",
+      "locked": "5.1.11",
+      "installed": "5.1.11",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@asamuzakjp/dom-selector",
+      "locked": "7.1.1",
+      "installed": "7.1.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@asamuzakjp/generational-cache",
+      "locked": "1.0.1",
+      "installed": "1.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@asamuzakjp/nwsapi",
+      "locked": "2.3.9",
+      "installed": "2.3.9",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@bramus/specificity",
+      "locked": "2.4.2",
+      "installed": "2.4.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@csstools/color-helpers",
+      "locked": "6.1.0",
+      "installed": "6.1.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@csstools/css-calc",
+      "locked": "3.2.1",
+      "installed": "3.2.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@csstools/css-color-parser",
+      "locked": "4.1.9",
+      "installed": "4.1.9",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@csstools/css-parser-algorithms",
+      "locked": "4.0.0",
+      "installed": "4.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@csstools/css-syntax-patches-for-csstree",
+      "locked": "1.1.6",
+      "installed": "1.1.6",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@csstools/css-tokenizer",
+      "locked": "4.0.0",
+      "installed": "4.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint-community/eslint-utils",
+      "locked": "4.9.1",
+      "installed": "4.9.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint-community/eslint-utils/node_modules/eslint-visitor-keys",
+      "locked": "3.4.3",
+      "installed": "3.4.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint-community/regexpp",
+      "locked": "4.12.2",
+      "installed": "4.12.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint/config-array",
+      "locked": "0.23.5",
+      "installed": "0.23.5",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint/config-helpers",
+      "locked": "0.6.0",
+      "installed": "0.6.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint/core",
+      "locked": "1.2.1",
+      "installed": "1.2.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint/object-schema",
+      "locked": "3.0.5",
+      "installed": "3.0.5",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@eslint/plugin-kit",
+      "locked": "0.7.2",
+      "installed": "0.7.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@exodus/bytes",
+      "locked": "1.15.1",
+      "installed": "1.15.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@humanfs/core",
+      "locked": "0.19.2",
+      "installed": "0.19.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@humanfs/node",
+      "locked": "0.16.8",
+      "installed": "0.16.8",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@humanfs/types",
+      "locked": "0.15.0",
+      "installed": "0.15.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@humanwhocodes/module-importer",
+      "locked": "1.0.1",
+      "installed": "1.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@humanwhocodes/retry",
+      "locked": "0.4.3",
+      "installed": "0.4.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@types/esrecurse",
+      "locked": "4.3.1",
+      "installed": "4.3.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@types/estree",
+      "locked": "1.0.9",
+      "installed": "1.0.9",
+      "matches": true
+    },
+    {
+      "package": "node_modules/@types/json-schema",
+      "locked": "7.0.15",
+      "installed": "7.0.15",
+      "matches": true
+    },
+    {
+      "package": "node_modules/acorn",
+      "locked": "8.17.0",
+      "installed": "8.17.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/acorn-jsx",
+      "locked": "5.3.2",
+      "installed": "5.3.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/ajv",
+      "locked": "6.15.0",
+      "installed": "6.15.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/axe-core",
+      "locked": "4.12.1",
+      "installed": "4.12.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/balanced-match",
+      "locked": "4.0.4",
+      "installed": "4.0.4",
+      "matches": true
+    },
+    {
+      "package": "node_modules/bidi-js",
+      "locked": "1.0.3",
+      "installed": "1.0.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/brace-expansion",
+      "locked": "5.0.12",
+      "installed": "5.0.12",
+      "matches": true
+    },
+    {
+      "package": "node_modules/cross-spawn",
+      "locked": "7.0.6",
+      "installed": "7.0.6",
+      "matches": true
+    },
+    {
+      "package": "node_modules/css-tree",
+      "locked": "3.2.1",
+      "installed": "3.2.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/data-urls",
+      "locked": "7.0.0",
+      "installed": "7.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/debug",
+      "locked": "4.4.3",
+      "installed": "4.4.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/decimal.js",
+      "locked": "10.6.0",
+      "installed": "10.6.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/deep-is",
+      "locked": "0.1.4",
+      "installed": "0.1.4",
+      "matches": true
+    },
+    {
+      "package": "node_modules/entities",
+      "locked": "8.0.0",
+      "installed": "8.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/escape-string-regexp",
+      "locked": "4.0.0",
+      "installed": "4.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/eslint",
+      "locked": "10.7.0",
+      "installed": "10.7.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/eslint-scope",
+      "locked": "9.1.2",
+      "installed": "9.1.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/eslint-visitor-keys",
+      "locked": "5.0.1",
+      "installed": "5.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/espree",
+      "locked": "11.2.0",
+      "installed": "11.2.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/esquery",
+      "locked": "1.7.0",
+      "installed": "1.7.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/esrecurse",
+      "locked": "4.3.0",
+      "installed": "4.3.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/estraverse",
+      "locked": "5.3.0",
+      "installed": "5.3.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/esutils",
+      "locked": "2.0.3",
+      "installed": "2.0.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/fast-deep-equal",
+      "locked": "3.1.3",
+      "installed": "3.1.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/fast-json-stable-stringify",
+      "locked": "2.1.0",
+      "installed": "2.1.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/fast-levenshtein",
+      "locked": "2.0.6",
+      "installed": "2.0.6",
+      "matches": true
+    },
+    {
+      "package": "node_modules/file-entry-cache",
+      "locked": "8.0.0",
+      "installed": "8.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/find-up",
+      "locked": "5.0.0",
+      "installed": "5.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/flat-cache",
+      "locked": "4.0.1",
+      "installed": "4.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/flatted",
+      "locked": "3.4.2",
+      "installed": "3.4.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/glob-parent",
+      "locked": "6.0.2",
+      "installed": "6.0.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/globals",
+      "locked": "16.5.0",
+      "installed": "16.5.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/html-encoding-sniffer",
+      "locked": "6.0.0",
+      "installed": "6.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/ignore",
+      "locked": "5.3.2",
+      "installed": "5.3.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/imurmurhash",
+      "locked": "0.1.4",
+      "installed": "0.1.4",
+      "matches": true
+    },
+    {
+      "package": "node_modules/is-extglob",
+      "locked": "2.1.1",
+      "installed": "2.1.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/is-glob",
+      "locked": "4.0.3",
+      "installed": "4.0.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/is-potential-custom-element-name",
+      "locked": "1.0.1",
+      "installed": "1.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/isexe",
+      "locked": "2.0.0",
+      "installed": "2.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/jsdom",
+      "locked": "29.1.1",
+      "installed": "29.1.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/json-buffer",
+      "locked": "3.0.1",
+      "installed": "3.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/json-schema-traverse",
+      "locked": "0.4.1",
+      "installed": "0.4.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/json-stable-stringify-without-jsonify",
+      "locked": "1.0.1",
+      "installed": "1.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/keyv",
+      "locked": "4.5.4",
+      "installed": "4.5.4",
+      "matches": true
+    },
+    {
+      "package": "node_modules/levn",
+      "locked": "0.4.1",
+      "installed": "0.4.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/locate-path",
+      "locked": "6.0.0",
+      "installed": "6.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/lru-cache",
+      "locked": "11.5.2",
+      "installed": "11.5.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/mdn-data",
+      "locked": "2.27.1",
+      "installed": "2.27.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/minimatch",
+      "locked": "10.2.5",
+      "installed": "10.2.5",
+      "matches": true
+    },
+    {
+      "package": "node_modules/ms",
+      "locked": "2.1.3",
+      "installed": "2.1.3",
+      "matches": true
+    },
+    {
+      "package": "node_modules/natural-compare",
+      "locked": "1.4.0",
+      "installed": "1.4.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/optionator",
+      "locked": "0.9.4",
+      "installed": "0.9.4",
+      "matches": true
+    },
+    {
+      "package": "node_modules/p-limit",
+      "locked": "3.1.0",
+      "installed": "3.1.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/p-locate",
+      "locked": "5.0.0",
+      "installed": "5.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/parse5",
+      "locked": "8.0.1",
+      "installed": "8.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/path-exists",
+      "locked": "4.0.0",
+      "installed": "4.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/path-key",
+      "locked": "3.1.1",
+      "installed": "3.1.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/playwright",
+      "locked": "1.61.1",
+      "installed": "1.61.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/playwright-core",
+      "locked": "1.61.1",
+      "installed": "1.61.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/pngjs",
+      "locked": "7.0.0",
+      "installed": "7.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/prelude-ls",
+      "locked": "1.2.1",
+      "installed": "1.2.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/punycode",
+      "locked": "2.3.1",
+      "installed": "2.3.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/require-from-string",
+      "locked": "2.0.2",
+      "installed": "2.0.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/saxes",
+      "locked": "6.0.0",
+      "installed": "6.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/shebang-command",
+      "locked": "2.0.0",
+      "installed": "2.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/shebang-regex",
+      "locked": "3.0.0",
+      "installed": "3.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/source-map-js",
+      "locked": "1.2.1",
+      "installed": "1.2.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/symbol-tree",
+      "locked": "3.2.4",
+      "installed": "3.2.4",
+      "matches": true
+    },
+    {
+      "package": "node_modules/tldts",
+      "locked": "7.4.8",
+      "installed": "7.4.8",
+      "matches": true
+    },
+    {
+      "package": "node_modules/tldts-core",
+      "locked": "7.4.8",
+      "installed": "7.4.8",
+      "matches": true
+    },
+    {
+      "package": "node_modules/tough-cookie",
+      "locked": "6.0.2",
+      "installed": "6.0.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/tr46",
+      "locked": "6.0.0",
+      "installed": "6.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/type-check",
+      "locked": "0.4.0",
+      "installed": "0.4.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/undici",
+      "locked": "7.29.1",
+      "installed": "7.29.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/uri-js",
+      "locked": "4.4.1",
+      "installed": "4.4.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/w3c-xmlserializer",
+      "locked": "5.0.0",
+      "installed": "5.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/webidl-conversions",
+      "locked": "8.0.1",
+      "installed": "8.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/whatwg-mimetype",
+      "locked": "5.0.0",
+      "installed": "5.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/whatwg-url",
+      "locked": "16.0.1",
+      "installed": "16.0.1",
+      "matches": true
+    },
+    {
+      "package": "node_modules/which",
+      "locked": "2.0.2",
+      "installed": "2.0.2",
+      "matches": true
+    },
+    {
+      "package": "node_modules/word-wrap",
+      "locked": "1.2.5",
+      "installed": "1.2.5",
+      "matches": true
+    },
+    {
+      "package": "node_modules/xml-name-validator",
+      "locked": "5.0.0",
+      "installed": "5.0.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/xmlchars",
+      "locked": "2.2.0",
+      "installed": "2.2.0",
+      "matches": true
+    },
+    {
+      "package": "node_modules/yocto-queue",
+      "locked": "0.1.0",
+      "installed": "0.1.0",
+      "matches": true
+    }
+  ],
+  "platformOptionalSkipped": [
+    {
+      "package": "node_modules/fsevents",
+      "os": [
+        "darwin"
+      ],
+      "optional": true,
+      "reason": "Not applicable to Linux"
+    }
+  ]
+}

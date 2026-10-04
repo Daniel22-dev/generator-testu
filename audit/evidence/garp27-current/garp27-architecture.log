@@ -1,0 +1,239 @@
+$ npm run qa:garp27:architecture
+EXIT=0
+
+STDOUT
+
+> generator-testu@7.1.87 qa:garp27:architecture
+> node scripts/garp27/architecture-integrity.mjs
+
+{
+  "classification": "FOUNDATION_ARCHITECTURE_INTEGRITY",
+  "schema": "garp27-architecture-integrity-report-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.87",
+  "status": "PASS",
+  "trustMode": "LOCAL_PIN",
+  "scope": {
+    "sourceFiles": 190,
+    "artifactFiles": 39
+  },
+  "checks": [
+    {
+      "id": "G27-AUTH",
+      "pass": true,
+      "detail": "active authority"
+    },
+    {
+      "id": "G27-VERSION",
+      "pass": true,
+      "detail": "version binding"
+    },
+    {
+      "id": "G27-G02",
+      "pass": true,
+      "detail": "r2 inventory"
+    },
+    {
+      "id": "required:package-lock.json",
+      "pass": true,
+      "detail": "package-lock.json"
+    },
+    {
+      "id": "required:public/ai-operations.json",
+      "pass": true,
+      "detail": "public/ai-operations.json"
+    },
+    {
+      "id": "required:public/config/deployment.json",
+      "pass": true,
+      "detail": "public/config/deployment.json"
+    },
+    {
+      "id": "required:public/config/deployment.school-server.json",
+      "pass": true,
+      "detail": "public/config/deployment.school-server.json"
+    },
+    {
+      "id": "required:public/config/data-manifest.json",
+      "pass": true,
+      "detail": "public/config/data-manifest.json"
+    },
+    {
+      "id": "required:src/config/release-acceptance.json",
+      "pass": true,
+      "detail": "src/config/release-acceptance.json"
+    },
+    {
+      "id": "required:security/garp27/garp-policy.json",
+      "pass": true,
+      "detail": "security/garp27/garp-policy.json"
+    },
+    {
+      "id": "required:security/garp27/capability-inventory.json",
+      "pass": true,
+      "detail": "security/garp27/capability-inventory.json"
+    },
+    {
+      "id": "required:vendor/garp-2.7-consolidated-r2/MASTER/CONTRACTS/garp27-core.json",
+      "pass": true,
+      "detail": "vendor/garp-2.7-consolidated-r2/MASTER/CONTRACTS/garp27-core.json"
+    },
+    {
+      "id": "required:vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json",
+      "pass": true,
+      "detail": "vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json"
+    },
+    {
+      "id": "policy-digest",
+      "pass": true,
+      "detail": "policy digest"
+    },
+    {
+      "id": "inventory-digest",
+      "pass": true,
+      "detail": "inventory digest"
+    },
+    {
+      "id": "garp-policy-digest",
+      "pass": true,
+      "detail": "garp policy digest"
+    },
+    {
+      "id": "vendor-digest",
+      "pass": true,
+      "detail": "64 2c653aa771c16ce1b610492bf5bf9d57c37af4987c85109de6cbb7cf8aa9a2fb"
+    },
+    {
+      "id": "core-digest",
+      "pass": true,
+      "detail": "core digest"
+    },
+    {
+      "id": "ecosystem-digest",
+      "pass": true,
+      "detail": "inventory digest"
+    },
+    {
+      "id": "tool:scripts/garp27/architecture-integrity.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/architecture-integrity.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/mutation-tests.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/mutation-tests.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/contract-gate.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/contract-gate.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/policy-admission-mutations.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/policy-admission-mutations.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/auto-patch-contract.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/auto-patch-contract.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/foundation-gate.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/foundation-gate.mjs"
+    },
+    {
+      "id": "source-scope",
+      "pass": true,
+      "detail": "190"
+    },
+    {
+      "id": "resolver",
+      "pass": true,
+      "detail": "0 unresolved"
+    },
+    {
+      "id": "forbidden-edges",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "id": "artifact-present",
+      "pass": true,
+      "detail": "39"
+    },
+    {
+      "id": "artifact-paths",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "id": "artifact-fragments",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "id": "artifact-index",
+      "pass": true,
+      "detail": "index version"
+    },
+    {
+      "id": "artifact-sw",
+      "pass": true,
+      "detail": "sw version"
+    },
+    {
+      "id": "artifact-aiops",
+      "pass": true,
+      "detail": "ai ops version"
+    },
+    {
+      "id": "ai-operations",
+      "pass": true,
+      "detail": "operations"
+    },
+    {
+      "id": "provider-tools",
+      "pass": true,
+      "detail": "tools"
+    },
+    {
+      "id": "agentic-boundary",
+      "pass": true,
+      "detail": "partial/no autonomous"
+    },
+    {
+      "id": "egress",
+      "pass": true,
+      "detail": "profiles"
+    },
+    {
+      "id": "live-deferred",
+      "pass": true,
+      "detail": "server deferred"
+    },
+    {
+      "id": "fallback",
+      "pass": true,
+      "detail": "no fallback"
+    },
+    {
+      "id": "single-authority",
+      "pass": true,
+      "detail": "0"
+    }
+  ],
+  "findings": [],
+  "summary": {
+    "total": 41,
+    "passed": 41,
+    "failed": 0,
+    "critical": 0,
+    "high": 0
+  }
+}
+
+STDERR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

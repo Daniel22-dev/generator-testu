@@ -21,7 +21,7 @@ function assertPdf(file, expectedPrefix) {
   return bytes.length;
 }
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {}) });
 const page = await browser.newPage({ acceptDownloads: true });
 const pageErrors = [];
 page.on('pageerror', error => pageErrors.push(String(error)));

@@ -1,0 +1,110 @@
+[
+  {
+    "case": "advanced-to-simple-clears-hidden-state",
+    "mode": "simple",
+    "identity": "name",
+    "groups": 0,
+    "roster": 0,
+    "cfg": 0,
+    "detail": false,
+    "split": false,
+    "layout": "tabs",
+    "source": "auto",
+    "name": "Transition QA",
+    "topic": "Water",
+    "ok": true
+  },
+  {
+    "case": "cancel-mode-switch-preserves-state",
+    "unchanged": true,
+    "ok": true
+  },
+  {
+    "case": "simple-advanced-simple-no-ghost-return",
+    "groups": 0,
+    "roster": 0,
+    "cfg": 0,
+    "detail": false,
+    "diff": "NE",
+    "identity": "name",
+    "ok": true
+  },
+  {
+    "case": "snapshot-roundtrip-clears-sensitive-and-files",
+    "mode": "simple",
+    "files": [],
+    "pin": "",
+    "legacy": "",
+    "name": "Saved test",
+    "source": "Safe source text",
+    "step": 2,
+    "max": 3,
+    "ok": true
+  },
+  {
+    "case": "template-prefill-v3-restores-safe-fields-only",
+    "restored": true,
+    "rcTopicRestored": true,
+    "sensitiveExcluded": true,
+    "filesCleared": true,
+    "ok": true
+  },
+  {
+    "case": "template-prefill-v3-warns-to-reattach-file",
+    "attachmentWasPresent": true,
+    "serialized": "{\"id\":1791109436434,\"name\":\"Attachment template\",\"why\":\"\",\"format\":\"prefill_v3\",\"prefill\":{\"appMode\":\"advanced\",\"workPreset\":\"advanced\",\"jazyk\":\"angličtina\",\"instrJazyk\":\"target\",\"uroven\":[\"B1\"],\"kombinovat\":false,\"pocet\":2,\"typyCviceni\":[\"translation\",\"multiple choice\"],\"zadaniTab\":\"file\",\"urls\":[\"\"],\"rcLength\":\"medium\",\"rcTopic\":\"\",\"readingQuestionCount\":6,\"listeningQuestionCount\":5,\"sourceUseMode\":\"auto\",\"cas\":30,\"odevzdavani\":\"B\",\"randomizace\":\"NE\",\"testMode\":\"bezny\",\"layout\":\"scroll\",\"resultMode\":\"instant\",\"identityMode\":\"name\",\"body\":24,\"gradeTyp\":\"skola\",\"exerciseDetail\":true,\"exerciseConfig\":[{\"typ\":\"translation\",\"pocetOtazek\":2,\"body\":12},{\"typ\":\"multiple choice\",\"pocetOtazek\":2,\"body\":12}],\"fuzzyTolerance\":\"off\",\"tema\":\"examBlue\",\"zolicek\":\"NE\",\"diferencovany\":\"NE\",\"overeni\":\"NE\",\"anonymizace\":\"ANO\",\"ageGroup\":\"\",\"ageGroupCustom\":\"\",\"testPurpose\":\"\",\"simpleTemplate\":\"\",\"screenGuard\":false,\"feedbackMode\":\"brief\",\"differentiationLevel\":\"standard\",\"skupinyCount\":0,\"skupinyNazvy\":[]},\"dom\":{\"nazev\":\"Transition QA\",\"proKoho\":\"QA\",\"latka\":\"Water\",\"zadaniText\":\"Use the supplied language topic. Source sentence. Source sentence. Source sentence. Source sentence. Source sentence. Source sentence. Source sentence. Source sentence. Source sentence. Source sentence. \",\"zadaniFileNote\":\"\",\"zadaniUrlNote\":\"\",\"listeningFocus\":\"\",\"listeningQuestions\":\"\",\"listeningTranscript\":\"water river\",\"readingTopicCustom\":\"\",\"readingText\":\"Readable source\",\"readingQuestions\":\"\",\"casCustom\":\"30\",\"bodyCustom\":\"24\",\"ucitelJmeno\":\"Audit Teacher\",\"poznamky\":\"\",\"vlastniSkala\":\"\"},\"attachmentWasPresent\":true,\"ts\":1791109436434}",
+    "files": [],
+    "fileObjects": 0,
+    "tab": "file",
+    "toast": "Šablona „Attachment template“ načtena a formulář předvyplněn. Původní příloha se do šablony neukládá — připoj ji znovu.",
+    "toastWarn": true,
+    "legacyToast": "Šablona „Attachment template“ načtena a formulář předvyplněn. Původní příloha se do šablony neukládá — připoj ji znovu.",
+    "legacyWarn": true,
+    "ok": true
+  },
+  {
+    "case": "differentiation-prompts-preserve-structure",
+    "levels": [
+      "basic",
+      "standard",
+      "challenge"
+    ],
+    "sameStructureInvariant": true,
+    "legacyConflictRemoved": true,
+    "ok": true
+  },
+  {
+    "case": "history-anonymizes-students-and-files",
+    "students": [
+      "Student A1",
+      "Student A2"
+    ],
+    "files": [],
+    "ok": true
+  },
+  {
+    "case": "legacy-incompatible-simple-state-is-not-hidden",
+    "mode": "advanced",
+    "result": "secureOffline",
+    "identity": "oneTimeCode",
+    "diff": "ANO",
+    "split": true,
+    "layout": "scroll",
+    "source": "auto",
+    "ok": true
+  },
+  {
+    "case": "simple-detail-rebuilds-from-visible-selection",
+    "detail": true,
+    "types": [
+      "translation",
+      "multiple choice"
+    ],
+    "manual": [
+      false,
+      false
+    ],
+    "count": 2,
+    "ok": true
+  }
+]

@@ -1,0 +1,20 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.77 check:redteam-isolation-browser
+> node scripts/check-redteam-isolation-browser.mjs
+
+{
+  "status": "PASS",
+  "browser": "153.0.8010.0",
+  "syntheticOnly": true,
+  "platformScope": "desktop Chromium; not real mobile",
+  "checks": [
+    "cold generator loads bundled parser before first export",
+    "teacher capability absent",
+    "real WebCrypto + IndexedDB",
+    "locked reload retains ID/deadline/answers",
+    "classroom unlock preserves attempt",
+    "encrypted submission",
+    "submitted reload cannot retry"
+  ]
+}

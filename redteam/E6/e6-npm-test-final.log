@@ -1,0 +1,1942 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 test
+> node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && npm run check:exercise-help && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && npm run check:runtime-ux && npm run check:joker-workflow && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run check:redteam-isolation && npm run check:redteam-trust && npm run check:redteam-verifier && npm run check:redteam-storage && npm run check:redteam-runtime && npm run check:redteam-publication && npm run check:r3-security-behavior && npm run check:r5-adversarial && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow
+
+✅  Verze sedi napric projektem: 7.1.82
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:studio-manifest
+> node scripts/check-studio-manifest-template.mjs
+
+✅ Studio manifest template: generator 7.1.82, cache ghrab-generator-v7.1.82
+✅  QA manifest odpovídá GHRAB-QA-1.0.2 a verzi 7.1.82.
+✅  Lockfile používá veřejný npm registr (113 resolved URL, 0 interních).
+✅  Externí GitHub Actions jsou připnuté plným commit SHA (34 použití).
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:exercise-help
+> node scripts/check-exercise-type-help.mjs
+
+PASS: 38 exercise types have complete contextual help; Simple mode exposes item/point controls without advanced manual controls.
+✅  Produkcni invariants jsou splneny.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:assistant
+> node scripts/check-generator-assistant.mjs
+
+PASS Poradce používá balanced AI Core profil
+PASS Poradce má lokální retrieval, aktuální kontext a validaci opor
+PASS Dotazy na právě sestavovaný test používají aktuální stav
+PASS KB zná Google Forms secure workflow
+PASS KB nenabádá k ruční volbě konkrétního modelu
+PASS UI neobsahuje volbu konkrétního modelu
+PASS Direct transport mapuje interní AI Core profily
+PASS Provider credential/UI už nepřepisuje AI Core profil konkrétním modelem
+PASS Legacy týmový bezpečnostní kód není v UI
+Generator Assistant / AI Core invariants: PASS
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:selftest-rpc
+> node scripts/check-selftest-rpc-injection.mjs
+
+✅ Self-test RPC bridge: poslední </body> + fallback bez body PASS.
+✅  Aktivní CSP je synchronní, bez unsafe-eval; Acorn je lazy a runtime neobsahuje eval/new Function.
+✅  Zdrojova struktura OK: 18 split modulu, puvodni nazvy pouze jako migracni tombstones.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:runtime-ux
+> node scripts/check-runtime-ux-regressions.mjs
+
+PASS secure runtime detects iPadOS including desktop-class UA
+PASS secure keyboard exception is limited to a visible page
+PASS secure blur path ignores only the iPad keyboard transition before normal leave handling
+PASS secure visibility-hidden path remains fail-closed
+PASS secure pagehide path remains fail-closed
+PASS instant runtime detects iPadOS including desktop-class UA
+PASS instant keyboard exception is limited to a visible page
+PASS instant blur guard preserves normal lock path outside keyboard exception
+PASS instant visibility-hidden path still locks according to policy
+PASS Teacher Verifier presents Google Forms before emergency backup
+PASS Verifier explains that CSV file association/icon is irrelevant
+PASS Google Forms dropzone gives ZIP guidance and imports CSV
+PASS Verifier V2 moves the renamed import card into Results
+PASS Pasted-backup button gives feedback when no payload is present
+PASS Forms import confirms successful completion
+PASS download actions give visible confirmation
+PASS runtime UX regression contract
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:joker-workflow
+> node scripts/check-joker-workflow-regressions.mjs
+
+PASS secure runtime has persistent active-attempt seal
+PASS active attempt is bound to hashed student identity
+PASS joker requires an explicit confirmation before first start
+PASS different identity cannot reuse the active attempt without teacher reset
+PASS reload restores committed joker choice, attempt id and deadline
+PASS reload is preserved as an audit event
+PASS reload cannot bypass a persisted locked state
+PASS active-attempt persistence is HMAC-protected and verified fail-closed before rendering the test
+PASS successful submission persists submitted guard before clearing active-attempt state
+PASS instant runtime also asks for explicit joker confirmation
+PASS Verifier separates reviewable results from classification results
+PASS security review still includes joker attempts
+PASS results CSV carries explicit joker and classification metadata
+PASS CSV marks joker as excluded and other grades as requiring trust review
+PASS CSV derives classification state in the private verifier
+PASS Verifier visibly labels joker as outside classification
+PASS short-time signal is evaluated for joker attempts too
+PASS Verifier dashboard reports joker exclusion explicitly
+PASS joker workflow regression contract
+✅  Obecná kontrola citlivých údajů prošla (70 veřejných zdrojových souborů).
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 qa:garp23
+> npm run check:ai-operations && npm run test:suite-session && node scripts/qa-garp23-security.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:ai-operations
+> node scripts/check-ai-operation-registry.mjs
+
+PASS ai-operations registry parity: 11 operations; runtime input types normalized to GHRAB AI Core 1.0.0.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 test:suite-session
+> node scripts/test-suite-session-lifecycle.mjs
+
+{
+  "schema": "ghrab-generator-suite-session-test-v1",
+  "platformVersion": "1.1.2",
+  "syntheticDataOnly": true,
+  "checks": [
+    {
+      "ok": true,
+      "name": "Platform 1.1.2 exact vendor SHA-256",
+      "detail": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack waits for runtime cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child clears synthetic Generator canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves other child namespace",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves non-content telemetry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves global suite generation tombstone",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "F-02 records seen and cleanup complete",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack exists after cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay clears pending canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay acknowledges generation",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Reload after replay does not repeat destructive cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab cross-context signal clears canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab stale tab persistence is locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab autosave cannot restore canary",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document cleans despite shared seen ack",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document stays locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed synthetic delete failure is observable",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed does not falsely acknowledge",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed status records failure",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work reports successful cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work clears Generator-owned local/session data and targeted handoff",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work removes shared access permit",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work preserves other app namespace",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work preserves unrelated telemetry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work preserves global suite generation tombstone",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "G-01 settings UI exposes explicit end-work cleanup button",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "G-01 cleanup button requires confirmation before invoking generatorEndWork",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "G-01 implementation does not use broad browser storage clear",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Forms onboarding documents required metadata placeholders",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Forms onboarding derives and requires Test ID/name/group entry IDs",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Secure test validates and seals Forms metadata mapping into generated config",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Secure student public config carries only the validated Forms metadata mapping",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Student runtime prefills per-test metadata without manual student entry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Verifier filters imported submissions by cryptographically decrypted payload identity",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Verifier locates payload column by content rather than fixed CSV position",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Full-year CSV import classifies other tests without adding them to current results",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Forms metadata mismatches are visible but non-authoritative",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Exact duplicates are suppressed and distinct attempts require an explicit teacher decision",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Verifier exposes separate current-test result and submission exports",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Analytics/export path uses deduplicated explicitly resolved effective results",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Large CSV import yields to the browser and reports progress",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Negative control detects disabled cleanup (weakened copy fails as required)",
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 42,
+    "passed": 42,
+    "failed": 0
+  },
+  "status": "passed"
+}
+{
+  "schema": "ghrab-garp23-security-regression-v1",
+  "syntheticOnly": true,
+  "airStructural": {
+    "attempts": 24,
+    "mutationFamilies": 4,
+    "boundaryEscapes": 0,
+    "officialCorpus": {
+      "vectors": 18,
+      "wrapperAttempts": 54,
+      "boundaryEscapes": 0,
+      "sha256": "3560e60fd78a9cc81cfef1d7d2c3ba52b270ac5f38d582cc0cded3aa31183a6d"
+    },
+    "behavioralLiveModel": "NOT TESTED"
+  },
+  "privacyCanary": {
+    "type": "example.invalid",
+    "preflightBlocked": true
+  },
+  "pc01": {
+    "reviewedApplicationCallSites": 9,
+    "callSites": [
+      {
+        "file": "src/features/preview-editor.js",
+        "line": 540,
+        "operation": "acceptable-answer-enrichment"
+      },
+      {
+        "file": "src/features/testlab.js",
+        "line": 510,
+        "operation": "diagnostic-ping"
+      },
+      {
+        "file": "src/js/01-core.js",
+        "line": 1106,
+        "operation": "generator-help-answer"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 415,
+        "operation": "reading-source-analysis"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 512,
+        "operation": "listening-question-suggestions"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 621,
+        "operation": "reading-package-suggestion"
+      },
+      {
+        "file": "src/js/08-manual-editor.js",
+        "line": 387,
+        "operation": "attempt?'generation-repair':'exercise-generation'"
+      },
+      {
+        "file": "src/js/09-selftest-keycheck.js",
+        "line": 355,
+        "operation": "answer-key-verification"
+      },
+      {
+        "file": "src/js/12-prompt-builder.js",
+        "line": 127,
+        "operation": "grading-scale-parse"
+      }
+    ]
+  },
+  "endWork": {
+    "lifecycleHarness": "scripts/test-suite-session-lifecycle.mjs",
+    "platformVersion": "1.1.2",
+    "contract": "ghrab-suite-session-v1"
+  },
+  "studentPackage": {
+    "canonicalTypesChecked": 21,
+    "answerKeyCanaryAbsent": true
+  },
+  "negativeControls": [
+    "weakened-production-boundary-detected",
+    "new-unreviewed-ai-call-detected",
+    "same-line-multiple-ai-calls-detected",
+    "template-context-ai-call-flagged-for-review",
+    "raw-differentiation-egress-detected",
+    "suite-session-negative-control-detected-by-lifecycle-harness",
+    "answer-key-strip-leak-detected",
+    "same-origin-selftest-sandbox-weakening-detected",
+    "same-origin-print-sandbox-weakening-detected",
+    "benign-pseudonymous-preflight-allowed",
+    "other-app-storage-preserved"
+  ],
+  "passed": 82,
+  "failed": 0,
+  "failures": []
+}
+✅  Oba studentské runtimy používají deadline timer a přepočet po návratu.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 lint
+> node scripts/lint.mjs
+
+✅  ESLint globály vygenerovány (825 názvů).
+
+/workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-joker-workflow-browser.mjs
+  36:569  warning  '_' is defined but never used  no-unused-vars
+
+/workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-security-adversarial-r5.mjs
+  186:7  warning  'secCfg' is assigned a value but never used  no-unused-vars
+
+/workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-security-behavior-r3.mjs
+  79:70  warning  'e' is defined but never used  no-unused-vars
+
+/workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/redteam-harness-utils.mjs
+  12:16  warning  'T' is defined but never used                     no-unused-vars
+  13:10  warning  'must' is defined but never used                  no-unused-vars
+  92:7   warning  'storedBody' is assigned a value but never used   no-unused-vars
+  94:7   warning  'containsRaw' is assigned a value but never used  no-unused-vars
+
+/workspace/scratch/ebcee4a4dd99/work/generator-testu-main/tools/headless-check.mjs
+  265:75  warning  '_' is defined but never used  no-unused-vars
+
+✖ 8 problems (0 errors, 8 warnings)
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 prebuild
+> npm run check:credential-security && npm run check:security-forensics && npm run check:secret-hygiene && npm run check:security-adversarial && npm run check:e1-remediation && npm run check:r2-credential-policy && npm run check:r3-test-infrastructure && npm run check:r4-recovery-runtime && npm run check:r5-adversarial-wiring && npm run check:f0-ci-trust-pin && npm run check:f2-journey-migration && npm run check:ai-operations && npm run check:exercise-help && npm run check:verifier-generated-syntax && npm run check:embedded-script-terminators && npm run check:studio-manifest
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:credential-security
+> node scripts/check-security-credential-e1.mjs && node scripts/check-security-credential-e2.mjs && node scripts/check-security-credential-e3.mjs
+
+PASS E1: teacher/admin secret field exists
+PASS E1: separate recovery field exists
+PASS E1: UI clearly distinguishes secret teacher credential from recovery
+PASS E1: step 3 no longer claims one shared code
+PASS E1: both credentials are marked sensitive
+PASS E1: recovery has independent value/sync helpers
+PASS E1: teacher and recovery generation helpers are separate
+PASS E1: teacher secret is no longer mirrored into legacy unlock field
+PASS E1: recovery generation uses randomChunk/WebCrypto path
+PASS E1: strict mode or screenGuard requires recovery
+PASS E1: UI mode changes trigger recovery provisioning
+PASS E1: validation rejects identical teacher/recovery values
+PASS E1: teacher secret retains minimum 12-character strength gate
+PASS E1: manual recovery code has a minimum strength floor
+PASS E1: persistence sanitizer includes recovery raw value
+PASS E1: download guidance uses recovery, not teacher secret
+PASS E1 credential model + generator UX gate
+PASS E2: assembly reads Teacher/Admin and Recovery from separate inputs
+PASS E2: teacher hash is derived only from Teacher/Admin secret
+PASS E2: recovery hash is derived only from Classroom Recovery Code
+PASS E2: output CFG uses explicit recovery names
+PASS E2: new assembly no longer emits legacy unlock hash/domain names
+PASS E2: guarded test assembly fails closed through shared credential policy
+PASS E2: secure public CFG has only a procedural classroom unlock hash
+PASS E2: secure package has no legacy unlock output field
+PASS E2: secure runtime unlock uses recovery-code branch
+PASS E2: secure runtime teacher login remains teacher-pin only
+PASS E2: secure runtime no longer accepts legacy unlock branch
+PASS E2: instant lock-screen builder uses recovery capability flag
+PASS E2: instant runtime unlock uses recovery-code branch
+PASS E2: instant runtime teacher login remains teacher-pin only
+PASS E2: instant runtime uses recovery capability flag
+PASS E2: instant runtime no longer accepts legacy unlock branch
+PASS E2: raw Teacher/Admin secret is not a CFG property
+PASS E2: raw Recovery Code is not a CFG property
+PASS E2: generated-output scanner rejects raw recoveryCode field/reference
+PASS E2: synthetic instant student HTML does not contain raw Teacher/Admin secret
+PASS E2: synthetic instant student HTML does not contain raw Recovery Code
+PASS E2: synthetic instant student HTML contains only the two derived credential hashes
+PASS E2: secure student public CFG drops raw Teacher/Admin and Recovery values
+PASS E2: secure student public CFG drops both legacy credential hashes
+PASS E2: Teacher/Admin and Recovery hashes are cryptographically domain-separated
+PASS E2: same Recovery Code is bound to testId and not portable between tests
+PASS E2: Recovery Code hash cannot equal teacher credential hash even for identical plaintext
+PASS E2: Teacher/Admin normalization is stable
+PASS E2: Recovery normalization is stable
+PASS E2: generator PBKDF2 helper explicitly recognizes only the two current credential domains
+PASS E2: legacy unlock-password domain removed from new generator helper
+PASS E2 cryptographic credential separation gate
+PASS E3 secure: submitted retry accepts only Teacher/Admin authorization
+PASS E3 secure: active-attempt reset accepts only Teacher/Admin authorization
+PASS E3 secure: tryUnlock accepts only Classroom Recovery authorization
+PASS E3 secure: teacher login accepts only Teacher/Admin authorization
+PASS E3 secure: Teacher/Admin helper is limited to retry, reset and teacher login plus its definition
+PASS E3 secure: Recovery helper is limited to tryUnlock plus its definition
+PASS E3 secure: hidden 5x lock-tap reveal is preserved
+PASS E3 instant: tryUnlock accepts only Classroom Recovery authorization
+PASS E3 instant: teacher login accepts only Teacher/Admin authorization
+PASS E3 instant: generic cross-role secret matcher was removed
+PASS E3 instant: role-specific helpers are each used only by their matching operation
+PASS E3 instant: hidden 5x lock-tap reveal is preserved
+PASS E3 secure dynamic: Teacher/Admin secret matches Teacher/Admin branch
+PASS E3 secure dynamic: Recovery Code cannot authenticate as Teacher/Admin
+PASS E3 secure dynamic: Recovery Code matches Recovery branch
+PASS E3 secure dynamic: Teacher/Admin secret does not substitute for Recovery Code
+PASS E3 secure dynamic: Recovery Code does not open teacher panel
+PASS E3 secure dynamic: Teacher/Admin secret opens teacher panel
+PASS E3 secure dynamic: Teacher/Admin secret cannot unlock through the Recovery path
+PASS E3 secure dynamic: Recovery unlock preserves attemptId, deadline, identity, variant, joker choice, start time and answers
+PASS E3 secure dynamic: valid Recovery Code unlocks the current attempt
+PASS E3 secure dynamic: Recovery unlock appends to existing securityEvents instead of replacing them
+PASS E3 secure dynamic: persisted active-attempt seal retains immutable attempt identity/variant/joker/deadline
+PASS E3 secure dynamic: fewer than five lock taps do not reveal Recovery input
+PASS E3 secure dynamic: fifth lock tap reveals Recovery input
+PASS E3 instant dynamic: Recovery Code does not open teacher panel
+PASS E3 instant dynamic: Teacher/Admin secret opens teacher panel
+PASS E3 instant dynamic: Teacher/Admin secret cannot unlock through Recovery path
+PASS E3 instant dynamic: Recovery unlock preserves attempt id, deadline, variant and joker state
+PASS E3 instant dynamic: valid Recovery Code unlocks and appends an audit event
+PASS E3 instant dynamic: fewer than five lock taps do not reveal Recovery input
+PASS E3 instant dynamic: fifth lock tap reveals Recovery input
+PASS E3 runtime privilege-boundary gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:security-forensics
+> node scripts/check-security-forensics-e4.mjs
+
+PASS E4 secure: successful Classroom Recovery unlock has explicit recovery-unlock event
+PASS E4 secure: recovery-unlock preserves previous lock reason and lock timestamp
+PASS E4 instant: successful Classroom Recovery unlock has explicit recovery-unlock event
+PASS E4 instant: recovery-unlock preserves previous lock reason
+PASS E4 verifier: recovery unlock is rendered as audit/info, not hard/soft issue
+PASS E4 verifier: audit-only recovery unlock is excluded from security issue count
+PASS E4 exports: results CSV retains audit info and full security event timeline
+PASS E4 exports: archive JSON retains result objects including securityEvents
+PASS E4 secure dynamic: repeated lock/recovery-unlock cycles remain ordered and reconstructible
+PASS E4 secure dynamic: each recovery unlock carries its own preceding lock reason
+PASS E4 verifier dynamic: recovery unlock alone does not count as a security issue
+PASS E4 verifier dynamic: recovery unlock remains visible as audit information
+PASS E4 verifier dynamic: lock count and both reasons are visible
+PASS E4 verifier dynamic: recovery count and linked lock reasons are visible
+PASS E4 verifier dynamic: exported timeline preserves event order
+PASS E4 forensic audit gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:secret-hygiene
+> node scripts/check-security-secret-hygiene-e5.mjs
+
+✅ E5: both credential DOM fields remain marked sensitive
+✅ E5: persistent storage has explicit raw-credential key denylist
+✅ E5: stored state is recursively stripped before persistence/export
+✅ E5: current live credential values are recursively redacted from arbitrary stored string fields
+✅ E5: imported/legacy state is recursively stripped before use
+✅ E5: migration physically scrubs the current snapshot
+✅ E5: every template write passes through secret sanitizer
+✅ E5: every history write passes through secret sanitizer
+✅ E5: assignment export passes through secret sanitizer
+✅ E5: imported assignment is scrubbed before state replacement
+✅ E5: manual/AI prompt uses Teacher/Admin placeholder
+✅ E5: manual/AI prompt uses Classroom Recovery placeholder
+✅ E5: obsolete one-code placeholder is gone
+✅ E5: prompt no longer instructs AI to use one shared credential
+✅ E5: prompt documents the one-purpose recovery boundary
+✅ E5: prompt documents independent per-test derivation domains
+✅ E5: current security guide describes the split credential workflow
+✅ E5: changing Recovery Code after generation is tracked as output drift
+✅ E5: generated HTML smoke check rejects leaked local credential placeholders
+✅ E5: SecretScanner has dedicated raw test credential rules
+✅ E5: SecretScanner covers teacher, recovery and placeholder leaks
+✅ E5 dynamic: persisted artifact removes raw secret LEGACY-RAW…
+✅ E5 dynamic: persisted artifact removes raw secret TEACH-RAW-…
+✅ E5 dynamic: persisted artifact removes raw secret REC-AB12-C…
+✅ E5 dynamic: persisted artifact removes raw secret NESTED-TEA…
+✅ E5 dynamic: persisted artifact removes raw secret NESTED-REC…
+✅ E5 dynamic: stored prompt replaces Teacher/Admin line with placeholder
+✅ E5 dynamic: stored prompt replaces Recovery line with placeholder
+✅ E5 dynamic: sanitizer preserves non-secret nested data
+✅ E5 dynamic: live credential values are redacted even under non-sensitive field names
+✅ E5 dynamic: SecretScanner built-in regression suite passes (20/20)
+✅ E5 dynamic: derived credential hash fields remain allowed in student HTML
+✅ E5 dynamic: raw Recovery Code is blocked by SecretScanner
+
+✅ E5 secret hygiene gate PASS.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:security-adversarial
+> node scripts/check-security-adversarial-e6.mjs
+
+PASS E6: secure recovery credential has one runtime authority: unlock
+PASS E6: secure teacher login uses Teacher/Admin only
+PASS E6: secure submitted retry uses Teacher/Admin only
+PASS E6: secure active-attempt reset uses Teacher/Admin only
+PASS E6: instant recovery credential has one runtime authority: unlock
+PASS E6: instant teacher login uses Teacher/Admin only
+PASS E6: generator retains distinct credential derivation domains
+PASS E6: obsolete shared unlock derivation domain cannot re-enter new output
+PASS E6: same plaintext cannot cross Teacher/Recovery role boundary
+PASS E6: Recovery Code material cannot replay across testId boundary
+PASS E6: persistence deny/sanitizer retains ucitelPin coverage
+PASS E6: persistence deny/sanitizer retains recoveryCode coverage
+PASS E6: persistence deny/sanitizer retains heslo coverage
+PASS E6: Verifier keeps Recovery Unlock audit-only
+PASS E6: Verifier export preserves forensic timeline
+PASS E6: secure runtime retains sealed attempt/deadline persistence
+PASS E6 adversarial security gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:e1-remediation
+> node scripts/check-e1-remediation.mjs
+
+PASS student persistence is signed, revisioned, redundant and submit-race hardened
+PASS teacher verifier rejects forged student-variant binding before scoring
+E1 REMEDIATION STATIC/DYNAMIC GATE PASSED
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:r2-credential-policy
+> node scripts/check-credential-policy-r2.mjs
+
+PASS R2: valid distinct credentials pass
+PASS R2: same plaintext is rejected
+PASS R2: weak Teacher/Admin secret is rejected
+PASS R2: missing required Recovery Code is rejected
+PASS R2: weak Recovery Code is rejected
+PASS R2: Recovery Code may be absent when not required
+PASS R2: UI validation uses shared credential policy
+PASS R2: settings drift/apply path uses shared credential policy
+PASS R2: assembleTestHtml captures current output fields before policy evaluation
+PASS R2: current credential fields override stale __outputFields snapshot
+PASS R2: assembleTestHtml enforces shared credential policy
+PASS R2: assembleTestHtml fails closed on credential policy errors
+PASS R2 credential policy gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:r3-test-infrastructure
+> node scripts/check-test-infrastructure-r3.mjs
+
+PASS R3: D7 fixture uses a policy-compliant Teacher/Admin secret
+PASS R3: D7 fixture provides a separate Recovery Code
+PASS R3: D7 fixture no longer seeds the legacy shared code
+PASS R3: workflow resetBase seeds a separate Recovery Code
+PASS R3: workflow matrix no longer derives the legacy unlock-password branch
+PASS R3: workflow matrix no longer asserts the one-code model
+PASS R3: workflow matrix exercises separate Teacher and Recovery runtime inputs
+PASS R3: E6 no longer checks nonexistent authorization functions
+PASS R3: E6 targets real retry/reset runtime functions
+PASS R3: R3 behavioral gate executes the built generator and drift path
+PASS R3: R3 behavioral gate parses the generated Teacher Verifier
+PASS R3: R3 behavioral gate has an npm script
+PASS R3: npm test requires the R3 behavioral gate after build
+PASS R3 test infrastructure gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:r4-recovery-runtime
+> node scripts/check-recovery-runtime-r4.mjs
+
+PASS R4: secure runtime declares unlock busy state
+PASS R4: secure tryUnlock is a no-op unless locked and serializes concurrent unlocks
+PASS R4: secure unlock busy flag is fail-safe via try/finally
+PASS R4: instant runtime declares unlock busy state
+PASS R4: instant tryUnlock is a no-op unless locked and serializes concurrent unlocks
+PASS R4: instant unlock busy flag is fail-safe via try/finally
+PASS R4: instant warningCount tracks warning-class events only
+PASS R4: secure concurrent recovery unlock releases the lock
+PASS R4: secure concurrent recovery unlock performs exactly one PBKDF2 match
+PASS R4: secure one lock produces exactly one recovery-unlock audit event
+PASS R4: secure unlock on an already unlocked attempt is a no-op
+PASS R4: instant concurrent recovery unlock releases the lock
+PASS R4: instant concurrent recovery unlock performs exactly one PBKDF2 match
+PASS R4: instant one lock produces exactly one recovery-unlock audit event
+PASS R4: instant recovery-unlock and lock events do not inflate warningCount
+PASS R4: instant unlock on an already unlocked attempt is a no-op
+PASS R4: instant warningCount increments only for warning-class events
+PASS R4 recovery runtime gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:r5-adversarial-wiring
+> node scripts/check-adversarial-wiring-r5.mjs
+
+PASS R5: behavioral R5 gate covers: Q-crypto: stejný plaintext v obou rolích
+PASS R5: behavioral R5 gate covers: A instant: správný Recovery odemkne
+PASS R5: behavioral R5 gate covers: C instant: Recovery neotevře učitelský panel
+PASS R5: behavioral R5 gate covers: AB instant: dvojklik / unlock bez zámku
+PASS R5: behavioral R5 gate covers: instant: recovery-unlock nezvyšuje počet varování
+PASS R5: behavioral R5 gate covers: A secure: správný Recovery odemkne
+PASS R5: behavioral R5 gate covers: AB secure: souběžné dvojité odemčení jednoho zámku
+PASS R5: behavioral R5 gate covers: AA secure: reload zamčeného pokusu zámek neobejde
+PASS R5: behavioral R5 gate covers: E secure: studentský soubor nepovoluje reset cizí identity
+PASS R5: behavioral R5 gate covers: D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo
+PASS R5: behavioral R5 gate covers: Verifier: hlavní skript se naparsuje
+PASS R5: behavioral R5 gate covers: AC/AD + export: Verifier zachová lock jako signál, recovery jako audit, CSV nese údaje
+PASS R5: behavioral R5 gate covers: U: snapshot / stav pro uložení bez raw credentialů
+PASS R5: behavioral R5 gate covers: W: import legacy záznamu s jedním „heslo" nevyrobí dva credentialy
+PASS R5: behavioral R5 gate covers: X: AI prompt neobsahuje raw credentialy
+PASS R5: behavioral R5 gate covers: Q-bypass: applySettingsWithoutAi nesmí sestavit test s Teacher == Recovery
+PASS R5: behavioral R5 gate covers: Q-bypass: slabý Teacher (6 znaků) přes applySettingsWithoutAi
+PASS R5: R5 runs the built generator and parses generated HTML
+PASS R5: R5 writes a machine-readable result artifact
+PASS R5: R5 behavioral npm script is defined
+PASS R5: npm test requires the full R5 adversarial gate after build
+PASS R5: R4 runtime gate is defined
+PASS R5: prebuild requires the R4 recovery runtime gate
+PASS R5 adversarial wiring gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:f0-ci-trust-pin
+> node scripts/check-ci-trust-pin-f0.mjs
+
+PASS F0 CI trust pin gate: 9 workflow pin(s) match dc075d81428eb314bdeefda788557f8953d72c59766dacd0c2983b1b0a42e831
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:f2-journey-migration
+> node scripts/check-f2-journey-migration.mjs
+
+PASS F2: audit fixture declares independent Teacher/Admin secret
+PASS F2: audit fixture declares independent Recovery code
+PASS F2: Teacher/Admin and Recovery audit credentials are distinct
+PASS F2: audit fixture populates recoveryCode field
+PASS F2: legacy heslo fixture is empty
+PASS F2: identity journey contains no legacy unlock-password
+PASS F2: identity journey contains no legacy CFG.hesloHash
+PASS F2: identity journey contains no legacy secretMatches(
+PASS F2: identity journey proves Recovery cannot teacher-login
+PASS F2: identity journey proves Teacher cannot recovery-unlock
+PASS F2: identity journey reveals Recovery input through the five-tap lock affordance
+PASS F2: identity journey opens Verifier fallback details before paste
+PASS F2: browser matrix opens Verifier fallback details before paste
+PASS F2: instant joker journey confirms irreversible choice
+PASS F2: secure joker journey confirms irreversible choice
+PASS F2: primary journey no longer searches for the removed shared-code button
+PASS F2: primary journey uses the current Teacher/Admin generator
+PASS F2: primary journey knows the current Recovery generator
+PASS F2: strict journey proves Teacher/Admin cannot unlock
+PASS F2: strict journey proves Recovery can unlock
+PASS F2: primary journey discloses Verifier emergency fallback before paste
+PASS F2: identity suite scenario cardinality stays 8
+PASS F2 journey E2E migration gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:ai-operations
+> node scripts/check-ai-operation-registry.mjs
+
+PASS ai-operations registry parity: 11 operations; runtime input types normalized to GHRAB AI Core 1.0.0.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:exercise-help
+> node scripts/check-exercise-type-help.mjs
+
+PASS: 38 exercise types have complete contextual help; Simple mode exposes item/point controls without advanced manual controls.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:verifier-generated-syntax
+> node scripts/check-verifier-generated-script-syntax-r1.mjs
+
+PASS R1: inline verifier script 1/1 parses.
+PASS R1: generated verifier contains renderTable().
+PASS R1: generated verifier contains downloadResultsCsv().
+PASS R1: generated verifier contains parseFormsCsvText().
+PASS R1: generated verifier contains bulkVerifyPasted().
+PASS R1: generated verifier contains downloadDirectPdf().
+R1 generated Teacher Verifier syntax gate PASS.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:embedded-script-terminators
+> node scripts/check-embedded-script-terminators.mjs
+
+✅ Embedded-script terminator guard: PASS (src/js, src/features)
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:studio-manifest
+> node scripts/check-studio-manifest-template.mjs
+
+✅ Studio manifest template: generator 7.1.82, cache ghrab-generator-v7.1.82
+
+> generator-testu@7.1.82 build
+> node scripts/build.mjs
+
+✅ Generátor 7.1.82: Core 1.0.0 SHA-256 OK · 11 operací · 41 initial modulů + 2 lazy features · 1557.8 kB
+[P3] generator 7.1.82: platform 1.1.2, HTML 2, cache ghrab-generator-v7.1.82
+
+> generator-testu@7.1.82 postbuild
+> node scripts/ghrab-platform-conformance.mjs
+
+{
+  "schema": "ghrab-platform-conformance-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.82",
+  "total": 115,
+  "passed": 115,
+  "failed": 0,
+  "checks": [
+    {
+      "label": "dist exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite dist has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite source has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "consumer schema",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "package ↔ consumer version",
+      "ok": true,
+      "detail": "7.1.82 / 7.1.82"
+    },
+    {
+      "label": "platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact exports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact imports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "native export formats declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy JSON import policy declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "cache naming",
+      "ok": true,
+      "detail": "ghrab-generator-v7.1.82"
+    },
+    {
+      "label": "storage migration declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage namespace sestavovac_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.state.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_tpl_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.templates.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_hist_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.history.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_mode",
+      "ok": true,
+      "detail": "ghrab.generator.theme.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_model",
+      "ok": true,
+      "detail": "ghrab.generator.ai.model.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.local.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key_session",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.session.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_data_notice_v1",
+      "ok": true,
+      "detail": "ghrab.generator.ai.data-notice.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_school_security_code_v1",
+      "ok": true,
+      "detail": "ghrab.generator.security-code.v1"
+    },
+    {
+      "label": "storage namespace genOnboardingDone_v1",
+      "ok": true,
+      "detail": "ghrab.generator.onboarding-done.v1"
+    },
+    {
+      "label": "storage namespace genWelcomeShown_session",
+      "ok": true,
+      "detail": "ghrab.generator.welcome-shown.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_",
+      "ok": true,
+      "detail": "ghrab.generator.legacy."
+    },
+    {
+      "label": "vendor ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.consumer.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/platform-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/brand-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist platform-build-info.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built consumer identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform manifest contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built service-worker contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built artifact contracts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest migration id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest canonical prefix",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact exports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact imports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical logo manifest hash",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no inline school logo base64",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no legacy school logo reference",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no obsolete top-level platform references in satellite build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "platform contract present in build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "full eligible HTML documents found",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker canonical cache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker contract marker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker legacy cleanup list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker update protocol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker platform precache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker P3 asset list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no automatic skipWaiting during install",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no-store bypass",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no obsolete satellite platform asset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA manifest exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA app identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime suite session contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime previous platform rejected",
+      "ok": true,
+      "detail": "1.1.1"
+    },
+    {
+      "label": "runtime current accepted",
+      "ok": true,
+      "detail": "1.1.2"
+    },
+    {
+      "label": "runtime n+1 accepted",
+      "ok": true,
+      "detail": "1.2.0"
+    },
+    {
+      "label": "runtime major rejected",
+      "ok": true,
+      "detail": "2.0.0"
+    },
+    {
+      "label": "storage alias reads migrated value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical storage value created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage alias writes canonical key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration idempotent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration rollback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "rollback restored original value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 create",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 peek",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 take",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge consumes once",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope SHA-256",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrap",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope detection",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrapMaybe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy artifact compatibility",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme contract runtime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact compatibility facade",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "accessibility runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "performance runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy module runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy script loader available",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:redteam-isolation
+> node scripts/check-redteam-isolation.mjs
+
+PASS real artifact has no teacher mode, credential hashes, roster or code membership oracle
+PASS private verifier retains code to email mapping and independent answer scoring
+PASS classroom unlock preserves attempt, deadline, identity, answers and history
+PASS foreign identity cannot reset an active attempt
+PASS submitted guard denies another attempt and output has no student grade
+PASS negative controls: teacher hash, code hashes, private JWK and answer key are rejected
+PASS negative control: missing parser fails closed instead of serializing legacy runtime
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:redteam-trust
+> node scripts/check-redteam-trust-e2.mjs
+
+PASS E2 trust
+PASS E2 telemetry
+PASS E2 ui
+PASS E2 exports
+PASS E2 credentials
+{
+  "status": "PASS",
+  "version": "7.1.82",
+  "syntheticOnly": true,
+  "checks": [
+    "trust",
+    "telemetry",
+    "ui",
+    "exports",
+    "credentials"
+  ],
+  "forgedPayload": {
+    "technicalAcceptance": "current",
+    "score": 100,
+    "runtimeAuthenticity": "CLIENT-CONTROLLED",
+    "classificationAuthorization": "REVIEW_REQUIRED"
+  },
+  "limitation": "E3 anchors constrain the input; matching anchors still leave runtime CLIENT-CONTROLLED and classification REVIEW_REQUIRED."
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:redteam-verifier
+> node scripts/check-redteam-verifier-e3.mjs
+
+PASS E3 schema
+PASS E3 answers
+PASS E3 identity
+PASS E3 time
+PASS E3 replay
+PASS E3 csv
+PASS E3 json
+{
+  "status": "PASS",
+  "version": "7.1.82",
+  "syntheticOnly": true,
+  "checks": [
+    "schema",
+    "answers",
+    "identity",
+    "time",
+    "replay",
+    "csv",
+    "json"
+  ],
+  "scope": "actual generated HTML, RSA-OAEP/AES-GCM, direct import and CSV import",
+  "limits": [
+    "Owner attests Forms settings and unaltered CSV; no live configuration proof",
+    "Private E4 digest observations survive restart; full storage deletion or another profile needs server trust",
+    "Consistent public-key forgeries remain possible; runtime CLIENT-CONTROLLED",
+    "Mobile NOT TESTED; F7 and E5–E10 pending"
+  ]
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:redteam-storage
+> node scripts/check-redteam-storage-faults-e4.mjs
+
+PASS E4 fault guard-write-failure
+PASS E4 fault crypto-failure
+PASS E4 fault outbox-local-quota
+PASS E4 fault active-write-failure
+PASS E4 fault unavailable-idb
+{
+  "stage": "E4",
+  "version": "7.1.82",
+  "status": "PASS",
+  "selected": "all",
+  "checks": [
+    "guard-write-failure",
+    "crypto-failure",
+    "outbox-local-quota",
+    "active-write-failure",
+    "unavailable-idb"
+  ],
+  "scope": "Generated-runtime fault injection using WebCrypto and simulated IDB; real restart proof is the separate native browser gate",
+  "guarantees": "HARDENED / BEST-EFFORT",
+  "limits": "No proof against client-owner editing or complete storage rollback"
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:redteam-runtime
+> node scripts/check-redteam-runtime-e5.mjs
+
+PASS E5 runtime away-during-lock
+PASS E5 runtime beforeunload-lock
+PASS E5 runtime locked-responses
+PASS E5 runtime clipboard-block
+PASS E5 runtime split-reload
+PASS E5 runtime unlock-race
+PASS E5 runtime lifecycle-lock
+PASS E5 runtime ipad-keyboard-model
+PASS E5 runtime submitted-responses
+PASS E5 runtime verifier-audit
+{
+  "stage": "E5",
+  "version": "7.1.82",
+  "status": "PASS",
+  "checks": [
+    "away-during-lock",
+    "beforeunload-lock",
+    "locked-responses",
+    "clipboard-block",
+    "split-reload",
+    "unlock-race",
+    "lifecycle-lock",
+    "ipad-keyboard-model",
+    "submitted-responses",
+    "verifier-audit"
+  ],
+  "scope": "Actual generated HTML with native Node WebCrypto and simulated DOM/IndexedDB. Lifecycle, dimensions, clipboard and iPad inputs are controlled injections, not real device evidence.",
+  "runtime": "CLIENT-CONTROLLED",
+  "guarantees": "HARDENED / DETECTED / BEST-EFFORT",
+  "mobile": "ANALYZED / NOT TESTED",
+  "limits": [
+    "Native event proof is the separate Chromium gate",
+    "No prevention of client-owner edits, screenshots, overlays, other profiles or other devices",
+    "iPad keyboard exemption is a heuristic with a known visible-focus blind spot"
+  ]
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:redteam-publication
+> node scripts/check-redteam-publication-e6.mjs
+
+PASS E6 generated-student-and-private-pair
+PASS E6 all-21-exercise-types
+PASS E6 export-answer-derivative-rejection
+PASS E6 hidden-data-comments-scripts-attributes
+PASS E6 private-pair-byte-and-identity-binding
+PASS E6 publication-allowlist-and-no-private-copy
+PASS E6 deleted-blob-and-all-ref-history
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:r3-security-behavior
+> node scripts/check-security-behavior-r3.mjs
+
+Inicializační krok selhal: loadGeminiKey Error: Chybí ověřená deployment konfigurace.
+    at genConfigurationError (https://qa.local/generator-testu/:20:62)
+    at genDeploymentConfig (https://qa.local/generator-testu/:21:123)
+    at genDeploymentKind (https://qa.local/generator-testu/:22:43)
+    at genSchoolMode (https://qa.local/generator-testu/:23:33)
+    at updateGeminiStatus (https://qa.local/generator-testu/:115:44)
+    at setGeminiKey (https://qa.local/generator-testu/:82:1)
+    at loadGeminiKey (https://qa.local/generator-testu/:95:1)
+    at safeInitStep (https://qa.local/generator-testu/:38:14)
+    at init (https://qa.local/generator-testu/:48:1)
+    at https://qa.local/generator-testu/:67:3 {
+  code: 'CONFIGURATION_ERROR'
+}
+PASS  R2-direct-same-secret - fail-closed
+PASS  R2-direct-weak-teacher - fail-closed
+PASS  R2-drift-bypass - invalid drift cannot rebuild
+PASS  R3-instant-privilege-boundary - login/unlock separated
+PASS  R1-verifier-generated-script - 1 script(s) parsed
+PASS  R3-secure-privilege-boundary - teacher absent; classroom unlock preserves attempt; foreign identity blocked
+PASS R3 behavioral security gate
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:r5-adversarial
+> node scripts/check-security-adversarial-r5.mjs
+
+PASS      Q-crypto: stejný plaintext v obou rolích → různé hashe — domény oddělené
+PASS      P-crypto: stejný Recovery plaintext, jiný testId → jiný hash — testId je součástí soli
+PASS      Q-ui instant: Teacher == Recovery blokuje krok 3 — next3 disabled + hláška
+PASS      R: přísný test bez Recovery kódu se nesestaví (fail-closed) — assembleTestHtml vyhodí chybu
+PASS      S/T instant: raw credentialy nejsou v HTML — lockOnLeave=true, hasRecoveryUnlock=true
+PASS      C instant: Recovery neotevře učitelský panel — panel zůstal skrytý
+PASS      F instant: Teacher/Admin otevře učitelský panel — OK (i lowercase)
+PASS      instant: pagehide zamkne — lockScreen
+PASS      H instant: Teacher/Admin neodemkne zámek — zůstává zamčeno
+PASS      B instant: špatný Recovery neodemkne — zůstává zamčeno
+PASS      A instant: správný Recovery odemkne — odemčeno (i lowercase)
+PASS      I/N instant: attemptId a odpovědi zachovány — AMUSQQ5TM21672J
+PASS      O instant: LOCK→UNLOCK→LOCK→UNLOCK uspořádané a provázané — lock>recovery-unlock>lock>recovery-unlock
+PASS      AB instant: dvojklik / unlock bez zámku nevytvoří falešný audit — beze změny
+PASS      instant: recovery-unlock nezvyšuje počet varování v OVR4 — shoda
+PASS      P instant: Recovery z testu A neodemkne test B — B zůstal zamčen
+PASS      S/T secure: raw credentialy nejsou ve student HTML — student 112 kB
+PASS      secure: raw credentialy nejsou ani ve Verifieru — OK
+PASS      secure: test běží a pečeť existuje — AMUSQQ6L1910BQ15HD8
+PASS      C/F secure: student nemá učitelský mód ani autentizační funkci — teacher capability absent
+PASS      H secure: Teacher/Admin neodemkne zámek — LOCKED=true
+PASS      B secure: špatný Recovery neodemkne — LOCKED=true + bad-unlock
+PASS      A secure: správný Recovery odemkne — LOCKED=false
+PASS      I–N secure: odemčení nevytvoří nový pokus — 7 polí beze změny; lockReason="adv-lock-1"
+PASS      AB secure: dvojité odeslání / unlock bez zámku — beze změny
+PASS      AB secure: souběžné dvojité odemčení jednoho zámku — 1 záznam
+PASS      AA secure: reload po recovery unlocku nevytvoří nový pokus ani nový deadline — attemptId + deadline zachovány; strict reload zamčený a recovery funkční
+PASS      AA secure: reload zamčeného pokusu zámek neobejde — zůstává zamčeno
+PASS      E secure: studentský soubor nepovoluje reset cizí identity — blocked; no reset capability
+PASS      D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo — submitted remains locked
+PASS      Verifier: hlavní skript se naparsuje — 1 inline skript(ů) OK
+PASS      AC/AD + export: Verifier zachová lock jako signál, recovery jako audit, CSV nese údaje — lock=hard, recovery=info, issues=4; CSV: "securitySignals","securityAuditInfo","recoveryUnlocks"
+PASS      U: snapshot / stav pro uložení bez raw credentialů — čisté
+PASS      U: export zadání (JSON) bez raw credentialů — 2507 B čistých
+PASS      U: historie (sanitizeStoredRecord) odstraní klíče i hodnoty — klíče i hodnoty pryč
+PASS      W: import legacy záznamu s jedním „heslo" nevyrobí dva credentialy — po importu Teacher="", Recovery=""
+PASS      X: AI prompt neobsahuje raw credentialy — jen placeholdery
+PASS      Q-bypass: applySettingsWithoutAi nesmí sestavit test s Teacher == Recovery — odmítnuto
+PASS      Q-bypass: slabý Teacher (6 znaků) přes applySettingsWithoutAi — odmítnuto
+
+R5 SOUHRN: 39 PASS, 0 FAIL, 0 ERROR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:prep-static
+> npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:selftest
+> node security/garp25/tools/selftest-garp251.mjs
+
+{
+  "status": "PASS",
+  "checks": 59,
+  "passed": 59,
+  "failed": []
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:sync-rewrite
+> node scripts/test-ai-core-version-rewrite.mjs
+
+{
+  "status": "PASS",
+  "checks": [
+    "targeted-json-keys-only",
+    "brandVersion-preserved",
+    "build-CORE_VERSION-only"
+  ]
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:sbom:check
+> node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.82.cdx.json --check
+
+✅ CycloneDX 1.7 SBOM odpovídá lockfile: 113 komponent.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:ai-evidence:check
+> node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check
+
+✅ AI assurance fingerprint current: e506813761ba2c0fd5029b5e54ac250116c6175d7391f4531920b7839e8ae22e
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:sw
+> node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json
+
+{
+  "status": "PASS",
+  "serviceWorker": "dist/sw.js",
+  "criticalListSource": "security/security-critical-assets.json",
+  "precachedEntries": 28,
+  "precacheSources": [
+    {
+      "source": "addAll:expression",
+      "entries": [
+        "./",
+        "./index.html",
+        "./frame-guard.js",
+        "./manifest.webmanifest",
+        "./access/access-gate.css",
+        "./access/deployment-config.js",
+        "./access/reporter-bootstrap.js",
+        "./access/error-reporter.js",
+        "./access/error-reporter.css",
+        "./access/error-reporter-adapter.js",
+        "./manual/",
+        "./manual/index.html",
+        "./icons/icon-32.png",
+        "./icons/icon-192.png",
+        "./icons/icon-512.png",
+        "./icons/apple-touch-icon.png",
+        "./config/brand-manifest.json",
+        "./config/platform-manifest.json",
+        "./assets/brand/school-logo.png",
+        "./ghrab-platform.consumer.json",
+        "./access/suite-session-cleanup.js",
+        "./ghrab/ghrab-platform.js",
+        "./features/testlab.js",
+        "./features/preview-editor.js"
+      ]
+    },
+    {
+      "source": "map-add:GHRAB_PLATFORM_P3_ASSETS",
+      "entries": [
+        "./ghrab/ghrab-platform.css",
+        "./ghrab/ghrab-artifact-envelope-v1.schema.json",
+        "./ghrab/ghrab-app-registry-v2.schema.json",
+        "./ghrab/ghrab-platform-manifest-1.1.2.json",
+        "./assets/brand/school-logo.png",
+        "./ghrab-platform.consumer.json"
+      ]
+    }
+  ],
+  "unresolvedCacheWrites": [],
+  "cacheFirstDetected": true,
+  "policySchema": "ghrab-sw-security-assets-v2",
+  "structuralNetworkOnlyGuard": true,
+  "structuralNetworkFirstFallbackGuard": true,
+  "criticalAssetsInDeployment": [
+    "config/deployment.json",
+    "config/deployment.school-server.json"
+  ],
+  "networkFirstFallbackAssetsInDeployment": [
+    "access/suite-session-cleanup.js",
+    "ghrab/ghrab-platform.js"
+  ],
+  "findings": [],
+  "checkerRevision": "garp-2.5.1-r3-runtime-failsafe-routing",
+  "note": "Static bounded analysis. PASS means network-only authorization/revocation/integrity assets are never cached and route through networkOnlyNoStore, while declared freshness-sensitive offline fail-safe scripts are install-cached and route networkFirst with cache fallback. Does not replace SIM-07 browser revocation/offline tests."
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:sw-offline
+> node scripts/test-sw-offline-failsafe.mjs
+
+PASS install-created-cache
+PASS cleanup-precached
+PASS platform-precached
+PASS cleanup-online-network-first
+PASS platform-online-network-first
+PASS cleanup-offline-cache-fallback
+PASS platform-offline-cache-fallback
+PASS revocation-remains-network-only-no-cache-fallback
+PASS integrity-remains-network-only-no-cache-fallback
+{
+  "status": "PASS",
+  "checks": 9,
+  "cacheName": "ghrab-generator-v7.1.82",
+  "policy": "network-first support layers + network-only authorization/revocation/integrity"
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:vendored
+> node security/garp25/tools/check-vendored-consistency.mjs security/vendored-consistency.generator.json
+
+{
+  "status": "PASS",
+  "canonicalRoot": "..",
+  "components": [
+    {
+      "id": "platform-js",
+      "sha256": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "id": "platform-css",
+      "sha256": "eb465488df46f3d1672d721094800b0be3eb1278924b7699873a483f130b07ad"
+    },
+    {
+      "id": "artifact-envelope-schema",
+      "sha256": "8edeaaadd72c7bf60285440dd59eb31d0e7139755e1e4642d5ab457816e46d58"
+    },
+    {
+      "id": "app-registry-schema",
+      "sha256": "47c797999eb93fbd918b968b90a8f8545f938db486fe635b19efcc7936b5672f"
+    },
+    {
+      "id": "school-logo",
+      "sha256": "300396a48cc36d8c2abda0aea673273d4d985476ba88fb0430630ef89ac86770"
+    }
+  ],
+  "declaredCopies": 11,
+  "checkedCopies": 6,
+  "profileCopiesNotBuilt": 5,
+  "conditionalCopies": [
+    {
+      "path": "dist-school-server/ghrab/ghrab-platform.js",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-platform.css",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-artifact-envelope-v1.schema.json",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-app-registry-v2.schema.json",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/assets/brand/school-logo.png",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    }
+  ],
+  "drift": 0,
+  "findings": []
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 garp25:leaks
+> node security/garp25/tools/scan-deployment-leaks.mjs dist
+
+{
+  "status": "PASS",
+  "root": "/workspace/scratch/ebcee4a4dd99/work/generator-testu-main/dist",
+  "info": [
+    "INFO-binary-not-scanned:assets/brand/school-logo.png",
+    "INFO-binary-not-scanned:icons/apple-touch-icon.png",
+    "INFO-binary-not-scanned:icons/icon-192.png",
+    "INFO-binary-not-scanned:icons/icon-32.png",
+    "INFO-binary-not-scanned:icons/icon-512.png",
+    "INFO-binary-not-scanned:icons/icon-maskable-512.png"
+  ]
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 test:headless:dist
+> node tools/headless-check.mjs dist/index.html
+
+=== headless-check: dist/index.html ===
+PASS veřejný build je fail-closed → 42 inertních modulů
+PASS aplikační runtime po povolení naběhne bez JS chyb → 7.1.82
+PASS centrální admin se promítl do Generátoru → Headless Admin
+PASS veřejný build neobsahuje starou PIN bránu → jen AI Studio permit
+PASS changelog max 10 záznamů → 10
+PASS buildPrompt() > 500 znaků → 25094
+PASS exportZadani() bez výjimky
+PASS privacy regression: skutečná jména se nikdy nedostanou do promptu → Student A1/A2 bez jmen
+PASS privacy regression: roster ve výstupním HTML obsahuje jen solené hashe → 2 salted SHA-256 hashe
+PASS setAppMode advanced/simple
+PASS validate + applyVisualState
+PASS přepnutí jazyka čeština↔angličtina
+PASS appModeSummary element existuje a má text
+PASS PWA soubory existují v dist → 4 souborů
+PASS safeJsonForScript neutralizuje </script> → OK
+PASS importované a lokálně uložené stavy jsou omezené schématem → allowlist + limity + zákaz prototypových klíčů
+PASS AI runtime mapuje veřejný a školní profil bez automatického fallbacku → direct-only / gateway-only / hybrid fail-closed
+PASS školní profil odstraní lokální provider klíče → localStorage + sessionStorage vyčištěny
+PASS Gemini request contract: stabilní model, API key header a validní JSON → gemini-3.8-flash + x-goog-api-key
+PASS secureOffline: student + teacher verifier se sestaví → 112 kB student / 179 kB verifier + roster + Stage 4 Forms/fallback OK
+PASS stage4 settings: Google Forms responder URL fail-closed validace → docs.google.com/viewform + forms.gle accepted; http/edit/cizí doména rejected
+PASS stage3 verifier: Google Forms CSV importuje, dešifruje a hlásí chyby/duplicity → 4 řádky: 2 OK / 1 chybí / 1 neplatný + duplicity + CSV ,/;
+PASS stage1 simple: právě tři účely → 💬ProcvičováníVýsledek hned. Student u chyb vidí správné řešení a vysvětlení; vh
+PASS stage1 simple: účely nastavují deterministické profily → practice / standard / strict
+PASS stage5 advanced: pět skupin a přesné členství → 5 skupin
+PASS stage5 advanced: reorganizace nemění state → state byte-for-byte shodný
+PASS stage5 simple: původní kroky se obnoví → restore → advanced OK
+PASS stage5 security: jeden pokus je pouze vysvětlení existujícího chování → read-only secure-offline explanation
+PASS stage1 advanced: stejné tři účely jako v simple → 3
+PASS stage1 advanced: účel předvyplní, ale technické volby nezamkne → fl_standard + ručně změněný feedback
+PASS legacy migrace fl_homework → fl_practice
+PASS legacy migrace fl_graded_quick → fl_standard
+PASS legacy migrace cs_text → cs_practice
+PASS reading source: bez zvolené CEFR není skrytý fallback B1 → explicitní CEFR
+PASS reading source: režim zdroje + poznámka + preanalýza jsou v hlavním promptu → source policy + note + analysis + CEFR
+PASS reading source: advanced má šest vysvětlených karet → auto,content,vocabulary,grammar,model,combined
+PASS reading source: simple vynutí pouze Automaticky → auto only
+PASS reading source: explicitní Reading téma má prioritu před tématem zdroje → Reading topic > source topic
+Test Lab: 26 pass / 0 neočekávaných warn / 0 fail (1 očekávaný skip: self-test bez vygenerovaného testu)
+PASS žádné JS chyby po celém běhu
+
+✅ Vše prošlo
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 check:precache
+> node scripts/check-sw-precache.mjs
+
+✅  Service worker precache je konzistentní (24/24 souborů existuje).
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.82 test:workflow
+> node tools/run-workflow-audit.mjs dist/index.html
+
+=== workflow-matrix-check: dist/index.html ===
+PASS Stage 6: UI ma oddeleny Teacher/Admin secret a Classroom Recovery Code
+PASS Stage 6: Teacher a Recovery maji nezavisle PBKDF2 domeny
+PASS kartézská matice režimů bez rozporu → 576 kombinací
+PASS aktivní účely v simple i advanced → 12 průchodů
+PASS legacy ID se migrují bez mrtvých profilů → 3 migrace
+PASS Bez šablony přepne simple → advanced
+PASS simple UI má právě 3 účely bez technické šablony
+PASS simple Procvičování nastaví stabilní formativní profil
+PASS simple Běžný test resetuje historii klikání na standardní profil
+PASS simple Přísný test nastaví secure profil
+PASS simple účel se zachová při změně jazykové sady
+PASS advanced UI používá stejné tři účely jako simple
+PASS advanced účel je pouze profil a technické volby zůstávají editovatelné
+PASS Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsech 3 ucelech testu → 6 kombinaci x 2 AI faze
+PASS UI závislosti režim × výsledek × feedback → 18 stavů
+PASS 11 různých typů je zablokováno
+PASS listening bez zdroje je zablokován
+PASS listening s transkriptem projde
+PASS úplná vlastní stupnice projde
+PASS mezera ve stupnici je zablokována
+PASS překryv stupnice je zablokován
+PASS unikátní identifikátory skupin projdou
+PASS duplicitní student ve skupinách je zablokován
+PASS oneTimeCode + přesná 1:1 vazba rosteru projde
+PASS oneTimeCode + neznámý nebo chybějící kód je zablokován
+PASS všechny typy a všechny jejich dvojice → 38 samostatně / 703 dvojic
+PASS legacy vlastní typ cvičení není v UI dostupný
+PASS Simple: položky a body lze otevřít a znovu sbalit
+PASS Typy, počet a detail zůstávají 1:1 synchronní včetně Readingu
+PASS Změna typu v detailu okamžitě aktualizuje Reading blok
+PASS Legacy snapshot s jiným počtem se při načtení normalizuje podle typů
+PASS bez výběru podporovaného typu je krok zablokován
+PASS všechny neprázdné kombinace CEFR ve všech cizích jazycích → 315 kombinací
+PASS sekundární volby bez skrytých kolizí → 72 kombinací
+PASS všechny kombinace povinných polí kroku 1 → 16 kombinací
+PASS všechny cizí jazyky × simple/advanced × jazyk instrukcí → 30 průchodů
+PASS všechny oborové šablony českého jazyka → 13 presetů
+PASS nezávislé aktivace/deaktivace a viditelnosti polí → 20 stavů
+PASS migrace rozporných uložených stavů → 4 historické stavy
+PASS souvislý průchod krok 1 → finální prompt → 4 návazné přechody
+PASS instant runtime odmítne cizí jednorázový kód → invalid blocked / valid accepted
+PASS secure konfigurace nepřenáší roster ani hashe jednorázových kódů → roster validation remains teacher-only
+PASS reprezentativní výstupová matice instant HTML → 16 sestavených testů
+PASS Stage 6: instant Teacher login a Recovery unlock jsou oddelene
+PASS legacy týmový bezpečnostní kód už není v UI ani formuláři
+PASS legacy uložený týmový kód se při startu smaže
+PASS instant simple helper se zobrazuje jen když chybí učitelský přístupový kód
+PASS Nastavení secure předání pracuje s Google Forms bez vazby na studentský kód
+PASS secure public config zachová lockOnLeave pro přísný test
+PASS tabs instant má finální odevzdání jen v posledním cvičení
+PASS practice po výsledku automaticky ukáže chybu i správné řešení
+PASS secure tabs: submit až na konci a strict odchod zamkne test
+PASS export checklist je zkrácen na 0 / 4 položky podle režimu
+PASS finální učitelský workflow má regresní pojistky
+PASS secure studentský soubor nepovolí další spuštění po odevzdání
+
+Workflow audit: 55 PASS / 0 FAIL

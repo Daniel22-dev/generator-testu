@@ -1,0 +1,14 @@
+{
+  "command": "npm run qa:garp27:foundation",
+  "startedAt": "2026-10-03T21:32:32.058916+00:00",
+  "finishedAt": "2026-10-03T21:32:50.281260+00:00",
+  "exitCode": 0,
+  "complete": true,
+  "bytes": 3849,
+  "localExternalPin": "bc79979af91d2b59460f0a33282b0707a4a2c5f3bcf8f75db9cde71c8d399abe",
+  "githubActionsExecuted": false,
+  "rawLogBytes": 3849,
+  "rawLogSha256": "10823c7b3d68d83f1c6a76f73125d95842d08cd5f85e49cf4964a13a6e7b6a67",
+  "logSha256": "10823c7b3d68d83f1c6a76f73125d95842d08cd5f85e49cf4964a13a6e7b6a67",
+  "normalization": "ANSI/trailing whitespace removed after raw completion and matching size validation"
+}

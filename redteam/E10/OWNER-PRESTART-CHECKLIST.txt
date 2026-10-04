@@ -1,0 +1,27 @@
+GIT E10 — vlastník před prvním studentským během
+1. Soukromý verifier, roster, answer key a privátní klíč pouze na soukromém
+   PC mimo školu. Studentům patří výhradně šifrovaný student_test.html.
+2. E6 je rozhodnutím vlastníka z 4. 10. 2026 odloženo. Incident není
+   uzavřen; historické raw/cache purge a soukromá rotace nejsou potvrzené.
+3. Forms: vlastník 4. 10. 2026 potvrdil kontrolu. Zachovat původní CSV
+   a čas publikace. V private verifieru nastavit kotvy a roster; diagnózy
+   nebrat za autorizační rozhodnutí jen proto, že je payload dešifrovaný.
+4. E7 je plánováno při řízené zkoušce 6. a 9. 10. 2026. Na iPhone/iPad
+   Safari + Android zadat nový
+   startovní kód z private verifieru, zkusit wrong code a reload před/po
+   startu, striktní lock, classroom recovery, odevzdání do Forms. Odpověď,
+   start/deadline a attempt musí po reloadu zůstat původní. Device matrix
+   z redteam/E7 zůstává ANALYZED / NOT TESTED pro provedení tímto agentem.
+5. Pro každou třídu/novou variantu sestavit nový balíček s novým startovním
+   kódem. Po editaci zadání stáhnout nový student soubor i jeho private
+   verifier; starý kód nepatří k novému souboru. Ověřit code v self-testu.
+6. Šifrovaný student soubor zveřejnit co nejpozději. Kód ukázat na tabuli
+   teprve při zahájení; nesdílet v URL, publikovaných souborech či repu.
+   Classroom unlock je oddělený kód, procedurální brzda při osobním dozoru.
+7. Připravit samostatný hlásící formulář: pokus, údajný průnik, reprodukce.
+   Druhé zařízení zakázané a hlídané dozorem, technicky neviditelné.
+8. Vlastník 4. 10. 2026 schválil vydání pro řízenou red-team zkoušku.
+   Rozhodnutí je verzováno v security/release-readiness-e10.json.
+   Povinné: úplné CI přesného SHA → chráněná main → deploy jen main.
+   --require-ready zůstává před merge/deploy; E7 nepřepisovat na PASS
+   bez skutečných mobilních pozorování a E6 nevydávat za uzavřené.

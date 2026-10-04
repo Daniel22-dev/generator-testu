@@ -1,0 +1,146 @@
+
+> generator-testu@7.1.85 qa:garp27:foundation
+> node scripts/garp27/foundation-gate.mjs
+
+{
+  "classification": "GARP27_FOUNDATION_GATE",
+  "schema": "garp27-foundation-summary-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "status": "FOUNDATION_PASS_LIVE_NOT_TESTED",
+  "serverPhase": "DEFERRED_BY_OWNER_DECISION",
+  "liveStatus": "NOT_TESTED",
+  "sourceIdentity": {
+    "value": "6d89f8924693c30fab8bbbd18081a50c9524a94e",
+    "kind": "local-source-tree-sha1-surrogate"
+  },
+  "steps": [
+    {
+      "id": "build-production",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "build-production",
+        "sha256": "1d28a090eac82b36b508c3f0ba31509655bc6add9b35a851a2f8d8b19cb145a8"
+      }
+    },
+    {
+      "id": "version-contract",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "version-contract",
+        "sha256": "291a3d727cbf66cd9ae04a0d01464e9d8790191cc355bb80974e52a3ca1e45b3"
+      }
+    },
+    {
+      "id": "garp27-contracts",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-contracts",
+        "sha256": "ff0024845ce5f1014b74f0d373dc8e32c3f0c86de58a908e5d702166e0d3dbc6"
+      }
+    },
+    {
+      "id": "garp27-architecture",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-architecture",
+        "sha256": "27978ee40bf567ce9912f474fdf2a6ea5f6f4d91a66b5eb68e9c0ee7c5e889b5"
+      }
+    },
+    {
+      "id": "garp27-policy-mutations",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-policy-mutations",
+        "sha256": "f32e808c3adbce931caf4a726b8afea3ec00ded1e35db6e160990c85d3191507"
+      }
+    },
+    {
+      "id": "garp27-mutations",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-mutations",
+        "sha256": "3b07350c7d4f1b0f86147307c87ca90d3046538afd8da4ae79f4562b6842789c"
+      }
+    },
+    {
+      "id": "garp27-auto-patch",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-auto-patch",
+        "sha256": "06a17462ba9594106fe02aae10d3d26074ad3b4694bb0700ee9d90baaf6a2586"
+      }
+    },
+    {
+      "id": "legacy-garp25-static",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "legacy-garp25-static",
+        "sha256": "e3b9c71ff09366815c6dd0e7b275bad77c021794c83da2f264ce85219ae46424"
+      }
+    },
+    {
+      "id": "production-readiness",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "production-readiness",
+        "sha256": "966e74e7f0d16f96e49bbcc1adc4205cfa8c89b64d19ef8b6c9ba8ab9f1cb0f4"
+      }
+    },
+    {
+      "id": "action-pins",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "action-pins",
+        "sha256": "46fde3e5f37f70a465502219ca7621aa9453622d2d5a285a7995a81ac7fc508f"
+      }
+    },
+    {
+      "id": "sensitive-scan",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "sensitive-scan",
+        "sha256": "f949af28130ddc30659051459b21c935029f51211d2b7eabd870deced9ccabfb"
+      }
+    },
+    {
+      "id": "assurance-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "assurance-admission",
+        "sha256": "19f2f1135fca6ac0057b390d85947f0dc8a019f73aeb766cac60bd111d81f0ba"
+      }
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  }
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

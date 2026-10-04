@@ -1,0 +1,105 @@
+GIT RED-TEAM E9 — REGRESSION & CI
+Checkpoint 7.1.85 / 2026-10-04 / candidate
+STAV ETAPY: lokální výsledek viz checkpoint-manifest.json a přesný procesní log.
+STAV RELEASE: NOT READY – BLOCKING ISSUE
+
+A. VÝCHOZÍ STAV
+E8 7.1.84 již obsahoval 108 forgery scénářů a ochranu start/joker markerů
+při omezení historie. Kontroly E4/E5 proti historickým exportům vyžadovaly
+externí baseline a nebyly opakovatelnou součástí běžného CI. P5 workflow
+spouštělo foundation po P5; foundation znovu buildí dist a odstraní P5
+reporty před uploadem. První E9 kontrolní běh dále odhalil zastaralý P5
+kontrakt ci.p5-gate, který hledal přímo původní příkaz qa:p5:ci.
+
+B. ZMĚNY
+1. npm run qa:redteam:ci: fail-fast npm test → GARP foundation → P5 CI →
+   evidence admission. P5 a deploy workflow používají stejný řetězec.
+2. Každý krok má exit code, úplný log a SHA256. Proveditelné zdroje,
+   public assets, CI a release vstupy mají společný snapshot před/po běhu;
+   změna zdrojů za běhu zakazuje PASS. Auditní výstupy a checksum ledgers
+   jsou z input snapshotu výslovně vyňaty.
+3. CI kontrakt má 14 mutací: vynechané VM/native/negative gate, místní/CI
+   rozdíl, vynechaný admission, špatné pořadí, změna zdroje, potlačení
+   selhání, optional gate, neuzamčená instalace, artifact bez SHA,
+   ztracená evidence, obejití deploy gate a nebezpečný název logu.
+4. Sedm negativních exportů: teacher hash ve studentovi; šifrování
+   vydávané za autenticitu; ignorovaný Forms/roster nesoulad; persistence
+   fail-open; vypnutá navigace; vypnutý freeze guard; answer key leak.
+   Každý je skutečný vygenerovaný export změněný pouze v paměti testu.
+   Vyžaduje assertion failure; timeout, syntax/runtime error ani chybějící
+   závislost se nepočítají jako úspěšná detekce. Produkce nemá tuto hook.
+5. Nativní Chromium: 12 případů (2 opakování × bez/s žolíkem × flush reload,
+   pending reload, graceful restart stejného profilu), 180 skutečných
+   recordSec volání. Zachování identity/pokusu, startu, deadline, odpovědi
+   a start/joker markerů; recovery a zašifrované odevzdání do skutečného
+   privátního verifieru. Dvě negativní nativní mutace ztrácejí start marker.
+   Jen tyto rozbité testovací skripty dostanou nový CSP hash, aby se
+   opravdu spustily; pozitivní testy používají původní CSP.
+6. Admission ověřuje 34 aktuálních reportů, čerstvost vůči počátku běhu,
+   verze, PASS/failed/blockers, počty a detekci negativních kontrol,
+   GARP 12/12, neměněný size budget a pravdivý stav E7. Dalších 11 mutací
+   prokazuje odmítnutí chybějící/staré/jiné verze/FAIL/částečné evidence,
+   vymyšleného fyzického mobilního testu a zvýšeného budgetu.
+7. P5 release kontrakt volá tentýž úplný CI validátor; kontrola nebyla
+   nahrazena samotným nalezením nového názvu příkazu. Citlivé runtime
+   artefakty zůstávají mimo upload; uchovávají se souhrny a procesní logy.
+
+C. KATEGORIE
+DETECTED: známé podvrhy, rozpory identity, replay a záměrně rozbité exporty.
+HARDENED / BEST-EFFORT: obnova ve stejném profilu, signed storage a guard.
+CLIENT-CONTROLLED: telemetrie, self-hash, runtime a klientem vyráběný payload.
+ARCHITECTURAL LIMIT / SERVER REQUIRED: důvěryhodný globální attempt/replay
+stav proti kompletnímu resetu, novému profilu nebo upravenému runtime.
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhé zařízení. Server nepomůže
+proti fotografování obrazovky druhým telefonem. Experiment má osobní dozor.
+
+D. VÝSLEDKY A HRANICE
+Přesné počty, čas běhu, exit code, hashe a metriky jsou v manifestu.
+108 E8 scénářů není tvrzení, že lze odmítnout každý konzistentní podvrh.
+Veřejný RSA klíč umožňuje vyrobit konzistentně zašifrovaný payload;
+matching hash také neprokazuje původ. Takový výsledek zůstává
+DECRYPTED_NOT_AUTHENTICATED / CLIENT-CONTROLLED / REVIEW_REQUIRED,
+skóre přepočítá soukromý answer key. Žolík je JOKER_EXCLUDED.
+
+Desktop Chromium není reálný iOS/Android. E7 zůstává ANALYZED / NOT TESTED,
+146 profile-case dvojic NOT RUN. Graceful shutdown není OS kill, výpadek
+napájení ani mobilní suspend. Příznivé opakované regrese nejsou univerzální
+certifikace lifecycle. Pending-write integrity lock je povolen pouze
+fail-closed, s původními chráněnými hodnotami a bez běžného odemčení.
+
+Offline čisté npm ci skončilo ENOTCACHED (yocto-queue není v cache).
+112 již instalovaných verzí odpovídá lockfile; fsevents je optional pro
+Darwin a na Linuxu není aplikovatelný. To neprokazuje čistou instalaci ani
+integrity ověření všech tarballů. GitHub Actions s Node 22 a vlastním
+pinned Playwright Chromium nebylo v E9 vzdáleně spuštěno.
+
+E. PŘEDCHOZÍ SELHÁNÍ / OPĚTOVNÉ OVĚŘENÍ
+review-run zachovává první běh: npm test a foundation prošly, P5 skončilo
+45/46 kvůli zastaralému ci.p5-gate. Review zároveň doplnilo úplnost uploadu,
+source snapshot a opravilo označení E9 v release metadatech. Tento běh
+necertifikuje finální zdroje; po dokončení oprav se spouští celý řetězec
+znovu. Úspěch je platný pouze se sourceUnchanged=true a čtyřmi exit 0.
+
+Druhý běh prošel všechny čtyři testové kroky včetně admission, ale obal
+běhu selhal při zápisu posledního logu: scripts/ v názvu příkazu vytvořilo
+neexistující podadresář. logging-failure zachovává tento FAIL. Názvy se
+nyní sanitizují na bezpečný plochý název (bez lomítek/dvojteček), přibyla
+CI negativní kontrola a počáteční source snapshot se uloží před testy.
+Teprve další úplný běh nad zmrazenými zdroji smí získat PASS.
+
+F. OTEVŘENÉ BLOCKERY / DALŠÍ KROK
+- F7: povinné AES-GCM/PBKDF2 šifrování obsahu startovním kódem ≥40 bitů
+  entropie dosud není implementované. Zůstává skutečný release blocker.
+- E7: vlastník provede checklist na fyzickém iPhonu/iPadu a Androidu.
+- E6: staré raw/cache URL a private credential rotation nejsou potvrzeně
+  uzavřené. Záznamy cleanup a smazání artifactu jsou historické z 3.10.;
+  E9 je neověřovalo čerstvě a nic dalšího nezveřejnilo.
+- Forms konfigurace je owner checklist; živý Forms účet nebyl prověřen.
+- E10: řešit readiness blockery, následně skutečné CI na přesném candidate
+  SHA, chráněná main a deploy pouze main. Lokální PASS samo není autorizace
+  k publikaci ani doklad, že je chráněná vzdálená main skutečně nastavena.
+
+E9 neupravuje produkční guard/verifier algoritmy z E8; nové behaviorální
+kontroly je skutečně spouštějí. Produkční změna je checkpoint identity a
+newest-first RELEASE.changes (10). Bez pushe, PR, merge, nasazení nebo
+zprávy Supportu. Serverová verze zůstává DEFERRED – SERVER VERSION.

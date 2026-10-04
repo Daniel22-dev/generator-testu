@@ -1,0 +1,21 @@
+{
+  "observedAt": "2026-10-03T21:01:16.742799+00:00",
+  "artifactId": 11282999590,
+  "directApiStatus": 404,
+  "remainingArtifacts": [
+    {
+      "id": 11284425570,
+      "head": "f337f9c81a577fae98ccaec25de405b2b2f0b2aa",
+      "run": 37150948555
+    },
+    {
+      "id": 11283479156,
+      "head": "faea1ffbd9c683b7b679c2e7336b13b0e00d90df",
+      "run": 37151300933
+    }
+  ],
+  "remainingCount": 2,
+  "deleted": true,
+  "proofBytes": 81084,
+  "secretValuesOmitted": true
+}

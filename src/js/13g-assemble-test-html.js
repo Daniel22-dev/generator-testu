@@ -74,9 +74,10 @@ async function assembleTestHtml(st, genData) {
   // a v instant větvi je HMAC klíč součástí studentského HTML, takže týmový secret
   // nepřidával skutečnou bezpečnost. Report seal proto používá náhodný per-test secret.
   const verifySecret=makeVerifySecret();
-  const teacherAccessCode=field('ucitelPin')||'';
+  const teacherRequired=requiresTeacherAccessCode(st);
+  const teacherAccessCode=teacherRequired?(field('ucitelPin')||''):'';
   const classroomRecoveryCode=field('recoveryCode')||'';
-  const credentialErrors=credentialPolicyErrors(teacherAccessCode,classroomRecoveryCode,configForHash.lockOnLeave,field('ucitelJmeno')||'');
+  const credentialErrors=credentialPolicyErrors(teacherAccessCode,classroomRecoveryCode,configForHash.lockOnLeave,field('ucitelJmeno')||'',teacherRequired);
   if(credentialErrors.length){
     throw new Error('Test nebyl sestaven: '+credentialErrors.join(' '));
   }

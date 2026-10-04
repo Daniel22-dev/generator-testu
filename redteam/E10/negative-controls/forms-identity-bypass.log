@@ -1,0 +1,23 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'current'
+- 'invalid-current'
+
+    at reject (file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-verifier-e3.mjs:17:98)
+    at async file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-verifier-e3.mjs:52:5
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-verifier-e3.mjs:18:81)
+    at async file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-verifier-e3.mjs:51:3 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'current',
+  expected: 'invalid-current',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

@@ -2,24 +2,26 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.76",
-  "releaseStatus": "security-remediation-r7-e1-production-deployed",
+  "appVersion": "7.1.87",
+  "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
     "offlineCapable": true,
-    "currentUseApproved": true
+    "currentUseApproved": true,
+    "useScope": "controlled-student-redteam-only"
   },
   "github": {
-    "status": "deployed-verified",
+    "status": "not-yet-uploaded",
     "uploadDeferredUntilEcosystemComplete": false,
-    "postUploadValidationRequired": false,
+    "postUploadValidationRequired": true,
     "requiredChecks": [
       "p5-release-gate",
       "journey-e2e",
       "safe-promotion",
       "pages-release-identity"
-    ]
+    ],
+    "statusScope": "Production runtime deployment; candidate source upload and exact-SHA CI are tracked separately in handoff and Actions evidence."
   },
   "schoolServer": {
     "status": "prepared-not-connected",
@@ -38,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "SECURITY-REMEDIATION-R7-E1-PRODUCTION-2026-10-03",
+  "revision": "REDTEAM-V2-E10-OWNER-RELEASE-2026-10-04",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
-    "transport": "7.1.76 R7/E1 remediation is promoted and deployed. Exact-lockfile npm ci, P5 R2, journey E2E, Safe Promotion, GitHub Pages deployment, live release-identity verification and AI Studio notification completed successfully in GitHub Actions.",
-    "note": "R7/E1 closes the confirmed E1 gaps without changing Teacher/Admin vs Classroom Recovery privilege semantics. Persistence now uses signed revisioned records with IndexedDB authority; verifier rejects identity/group binding mismatches before scoring; in-progress responses are restored. Full browser-data clearing, another profile/device, and arbitrary same-origin DevTools execution remain declared serverless limitations.",
-    "exactLockfileCiExecuted": true,
+    "transport": "Local exact-lockfile dependency checks, desktop Chromium reporter and fixture workflow; complete frozen E10 chain required for this candidate.",
+    "note": "7.1.87 fixes secure generation, hidden credential settings and current workflow fixtures. Owner authorized publication on 2026-10-04: E6 deferred, Forms owner-reported checked, E7 physical mobile testing scheduled for 2026-10-06 and 2026-10-09. Exact-SHA CI and deployment verification remain required; physical devices are not certified.",
+    "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
-    "productionDeploymentVerified": true
+    "productionDeploymentVerified": false
   },
-  "note": "7.1.76 R7/E1 is the verified production serverless release. E1 persistence integrity, submitted-attempt continuity, response restoration and verifier identity-to-variant binding passed release gates and E2E validation. Remaining items are declared serverless limitations, manual accessibility follow-up, and the future school-server phase.",
+  "note": "Owner-approved release for the supervised student red-team experiment only. Current production status must be read from Actions and release identity; E6 is not closed and mobile testing is scheduled.",
   "publication": {
-    "runtimeDistributed": true,
+    "runtimeDistributed": false,
     "liveStatusAuthority": [
       "dist/release-integrity.json",
       "AI Studio release-wave"

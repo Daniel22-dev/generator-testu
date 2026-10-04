@@ -1,0 +1,103 @@
+GIT RED-TEAM v2 — E7 / MOBILE RED-TEAM MATRIX
+Verze 7.1.83; 2026-10-03; lokální větev candidate.
+E7: ANALYZED / NOT TESTED (nikdy mobilní GREEN).
+Ostrý třídní experiment: NOT READY – BLOCKING ISSUE.
+Výchozí E6 commit: d5d54a55d85f64c79f2894573ffce338325e0550.
+
+CO JE HOTOVÉ
+40 konkrétních ručních scénářů pro fyzický iPhone Safari, iPad Safari,
+Android Chrome a alternativní Android Chromium. Celkem 146 dvojic
+případ/profil: 35/37/37/37. Všechny jsou NOT RUN, ne provedené testy.
+Každý případ má kroky, očekávání, přesnou kategorii, hranice, soukromou
+evidenci a negativní kontrolu. Praktický ruční protokol, plain TXT
+matice a offline HTML záznamník jsou v redteam/E7.
+
+MOBILE-CHECKLIST.html otevři na soukromém PC vlastníka mimo školu a
+sleduj reálný telefon. Záznamník umí samostatná metadata/pozorování pro
+každý profil a JSON export. Nemá síť ani localStorage; před zavřením
+exportuj. PASS bez metadat, důkazu, poznámky a PASS negativní kontroly
+odmítne. Nikdy nezmění E7 na GREEN ani neschválí release. Ruční exporty
+jsou MANUALLY REPORTED / NOT VERIFIED a potřebují přezkum vlastníka.
+Do záznamníku nepatří payload, skutečné emaily, kódy, odpovědi ani klíče.
+Plain manuál vysvětluje syntetický pilot a interpretaci PASS/N/A/FAIL.
+
+ROZSAH A HRANICE
+Tentýž telefon: keyboard false positives, app switch, oznámení/hovor,
+screen lock, fullscreen/fallback, screenshot, OCR → AI, Siri a Apple
+Intelligence, Gemini/Circle to Search, split/plovoucí okno, clipboard,
+inert lock, procedurální unlock, reload, native history/BFCache,
+force-kill/restart, suspend/discard, 40min expiry, posun hodin,
+multi-tab/private/jiný browser, storage reset, offline/outbox,
+duplicate, identity transfer, klientské úpravy, prestart F7 a a11y.
+Native BFCache/freeze/discard a skutečný 40min průchod musí být reálné;
+headless event dispatch, UA nebo kratší timer je nenahradí.
+DETECTED/HARDENED je podmíněno doručenými eventy a běžným klientem.
+Screenshot a AI overlay mohou uspět bez eventu; žádná prevence se neslibuje.
+Storage reset/jiný profil jsou ARCHITECTURAL LIMIT; globální session,
+replay a časy potřebují externí trusted state (SERVER REQUIRED).
+Druhé zařízení: MIMO TECHNICKÝ DOSAH – POUZE DOZOR. Ani server jej
+nevyřeší; v 40min experimentu je zakázané a vlastník průběžně dohlíží.
+Runtime, hodiny, telemetry a konzistentní klientské podvrhy zůstávají
+CLIENT-CONTROLLED. Klasifikace nadále REVIEW_REQUIRED.
+F7 startovní šifrování otázek s >=40bit entropií dosud není hotové.
+Třídní unlock je procesní brzda, nikoli autentizace učitele.
+Private verifier/answer key/roster/privátní klíč jen na soukromém PC
+vlastníka mimo školu, nikdy student/public repo/historie/cizí AI.
+Živé Forms verified email, one response a trusted timestamp nejsou
+v E7 automaticky prokázány; checklist má jejich owner-side kontrolu.
+
+LOKÁLNÍ TESTY — PASS, NE MOBILNÍ CERTIFIKACE
+npm test: dokončený proces 0, workflow 55 PASS / 0 FAIL, lint 0 chyb
+a 8 dřívějších upozornění, build/security/headless/GARP regrese.
+P5 CI ekvivalent: konečný dokončený proces 0, release 46/46,
+acceptance 19/19, quality 35/35. Runtime 0 blockers/exceptions/overflows.
+Entry critical 1769661 bytes / limit 1 770 000;
+limit nezvýšen. Axe 4 stavy, 0 potvrzených violations; incomplete
+ARIA/contrast zůstávají v reportech a vyžadují ruční ověření.
+GARP 2.7 foundation: 12/12, FOUNDATION_PASS_LIVE_NOT_TESTED.
+Lokální source identity je SHA1 surrogate vybraných zdrojů, ne remote
+Git commit nebo skutečně proběhlé GitHub Actions. Externí pin pro
+lokální běh odpovídá workflow; nová provenance mimo CI se tím netvrdí.
+E7 protocol gate: 12 záměrně chybných matric odmítnuto (false GREEN/PASS,
+headless→physical, chybějící iPad/AI/control, screenshot PREVENTED,
+second device SERVER REQUIRED, špatný reset/attestation/threshold).
+Desktop offline recorder: 5 kontrol, včetně skutečného JSON download,
+odmítnutí nedoloženého PASS, přepínání profilů a bezpečného textu.
+Negativní kontrola s blokovaným skriptem nevytvoří funkční záznamník.
+Chromium 153.0.8010.0, Playwright 1.61.1; zařízení 0.
+Secure runtime zdroje 13*.js se oproti E6 nezměnily (17 modulů).
+E5 původní historické negativní kontroly zůstávají v redteam/E5;
+nejsou přeznačeny jako nově provedené fyzické mobilní testy.
+27 sanitizovaných aktuálních reportů + dokončené logy a manifest v E7.
+Foundation přestavuje dist; proto byly konečný foundation i P5 znovu
+spuštěny za sebou. Předchozí JSON bez dostupných souborů není finální
+PASS evidence. Poslední kompletní logy/JSON jsou v balíčku.
+Nový gate je v npm test a P5/P5 CI, recorder v P5/P5 CI.
+Workflow připraven ukládat E7 reporty; na GitHubu nebyl tento SHA spuštěn.
+
+AKTUÁLNÍ E6 PROVOZNÍ STAV
+Po odděleném výslovném schválení byl public main přepsán na safe
+faea1ffbd9c683b7b679c2e7336b13b0e00d90df: dosažitelné 2 commity/1 README.
+10 starých Pages URL byly 404. Citlivý Actions artifact 11282999590
+odstraněn, API 404 dne 2026-10-03T21:01:16Z; 2 safe artifacts zůstaly.
+Starý raw unit4 URL ještě 2026-10-03T21:03:38Z vracel 200.
+Support purge/cache a soukromá rotace nejsou potvrzeny; support ticket
+nebyl odeslán. E7 tato starší ověření neopakoval. Původní E6 historický
+audit se nepřepisuje; E7 přikládá sanitizovaný post-cleanup kontext.
+
+DALŠÍ POSTUP
+Na skutečných zařízeních projít protokol a jeho kontroly. Nové chyby
+reprodukovat, opravit dostupné příčiny a ověřit regresí. Samotný
+checklist neuzavírá mobilní kompatibilitu ani nezaručuje detekci AI.
+Otevřeno: E6 residual/raw/cache a rotace; F7; skutečné mobily; E8 plný
+forged payload harness; E9 finální regrese/CI; E10 candidate → protected
+main → deploy main. Serverová verze DEFERRED – SERVER VERSION.
+E7 neprovedl PR, merge, remote promotion, support zprávu ani deployment.
+
+BALÍČEK
+Zdrojový candidate ZIP 7.1.83 + tento plain TXT. Dále samostatný offline
+HTML checklist a plain TXT protokol s celou maticí. RELEASE.changes
+nejnovější nahoře, maximálně 10; verze, GARP piny, SBOM a assurance
+fingerprint synchronizovány. Bez node_modules/dist/.git, skutečných
+public raw HTML, mirroru historie, skutečného rosteru/privátní RSA,
+hotových soukromých teacher HTML nebo PDF. Podrobné důkazy v E7 manifestu.

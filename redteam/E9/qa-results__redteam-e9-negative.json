@@ -1,0 +1,105 @@
+{
+  "stage": "E9",
+  "version": "7.1.85",
+  "status": "PASS",
+  "syntheticOnly": true,
+  "controls": [
+    {
+      "id": "teacher-hash-leak",
+      "stage": "E1",
+      "script": "check-redteam-isolation.mjs",
+      "selected": {},
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "teacher-hash-leak.log",
+      "logSha256": "77dd4d114eb9d08cce3b5d3cc077193e45435cd050ccfbf5ad7798d5b372337f",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    },
+    {
+      "id": "encryption-as-authenticity",
+      "stage": "E2",
+      "script": "check-redteam-trust-e2.mjs",
+      "selected": {
+        "GIT_REDTEAM_E2_CASE": "trust"
+      },
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "encryption-as-authenticity.log",
+      "logSha256": "61686c4f3b2f6da09eab4f9bf977f2e6b6c47cb2abc5a70101c520271d8f6f93",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    },
+    {
+      "id": "forms-identity-bypass",
+      "stage": "E3",
+      "script": "check-redteam-verifier-e3.mjs",
+      "selected": {
+        "GIT_REDTEAM_E3_CASE": "identity"
+      },
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "forms-identity-bypass.log",
+      "logSha256": "83f07b16981386fdf9dba72b169b39a8d49888570f2f2c59bab0fceddd8356be",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    },
+    {
+      "id": "persistence-fail-open",
+      "stage": "E4",
+      "script": "check-redteam-storage-faults-e4.mjs",
+      "selected": {
+        "GIT_REDTEAM_E4_FAULT": "active-write-failure"
+      },
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "persistence-fail-open.log",
+      "logSha256": "494d6ef67cbfa495b2609cf5634673d09b8a4677fb749bfe106182523fc3f9d4",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    },
+    {
+      "id": "navigation-guard-disabled",
+      "stage": "E5",
+      "script": "check-redteam-runtime-e5.mjs",
+      "selected": {
+        "GIT_REDTEAM_E5_CASE": "beforeunload-lock"
+      },
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "navigation-guard-disabled.log",
+      "logSha256": "a39985fe08436a72904707493bacf821fd653caa1e24ec6cf5fb26deda0ef22c",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    },
+    {
+      "id": "frozen-guard-disabled",
+      "stage": "E5",
+      "script": "check-redteam-runtime-e5.mjs",
+      "selected": {
+        "GIT_REDTEAM_E5_CASE": "lifecycle-lock"
+      },
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "frozen-guard-disabled.log",
+      "logSha256": "f94c9e5a304e9eab8a73467d0eb959a17af2a5bbf17a3771684d101a7e206830",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    },
+    {
+      "id": "publication-answer-leak",
+      "stage": "E6",
+      "script": "check-redteam-publication-e6.mjs",
+      "selected": {
+        "GIT_REDTEAM_E6_CASE": "generated-student-and-private-pair"
+      },
+      "expectedExit": 1,
+      "actualExit": 1,
+      "detected": true,
+      "log": "publication-answer-leak.log",
+      "logSha256": "e16d6aa2c60291b58e47b796535371ad44396dae4363864b6163fba0823358c2",
+      "scope": "Actual generated artifact intentionally weakened in memory; assertion failure required"
+    }
+  ],
+  "otherNegativeCoverage": "E7 contract mutations and E8 per-case/retention/native controls execute in their own gates. Existing legacy/GARP mutations remain mandatory."
+}

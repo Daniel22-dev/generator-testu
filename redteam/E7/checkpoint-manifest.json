@@ -1,0 +1,260 @@
+{
+  "schema": "git-redteam-e7-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.83",
+  "stage": "E7",
+  "stageE7": "ANALYZED / NOT TESTED",
+  "protocolDeliverableComplete": true,
+  "physicalDevicesTested": false,
+  "physicalResults": "All 146 profile/case pairs NOT RUN",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "sourceBranch": "candidate",
+  "baseCommit": "d5d54a55d85f64c79f2894573ffce338325e0550",
+  "manualCases": 40,
+  "physicalProfiles": 4,
+  "profileCaseCounts": {
+    "iphone-safari": 35,
+    "ipad-safari": 37,
+    "android-chrome": 37,
+    "android-alt-chromium": 37
+  },
+  "profileCasePairs": 146,
+  "matrixContractNegativeControls": [
+    {
+      "id": "false-mobile-green",
+      "expectedRejected": true
+    },
+    {
+      "id": "false-mobile-pass",
+      "expectedRejected": true
+    },
+    {
+      "id": "headless-as-physical",
+      "expectedRejected": true
+    },
+    {
+      "id": "missing-ipad",
+      "expectedRejected": true
+    },
+    {
+      "id": "executed-before-owner",
+      "expectedRejected": true
+    },
+    {
+      "id": "screenshot-prevented",
+      "expectedRejected": true
+    },
+    {
+      "id": "second-device-server",
+      "expectedRejected": true
+    },
+    {
+      "id": "no-negative-control",
+      "expectedRejected": true
+    },
+    {
+      "id": "no-ai-coverage",
+      "expectedRejected": true
+    },
+    {
+      "id": "no-reset-boundary",
+      "expectedRejected": true
+    },
+    {
+      "id": "fake-authentication",
+      "expectedRejected": true
+    },
+    {
+      "id": "threshold-drift",
+      "expectedRejected": true
+    }
+  ],
+  "recorderChecks": [
+    "Blank report includes all 146 unexecuted profile/case pairs, never mobile PASS.",
+    "Export rejects PASS without metadata/evidence/completed negative control.",
+    "Metadata and notes survive profile switching; notes cannot execute HTML.",
+    "Actual offline JSON download keeps self-reported scope and no release authorization.",
+    "Negative control: deliberately blocked UI script cannot produce a functioning recorder."
+  ],
+  "recorderNegativeControl": {
+    "id": "script-disabled",
+    "expectedRejected": true
+  },
+  "npmTest": "PASS / complete terminal marker and matching raw log size",
+  "localP5Equivalent": "PASS / final completed process and report bundle",
+  "garp27Foundation": "FOUNDATION_PASS_LIVE_NOT_TESTED",
+  "garp27FoundationSummary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "garpSourceIdentityKind": "local-source-tree-sha1-surrogate",
+  "githubActionsExecuted": false,
+  "exactLockfileCiExecuted": false,
+  "desktopRecorderBrowser": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "runtimeModulesUnchangedFromE6": {
+    "src/js/13-secure-export.js": "e43fbf04d436457f4228e973349d26502fd78b2dfeb88caa73b5b89ec954a742",
+    "src/js/13a-secure-helpers.js": "a32104f2c3c3c7ba34e649fe1b15de5fee8cc154480401a1a5f1757e81719312",
+    "src/js/13b-secure-shared-scoring.js": "cbf135fbc071f58cbba2c59874a1d429e00239935b4b36a3fcb645c826cb6b56",
+    "src/js/13c-secure-package.js": "bc4f65ccdfb3738577f5aa53d1faae523d38c0efd906536c5fc0d1c3bbf34e24",
+    "src/js/13d-secure-student-shell.js": "52b47d51a1ad9ff07c94b30a4d7b2f2d0946ef4a9ce5817a07ec9882a418e7fd",
+    "src/js/13da-secure-student-isolation.js": "a08a2ff1166a7c331c634d454154ab5de503ac3444cd851bcfbb7e283e33948d",
+    "src/js/13de-secure-student-guard.js": "6fb9eff572a4893c628da7403c29fef324c483b901be5129e33cb0d2af2b3129",
+    "src/js/13e-secure-student-runtime.js": "cbcb34656dadab3afac85247abcfb7f91a0dea62f8122a0ac5a7ecdd84244cbc",
+    "src/js/13ea-secure-verifier-forms.js": "e49155522f3633cb006c8551d347710d804d225ea33a2ef161e76c7175497bcf",
+    "src/js/13eb-secure-teacher-verifier-v2-ui.js": "6dd6f15567b1a9ac7c51aacafa0e9c782d2b411d8862af9ed844f59e80633292",
+    "src/js/13ec-secure-verifier-trust.js": "035eda258bda34112d653181f3c1f9a1d3fbfa6181ccc24b76867056a2c75e0f",
+    "src/js/13ed-secure-verifier-validation.js": "4fe8cf52d2eaffcb48472c197fbb54f92617fa6f98e7f13ad8c732641a3572e4",
+    "src/js/13ee-secure-verifier-anchors.js": "c3b6f58eda19684aba08be57d6dd34c402c4cdaff4a2734f94dda7b87d2d6977",
+    "src/js/13ef-secure-verifier-replay.js": "8c58cf25b146442fe50ba9a5666094a493b467b380e19ec36a0730444bac0399",
+    "src/js/13f-secure-teacher-verifier.js": "20723ce72e6f129a2837dd3dd916fcb5ee4b22fbc359f9fbc95e341866d50fe7",
+    "src/js/13fa-secure-teacher-verifier-pdf.js": "137163f10257a4cf759801d0999ac66e11ffd0cf42c91057912263df0f5afc52",
+    "src/js/13g-assemble-test-html.js": "5e568c7f5fe3bb40dad9ecbd3ceb616bafc4ee49e55064111afc00329453d0a2"
+  },
+  "release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.83",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-03T21:34:17.421Z",
+    "distBytes": 2569701,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1647325,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1597842,
+    "entryCriticalBytes": 1769661,
+    "largestInlineScriptBytes": 157609,
+    "precacheBytes": 2193100,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1597842,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "entryCriticalBudget": {
+    "limit": 1770000,
+    "changed": false
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "axeIncomplete": [
+    {
+      "page": "index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 120
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 109
+        }
+      ]
+    }
+  ],
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 8
+  },
+  "localEvidenceReports": 27,
+  "e7GithubWrites": false,
+  "e7DeploymentPerformed": false,
+  "previousE6Cleanup": {
+    "separatelyAuthorized": true,
+    "main": "faea1ffbd9c683b7b679c2e7336b13b0e00d90df",
+    "reachableCommits": 2,
+    "reachableBlobs": 1,
+    "livePagesUrlsPreviously404": 10,
+    "sensitiveArtifactDeleted": 11282999590,
+    "deletionApiStatus": 404,
+    "lastRawProbeStatus": 200,
+    "lastRawProbeAt": "2026-10-03T21:03:38.423134+00:00",
+    "retestedInE7": false,
+    "supportTicketSent": false,
+    "credentialRotationConfirmed": false
+  },
+  "pending": [
+    "E6 unreachable raw/cache purge and private rotation confirmation",
+    "F7 start content encryption with >=40bit entropy",
+    "physical iPhone/iPad/Android execution",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "runtimeProvenance": "CLIENT-CONTROLLED",
+  "classificationAuthorization": "REVIEW_REQUIRED",
+  "teacherStoragePolicy": "Only owner private PC outside school; never public repo/history or student device",
+  "serverDecision": "DEFERRED – SERVER VERSION",
+  "secondDeviceCategory": "MIMO TECHNICKÝ DOSAH – POUZE DOZOR",
+  "initialPassEvidenceExcluded": "Initial P5 JSON files removed by foundation rebuild; initial foundation preceded final audit bookkeeping. Final foundation and P5 repeated sequentially; only final completed logs/reports admitted."
+}

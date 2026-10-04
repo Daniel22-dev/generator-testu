@@ -1,0 +1,14 @@
+{
+  "command": "npm run qa:p5:ci",
+  "startedAt": "2026-10-03T21:32:50.281907+00:00",
+  "finishedAt": "2026-10-03T21:34:34.855487+00:00",
+  "exitCode": 0,
+  "complete": true,
+  "bytes": 135373,
+  "localExternalPin": "bc79979af91d2b59460f0a33282b0707a4a2c5f3bcf8f75db9cde71c8d399abe",
+  "githubActionsExecuted": false,
+  "rawLogBytes": 135373,
+  "rawLogSha256": "6cfb14941c484c35bdd6349fa870f8b6598263bb5613c813073b18da20cc3b63",
+  "logSha256": "6cfb14941c484c35bdd6349fa870f8b6598263bb5613c813073b18da20cc3b63",
+  "normalization": "ANSI/trailing whitespace removed after raw completion and matching size validation"
+}

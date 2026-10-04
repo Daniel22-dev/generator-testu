@@ -2,6 +2,23 @@ from harness import Harness,TESTS
 import json,time,traceback
 OUT=TESTS.parent/'evidence'
 def click_attr(p,attr,val):p.locator('['+attr+'='+json.dumps(val)+']').click()
+def private_start_code(h,teacher_html):
+ v=h.new_page(teacher_html)
+ try:
+  code=v.evaluate('CONFIG.startCode')
+  assert len(code)==10 and v.locator('.warn code').first.inner_text()==code,'private verifier must display its start code'
+  return code
+ finally:v.close()
+def enter_start_code(p,code):
+ assert len(code)==10,'use the code belonging to this private package'
+ p.locator('#startCode').fill(code)
+def configure_forms_anchors(p,published_at,email_header='Email Address',timestamp_header='Timestamp'):
+ # Synthetic owner attestation for these fixtures; this does not inspect a live Form.
+ p.locator('#formsSchoolDomain').fill('example.invalid');p.locator('#formsPublishedAt').fill(published_at)
+ p.locator('#formsEmailHeader').fill(email_header);p.locator('#formsTimestampHeader').fill(timestamp_header)
+ for field in ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed']:p.locator('#'+field).check()
+ p.get_by_role('button',name='Použít kotvy',exact=True).click()
+ assert p.evaluate('!!FORMS_ANCHOR_POLICY'),p.locator('#formsAnchorStatus').inner_text()
 def answer(p,ex,ei,mode,language):
  t=ex['type']
  for qi,it in enumerate(ex['items']):
@@ -40,13 +57,15 @@ def run():
      chunk=types[bi:bi+10];row={'language':language,'mode':mode,'types':chunk,'countPerExercise':2};s=v=None;start=time.time()
      try:
       x=p.evaluate('async a=>await auditBuild(a.types,a.mode,a.lang,"target",2)',{'types':chunk,'mode':mode,'lang':language});assert x['cfg']['uiLang']==language,(language,x['cfg']['uiLang']);exs=x['variants']['__default'];assert len(exs)==len(chunk)
-      s=h.new_page(x['html']);s.locator('#studentName').fill('QA');click_attr(s,'onclick','startTest()');s.wait_for_timeout(80)
+      s=h.new_page(x['html']);s.locator('#studentName').fill('QA')
+      if mode=='secureOffline':enter_start_code(s,private_start_code(h,x['teacher']))
+      click_attr(s,'onclick','startTest()');s.wait_for_function('started' if mode=='instant' else 'CONTENT_READY && STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")')
       for ei,ex in enumerate(exs):answer(s,ex,ei,mode,language)
       if mode=='instant':
        sc=s.evaluate('calcScore()');assert sc['earned']==sc['total']==12*len(chunk),sc
        click_attr(s,'onclick','confirmSubmit()');click_attr(s,'onclick','doSubmit()');s.wait_for_function('!document.getElementById("resultScreen").classList.contains("hidden")')
       else:
-       click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('typeof ANSWER_TXT==="string" && ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt);assert sc['earned']==sc['total']==12*len(chunk),sc
+       click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt);assert sc['earned']==sc['total']==12*len(chunk),sc
        v.locator('[data-v2-panel="results"]').click();v.locator('#fallbackImportDetails').evaluate('el=>{el.open=true}');v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('document.getElementById("resultTable").textContent.includes("QA")')
       assert s.evaluate('__errors')==[],s.evaluate('__errors')
       st=p.evaluate('async()=>await runScoringSelfTest()');assert st['ok'] and not st['hasGaps'],st

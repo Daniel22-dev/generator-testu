@@ -1,0 +1,314 @@
+{
+  "schema": "git-redteam-e6-live-pages-v1",
+  "repository": "Daniel22-dev/interaktivni-testy",
+  "head": "2af3fade24465511503dc9f215f7d91ab4a066b1",
+  "status": "FAIL",
+  "pages": [
+    {
+      "path": "Appearance.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/Appearance.html",
+      "httpStatus": 200,
+      "bytes": 98175,
+      "sha256": "c45ee5dc5d64307d2f3efaee99bcff0d931471cf3c22fdb17808ed0a2313aac2",
+      "headBlob": "32479c527eae79465eeda536818e7adbf7f8361b",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:03.300843+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field"
+        ],
+        "sha256": "c45ee5dc5d64307d2f3efaee99bcff0d931471cf3c22fdb17808ed0a2313aac2",
+        "bytes": 98175,
+        "generatorVersion": "7.1.71",
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": true,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "PAST PERFECT.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/PAST%20PERFECT.html",
+      "httpStatus": 200,
+      "bytes": 100954,
+      "sha256": "66f69fd4f2a6181281f813112025eed8bd9f4514d1a1a9a82f00f0292be6d784",
+      "headBlob": "194e02d45c1c4978c9e99e44705de2683eefaf70",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:03.389302+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field"
+        ],
+        "sha256": "66f69fd4f2a6181281f813112025eed8bd9f4514d1a1a9a82f00f0292be6d784",
+        "bytes": 100954,
+        "generatorVersion": "7.1.60",
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": true,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "Státy Latinské Ameriky a hlavní města - slepá mapa.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/St%C3%A1ty%20Latinsk%C3%A9%20Ameriky%20a%20hlavn%C3%AD%20m%C4%9Bsta%20-%20slep%C3%A1%20mapa.html",
+      "httpStatus": 200,
+      "bytes": 50409,
+      "sha256": "569a3a5f6e859fbf393181f0b516548a80027c1a911c5b36aa7435387a807d87",
+      "headBlob": "ec73edcdb4ad714c4274977467250a483ddad02f",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:03.169759+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "hidden-answer-property",
+          "secure-student-format-required"
+        ],
+        "sha256": "569a3a5f6e859fbf393181f0b516548a80027c1a911c5b36aa7435387a807d87",
+        "bytes": 50409,
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": false,
+        "studentCodeHashes": false,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": true
+      }
+    },
+    {
+      "path": "Unidad 1.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/Unidad%201.html",
+      "httpStatus": 200,
+      "bytes": 97955,
+      "sha256": "a580b4c155429337bfe300485b9bed160c473eab22f07b8e4ba0edf0e9ef2713",
+      "headBlob": "7fa3ab5babd3f03e16bf10dd5d7f5cc7ee120257",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:08.802296+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field"
+        ],
+        "sha256": "a580b4c155429337bfe300485b9bed160c473eab22f07b8e4ba0edf0e9ef2713",
+        "bytes": 97955,
+        "generatorVersion": "7.1.60",
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": true,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "Unit 5 revision.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/Unit%205%20revision.html",
+      "httpStatus": 200,
+      "bytes": 96810,
+      "sha256": "dca178eed8fe1ac4b4cf962814fb6b1c3b4b8e7fdbd802363eb842a5279e3b05",
+      "headBlob": "94bc1b3cec4f4eab80cda66c1a9d050b7dd33599",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:08.798012+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field"
+        ],
+        "sha256": "dca178eed8fe1ac4b4cf962814fb6b1c3b4b8e7fdbd802363eb842a5279e3b05",
+        "bytes": 96810,
+        "generatorVersion": "7.1.57",
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": true,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "brona-test_student_test.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/brona-test_student_test.html",
+      "httpStatus": 200,
+      "bytes": 48107,
+      "sha256": "55fbd09c7009de1b3fcec08c46c86b64d2b81f276d7ec4a967f99719c4b1fde7",
+      "headBlob": "673db5da88ac37972b2c02fd06edcf0db4271351",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:08.645407+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field",
+          "unexpected-scoring-policy-field"
+        ],
+        "sha256": "55fbd09c7009de1b3fcec08c46c86b64d2b81f276d7ec4a967f99719c4b1fde7",
+        "bytes": 48107,
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": false,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "english-or-czenglish-aktivita_student_test.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/english-or-czenglish-aktivita_student_test.html",
+      "httpStatus": 200,
+      "bytes": 52568,
+      "sha256": "a0c9834e9598a09f6aac29a8d965a00b31610150747f4b7de742a9896e2b62be",
+      "headBlob": "518100f84ced7a0b185a854a1403e2ba67d4b2b3",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:15.704850+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field",
+          "unexpected-scoring-policy-field"
+        ],
+        "sha256": "a0c9834e9598a09f6aac29a8d965a00b31610150747f4b7de742a9896e2b62be",
+        "bytes": 52568,
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": false,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "relative-clauses_student_test.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/relative-clauses_student_test.html",
+      "httpStatus": 200,
+      "bytes": 76259,
+      "sha256": "437ca3572116e5a28652da177e89db9f36cbcaa890d8be9eb1eb3cb3d06e025b",
+      "headBlob": "d6ebfd09279905ba048d51939600f60365f9ff73",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:15.684396+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "private-or-answer-derived-property",
+          "private-public-config",
+          "secure-student-mode-required",
+          "teacher-or-roster-data",
+          "teacher-runtime-capability",
+          "unexpected-public-config-field"
+        ],
+        "sha256": "437ca3572116e5a28652da177e89db9f36cbcaa890d8be9eb1eb3cb3d06e025b",
+        "bytes": 76259,
+        "generatorVersion": "6.11.68",
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": true,
+        "studentCodeHashes": false,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": false
+      }
+    },
+    {
+      "path": "unit4_food_test_vB.html",
+      "url": "https://daniel22-dev.github.io/interaktivni-testy/unit4_food_test_vB.html",
+      "httpStatus": 200,
+      "bytes": 45575,
+      "sha256": "a9e99d9a434d0bb677f3fdaa5c59e7e3736032c5ed975a8d6cadf2f1bd8a157e",
+      "headBlob": "a4c29007d9b191b7f48f45768175ef8c97460f53",
+      "matchesHeadBlob": true,
+      "observedAt": "2026-10-03T18:26:15.588675+00:00",
+      "scan": {
+        "status": "FAIL",
+        "findings": [
+          "hidden-answer-property",
+          "secure-student-format-required"
+        ],
+        "sha256": "a9e99d9a434d0bb677f3fdaa5c59e7e3736032c5ed975a8d6cadf2f1bd8a157e",
+        "bytes": 45575,
+        "secretValuesOmitted": true,
+        "limits": [
+          "Static schema and known secret indicators; arbitrary encoded secrets or answer hints inside legitimate prose are not provably detectable.",
+          "Question content is plaintext until F7. This preflight is not release approval or runtime authentication."
+        ]
+      },
+      "indicators": {
+        "teacherCredentialHash": false,
+        "studentCodeHashes": false,
+        "privateRsaDetected": false,
+        "knownAnswerDerivedDetected": true
+      }
+    }
+  ],
+  "secretValuesOmitted": true
+}

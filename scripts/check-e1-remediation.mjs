@@ -9,7 +9,7 @@ const pass=(m)=>console.log('PASS',m);
 const must=(v,m)=>{if(!v)fail(m)};
 const read=(p)=>fs.readFileSync(new URL('../'+p, import.meta.url),'utf8');
 
-const student=read('src/js/13e-secure-student-runtime.js');
+const student=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const verifier=read('src/js/13f-secure-teacher-verifier.js');
 const formsSrc=read('src/js/13ea-secure-verifier-forms.js');
 
@@ -33,7 +33,8 @@ const formCtx=vm.createContext({});
 vm.runInContext(formsSrc+'\n;globalThis.__forms=SECURE_VERIFIER_FORMS_JS;',formCtx);
 const forms=formCtx.__forms;
 must(typeof forms==='string'&&forms.includes('async function payloadBindingError(payload)'), 'payload binding verifier helper missing');
-must(forms.indexOf('bindingError=await payloadBindingError(payload)')<forms.indexOf('const scored=scorePayload(payload)'), 'payload binding is not enforced before scoring');
+const bindingAt=forms.indexOf('bindingError=await payloadBindingError(payload)'),schemaAt=forms.indexOf('validateSecurePayload(payload)'),anchorAt=forms.indexOf('evaluateFormsAnchors(payload,sm)'),scoreAt=forms.indexOf('scored=scorePayload(payload)');
+must(bindingAt>=0&&schemaAt>=0&&anchorAt>=0&&scoreAt>bindingAt&&scoreAt>schemaAt&&scoreAt>anchorAt, 'payload schema, identity binding and Forms anchors are not enforced before scoring');
 
 const norm=(value)=>String(value??'').normalize('NFKD').toLowerCase().replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 const b64url=(buf)=>Buffer.from(buf).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');

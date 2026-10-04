@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "syntheticOnly": true,
+  "mutation": "wrong expected DevTools browser endpoint",
+  "expectedExit": 1,
+  "observedExit": 1,
+  "observed": "Chromium DevTools instance mismatch; original gate rejects before page evaluation"
+}

@@ -1,0 +1,10 @@
+{
+  "command": "npm run qa:p5:ci",
+  "exitCode": 0,
+  "bytes": 134934,
+  "complete": true,
+  "rawLogBytes": 134934,
+  "rawLogSha256": "4ef5f8d09fecf9076fdab5bc8769bd7b39b8c9642c4efed3a4c2cec43912a893",
+  "logSha256": "4ef5f8d09fecf9076fdab5bc8769bd7b39b8c9642c4efed3a4c2cec43912a893",
+  "normalization": "ANSI and trailing whitespace removed; raw completion and matching byte count validated before copying"
+}

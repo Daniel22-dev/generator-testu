@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: navigation/reload must lock before leaving
+
+false !== true
+
+    at file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-runtime-e5.mjs:17:100
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-runtime-e5.mjs:7:71)
+    at async file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-runtime-e5.mjs:17:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

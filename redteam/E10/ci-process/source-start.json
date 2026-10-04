@@ -1,0 +1,10 @@
+{
+  "version": "7.1.86",
+  "startedAt": "2026-10-04T06:22:31.603Z",
+  "sourceBefore": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 510,
+    "sha256": "589ab89f326108263950224ea43fd3ebc96bba491401b66801ce12bd15109c00",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  }
+}

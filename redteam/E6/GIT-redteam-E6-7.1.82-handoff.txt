@@ -1,0 +1,194 @@
+GIT RED-TEAM v2 — E6 / PUBLICATION A BUILD LEAKAGE
+Verze 7.1.82; datum 2026-10-03; větev candidate.
+Výchozí commit: 459565963be926c5902ae47cce699600aab711eb (E5 / 7.1.81).
+Stav: NOT READY – BLOCKING ISSUE.
+E6 audit, lokální implementace a testy jsou dokončené.
+VEŘEJNÁ AKCEPTACE E6/F5 JE STÁLE BLOCKED: původní veřejné úniky
+nebyly odstraněny, vzdálená historie nebyla přepsána a credentialy
+nebyly rotovány. Toto předání není potvrzení dokončeného public purge.
+E7–E10, F7 a skutečné mobilní ověření čekají.
+Nebylo provedeno GitHub write, PR, merge, promotion ani deployment.
+Server: DEFERRED – SERVER VERSION.
+
+HLAVNÍ NÁLEZY NA SKUTEČNÉM VEŘEJNÉM CÍLI
+Repository: https://github.com/Daniel22-dev/interaktivni-testy
+Pages: https://daniel22-dev.github.io/interaktivni-testy/
+main: 2af3fade24465511503dc9f215f7d91ab4a066b1.
+Pozorování: 2026-10-03T18:25:20.319352+00:00 až 2026-10-03T18:26:20.005197+00:00.
+Čerstvé veřejné refs na začátku/konci souhlasily s immutable mirror.
+Jediný dostupný ref je main. Prošlo fsck, všech 12 dostupných commitů
+z REST i lokálního mirroru a 11 unikátních dosažitelných blobů.
+Všech 9 současných HTML přes HTTPS vrátilo 200 a byte-exact odpovídalo
+svému blobu v main. Pages run stejného head byl úspěšný 2026-10-02;
+není to CI ověření tohoto nového kandidáta 7.1.82.
+
+E6-01 / HIGH / STILL PUBLIC: sedm současných souborů obsahuje
+ucitelPinHash a učitelské runtime capabilities:
+Appearance.html, PAST PERFECT.html, Unidad 1.html, Unit 5 revision.html,
+brona-test_student_test.html, english-or-czenglish-aktivita_student_test.html,
+relative-clauses_student_test.html.
+Tyto učitelské odvozeniny jsou ve studentském repu zakázané i bez
+znalosti původního tajemství. Nebyl proveden pokus o prolomení kódu.
+
+E6-02 / HIGH / STILL PUBLIC: první čtyři soubory navíc obsahují
+studentské/code-membership hashe a rosterové odvozeniny. Patří pouze
+do soukromého verifieru. Report neukládá jejich hodnoty, skutečné
+kódy, jména žáků ani code-email mapování.
+
+E6-03 / HIGH / STILL IN HISTORY: nemcina-test.html je smazané z head,
+ale jeho blob zůstává dosažitelný v minulém commitu a obsahuje
+teacher hash. Celkem osm historických HTML má tyto učitelské úniky.
+Odstranění ze současného stromu není odstranění z Git historie.
+
+E6-04 / LEGACY / NOT ACCEPTED: unit4_food_test_vB.html má strukturované
+správné odpovědi v klientském JavaScriptu (ans/correct/answers).
+Mapová aplikace Státy Latinské Ameriky a hlavní města - slepá mapa.html
+má veřejný country/capital dataset a vlastní klientské hodnocení.
+Tato data mapy sama neprokazují credential leak, ale oba jiné legacy
+formáty neprocházejí secure publication gate pro ostrý experiment.
+Původní practice režimy generátoru mají své zachované regresní testy;
+nezískávají tím nové secureOffline záruky.
+
+Známé indikátory privátní RSA/PEM v těchto prohledaných veřejných HTML
+nebyly nalezeny. Absence libovolně zakódovaného privátního materiálu
+není dokázaná. Aktuálně vypsáno 0 PR, 0 releases, 0 forks a 0 Actions
+artefaktů; všech 11 viditelných Pages workflow runs bylo vypsáno.
+To neprokazuje absenci cizích kopií, cache, nedosažitelných objektů,
+smazaných/neadvertisovaných refs ani někdejších detached artefaktů.
+
+LOKÁLNÍ OPRAVY A PREVENTIVNÍ GATE
+E6-05 / HARDENED: assertSecureStudentIsolation nyní odmítá i odpověďové
+hashe/checksumy, normalizované správné odpovědi, correct position,
+shuffle/answer seed, teacher konfiguraci, normalizované secret/roster
+názvy a privátní key/JWK položky vnořené do obou datových povrchů.
+Ukazatele odpovědí nestačí bezpečně schovat pomocí hashování.
+
+E6-06 / HARDENED: nový owner-side preflight parsuje HTML bez spuštění
+jeho JavaScriptu nebo externích zdrojů. Acorn převádí pouze statické
+literály CFG a STUDENT_VARIANTS; neprovádí eval, volání ani výrazy.
+Vyžaduje secureOffline/teacher-verifier-only formát a public allowlist.
+Kontroluje teacher/runtime funkce, private RSA parametry, answer key
+odvozeniny, skrytý JSON/template, další/externí skripty, komentáře,
+secret-bearing data atributy, sourcemapy a známé access/provider klíče.
+Vnořené listening/table/category/transformation/error-tagging struktury
+mají kontrolu jejich povoleného studentského tvaru. Listening ponechá
+jen sentinel teacher-plays-audio; transkript, URL a text poslechu zůstává
+soukromý. Cizí/neznámé formáty se odmítají, nedochází k jejich konverzi.
+Nevalidní UTF-8 není přijato jako byte-exact originální soubor.
+
+E6-07 / HARDENED: prepare vyžaduje student HTML i důvěryhodný soukromý
+verifier z PC vlastníka. SHA celého student HTML musí být shodný
+s private CONFIG.studentHtmlSha256; současně test ID, manifest, verze
+a RSA public/private dvojice. Verifier se nikdy nekopíruje do výstupu.
+Nová výstupní složka obsahuje výhradně index.html, prázdné .nojekyll
+a student-publication.json s cestou a SHA. Manifest nese NOT READY.
+Existující složka se nepřepisuje; odmítnutí nevytvoří publikaci.
+Samostatný directory gate blokuje teacher přejmenovaný na index,
+JSON/ZIP/map/backup/klíče/debug, podadresáře/symlinky a nesouhlas SHA.
+Veřejný manifest neobsahuje identitu žáka, roster, kód ani tajemství.
+
+E6-08 / DETECTED: history gate kontroluje všechny unikátní bloby
+ze všech dostupných refs/commitů, včetně souborů smazaných z head.
+Read-only audit dále porovná živé Pages s current main, ověří stálost
+refs a úplnost aktuálních dostupných kolekcí PR/release/workflow/artefakt.
+Do JSON zapisuje pouze cesty, typy nálezů, veřejné SHA a počty.
+Raw skutečné veřejné HTML zůstává mimo předávaný candidate ZIP.
+
+OVĚŘENÍ E6 — PASS LOKÁLNĚ
+Sedm skupin: skutečný student/private pair; všech 21 základních typů;
+export rejection answer derivátů; skryté JSON/comment/script/attribute;
+přesné byte/identity/key párování; výstupní allowlist bez private copy;
+syntetický Git repo s deleted private blobem a druhým dostupným refem.
+Skutečné RSA/WebCrypto a skutečné generované student/verifier HTML.
+Privátní materiál se používá jen v dočasné složce a po testu se maže.
+Canary v teacher-only a vnořených polích všech typů se do studenta
+nedostal; student zachoval zadání, volby a požadované veřejné struktury.
+
+15 záměrně poškozených artefaktů odmítnuto: hidden JSON, template JSON,
+single-script answer objekt, teacher modul, teacher hash/secret komentář,
+answer hash komentář, answer atribut, sourcemapa, externí script, PEM,
+privátní RSA v publicKey, nested roster, skrytá konfigurace, executable CFG.
+Další negativní vstupy ověřily jiný verifier, změněné HTML, obrácené
+soubory, nepovolené ZIP/JSON/map/key zálohy, symlink a změněný index.
+Kontrola nikdy nespustila testovací executable CFG.
+Syntetický historický private blob byl detekován i po smazání z HEAD;
+čistý read-only textový repo nejprve prošel. Secret values nebyly vypsány.
+
+Skutečné historické negativní kontroly 2/2:
+- 7.1.76 selže na izolaci skutečného student artefaktu;
+- 7.1.81 selže na novém odmítání answer derivátů při exportu.
+Každá má AssertionError a exit code 1; timeout, chybějící závislost,
+Type/Reference/SyntaxError není uznáván jako negativní úspěch.
+Originální SHA snapshotů a logy jsou v negative-controls.json.
+Ostatní nové checky mají záměrně porušené artefakty/private páry/folder
+nebo historii, na kterých se kontrola musí skutečně odmítnout.
+
+ÚPLNÉ REGRESE A MÍSTNÍ CI EKVIVALENT — PASS
+npm test: dokončený poslední běh, Workflow audit 55 PASS / 0 FAIL.
+npm run qa:p5:ci: dokončený poslední běh s finálním acceptance reportem.
+Oba proběhly postupně, bez souběžného přepisování dist.
+Quality 35/35,
+release 46/46,
+acceptance 19/19.
+Entry critical 1769937 bytes; limit 1 770 000 beze změny.
+První P5 překročil limit o 158 bytes. Zkráceny byly duplicitní komentáře
+a nový release text; normalizovaný deny regex byl ekvivalentně zkrácen
+seskupením stejných prefixů. Bezpečnostní behavior se nezměnil. Po úpravě se
+obnovil odvozený AI assurance fingerprint a zopakovaly se celé gates.
+Neúplný P5 ani meziběh se stale fingerprint se do PASS důkazů nepočítají.
+Lint 0 chyb / 8 dřívějších upozornění. E1–E5 browser/runtime, R3/R5,
+D7/D8, workflow, GARP 2.7, teacher UI i PDF runtime/quality regrese
+zachovány. PDF se jako výstup nepředává. Entry limit se nezvyšoval.
+Runtime: 0 blockers/exceptions/init failures/overflows.
+Chromium 153.0.8010.0, Playwright 1.61.1; native desktop CSP/crypto/IDB
+regrese jsou lokální důkaz, ne fyzický iPad/iPhone/Android test.
+Axe 4 stavy: 0 potvrzených violations; incomplete ARIA/contrast
+ponechány v reportech pro ruční ověření. Plná a11y se netvrdí.
+24 sanitizovaných reportů, úplné logy a completion evidence v redteam/E6.
+E6 behavior gate je připojen k npm test, P5 a P5 CI skriptům generátoru.
+Není nainstalovaný ani spuštěný nový GitHub gate v cílovém public repu.
+
+HRANICE A NEVYŘEŠENÉ PODMÍNKY
+HARDENED / DETECTED: známé strukturované privátní/answer položky,
+read-only statické audity, přesný trusted private pair a složka publikace.
+BEST-EFFORT: nalezení libovolného tajemství v zakódovaných datech,
+komentáři bez známého markeru či v legitimním prose zadání. Učitel
+musí posoudit skutečný obsah. Návrh prepare má privátní verifier jako
+důvěryhodný owner-side vstup; někdo ovládající oba soubory může
+vytvořit souhlasnou dvojici. Nejde o serverový podpis ani runtime auth.
+
+F7 zůstává nesplněné: otázky nejsou startovně šifrované za AES-GCM/PBKDF2
+s alespoň 40bit kódem. PASS E6 preflight neopravňuje publikaci plaintext
+obsahu pro ostrý experiment. Kód třídy je pouze procesní unlock brzda;
+teacher/admin/recovery/reset/retry pravomoci student nadále nemá.
+Private answer key a roster jsou jen verifier-only na soukromém PC
+vlastníka mimo školu. Žádný školní server či školní počítač.
+
+Runtime, hodiny, telemetrie a veřejný šifrovací klíč zůstávají
+CLIENT-CONTROLLED. Konzistentní forgery může projít technickým scoringem;
+REVIEW_REQUIRED se nemění. Server/externí důvěra je nutná pro autoritu
+identity/session/časů a globální replay. Druhé zařízení vyžaduje dozor.
+Forms policy/verified email/domain/one response a soukromý roster jsou
+potvrzení vlastníka, nikoli živé nastavení ověřené v tomto E6.
+Skutečná publikace není generatedAt. Native BFCache/freeze/OS discard,
+iPhone/iPad Safari, Android a ostatní browser enginy: ANALYZED / NOT TESTED.
+
+KONKRÉTNÍ PŘIPRAVENÝ DALŠÍ ZÁSAH
+PUBLIC-CLEANUP-PROPOSAL.txt uvádí osm citlivých cest včetně history-only,
+dvě legacy aplikace pro oddělené posouzení, soukromou rotaci starých
+credentialů/kódů a ověřovací podmínky po vyčištění. Žádný skutečný
+remote purge/rotation/deployment nebyl proveden. Rewrite sdílené historie
+má samostatný výslovný schvalovací rozsah; tento audit jej neprovedl.
+Cache a cizí kopie nelze potvrdit jako zničené, ani po budoucím rewrite.
+E6 public cleanup a F7 musí být uzavřeny před ostrým experimentem.
+E7 mobilní checklist, E8 plná forgery matice, E9 final CI, E10 GARP 2.7
+promotion candidate→protected main→deploy main stále čekají.
+
+PŘEDÁNÍ
+Zdrojový candidate ZIP 7.1.82 a plain TXT. RELEASE.changes nejnovější
+nahoře, maximálně 10 položek. Verze, GARP 2.7 piny, SBOM a assurance
+fingerprint synchronizovány. Bez node_modules/dist/.git, raw skutečných
+public HTML, skutečného rosteru, privátní RSA, hotových teacher HTML a PDF.
+PUBLICATION-PREFLIGHT.txt má reprodukovatelné lokální příkazy.
+Veřejný scan má očekávané FAIL nálezy; není označen za čistý/PASS.
+NOT READY – BLOCKING ISSUE trvá pro celý ostrý třídní experiment.

@@ -1,0 +1,22 @@
+{
+  "stage": "E8",
+  "version": "7.1.83",
+  "status": "BASELINE_PROBE",
+  "checks": [
+    {
+      "id": "long-history-reload-default",
+      "status": "BASELINE_GAP",
+      "negativeControl": "NOT_RUN_BASELINE_PROBE"
+    },
+    {
+      "id": "long-history-reload-joker",
+      "status": "BASELINE_GAP",
+      "negativeControl": "NOT_RUN_BASELINE_PROBE"
+    }
+  ],
+  "scope": "Actual generated student start, 180 runtime audit records, signed active-state persistence, same-profile reload, recovery unlock, encrypted submit and private scoring; controlled jsdom/IndexedDB, native Node crypto.",
+  "limits": [
+    "Only start/joker markers plus a bounded recent tail are retained; this is not a complete or authenticated audit trail",
+    "Physical mobile NOT TESTED; runtime CLIENT-CONTROLLED"
+  ]
+}

@@ -1,0 +1,23 @@
+GIT E9 7.1.85 — REGRESSION MATRIX
+12 positive desktop lifecycle cases; 2 weakened native exports detected.
+Pending reload covers queued audit writes; the answer was explicitly flushed first.
+Original student CSP/native WebCrypto/IndexedDB; no physical mobile evidence.
+ID	OUTCOME	INTEGRITY LOCK	SCORE	CLASSIFICATION
+flushed-reload-default-1	HARDENED / RECOVERED	False	20	REVIEW_REQUIRED
+pending-reload-default-1	HARDENED / RECOVERED	False	20	REVIEW_REQUIRED
+profile-restart-default-1	HARDENED / RECOVERED	False	20	REVIEW_REQUIRED
+flushed-reload-joker-1	HARDENED / RECOVERED	False	20	JOKER_EXCLUDED
+pending-reload-joker-1	HARDENED / RECOVERED	False	20	JOKER_EXCLUDED
+profile-restart-joker-1	HARDENED / RECOVERED	False	20	JOKER_EXCLUDED
+flushed-reload-default-2	HARDENED / RECOVERED	False	20	REVIEW_REQUIRED
+pending-reload-default-2	HARDENED / RECOVERED	False	20	REVIEW_REQUIRED
+profile-restart-default-2	HARDENED / RECOVERED	False	20	REVIEW_REQUIRED
+flushed-reload-joker-2	HARDENED / RECOVERED	False	20	JOKER_EXCLUDED
+pending-reload-joker-2	HARDENED / RECOVERED	False	20	JOKER_EXCLUDED
+profile-restart-joker-2	HARDENED / RECOVERED	False	20	JOKER_EXCLUDED
+
+Current CI controls: 7 weakened exports + 14 wiring mutations + 11 evidence mutations.
+E7 protocol/recorder and E8 108 per-case negatives/retention/native controls also mandatory.
+Detailed historical E4/E5 negative evidence remains in prior stage folders.
+No assertion-timeout/missing dependency/syntax/runtime error counts as negative success.
+Physical mobile: ANALYZED / NOT TESTED. Another device: MIMO TECHNICKÝ DOSAH – POUZE DOZOR.

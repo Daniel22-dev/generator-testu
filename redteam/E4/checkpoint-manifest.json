@@ -1,0 +1,181 @@
+{
+  "schema": "git-redteam-e4-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.80",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "completedStages": [
+    "E0",
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "pendingStages": [
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "sourceBranch": "candidate",
+  "baseCommit": "8242a19d98ac4699472edc3d5839a714902a911f",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "npmTest": "PASS / complete terminal marker and matching log byte count",
+  "localP5Equivalent": "PASS / completed process and final acceptance report",
+  "githubActionsExecuted": false,
+  "desktopChromium": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "otherBrowserEngines": "ANALYZED / NOT TESTED",
+  "nativeBrowserGroups": [
+    "restart-outbox",
+    "parallel-tabs",
+    "integrity",
+    "interrupted-submit",
+    "private-replay-restart",
+    "storage-and-profile-limits"
+  ],
+  "faultInjectionGroups": [
+    "guard-write-failure",
+    "crypto-failure",
+    "outbox-local-quota",
+    "active-write-failure",
+    "unavailable-idb"
+  ],
+  "historicalNegativeControlCount": 20,
+  "sourceSnapshots": {
+    "7.1.76": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+    "7.1.79": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3"
+  },
+  "release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.80",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-03T16:39:14.962Z",
+    "distBytes": 2565624,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1643248,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1593765,
+    "entryCriticalBytes": 1765584,
+    "largestInlineScriptBytes": 158014,
+    "precacheBytes": 2189023,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1593765,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "entryCriticalBudget": {
+    "limit": 1770000,
+    "changedInE4": false
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "axeIncomplete": [
+    {
+      "page": "index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 120
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 109
+        }
+      ]
+    }
+  ],
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 8
+  },
+  "limits": [
+    "Full origin storage wipe permits a fresh local attempt",
+    "Incognito context has a separate storage namespace",
+    "Coherent replay of both signed stores with the preserved MAC key cannot be distinguished from the original local state",
+    "Independent Chromium browser profile has no shared local attempt ledger; Firefox/Safari not tested"
+  ],
+  "concurrency": "Native Web Locks protect supported same-origin profiles; unsupported browsers BEST-EFFORT",
+  "privateReplayRecovery": "Known identical payload reconstructs one validated working row; altered historical content conflicts; no scores or authorization restored from storage",
+  "teacherStoragePolicy": "private owner PC outside school, never public repo/history",
+  "externalAnchorProvenance": "Owner-attested Forms settings and unaltered CSV; no live configuration proof",
+  "runtimeProvenance": "CLIENT-CONTROLLED",
+  "classificationAuthorization": "REVIEW_REQUIRED",
+  "serverDecision": "DEFERRED – SERVER VERSION",
+  "evidenceScope": "Synthetic summaries and logs; generated private HTML/RSA keys/rosters/PDF excluded. Public scan remains E0 historical snapshot.",
+  "logNormalization": "ANSI, trailing whitespace and redundant terminal blank lines removed in copied evidence; outcomes preserved."
+}

@@ -13,7 +13,7 @@ const files = {
   gemini: read('src/js/07-gemini.js'),
   workflow: read('src/js/08a-output-workflow.js'),
   prompt: read('src/js/12-prompt-builder.js'),
-  student: read('src/js/13e-secure-student-runtime.js'),
+  student: (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js')),
   verifier: read('src/js/13f-secure-teacher-verifier.js'),
   pdf: read('src/js/13fa-secure-teacher-verifier-pdf.js'),
   verifierUi: read('src/js/13eb-secure-teacher-verifier-v2-ui.js'),

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const sourcePath = 'src/js/13f-secure-teacher-verifier.js';
-const source = fs.readFileSync(sourcePath, 'utf8');
+const source = fs.readFileSync(sourcePath, 'utf8')+'\n'+fs.readFileSync('src/js/13ef-secure-verifier-replay.js','utf8');
 
 function extractFunction(name) {
   const marker = `function ${name}(`;

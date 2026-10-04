@@ -1,0 +1,109 @@
+$ npm run qa:garp27:mutations
+EXIT=0
+
+STDOUT
+
+> generator-testu@7.1.87 qa:garp27:mutations
+> node scripts/garp27/mutation-tests.mjs
+
+{
+  "classification": "GARP27_MUTATION_TEST",
+  "status": "PASS",
+  "syntheticOnly": true,
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "results": [
+    {
+      "id": "G27-AR-POS",
+      "expected": "PASS",
+      "observed": "PASS",
+      "pass": true,
+      "failedChecks": []
+    },
+    {
+      "id": "G27-AR01-forbidden-source-edge",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "forbidden-edges"
+      ]
+    },
+    {
+      "id": "G27-AR02-production-test-bypass",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "artifact-fragments"
+      ]
+    },
+    {
+      "id": "G27-AR03-uninventoried-ai-operation",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "ai-operations"
+      ]
+    },
+    {
+      "id": "G27-AR03-uninventoried-provider-tool",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "provider-tools"
+      ]
+    },
+    {
+      "id": "G27-AR03-school-local-key-bypass",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "egress"
+      ]
+    },
+    {
+      "id": "G27-AR04-policy-self-edit",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "policy-digest"
+      ]
+    },
+    {
+      "id": "G27-AR04-tool-self-edit",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "tool:scripts/garp27/architecture-integrity.mjs"
+      ]
+    },
+    {
+      "id": "G27-AR05-vendored-master-drift",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "vendor-digest"
+      ]
+    },
+    {
+      "id": "G27-AR05-conflicting-active-authority",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "single-authority"
+      ]
+    }
+  ]
+}
+
+STDERR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

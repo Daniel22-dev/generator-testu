@@ -1,0 +1,137 @@
+GIT — E7: RUČNÍ MOBILNÍ RED-TEAM PROTOKOL — 7.1.83
+Datum: 2026-10-03
+E7: ANALYZED / NOT TESTED
+Ostrý třídní experiment: NOT READY – BLOCKING ISSUE
+
+CO JE PŘIPRAVENO
+40 ručních scénářů; 4 fyzické profily, celkem 146 dvojic případ/profil.
+iPhone Safari 35, iPad Safari 37, Android Chrome 37, Android alternativní
+Chromium 37. Nejde o 146 provedených testů. Vše začíná NOT RUN.
+Headless Chromium, WebKit, změna user-agentu ani syntetické DOM eventy
+nejsou reálný iPhone/iPad/Android. Žádné mobilní GREEN se netvrdí.
+
+Checklist je MOBILE-CHECKLIST.html. Otevři jej lokálně na soukromém PC
+vlastníka mimo školu a vedle něj sleduj skutečný telefon/tablet. Je to
+záznamník ručních pozorování, ne generátor testů ani automatický tester.
+Nevyžaduje síť, nic neposílá, nepoužívá localStorage a neimportuje payload.
+Před zavřením vždy exportuj JSON; rozepsané údaje jinak zmizí.
+Každý profil má vlastní záznam metadat a vlastní výsledky. Změna filtru
+ponechá rozepsané údaje ostatních profilů. Jeden export zahrne všechny.
+JSON má vždy E7 ANALYZED / NOT TESTED a MANUALLY REPORTED / NOT VERIFIED;
+jednotlivé PASS jsou pouze podpisem/pozorováním vlastníka, ne certifikací.
+Plaintext rozpis všech případů: MOBILE-MATRIX.txt.
+Strojový zdroj a přesné očekávání: mobile-matrix.json.
+
+PŘÍPRAVA PILOTU (POUZE SYNTETICKÁ DATA)
+1. Použij checkpoint generátoru 7.1.83 a dva syntetické testové účty,
+   syntetické otázky a privátní roster. Vlastní experiment má mít hard
+   lockOnLeave režim a 40 minut. Pro každý destruktivní případ vytvoř
+   nový pokus/kód/identitu, aby se nemíchaly výsledky.
+2. Zaznamenej SHA-256 přesného student HTML, opaque test/variant/run ID,
+   HTTPS origin bez query, model zařízení, OS build, browser/verzi,
+   locale, dostupné AI funkce a jejich verze. Verzi generátoru čti z
+   důvěryhodného vytvoření artefaktu; neodvozuj ji jen z textu stránky.
+   Skutečné hodnoty identit, start/unlock kódů a teacher credentialů
+   do veřejného reportu ani do checklistu nepatří.
+3. WebCrypto potřebuje skutečný podporovaný secure context. Studentský
+   pilot otevři přes HTTPS dle vlastního zavedeného postupu. Tento E7
+   sám nic nepublikuje. Do public repa patří pouze prověřený student
+   soubor a povolený manifest, nikdy private pair/roster/teacher HTML.
+   Owner-side scan: node scripts/student-publication.mjs file STUDENT_HTML.
+   Párování: node scripts/student-publication.mjs prepare STUDENT_HTML
+   PRIVATE_VERIFIER_HTML NOVA_SLOZKA (celý příkaz na jednom řádku).
+   E6 preflight není splnění F7 ani povolení ostrých otázek před startem.
+4. Private teacher verifier, answer key, privátní dešifrovací klíč,
+   roster a surové výsledky ponech jen na soukromém PC vlastníka mimo
+   školu. Nikdy je nekopíruj na testovaný studentský telefon, server,
+   public repo, cizí AI ani do jeho Git historie.
+5. Zkontroluj opravdu verified školní email, one response a trusted
+   timestamp ve Forms. Vyplněná email položka toto nenahrazuje.
+   Bez skutečných kontrolovaných účtů nech M26/M31/M35/M40 Forms větev
+   NOT RUN. Nesmí se simulovat jako živá evidence.
+6. Důkazy čísluj (např. E7-IPAD-M02-01). Screenshoty/runtimeline ulož
+   soukromě a sanitizuj identity, notifications, kódy a odpovědi před
+   sdílením. Do záznamníku patří pouze ID důkazu, stručný výsledek
+   a typ eventu, nikoli payload/ciphertext, tajemství či skutečný email.
+
+JAK POSTUPOVAT
+- Nejdřív M01–M04 a běžný průchod. Ověř, že legitimní psaní, klávesnice,
+  otočení a zoom nezpůsobují falešnou blokaci. Zapiš takové chyby jako FAIL.
+- Pak M05–M20: odchod, lock, screenshot, OCR+AI, Siri/Apple Intelligence,
+  Gemini/Circle to Search, split/overlay a clipboard. Používej tentýž
+  telefon. Nedostupná AI funkce = NOT APPLICABLE s konkrétním důvodem.
+- M21–M34 zkoušej v izolovaných čerstvých pokusech: reload/history,
+  restart, skutečné pozadí/expiry, storage a submitted/outbox. Data maž
+  jen pro pilotní origin; nemaž osobní účty nebo ostatní weby.
+- M35–M38: identity transfer, klientské úpravy, prestart plaintext
+  a procedurální druhé zařízení. Nepřesouvej na telefon private verifier.
+- M39–M40 ověř přístupnost a celý skutečný 40minutový průchod.
+  Celá sada potřebuje více pilotních relací, nikoli jeden 40min test.
+- U každého případu přečti očekávání i NEGATIVNÍ KONTROLU a proveď ji
+  v samostatném čerstvém pokusu, pokud by se stavy jinak ovlivnily.
+  Pokud ji neprovedeš, pozitivní bezpečnostní tvrzení zůstává nedoložené.
+- Rychlé komparativní eventy jsou jen orientační. Split vzorkování
+  má skutečný interval 2000 ms, souvislou malou plochu od 10000 ms,
+  prah 0.60. Pro split čekej 20 s, nerychli interval v JS.
+  Split summary se přidává při odevzdání a není automatický split lock.
+- Blur čeká 900 ms; iPad editable výjimka 2600 ms a viewport 1800 ms.
+  Skutečné visibility-hidden se neignoruje. Soft odchod pod 8000 ms
+  je také lock; soft/hard popisuje délku, ne oprávnění použít AI.
+- Plný M25/M40 musí opravdu trvat 40 minut. Kratší mock není výsledek.
+  Native BFCache/discard/freeze přiznej jako NOT RUN, pokud neprokážeš
+  reálnou větev. Umělý pageshow/freeze patří jen do lokálního harnessu.
+
+JAK OZNAČIT VÝSLEDEK JEDNOTLIVÉHO PŘÍPADU
+NOT RUN: nebyl proveden nebo nebyla prokázána požadovaná nativní větev.
+PASS: konkrétní očekávání i negativní kontrola byly pozorovány;
+      připoj ID důkazu, stručnou poznámku a výsledek kontroly.
+      PASS architektonického limitu jen potvrzuje popsaný limit.
+      Neznamená, že útok byl zastaven nebo že E7 je GREEN.
+FAIL: chování nesplnilo očekávání, zapiš kroky, důkaz a kontrapříklad.
+BLOCKED: test nelze dokončit kvůli chybě/podmínce (např. broken pilot).
+NOT APPLICABLE: funkce na konkrétním zařízení skutečně neexistuje;
+                uvedení modelu/OS a důvodu je povinné.
+Bez metadat a potřebných důkazů záznamník export odmítne. Výsledek
+negativní kontroly se zapisuje zvlášť; její BLOCKED/NOT RUN nemůže
+podpořit PASS. Samotná absence security eventu neprokazuje absenci AI.
+U případu s více větvemi napiš, co bylo provedeno a co zůstalo NOT RUN;
+označení PASS používej až po všech dostupných požadovaných větvích.
+
+KATEGORIE A JEJICH VÝZNAM V TOMTO PROTOKOLU
+PREVENTED: používat jen pro přesný skutečně zastavený útok s důkazem,
+          ne jako předem přidělenou mobilní garanci. Matice jej neslibuje.
+DETECTED: konkrétní doručený signál lze evidovat; důvěryhodnost jeho
+          původu v klientem ovládaném JS se tím nezískává.
+HARDENED: běžná cesta ztížena/uzamčena, s konkrétními předpoklady.
+BEST-EFFORT: heuristika/event nemusí přijít nebo může mít false-positive.
+CLIENT-CONTROLLED: student ovládající HTML/JS/storage/hodiny může
+                   měnit chování nebo vytvořit falešnou telemetrii.
+ARCHITECTURAL LIMIT: lokální runtime obecnou garanci nedává.
+SERVER REQUIRED: autoritativní session/replay/čas napříč profily potřebuje
+                 server či ekvivalentní externí trusted state;
+                 serverová verze se zde neimplementuje (DEFERRED).
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhý fotografující telefon/externí
+  AI nemůže zaručeně detekovat ani server. Druhé zařízení je v reálném
+  experimentu zakázáno a vlastník průběžně dohlíží celých 40 minut.
+
+PODMÍNKY DALŠÍHO POSTUPU
+Exportované ruční záznamy přezkoumá vlastník proti soukromým důkazům.
+Jakýkoliv nový bug/false-positive/bypass se musí reprodukovat; opravitelný
+bug opravit s regresí a negativní kontrolou. Bez tohoto kroku žádná nová
+kompatibilita ani mobilní ochrana není schválená.
+E7 authored protocol není uzavření experimentu. Otevřeny jsou F7
+startovní šifrování (alespoň 40bit entropie), E8 úplný forged payload
+harness, E9 finální regrese/CI a E10 candidate → protected main →
+deploy main. Žádný nový deployment tento checkpoint neprovedl.
+
+AKTUÁLNÍ E6 PROVOZNÍ KONTEXT (HISTORICKÉ DŮKAZY SE NEPŘEPISUJÍ)
+Veřejný interaktivni-testy main byl po schválení vyčištěn a přepsán na
+faea1ffbd9c683b7b679c2e7336b13b0e00d90df. Fresh scan: 2 dosažitelné
+commity, 1 README blob, PASS v rozsahu dosažitelných refs. Staré Pages
+testové URL byly 404. Citlivý Actions artifact 11282999590 byl odstraněn
+a API potvrdilo 404 dne 2026-10-03T21:01:16Z; zůstaly 2 safe artifacts.
+Historický raw URL pro unit4 byl ale ještě 2026-10-03T21:03:38Z HTTP 200.
+GitHub Support purge/caches a soukromá rotace starých credentialů/kódů
+nejsou potvrzeny. E7 je znovu neověřoval ani neodeslal support ticket.
+Veřejné odstranění souborů nelze zaměnit za zničení všech starých kopií.
+Sanitizované evidence jsou přiloženy v redteam/E7, žádné staré raw HTML.

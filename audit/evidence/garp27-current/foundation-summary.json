@@ -1,0 +1,141 @@
+{
+  "classification": "GARP27_FOUNDATION_GATE",
+  "schema": "garp27-foundation-summary-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.87",
+  "status": "FOUNDATION_PASS_LIVE_NOT_TESTED",
+  "serverPhase": "DEFERRED_BY_OWNER_DECISION",
+  "liveStatus": "NOT_TESTED",
+  "sourceIdentity": {
+    "value": "138d1e65d6f3f89d824f621cd74af490c224e299",
+    "kind": "local-source-tree-sha1-surrogate"
+  },
+  "steps": [
+    {
+      "id": "build-production",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "build-production",
+        "sha256": "60763c96856b6a87bf093ac971194395976ee028ea3df71c4d3a5f7540acf50b"
+      }
+    },
+    {
+      "id": "version-contract",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "version-contract",
+        "sha256": "c040b8493f7a046f4098ccc68756786941dc41c24fda23a9ab6e960cbee7b955"
+      }
+    },
+    {
+      "id": "garp27-contracts",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-contracts",
+        "sha256": "c50a6f6ebb4e31cd3a0212158121bfda0f1b44c70b5e1a17b03189fff9f2c703"
+      }
+    },
+    {
+      "id": "garp27-architecture",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-architecture",
+        "sha256": "3e299f7ba36c676f7e25e6e25838fc6df49505e1ccc840afe150b91005a8a9e4"
+      }
+    },
+    {
+      "id": "garp27-policy-mutations",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-policy-mutations",
+        "sha256": "985181430de7839f622547a9df0d1efdd628c23c7104433708c08a14b831b0d9"
+      }
+    },
+    {
+      "id": "garp27-mutations",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-mutations",
+        "sha256": "a6c8db5dd0bbef19e689a917786225de346c595b147e996d915af51fdc67df89"
+      }
+    },
+    {
+      "id": "garp27-auto-patch",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "garp27-auto-patch",
+        "sha256": "1b75ceb9deb51236340d5821178a50f41907a5e4d92c7669f0e0209b7305551c"
+      }
+    },
+    {
+      "id": "legacy-garp25-static",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "legacy-garp25-static",
+        "sha256": "3852b015e9070a0d2b284ad9c0cfa62a3bd7ab64a7e5aa0ab2e8d661dbe52d84"
+      }
+    },
+    {
+      "id": "production-readiness",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "production-readiness",
+        "sha256": "3f2cfd8bcea10d14ff2928e2c74341c6ae6bd500a38b3b07930f12c76dba5212"
+      }
+    },
+    {
+      "id": "action-pins",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "action-pins",
+        "sha256": "99b1ee4a7f4ef535219efafe55dde8e765962b81437b9adcc097ec59db0e429c"
+      }
+    },
+    {
+      "id": "sensitive-scan",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "sensitive-scan",
+        "sha256": "a6498bbf96bfd131c94b0ee2a8d0642d2c90ff75beea2b7c13bbf27455ad088d"
+      }
+    },
+    {
+      "id": "assurance-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "evidence": {
+        "id": "assurance-admission",
+        "sha256": "19f2f1135fca6ac0057b390d85947f0dc8a019f73aeb766cac60bd111d81f0ba"
+      }
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  }
+}

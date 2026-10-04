@@ -1,0 +1,119 @@
+{
+  "status": "PASS",
+  "kind": "expected failure against actual archived generator builds",
+  "syntheticOnly": true,
+  "controls": [
+    {
+      "version": "7.1.76",
+      "group": "schema",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-schema.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "answers",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-answers.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "identity",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-identity.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "time",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-time.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "replay",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-replay.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "csv",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-csv.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "json",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-json.log"
+    },
+    {
+      "version": "7.1.76",
+      "group": "browser",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.76-browser.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "schema",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-schema.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "answers",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-answers.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "identity",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-identity.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "time",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-time.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "replay",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-replay.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "csv",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-csv.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "json",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-json.log"
+    },
+    {
+      "version": "7.1.78",
+      "group": "browser",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "redteam/E3/negative-7.1.78-browser.log"
+    }
+  ]
+}

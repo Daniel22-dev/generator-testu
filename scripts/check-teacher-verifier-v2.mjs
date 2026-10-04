@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 const authorityFile='src/js/13f-secure-teacher-verifier.js';
 const uiFile='src/js/13eb-secure-teacher-verifier-v2-ui.js';
-const authority=fs.readFileSync(authorityFile,'utf8');
+const authority=fs.readFileSync(authorityFile,'utf8')+'\n'+fs.readFileSync('src/js/13ef-secure-verifier-replay.js','utf8');
 const ui=fs.readFileSync(uiFile,'utf8');
 const s=ui+'\n'+authority;
 let failed=0;
@@ -36,13 +36,13 @@ need(/v2SecurityFilter[\s\S]*setVerifierSecurityQuery/,'Security signal filter i
 need(/METADATA MISMATCH — metadata Google Forms/,'Google Forms metadata mismatch is promoted into the Security signal model.');
 need(/I\('tech',[\s\S]*Creator ID[\s\S]*Manifest SHA-256[\s\S]*Student HTML SHA-256[\s\S]*Kontrola integrity/,'Low-level identity/build/integrity metadata live in the Technical panel.');
 need(/v2-nav-icon[\s\S]*v2-nav-label/,'Navigation exposes icon + label hierarchy.');
-need(/Pouze učitel \/ školní úložiště/,'Teacher-only archive route is clearly labeled.');
+need(/Pouze soukromý počítač vlastníka mimo školu/,'Teacher-only archive route is clearly labeled.');
 need(/Pro studenty[\s\S]*Feedback HTML/,'Student-facing feedback route is separated from teacher archive.');
 need(/Nejde o automatické obvinění z podvodu|Toto není automatický důkaz podvodu/,'Security signals retain non-accusatory interpretation.');
 
 need(/async function decryptPayload\(pack\)[\s\S]*RSA-OAEP[\s\S]*AES-GCM/,'RSA-OAEP/AES-GCM verifier decryption remains present.');
 need(/function parseTxt\(txt\)[\s\S]*SECURE-ANSWERS-V1/,'SECURE-ANSWERS-V1 parser remains present.');
-need(/function effectiveResults\(\)[\s\S]*exactDuplicate[\s\S]*ATTEMPT_DECISIONS/,'Effective results still exclude exact duplicates and require explicit attempt decisions.');
+need(/function resolvedResults\(\)[\s\S]*exactDuplicate[\s\S]*hardReplayConflict[\s\S]*ATTEMPT_DECISIONS[\s\S]*function effectiveResults/,'Effective results exclude duplicates/hard replay conflicts and preserve legacy attempt decisions.');
 need(/function downloadResultsCsv\(\)[\s\S]*unresolvedAttemptConflicts\(\)[\s\S]*Nejdřív vyber pokus/,'Results CSV remains blocked on unresolved attempt conflicts.');
 need(/function renderTable\(\)[\s\S]*securitySignalText\(r,info\)/,'Results status is sourced from the unified Security signal model.');
 need(/function analysisHtml\(forExport\)\{var ok=effectiveResults\(\)[\s\S]*Diskriminace[\s\S]*Obtížnost/,'Item analysis remains available and uses effective results.');

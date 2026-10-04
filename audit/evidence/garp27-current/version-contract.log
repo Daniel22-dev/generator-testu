@@ -1,0 +1,12 @@
+$ npm run check:versions
+EXIT=0
+
+STDOUT
+
+> generator-testu@7.1.87 check:versions
+> node scripts/check-versions.mjs
+
+✅  Verze sedi napric projektem: 7.1.87
+
+STDERR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

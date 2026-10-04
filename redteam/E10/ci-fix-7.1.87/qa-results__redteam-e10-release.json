@@ -1,0 +1,60 @@
+{
+  "stage": "E10",
+  "version": "7.1.87",
+  "status": "PASS",
+  "releaseReadiness": "NOT READY – BLOCKING ISSUE",
+  "releaseBlocked": true,
+  "blockers": [
+    {
+      "id": "E7_PHYSICAL",
+      "required": "Owner must execute and record physical iPhone/iPad Safari and Android profiles; currently ANALYZED / NOT TESTED."
+    },
+    {
+      "id": "E6_INCIDENT",
+      "required": "Historical raw/cache purge and owner private credential rotation require verified closure."
+    },
+    {
+      "id": "LIVE_FORMS",
+      "required": "Owner must verify school email/domain, one response, original CSV and publication time."
+    }
+  ],
+  "negativeControls": [
+    {
+      "id": "drop-content",
+      "detected": true
+    },
+    {
+      "id": "drop-native",
+      "detected": true
+    },
+    {
+      "id": "drop-merge-readiness",
+      "detected": true
+    },
+    {
+      "id": "drop-deploy-readiness",
+      "detected": true
+    },
+    {
+      "id": "deploy-candidate",
+      "detected": true
+    },
+    {
+      "id": "partial-promotion-gate",
+      "detected": true
+    },
+    {
+      "id": "not-ready",
+      "detected": true
+    },
+    {
+      "id": "unclosed-blocker",
+      "detected": true
+    },
+    {
+      "id": "wrong-version",
+      "detected": true
+    }
+  ],
+  "scope": "Local workflow and readiness enforcement contract. A synthetic READY fixture is only a positive validator control; current release remains NOT READY."
+}

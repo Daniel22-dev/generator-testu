@@ -1,0 +1,10 @@
+{
+  "command": "npm test",
+  "exitCode": 0,
+  "bytes": 75474,
+  "complete": true,
+  "rawLogBytes": 75518,
+  "rawLogSha256": "21e9e416fe8df29e111909ed3a80806f6df64e4ab134615ad9c6d14e0b947245",
+  "logSha256": "d4672d559b584f0b242314eef88d8d98abc48590f5c767b731614052f0477db8",
+  "normalization": "ANSI and trailing whitespace removed; raw completion and matching byte count validated before copying"
+}

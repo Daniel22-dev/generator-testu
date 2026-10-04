@@ -1,0 +1,16 @@
+{
+  "stage": "E4",
+  "version": "7.1.87",
+  "status": "PASS",
+  "selected": "all",
+  "checks": [
+    "guard-write-failure",
+    "crypto-failure",
+    "outbox-local-quota",
+    "active-write-failure",
+    "unavailable-idb"
+  ],
+  "scope": "Generated-runtime fault injection using WebCrypto and simulated IDB; real restart proof is the separate native browser gate",
+  "guarantees": "HARDENED / BEST-EFFORT",
+  "limits": "No proof against client-owner editing or complete storage rollback"
+}

@@ -1,0 +1,47 @@
+{
+  "syntheticOnly": true,
+  "findings": [
+    {
+      "id": "F1",
+      "observed": {
+        "teacherHash": false,
+        "recoveryHash": false,
+        "teacherMode": false
+      },
+      "detail": "actual generated student HTML"
+    },
+    {
+      "id": "code-hashes",
+      "observed": {
+        "count": 0
+      },
+      "detail": "public membership-hash count; a nonzero value enables offline guessing"
+    },
+    {
+      "id": "F7",
+      "observed": true,
+      "detail": "questions readable in the public artifact before start"
+    },
+    {
+      "id": "F6-roster",
+      "observed": true,
+      "detail": "private roster retains email; this does not establish Forms enforcement"
+    },
+    {
+      "id": "W1-W3b",
+      "observed": {
+        "classification": "current",
+        "status": "OK",
+        "pct": 100,
+        "runtimeAuthenticity": "CLIENT-CONTROLLED",
+        "classificationAuthorization": "REVIEW_REQUIRED"
+      },
+      "detail": "public-key encrypted forged payload, impossible times, empty telemetry, synthetic wrong Forms email; technical scoring alone is not authenticated acceptance"
+    },
+    {
+      "id": "duplicate",
+      "observed": "current",
+      "detail": "same ciphertext imported twice"
+    }
+  ]
+}

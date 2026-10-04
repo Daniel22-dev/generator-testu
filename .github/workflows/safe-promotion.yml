@@ -85,9 +85,9 @@ jobs:
         run: npm run qa:platform
 
       - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
-        run: npm run qa:p5:ci
+        run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
+          GARP27_EXTERNAL_TRUST_SHA256: 1f6c5b888631fcb9601918728aa01310ac64ff4b8c863fc1682b9cbb4576d823
 
       - name: Upload candidate QA evidence
         if: always()
@@ -228,9 +228,9 @@ jobs:
 
       - name: Enforce PR P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         if: steps.pr_freshness.outputs.current == 'true'
-        run: npm run qa:p5:ci
+        run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
+          GARP27_EXTERNAL_TRUST_SHA256: 1f6c5b888631fcb9601918728aa01310ac64ff4b8c863fc1682b9cbb4576d823
 
       - name: Upload PR certification evidence
         if: always() && steps.pr_freshness.outputs.current == 'true'
@@ -337,6 +337,10 @@ jobs:
             echo "::error::Candidate or promotion PR moved while waiting for required release checks; refusing merge."
             exit 1
           fi
+
+      - name: Require classroom release readiness
+        if: steps.premerge.outputs.eligible == 'true'
+        run: node scripts/check-redteam-release-e10.mjs --require-ready
 
       - name: Merge certified pull request into main
         if: steps.premerge.outputs.eligible == 'true'

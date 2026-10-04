@@ -7,6 +7,8 @@ production. Each assertion checks what the teacher/student actually sees or can
 do next, not only internal state.
 """
 from harness import Harness,TESTS
+from browser_matrix import private_start_code,enter_start_code,configure_forms_anchors
+from datetime import datetime,timezone,timedelta
 import json,re,time,traceback
 
 FETCH_MOCK=r'''
@@ -66,6 +68,9 @@ class Journey:
    s.p.wait_for_timeout(150)
   raise AssertionError('generation timeout '+str(seen))
  def ensure_teacher_secret(s):
+  if not s.ev('()=>requiresTeacherAccessCode()'):
+   assert not s.p.locator('#ucitelPin').is_visible(),'secure student workflow must not ask for Teacher/Admin credentials'
+   return
   if not s.p.input_value('#ucitelPin'):
    s.p.get_by_role('button',name=re.compile('Vygenerovat tajný učitelský kód')).click()
   assert len(s.p.input_value('#ucitelPin'))>=12,'Teacher/Admin secret must satisfy current policy'
@@ -96,6 +101,7 @@ class Journey:
    if s.modal():s.ok()
    if s.ev('()=>__downloads.length')>n:break
    s.p.wait_for_timeout(150)
+  assert s.ev("()=>__downloads.length")>n,{"button":sel,"modal":s.modal(),"gate":s.gate(),"selfTest":s.ev("()=>lastSelfTest"),"errors":s.ev("()=>__errors"),"generationError":s.text("#genError")}
   return s.ev("async()=>{const d=__downloads.at(-1);return {name:d.name,text:await __readDownloadText(-1)}}")
 
 def answer_instant(fr,good=lambda k:True):
@@ -169,13 +175,14 @@ try:
  record('step3-missing-teacher-name-is-explained',missing_teacher_name)
 
  def simple_strict_to_verifier(j):
-  j.new_test('Přísný test');teacher_code=j.ev("()=>val('ucitelPin')");recovery_code=j.ev("()=>val('recoveryCode')");assert teacher_code and recovery_code and teacher_code!=recovery_code
+  j.new_test('Přísný test');teacher_code='AUDIT-TEACH-482957';recovery_code=j.ev("()=>val('recoveryCode')");assert recovery_code and teacher_code!=recovery_code
   g=j.gate();assert not g['allowed'] and 'self-test' in g['banner'],g
   j.selftest();j.checklist();g=j.gate();assert g['allowed'],g
   stu=j.download('#btnDownloadStudent');tea=j.download('#btnDownloadTeacher')
   hint=j.text('#lockUnlockHint');assert hint and '5×' in hint,('teacher must learn how to unlock a locked student (F-25)',hint)
   assert '"privateKey"' not in stu['text'] and '"d":' not in stu['text'] and 'alt_answers' not in stu['text'],'student file leaks key material'
   sp=h.new_page(stu['text']);sp.wait_for_timeout(700)
+  enter_start_code(sp,private_start_code(h,tea['text']))
   sp.fill('#studentName','Jana Nováková');sp.get_by_role('button',name=re.compile('Start')).first.click()
   sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")')
   for hidden in (True,False):
@@ -224,9 +231,9 @@ try:
   vp.get_by_role('button',name='Bezpečnost').click();assert vp.locator('#v2SecurityFilter').is_visible(),'security filter missing'
   vp.fill('#v2SecurityFilter','Jana');assert vp.input_value('#v2SecurityFilter')=='Jana','security filter must accept query'
   vp.get_by_role('button',name='Test & PDF').click();assert vp.locator('#teacherPreviewDetails').is_visible(),'teacher preview must live in Test & PDF'
-  vp.get_by_role('button',name='Export').click();et=vp.locator('#v2-export').inner_text();assert 'Pro studenty' in et and 'Pouze učitel / školní úložiště' in et,('export routes must separate student and teacher outputs',et[:500])
+  vp.get_by_role('button',name='Export').click();et=vp.locator('#v2-export').inner_text();assert 'Pro studenty' in et and 'Pouze soukromý počítač vlastníka mimo školu' in et,('export routes must separate student and teacher outputs',et[:500])
   vp.get_by_role('button',name='Technické údaje').click();tt=vp.locator('#v2-tech').inner_text();assert all(x in tt for x in ['Creator ID','Generator','Build','Test ID','Manifest SHA-256','Student HTML SHA-256','Kontrola integrity:']),('technical identity/integrity panel missing',tt[:800])
-  vp.evaluate("""()=>{const base=RESULTS.find(r=>r&&r.status==='OK');if(!base)throw new Error('missing valid verifier result');RESULTS.splice(0,RESULTS.length,Object.assign({},base,{attemptId:'D5META',submissionDigest:'d5-meta-only',startedAt:'',submittedAt:'',securityEvents:[],answerChangeStats:{},totalAnswerChanges:0,metadataMismatch:['název ve formuláři neodpovídá ověřenému testu'],envelopeMismatch:[]}));ATTEMPT_DECISIONS.clear();afterResultsChanged()}""");vp.get_by_role('button',name='Bezpečnost').click();vp.fill('#v2SecurityFilter','D5META');vp.wait_for_timeout(80);st=vp.locator('#v2-security').inner_text();cards=vp.locator('#v2-security .signal-card');assert cards.count()>=3,('security KPI cards missing',cards.count());hard=cards.nth(0).locator('b').inner_text().strip();soft=cards.nth(1).locator('b').inner_text().strip();assert 'METADATA MISMATCH — metadata Google Forms' in st and 'název ve formuláři neodpovídá ověřenému testu' in st and hard=='0' and soft=='1',('metadata mismatch must be one soft Security signal',{'hard':hard,'soft':soft,'text':st[-900:]})
+  vp.get_by_role('button',name='Bezpečnost').click();trust=vp.evaluate('resultTrust(RESULTS[0])');assert trust['classificationAuthorization']=='DIAGNOSTIC_ONLY' and trust['runtimeAuthenticity']=='CLIENT-CONTROLLED' and 'Původ výsledku není prokázán' in vp.locator('.verifier-trust-notice').first.inner_text(),trust
   vp.set_viewport_size({'width':390,'height':844});vp.wait_for_timeout(100)
   assert vp.evaluate("getComputedStyle(document.querySelector('.v2-nav')).display")=='flex','mobile verifier navigation must become horizontal'
   vp.close()
@@ -243,7 +250,7 @@ try:
   assert btns==['Otevřít rozhodnutí v kroku 3'],('no blanket unlock (F-10)',btns)
   j.p.click('#resultTab4');j.p.get_by_role('button',name='Otevřít rozhodnutí v kroku 3').click()
   r=j.p.locator('#keyCheckReport');r.locator('input[name=akvDiff0][value=keep]').check();r.locator('input[name=akvDiff1][value=ai]').check()
-  r.get_by_role('button',name='Použít moje rozhodnutí').click();j.p.wait_for_timeout(1200)
+  r.get_by_role('button',name='Použít moje rozhodnutí').click();j.p.wait_for_function('!outputMutationBusy && document.getElementById("keyCheckReport").innerText.includes("Klíč upraven")')
   shown=j.text('#keyCheckReport');assert shown and 'Klíč upraven' in shown,('decision result must stay visible (F-05)',shown)
   assert j.ev('()=>[lastGenData.exercises[0].items[1].correct,lastGenData.exercises[2].items[0].correct]')==[1,False]
   st=j.ev("()=>document.getElementById('selfTestReport').innerText");assert 'neplatí' in st,('self-test invalidation must say why (F-11)',st)
@@ -253,11 +260,11 @@ try:
 
  def pending_diffs_survive_alternatives(j):
   j.new_test('Přísný test');j.selftest();j.checklist();j.keycheck({'2':2,'6':['the water']})
-  j.p.locator('#keyCheckReport .akv-pick').first.check();j.p.locator('#keyCheckReport').get_by_role('button',name='Přidat zaškrtnuté alternativy').click();j.p.wait_for_timeout(1200)
+  j.p.locator('#keyCheckReport .akv-pick').first.check();j.p.locator('#keyCheckReport').get_by_role('button',name='Přidat zaškrtnuté alternativy').click();j.p.wait_for_function('!outputMutationBusy && JSON.stringify(lastGenData.exercises[1].items[0].alt_answers).includes("the water")')
   assert 'the water' in j.ev('()=>JSON.stringify(lastGenData.exercises[1].items[0].alt_answers)')
   assert j.ev("()=>document.querySelectorAll('#keyCheckReport input[name=akvDiff0]').length")==2,'unresolved closed diff must stay actionable (F-07)'
   j.selftest();assert not j.gate()['allowed'],'gate must stay closed until the teacher decides (F-07)'
-  j.p.click('#resultTab3');j.p.locator('#keyCheckReport input[name=akvDiff0][value=keep]').check();j.p.locator('#keyCheckReport').get_by_role('button',name='Použít moje rozhodnutí').click();j.p.wait_for_timeout(400)
+  j.p.click('#resultTab3');j.p.locator('#keyCheckReport input[name=akvDiff0][value=keep]').check();j.p.locator('#keyCheckReport').get_by_role('button',name='Použít moje rozhodnutí').click();j.p.wait_for_function('keyDiffsAcknowledged && !outputMutationBusy')
   assert j.gate()['allowed']
   return {'carried':True}
  record('pending-key-diffs-survive-alternatives',pending_diffs_survive_alternatives)
@@ -265,11 +272,11 @@ try:
  def edits_and_pending_diffs(j):
   j.new_test('Přísný test');j.selftest();j.checklist();j.keycheck({'2':2})
   j.p.click('#resultTab1');j.p.click('#btnEdit');j.p.wait_for_timeout(300)
-  j.p.locator('#editorBody textarea').nth(4).fill('Changed unrelated question');j.p.click('#btnEditorApply');j.p.wait_for_timeout(1200)
+  j.p.locator('#editorBody textarea').nth(4).fill('Changed unrelated question');j.p.click('#btnEditorApply');j.p.wait_for_function('!outputMutationBusy && document.getElementById("editorModal").classList.contains("hidden")');assert not j.p.locator('#editorModal').is_visible(),j.p.locator('#editorError').inner_text()
   cl=j.ev('()=>exportChecklist');assert all(cl.get(k) for k in ['content','answers','grading','distribution']),('same test keeps teacher review',cl)
   assert j.ev('()=>lastSelfTest')is None and j.ev('()=>lastKeyCheck.closedDiffs')==1,'text edit: self-test invalid, diff still pending'
   j.p.click('#resultTab1');j.p.click('#btnEdit');j.p.wait_for_timeout(300)
-  j.p.locator('#editorBody input[type=radio]').nth(5).check();j.p.click('#btnEditorApply');j.p.wait_for_timeout(1200)
+  j.p.locator('#editorBody input[type=radio]').nth(5).check();j.p.click('#btnEditorApply');j.p.wait_for_function('!outputMutationBusy && document.getElementById("editorModal").classList.contains("hidden")');assert not j.p.locator('#editorModal').is_visible(),j.p.locator('#editorError').inner_text()
   kc=j.ev('()=>({c:lastKeyCheck.closedDiffs,older:lastKeyCheck.olderVersion,mc:lastGenData.exercises[0].items[1].correct})')
   assert kc=={'c':0,'older':True,'mc':2},('teacher key edit resolves that diff',kc)
   j.selftest();assert j.gate()['allowed']
@@ -312,17 +319,17 @@ try:
   p.locator('#simpleTemplateBtns').get_by_role('button',name=re.compile('Běžný test')).click()
   p.locator('#cefrBtns [data-val=B1]').click();p.fill('#zadaniText','Present perfect vs past simple.');p.click('#next1')
   p.locator('#resultModeBtns [data-val=secureOffline]').click();p.locator('#identityModeBtns [data-val=oneTimeCode]').click()
-  p.fill('#rosterEmails','novak@ghrabuvka, svoboda@ghrabuvka');p.get_by_role('button',name=re.compile('Vygenerovat kódy')).click();p.wait_for_timeout(200)
+  p.fill('#rosterEmails','novak@example.invalid, svoboda@example.invalid');p.get_by_role('button',name=re.compile('Vygenerovat kódy')).click();p.wait_for_timeout(200)
   codes=j.ev('()=>rosterEntries.map(x=>x.code)');p.click('#next2');p.fill('#ucitelJmeno','Jana Učitelová')
-  if not p.input_value('#ucitelPin'):p.fill('#ucitelPin','AUDIT-TEACH-482957')
+  j.ensure_teacher_secret()
   p.click('#next3');j.generate();j.selftest();j.checklist()
   p.click('#resultTab1');p.click('#btnPreview');p.wait_for_timeout(700);fr=[f for f in p.frames if f!=p.main_frame][0]
   assert fr.evaluate("document.getElementById('studentName').value")==codes[0],'teacher preview must be usable before handing out codes'
   p.get_by_role('button',name='Zavřít náhled').click()
-  stu=j.download('#btnDownloadStudent');tea=j.download('#btnDownloadTeacher')
+  stu=j.download('#btnDownloadStudent');tea=j.download('#btnDownloadTeacher');published=(datetime.now(timezone.utc)-timedelta(seconds=5)).isoformat(timespec='milliseconds')
   assert all(c not in stu['text'] for c in codes),'student file must not contain plain codes'
   sp=h.new_page(stu['text']);sp.wait_for_timeout(700)
-  sp.fill('#studentName','ZZZZZZ');sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_timeout(500)
+  enter_start_code(sp,private_start_code(h,tea['text']));sp.fill('#studentName','!invalid!');sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_timeout(500)
   msg=sp.evaluate("document.body.innerText");assert 'not valid' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with a message'
   sp.locator('button:visible',has_text=re.compile('^OK$')).first.click()
   sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
@@ -334,11 +341,11 @@ try:
   t=vp.evaluate('document.body.innerText');vp.close()
   assert re.search(r'novak \(kód '+codes[0]+r'\)\t\S+\t30/30\t100 %\t1\t',t),('verifier resolves the code to the roster e-mail',t[:500])
   import csv,io,tempfile
-  buf=io.StringIO();csv.writer(buf).writerows([['Časová značka','E-mailová adresa','Odevzdávací kód'],['29.9.2026 10:00:00','novak@ghrabuvka.cz',backup],['29.9.2026 10:05:00','novak@ghrabuvka.cz',backup.replace('"attemptId"','"attemptId"')]])
+  buf=io.StringIO();csv.writer(buf).writerows([['Časová značka','E-mailová adresa','Odevzdávací kód'],[datetime.now(timezone.utc).isoformat(timespec='milliseconds'),'novak@example.invalid',backup],[datetime.now(timezone.utc).isoformat(timespec='milliseconds'),'novak@example.invalid',backup.replace('"attemptId"','"attemptId"')]])
   f=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);f.write(buf.getvalue());f.close()
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vp,published,'E-mailová adresa','Časová značka');vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
-  assert 'novak@ghrabuvka.cz' in t and re.search(r'Duplicity: [1-9]',t),('Forms CSV import + repeated code must be flagged',t[t.find('Načteno'):t.find('Načteno')+200])
+  assert 'novak@example.invalid' in t and re.search(r'Duplicity: [1-9]',t),('Forms CSV import + repeated code must be flagged',t[t.find('Načteno'):t.find('Načteno')+200])
   return {'codes':len(codes)}
  record('advanced-one-time-code-to-verifier',advanced_one_time_code_to_verifier)
 
@@ -356,24 +363,25 @@ try:
   cfg=p.evaluate("""u=>{const c=parseGoogleFormsPrefilledMetadataUrl(u);localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);return c}""",pre)
   assert cfg['entries']['testId']=='111' and cfg['entries']['testName']=='222' and cfg['entries']['group']=='333',cfg
 
-  def build_secure(jj,name,group):
+  def build_secure(jj,name,group,email):
    q=jj.p;q.fill('#geminiKeyInput','AIzaTEST-forms-000000000000000000');q.click('#btnUseKeySession')
    q.get_by_role('button',name=re.compile('Pokročilá nastavení')).first.click()
    q.fill('#nazev',name);q.fill('#proKoho',group);q.locator('#jazykBtns [data-val="angličtina"]').click();q.fill('#latka','Present perfect');q.click('#next0')
    for typ in ('multiple choice','fill-in-the-blank','true/false'):q.locator('#typyBtns').get_by_role('button',name=typ,exact=True).first.click()
    q.locator('#simpleTemplateBtns').get_by_role('button',name=re.compile('Běžný test')).click();q.locator('#cefrBtns [data-val=B1]').click();q.fill('#zadaniText','Present perfect.');q.click('#next1')
-   q.locator('#resultModeBtns [data-val=secureOffline]').click();q.locator('#identityModeBtns [data-val=name]').click();q.click('#next2');q.fill('#ucitelJmeno','Jana Učitelová')
-   if not q.input_value('#ucitelPin'):q.fill('#ucitelPin','AUDIT-FORMS-482957')
+   q.locator('#resultModeBtns [data-val=secureOffline]').click();q.locator('#identityModeBtns [data-val=oneTimeCode]').click();q.fill('#rosterEmails',email);q.get_by_role('button',name=re.compile('Vygenerovat kódy')).click();code=jj.ev('()=>rosterEntries[0].code');q.click('#next2');q.fill('#ucitelJmeno','Jana Učitelová')
+   jj.ensure_teacher_secret()
    q.click('#next3');jj.generate();jj.selftest();jj.checklist()
-   return jj.download('#btnDownloadStudent'),jj.download('#btnDownloadTeacher')
+   student,teacher=jj.download('#btnDownloadStudent'),jj.download('#btnDownloadTeacher');student['startCode']=private_start_code(h,teacher['text']);student['code']=code;student['publishedAt']=(datetime.now(timezone.utc)-timedelta(seconds=5)).isoformat(timespec='milliseconds')
+   return student,teacher
 
   name_a='Přítomný čas – čárky & A+B';group_a='1.A / skupina B'
-  stu_a,tea_a=build_secure(j,name_a,group_a)
+  stu_a,tea_a=build_secure(j,name_a,group_a,'alpha@example.invalid')
 
   def student_submission(stu,student):
-   sp=h.new_page(stu['text']);sp.wait_for_timeout(600)
+   sp=h.new_page(stu['text']);sp.wait_for_timeout(600);enter_start_code(sp,stu['startCode'])
    url=sp.evaluate('formsOpenUrl()')
-   sp.fill('#studentName',student);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
+   sp.fill('#studentName',stu['code']);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
    sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(250)
    y=sp.locator('.s-modal-bd button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
    if y.count():y.first.click()
@@ -393,7 +401,7 @@ try:
   try:
    j2.ev("(c)=>{localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl)}",cfg)
    name_b='Vocabulary B';group_b='2.B'
-   stu_b,tea_b=build_secure(j2,name_b,group_b)
+   stu_b,tea_b=build_secure(j2,name_b,group_b,'beta@example.invalid')
   finally:
    j2.p.close()
   url_b,backup_b=student_submission(stu_b,'Student Beta')
@@ -403,42 +411,42 @@ try:
   assert ub=={'id':test_b,'name':name_b,'group':group_b},ub
 
   corrupt=pyjson.loads(re.sub(r'^SECURE-ANSWERS-V1\s*','',backup_a1));d=corrupt['payload']['data'];corrupt['payload']['data']=('A' if d[:1]!='A' else 'B')+d[1:]
-  corrupt_txt='SECURE-ANSWERS-V1\n'+pyjson.dumps(corrupt,separators=(',',':'))
+  corrupt_txt='SECURE-ANSWERS-V1\n'+pyjson.dumps(corrupt,separators=(',',':'));forms_time=datetime.now(timezone.utc).isoformat(timespec='milliseconds')
   rows=[
    ['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'],
-   ['30.9.2026 08:00:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,backup_a1],
-   ['30.9.2026 08:01:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,backup_a1],
-   ['30.9.2026 08:02:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,backup_a2],
-   ['30.9.2026 08:03:00','alpha@ghrabuvka.cz','EDITED-BY-STUDENT',name_a,'4.Z WRONG',backup_a1],
-   ['30.9.2026 08:04:00','beta@ghrabuvka.cz',test_b,name_b,group_b,backup_b],
-   ['30.9.2026 08:05:00','alpha@ghrabuvka.cz',test_a,name_a,group_a,corrupt_txt]
+   [forms_time,'alpha@example.invalid',test_a,name_a,group_a,backup_a1],
+   [forms_time,'alpha@example.invalid',test_a,name_a,group_a,backup_a1],
+   [forms_time,'alpha@example.invalid',test_a,name_a,group_a,backup_a2],
+   [forms_time,'alpha@example.invalid','EDITED-BY-STUDENT',name_a,'4.Z WRONG',backup_a1],
+   [forms_time,'beta@example.invalid',test_b,name_b,group_b,backup_b],
+   [forms_time,'alpha@example.invalid',test_a,name_a,group_a,corrupt_txt]
   ]
   buf=io.StringIO();csv.writer(buf).writerows(rows);tmp=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);tmp.write(buf.getvalue());tmp.close()
 
-  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
+  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va,stu_a['publishedAt']);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
   ta=va.evaluate('document.body.innerText')
-  assert 'alpha@ghrabuvka.cz' in ta and 'beta@ghrabuvka.cz' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
-  assert 'METADATA MISMATCH' in ta,('tampered Forms metadata must warn, not hide valid payload',ta[:1000])
-  assert 'VÍCE RŮZNÝCH POKUSŮ' in ta,('two distinct valid attempts require explicit teacher decision',ta[:1000])
+  assert 'alpha@example.invalid' in ta and 'beta@example.invalid' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
+  assert va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&r.validationCodes.includes('binding.forms-metadata'))"),'tampered Forms metadata must be rejected before scoring'
+  assert va.evaluate('RESULTS.some(r=>r.hardReplayConflict)'),('distinct attempts must retain replay rejection',ta[-1000:])
   assert re.search(r'jiné testy\s+1',ta,re.I),('full CSV must classify TEST-B as another test',ta[:1000])
-  assert re.search(r'neplatné/poškozené\s+1',ta,re.I),('corrupt current-test payload must be invalid',ta[:1000])
+  assert re.search(r'neplatné/poškozené\s+2',ta,re.I),('corrupt payload and altered metadata must both be invalid',ta[:1000])
   assert re.search(r'Duplicity:\s*[1-9]',ta),('identical payload must be duplicate',ta[:1000])
   va.evaluate("()=>{const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate);chooseAttemptByDigest(r.submissionDigest)}")
   va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await __readDownloadText(-1)")
-  assert res_csv.count('\n')==1,('resolved results export must contain one effective student row',res_csv)
+  assert len(res_csv.splitlines())==1,('manual selection must not classify replay-rejected submissions',res_csv)
   va.evaluate('downloadSubmissionsCsv()');sub_csv=va.evaluate("async()=>await __readDownloadText(-1)")
-  assert test_b not in sub_csv and 'beta@ghrabuvka.cz' not in sub_csv,('submissions export must exclude other tests',sub_csv[:500])
+  assert test_b not in sub_csv and 'beta@example.invalid' not in sub_csv,('submissions export must exclude other tests',sub_csv[:500])
   va.close()
 
-  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
+  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vb,stu_b['publishedAt']);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
   tb=vb.evaluate('document.body.innerText')
-  assert 'beta@ghrabuvka.cz' in tb and 'alpha@ghrabuvka.cz' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
+  assert 'beta@example.invalid' in tb and 'alpha@example.invalid' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
   assert re.search(r'jiné testy\s+[1-9]',tb,re.I),('verifier B must classify TEST-A rows as other tests',tb[:1000])
   vb.close()
 
   # Real-browser long-run benchmark: actual verifier + WebCrypto + yielding UI.
   perf=[]
-  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click()
+  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va2,stu_a['publishedAt'])
   try:
    for size in (100,1000,3000,5000):
     big=io.StringIO();w=csv.writer(big);w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
@@ -446,7 +454,7 @@ try:
     for i in range(size):
      is_a=(i%20==0)
      if is_a:current+=1
-     w.writerow(['30.9.2026 09:00:00',('alpha'+str(i)+'@ghrabuvka.cz') if is_a else ('beta'+str(i)+'@ghrabuvka.cz'),test_a if is_a else test_b,name_a if is_a else name_b,group_a if is_a else group_b,backup_a1 if is_a else backup_b])
+     w.writerow([forms_time,'alpha@example.invalid' if is_a else 'beta@example.invalid',test_a if is_a else test_b,name_a if is_a else name_b,group_a if is_a else group_b,backup_a1 if is_a else backup_b])
     bf=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);bf.write(big.getvalue());bf.close()
     va2.evaluate("()=>{clearInterval(window.__formsHbTimer);window.__formsHb=0;window.__formsHbTimer=setInterval(()=>window.__formsHb++,25)}")
     t0=time.time();va2.set_input_files('#formsCsvFile',bf.name)
@@ -454,7 +462,7 @@ try:
     elapsed=round(time.time()-t0,3);txt=va2.locator('#formsImportSummary').inner_text()
     hb=va2.evaluate("()=>{clearInterval(window.__formsHbTimer);return window.__formsHb}")
     heap=va2.evaluate("()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null")
-    assert re.search(r'platné výsledky tohoto testu\s+'+str(current)+r'\b',txt,re.I),(size,current,txt)
+    assert re.search(r'opravené výsledky tohoto testu(?:\s+\([^)]*\))?\s+'+str(current)+r'\b',txt,re.I),(size,current,txt)
     assert re.search(r'jiné testy\s+'+str(size-current)+r'\b',txt,re.I),(size,txt)
     assert 'neplatné/poškozené 0' in txt,(size,txt)
     assert hb>0,('large CSV import must yield to browser event loop',size,hb)
@@ -493,9 +501,9 @@ try:
   none=run();assert 'nenavrhla' in none and 'Zaškrtni' not in none,('zero proposals must not ask to tick anything (F-27)',none)
   j.ev("()=>{window.__aiEnrichPayload=b=>({items:b.map(x=>({id:x.id,alts:x.id===0?['the water','aqua']:[]}))})}")
   multi=run();assert '__default' not in multi and 'původní správná odpověď zůstává' in multi,('readable proposals (F-26)',multi[:200])
-  p.locator('.en-pick').first.check();p.click('#btnAcceptProposals');p.wait_for_timeout(1200)
+  p.locator('.en-pick').first.check();p.click('#btnAcceptProposals');p.wait_for_function('!outputMutationBusy && document.getElementById("enApplyStatus").innerText.includes("Přidáno:")')
   st=j.text('#enApplyStatus');assert 'self-test' in st and 'zkontroluj obsah' not in st,st
-  run();p.click('#resultTab1');p.click('#btnEdit');p.wait_for_timeout(300);p.locator('#editorBody textarea').first.fill('Changed');p.click('#btnEditorApply');p.wait_for_timeout(1200)
+  run();p.click('#resultTab1');p.click('#btnEdit');p.wait_for_timeout(300);p.locator('#editorBody textarea').first.fill('Changed');p.click('#btnEditorApply');p.wait_for_function('!outputMutationBusy && document.getElementById("editorModal").classList.contains("hidden")');assert not p.locator('#editorModal').is_visible(),p.locator('#editorError').inner_text()
   dis=j.ev("()=>[...document.querySelectorAll('.en-pick')].every(c=>c.disabled)&&document.getElementById('btnAcceptProposals').disabled")
   assert dis and 'nejde použít' in (j.ev("()=>document.getElementById('enApplyStatus').innerText") or ''),'stale proposals must not stay actionable (F-28)'
   return {'accepted':True}
@@ -516,7 +524,7 @@ try:
   j.new_test('Přísný test');j.selftest();j.checklist();p=j.p
   B="()=>{const e=document.getElementById('settingsDriftBanner');return e.classList.contains('hidden')?'':e.innerText}"
   assert j.ev(B)=='','no false drift warning right after generation'
-  p.click('#resultTab1');p.click('#btnEdit');p.wait_for_timeout(300);p.locator('#editorBody textarea').first.fill('Edited');p.click('#btnEditorApply');p.wait_for_timeout(1200)
+  p.click('#resultTab1');p.click('#btnEdit');p.wait_for_timeout(300);p.locator('#editorBody textarea').first.fill('Edited');p.click('#btnEditorApply');p.wait_for_function('!outputMutationBusy && document.getElementById("editorModal").classList.contains("hidden")');assert not p.locator('#editorModal').is_visible(),p.locator('#editorError').inner_text()
   assert j.ev(B)=='','editor change is not settings drift'
   j.ev("()=>goTo(2)");p.locator('#bodyBtns [data-val=\"50\"]').click();p.locator('#timeBtns [data-val=\"45\"]').click();j.ev("()=>goTo(4)");p.wait_for_timeout(200)
   w=j.ev(B);assert 'body' in w and 'čas' in w,('changed settings must be visible at download (F-30)',w)
@@ -537,7 +545,7 @@ try:
   p=j.p;j.ev("()=>goTo(0)");p.locator('#jazykBtns [data-val=\"čeština\"]').click();p.wait_for_timeout(300)
   btns=j.ev("()=>[...document.querySelectorAll('#csEntryModal button')].map(b=>b.innerText.trim())");assert 'Zůstat zde' in btns,('dialog button matches its text (F-20)',btns)
   p.locator('#csEntryModal [data-cs-stay]').click()
-  j.ev("()=>goTo(4)");p.click('#resultTab1');p.click('#btnEdit');p.wait_for_timeout(300);p.locator("[onclick='edAddItem(0)']").click();p.click('#btnEditorApply');p.wait_for_timeout(600)
+  j.ev("()=>goTo(4)");p.click('#resultTab1');p.click('#btnEdit');p.wait_for_timeout(300);p.locator("[onclick='edAddItem(0)']").click();p.click('#btnEditorApply');p.wait_for_function('!outputMutationBusy && !document.getElementById("editorError").classList.contains("hidden") && document.getElementById("editorError").innerText.length>0');assert p.locator('#editorModal').is_visible()
   e=j.text('#editorError') or '';assert 'musí být' in e or 'chybí' in e,('editor validation readable Czech (F-31)',e[:160])
   return {'tabs':tabs}
  record('student-language-and-small-texts',student_language_and_small_texts)

@@ -1,0 +1,47 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.78 qa:browser
+> node scripts/qa-p3-browser.mjs
+
+{
+  "schema": "ghrab-p3-browser-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.78",
+  "chromium": "system",
+  "result": {
+    "checks": {
+      "platformPresent": true,
+      "version": true,
+      "a11yContract": true,
+      "performanceContract": true,
+      "moduleContract": true,
+      "skipLink": true,
+      "liveRegion": true,
+      "inputName": true,
+      "iconName": true,
+      "imageAlt": true,
+      "dialogName": true,
+      "initialFocus": true,
+      "tabWrap": true,
+      "shiftTabWrap": true,
+      "escapeClosed": true,
+      "focusReturned": true,
+      "announcement": true,
+      "performance": true,
+      "lazy": true
+    },
+    "failed": [],
+    "activeElement": "launcher",
+    "snapshot": {
+      "contract": "ghrab-performance-v1",
+      "now": 312.8000000002794,
+      "domContentLoadedMs": 22.700000000186265,
+      "loadMs": 23.100000000093132,
+      "transferBytes": 0,
+      "decodedBytes": 0,
+      "jsHeapUsedBytes": 10000000,
+      "resourceCount": 0
+    }
+  },
+  "status": "passed"
+}

@@ -1,0 +1,1300 @@
+{
+  "schema": "git-redteam-e7-mobile-matrix-v1",
+  "version": "7.1.83",
+  "stage": "E7",
+  "stageStatus": "ANALYZED / NOT TESTED",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "physicalDevicesTested": false,
+  "claimScope": "Manual protocol authored; no physical mobile execution or certification. Headless/desktop results are separate local evidence.",
+  "categories": [
+    "PREVENTED",
+    "DETECTED",
+    "HARDENED",
+    "BEST-EFFORT",
+    "CLIENT-CONTROLLED",
+    "ARCHITECTURAL LIMIT",
+    "SERVER REQUIRED",
+    "MIMO TECHNICKÝ DOSAH – POUZE DOZOR"
+  ],
+  "profiles": [
+    {
+      "id": "iphone-safari",
+      "label": "Reálný iPhone · Safari",
+      "platform": "iOS",
+      "requiredEvidence": "Model, iOS verze/build, Safari verze/build, locale a skutečná dostupnost Siri/Apple Intelligence."
+    },
+    {
+      "id": "ipad-safari",
+      "label": "Reálný iPad · Safari",
+      "platform": "iPadOS",
+      "requiredEvidence": "Model, iPadOS/Safari build, klávesnice, multitasking režim a dostupnost AI."
+    },
+    {
+      "id": "android-chrome",
+      "label": "Reálný Android · Chrome",
+      "platform": "Android",
+      "requiredEvidence": "Model/výrobce, Android build, přesná Chrome verze, systémový AI asistent."
+    },
+    {
+      "id": "android-alt-chromium",
+      "label": "Reálný Android · alternativní Chromium",
+      "platform": "Android",
+      "requiredEvidence": "Stejný telefon, odlišný skutečný produkt (např. Edge/Brave pokud nainstalován), přesná verze a profil. Není to desktop emulace."
+    }
+  ],
+  "resultStatuses": [
+    "NOT RUN",
+    "PASS",
+    "FAIL",
+    "BLOCKED",
+    "NOT APPLICABLE"
+  ],
+  "reportScope": "MANUALLY REPORTED / NOT VERIFIED",
+  "guardParameters": {
+    "blurDelayMs": 900,
+    "ipadEditableWindowMs": 2600,
+    "ipadViewportWindowMs": 1800,
+    "awayHardThresholdMs": 8000,
+    "splitRatio": 0.6,
+    "splitSampleMs": 2000,
+    "splitMinRunMs": 10000
+  },
+  "cases": [
+    {
+      "id": "M01",
+      "title": "Čistý start a běžné psaní",
+      "coverage": [
+        "baseline",
+        "keyboard"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Nový syntetický pokus v hard režimu, limit 40 minut. Zapiš začátek a identifikátor pokusu soukromě.",
+        "Vyplň MCQ i krátkou odpověď, otevři a zavři klávesnici; zůstaň v testu 30 s."
+      ],
+      "expected": "Odpovědi zůstávají editovatelné, timer klesá, bez neodůvodněného locku. Samotný mobilní výsledek je dosud neověřený.",
+      "limits": "Běžné OS eventy a virtual keyboard se mezi zařízeními liší; detekce není autentická.",
+      "negativeControl": "Kontrola: v čerstvém pokusu skutečně přepni do jiné aplikace na 12 s. Při visibility-hidden očekávej lock a event; běžné psaní jej nemá napodobovat.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M02",
+      "title": "Zavření klávesnice na iPadu",
+      "coverage": [
+        "keyboard",
+        "ipad-keyboard"
+      ],
+      "profiles": [
+        "ipad-safari"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Otevři textové pole, zavři soft klávesnici. Opakuj po focusout a po změně visualViewport.",
+        "Zkontroluj lock ihned a po 3 s; opakuj s připojenou fyzickou klávesnicí, pokud ji vlastníš."
+      ],
+      "expected": "Je-li dokument stále viditelný, podporovaná iPad heuristika má potlačit mylný blur lock; případný keyboard-dismiss-ios zapisuj jako heuristický event.",
+      "limits": "Výjimka: editable do 2600 ms nebo visualViewport do 1800 ms; blur čeká 900 ms. Není to důkaz, že viditelný AI overlay nemůže projít. Fyzická klávesnice N/A s důvodem, pokud není dostupná.",
+      "negativeControl": "Kontrola: ihned po zavření klávesnice přepni do jiné aplikace. visibility-hidden se nesmí ignorovat jako keyboard-dismiss-ios.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M03",
+      "title": "Klávesnice na iPhonu a Androidu",
+      "coverage": [
+        "keyboard"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Opakuj otevření/zavření klávesnice, výběr textu, posun caret a dlouhé psaní.",
+        "Sleduj timer, lock a rozměry dostupné plochy; nepoužívej vývojářskou změnu UA."
+      ],
+      "expected": "Bez mylného locku při pouhém psaní; každé jiné pozorování je FAIL kompatibility a musí se reprodukovat.",
+      "limits": "iPad výjimka není automaticky podporou iPhonu/Androidu. Nízká plocha klávesnice může ovlivnit split heuristiku.",
+      "negativeControl": "Kontrola: klávesnici nech otevřenou a přejdi na domovskou obrazovku. Při hidden se očekává lock, ne výjimka pro keyboard.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M04",
+      "title": "Otočení, lišta adresy a zoom",
+      "coverage": [
+        "viewport",
+        "false-positive"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Bez odchodu z aplikace otoč zařízení, zobraz/skryj adresní lištu a přibliž text.",
+        "V každém stavu počkej 15 s, aby se uplatnilo vzorkování malé plochy; zapiš velikost a skutečný layout."
+      ],
+      "expected": "Žádný neodůvodněný lock; případný split-window při odevzdání je jen měkký signál a nesmí automaticky prokazovat podvádění.",
+      "limits": "Poměr viewport/screen pod 0.60 nemusí znamenat split screen. Zoom a klávesnice mohou vytvořit stejný signál.",
+      "negativeControl": "Kontrola: skutečný malý multitasking layout, pokud OS dovoluje, porovnej s otočením a klávesnicí. Při shodném eventu označ falešnou pozitivitu.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M05",
+      "title": "Přepnutí aplikace na stejném telefonu",
+      "coverage": [
+        "app-switch",
+        "visibility"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "DETECTED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Odpověz na jednu otázku a přepni do Notes/AI aplikace na 3 s; vrať se.",
+        "Nový pokus: zopakuj na 12 s. Soukromě porovnej attemptId, odpovědi a deadline."
+      ],
+      "expected": "Pokud přišel visibility-hidden/pagehide, hard režim uzamkne. Při návratu odpovědi i původní deadline zůstávají; returned severity soft pod 8000 ms, hard od 8000 ms.",
+      "limits": "Krátký odchod je také lock; soft/hard je klasifikace délky, nikoli povolení krátce používat AI. Telemetrie CLIENT-CONTROLLED.",
+      "negativeControl": "Kontrola: stejnou dobu pouze piš v testu. Nesmí vzniknout lock ani returned odchod bez skutečného přepnutí.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M06",
+      "title": "Centrum oznámení, ovládání a příchozí hovor",
+      "coverage": [
+        "overlay",
+        "interrupt"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Rozbal oznámení/ovládací centrum bez opuštění testu. Zůstaň 12 s, zavři.",
+        "Pokud máš druhého dospělého testera, pouze domluv simulovaný hovor; bez něj zapiš hovor NOT RUN."
+      ],
+      "expected": "Zapiš, zda OS změnil visibility/focus a zda nastal lock. Viditelný overlay bez eventu může projít bez signálu; to je limit, ne úspěch prevence.",
+      "limits": "Nemusí se vyvolat blur nebo hidden. Reálné osobní oznámení ani telefonní číslo nedávej do důkazu.",
+      "negativeControl": "Kontrola: skutečně přepni aplikaci na 12 s, a porovnej eventy. Prázdný overlay timeline neprokazuje, že overlay nebyl otevřen.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M07",
+      "title": "Uzamčení displeje a návrat",
+      "coverage": [
+        "screen-lock",
+        "timer"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Zaznamenej zbývající čas, zamkni telefon na 60 s a odemkni.",
+        "Zkontroluj lock, odpovědi, původní deadline a soukromý audit."
+      ],
+      "expected": "Při doručeném hidden/pagehide lock; timer po návratu zahrne uplynulou minutu, nepřidá nový limit.",
+      "limits": "Pozastavené JS intervaly nejsou důvěryhodné hodiny. Chybějící OS lifecycle může znamenat ztrátu posledních nezapsaných odpovědí.",
+      "negativeControl": "Kontrola: nový pokus nech 60 s viditelný bez interakce. Oba timery mají spotřebovat stejný čas; jen skutečný odchod má audit.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M08",
+      "title": "Nativní fullscreen a jeho opuštění",
+      "coverage": [
+        "fullscreen"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "BEST-EFFORT"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "V aktivním testu tlačítkem požádej o fullscreen; ověř skutečný fullscreen OS, ne pouhé skrytí lišty.",
+        "Pokud byl aktivní, ukonči jej nativním gestem. Pokud API není podporováno, zapiš BLOCKED pro tuto větev a proveď M09."
+      ],
+      "expected": "Po skutečném vstupu a výstupu fullscreen-left + lock v hard režimu; nelze požadovat event, pokud se fullscreen nikdy neaktivoval.",
+      "limits": "Podpora API je device-specific. Fullscreen není kiosk ani DRM a nepřekáží screenshotům či asistentovi.",
+      "negativeControl": "Kontrola: bez aktivního fullscreen jej nepředstírej pouhým skrytím adresní lišty; nečekej fullscreen-left.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M09",
+      "title": "Odmítnutý/nepodporovaný fullscreen",
+      "coverage": [
+        "fullscreen",
+        "fallback"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Na skutečném zařízení, kde OS/browser požadavek odmítá, stiskni fullscreen.",
+        "Zapiš text informace a dokonči dvě běžné odpovědi. Je-li API vždy podporováno, tato větev NOT APPLICABLE s důvodem."
+      ],
+      "expected": "fullscreen-unavailable a informace o nedostupnosti; test zůstane použitelný bez falešného tvrzení, že ochrana fullscreen je aktivní.",
+      "limits": "Nelze v rámci fyzického výsledku nahradit odmítnutí monkeypatchem nebo emulací.",
+      "negativeControl": "Kontrola: na zařízení s podporou vstup a skutečný exit z M08 mají lock. Žádný úspěšný fullscreen event se při odmítnutí nemá falšovat.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M10",
+      "title": "Nativní screenshot",
+      "coverage": [
+        "screenshot",
+        "ocr-ai"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "ARCHITECTURAL LIMIT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Na stejném telefonu pořiď screenshot syntetické otázky nativními tlačítky/gestem.",
+        "Zkontroluj, zda screenshot vznikl; bez přepnutí do Photos sleduj lock a audit."
+      ],
+      "expected": "Screenshot může úspěšně vzniknout bez web eventu a bez locku. Zapiš tento limit; screenshot-blocked se nepředpokládá.",
+      "limits": "Web runtime nemá obecnou autoritu zakázat OS screenshot nebo dokázat jeho vznik. Není to SERVER REQUIRED řešení ani slíbená prevence.",
+      "negativeControl": "Kontrola: následně otevři Photos/Gallery. Případný lock z app-switch nesmí být vydáván za detekci samotného screenshotu.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M11",
+      "title": "Screenshot → OCR → AI na stejném telefonu",
+      "coverage": [
+        "ocr-ai",
+        "app-switch"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "ARCHITECTURAL LIMIT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Použij pouze veřejnou syntetickou otázku a screenshot z M10. Otevři Gallery/Photos, OCR a dostupnou AI aplikaci na témže telefonu.",
+        "Získej odpověď, vrať se do testu a zkus ji napsat; zapiš, zda lock a timeline odhalily odchod."
+      ],
+      "expected": "Odchod s hidden má lock. Pokud cesta proběhne bez eventu, zůstává možný nezjištěný AI bypass; vyžaduje ruční přezkum experimentu.",
+      "limits": "Přístup AI se neprokazuje eventem samotného blur. Do cizí AI nedávej skutečný test, studentská data ani teacher data.",
+      "negativeControl": "Kontrola: pouze pořizuj screenshot bez přepnutí aplikace. Odlišíš screenshot od monitorovaného odchodu.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M12",
+      "title": "Siri: hlasový i psaný dotaz",
+      "coverage": [
+        "siri",
+        "ai-overlay"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Vyvolej Siri nad aktivním syntetickým testem, nejprve bez otevření nové aplikace.",
+        "Zeptej se na syntetickou otázku hlasem a pokud zařízení dovolí psaním; zapiš model, OS, locale a dostupnou funkci."
+      ],
+      "expected": "Zapiš, zda pomoc proběhla, zda test zůstal visible/focused a zda vznikl lock. Bez eventu není garance detekce.",
+      "limits": "Siri podpora sama nepotvrzuje Apple Intelligence ani přístup k obsahu obrazovky. Nedostupná funkce NOT APPLICABLE s důvodem.",
+      "negativeControl": "Kontrola: stejný dotaz v oddělené aplikaci na témže zařízení má při hidden lock. Nezaměň event odchodu za zamezení hlasové pomoci.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M13",
+      "title": "Apple Intelligence / asistence k obrazovce",
+      "coverage": [
+        "apple-intelligence",
+        "ai-overlay"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "ARCHITECTURAL LIMIT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Na kompatibilním zařízení zaznamenej skutečně dostupnou funkci a locale. Vyvolej asistenci nad syntetickým zadáním.",
+        "Vyzkoušej přístup k obsahu/psaní, pouze pokud jej systém nabízí; sleduj lock a audit."
+      ],
+      "expected": "Pozorování se zapisuje odděleně od Siri. Dostupný overlay bez eventu může uspět; nelze tvrdit PREVENTED. Nedostupné možnosti N/A s důvodem.",
+      "limits": "Část Apple zařízení funkci nemá; emulovaná UA nebo headless WebKit nepokrývají tuto větev.",
+      "negativeControl": "Kontrola: přepnutí do samostatné aplikace musí být odlišeno od overlay. Nedostupnost funkce není PASS ochrany.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M14",
+      "title": "Gemini / systémový AI asistent",
+      "coverage": [
+        "gemini",
+        "ai-overlay"
+      ],
+      "profiles": [
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Vyvolej dostupný asistent/overlay nad Chrome i alternativním Chromium.",
+        "Použij text nebo sdílení syntetické obrazovky, pokud je funkce dostupná; poznamenej OS, browser a app verzi."
+      ],
+      "expected": "Zapiš možnost odpovědi, eventy a lock. Není-li funkce dostupná, N/A, nikoli důkaz blokace AI.",
+      "limits": "AI overlay může ponechat stránku visible/focused. Chování jednoho výrobce není důkaz pro všechny Androidy.",
+      "negativeControl": "Kontrola: plné otevření AI aplikace na stejném telefonu porovnej s overlay; očekávej hidden lock jen u skutečně doručeného odchodu.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M15",
+      "title": "Circle to Search / OCR nad obrazovkou",
+      "coverage": [
+        "circle-to-search",
+        "ocr-ai"
+      ],
+      "profiles": [
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "ARCHITECTURAL LIMIT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Je-li dostupné, aktivuj Circle to Search nebo systémové OCR nad syntetickou otázkou.",
+        "Pošli rozpoznaný syntetický text do dostupné AI bez druhého zařízení; vrať se."
+      ],
+      "expected": "Zapiš úspěch získání obsahu a lock/timeline. Pokud žádný event nepřišel, experiment musí uvést nezjištěný bypass jako limit.",
+      "limits": "Dostupnost a eventy závisí na výrobci/OS. N/A vyžaduje konkrétní důvod, ne optimistický PASS.",
+      "negativeControl": "Kontrola: stejný dotaz proveď ve zvlášť otevřené aplikaci; nezaměň lock z přepnutí za blokaci OCR.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M16",
+      "title": "Rozdělená obrazovka a malé okno",
+      "coverage": [
+        "split-screen",
+        "viewport"
+      ],
+      "profiles": [
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Pokud OS podporuje multitasking, dej vedle testu AI/Notes na témže zařízení a nech layout skutečně 20 s.",
+        "Odevzdej nebo obnov pokus, poté soukromě porovnej runtimeAudit a split-window summary v verifieru."
+      ],
+      "expected": "Pouze při poměru innerWidth/screen.width nebo innerHeight/screen.height pod 0.60 se vzorkuje malé okno. Vzorkování 2000 ms, souvislý běh od 10000 ms; summary se zaznamená při odevzdání, ne jako garantovaný okamžitý lock.",
+      "limits": "Některé layouty prah nesplní. Split signal může být keyboard/zoom. Nesmí sám prokazovat podvádění.",
+      "negativeControl": "Kontrola: plná plocha 20 s a klávesnice 20 s. Porovnej smallMs/totalMs a false-positive; iPad Slide Over může mít velký test viewport.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M17",
+      "title": "Slide Over / plovoucí okno bez malé plochy",
+      "coverage": [
+        "overlay",
+        "split-screen"
+      ],
+      "profiles": [
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Otevři podporované plovoucí AI/Notes okno přes test, ponech test na velké ploše 20 s.",
+        "Vrať focus a soukromě přečti timeline i split summary; žádné eventy nepřidávej ručně."
+      ],
+      "expected": "Možný blur lock po 900 ms; pokud stránka zůstala focused/visible a prah malé plochy se nesplnil, bypass nemusí mít žádný signál.",
+      "limits": "Není-li OS funkce dostupná, N/A. Heuristika iPadu po klávesnici je známé rizikové okno.",
+      "negativeControl": "Kontrola: opravdové malé okno M16. Prázdný split summary při velkém overlay není důkaz nepoužití overlay.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M18",
+      "title": "Paste/drop a automatické doplnění",
+      "coverage": [
+        "clipboard",
+        "autofill"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "V hard režimu zkus nativní Vložit do odpovědi, příp. drop textu na iPadu.",
+        "Odděleně vyzkoušej diktování, text replacement a autofill z OS; nikdy nevkládej skutečná tajemství."
+      ],
+      "expected": "Při nativním paste/drop/beforeinput insertFromPaste/Drop mají být změna blokována a event paste-blocked/drop-blocked/clipboard-input-blocked. Diktování/autofill nemusí vyslat tyto typy eventů; výsledek zapisuj samostatně.",
+      "limits": "Blokovaný clipboard není ochrana před ručním přepisem, diktováním ani upraveným klientem. Drop N/A na nepodporovaném zařízení.",
+      "negativeControl": "Kontrola: běžně napsaný stejný text má projít. Diktování bez paste eventu nepovažuj za potvrzení jeho blokace.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M19",
+      "title": "Odpovědi za lockem",
+      "coverage": [
+        "locked-input"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Vyvolej reálný lock přepnutím aplikace, vrať se.",
+        "Zkus tap, Tab externí klávesnice, caret, paste a systémové návrhy do odpovědi za dialogem."
+      ],
+      "expected": "Běžná UI změna odpovědi za lockem nesmí projít; zkontroluj skutečné odpovědi v privátním výsledku po korektním odemknutí.",
+      "limits": "inert a event guards brání běžné interakci, ne klientovi s upraveným JavaScriptem. Externí klávesnice N/A bez hardware.",
+      "negativeControl": "Kontrola: nový odemčený pokus musí stejné obyčejné psaní přijmout; zablokování celé aplikace není požadovaná ochrana.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M20",
+      "title": "Odemknutí není učitelská identita",
+      "coverage": [
+        "unlock",
+        "identity"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Po locku dle běžného návodu odkryj pole pro třídní unlock (pět tapů během 2 s).",
+        "Zkus chybný kód a pak správný syntetický kód pod dohledem vlastníka. Nezapisuj jeho hodnotu do protokolu."
+      ],
+      "expected": "Chybný kód neodemkne; správný procedurální kód dovolí návrat. Odpovědi/attempt/deadline se nesmějí změnit ani dostat nový limit.",
+      "limits": "Sdílený třídní kód není autentizace učitele. Jeho znalost, sdílení či offline hledání jsou CLIENT-CONTROLLED/procesní brzda.",
+      "negativeControl": "Kontrola: nový hidden během probíhajícího unlock nesmí odemknout nepřítomný test. Provést s druhým dospělým, nebo NOT RUN; nedělat rychlostní tvrzení bez důkazu.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M21",
+      "title": "Refresh aktivního pokusu",
+      "coverage": [
+        "reload",
+        "persistence"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Napiš dvě odpovědi, vyčkej 3 s pro zápis, obnov stránku nativním tlačítkem/gestem.",
+        "Použij stejnou syntetickou identitu a code; porovnej soukromě attempt, odpovědi, deadline a lock."
+      ],
+      "expected": "Původní zapečetěný pokus a deadline mají být obnoveny, v hard režimu uzamčeny; nesmí vzniknout pohodlný nový čistý limit.",
+      "limits": "Výsledek závisí na dostupnosti WebCrypto/IndexedDB a doručení lifecycle. Ztráta nejnovější odpovědi se hlásí, ne zatajuje.",
+      "negativeControl": "Kontrola: bez refresh ponech stejný pokus 3 s; jeho odpovědi ani deadline se nesmějí samy měnit.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M22",
+      "title": "Zpět/vpřed a nativní obnovení stránky",
+      "coverage": [
+        "history",
+        "bfcache"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Přejdi nativním Zpět/Vpřed přes skutečný history entry a případný BFCache návrat.",
+        "Zapiš, zda nastal skutečný BFCache (pokud to lze prokázat privátním auditem page-restored), nikoli jen reload."
+      ],
+      "expected": "history-navigation/pagehide mohou locknout; skutečný persisted pageshow má přepočítat timer a obnovit zapečetěný stav bez editace za lockem.",
+      "limits": "BFCache není garantován a nelze ztotožnit s uměle dispatchnutým pageshow. Nedosažená BFCache větev NOT RUN, běžný návrat samostatně.",
+      "negativeControl": "Kontrola: běžný refresh M21 porovnej s nativním návratem. Chybějící page-restored při reloadu není BFCache PASS.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M23",
+      "title": "Ukončení browseru / restart OS",
+      "coverage": [
+        "force-kill",
+        "restart"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "ARCHITECTURAL LIMIT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Po zapsání odpovědi a čekání 3 s ukonči browser z app switcher; otevři stejný URL/pokus.",
+        "Odděleně skutečně restartuj zařízení a zkus navázat; poslední neuloženou odpověď vyzkoušej v čerstvém pokusu."
+      ],
+      "expected": "Pokud storage přežila, má se obnovit původní stav/deadline a lock. Pokud OS nezapsal poslední změnu, zapiš přesnou ztrátu; nový browser start není časové oprávnění.",
+      "limits": "OS nemusí před kill doručit žádný unload/freeze event. Garance záchrany poslední nezapsané změny se netvrdí.",
+      "negativeControl": "Kontrola: normální refresh po 3 s má obnovit zapsanou odpověď; odliší persistentní chybu od nedoručeného kill eventu.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M24",
+      "title": "Pozadí 60 s a suspend/discard",
+      "coverage": [
+        "lifecycle",
+        "timer"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "BEST-EFFORT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Přepni aplikaci na 60 s, pak se vrať. Pokus nech zvlášť dlouho v pozadí pro OS suspend/discard.",
+        "Pokud OS nevyvolal discard, zapiš tuto větev NOT RUN; nijak ji nepředstírej dispatch eventem."
+      ],
+      "expected": "Timer se po návratu opírá o původní deadline. Doručené hidden/freeze/resume mohou mít audit. Nativní discard musí být skutečně rozlišen od běžného návratu.",
+      "limits": "Nelze garantovat freeze/resume API na Safari ani vynutit OS discard. Absence eventu není důkaz absence odchodu.",
+      "negativeControl": "Kontrola: viditelný pokus 60 s spotřebuje stejný čas. Emulované freeze/resume patří jen do lokálního testu, ne tohoto výsledku.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M25",
+      "title": "Skutečné vypršení 40 minut",
+      "coverage": [
+        "timer",
+        "expiry"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Spusť celý syntetický 40minutový pokus; stopkami mimo test si kontroluj skutečnou dobu.",
+        "Část doby nech aplikaci v pozadí; vrať se až po deadline. Neposouvej klientské hodiny pro tento případ."
+      ],
+      "expected": "Po návratu nesmí zbýt nový limit a editace po deadline nemá pokračovat. Zkontroluj přesnou finální UI větev a privátní výsledek; žádný výsledek předem nepředpokládej.",
+      "limits": "Zrychlený mock timer ani 2minutový pokus nejsou skutečný 40minutový mobile test. Není-li čas, NOT RUN.",
+      "negativeControl": "Kontrola: jiný pokus vrať před deadline; nesmí mylně skončit předčasně. Posun systémových hodin je samostatné riziko M26.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M26",
+      "title": "Posun systémového času",
+      "coverage": [
+        "clock",
+        "trust"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "CLIENT-CONTROLLED",
+        "SERVER REQUIRED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "V odděleném syntetickém pokusu, je-li OS dovoluje, vypni automatický čas a posuň hodiny dozadu; po testu vrať automatiku.",
+        "Zapiš vliv na timer a payload proti důvěryhodnému Forms oknu vlastníka."
+      ],
+      "expected": "Klientské Date.now/deadline nemají externí autoritu; posun může ovlivnit čas. Verifier má kontrolovat důvěryhodné okno, nikoli věřit pouze client timestamps.",
+      "limits": "Globálně autoritativní čas vyžaduje externí důvěru/server. Živé Forms nastavení a skutečné okno se musí ověřit zvlášť.",
+      "negativeControl": "Kontrola: pokus s automatickým časem. Bez živé Forms anchor evidence výsledek clock/identity části NOT RUN, nikoli PASS.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M27",
+      "title": "Dva taby stejný profil",
+      "coverage": [
+        "tabs",
+        "attempt-lock"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "ARCHITECTURAL LIMIT"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Otevři stejný syntetický pokus v druhém tabu stejného browser profilu.",
+        "Zkus start/odpovědi v obou a poté odevzdej v prvním. Ověř reálnou podporu Web Locks browseru."
+      ],
+      "expected": "Při fungujícím lokálním attempt locku nemají běžně současně běžet dva zapisující klienti; fallback/N/A konkrétního browseru se zaznamená.",
+      "limits": "Web Locks/IDB sdílí jen profil/origin; nepokrývá anonymní profil nebo jiný browser. Izolovaný profil je M28/M29.",
+      "negativeControl": "Kontrola: po legitimním ukončení/zavření vlastnícího tabu má být přístup obnoven dle stavu; nesmí se resetovat odevzdaný pokus.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M28",
+      "title": "Anonymní/soukromý režim stejného telefonu",
+      "coverage": [
+        "private-mode",
+        "storage-reset"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "ARCHITECTURAL LIMIT",
+        "SERVER REQUIRED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "S týmž syntetickým kódem a identitou otevři test v privátním profilu stejného telefonu.",
+        "Porovnej storage a možnost nového pokusu/odevzdání; soukromě ověř stejný verified email a roster v owner verifieru."
+      ],
+      "expected": "Soukromý profil má izolované lokální úložiště; čistý pokus může vzniknout. Lokální marker nelze vydávat za globální replay prevenci.",
+      "limits": "Autoritativní session/replay napříč profily vyžaduje server nebo důvěryhodný externí ledger. Forms one response je externí procesní podmínka.",
+      "negativeControl": "Kontrola: běžný profil bez smazání storage má při refresh zachovat původní/submitted stav; čistý privátní profil je jiná hranice.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M29",
+      "title": "Jiný browser na stejném telefonu",
+      "coverage": [
+        "alternative-browser",
+        "profile-isolation"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "ARCHITECTURAL LIMIT",
+        "SERVER REQUIRED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Se stejným syntetickým pokusem otevři jiný nainstalovaný browser na témže zařízení.",
+        "Na Androidu zopakuj celý příslušný profil android-alt-chromium a zapiš přesný produkt/verzi; na iOS zapiš skutečný engine, pokud je znám."
+      ],
+      "expected": "Jiný browser/jeho profil může mít čistý marker a umožnit nový pokus. Úspěch jednoho browseru nepotvrzuje druhý.",
+      "limits": "Alternativní Android Chromium není emulovaná desktop UA. iOS Chrome se nesmí automaticky označovat za důkaz Android Chromium nebo známého enginu.",
+      "negativeControl": "Kontrola: dva běžné taby stejného profilu M27 mají jiný očekávaný lokální boundary než odlišný browser.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M30",
+      "title": "Smazání storage po startu",
+      "coverage": [
+        "storage-reset",
+        "attempt"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "ARCHITECTURAL LIMIT",
+        "SERVER REQUIRED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "V syntetickém aktivním pokusu přes skutečné nastavení browseru smaž data jen daného originu.",
+        "Znovu otevři URL, použij stejnou syntetickou identitu a kód; porovnej možnost čistého pokusu."
+      ],
+      "expected": "Ztracený lokální marker dovoluje obejít lokální kontinuitu. Toto je explicitní architektonický limit, ne tvrzení PREVENTED.",
+      "limits": "Smazání dat neodvolá externí Forms záznam. Úklid ostatních osobních webů není součástí testu.",
+      "negativeControl": "Kontrola: refresh bez smazání dat M21 má zachovat původní pokus; tím rozlišíš storage reset od běžného reload.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M31",
+      "title": "Smazání storage po odevzdání",
+      "coverage": [
+        "storage-reset",
+        "replay"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "ARCHITECTURAL LIMIT",
+        "SERVER REQUIRED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Odevzdej syntetický pokus, ověř submitted marker a lokální obnovu výsledku.",
+        "Smaž data originu, otevři znovu stejnou identitu/kód; soukromě zkontroluj duplicity a Forms one response."
+      ],
+      "expected": "Submitted marker je pouze lokální. Nový profil/reset může připravit další payload; privátní verifier/Forms pravidla musí řešit replay mimo klienta.",
+      "limits": "Živé Forms verified email, one response a roster nejsou v tomto E7 automaticky ověřeny. Bez evidence jejich větev NOT RUN.",
+      "negativeControl": "Kontrola: bez mazání dat po submitted běžný reload nesmí otevřít čistý test; ciphertext outbox má zůstat dostupný dle UI.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M32",
+      "title": "Odmítnutá / nedostupná persistence",
+      "coverage": [
+        "storage-failure",
+        "fail-closed"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "BEST-EFFORT"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "V novém syntetickém profilu se skutečně omezeným site storage zkus start a zápis. Pokud browser takové nastavení nemá, NOT APPLICABLE.",
+        "Zapiš chybu a zda lze pokračovat v pokusu bez potvrzené persistence."
+      ],
+      "expected": "Při rozpoznaném selhání bezpečného úložiště má nastat blokace, nikoli tichý čistý pokus. Fyzická větev nesmí být nahrazena fake IndexedDB.",
+      "limits": "Není garance kompatibility všech privacy režimů. Nastavení musí být skutečně dosažené a po testu obnoveno.",
+      "negativeControl": "Kontrola: tentýž origin v novém povoleném běžném profilu musí startovat; jinak jde o obecnou chybu nebo neplatný kód.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M33",
+      "title": "Offline, výpadek sítě a outbox",
+      "coverage": [
+        "offline",
+        "outbox"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "ARCHITECTURAL LIMIT"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Načti celý syntetický student HTML přes HTTPS, poté přepni airplane mode; proveď několik odpovědí a odevzdej.",
+        "Vyzkoušej obnovu dostupného lokálního výsledku a následné připojení. Nečekej, že Forms přijme odpověď offline."
+      ],
+      "expected": "Lokální ciphertext outbox má umožnit zpřístupnění dříve vytvořeného výsledku bez nového scoringu/pokusu. Nedostupná online cesta se musí jasně zaznamenat.",
+      "limits": "Offline načtení nového URL není garantováno pro student HTML. Outbox není důvěryhodná globální fronta a data mohou být smazána.",
+      "negativeControl": "Kontrola: online odevzdání stejného typu čerstvého pokusu; vlastní identita a nový pokus pro každý destruktivní případ.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M34",
+      "title": "Duplikované odevzdání a opakovaný výsledek",
+      "coverage": [
+        "submission",
+        "replay"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "SERVER REQUIRED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "V jednom pokusu rychle dvakrát stiskni odevzdání; zkus obnovu a zpřístupnění výsledku.",
+        "Soukromě vlož tentýž ciphertext dvakrát do owner verifieru s důvěryhodným Forms rámcem a porovnej duplicate/replay."
+      ],
+      "expected": "Běžné dvojí odevzdání nemá vytvořit nový pokus. Verifier má rozpoznat duplicitu v rámci svého důvěryhodného datasetu; odpovědi po submitted nesmí běžně měnit.",
+      "limits": "Globální deduplikace mezi oddělenými PC/datasety nebo novým profilem potřebuje důvěryhodný ledger/server. Payload se nedává do tohoto checklistu.",
+      "negativeControl": "Kontrola: dva legitimní odlišné syntetické pokusy různých identit musí být rozlišeny; nemá být vše odmítnuto jako duplicate.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M35",
+      "title": "Cizí identita / přenesený ciphertext",
+      "coverage": [
+        "identity",
+        "forms"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED",
+        "SERVER REQUIRED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Pouze s vlastněnými syntetickými účty a soukromým rosterem přenes výsledek pokusu A do důvěryhodné odevzdávací identity B.",
+        "V owner verifieru použij skutečně verified Forms email a čas; bez těchto účtů nech větev NOT RUN."
+      ],
+      "expected": "Důvěryhodný email ↔ roster ↔ payload code mismatch má být odmítnut/předán k explicitnímu review podle přesného verifier pravidla. Samotná vyplněná email položka není trusted.",
+      "limits": "Formulare a private roster jsou externí owner evidence; klientská identita sama není autentická. Kompletní forgery harness patří E8.",
+      "negativeControl": "Kontrola: správný pár A s jeho verified emailem a rosterem má být validní ve stejném okně; mismatch nesmí projít jen díky správnému šifrování.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M36",
+      "title": "Lokální úprava student HTML / telemetry",
+      "coverage": [
+        "client-edit",
+        "trust"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "CLIENT-CONTROLLED",
+        "ARCHITECTURAL LIMIT",
+        "SERVER REQUIRED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Na kopii vlastní syntetické aplikace v odděleném profilu zkus běžnými dostupnými mobilními nástroji odstranit lock/logging nebo ručně sestavit vstup.",
+        "Zapiš dostupnost editoru/nástroje. Nespouštěj cizí stránky ani skutečný soukromý verifier na studentském telefonu."
+      ],
+      "expected": "Klient ovládající JS může odstranit UI guardy nebo vyrobit konzistentní nepravdivou telemetry. Zapečetění/šifrování se nesmí vydávat za podpis důvěryhodné session.",
+      "limits": "Pokud editovací nástroj nemáš, NOT RUN; neznamená to bezpečnost. Úplná schema/forgery matice se řeší v E8, zde pouze mobilní dostupnost cesty.",
+      "negativeControl": "Kontrola: původní identický HTML má lock/logy M05; upravená kopie není původní artifact SHA a musí se jako taková uvést soukromě.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M37",
+      "title": "Obsah dostupný před startem",
+      "coverage": [
+        "prestart",
+        "f7"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "ARCHITECTURAL LIMIT",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "U syntetického student HTML před zadáním start kódu zkus čtení zdroje/kopie dostupnými nástroji na témže telefonu.",
+        "Porovnej dostupnost zadání s původním souborem; nepoužívej skutečné testové otázky."
+      ],
+      "expected": "Současný checkpoint nemá dokončené F7 startovní šifrování zadání. Plaintext obsah je známý blokátor ostrého experimentu bez ohledu na mobilní guard.",
+      "limits": "F7 vyžaduje skutečně šifrovaný obsah a alespoň 40bit startovní entropii. UI skrývání, PIN ani minifikace tuto podmínku nenahrazují.",
+      "negativeControl": "Kontrola: neodvozuj ochranu z pouhého start dialogu. Existence čitelné otázky v souboru je dostačující důkaz nesplněného F7, ne teacher answer-key evidence.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M38",
+      "title": "Druhé zařízení pod dohledem",
+      "coverage": [
+        "second-device",
+        "supervision"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "MIMO TECHNICKÝ DOSAH – POUZE DOZOR"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Na syntetickém pilotu s druhým dospělým ukaž, že druhý telefon umí fotografovat obrazovku prvního bez zásahu do test browseru.",
+        "Zapiš pouze procesní opatření: vlastník průběžně dohlíží, druhé zařízení je při 40min experimentu zakázáno."
+      ],
+      "expected": "Software prvního telefonu nemůže zaručit detekci druhého zařízení. Výsledek je procedurální limit, nikoli technický PASS.",
+      "limits": "Ani server nevyřeší fotografující druhý telefon. Kategorie SERVER REQUIRED ani PREVENTED zde nesmí být použita.",
+      "negativeControl": "Kontrola: první telefon neopouštěj. Absence guard eventu ukazuje hranici; přepnutí na stejném telefonu M05 je odlišný scénář.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M39",
+      "title": "Přístupnost locku a dlouhé odpovědi",
+      "coverage": [
+        "accessibility",
+        "false-positive"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "BEST-EFFORT",
+        "HARDENED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Na skutečném zařízení zapni dostupný VoiceOver/TalkBack, zvětši text a vyplň delší syntetickou odpověď.",
+        "Vyvolej lock a zkus navigaci čtečkou pouze v lock dialogu, následně odemkni."
+      ],
+      "expected": "Test má být čitelný, lock dialog dosažitelný, odpovědi za lockem needitovatelné; všechny problémy se zapisují jako kompatibilitní FAIL.",
+      "limits": "Automatizovaný axe ani desktop keyboard nejsou ověřením mobilní screen reader podpory. Neposkytuje garanci zabránění OS diktování.",
+      "negativeControl": "Kontrola: odemčený test se čtečkou má umožňovat legitimní odpovědi; blokace celé accessibility není správný výsledek.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    },
+    {
+      "id": "M40",
+      "title": "Plný syntetický 40minutový průchod",
+      "coverage": [
+        "end-to-end",
+        "forms",
+        "timer"
+      ],
+      "profiles": [
+        "iphone-safari",
+        "ipad-safari",
+        "android-chrome",
+        "android-alt-chromium"
+      ],
+      "categories": [
+        "HARDENED",
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "NOT RUN",
+      "steps": [
+        "Po izolovaných scénářích proveď celý nový 40minutový syntetický test s běžným psaním na každém profilu.",
+        "Odevzdej dle vlastního Forms workflow a ověř na soukromém PC mimo školu; kontroluj roster, verified email, timestamp, variant/test/manifest a outbox."
+      ],
+      "expected": "Žádná ztráta běžně uložených odpovědí, prodloužení deadline nebo nový čistý attempt. Verifier výsledek musí obsahovat správné vazby a požadavek review untrusted telemetry.",
+      "limits": "Nejde o povolení ostrého experimentu; F7, E6 residual/rotation, E8–E10 a důvěryhodné externí nastavení zůstávají otevřeny.",
+      "negativeControl": "Kontrola: oddělený pokus s reálným odchodem M05 musí mít jiné pozorování; plynulý průchod sám nesmí být vydáván za důkaz všech útoků.",
+      "evidence": [
+        "Pozorovaný stav obrazovky a čas kroku",
+        "Sanitizovaný timeline z privátního verifieru; chybějící event výslovně zapsat",
+        "Pouze ID důkazu v protokolu; žádný payload, email, heslo ani klíč"
+      ]
+    }
+  ]
+}

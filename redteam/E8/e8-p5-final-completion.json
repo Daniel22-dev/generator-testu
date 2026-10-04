@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "qa:p5:ci"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-04T05:03:17.802320+00:00",
+  "completedAt": "2026-10-04T05:05:42.049595+00:00",
+  "version": "7.1.84",
+  "logFile": "e8-p5-final.log",
+  "logBytes": 138319,
+  "logSha256": "cfe3862741b30ed7c36846803daeb667fb8302c5590c3c6b73a61719993e4823",
+  "scope": "Local installed exact-lockfile dependencies; no GitHub Actions or real mobile run"
+}

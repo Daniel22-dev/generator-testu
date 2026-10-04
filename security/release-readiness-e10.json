@@ -1,0 +1,38 @@
+{
+  "schema": "git-release-readiness-e10-v1",
+  "version": "7.1.87",
+  "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
+  "blockers": [],
+  "f7": "IMPLEMENTED; current-version gates required",
+  "remotePath": "Exact candidate SHA CI, protected main PR merge and deploy only main remain required. Owner approval permits the controlled experiment; technical regressions must pass for the new SHA.",
+  "scope": "CONTROLLED_STUDENT_RED_TEAM_ONLY",
+  "ownerDecision": {
+    "recordedOn": "2026-10-04",
+    "source": "Explicit owner instruction in the current session",
+    "authorizeGithubPublication": true,
+    "E6_INCIDENT": {
+      "status": "DEFERRED_BY_OWNER",
+      "closed": false,
+      "note": "Owner deferred E6. Historical raw/cache purge and private credential rotation are not certified complete."
+    },
+    "LIVE_FORMS": {
+      "status": "OWNER_REPORTED_CHECKED",
+      "independentlyVerified": false,
+      "note": "Owner states that Forms were checked. This record is owner confirmation, not an independent live inspection."
+    },
+    "E7_PHYSICAL": {
+      "status": "SCHEDULED",
+      "physicalDevicesTested": false,
+      "testDates": [
+        "2026-10-06",
+        "2026-10-09"
+      ],
+      "note": "Physical mobile behavior will be tested during the supervised Tuesday and Friday student experiment."
+    }
+  },
+  "limitations": [
+    "Publication is authorized for the supervised student red-team experiment; physical mobile compatibility is not certified.",
+    "E6 remains deferred and open; a clean current branch does not prove historical cache removal.",
+    "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication."
+  ]
+}

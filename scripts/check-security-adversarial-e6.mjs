@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
-const secure=read('src/js/13e-secure-student-runtime.js');
+const secure=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant=read('src/js/14b-instant-test-runtime.js');
 const core=read('src/js/13g-assemble-test-html.js');
 const persistence=read('src/js/02-state-persistence.js');

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 
-const secure = fs.readFileSync('src/js/13e-secure-student-runtime.js', 'utf8');
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js', 'utf8'));
 const instant = fs.readFileSync('src/js/14b-instant-test-runtime.js', 'utf8');
 const verifier = fs.readFileSync('src/js/13f-secure-teacher-verifier.js', 'utf8');
 const forms = fs.readFileSync('src/js/13ea-secure-verifier-forms.js', 'utf8');

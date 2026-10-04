@@ -1,0 +1,421 @@
+{
+  "stage": "E10",
+  "version": "7.1.87",
+  "status": "LOCAL_CANDIDATE_PASS",
+  "releaseReadiness": "NOT READY – BLOCKING ISSUE",
+  "sourceSnapshot": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 511,
+    "sha256": "7cb95f329a743df456e8d8c1d29a8c659321443a001176ac541614f1d4a86b62",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "sourceUnchanged": true,
+  "executionRootKind": "isolated local copy with fresh npm ci; source snapshot equals deliverable source",
+  "canonicalSteps": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "file": "ci-process/step-1.log",
+      "sha256": "ce27e60940ac585581d9a39c3a96a13ab8930a864afc16c4c0bfce3723e762bc"
+    },
+    {
+      "command": "npm run qa:garp27:foundation",
+      "exitCode": 0,
+      "file": "ci-process/step-2.log",
+      "sha256": "eeeb77575e24f4eb90a47b37c0c929ea84e8226d26ac65962927c2439705f61d"
+    },
+    {
+      "command": "npm run qa:p5:ci",
+      "exitCode": 0,
+      "file": "ci-process/step-3.log",
+      "sha256": "11e84f66ecf295744e2d486746f1efca5cdc7fb9f1002f35e452cf8bae95d468"
+    },
+    {
+      "command": "node scripts/check-redteam-evidence-e10.mjs",
+      "exitCode": 0,
+      "file": "ci-process/step-4.log",
+      "sha256": "671e2ada764ea2da4ce7cf3fd28713bdb507a2a63e9071081641ff4b2512795f"
+    }
+  ],
+  "reports": [
+    {
+      "source": "audit/evidence/garp27-current/foundation-summary.json",
+      "file": "audit__evidence__garp27-current__foundation-summary.json",
+      "sha256": "c1d9370507ca96c2bb60bcbcb174aa6988da6c5958e782d9104aa5a08449dcae"
+    },
+    {
+      "source": "dist/qa-p3-browser-report.json",
+      "file": "dist__qa-p3-browser-report.json",
+      "sha256": "97b67342cefbe7eaca00ec11b675eaa6a18217ba14b3d570db37101ab332068a"
+    },
+    {
+      "source": "dist/qa-p5-acceptance-report.json",
+      "file": "dist__qa-p5-acceptance-report.json",
+      "sha256": "15aac8ba07b487e02823291c8ec05ca962b52582d4565d22ff9d12f82f15054b"
+    },
+    {
+      "source": "dist/qa-p5-axe-runtime-report.json",
+      "file": "dist__qa-p5-axe-runtime-report.json",
+      "sha256": "9c4d87d3c6941c0fd5ff13358e420225faf30e102da8d84d9f1863fbe2630f59"
+    },
+    {
+      "source": "dist/qa-p5-release-report.json",
+      "file": "dist__qa-p5-release-report.json",
+      "sha256": "f1609319fec5be0bb34c9b39e1935253ac510347e383c2d4fbf893ae182964f8"
+    },
+    {
+      "source": "dist/qa-p5-runtime-report.json",
+      "file": "dist__qa-p5-runtime-report.json",
+      "sha256": "a8e512aa18f6641b27695c21de88ebaecdf34caea184fb4aefa228cb414d0e4c"
+    },
+    {
+      "source": "dist/qa-p5-xss-sinks-report.json",
+      "file": "dist__qa-p5-xss-sinks-report.json",
+      "sha256": "d23c4fb1215e73ae12225f1678538be291b8d5b0e2bca6dc062fbf9b59d0ea8b"
+    },
+    {
+      "source": "dist/quality-report.json",
+      "file": "dist__quality-report.json",
+      "sha256": "5eac4adad4fa69d01af69b9a67a9045368aabe902b187f779a864df627936c18"
+    },
+    {
+      "source": "qa-results/adversarial-harness-r5.json",
+      "file": "qa-results__adversarial-harness-r5.json",
+      "sha256": "6754644416ecec09b40da679611d9c1fe9c5ebe893c749850479775ec58c2440"
+    },
+    {
+      "source": "qa-results/d7-regressions.json",
+      "file": "qa-results__d7-regressions.json",
+      "sha256": "4293663bf809d1c6ac3dae78349c2de6e22cb1706fd02daf437ffb45cc3f6556"
+    },
+    {
+      "source": "qa-results/d8-final-audit.json",
+      "file": "qa-results__d8-final-audit.json",
+      "sha256": "5eea76e03b6d61810396388a9e1dec4aaadafe6ff9078bc0f669b1c5f5fcc4a5"
+    },
+    {
+      "source": "qa-results/redteam-e1-browser.json",
+      "file": "qa-results__redteam-e1-browser.json",
+      "sha256": "95a28e63ee237ac69cce6e7a5f0c6c96f8c67b26b5b660fff383cf94cc1c4def"
+    },
+    {
+      "source": "qa-results/redteam-e1-isolation.json",
+      "file": "qa-results__redteam-e1-isolation.json",
+      "sha256": "67e757a379e4e802368c28dd6b94d50edfa7d1db20791ae1e1abc7f075638feb"
+    },
+    {
+      "source": "qa-results/redteam-e10-browser.json",
+      "file": "qa-results__redteam-e10-browser.json",
+      "sha256": "ff7851fd0afe77752600202e4a89632d1fea5fa61780db785e95d1dbe3dfe1d0"
+    },
+    {
+      "source": "qa-results/redteam-e10-ci-run.json",
+      "file": "qa-results__redteam-e10-ci-run.json",
+      "sha256": "ccc584679efdf4de55a81524ca87103e9e5a32caa436e2c8e4f2110d17f3a2c4"
+    },
+    {
+      "source": "qa-results/redteam-e10-content.json",
+      "file": "qa-results__redteam-e10-content.json",
+      "sha256": "cfdb81a01f28707fbb0f01427dcae1da3f20a47bfe14bca2f1500efcdb8e4a30"
+    },
+    {
+      "source": "qa-results/redteam-e10-evidence.json",
+      "file": "qa-results__redteam-e10-evidence.json",
+      "sha256": "3baa5702a10e987ee983009d11cc3e137e6bab9cae34dbe3e1287ee13d3a2c9b"
+    },
+    {
+      "source": "qa-results/redteam-e10-release.json",
+      "file": "qa-results__redteam-e10-release.json",
+      "sha256": "d90c9af0fefef0ecd8cb20da1948256a4f621373ed971ff99b6b3b2f37df85cc"
+    },
+    {
+      "source": "qa-results/redteam-e2-browser.json",
+      "file": "qa-results__redteam-e2-browser.json",
+      "sha256": "50a7577ddc8cdad918b93174a84a662f734eaaad4acb13407118a676e762d9e8"
+    },
+    {
+      "source": "qa-results/redteam-e2-trust.json",
+      "file": "qa-results__redteam-e2-trust.json",
+      "sha256": "2ae814592a81b723ac63fc85b05b5abc42225aed2cf978a3fcda20f7e4488144"
+    },
+    {
+      "source": "qa-results/redteam-e3-browser.json",
+      "file": "qa-results__redteam-e3-browser.json",
+      "sha256": "69358eb9df4f46f074527dc14be68583f57bbf35e9fd9e090b2111dd0dbf618e"
+    },
+    {
+      "source": "qa-results/redteam-e3-verifier.json",
+      "file": "qa-results__redteam-e3-verifier.json",
+      "sha256": "bee84446a1eacea560b911113bd445bd41bf5701f79b5d5574f09140ec4d4ca5"
+    },
+    {
+      "source": "qa-results/redteam-e4-browser.json",
+      "file": "qa-results__redteam-e4-browser.json",
+      "sha256": "c7548c962111fc45e823fb874afdb2d8731fc48b68c8c391d288d4456164a9b9"
+    },
+    {
+      "source": "qa-results/redteam-e4-faults.json",
+      "file": "qa-results__redteam-e4-faults.json",
+      "sha256": "6b58c50ac346167cfcdaa29e774951de2b30aa127ece2bbc450983450928d569"
+    },
+    {
+      "source": "qa-results/redteam-e5-browser.json",
+      "file": "qa-results__redteam-e5-browser.json",
+      "sha256": "b9a3b068a0cfa69ebaeb8b606b04ad56ea4fe24b62765506a741403947e42450"
+    },
+    {
+      "source": "qa-results/redteam-e5-runtime.json",
+      "file": "qa-results__redteam-e5-runtime.json",
+      "sha256": "b89d47bc4a279018ebb362a1722db4fc57399fad6bae707eb3829ea35d807cd5"
+    },
+    {
+      "source": "qa-results/redteam-e6-publication.json",
+      "file": "qa-results__redteam-e6-publication.json",
+      "sha256": "812249595a6d299ccd0a708e01f977053ce914b90ef440ac9c955e9a7f726fe1"
+    },
+    {
+      "source": "qa-results/redteam-e7-mobile-protocol.json",
+      "file": "qa-results__redteam-e7-mobile-protocol.json",
+      "sha256": "abfff434193b6956de4df2c48824602505b007e6ea50697da01ddbdbf1512630"
+    },
+    {
+      "source": "qa-results/redteam-e7-recorder.json",
+      "file": "qa-results__redteam-e7-recorder.json",
+      "sha256": "0ef301daaf211a16f7ca167bd6de7d2210f60a20aedc7a3ded9292eab08b4411"
+    },
+    {
+      "source": "qa-results/redteam-e8-browser.json",
+      "file": "qa-results__redteam-e8-browser.json",
+      "sha256": "c9853d1651a43243b8bdb45d51ec42f2a39f0a2dfd8f0acd21b20773137a719d"
+    },
+    {
+      "source": "qa-results/redteam-e8-forgery.json",
+      "file": "qa-results__redteam-e8-forgery.json",
+      "sha256": "67619967a46ca29ae872602cd129c132c843bfd3580d6f00a98c0c3db083662f"
+    },
+    {
+      "source": "qa-results/redteam-e8-retention.json",
+      "file": "qa-results__redteam-e8-retention.json",
+      "sha256": "3a073349628135bd70a6882bd6b4382e6a81924a042e21ffda950eea37b7c42d"
+    },
+    {
+      "source": "qa-results/redteam-e9-ci-contract.json",
+      "file": "qa-results__redteam-e9-ci-contract.json",
+      "sha256": "1ed7bec02c957e11e1e9f7111c8a129bad472ec9022da84357a21b5f9b472739"
+    },
+    {
+      "source": "qa-results/redteam-e9-evidence.json",
+      "file": "qa-results__redteam-e9-evidence.json",
+      "sha256": "09349e6dd8a28224408cf4289dee18e51f401ec55842c841b134f81ff537d851"
+    },
+    {
+      "source": "qa-results/redteam-e9-negative.json",
+      "file": "qa-results__redteam-e9-negative.json",
+      "sha256": "b77768823c4551ae02d532c8eac334eaa4c9d62b852c43f634b8887fdb08ffb3"
+    },
+    {
+      "source": "qa-results/redteam-e9-restart-browser.json",
+      "file": "qa-results__redteam-e9-restart-browser.json",
+      "sha256": "da77ee8601a7ff103e1683f88225f56b57166343a06e5b6be1d7d86908633985"
+    },
+    {
+      "source": "qa-results/security-behavior-r3.json",
+      "file": "qa-results__security-behavior-r3.json",
+      "sha256": "fb301f04be687c35dd6e47829af87ee4df0be8e50f5fcb58d83e83738cb0d5fe"
+    },
+    {
+      "source": "qa-results/stage3-pdf-quality/summary.json",
+      "file": "qa-results__stage3-pdf-quality__summary.json",
+      "sha256": "4bc5eb30912b8bfac93de3662d02eb57b6565e119cec221bd3c9acb168d0d2e3"
+    },
+    {
+      "source": "qa-results/stage3-pdf-runtime/summary.json",
+      "file": "qa-results__stage3-pdf-runtime__summary.json",
+      "sha256": "ff66eda5dc2d1478fd859f76a0ad90a8a5ad088397a76b04cdc906d9403f28a0"
+    },
+    {
+      "source": "qa-results/verifier-ui-runtime/summary.json",
+      "file": "qa-results__verifier-ui-runtime__summary.json",
+      "sha256": "c0a19b260c330edd99a5129ab459e5861abe7be27f1bbaae6ebed2b7fd0bef4c"
+    }
+  ],
+  "reportCount": 38,
+  "startedAt": "2026-10-04T10:44:15.448Z",
+  "completedAt": "2026-10-04T10:49:07.081Z",
+  "workflowScenarioCount": 392,
+  "reporterChecks": 86,
+  "foundation": {
+    "classification": "GARP27_FOUNDATION_GATE",
+    "schema": "garp27-foundation-summary-v1",
+    "garpVersion": "2.7",
+    "appId": "generator",
+    "appVersion": "7.1.87",
+    "status": "FOUNDATION_PASS_LIVE_NOT_TESTED",
+    "serverPhase": "DEFERRED_BY_OWNER_DECISION",
+    "liveStatus": "NOT_TESTED",
+    "sourceIdentity": {
+      "value": "138d1e65d6f3f89d824f621cd74af490c224e299",
+      "kind": "local-source-tree-sha1-surrogate"
+    },
+    "steps": [
+      {
+        "id": "build-production",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "build-production",
+          "sha256": "60763c96856b6a87bf093ac971194395976ee028ea3df71c4d3a5f7540acf50b"
+        }
+      },
+      {
+        "id": "version-contract",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "version-contract",
+          "sha256": "c040b8493f7a046f4098ccc68756786941dc41c24fda23a9ab6e960cbee7b955"
+        }
+      },
+      {
+        "id": "garp27-contracts",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "garp27-contracts",
+          "sha256": "c50a6f6ebb4e31cd3a0212158121bfda0f1b44c70b5e1a17b03189fff9f2c703"
+        }
+      },
+      {
+        "id": "garp27-architecture",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "garp27-architecture",
+          "sha256": "3e299f7ba36c676f7e25e6e25838fc6df49505e1ccc840afe150b91005a8a9e4"
+        }
+      },
+      {
+        "id": "garp27-policy-mutations",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "garp27-policy-mutations",
+          "sha256": "985181430de7839f622547a9df0d1efdd628c23c7104433708c08a14b831b0d9"
+        }
+      },
+      {
+        "id": "garp27-mutations",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "garp27-mutations",
+          "sha256": "a6c8db5dd0bbef19e689a917786225de346c595b147e996d915af51fdc67df89"
+        }
+      },
+      {
+        "id": "garp27-auto-patch",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "garp27-auto-patch",
+          "sha256": "1b75ceb9deb51236340d5821178a50f41907a5e4d92c7669f0e0209b7305551c"
+        }
+      },
+      {
+        "id": "legacy-garp25-static",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "legacy-garp25-static",
+          "sha256": "3852b015e9070a0d2b284ad9c0cfa62a3bd7ab64a7e5aa0ab2e8d661dbe52d84"
+        }
+      },
+      {
+        "id": "production-readiness",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "production-readiness",
+          "sha256": "3f2cfd8bcea10d14ff2928e2c74341c6ae6bd500a38b3b07930f12c76dba5212"
+        }
+      },
+      {
+        "id": "action-pins",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "action-pins",
+          "sha256": "99b1ee4a7f4ef535219efafe55dde8e765962b81437b9adcc097ec59db0e429c"
+        }
+      },
+      {
+        "id": "sensitive-scan",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "sensitive-scan",
+          "sha256": "a6498bbf96bfd131c94b0ee2a8d0642d2c90ff75beea2b7c13bbf27455ad088d"
+        }
+      },
+      {
+        "id": "assurance-admission",
+        "expectedExit": 0,
+        "actualExit": 0,
+        "pass": true,
+        "evidence": {
+          "id": "assurance-admission",
+          "sha256": "19f2f1135fca6ac0057b390d85947f0dc8a019f73aeb766cac60bd111d81f0ba"
+        }
+      }
+    ],
+    "summary": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0
+    }
+  },
+  "p5Release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "p5Acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "entryCriticalBytes": 1750990,
+  "remoteCi": "Exact candidate SHA must be checked after upload; final handoff records remote outcomes.",
+  "initialUpload": {
+    "sha": "598b96350a5c104b58c475005dc17945e56bd8c0",
+    "tree": "9fb03a9b8c63084b73a111082a941bf1796f1cf4",
+    "version": "7.1.86",
+    "p5": "PASS",
+    "journeys": "FAIL; migrated for current isolation/start/Forms contracts",
+    "safePromotion": "FAIL at reporter; README and release notes corrected"
+  },
+  "limits": [
+    "Physical iPhone/iPad/Android ANALYZED / NOT TESTED",
+    "E6 historical raw/cache and private rotation remain unconfirmed",
+    "Live school Forms owner verification remains pending",
+    "Client-controlled telemetry is not authentication",
+    "No merge or deployment authorization"
+  ]
+}

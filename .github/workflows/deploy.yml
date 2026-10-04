@@ -30,6 +30,9 @@ jobs:
           node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
+      - name: Require classroom release readiness on main
+        if: github.ref == 'refs/heads/main'
+        run: node scripts/check-redteam-release-e10.mjs --require-ready
       - name: Install dependencies
         timeout-minutes: 5
         run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
@@ -47,25 +50,36 @@ jobs:
         run: npm run qa:release
         env:
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      - name: Verify GHRAB Platform P3 conformance
+        run: npm run qa:platform
+
+      - name: Enforce E9 complete regression admission
+        run: npm run qa:redteam:ci
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: 1f6c5b888631fcb9601918728aa01310ac64ff4b8c863fc1682b9cbb4576d823
+
       - name: Upload QA evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ghrab-qa-generator-${{ github.sha }}
-          path: qa-results
-      - name: Verify GHRAB Platform P3 conformance
-        run: npm run qa:platform
-
-      - name: Enforce GARP 2.7 foundation on release source
-        run: npm run qa:garp27:foundation
-        env:
-          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
-
-      - name: Enforce final P5 R2 release gate
-        run: npm run qa:p5:ci
-        env:
-          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
-
+          if-no-files-found: error
+          path: |
+            qa-results/redteam-e*.json
+            qa-results/redteam-e9-*.json
+            qa-results/redteam-e10-ci/*.log
+            qa-results/redteam-e9-negative/*.log
+            audit/evidence/garp27-current/
+            dist/qa-p5-*.json
+            dist/quality-report.json
+            dist/qa-p3-browser-report.json
+            qa-results/d7-regressions.json
+            qa-results/d8-final-audit.json
+            qa-results/security-behavior-r3.json
+            qa-results/adversarial-harness-r5.json
+            qa-results/stage3-pdf-runtime/summary.json
+            qa-results/stage3-pdf-quality/summary.json
+            qa-results/verifier-ui-runtime/summary.json
       - name: Prepare release identity
         env:
           GHRAB_SOURCE_COMMIT: ${{ github.sha }}
@@ -73,7 +87,7 @@ jobs:
           GHRAB_BUILD_ID: ${{ github.run_id }}-${{ github.run_attempt }}
           GHRAB_WORKFLOW_REF: ${{ github.workflow_ref }}
           GHRAB_BUILDER_ID: github-actions-hosted
-          GHRAB_BUILD_ENTRYPOINT: npm run qa:p5:ci
+          GHRAB_BUILD_ENTRYPOINT: npm run qa:redteam:ci
           GHRAB_BUILD_PROFILE: github-pages-release
         run: node scripts/prepare-release-identity.mjs
 

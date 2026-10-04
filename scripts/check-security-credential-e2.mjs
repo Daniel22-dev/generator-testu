@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 const helpers = read('src/js/13a-secure-helpers.js');
 const pkg = read('src/js/13c-secure-package.js');
-const secureRuntime = read('src/js/13e-secure-student-runtime.js');
+const secureRuntime = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const assemble = read('src/js/13g-assemble-test-html.js');
 const builders = read('src/js/14a-test-html-builders.js');
 const instantRuntime = read('src/js/14b-instant-test-runtime.js');
@@ -31,8 +31,8 @@ assert(!/hesloHash|hasUnlock|unlock-password/.test(assemble), 'E2: new assembly 
 assert(/credentialPolicyErrors\(teacherAccessCode,classroomRecoveryCode,configForHash\.lockOnLeave/.test(assemble), 'E2: guarded test assembly fails closed through shared credential policy');
 
 // Secure output path.
-assert(/recoveryCodeHash:cfg\.recoveryCodeHash/.test(pkg) && /hasRecoveryUnlock:!!cfg\.hasRecoveryUnlock/.test(pkg), 'E2: secure public CFG carries only derived recovery material');
-assert(!/hesloHash|hasUnlock|unlock-password/.test(pkg), 'E2: secure package has no legacy unlock output field');
+assert(/unlockCodeHash:cfg\.unlockCodeHash/.test(pkg) && !/ucitelPinHash|recoveryCodeHash|identityCodeHashes/.test(pkg), 'E2: secure public CFG has only a procedural classroom unlock hash');
+assert(!/hesloHash|hasUnlock\b|unlock-password/.test(pkg), 'E2: secure package has no legacy unlock output field');
 assert(/async function recoveryCodeMatches\(secret\)/.test(secureRuntime) && /deriveSecretHash\('recovery-code',secret,CFG\.testId\)/.test(secureRuntime) && /tryUnlock\(\).*recoveryCodeMatches/s.test(secureRuntime), 'E2: secure runtime unlock uses recovery-code branch');
 assert(/async function teacherSecretMatches\(secret\)/.test(secureRuntime) && /deriveSecretHash\('teacher-pin',secret,CFG\.testId\)/.test(secureRuntime) && /teacherLogin\(\).*teacherSecretMatches/s.test(secureRuntime), 'E2: secure runtime teacher login remains teacher-pin only');
 assert(!/hesloHash|unlock-password/.test(secureRuntime), 'E2: secure runtime no longer accepts legacy unlock branch');
@@ -62,6 +62,7 @@ assert(scanner.includes('\\"recoveryCode\\"') && scanner.includes('CFG\\.recover
     trim:id => fields[id] || '',
     CEFR_LEVELS:['B2'],
     requireWebCrypto(){},
+    requiresTeacherAccessCode:st=>(st.resultMode||'instant')!=='secureOffline',
     getApiDiffGroups:()=>[],
     normalizeAllVariants:()=>({__default:[{title:'Synthetic',type:'multiple choice',points_total:1,points_each:1,items:[{question:'Q',options:['A','B'],correct:0}]}]}),
     getUiLang:()=> 'cs',
@@ -103,7 +104,7 @@ assert(scanner.includes('\\"recoveryCode\\"') && scanner.includes('CFG\\.recover
 
 // Secure public config serialization: only the two derived hashes may cross into student_test.html config.
 {
-  const context = {getSecureStudentLabels:()=>({}), getLabels:()=>({}), console};
+  const context = {getSecureStudentLabels:()=>({}), getLabels:()=>({}), isolatedSecureStudentLabels:x=>x, console};
   vm.runInNewContext(pkg + '\nthis.__securePublicCfg = securePublicCfg;', context);
   const rawTeacher = 'TEACH-RAW-SHOULD-NOT-LEAK';
   const rawRecovery = 'REC-RAW-SHOULD-NOT-LEAK';
@@ -117,7 +118,7 @@ assert(scanner.includes('\\"recoveryCode\\"') && scanner.includes('CFG\\.recover
   }, {publicJwk:{kty:'RSA'}});
   const serialized = JSON.stringify(publicCfg);
   assert(!serialized.includes(rawTeacher) && !serialized.includes(rawRecovery), 'E2: secure student public CFG drops raw Teacher/Admin and Recovery values');
-  assert(publicCfg.ucitelPinHash==='DERIVED-teacher-pin' && publicCfg.recoveryCodeHash==='DERIVED-recovery-code', 'E2: secure student public CFG retains only derived credential hashes');
+  assert(!('ucitelPinHash' in publicCfg) && !('recoveryCodeHash' in publicCfg), 'E2: secure student public CFG drops both legacy credential hashes');
 }
 
 // Cryptographic domain/test binding properties (independent reference implementation).

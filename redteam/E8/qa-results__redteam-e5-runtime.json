@@ -1,0 +1,26 @@
+{
+  "stage": "E5",
+  "version": "7.1.84",
+  "status": "PASS",
+  "checks": [
+    "away-during-lock",
+    "beforeunload-lock",
+    "locked-responses",
+    "clipboard-block",
+    "split-reload",
+    "unlock-race",
+    "lifecycle-lock",
+    "ipad-keyboard-model",
+    "submitted-responses",
+    "verifier-audit"
+  ],
+  "scope": "Actual generated HTML with native Node WebCrypto and simulated DOM/IndexedDB. Lifecycle, dimensions, clipboard and iPad inputs are controlled injections, not real device evidence.",
+  "runtime": "CLIENT-CONTROLLED",
+  "guarantees": "HARDENED / DETECTED / BEST-EFFORT",
+  "mobile": "ANALYZED / NOT TESTED",
+  "limits": [
+    "Native event proof is the separate Chromium gate",
+    "No prevention of client-owner edits, screenshots, overlays, other profiles or other devices",
+    "iPad keyboard exemption is a heuristic with a known visible-focus blind spot"
+  ]
+}

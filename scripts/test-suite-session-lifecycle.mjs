@@ -9,7 +9,7 @@ const shellSource=fs.readFileSync('src/shell.html','utf8');
 const accessSource=fs.readFileSync('src/js/16-access.js','utf8');
 const stateSource=fs.readFileSync('src/js/02-state-persistence.js','utf8');
 const assembleSource=fs.readFileSync('src/js/13g-assemble-test-html.js','utf8');
-const studentRuntimeSource=fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8');
+const studentRuntimeSource=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
 const verifierSource=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8')+'\n'+fs.readFileSync('src/js/13ea-secure-verifier-forms.js','utf8');
 const expectedHash='199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c';
 const actualHash=crypto.createHash('sha256').update(platformSource).digest('hex');
@@ -129,7 +129,7 @@ check(stateSource.includes('parseGoogleFormsPrefilledMetadataUrl')&&stateSource.
 check(assembleSource.includes('formsMetadata: configForHash.formsMetadata || null')&&assembleSource.includes('normalizeStoredGoogleFormsMetadata(formsMetaCandidate)'),'Secure test validates and seals Forms metadata mapping into generated config');
 check(fs.readFileSync('src/js/13c-secure-package.js','utf8').includes("formsMetadata:cfg.formsMetadata?{v:1,responderUrl:"),'Secure student public config carries only the validated Forms metadata mapping');
 check(studentRuntimeSource.includes('function formsOpenUrl()')&&studentRuntimeSource.includes("u.searchParams.set('entry.'+meta.entries[k]"),'Student runtime prefills per-test metadata without manual student entry');
-check(verifierSource.includes("String(payload.testId||'')!==String(CONFIG.testId)")&&verifierSource.includes("payload.manifestHash!==CONFIG.manifestHash")&&verifierSource.includes("payload.studentHtmlSha256!==CONFIG.studentHtmlSha256"),'Verifier filters imported submissions by cryptographically decrypted payload identity');
+check(verifierSource.includes("payload.testId===CONFIG.testId&&pack.testId===CONFIG.testId")&&verifierSource.includes("payload.manifestHash===CONFIG.manifestHash&&pack.manifestHash===CONFIG.manifestHash")&&verifierSource.includes("payload.studentHtmlSha256===CONFIG.studentHtmlSha256")&&verifierSource.indexOf('payload=await decryptPayload(pack)')<verifierSource.indexOf("verifiedTestId:payload.testId"),'Verifier filters imported submissions by cryptographically decrypted payload identity');
 check(verifierSource.includes('payloadHits*1000')&&verifierSource.includes("startsWith('SECURE-ANSWERS-V1')"),'Verifier locates payload column by content rather than fixed CSV position');
 
 // 9 Full-year Forms verifier contract

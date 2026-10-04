@@ -1,3 +1,37 @@
+// Start secret is generated uniformly: 10 independent base32 symbols = 50 bits.
+// AES-GCM authenticates the content and its test/manifest binding, not the client.
+function contentBytes(value,size){
+  if(typeof value!=='string'||!value||!/^[A-Za-z0-9_-]+$/.test(value))throw new Error('Invalid encrypted content');
+  const bytes=Uint8Array.from(atob(value.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+  if(size&&bytes.length!==size)throw new Error('Invalid encrypted content');
+  return bytes;
+}
+async function contentKey(code,salt){
+  const normalized=String(code||'').trim().toUpperCase().replace(/[\s-]/g,'');
+  if(!/^[A-Z2-7]{10}$/.test(normalized))throw new Error('Invalid start code');
+  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(normalized),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',salt,iterations:210000},key,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+function contentBinding(cfg){return new TextEncoder().encode('GIT-CONTENT-V1|'+cfg.testId+'|'+cfg.manifestHash);}
+async function decryptStudentContent(bundle,code,cfg){
+  if(!bundle||bundle.v!==1||bundle.alg!=='PBKDF2-SHA256+AES-256-GCM'||bundle.iterations!==210000||Object.keys(bundle).some(k=>!['v','alg','iterations','salt','iv','data'].includes(k)))throw new Error('Invalid encrypted content');
+  const salt=contentBytes(bundle.salt,16),iv=contentBytes(bundle.iv,12),data=contentBytes(bundle.data);
+  if(data.length<17)throw new Error('Invalid encrypted content');
+  const key=await contentKey(code,salt);
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:contentBinding(cfg),tagLength:128},key,data);
+  const variants=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(plain));
+  if(!variants||Array.isArray(variants)||typeof variants!=='object'||!Object.keys(variants).length||Object.values(variants).some(exs=>!Array.isArray(exs)))throw new Error('Invalid decrypted content');
+  return variants;
+}
+async function encryptStudentContent(variants,cfg){
+  requireWebCrypto('Šifrování zadání');
+  const code=Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'[b&31]).join('');
+  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await contentKey(code,salt);
+  const data=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:contentBinding(cfg),tagLength:128},key,new TextEncoder().encode(JSON.stringify(variants)));
+  return {code,bundle:{v:1,alg:'PBKDF2-SHA256+AES-256-GCM',iterations:210000,salt:b64UrlFromBuffer(salt),iv:b64UrlFromBuffer(iv),data:b64UrlFromBuffer(data)}};
+}
+
 // ─── Secure offline package (student without answer key + bulk teacher verifier) ──
 function stripItemForStudent(item, type) {
   const out = {};
@@ -106,11 +140,9 @@ function securePublicCfg(cfg, keyInfo) {
     cefr:cfg.cefr || '',
     cefrLevels:cfg.cefrLevels || [],
     cefrCombined:!!cfg.cefrCombined,
-    secureLabels:getSecureStudentLabels(cfg.uiLang),
+    secureLabels:isolatedSecureStudentLabels(getSecureStudentLabels(cfg.uiLang),cfg.uiLang),
     identityMode:cfg.identityMode||'name',
-    identityCodeScheme:cfg.identityCodeScheme||'sha256-v1',
-    identityCodeHashes:Array.isArray(cfg.identityCodeHashes)?cfg.identityCodeHashes.slice():[],
-    labels:cfg.labels || getLabels(cfg.uiLang),
+    labels:isolatedSecureStudentLabels(cfg.labels || getLabels(cfg.uiLang),cfg.uiLang),
     isCzech:!!cfg.isCzech,
     csScoringPolicy:cfg.csScoringPolicy||{},
     cas:cfg.cas,
@@ -126,13 +158,10 @@ function securePublicCfg(cfg, keyInfo) {
     fuzzyTolerance:cfg.fuzzyTolerance||'off',
     randomizace:cfg.randomizace,
     zolicek:cfg.zolicek,
-    ucitelJmeno:cfg.ucitelJmeno || '',
-    ucitelPinHash:cfg.ucitelPinHash || '',
-    recoveryCodeHash:cfg.recoveryCodeHash || '',
-    hasRecoveryUnlock:!!cfg.hasRecoveryUnlock,
-    diffRosterSalt:cfg.diffRosterSalt||'',
-    diffRosterScheme:cfg.diffRosterScheme||'sha256-v1',
-    diffGroups:(cfg.diffGroups||[]).map(g=>({key:g.key,name:g.name,studentHashes:Array.isArray(g.studentHashes)?g.studentHashes.slice():[],a11y:g.a11y||null})),
+    unlockCodeHash:cfg.unlockCodeHash||'',
+    hasUnlockCode:!!cfg.unlockCodeHash,
+    identityValidation:'teacher-verifier-only',
+    diffGroups:(cfg.diffGroups||[]).map(g=>({key:g.key,name:g.name,a11y:g.a11y||null})),
     publicKey:keyInfo.publicJwk
   };
 }
@@ -150,16 +179,25 @@ async function secureSchoolLogoDataUri(){
   }catch(_e){return '';}
 }
 async function assembleSecureOfflinePackage(st, cfg, variants) {
+  await ensureJavascriptParser();
   const keyInfo = await generateSecureKeyPair();
   const studentVariants = stripVariantsForStudent(variants);
-  const publicCfg = securePublicCfg(cfg, keyInfo);
-  const studentHtml = buildSecureStudentHtml(publicCfg, studentVariants);
+  const guarded=!!cfg.lockOnLeave||cfg.testMode==='prisny'||!!cfg.screenGuard;
+  const unlockCode=guarded?String(st.__outputFields&&st.__outputFields.recoveryCode||''):'';
+  if(guarded&&!unlockCode)throw new Error('Chybí odemykací kód třídy.');
+  const unlockCodeHash=unlockCode?await deriveSecretHash('classroom-unlock',unlockCode.trim().toUpperCase(),cfg.testId):'';
+  const publicCfg = securePublicCfg(Object.assign({},cfg,{unlockCodeHash}), keyInfo);
+  assertSecureStudentIsolation(publicCfg,studentVariants,'');
+  const content=await encryptStudentContent(studentVariants,publicCfg);
+  const studentHtml = buildSecureStudentHtml(publicCfg, content.bundle);
+  assertSecureStudentIsolation(publicCfg,studentVariants,studentHtml);
   const studentHtmlSha256 = await sha256HexText(studentHtml);
-  const teacherCfg = Object.assign({}, cfg, { privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256, schoolLogoDataUri:await secureSchoolLogoDataUri() });
+  const teacherCfg = Object.assign({}, cfg, { startCode:content.code, privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256, schoolLogoDataUri:await secureSchoolLogoDataUri() });
   const teacherHtml = buildSecureTeacherVerifierHtml(teacherCfg, variants);
   const teacherHtmlSha256 = await sha256HexText(teacherHtml);
   return {
     mode:'secureOffline',
+    startCode:content.code,
     studentHtml,
     teacherHtml,
     testId:cfg.testId,
@@ -176,4 +214,3 @@ async function assembleSecureOfflinePackage(st, cfg, variants) {
     teacherHtmlSha256
   };
 }
-

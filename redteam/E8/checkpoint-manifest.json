@@ -1,0 +1,597 @@
+{
+  "schema": "git-redteam-e8-local-checkpoint-v1",
+  "stage": "E8",
+  "version": "7.1.84",
+  "date": "2026-10-04",
+  "sourceBranch": "candidate",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "stageE8": "LOCAL HARNESS COMPLETE / PASS",
+  "baselineSourceZip": "GIT-redteam-E7-7.1.83.zip",
+  "baselineZipSha256": "86616433e73df28c462249140e16374ae57b22d2a72133ca7d6754c57eaa738d",
+  "originalE7Commit": "bc3edde8a2cbcef959a89976853f328e12cba044",
+  "localRestorationBaselineCommit": "d8ff2d71f8a14766378ea217962999d3805fd3ae",
+  "baselineAcceptedContradictions": 10,
+  "baselineRetentionFailures": 2,
+  "signedStateReconciliation": "Two valid MACs; only guard-only non-weakening transitions reconcile. Protected answer/identity/deadline/choice changes still fail closed.",
+  "directHarness": {
+    "caseCount": 108,
+    "rejections": 89,
+    "replaySequences": 6,
+    "controls": 13,
+    "negativeControls": 108
+  },
+  "retention": {
+    "stage": "E8",
+    "version": "7.1.84",
+    "status": "PASS",
+    "checks": [
+      {
+        "id": "long-history-reload-default",
+        "status": "PASS",
+        "negativeControl": "DETECTED_WEAKENED_BUILD"
+      },
+      {
+        "id": "long-history-integrity-default",
+        "status": "PASS",
+        "negativeControl": "DETECTED_WEAKENED_BUILD"
+      },
+      {
+        "id": "long-history-reload-joker",
+        "status": "PASS",
+        "negativeControl": "DETECTED_WEAKENED_BUILD"
+      },
+      {
+        "id": "long-history-integrity-joker",
+        "status": "PASS",
+        "negativeControl": "DETECTED_WEAKENED_BUILD"
+      },
+      {
+        "id": "signed-guard-only-divergence-preserves-lock-and-rejects-answer-replay",
+        "status": "PASS",
+        "negativeControl": "DETECTED_2_WEAKENED_BUILDS"
+      }
+    ],
+    "scope": "Actual generated student start, 180 runtime audit records, signed active-state persistence, same-profile reload, recovery unlock, encrypted submit and private scoring; controlled jsdom/IndexedDB, native Node crypto.",
+    "limits": [
+      "Only start/joker markers plus a bounded recent tail are retained; this is not a complete or authenticated audit trail",
+      "Physical mobile NOT TESTED; runtime CLIENT-CONTROLLED"
+    ]
+  },
+  "desktopBrowser": {
+    "stage": "E8",
+    "version": "7.1.84",
+    "status": "PASS",
+    "browser": "153.0.8010.0",
+    "syntheticOnly": true,
+    "rejectedForgeries": 13,
+    "negativeControls": 1,
+    "checks": [
+      "native-submit-file-csv-policy-private-score",
+      "empty-telemetry",
+      "missing-attempt-start",
+      "duplicated-attempt-start",
+      "attempt-start-wrong-time",
+      "attempt-start-wrong-id",
+      "split-small-exceeds-total",
+      "split-percent-disagrees",
+      "joker-disabled-in-private-config",
+      "joker-event-without-choice",
+      "end-before-start",
+      "foreign-manifest-inner",
+      "forms-wrong-account",
+      "ciphertext-gcm-tamper",
+      "file-csv-replay-excluded",
+      "real-csv-index-archive-downloads",
+      "consistent-public-key-forgery-client-score-rescored-review-only",
+      "native-weakened-build-accepts-missing-start-negative-control"
+    ],
+    "scope": "Desktop Chromium with unchanged generated CSP and native WebCrypto/IndexedDB; real student submit, actual CSV file input, policy UI and real downloads. Deliberately weakened verifier is an in-memory negative control.",
+    "limits": [
+      "Physical iOS/iPadOS/Android ANALYZED / NOT TESTED",
+      "Live Forms policy not inspected; owner attestation only",
+      "Consistent public-key forgery reaches private scoring but remains CLIENT-CONTROLLED / REVIEW_REQUIRED",
+      "No deployment or GitHub Actions run; NOT READY"
+    ]
+  },
+  "npmTest": "PASS / completed process 0 and matching raw log hash",
+  "localP5Equivalent": "PASS / completed process 0 and current reports",
+  "garp27Foundation": "FOUNDATION_PASS_LIVE_NOT_TESTED",
+  "garp27FoundationSummary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "garpSourceIdentity": {
+    "value": "3c02e27dbf9436e14b91670d718a9f534c9d5cb7",
+    "kind": "local-source-tree-sha1-surrogate"
+  },
+  "githubActionsExecuted": false,
+  "exactLockfileCiExecuted": false,
+  "physicalDevicesTested": false,
+  "physicalMobileStage": "ANALYZED / NOT TESTED",
+  "physicalMobileCasePairsNotRun": 146,
+  "liveFormsInspected": false,
+  "nativeHighVolumeReload": {
+    "stage": "E8",
+    "version": "7.1.84",
+    "status": "HARDENED / BROADER RELIABILITY NOT CERTIFIED",
+    "scope": "Additional desktop Chromium 180-record reload experiment, separate from the stable forged-payload/CSV gate",
+    "observed": "One reload preserved attempt ID/time/deadline/lock but lost attempt-start marker; the repeat passed. Another earlier trial reached the hidden unlock field but its driver timed out before normal five-tap reveal.",
+    "hypothesis": "Interrupted native unload writes can select the persistence-integrity path; that path also used a last-119 slice and discarded origin markers. This cause is not proved for the recorded native failure.",
+    "remediation": "Origin markers survive the integrity path. Two valid signed copies with a guard-only, non-weakening revision difference reconcile to the newer conservative state; identity/answers/deadline/joker differences or lock weakening still fail closed. Both MACs must validate. Controlled tests and the native E5 reload regression verify this; five post-fix native high-volume observations retained origin/deadline without integrity locks.",
+    "category": [
+      "BEST-EFFORT",
+      "HARDENED"
+    ],
+    "readiness": "NOT READY – BLOCKING ISSUE",
+    "followup": "E9 must broaden native reload/pending-write repeatability coverage; five favorable observations do not prove all browser/lifecycle cases.",
+    "evidence": [
+      "native-high-volume-reload-failure.log",
+      "native-high-volume-reload-retry-pass.log"
+    ],
+    "followupObservations": {
+      "runs": 5,
+      "originAndDeadlineRetained": 5,
+      "ordinaryReloadWithoutIntegrityLock": 4,
+      "integrityLockAfterOrdinaryReload": 1,
+      "source": "qa-results__redteam-e8-native-retention-probe.json",
+      "interpretation": "Origin retention is hardened; one native ordinary reload still blocked. Root cause and repeatability remain open."
+    },
+    "reproduction": "CHROMIUM_PATH=/path/to/chromium node scripts/probe-redteam-native-retention-e8.mjs",
+    "postSignedReconciliationObservations": {
+      "runs": 5,
+      "originAndDeadlineRetained": 5,
+      "integrityLocks": 0,
+      "source": "qa-results__redteam-e8-native-retention-probe.json",
+      "certification": false
+    }
+  },
+  "release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.84",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-04T05:05:24.793Z",
+    "distBytes": 2569610,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1647234,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1597751,
+    "entryCriticalBytes": 1769570,
+    "largestInlineScriptBytes": 155551,
+    "precacheBytes": 2193009,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1597751,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "entryCriticalBudget": {
+    "limit": 1770000,
+    "changed": false
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "axeIncomplete": [],
+  "sanitizedCurrentReports": [
+    {
+      "source": "qa-results/redteam-e1-isolation.json",
+      "file": "qa-results__redteam-e1-isolation.json",
+      "sha256": "67e757a379e4e802368c28dd6b94d50edfa7d1db20791ae1e1abc7f075638feb",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e1-browser.json",
+      "file": "qa-results__redteam-e1-browser.json",
+      "sha256": "95a28e63ee237ac69cce6e7a5f0c6c96f8c67b26b5b660fff383cf94cc1c4def",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e2-trust.json",
+      "file": "qa-results__redteam-e2-trust.json",
+      "sha256": "0fb43c53440871b3f340bc296357870316507d9296b659502f7e0663ffd2c66f",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e2-browser.json",
+      "file": "qa-results__redteam-e2-browser.json",
+      "sha256": "03542242c03601aa863631e7ba9b20283cdb25e14a355330be5b11318c24b69e",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e3-verifier.json",
+      "file": "qa-results__redteam-e3-verifier.json",
+      "sha256": "81c90dc24026df5198a620ed99cdde9919857c8645ee0837bedbd9b2ac09e5a7",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e3-browser.json",
+      "file": "qa-results__redteam-e3-browser.json",
+      "sha256": "7a91da86c97de3d80fcd63adff0119e55ccb63b9af29c57a91abf02217906b04",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e4-faults.json",
+      "file": "qa-results__redteam-e4-faults.json",
+      "sha256": "9cbf2628dce958d98f0828206d54c92c00bd776aecef3cb86dba77afbedaa1b6",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e4-browser.json",
+      "file": "qa-results__redteam-e4-browser.json",
+      "sha256": "c6641edd0a0f9b2ffe4d997cc02f644bdc8cfe1950cab6a635506c2fde736c3f",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e5-runtime.json",
+      "file": "qa-results__redteam-e5-runtime.json",
+      "sha256": "9c79e4ebbc9ff1403b1ceffa5cf227deaa4f983b87673d9d6b575be59ed6431f",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e5-browser.json",
+      "file": "qa-results__redteam-e5-browser.json",
+      "sha256": "24a04d6bd39e2cd232019798347d2540334b76491db2add3a21f7db8800b62f9",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e6-publication.json",
+      "file": "qa-results__redteam-e6-publication.json",
+      "sha256": "2ee3fda933c79fc62a87e515950d77609ecbc82f840fd97c4bf42afc959e5b62",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e7-mobile-protocol.json",
+      "file": "qa-results__redteam-e7-mobile-protocol.json",
+      "sha256": "94e7b2580cb8829b7259214abb6144c7641cab792b370a5c222ee763c31b1c80",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e7-recorder.json",
+      "file": "qa-results__redteam-e7-recorder.json",
+      "sha256": "a507de7d6eeeebf0f11bb764b1686c4cf58d3ab269e1e7ffff33b4142369ced6",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e8-forgery.json",
+      "file": "qa-results__redteam-e8-forgery.json",
+      "sha256": "85ffe03a7ae6aacb229b013fdfa588e086b2338b1fd960622766dcf326dba013",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e8-retention.json",
+      "file": "qa-results__redteam-e8-retention.json",
+      "sha256": "a2f25ec43084ab49a2ab68b26d6c96878e14b78b97ac44ba69dfb74b9eaa7d2b",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e8-browser.json",
+      "file": "qa-results__redteam-e8-browser.json",
+      "sha256": "ae42bdea7a3e86746c783ab901cd056b06b01d596d783f247a75ca35a0515e56",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/redteam-e8-native-retention-probe.json",
+      "file": "qa-results__redteam-e8-native-retention-probe.json",
+      "sha256": "a3f06303a400e1abf47450f1fd9be0bd91d8632c99280e8fe273231b603303a9",
+      "status": "OBSERVATION ONLY / NOT CERTIFIED"
+    },
+    {
+      "source": "qa-results/security-behavior-r3.json",
+      "file": "qa-results__security-behavior-r3.json",
+      "sha256": "fb301f04be687c35dd6e47829af87ee4df0be8e50f5fcb58d83e83738cb0d5fe",
+      "status": "See individual checks"
+    },
+    {
+      "source": "qa-results/adversarial-harness-r5.json",
+      "file": "qa-results__adversarial-harness-r5.json",
+      "sha256": "18ad2a21b47d8b88092968cb780ef495e335869807f2ad9541aec0b46d7d447b",
+      "status": "See individual checks"
+    },
+    {
+      "source": "qa-results/d7-regressions.json",
+      "file": "qa-results__d7-regressions.json",
+      "sha256": "c575ca39c03608784fbb9ac8f4281d01ebeba071b90be84d2388298ca55f71fa",
+      "status": "passed"
+    },
+    {
+      "source": "qa-results/d8-final-audit.json",
+      "file": "qa-results__d8-final-audit.json",
+      "sha256": "b837c3bc9439f496172cc51ce6b9d6c12e3959d991daedcda4202fd42a77d081",
+      "status": "PASS"
+    },
+    {
+      "source": "qa-results/stage3-pdf-runtime/summary.json",
+      "file": "qa-results__stage3-pdf-runtime__summary.json",
+      "sha256": "a3d845a9c35fe1cb2a00aad8e6845b1c7798b2886ce8e4934230903e2ed17418",
+      "status": "passed"
+    },
+    {
+      "source": "qa-results/stage3-pdf-quality/summary.json",
+      "file": "qa-results__stage3-pdf-quality__summary.json",
+      "sha256": "2891b17aecd368f5ca39bcc0681755bb61cf580b167b7b899c910a6b7df7f2e9",
+      "status": "passed"
+    },
+    {
+      "source": "qa-results/verifier-ui-runtime/summary.json",
+      "file": "qa-results__verifier-ui-runtime__summary.json",
+      "sha256": "c0a19b260c330edd99a5129ab459e5861abe7be27f1bbaae6ebed2b7fd0bef4c",
+      "status": "passed"
+    },
+    {
+      "source": "dist/qa-p3-browser-report.json",
+      "file": "dist__qa-p3-browser-report.json",
+      "sha256": "5b13edb35bb02a3ce5403db04b9e771aa00124526494bfb45298b4f9b4e88f04",
+      "status": "passed"
+    },
+    {
+      "source": "dist/qa-p5-runtime-report.json",
+      "file": "dist__qa-p5-runtime-report.json",
+      "sha256": "29f22c3c16ae2aff511fbbc7020646d016f116d775c2f5a67da23c3e1de8f850",
+      "status": "passed"
+    },
+    {
+      "source": "dist/qa-p5-xss-sinks-report.json",
+      "file": "dist__qa-p5-xss-sinks-report.json",
+      "sha256": "d23c4fb1215e73ae12225f1678538be291b8d5b0e2bca6dc062fbf9b59d0ea8b",
+      "status": "passed"
+    },
+    {
+      "source": "dist/qa-p5-axe-runtime-report.json",
+      "file": "dist__qa-p5-axe-runtime-report.json",
+      "sha256": "b68efe25e4f8f74f3773bb15030e8739a5298568971fab3fffda5468d550c2f7",
+      "status": "passed"
+    },
+    {
+      "source": "dist/qa-p5-release-report.json",
+      "file": "dist__qa-p5-release-report.json",
+      "sha256": "ea83c404cefb803756cea59a9225f73cf6e51f408335be93807a4656672490b3",
+      "status": "passed"
+    },
+    {
+      "source": "dist/qa-p5-acceptance-report.json",
+      "file": "dist__qa-p5-acceptance-report.json",
+      "sha256": "c1fcd2116c72d16943e6f5e68838b7dfd126a06d8798da2a4668e09360a21fb7",
+      "status": "passed"
+    },
+    {
+      "source": "dist/quality-report.json",
+      "file": "dist__quality-report.json",
+      "sha256": "616bde60d50c7bb44df4cf85daddb16c20a61987f0b22e0196c07df3eb0e4a7e",
+      "status": "See report"
+    }
+  ],
+  "sourceRuntimeChanges": [
+    "src/js/13e-secure-student-runtime.js",
+    "src/js/13ed-secure-verifier-validation.js"
+  ],
+  "operationalE6": "Historical records only: public cleanup and artifact deletion; raw/cache purge and private rotation still unconfirmed; not freshly rechecked in E8",
+  "limits": [
+    "Consistent public-key forgery and copied hashes remain CLIENT-CONTROLLED / REVIEW_REQUIRED",
+    "F7 start encryption pending",
+    "Private replay is same-profile best effort; full wipe/new profile SERVER REQUIRED",
+    "Physical E7 untested; E9/E10 pending",
+    "Second device: MIMO TECHNICKÝ DOSAH – POUZE DOZOR",
+    "No push, merge, Support message or deployment"
+  ],
+  "evidenceFiles": [
+    {
+      "file": "E8-CASE-MATRIX.txt",
+      "sha256": "2f3023404d90ab6fefc0091ff137bfcdf474236ddc5332d0d86b65b8ef0da134"
+    },
+    {
+      "file": "E8-FINDINGS.txt",
+      "sha256": "19839e05ab2d7f2592b9be0404634133c069813daafd485fbfcc27713e8f4bc6"
+    },
+    {
+      "file": "baseline-7.1.83-forgery-probe.json",
+      "sha256": "50156ecd207ce97b3ed2b7b24abbfbe7378bd5a68587b728b230a63311f0bbff"
+    },
+    {
+      "file": "baseline-7.1.83-retention-probe.json",
+      "sha256": "8c1e6b42d8ea63d25ff9c647bbe6cd28fd62118f93cc1a90f960e92178841d7f"
+    },
+    {
+      "file": "dist__qa-p3-browser-report.json",
+      "sha256": "5b13edb35bb02a3ce5403db04b9e771aa00124526494bfb45298b4f9b4e88f04"
+    },
+    {
+      "file": "dist__qa-p5-acceptance-report.json",
+      "sha256": "c1fcd2116c72d16943e6f5e68838b7dfd126a06d8798da2a4668e09360a21fb7"
+    },
+    {
+      "file": "dist__qa-p5-axe-runtime-report.json",
+      "sha256": "b68efe25e4f8f74f3773bb15030e8739a5298568971fab3fffda5468d550c2f7"
+    },
+    {
+      "file": "dist__qa-p5-release-report.json",
+      "sha256": "ea83c404cefb803756cea59a9225f73cf6e51f408335be93807a4656672490b3"
+    },
+    {
+      "file": "dist__qa-p5-runtime-report.json",
+      "sha256": "29f22c3c16ae2aff511fbbc7020646d016f116d775c2f5a67da23c3e1de8f850"
+    },
+    {
+      "file": "dist__qa-p5-xss-sinks-report.json",
+      "sha256": "d23c4fb1215e73ae12225f1678538be291b8d5b0e2bca6dc062fbf9b59d0ea8b"
+    },
+    {
+      "file": "dist__quality-report.json",
+      "sha256": "616bde60d50c7bb44df4cf85daddb16c20a61987f0b22e0196c07df3eb0e4a7e"
+    },
+    {
+      "file": "e8-foundation-final-completion.json",
+      "sha256": "9b615eea7a9afbec19235d51caab77136e747ac5094fa9eb101d474fb90640bb"
+    },
+    {
+      "file": "e8-foundation-final.log",
+      "sha256": "d50eeba3c4af8a77966ac6acd3fec3efabcc0e28236694b7d602df9152deea29"
+    },
+    {
+      "file": "e8-npm-test-final-completion.json",
+      "sha256": "d9d09b3dbce383bc68231c059c53c3a5d533bed9f57f1bf436f38ac4bdccd954"
+    },
+    {
+      "file": "e8-npm-test-final.log",
+      "sha256": "45c12043b990db3058c0e5702be3d77100fe6e802e76399fbdaed3527ab95042"
+    },
+    {
+      "file": "e8-p5-final-completion.json",
+      "sha256": "dbc67e468d7a344ad1db7daba6ec2c63075a81e032a96a02ee5e354e697fa969"
+    },
+    {
+      "file": "e8-p5-final.log",
+      "sha256": "cfe3862741b30ed7c36846803daeb667fb8302c5590c3c6b73a61719993e4823"
+    },
+    {
+      "file": "garp27-foundation-summary.json",
+      "sha256": "bb96c1b07ecd75eaedbb7a4d11884b486598ee1d0e53918cc4a4136d8517f2fe"
+    },
+    {
+      "file": "native-high-volume-reload-failure.log",
+      "sha256": "a56c011d2ba98ac2d7d5595ad4ab079bc64b818edcc772738a94c26883c703f8"
+    },
+    {
+      "file": "native-high-volume-reload-probe.json",
+      "sha256": "2ee8bff39cbb2490c259b49526c242b4e7046b62099cc55edc50bd7a8c1e5046"
+    },
+    {
+      "file": "native-high-volume-reload-retry-pass.log",
+      "sha256": "d8efacbd19c07852269b5b66fc4e0a8323218d4c257057ea7729d08cdbeb4e21"
+    },
+    {
+      "file": "native-retention-before-signed-reconciliation.log",
+      "sha256": "7e0a077fa6d72ce13cd447200db82dff33bc937dcebaff9bc75013f95d1fac42"
+    },
+    {
+      "file": "qa-results__adversarial-harness-r5.json",
+      "sha256": "18ad2a21b47d8b88092968cb780ef495e335869807f2ad9541aec0b46d7d447b"
+    },
+    {
+      "file": "qa-results__d7-regressions.json",
+      "sha256": "c575ca39c03608784fbb9ac8f4281d01ebeba071b90be84d2388298ca55f71fa"
+    },
+    {
+      "file": "qa-results__d8-final-audit.json",
+      "sha256": "b837c3bc9439f496172cc51ce6b9d6c12e3959d991daedcda4202fd42a77d081"
+    },
+    {
+      "file": "qa-results__redteam-e1-browser.json",
+      "sha256": "95a28e63ee237ac69cce6e7a5f0c6c96f8c67b26b5b660fff383cf94cc1c4def"
+    },
+    {
+      "file": "qa-results__redteam-e1-isolation.json",
+      "sha256": "67e757a379e4e802368c28dd6b94d50edfa7d1db20791ae1e1abc7f075638feb"
+    },
+    {
+      "file": "qa-results__redteam-e2-browser.json",
+      "sha256": "03542242c03601aa863631e7ba9b20283cdb25e14a355330be5b11318c24b69e"
+    },
+    {
+      "file": "qa-results__redteam-e2-trust.json",
+      "sha256": "0fb43c53440871b3f340bc296357870316507d9296b659502f7e0663ffd2c66f"
+    },
+    {
+      "file": "qa-results__redteam-e3-browser.json",
+      "sha256": "7a91da86c97de3d80fcd63adff0119e55ccb63b9af29c57a91abf02217906b04"
+    },
+    {
+      "file": "qa-results__redteam-e3-verifier.json",
+      "sha256": "81c90dc24026df5198a620ed99cdde9919857c8645ee0837bedbd9b2ac09e5a7"
+    },
+    {
+      "file": "qa-results__redteam-e4-browser.json",
+      "sha256": "c6641edd0a0f9b2ffe4d997cc02f644bdc8cfe1950cab6a635506c2fde736c3f"
+    },
+    {
+      "file": "qa-results__redteam-e4-faults.json",
+      "sha256": "9cbf2628dce958d98f0828206d54c92c00bd776aecef3cb86dba77afbedaa1b6"
+    },
+    {
+      "file": "qa-results__redteam-e5-browser.json",
+      "sha256": "24a04d6bd39e2cd232019798347d2540334b76491db2add3a21f7db8800b62f9"
+    },
+    {
+      "file": "qa-results__redteam-e5-runtime.json",
+      "sha256": "9c79e4ebbc9ff1403b1ceffa5cf227deaa4f983b87673d9d6b575be59ed6431f"
+    },
+    {
+      "file": "qa-results__redteam-e6-publication.json",
+      "sha256": "2ee3fda933c79fc62a87e515950d77609ecbc82f840fd97c4bf42afc959e5b62"
+    },
+    {
+      "file": "qa-results__redteam-e7-mobile-protocol.json",
+      "sha256": "94e7b2580cb8829b7259214abb6144c7641cab792b370a5c222ee763c31b1c80"
+    },
+    {
+      "file": "qa-results__redteam-e7-recorder.json",
+      "sha256": "a507de7d6eeeebf0f11bb764b1686c4cf58d3ab269e1e7ffff33b4142369ced6"
+    },
+    {
+      "file": "qa-results__redteam-e8-browser.json",
+      "sha256": "ae42bdea7a3e86746c783ab901cd056b06b01d596d783f247a75ca35a0515e56"
+    },
+    {
+      "file": "qa-results__redteam-e8-forgery.json",
+      "sha256": "85ffe03a7ae6aacb229b013fdfa588e086b2338b1fd960622766dcf326dba013"
+    },
+    {
+      "file": "qa-results__redteam-e8-native-retention-probe.json",
+      "sha256": "a3f06303a400e1abf47450f1fd9be0bd91d8632c99280e8fe273231b603303a9"
+    },
+    {
+      "file": "qa-results__redteam-e8-retention.json",
+      "sha256": "a2f25ec43084ab49a2ab68b26d6c96878e14b78b97ac44ba69dfb74b9eaa7d2b"
+    },
+    {
+      "file": "qa-results__security-behavior-r3.json",
+      "sha256": "fb301f04be687c35dd6e47829af87ee4df0be8e50f5fcb58d83e83738cb0d5fe"
+    },
+    {
+      "file": "qa-results__stage3-pdf-quality__summary.json",
+      "sha256": "2891b17aecd368f5ca39bcc0681755bb61cf580b167b7b899c910a6b7df7f2e9"
+    },
+    {
+      "file": "qa-results__stage3-pdf-runtime__summary.json",
+      "sha256": "a3d845a9c35fe1cb2a00aad8e6845b1c7798b2886ce8e4934230903e2ed17418"
+    },
+    {
+      "file": "qa-results__verifier-ui-runtime__summary.json",
+      "sha256": "c0a19b260c330edd99a5129ab459e5861abe7be27f1bbaae6ebed2b7fd0bef4c"
+    }
+  ]
+}

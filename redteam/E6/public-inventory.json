@@ -1,0 +1,45 @@
+{
+  "schema": "git-redteam-e6-public-inventory-v1",
+  "repository": "Daniel22-dev/interaktivni-testy",
+  "private": false,
+  "defaultBranch": "main",
+  "pushedAt": "2026-10-02T05:56:55Z",
+  "hasPages": true,
+  "forksCount": 0,
+  "refs": {
+    "refs/heads/main": "2af3fade24465511503dc9f215f7d91ab4a066b1"
+  },
+  "restCommitCount": 12,
+  "localReachableCommitCount": 12,
+  "pullRequestCount": 0,
+  "releaseCount": 0,
+  "workflowRunsTotal": 11,
+  "workflowRunsReturned": 11,
+  "latestPagesRun": {
+    "id": 36971231983,
+    "name": "pages build and deployment",
+    "head_sha": "2af3fade24465511503dc9f215f7d91ab4a066b1",
+    "conclusion": "success",
+    "updated_at": "2026-10-02T05:57:40Z"
+  },
+  "actionsArtifactCount": 0,
+  "actionsArtifactsReturned": 0,
+  "startedAt": "2026-10-03T18:25:20.319352+00:00",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "secretValuesOmitted": true,
+  "finishedAt": "2026-10-03T18:26:20.005197+00:00",
+  "refsStableAcrossAudit": true,
+  "currentHtmlFiles": 9,
+  "liveTeacherHashFiles": 7,
+  "liveStudentHashFiles": 4,
+  "headMatchesCount": 9,
+  "allLiveFilesFetched": true,
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "limitations": [
+    "No deletion/unadvertised refs, orphan objects, caches or historical detached artifacts are certified absent.",
+    "Zero listed forks/artifacts is current repository metadata, not proof against external copies.",
+    "A static format rejection of unrelated legacy educational HTML is not by itself a confirmed credential leak.",
+    "Questions remain plaintext until F7. No public repository write, secret rotation or history purge was performed."
+  ]
+}

@@ -119,7 +119,7 @@ function settingsDrift(){
 function renderSettingsDrift(){
   const el=$('settingsDriftBanner');if(!el)return;const d=settingsDrift();
   if(!d){el.classList.add('hidden');el.textContent='';return;}
-  const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno')):[];
+  const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno'),requiresTeacherAccessCode()):[];
   el.classList.remove('hidden');
   if(!d.content&&credentialErrors.length){
     el.textContent='';
@@ -134,7 +134,7 @@ function renderSettingsDrift(){
 }
 async function applySettingsWithoutAi(){
   const d=settingsDrift();if(!d||d.content||outputMutationBusy)return;
-  const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno')):[];
+  const credentialErrors=(typeof credentialPolicyErrors==='function')?credentialPolicyErrors(trim('ucitelPin'),trim('recoveryCode'),typeof requiresRecoveryCode==='function'?requiresRecoveryCode():(state.testMode==='prisny'||!!state.screenGuard),trim('ucitelJmeno'),requiresTeacherAccessCode()):[];
   if(credentialErrors.length){const g=$('genError');if(g){g.classList.remove('hidden');setErrorTextWithHttpHelp(g,'Nastavení se nepodařilo použít: '+credentialErrors.join(' '));}renderSettingsDrift();return;}
   const st=JSON.parse(JSON.stringify(state)),plan=generationPlan(st),v=lastGenData.group_variants?Object.values(lastGenData.group_variants)[0]:lastGenData,exs=(Array.isArray(v)?v:v.exercises)||[];
   st.exerciseDetail=true;st.pocet=plan.config.length;st.exerciseConfig=plan.config.map((c,i)=>Object.assign({},c,{pocetOtazek:exs[i]&&exs[i].items?exs[i].items.length:c.pocetOtazek}));

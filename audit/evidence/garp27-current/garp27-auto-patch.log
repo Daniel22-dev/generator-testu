@@ -1,0 +1,67 @@
+$ npm run qa:garp27:auto-patch
+EXIT=0
+
+STDOUT
+
+> generator-testu@7.1.87 qa:garp27:auto-patch
+> node scripts/garp27/auto-patch-contract.mjs
+
+{
+  "classification": "GARP27_AUTO_PATCH_CONTRACT",
+  "status": "PASS",
+  "liveAutoPatchClaim": false,
+  "note": "Synthetic GARP admission/state-machine checks plus static verification of the existing verified-release dispatch workflow. Live dispatch behavior remains separately evidenced by deployment.",
+  "results": [
+    {
+      "id": "prepared-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "validated-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "committed-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "transition-prepared-validated",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "transition-validated-committed",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "negative-empty-gates",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true
+    },
+    {
+      "id": "actual-release-identity-verified",
+      "pass": true
+    },
+    {
+      "id": "actual-studio-dispatch-bounded",
+      "pass": true
+    },
+    {
+      "id": "actual-dispatch-after-live-check",
+      "pass": true
+    }
+  ]
+}
+
+STDERR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

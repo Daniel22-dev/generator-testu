@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "probes": [
+    {
+      "probe": "e2-browser-diagnostic-1.log",
+      "gateStatus": "PASS",
+      "port": 9807,
+      "normalShutdownExit": 143,
+      "devToolsAnnounced": true
+    },
+    {
+      "probe": "e2-browser-diagnostic-2.log",
+      "gateStatus": "PASS",
+      "port": 9878,
+      "normalShutdownExit": 143,
+      "devToolsAnnounced": true
+    },
+    {
+      "probe": "e2-browser-diagnostic-3.log",
+      "gateStatus": "PASS",
+      "port": 9952,
+      "normalShutdownExit": 143,
+      "devToolsAnnounced": true
+    },
+    {
+      "probe": "e2-browser-diagnostic-4.log",
+      "gateStatus": "PASS",
+      "port": 10023,
+      "normalShutdownExit": 143,
+      "devToolsAnnounced": true
+    },
+    {
+      "probe": "e2-browser-diagnostic-5.log",
+      "gateStatus": "PASS",
+      "port": 10097,
+      "normalShutdownExit": 143,
+      "devToolsAnnounced": true
+    },
+    {
+      "probe": "e2-browser-diagnostic-6.log",
+      "gateStatus": "PASS",
+      "port": 10167,
+      "normalShutdownExit": 143,
+      "devToolsAnnounced": true
+    }
+  ],
+  "originalTimeoutCause": "Not established: original launcher discarded stderr. PID-derived port/profile fragility replaced; complete final P5 passed."
+}

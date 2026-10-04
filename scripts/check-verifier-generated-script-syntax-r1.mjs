@@ -7,6 +7,10 @@ const dependencyFiles = [
   'src/js/13b-secure-shared-scoring.js',
   'src/js/13ea-secure-verifier-forms.js',
   'src/js/13eb-secure-teacher-verifier-v2-ui.js',
+  'src/js/13ec-secure-verifier-trust.js',
+  'src/js/13ed-secure-verifier-validation.js',
+  'src/js/13ee-secure-verifier-anchors.js',
+  'src/js/13ef-secure-verifier-replay.js',
   'src/js/13fa-secure-teacher-verifier-pdf.js',
 ];
 const context = vm.createContext({

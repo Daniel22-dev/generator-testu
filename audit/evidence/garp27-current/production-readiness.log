@@ -1,0 +1,53 @@
+$ npm run check:production
+EXIT=0
+
+STDOUT
+
+> generator-testu@7.1.87 check:production
+> node scripts/check-production-readiness.mjs && npm run check:verifier-v2
+
+✅  Produkcni invariants jsou splneny.
+
+> generator-testu@7.1.87 check:verifier-v2
+> node scripts/check-teacher-verifier-v2.mjs
+
+✅  Teacher Verifier 2.0 shell exists.
+✅  Navigation contains all seven Stage B panels in canonical order.
+✅  Generated navigation binds panel id and aria-controls.
+✅  Generated panels expose aria-hidden state.
+✅  Panel switching marks the active navigation item.
+✅  Panel switching exposes hidden/visible regions to accessibility APIs.
+✅  Keyboard navigation is present.
+✅  Theme toggle persists preference.
+✅  Default verifier theme defines a real dark palette.
+✅  Light verifier theme defines an explicit light palette.
+✅  Theme tokens cover cards, form controls and modal surfaces.
+✅  Fullscreen toggle uses explicit request/exit capability resolution.
+✅  Fullscreen state follows browser fullscreenchange events.
+✅  Fullscreen button exposes active state and changing label.
+✅  Unsupported fullscreen produces explicit user feedback.
+✅  Fullscreen failure produces actionable fallback feedback.
+✅  Results health summary exposes unresolved attempts.
+✅  Security signal filter is present.
+✅  Google Forms metadata mismatch is promoted into the Security signal model.
+✅  Low-level identity/build/integrity metadata live in the Technical panel.
+✅  Navigation exposes icon + label hierarchy.
+✅  Teacher-only archive route is clearly labeled.
+✅  Student-facing feedback route is separated from teacher archive.
+✅  Security signals retain non-accusatory interpretation.
+✅  RSA-OAEP/AES-GCM verifier decryption remains present.
+✅  SECURE-ANSWERS-V1 parser remains present.
+✅  Effective results exclude duplicates/hard replay conflicts and preserve legacy attempt decisions.
+✅  Results CSV remains blocked on unresolved attempt conflicts.
+✅  Results status is sourced from the unified Security signal model.
+✅  Item analysis remains available and uses effective results.
+✅  Distribution analytics use effective results.
+✅  Item analytics use effective results.
+✅  Security filtering is display-only over existing signals.
+✅  Stage B did not introduce a parallel scoring/decryption authority.
+✅  V2 UI module contains presentation/orchestration only.
+Teacher Verifier 2.0 contract PASS.
+
+STDERR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-const secure=fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8');
+const secure=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
 const instant=fs.readFileSync('src/js/14b-instant-test-runtime.js','utf8');
-const verifier=fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8');
+const verifier=(fs.readFileSync('src/js/13f-secure-teacher-verifier.js','utf8')+'\n'+fs.readFileSync('src/js/13ef-secure-verifier-replay.js','utf8'));
+const trust=fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8');
 const v2=fs.readFileSync('src/js/13eb-secure-teacher-verifier-v2-ui.js','utf8');
 let failed=0;const need=(src,re,msg)=>{if(re.test(src))console.log('PASS '+msg);else{failed++;console.error('FAIL '+msg);}};
 need(secure,/loadActiveAttemptSeal\(\)[\s\S]*activeAttempt/, 'secure runtime has persistent active-attempt seal');
@@ -18,7 +19,8 @@ need(instant,/confirmJokerStartInstant\(\)[\s\S]*jokerConfirmBody/, 'instant run
 need(verifier,/function resolvedResults\([\s\S]*function effectiveResults\(\)\{return resolvedResults\(\)\.filter\(r=>!r\.jokerUsed\);\}/, 'Verifier separates reviewable results from classification results');
 need(verifier,/function renderSecuritySignals\([\s\S]*const ok=resolvedResults\(\)/, 'security review still includes joker attempts');
 need(verifier,/classification_status[\s\S]*joker_used[\s\S]*joker_selected_at/, 'results CSV carries explicit joker and classification metadata');
-need(verifier,/JOKER_EXCLUDED[\s\S]*COUNTED/, 'CSV marks joker rows as excluded from classification');
+need(trust,/JOKER_EXCLUDED[\s\S]*REVIEW_REQUIRED/, 'CSV marks joker as excluded and other grades as requiring trust review');
+need(verifier,/classificationStatus\(r\)/, 'CSV derives classification state in the private verifier');
 need(verifier,/ŽOLÍK — MIMO KLASIFIKACI/, 'Verifier visibly labels joker as outside classification');
 need(verifier,/const mins=durationMinutes\(r\);const planned=Number\(CONFIG\.cas\)\|\|0;if\(mins!=null\)\{/, 'short-time signal is evaluated for joker attempts too');
 need(v2,/žolík mimo klasifikaci/, 'Verifier dashboard reports joker exclusion explicitly');

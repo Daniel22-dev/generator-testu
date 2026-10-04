@@ -1,0 +1,432 @@
+================================================================
+MASTER PROMPT v2 — GIT: PŘÍPRAVA NA ŽIVÝ STUDENTSKÝ RED-TEAM
+================================================================
+Určeno modelu ASTRA (ChatGPT). Po tomto promptu nahraji aktuální
+ZIP zdrojového kódu GIT (Generátor interaktivních testů).
+
+Tento prompt je nadřazený jakémukoli dřívějšímu znění. Rozhodnutí
+v oddílu 0 jsou závazná. Nerozhoduj je znovu, nezpochybňuj je jako
+"nedoporučené", nevypínej je. Tvůj úkol není minimalizovat funkce,
+ale zpevnit aplikaci v mezích těchto rozhodnutí a pravdivě popsat,
+co ještě zpevnit nejde.
+
+
+================================================================
+0. ZÁVAZNÁ ROZHODNUTÍ PRO TENTO EXPERIMENT
+================================================================
+Tato rozhodnutí učinil vlastník aplikace. Ber je jako zadání, ne
+jako návrh k posouzení.
+
+ARCHITEKTURA A ROZSAH
+- Experiment běží serverless. Školní aplikační server je ODLOŽEN.
+  Serverové kotvy označuj DEFERRED – SERVER VERSION, ale nikdy je
+  nepoužívej jako důvod neudělat maximum, které jde udělat teď.
+- Student poběží z veřejného repozitáře Daniel22-dev/interaktivni-testy
+  přes GitHub Pages. GitHub Pages neumí nastavit HTTP hlavičky:
+  CSP tedy jen přes <meta>, bez frame-ancestors. Nepředpokládej
+  žádnou ochranu, která vyžaduje serverové hlavičky.
+- Teacher verifier, answer key, privátní dešifrovací klíč a roster
+  jsou výhradně na soukromém PC vlastníka mimo školu. Do žádného
+  repozitáře ani jeho historie nikdy nepatří. Ověření, že tam
+  opravdu nejsou (viz F5, F7, F8), je jeden z hlavních úkolů.
+
+PRŮBĚH
+- Dva běhy: úterý jedna třída, pátek jiná třída (dvě různé skupiny).
+  Doporučeno, ne závazně: nálezy z úterý zapracovat do tvrdšího
+  pátečního buildu (nové kódy, nový startovní klíč, jiná varianta).
+- Test publikuje vlastník přímo ve třídě pár minut před startem.
+  Okno pro útok před testem je proto krátké. Šifrování obsahu
+  (viz F7) přesto zůstává povinné jako obrana do hloubky.
+- Test trvá ~40 minut, úlohy jsou záměrně velmi obtížné.
+- Vlastník dozoruje po celou dobu osobně.
+
+ZAŘÍZENÍ A POVOLENÉ ÚTOKY
+- Druhé zařízení je ZAKÁZÁNO pravidly a hlídá ho dozor.
+  DŮLEŽITÉ: tento zákaz je procedurální, ne technický. Prohlížeč
+  druhé zařízení nevidí. V reportu to tak musí být napsané; netvrď,
+  že je to technicky ošetřeno.
+- Povolené (a očekávané) útoky na vlastním jednom zařízení:
+  opuštění stránky, libovolné prohlížeče včetně anonymního režimu,
+  nainstalované aplikace a systémoví AI asistenti (Gemini, Circle
+  to Search, Siri/Apple Intelligence, OCR+AI), screenshot workflow,
+  mazání localStorage/IndexedDB, úprava lokální kopie HTML, ruční
+  výroba payloadu.
+- Zakázané pravidly: druhé zařízení, společné řešení vedle sebe,
+  útoky mimo GIT, odeslání pod přihlášením spolužáka.
+
+IDENTITA A ODEVZDÁNÍ
+- Studenti jsou přihlášeni školním Google účtem. Google Forms na
+  konci vynutí přihlášení, sbírá ověřený školní e-mail a je omezený
+  na jednu odpověď. Forms je proto důvěryhodná kotva identity i času.
+- V nejpřísnějším režimu GIT student na konci nevidí žádné skóre,
+  známku ani zpětnou vazbu — pouze neprůhledný výsledkový kód, který
+  zkopíruje a vloží do Forms. Vlačník kód z Forms přenese do
+  verifieru.
+- Roster mapuje jednorázový kód na školní e-mail a je jen na PC
+  vlastníka. Verifier u každého payloadu porovná školní e-mail
+  z Forms s e-mailem, který rosteru přísluší ke kódu v payloadu.
+
+ZÁMEK OBRAZOVKY
+- Při zamknutí dostane student kód, který test znovu otevře. Tento
+  odemykací kód je JEDEN na test a třídu (ne per-student).
+- Odemykací kód je procedurální brzda, ne bezpečnostní hranice. Kdo
+  upraví runtime, odemkne si test bez jakéhokoli kódu. Jeho hash
+  sice bude ve studentském HTML a půjde offline prolomit (F1), ale
+  při modelu plného dozoru na tom nezáleží. V reportu to popiš takto,
+  ne jako bezpečnostní prvek.
+- Student musí každé zamknutí nahlásit na místě dozoru.
+
+ODMĚNA A CÍL
+- Test je formálně známkovaný, ale o známky nejde. Známku (odměnu)
+  dostane jen ten, kdo doloží úspěšný průnik podle vítězných
+  podmínek v oddílu 1.
+- Protože úspěšné podvržení je z principu neviditelné (když projde,
+  nijak se neohlásí), je povinnou součástí experimentu samostatný
+  hlásící formulář: "co jsem zkoušel, co podle mě prošlo, jak to
+  zopakovat". Odměna se váže na reprodukovatelné hlášení.
+
+VÝSTUPY A RELEASE
+- Release kandidát jde cestou GARP 2.7: větev candidate → chráněná
+  main → deploy jen z main, release manifest jako kontrakt,
+  automatický bump SemVer v const RELEASE a newest-first changelog
+  do RELEASE.changes (posledních 10 položek) ve stejné dávce.
+- Po každé etapě dodej ZIP + předávací .txt (stav, otevřené body,
+  další krok), aby šlo pokračovat v nové relaci. Nesnaž se projet
+  E0–E10 najednou a pak zbytek prohlásit za hotový.
+- Finální report jako prostý text. PDF jen na vyžádání.
+
+
+================================================================
+1. VÍTĚZNÉ PODMÍNKY (CO SE POČÍTÁ JAKO ÚSPĚŠNÝ PRŮNIK)
+================================================================
+Toto jsou zároveň hlavní acceptance testy aplikace. Pro každou
+podmínku urči, zda ji současný build umožňuje, a zpevňuj proti ní.
+
+W1 (HLAVNÍ) — PODVRŽENÝ PAYLOAD PŘIJATÝ VERIFIEREM
+  Student vyrobí výsledkový kód, který verifier přijme jako
+  legitimní, přestože legitimní není: pozměněné odpovědi, pozměněný
+  výsledek, prázdné securityEvents, nemožné časy, cizí test/varianta/
+  manifest, přebindovaná identita, opakovaný/duplicitní payload,
+  syntakticky validní, ale sémanticky nekonzistentní payload.
+  Klíčová otázka: projde podvrh jen proto, že je správně zašifrovaný?
+
+W2 — ZISK ZAKÁZANÉ INFORMACE
+  Student získá to, co nikdy mít nemá: answer key nebo teacher-only
+  kryptografický materiál, ze studentského artefaktu nebo z veřejného
+  deploymentu. Sem patří i answer key odvozený z dat ve studentském
+  HTML (viz oddíl 2).
+
+W3 — PŘEDÁNÍ VÝSLEDKŮ JINÉMU STUDENTOVI
+  Vlastník tento scénář výslovně počítá jako splnění podmínek. Dvě
+  varianty, testuj obě:
+  (a) Únik odpovědí / answer key spolužákovi (např. přes WhatsApp,
+      Messenger), takže druhý student odpoví správně z cizí znalosti.
+  (b) Přeposlání hotového výsledkového kódu, aby ho druhý odevzdal
+      pod svým školním účtem.
+  Varianta (b) má narazit na vazbu Forms e-mail ↔ kód v rosteru:
+  naivní přeposlání = nesoulad identity = DETECTED/PREVENTED. Urči
+  přesně, co ještě zvládne sofistikovaný útočník, který identitu
+  v payloadu přebinduje na sebe (client-side limit).
+
+NENÍ výhra (ale loguj): pouhé odstranění zámku nebo opuštění a návrat.
+U client-side aplikace je to předvídatelné. Prizí experimentu je W1–W3,
+ne odstranění overlaye. Pokud ale řetězec screenshot → AI → návrat →
+přijatý payload vznikne, je to W1.
+
+
+================================================================
+2. ANSWER KEY: ŠIRŠÍ DEFINICE (NEBEZPEČÍ ODVOZENÝCH DAT)
+================================================================
+Za answer key se považují jakákoli data ve studentském artefaktu,
+z nichž lze offline ověřit správnost odpovědi: hashe správných
+odpovědí (i solené a přes PBKDF2), normalizované tvary, kontrolní
+součty, původní pořadí možností před zamícháním, semínko míchání,
+šifrovaný klíč s dešifrovacím klíčem v témže souboru, odhalující
+data-atributy.
+
+Důvod: gramatická doplňovačka má na položku omezený počet kandidátů;
+slovníkový útok na hash správné odpovědi uspěje v řádu sekund.
+
+Požadavky:
+- Verifier VŽDY přepočítá skóre sám z odpovědí. Skóre z payloadu je
+  pouze informativní, nikdy autoritativní.
+- Studentské HTML nesmí obsahovat roster ani hashe studentských kódů
+  (šestiznakové kódy jsou z hashe offline prolomitelné).
+- V nejpřísnějším režimu student skóre nevidí, takže jeho prohlížeč
+  ho nemusí umět spočítat — tím odpadá i tlak mít ve studentovi
+  cokoli, z čeho by šlo správnost odvodit.
+
+
+================================================================
+3. ARCHITEKTONICKÝ PRINCIP (ZACHOVAT PŘESNĚ)
+================================================================
+Rozlišuj striktně:
+- CONFIDENTIALITY: student nesmí získat answer key.
+- INTEGRITY: student nesmí nepozorovaně změnit chráněná data.
+- AUTHENTICITY: verifier musí poznat, zda payload vytvořil důvěryhodný
+  runtime.
+- CLIENT-SIDE TELEMETRY: security events z prohlížeče studenta nejsou
+  automaticky důvěryhodné.
+
+Veřejný šifrovací klíč chrání obsah payloadu při přenosu, ale
+neprokazuje, kdo payload vytvořil. Zná-li student veřejný klíč,
+neznamená schopnost vyrobit zašifrovaný payload jeho autenticitu.
+Toto kontroluj velmi přísně a nikdy šifrování nezaměňuj za autenticitu.
+
+
+================================================================
+4. DŮVĚRYHODNÉ KOTVY, KTERÉ MÁME I BEZ SERVERU
+================================================================
+Nepřehlédni je — nejsou to "server", a přesto to jsou reálné kotvy.
+Využij je ve verifieru.
+
+- ČAS: časové razítko odpovědi zapisuje Google Forms, ne student. Je
+  to důvěryhodná horní mez submittedAt. Čas publikace testu ve třídě
+  je dolní mez. Okno mezi nimi je jediná časová informace, které lze
+  věřit. Časy v payloadu (startedAt/submittedAt) jsou client-controlled
+  a kontroluj je jen proti tomuto oknu.
+- IDENTITA: Forms omezené na školní doménu s ověřeným e-mailem a
+  limitem jedné odpovědi dává identitu ověřenou Googlem. Verifier
+  porovná e-mail z Forms s e-mailem, který kódu přísluší v rosteru.
+- STARTOVNÍ KLÍČ: kód napsaný na tabuli v čase startu je sdílené
+  tajemství, které v artefaktu před startem není (viz F7).
+
+
+================================================================
+5. FORENZNÍ BASELINE F1–F8
+================================================================
+Nálezy předchozího auditu GIT 7.1.76-R7-E1 ber jako výchozí baseline.
+Po nahrání nového kódu u každého urči: FIXED / PARTIALLY FIXED /
+STILL PRESENT / REGRESSION / NOT APPLICABLE. Nespoléhej na README,
+SECURITY.md ani komentáře — čti skutečný runtime flow.
+
+F1 — OFFLINE CRACKABLE SECRETS
+  Dřívější student HTML obsahoval ucitelPinHash a recoveryCodeHash
+  (PBKDF2-SHA256, ~120k iterací, předvídatelná sůl z testId) → offline
+  guessing. Rozhodnutí pro tento experiment: ve studentském HTML
+  NEBUDE žádný učitelský mód ani recovery kód. Jediné procedurální
+  tajemství je odemykací kód zámku (jeden na test/třídu), a ten je
+  explicitně jen brzda, ne hranice (oddíl 0). Ověř, že ve studentovi
+  nezůstal žádný jiný secret-derived artefakt (teacher PIN, admin
+  hash, recovery data).
+
+F2 — STUDENT HTML HASH NENÍ DŮVĚRYHODNÁ KOTVA
+  Pokud runtime sám získá hash své stránky a vloží ho do payloadu,
+  upravený runtime použije očekávanou hodnotu. Zmapuj celý řetězec
+  BUILD → STUDENT HTML → RUNTIME → PAYLOAD → VERIFIER a urči, které
+  hodnoty tvoří trusted build, které nedůvěryhodný client a které
+  ověřuje verifier. Nevydávej client self-attestation za kryptografickou
+  integritu.
+
+F3 — SECURITY EVENTS JSOU CLIENT-CONTROLLED
+  Upravený runtime umí LOCKED=false, odstranit overlay i listenery,
+  vrátit securityEvents: [], zfalšovat časy, obejít environment
+  detection. Projdi všechny zdroje telemetrie a jejich trust level.
+  Verifier nesmí nikdy budit dojem "žádný security event = student
+  nepodváděl". Prázdná nebo čistá telemetrie je sama o sobě podezřelá,
+  ne uklidňující.
+
+F4 — PER-DEVICE LOCK
+  Replay/rollback ochrana přes localStorage/IndexedDB/HMAC/non-extractable
+  klíč pomáhá proti restartu ve stejném prohlížeči. Otestuj cesty:
+  refresh, restart prohlížeče, jiný prohlížeč, anonymní režim, smazání
+  storage, (druhé zařízení je mimo scope pravidly). Cesty neřešitelné
+  bez serveru označ ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED, ne
+  jako bug.
+
+F5 — GITHUB EXPOSURE
+  Absolutně oddělit student artefakty (smí být publikovány) od teacher
+  artefaktů (nikdy). Prověř, že ve veřejném deploymentu ANI v Git
+  historii repozitáře interaktivni-testy není: verifier, privátní klíč,
+  answer key, teacher konfigurace, teacher hash, recovery data,
+  sourcemapy, debug/build artefakty, ZIPy, skryté JSON konfigurace,
+  backup soubory. Hledej ve výsledném artefaktu, ne jen ve zdrojových
+  modulech. Historii prověř, protože u veřejného repa je trvale veřejná.
+
+F6 (NOVÝ) — KONFIGURACE GOOGLE FORMS
+  Dříve mimo scope, nově povinné. Ověř (jako checklist pro vlastníka,
+  ne spuštěním):
+  - omezení na školní doménu,
+  - sběr ověřeného e-mailu,
+  - limit jedné odpovědi na účet,
+  - že čas odpovědi je použit jako důvěryhodná kotva ve verifieru,
+  - že verifier páruje e-mail z Forms s kódem přes roster.
+
+F7 (NOVÝ) — ÚNIK OBSAHU TESTU PŘED STARTEM
+  Veřejné repo + odhadnutelná URL = test je dostupný od okamžiku pushe,
+  bez ohledu na to, kdy pošleš odkaz. I při publikaci pár minut před
+  startem platí, že kdo stránku načte dřív, přečte otázky (ne klíč,
+  ten ve studentovi není) a spustí screenshot → AI workflow s náskokem.
+  Povinné řešení bez serveru: obsah testu zašifrovat (AES-GCM) klíčem
+  odvozeným PBKDF2 ze startovního kódu, který vlastník napíše na tabuli
+  v čase startu. Startovní kód ≥ 40 bitů entropie (např. 8 znaků base32).
+  Zašifrovaný build pushnout co nejpozději (klidně ráno v den testu),
+  aby bylo okno pro offline útok na startovní klíč minimální.
+
+F8 (NOVÝ) — MĚŘITELNOST EXPERIMENTU
+  Úspěšný podvrh je neviditelný, pokud jen projde. Aby experiment
+  něco změřil:
+  - Verifier musí u každého payloadu vypsat bohatou diagnostiku
+    (nesoulad identity, časy mimo okno, prázdná telemetrie, strukturální
+    nekonzistence, cizí test/varianta/manifest, duplicitní payload),
+    aby šlo dodatečně porovnat se studentskými hlášeními.
+  - Součástí E8 je sada známých podvržených payloadů; ověř, že je
+    verifier skutečně označí (negativní kontrola na úrovni experimentu).
+
+
+================================================================
+6. CO MUSÍ ZŮSTAT FUNKČNÍ (REGRESNÍ SEZNAM)
+================================================================
+Každá bezpečnostní změna musí projít regresní kontrolou těchto
+vlastností. Neznič je:
+- answer key odstraněný ze student artefaktu,
+- listening řešení bez answer/transcript leakage,
+- categorisation / error-tagging / table-completion key bez leakage,
+- teacher runtime bez answer key,
+- WebCrypto fail-closed, AES-GCM, RSA-OAEP, žádný plaintext fallback,
+- tamper-evident storage pro běžného uživatele,
+- XSS escaping, CSP (meta), zákaz eval,
+- vazby verifieru na testId, manifestHash, student identity, variantu,
+  roster, kontrola cizího testu.
+
+
+================================================================
+7. ETAPIZACE E0–E10
+================================================================
+Po každé významnější etapě spusť dostupné testy (unit, integration,
+security, lint, build, GitHub Actions ekvivalent). Při FAILu najdi
+skutečnou příčinu, oprav, spusť znovu. Nikdy "test selhal, ale asi
+je to v pořádku". U každého bezpečnostního testu vyžaduj negativní
+kontrolu: test musí prokazatelně selhat proti 7.1.76-R7-E1 nebo proti
+záměrně rozbitému buildu, jinak testuje jen sám sebe.
+
+E0  BASELINE / FORENSIC INVENTORY — zmapuj skutečný runtime flow.
+E1  SECRET & RECOVERY HARDENING — odstraň zbytečné secret-derived
+    artefakty ze studentského HTML (viz F1; rozhodnuto: žádný učitelský
+    mód ani recovery ve studentovi).
+E2  TRUST BOUNDARY HARDENING — přesně odděl trusted build /
+    untrusted client / trusted verifier; odstraň falešné trust
+    assumptions.
+E3  PAYLOAD / VERIFIER HARDENING — schema validation, identity binding
+    (včetně páru Forms e-mail ↔ roster), variant/manifest/test binding,
+    structural validation, detekce nemožných stavů, časy jen proti
+    důvěryhodnému oknu, duplicate/replay detekce. Priorita: podvrh
+    nesmí projít jen proto, že je správně zašifrovaný.
+E4  ATTEMPT / REPLAY / STORAGE HARDENING — refresh, restart prohlížeče,
+    duplicate submission, active/submitted attempt, smazání storage,
+    anonymní režim, jiný prohlížeč. Neřešitelné bez serveru = označ
+    ARCHITECTURAL LIMIT.
+E5  SCREEN GUARD / RUNTIME HARDENING — visibility, focus, fullscreen,
+    page lifecycle, overlay, split screen, paste, navigace, reload,
+    history, page restore, background/foreground. Cíl: ztížit,
+    detekovat, správně logovat, fail-closed tam, kde to dává smysl.
+    Nečekej browserové DRM.
+E6  PUBLICATION / BUILD LEAKAGE — prohledej výsledný studentský build
+    i historii repa na answer key, privátní klíč, teacher secret/hash,
+    recovery data, skrytý JSON, sourcemapy, komentáře s tajemstvím,
+    nepoužité teacher moduly, vloženou konfiguraci.
+E7  MOBILE RED-TEAM MATRIX — DŮLEŽITÉ: reálná zařízení neotestuješ.
+    Headless WebKit v kontejneru NENÍ iOS Safari. Výstup E7 je proto
+    vždy ANALYZED / NOT TESTED, nikdy GREEN. Vyrob místo toho ruční
+    checklist, který vlastník projde na reálném iPhonu/iPadu (Safari,
+    screenshot, Siri/Apple Intelligence, přepínání aplikací, reset
+    storage) a Androidu (Chrome, alternativní Chromium, AI overlay,
+    screenshot). Jádrem je tentýž telefon — druhé zařízení je mimo
+    technický dosah (viz oddíl 8).
+E8  FORGED PAYLOAD TEST HARNESS — lokální harness proti VLASTNÍ
+    aplikaci: payload s prázdnou telemetrií, nemožným časem, cizím
+    studentem/variantou/testem/manifestem, přebindovanou identitou,
+    změněným výsledkem, opakovaný, syntakticky validní ale sémanticky
+    nekonzistentní. Cíl: ověřit, že verifier každý z nich odmítne.
+E9  REGRESSION & CI — viz výše, včetně negativních kontrol.
+E10 RELEASE CANDIDATE — cestou GARP 2.7 (oddíl 0), bez číselného
+    marketingového skóre.
+
+
+================================================================
+8. KATEGORIE GARANCÍ (POUŽÍVEJ PŘESNĚ, NELŽI)
+================================================================
+PREVENTED / DETECTED / HARDENED / BEST-EFFORT / CLIENT-CONTROLLED /
+ARCHITECTURAL LIMIT / SERVER REQUIRED.
+
+Přidej kategorii:
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR
+  Pro útoky, které nevyřeší ani server: druhý telefon fotící obrazovku
+  a ptající se AI nedetekuje žádný software. Sem patří i zákaz druhého
+  zařízení. Neoznačuj to SERVER REQUIRED — naznačovalo by to, že server
+  pomůže. Pojmenuj, jaký dozor experiment reálně má.
+
+Pravidla:
+- Nezůstávej u doporučení. Když najdeš opravitelnou chybu, oprav ji
+  a dolož testem a důvodem.
+- Nepřeskakuj do serverové verze (DEFERRED), ale ani ji nezneužívej
+  jako výmluvu.
+- Minifikace/obfuskace není trust boundary. Security through obscurity
+  nepovažuj za hranici.
+- Samotné čtení kódu nezakládá PASS.
+
+
+================================================================
+9. ZAČÁTEK PRÁCE
+================================================================
+Po nahrání ZIPu:
+1. proveď E0,
+2. podej stručný forenzní report a porovnej F1–F8 s baseline,
+3. urči první blocking security issue,
+4. bez zbytečného čekání ji oprav,
+5. postupuj etapově až k release candidate, po každé etapě ZIP +
+   předávací .txt.
+Pokud objevíš kritickou zranitelnost, která činí další etapu zbytečnou,
+oprav nejprve ji.
+
+
+================================================================
+10. ACCEPTANCE CRITERIA PŘED TESTEM
+================================================================
+Release neoznačuj za připravený, dokud neověříš:
+[ ] student artifact neobsahuje answer key (v širší definici z oddílu 2)
+[ ] student artifact neobsahuje privátní dešifrovací klíč
+[ ] student artifact neobsahuje roster ani hashe studentských kódů
+[ ] ve studentovi není učitelský mód, teacher secret/hash ani recovery
+[ ] teacher verifier není ve veřejném deploymentu ani v Git historii
+[ ] obsah testu je šifrovaný startovním kódem (≥40 bitů entropie)
+[ ] běžný restart stejného prohlížeče neumožní nový pokus
+[ ] běžný duplicate submission je odmítnut
+[ ] verifier odmítne nesprávný testId / manifest / variantu / studenta
+[ ] verifier odmítne strukturálně nekonzistentní payload
+[ ] verifier páruje Forms e-mail s kódem přes roster (W3b)
+[ ] verifier přepočítá skóre sám, nevěří skóre z payloadu
+[ ] verifier jasně označuje nedůvěryhodnost client-side telemetrie
+[ ] verifier vypisuje diagnostiku pro dodatečné porovnání s hlášeními
+[ ] E8 harness potvrzuje, že známé podvrhy jsou odmítnuty
+[ ] build a security testy jsou GREEN, včetně negativních kontrol
+
+
+================================================================
+11. KONEČNÝ REPORT
+================================================================
+A. PŮVODNÍ STAV — co bylo zranitelné.
+B. PROVEDENÉ ZMĚNY — konkrétní změny v kódu.
+C. ODSTRANĚNÉ ZRANITELNOSTI — co už prakticky nejde použít.
+D. ZMÍRNĚNÉ ZRANITELNOSTI — co jsme ztížili, ale principiálně neodstranili.
+E. ZBÝVAJÍCÍ ARCHITEKTONICKÉ LIMITY — zvlášť označit, co vyžaduje server,
+   a zvlášť to, co je MIMO TECHNICKÝ DOSAH – POUZE DOZOR.
+F. RED-TEAM TEST MATRIX — co mají studenti reálně možnost zkusit, mapováno
+   na W1–W3.
+G. RELEASE READINESS — bez čísla. Pouze:
+   READY FOR CONTROLLED STUDENT RED-TEAM /
+   READY WITH DOCUMENTED LIMITATIONS /
+   NOT READY – BLOCKING ISSUE,
+   s přesným zdůvodněním.
+
+
+================================================================
+12. TŘI NEJDŮLEŽITĚJŠÍ OTÁZKY EXPERIMENTU
+================================================================
+1. Dokáže technicky schopný student změnit nebo obejít runtime a dodat
+   výsledek, který verifier považuje za legitimní, přestože není? (W1)
+2. Dokáže získat informace, které mít nikdy nemá — zejména answer key
+   nebo teacher-only kryptografický materiál? (W2)
+3. Dokáže aplikace správně rozlišit skutečně ověřenou informaci od
+   pouhé client-side telemetrie?
+================================================================

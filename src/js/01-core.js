@@ -14,21 +14,21 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.76',
-  date:    '2026-10-02',
+  version: '7.1.87',
+  date:    '2026-10-04',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
-    'SECURITY CREDENTIAL SPLIT (7.1.76): Teacher/Admin secret a Classroom Recovery Code jsou samostatné per-test credentialy s oddělenými PBKDF2 doménami a privilege boundary. Recovery Code umí pouze odemknout aktuální bezpečnostní lock, nemůže otevřít teacher panel, povolit retry ani resetovat pokus jiné identity. Recovery unlock zachovává attemptId, deadline, identitu, variantu, žolíka i auditní historii; Verifier jej eviduje jako auditní informaci. Raw credentialy jsou blokovány ve studentském HTML, persistenci, šablonách, historii, exportu zadání i AI/manual workflow.',
-    'ŽOLÍK WORKFLOW (7.1.74): bezpečný studentský runtime při prvním startu lokálně zapečetí identitu pokusu, volbu žolíka, attempt ID, absolutní deadline a stav zámku; běžný reload tak nemůže změnit volbu ani resetovat čas a rozpracovaný pokus jiné identity vyžaduje učitelský kód. Žolík se před startem explicitně potvrzuje. Teacher Verifier drží žolíkové pokusy pro kontrolu a bezpečnostní audit, ale vyřazuje je z klasifikačních statistik a položkové analýzy; CSV nese explicitní stav žolíka a klasifikace.',
-    'IPADOS + VERIFIER UX (7.1.73): iPadOS/WebKit zavření softwarové klávesnice již nevyvolá falešný zámek testu, pokud stránka zůstává viditelná a blur bezprostředně navazuje na editaci nebo změnu visualViewport; skutečné visibility/pagehide opuštění a split-screen monitoring zůstávají aktivní. Teacher Verifier staví Google Forms CSV jako hlavní importní cestu, nouzové answers.txt/vložený blok odsouvá do záložní sekce a po importech/exportech dává viditelné potvrzení.',
-    'GARP 2.8 + PDF LAYOUT (7.1.72): bezpečnostní workflow sync-ghrab-ai-core odděluje read-only ověření od jediného publish jobu se zápisem; Safe Promotion používá minimální oprávnění po jobech, přidán frame guard, kontrola zdroje postMessage a redakce Google API klíčů. Přímé student/teacher PDF má konzistentní horní a dolní okraj na každé stránce a stránkování přesouvá pozdně začínající cvičení na další stránku místo osamoceného nadpisu.',
-    'D8 / FINÁLNÍ AUDIT + CLEANUP (7.1.72): finální průřez A–D má povinný 29bodový kontrakt v P5. Odstraněny byly pouze prokazatelně mrtvé legacy profily/helpery, nevyužívané sourceSliceMode/pedagogicalPreset a zastaralá nápověda k dlouhým zdrojům; migrace starých uložených profilů zůstává zachována. Split-screen je výslovně veden jako měkká heuristika, nikoli důkaz.',
-    'D7 / CI + REGRESSION HARDENING (7.1.70): P5 release gate nyní povinně spouští samostatný D7 regression runner pro Teacher Verifier, effective analytics, IA/security, skutečné browserové PDF runtime/quality a dark/light/fullscreen runtime. Safe Promotion vyžaduje zelený p5-release-gate i journey-e2e pro stejný certifikovaný SHA; Journey čistí staré evidence, zahrnuje config_extra_suite a ukládá SHA-bound artifact. Citlivé teacher fixtures/PDF se po D7 testech odstraní a zůstávají jen JSON souhrny.',
-    'D6 / GENERATOR PREFILL + DIFERENCIACE (7.1.69): prefill_v3 ukládá a obnovuje i předdefinované Reading téma rcTopic; šablona si pamatuje, zda původní zadání používalo soubor, a po načtení výslovně vyžádá jeho nové připojení bez ukládání názvu či binárních dat. Aktivní prompt cesty i UI nyní drží pro Basic/Standard/Challenge stejné učivo, CEFR, typy cvičení, počty položek a body; mění se pouze míra podpory a hloubka zpracování.',
-    'D5 / VERIFIER IA + SECURITY UX (7.1.69): Dashboard je zjednodušen na pracovní přehled; Creator ID, build, manifest a Student HTML SHA-256 jsou soustředěny v panelu Technické údaje. Google Forms metadata mismatch je sjednocen s bezpečnostním modelem jako měkký signál, zobrazuje se v Security i Results bez duplicitního varování a dashboardový počet signálů používá effectiveResults(). Navigace má výraznější aktivní stav a ikonovou hierarchii.',
-    'D4 / THEME + FULLSCREEN (7.1.67): Teacher Verifier 2.0 má skutečný tmavý a světlý motiv napříč hlavními surfaces včetně karet, tabulek, formulářů a modalů. Fullscreen ovládání sleduje browserový fullscreenchange, mění aria-pressed i viditelný stav tlačítka a při nepodporovaném nebo odmítnutém API nabídne explicitní hlášku a F11 fallback.',
-    'D3 / PDF KVALITA (7.1.66): přímé studentské i učitelské PDF používá bezpečné A4 stránkování, které preferuje hranice celých otázek a jako pojistku neřeže přes textové řádky. Opravena česká diakritika a mezery mezi formátovanými částmi; studentská verze zůstává bez klíče a učitelského transcriptu, školní logo zachovává proporce.',
+    'RED-TEAM E10 CI FIX (7.1.87): smoke gate respektuje oddělený private verifier; klikací sady používají jeho startovní kód. Sjednocena dokumentace a release metadata. E7/Forms/E6 čekají. NOT READY.',
+    'RED-TEAM E10 (7.1.86): zadání šifrované AES-GCM/PBKDF2; startovní kód 50 bitů jen učiteli. Fail-closed start, reload a offline testy; readiness brání merge/deploy. E7/Forms/E6 čekají. NOT READY.',
+    'RED-TEAM E9 (7.1.85): společný CI řetězec, záporné kontroly exportu/zapojení/evidence a nativní obnova pokusu. GARP před P5 zachová reporty. E7 fyzicky netestováno; F7 chybí. NOT READY.',
+    'RED-TEAM E8 (7.1.84): 108 forgery scénářů, negativní kontroly, skutečný CSV import a dlouhá historie po reloadu. Verifier odmítá rozporné start/joker/split události; klientské skóre přepočítá. Konzistentní forgery zůstává CLIENT-CONTROLLED / REVIEW_REQUIRED. NOT READY.',
+    'RED-TEAM E7 (7.1.83): 40 ručních mobilních scénářů, offline checklist a negativní kontroly záznamníku. iPhone/iPad/Android ANALYZED / NOT TESTED. F7, E6 residual/rotace a E8–E10 čekají; NOT READY.',
+    'RED-TEAM E6 (7.1.82): student preflight, private verifier pairing, public SHA manifest a scan Git historie odmítají answer/teacher deriváty. Tehdejší živý public build/historie blokovaly release. NOT READY.',
+    'RED-TEAM E5 / RUNTIME (7.1.81): strict reload/history/freeze/fullscreen zamknou test a zachovají audit. Paste/drop a běžné změny za zámkem blokovány. Split přežije reload; odemčení kontroluje nový odchod. Native a negativní testy; mobily NOT TESTED, CLIENT-CONTROLLED.',
+    'RED-TEAM E4 / STORAGE (7.1.80): restart zachovává pokus, deadline a ciphertext outbox. Web Locks omezují souběh; poškozený stav má integrity lock. Soukromá replay evidence přežije restart. Native Chromium a negativní kontroly. Úplné smazání nebo jiný profil vyžaduje server; CLIENT-CONTROLLED.',
+    'RED-TEAM E3 / VERIFIER (7.1.79): schéma a 21 typů odpovědí před bodováním; soukromé Forms účet→roster a publikace→Forms kotvy. Zálohy pouze diagnostické. Replay/konflikty vyřazeny; CSV zachovává pracovní sadu. Artefaktové/browser negativní kontroly. Runtime CLIENT-CONTROLLED.',
+    'RED-TEAM E2 / TRUST BOUNDARIES (7.1.78): soukromý přepočet oddělen od původu. Hash/časy/telemetrie CLIENT-CONTROLLED; šifrování neověřuje autora. UI/CSV/archivy REVIEW_REQUIRED. Secure generátor nevyžaduje Teacher/Admin secret. Artefaktové/browser a historické negativní kontroly.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -517,7 +517,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'ucitelsky-soubor',title:'Učitelský soubor / teacher export',status:'reseno',
   keywords:['ucitelsky soubor','teacher export','soubor pro ucitele','ucitelska verze','klic pro ucitele','ucitelsky balicek'],
   simple:'Vedle studentského souboru se generuje učitelský soubor (s klíčem / verifier). Je jen pro tebe, nedávej ho studentům.',
-  detailed:'V bezpečném režimu se generuje teacher_verifier.html s privátním klíčem a plnými variantami pro opravu. Učitelský mód uvnitř testu (intro tlačítko „Učitelský režim") chrání samostatný Teacher/Admin secret. Bezpečnostní skener i názvové kontroly hlídají, aby se učitelský obsah nedostal do studentského exportu.',
+  detailed:'V bezpečném režimu se generuje teacher_verifier.html s privátním klíčem a plnými variantami pro opravu. Studentský bezpečný soubor nemá učitelský režim, reset pokusu ani hash učitelského tajemství. Učitelský režim s Teacher/Admin secret patří pouze k exportu s okamžitou známkou. Soukromý verifier nikdy nepublikuj.',
   evidence:['secureTeacherScript() / teacher_verifier.html','učitelský přístupový kód (ucitelPin)','SecretScanner blokuje učitelský obsah ve studentském souboru']},
 
  {id:'listening',title:'Listening comprehension (poslech)',status:'reseno',
@@ -596,7 +596,7 @@ const GENERATOR_ASSISTANT_KB = [
  {id:'google-forms-secure',title:'Google Forms pro předání secure výsledků',status:'reseno',
   keywords:['google forms','formulář','formular','forms csv','odevzdavaci kod','odevzdávací kód','secure answers','secures answers v1','responder odkaz','responder link'],
   simple:'Google Forms je volitelná sběrná cesta pro bezpečný offline test. Student do formuláře vloží celý šifrovaný blok SECURE-ANSWERS-V1; krátký jednorázový studentský kód sám o sobě k opravě nestačí. answers.txt zůstává nouzová záloha.',
-  detailed:'V ⚙️ Nastavení → Předání secure výsledků uloží učitel responder odkaz školního Google Formu. Po dokončení secure testu student zkopíruje celý SECURE-ANSWERS-V1 blok, otevře formulář a vloží ho do povinné otázky typu Odstavec. Form může volitelně sbírat ověřený školní e-mail. Učitel potom stáhne CSV odpovědí a otevře ho v teacher_verifier.html; verifier payloady rozpozná, kryptograficky ověří/dešifruje a opraví stejnou cestou jako answers.txt. Jednorázový studentský kód slouží pouze k identitě studenta, ne jako odevzdávací payload.',
+  detailed:'V ⚙️ Nastavení → Předání secure výsledků uloží učitel responder odkaz školního Google Formu. Po dokončení secure testu student zkopíruje celý SECURE-ANSWERS-V1 blok, otevře formulář a vloží ho do povinné otázky typu Odstavec. Pro tento experiment musí Form sbírat ověřený školní e-mail, omezit účty na školní doménu a povolit jednu odpověď na účet. Učitel potom stáhne CSV odpovědí a otevře ho v teacher_verifier.html; verifier payloady rozpozná, dešifruje a přepočítá odpovědi stejnou cestou jako answers.txt. Šifrování ani klientský hash neprokazuje původ výsledku; vazby Forms účtu a časového okna jsou zatím neověřené. Jednorázový studentský kód slouží pouze k identitě studenta, ne jako odevzdávací payload.',
   evidence:['GOOGLE_FORMS_SUBMISSION_URL_KEY','configuredGoogleFormsUrl()','SECURE-ANSWERS-V1','importFormsCsvFile()','identityMode'],},
 
  {id:'nouzova-zaloha-answers',title:'Nouzová záloha, když nejde stáhnout answers.txt',status:'reseno',
@@ -631,8 +631,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:"anonymizace-gdpr",title:"Anonymizace a ochrana osobních údajů",status:"reseno",
   keywords:["anonymizace", "gdpr", "osobni udaje", "jmena studentu", "ochrana dat", "pseudonymizace"],
-  simple:"Jména z diferenciačních skupin se do Gemini neposílají nikdy. Prompt používá kódy Student A1… a veřejný studentský HTML obsahuje jen solené SHA-256 otisky zadaných identifikátorů.",
-  detailed:"Ochrana má dvě vrstvy: buildDiffBlock() nahrazuje identity před AI požadavkem pseudonymy a veřejný rozpis skupin ve studentském souboru ukládá pouze salted hash. Pro diferencované testy je nejbezpečnější používat náhodné žákovské kódy, protože běžná jména lze při znalosti soli zkoušet slovníkovým útokem. Učitel musí odstranit osobní a citlivé údaje také z volného textu, podmínek skupin, URL a příloh; ty aplikace neumí spolehlivě rozpoznat.",
+  simple:"Jména z diferenciačních skupin se do Gemini neposílají. Prompt používá Student A1… Bezpečný studentský export neobsahuje roster ani hashe identifikačních kódů.",
+  detailed:"buildDiffBlock() nahrazuje identity před AI požadavkem pseudonymy. V bezpečném exportu student zvolí přidělenou skupinu a její vazbu na kód kontroluje soukromý verifier. Export s okamžitou známkou používá starší veřejné solené hashe identifikátorů; ty lze zkoušet offline a nejsou ochranou identity. Učitel musí odstranit osobní a citlivé údaje také z volného textu, podmínek skupin, URL a příloh; ty aplikace neumí spolehlivě rozpoznat.",
   evidence:["buildDiffBlock()", "buildPublicDiffGroups()", "studentHashes", "diffRosterSalt", "ensureGeminiDataNotice()"]},
 
  {id:'podpurna-opatreni',title:'Podpůrná opatření: delší čas, větší písmo, dyslexie-friendly',status:'reseno',
@@ -1001,13 +1001,13 @@ const GENERATOR_ASSISTANT_KB = [
  {id:"prirazeni-skupin",title:"Jak přiřadit studenty do skupin",status:"reseno",
   keywords:["prirazeni skupin", "přiřazení skupin", "skupiny", "skupina", "student ve skupine", "student ve skupině", "jak vytvorit skupiny", "jak vytvořit skupiny", "kdo je v jake skupine", "kdo je v jaké skupině", "trida", "třída", "rozdelit studenty", "rozdělit studenty", "jednorazovy kod", "jednorázový kód"],
   simple:"Každá diferenciační skupina má název, pedagogické podmínky, seznam přidělených jmen nebo kódů a volby přístupnosti. Student zadá přesně svůj přidělený identifikátor; podle jeho hashe se otevře správná varianta.",
-  detailed:"Skupiny nejsou chráněny společným PINem. Učitel přiřadí každému studentovi jedinečný identifikátor, ideálně náhodný jednorázový kód bez osobních údajů. Při spuštění test normalizuje zadanou hodnotu, vytvoří SHA-256 hash se solí konkrétního testu a porovná jej s veřejným seznamem hashů. Neznámý identifikátor je odmítnut, takže nedojde k náhodnému přidělení jiné varianty. Pedagogické podmínky formuluj obecně, bez diagnóz a nadbytečných citlivých údajů.",
+  detailed:"Učitel přiřadí studentovi individuální kód a skupinu. V bezpečném exportu student zvolí přidělenou skupinu; oprávněnost kódu a vazbu na skupinu kontroluje až soukromý verifier. Kontrola syntaxe v prohlížeči není ověření identity. Export s okamžitou známkou nadále používá starší veřejné solené hashe identifikátorů. Pedagogické podmínky formuluj obecně, bez diagnóz a nadbytečných citlivých údajů.",
   evidence:["state.skupiny", "identityMode", "buildPublicDiffGroups()", "chooseVariant()", "resolveStudentGroup()"]},
 
  {id:"anonymizace-v-diferenciaci",title:"Jak funguje anonymizace v diferenciovaném testu",status:"reseno",
   keywords:["anonymizace diferenciace", "anonymizace skupiny", "anonymni skupina", "anonymní skupina", "skryt skupinu", "skrýt skupinu", "nevidet skupinu", "nevidět skupinu", "anonymni trida", "anonymní třída", "diferenciace anonymizace"],
-  simple:"Před odesláním do AI se identity vždy mění na Student A1, A2…. Do studentského HTML se čitelný rozpis skupin nevkládá; obsahuje jen solené hashe.",
-  detailed:"buildDiffBlock() sestaví prompt s pseudonymy bez ohledu na staré nastavení. Snapshoty a historie také ukládají jen pseudonymy. Při exportu testu buildPublicDiffGroups() vytvoří pro každý identifikátor SHA-256 otisk s náhodnou solí konkrétního testu a runtime podle něj bezpečně zvolí variantu. Učitelský verifier může obsahovat nezbytné privátní mapování pro režim jednorázových kódů, a proto se nikdy nesmí zveřejnit. Hashování není anonymizace proti slovníkovému hádání běžných jmen; používej náhodné kódy.",
+  simple:"Před odesláním do AI se identity mění na Student A1, A2…. Bezpečný studentský export neobsahuje rozpis studentů ani jejich hashe.",
+  detailed:"buildDiffBlock() sestaví prompt s pseudonymy. Snapshoty a historie také ukládají jen pseudonymy. Bezpečný export zveřejňuje pouze názvy skupin a jejich studentský obsah; volbu skupiny kontroluje soukromý verifier proti privátnímu mapování. Verifier obsahuje kódy a e-maily a nesmí se zveřejnit. Starší hashové přiřazení v exportu s okamžitou známkou není anonymizace proti offline hádání.",
   evidence:["buildDiffBlock()", "anonymizeGroupsForStorage()", "buildPublicDiffGroups()", "studentHashes", "teacher_verifier.html"]},
 
  ];
@@ -1267,6 +1267,7 @@ function randomChunk(chars){
 }
 function normalizeCredentialInput(value){ return String(value||'').trim().toUpperCase(); }
 function teacherAccessCodeValue(){ return trim('ucitelPin'); }
+function requiresTeacherAccessCode(st=state){ return (st.resultMode||'instant')!=='secureOffline'; }
 function recoveryCodeValue(){ return trim('recoveryCode'); }
 function requiresRecoveryCode(){ return state.testMode === 'prisny' || !!state.screenGuard; }
 function syncTeacherAccessCode(){

@@ -1,0 +1,207 @@
+GIT RED-TEAM v2 — E5 / SCREEN GUARD A RUNTIME
+Verze 7.1.81; datum 2026-10-03; větev candidate.
+Výchozí commit: ebc464de2254666317fb2df2d36024d733946b42 (E4 / 7.1.80).
+Stav: NOT READY – BLOCKING ISSUE.
+E5 je dokončený lokální implementační a testovací checkpoint.
+Proběhly E0–E5; E6–E10, F7 a skutečné mobilní ověření čekají.
+Nebylo provedeno nahrání na GitHub, PR, merge, promotion ani deployment.
+Server: DEFERRED – SERVER VERSION.
+
+ROZSAH
+E5 upravuje exportovaný secureOffline studentský runtime a zobrazení
+jeho auditu v soukromém verifieru. Legacy instant/practice režimy
+mají zachované regrese; nové secure záruky se na ně nepřenášejí.
+Zámek je procesní překážka běžného UI, nikoli autentizace prohlížeče.
+Klientský runtime, hodiny, self-hash, události a veřejný šifrovací klíč
+zůstávají CLIENT-CONTROLLED. Klasifikace zůstává REVIEW_REQUIRED.
+
+NÁLEZY A OPRAVY
+E5-01 / HIGH: návrat po odchodu se v zamčeném stavu nevyhodnocoval,
+protože isTestRunning vylučoval LOCKED. Opakovaný odchod přepisoval
+první čas. Nově se sleduje aktivní pokus i za zámkem; LEFT_AT se
+nastaví pouze při prvním odchodu a vrácení zapíše awayMs/severity.
+První odchod je součástí místního sealed auditu i přes reload.
+Čas pokusu se tím neprodlužuje a klientský čas není důkaz původu.
+
+E5-02 / HIGH: běžný setResp zapisoval i po uzamčení nebo odevzdání.
+Nově vyžaduje skutečně běžící odemčený pokus. #test je za zámkem
+inert a skrytý pro accessibility strom; dialog má název a přijímá
+fokus. Unlock inert odstraní a zachová odpovědi, historii i deadline.
+Nativní klávesnice nemůže za zámkem upravovat test. Přímá editace
+RAM/globalů, DOM či listenerů vlastníkem klienta zůstává možná.
+
+E5-03 / HIGH: před reloadem nebyl beforeunload vždy důvodem zámku
+a nový monitor nuloval dřívější split-window měření. Nově strict
+beforeunload/pagehide zamkne pokus; obnovený strict pokus je vždy
+zamčený, včetně stavu dříve úspěšně odemčeného kódem třídy.
+Původní attempt ID, odpovědi a deadline se zachovají; další běžný
+unlock dovolí pokračování bez nového pokusu nebo nového časového limitu.
+Split total/small/run a LEFT_AT se ukládají a obnovují. Restart
+monitoru je nenuluje. Flush uloží čekající snapshot před návratem;
+dřívější flush pouze rušil jeho timer. Snapshot se před zařazením
+do fronty kopíruje, takže pozdější běžná změna nezmění starší zápis.
+Guard-only unsigned shadow může obnovit konzervativní zámek/audit;
+změna odpovědí, identity, žolíku či oslabení deadline/zámku nadále
+vyvolává integrity blokaci. Podepsaný rollback má původní E4 limit.
+
+E5-04 / MEDIUM: fullscreen API nemělo obsluhu odmítnutého Promise
+a opuštění fullscreen se nezachytávalo. Nově po skutečném vstupu
+nativní exit zapisuje fullscreen-left a v strict režimu zamyká.
+Odmítnuté/nedostupné API zobrazí modal a audit; není unhandled error.
+Fullscreen není nový povinný startovní gate na nepodporovaném zařízení.
+Standardní režim událost eviduje bez strict blokace. API nemůže
+dokázat, že student nemá jinou obrazovku, aplikaci nebo další zařízení.
+
+E5-05 / HIGH: správný odemykací kód mohl po asynchronním PBKDF2
+odemknout stránku, která mezitím znovu odešla. Nově se porovnává
+guard epoch z počátku s koncem ověřování, aktuální visibility a
+integrity stav. Blur epoch zvýší ihned, i při už zamčeném pokusu.
+Další odchod během ověřování zámek ponechá; UNLOCK_BUSY se vždy
+uvolní v finally a nevznikne falešný recovery-unlock záznam.
+Kód třídy nemá teacher/admin, reset ani retry pravomoc a jeho
+klientský hash neslouží jako bezpečnostní autentizace.
+
+E5-06 / MEDIUM: history, freeze/resume a cache restore neměly
+samostatnou obsluhu. Popstate a freeze nově zapisují odchod a
+strict zámek; resume zapíše návrat a obnoví původní časovač.
+Persisted pageshow zamkne UI před asynchronním čtením, znovu získá
+tab lock, kontroluje outbox/submitted guard a načte aktuální sealed
+stav. Starší RAM neobnoví předchozí odpovědi přes novější úložiště;
+neplatná obnova zůstane blokovaná. Platný standardní režim uvolní
+dočasný reconciliation lock; strict ponechá zámek. Deadline může být jen konzervativně
+zkrácen. document.wasDiscarded se eviduje, pokud jej browser poskytne.
+Nativní BFCache eligibility a skutečné OS discard nejsou doloženy.
+
+E5-07 / MEDIUM: paste měl pouze audit velkého textu. V strict testu
+se běžný paste/drop/insertFromPaste/insertFromDrop blokuje a loguje.
+Za zámkem se v testu blokuje beforeinput/keydown. Standardní režim
+ponechá běžný paste a zapíše pouze délku/počet slov u velkého vložení.
+Obsah schránky se do auditu neukládá. Clipboard/drop mimo oblast
+testu, například identita před zahájením, není tímto gate omezený.
+Copy/cut, screenshoty ani druhé zařízení nejsou touto změnou blokované.
+
+E5-08 / AUDIT: nové guard události jsou ve verifieru přehledné
+auditní informace runtime-guard a v úplné exportované časové ose.
+Tento souhrn sám nepřidává obvinění ani automatickou klasifikaci.
+Zámek, odchod a split-window mají dosavadní kontextové signály.
+Skutečné zašifrované odevzdání s novými událostmi prošlo schema,
+Forms/roster/time kotvami a soukromým bodováním; REVIEW_REQUIRED
+zůstalo zachované. RSA klíč ani roster nejsou součástí reportu.
+
+OVĚŘENÍ — PASS
+10 skupin na skutečně vygenerovaném HTML s nativním Node WebCrypto
+a simulovaným DOM/IDB: away-during-lock, beforeunload-lock,
+locked-responses, clipboard-block, split-reload, unlock-race,
+lifecycle-lock, ipad-keyboard-model, submitted-responses,
+verifier-audit. Visibility, lifecycle, rozměry, schránka a iPad
+v tomto gate jsou řízené vstupy; nejsou fyzickým mobilním důkazem.
+
+8 skupin v desktop Chromiu 153.0.8010.0, Playwright 1.61.1,
+původní CSP, skutečné IndexedDB/WebCrypto/Web Locks, bez pageerrors:
+- nativní reload včetně beforeunload/pagehide: zachované ID, odpovědi,
+  deadline, zamčené obnovení, návrat auditován, bez integrity fault;
+- nativní fullscreen vstup přes klik a exit: zámek/audit/deadline;
+- skutečný history.pushState/goBack: popstate zámek a stejný pokus;
+- native inert/focus/keyboard: za řízeně vyvolaným zámkem bez editace;
+- skutečné viewport/screen poměry a IDB/reload: split audit zachován,
+  šest ticků bylo zrychleno explicitním voláním, nikoli 12 s čekáním;
+- řízeně dispatchované freeze/resume: lock, návrat, stejný deadline;
+- řízeně dispatchované persisted pageshow/pagehide: obnova poslední
+  signed odpovědi namísto pozměněné RAM, zamčené UI a platná integrity;
+- řízené odmítnutí fullscreen API: audit/modal, bez unhandled error.
+
+NATIVE FREEZE/RESUME: ANALYZED / NOT TESTED.
+CDP freeze/active v této headless konfiguraci na viditelné stránce
+nedispatchoval události. Příkazy samotné se nepovažují za důkaz
+nativního zmrazení. Obsluha je doložena pouze řízeným event dispatch.
+NATIVE BFCache ELIGIBILITY: ANALYZED / NOT TESTED.
+Persisted pageshow byl v testu řízený vstup. Nativní cache restore,
+OS uspání/discard a reálné background/foreground na mobilech čekají.
+
+iPad keyboard výjimka zůstala zachovaná: viditelná stránka po
+nedávné práci v editable/visualViewport může ignorovat 900ms blur.
+Simulace nevyvolala falešný zámek a hidden visibility přesto zamkla.
+Jde o BEST-EFFORT heuristiku s viditelným focus blind spotem;
+skutečný iPad Safari/soft keyboard tím není certifikován.
+
+NEGATIVNÍ KONTROLY — PASS, 34/34
+Devět runtime a osm browser guard/audit skupin bylo spuštěno proti skutečným
+historickým generátorům 7.1.76 a E4 / 7.1.80. Každá kontrola skončila
+AssertionError a exit code 1. ReferenceError, TypeError, SyntaxError
+nebo timeout se za úspěšnou negativní kontrolu nepovažuje. iPad model
+je zachování původní výjimky; historické selhání se u něj nevyžaduje.
+SHA-256 zdrojových snapshotů a 34 logů jsou v redteam/E5.
+
+REGRESE A MÍSTNÍ CI EKVIVALENT — PASS
+npm test: kompletní běh; Workflow audit 55 PASS / 0 FAIL.
+npm run qa:p5:ci: kompletní místní běh s finálním acceptance reportem.
+Finální běhy proběhly postupně, bez současného přepisování dist.
+Předchozí neúplné P5 běhy nejsou uznány. Staré testovací fixture
+injektovaly poškození či mazaly stav ještě v aktivním okně; E5 unload
+legitimně zapsal jeho stav znovu. Integrity probe se přesunul před
+startup read a joker cleanup nejprve ukončí runtime/pending zápisy.
+Při vyčlenění guardu se obnovil komentář o měkkém split signálu,
+vyžadovaný dosavadním D8 statickým auditem; behavior gate se neoslabil.
+Cílený nativní joker/D8 test i finální úplné běhy prošly.
+Quality: 35/35; release: 46/46; acceptance: 19/19.
+Runtime: 0 blockers, exceptions, init failures a overflows.
+Lint: 0 chyb, 8 dřívějších upozornění.
+Entry critical bytes: 1769727; limit 1 770 000 z E3
+zůstal beze změny. Žádný rozpočtový limit se v E5 nezvyšoval.
+Guard byl vyčleněn do 13de; původní runtime zůstal pod 90KiB limitem.
+Static/VM fixture čtení nově zahrnuje tento modul a guard epoch.
+R5 požadavek na strict reload nyní ověřuje zamčené obnovení a
+funkční běžný recovery unlock se zachováním původního pokusu.
+23 sanitizovaných reportů, úplné logy a completion evidence jsou
+v redteam/E5. Nové runtime/browser gates jsou připojené k npm/P5.
+Zachovány E1–E4, R3/R5, D7/D8, verifier UI, PDF runtime/quality,
+workflow a GARP 2.7 regrese. PDF nejsou předávaný artefakt.
+Automatizované axe: 4 stavy, 0 potvrzených violations. Incomplete
+ARIA/kontrast kontroly zůstávají vyznačené v JSON a vyžadují ruční
+ověření. Plná přístupnost se netvrdí. Axe injekční harness obchází
+CSP; E5 Chromium gate používá původní CSP.
+
+HRANICE ZÁRUK
+HARDENED / DETECTED: běžné strict UI/clipboard/lifecycle cesty,
+původní pokus/deadline přes reload, audit návratu a persistence.
+BEST-EFFORT: blur/iPad klávesnice, velikost okna/split a API podpora.
+Split je měkký kontextový signál, nikoli zámek či rozsudek. Poměr
+70/30, OS overlay, jiné okno bez doručené události, některé přepínače
+a druhé zařízení se nemusí projevit. Detekce overlay obecně není možná.
+CLIENT-CONTROLLED: DevTools/změněné HTML/RAM/hodiny/listenery mohou
+tyto cesty obejít nebo vyrobit souhlasnou telemetrii. Absence událostí
+neprokazuje poctivost. Veřejným klíčem konzistentně zfalšovaný payload
+s odpovídajícím Forms účtem/časem nadále může dát technický návrh
+100 %; jeho runtime původ není potvrzen a známka je REVIEW_REQUIRED.
+ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED: úplné smazání storage,
+anonymní či jiný profil, konzistentní rollback obou signed stores,
+globální replay a autoritativní serverové časy/identity/session.
+Tyto hranice jsou již doložené E4 a E5 je nemění.
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhé fyzické zařízení,
+spolupráce jiného člověka a reálné dohledové chování.
+
+SOUKROMÁ/EXTERNÍ PRAVIDLA
+Teacher Verifier, private RSA, answer key a code-email roster patří
+pouze na soukromý PC vlastníka mimo školu; nikdy veřejně ani do
+veřejné Git historie, na školní server či školní počítač.
+Forms doména/verified email/one response a nezměněný CSV jsou
+potvrzení vlastníka, nikoli živě ověřená konfigurace. Čas skutečné
+publikace zůstává oddělený od generatedAt. Student nemá teacher,
+retry/reset ani code-membership oracle. F7 startovní šifrování
+obsahu za AES-GCM/PBKDF2 s alespoň 40bit kódem stále čeká.
+
+ZBÝVÁ
+E6 veřejný build a Git historie; E7 checklist reálných mobilů;
+E8 úplná forgery matice; E9 závěrečná regrese/CI; E10 release
+candidate podle GARP 2.7. E5 neaktualizovalo historický E0 public scan.
+iPhone/iPad Safari, Android a jiné enginy: ANALYZED / NOT TESTED.
+GitHub Actions exact-SHA, protected-main promotion, živý deployment,
+živé AI/Forms a ruční accessibility kontrola nebyly provedeny.
+NOT READY – BLOCKING ISSUE zůstává platné pro ostrý třídní experiment.
+
+PŘEDÁNÍ
+Zdrojový candidate ZIP 7.1.81, plain TXT, release poznámky, testy
+a sanitizované JSON/log evidence. Bez node_modules, dist, .git,
+skutečných rosterů, privátních RSA, hotových teacher HTML a PDF.
+SemVer identity/GARP 2.7 piny aktualizovány společně; RELEASE.changes
+má nejnovější položku nahoře a nejvýše deset záznamů. Bez publikování.

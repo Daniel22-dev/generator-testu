@@ -1,0 +1,14 @@
+{
+  "schema": "ghrab-stage3-pdf-runtime-v1",
+  "status": "passed",
+  "results": [
+    {
+      "file": "student_QA-bezpe-n-test_TTCX813-F8DC50E5.pdf",
+      "bytes": 117293
+    },
+    {
+      "file": "ucitel_klic_QA-bezpe-n-test_TTCX813-F8DC50E5.pdf",
+      "bytes": 115699
+    }
+  ]
+}

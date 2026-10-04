@@ -1,3 +1,13 @@
+## 7.1.77 — 2026-10-03 — RED-TEAM v2 / E1 izolace studentského exportu
+
+- odstraněny teacher/recovery credentialy, učitelské funkce, retry/reset a veřejné rosterové hashe z bezpečného studentského HTML; export při nalezení zakázaných polí selže;
+- parser Acorn se načítá před prvním bezpečným exportem; ověřen čistý browser start bez předem injektovaného parseru;
+- společný odemykací kód třídy má samostatnou derivaci a zachovává rozpracovaný pokus; jde pouze o procedurální brzdu;
+- soukromý roster zachovává školní e-mail; párování Forms a zpevnění payloadu čekají na E3;
+- doplněny testy skutečných artefaktů, záměrně poškozených konfigurací a běžného start/reload/submit v desktop Chromium;
+- opravena nápověda a přetečení štítku pracovního release při šířce 320 px;
+- synchronizovány SemVer, RELEASE.changes (10 položek), PWA, SBOM a GARP 2.7 trust anchor; stav candidate, nepovolena produkce.
+
 ## 7.1.76 — 2026-10-03 — R7 / E1 persistence + Verifier binding remediation
 
 - E1: active-attempt persistence pouziva podepsane HMAC zaznamy s monotoni revizi a sekundarni IndexedDB autoritou; tamper, local deletion a stale replay se fail-closed zablokuji;

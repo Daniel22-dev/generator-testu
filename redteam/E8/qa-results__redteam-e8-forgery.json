@@ -1,0 +1,1643 @@
+{
+  "stage": "E8",
+  "version": "7.1.84",
+  "status": "PASS",
+  "syntheticOnly": true,
+  "generatorSha256": "503aae9edef9b7e9558fbb84150c2322a3ca27a1899816cd1cb532afa3522d47",
+  "caseCount": 108,
+  "rejections": 89,
+  "replaySequences": 6,
+  "controls": 13,
+  "negativeControls": 108,
+  "baselineGaps": 0,
+  "cases": [
+    {
+      "id": "schema-version",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.version",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "unknown-server-claim",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.fields",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "unknown-trust-object",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.fields",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "unknown-total-score",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.fields",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "empty-attempt",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.identity",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "unsafe-attempt",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.attempt",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "missing-student",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.identity",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "identity-mode-invalid",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.identity",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "code-shape",
+      "group": "schema",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.code",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "student-code-disagree",
+      "group": "identity",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.code",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "unknown-roster-code",
+      "group": "identity",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.identity-variant",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "identity-mode-rebound",
+      "group": "identity",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.identity-variant",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "foreign-test-inner",
+      "group": "binding",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.test",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "foreign-manifest-inner",
+      "group": "binding",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.manifest",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "hash-invalid-shape",
+      "group": "binding",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.hash",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "hash-foreign-reference",
+      "group": "binding",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.hash",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "foreign-variant-missing",
+      "group": "variant",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.variant",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "foreign-existing-variant",
+      "group": "variant",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.identity-variant",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "default-alias-not-assigned",
+      "group": "variant",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.identity-variant",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "identity-rebound-variant",
+      "group": "variant",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.identity-variant",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-wrong-account",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.identity-mismatch",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "complete-identity-rebinding",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.identity-mismatch",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-foreign-domain",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.email",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-email-missing",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.email",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-email-number",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.source-shape",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-email-oversize",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.source-shape",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-time-missing",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.timestamp",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-time-invalid",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.timestamp",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-before-publication",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.timestamp",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-policy-missing",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.missing-policy",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-dst-ambiguous",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.timestamp",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-dst-nonexistent",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.timestamp",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-metadata-id",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.forms-metadata",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-metadata-title",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.forms-metadata",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "forms-metadata-group",
+      "group": "anchors",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.forms-metadata",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "end-before-start",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.order",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "invalid-calendar",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.order",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "no-timezone",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.order",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "start-before-publication",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.time-window",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "end-after-forms",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "anchors.time-window",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "event-after-end",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.event",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "event-before-start",
+      "group": "time",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.event",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "empty-telemetry",
+      "group": "telemetry",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.telemetry",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "missing-telemetry",
+      "group": "telemetry",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.telemetry",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "object-telemetry",
+      "group": "telemetry",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.telemetry",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "telemetry-over-limit",
+      "group": "telemetry",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.telemetry",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "event-nested-data",
+      "group": "telemetry",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.event",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "event-missing-time",
+      "group": "telemetry",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.event",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "missing-attempt-start",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.start",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "duplicated-attempt-start",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.start",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "attempt-start-wrong-time",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.start",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "attempt-start-wrong-id",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.start",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "split-small-exceeds-total",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.split",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "split-percent-disagrees",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.split",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "split-zero-total",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.split",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "split-missing-numbers",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.split",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "changes-negative",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.changes",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "changes-total-disagrees",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.changes",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "changes-unknown-question",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.changes",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "answers-array",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.answers",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "answers-unknown-question",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.answer",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "answer-out-of-range",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.answer",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "answer-nested-object",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.answer",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "answer-string-index",
+      "group": "answers",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.answer",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "score-out-of-range",
+      "group": "score",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.score",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "grade-out-of-range",
+      "group": "score",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.score",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "joker-disabled-in-private-config",
+      "group": "joker",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.joker",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "joker-selection-after-start",
+      "group": "joker",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.joker",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "joker-time-without-choice",
+      "group": "joker",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.joker",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "joker-event-without-choice",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.joker",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "joker-choice-without-event",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "telemetry.joker",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "joker-event-wrong-time",
+      "group": "semantics",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "time.event",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "inner-duplicate-key",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.duplicate-key",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "inner-escaped-duplicate",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.duplicate-key",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "inner-prototype-key",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.prototype",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "inner-depth-limit",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.limit",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-foreign-test",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.test",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-foreign-manifest",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.manifest",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-foreign-hash",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "binding.hash",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-unknown-field",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.fields",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-plain-fallback",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.crypto",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-algorithm",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.crypto",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-bad-base64",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.base64",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-short-iv",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.crypto-size",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-short-key",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.crypto-size",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "ciphertext-gcm-tamper",
+      "group": "envelope",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "crypto.parse-decrypt",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "invalid-utf8",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "crypto.parse-decrypt",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "outer-duplicate-key",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "schema.duplicate-key",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "oversize-txt",
+      "group": "parser",
+      "expect": "REJECTED",
+      "categories": [
+        "DETECTED",
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "invalid-current",
+      "code": "envelope.size",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "valid-correct",
+      "group": "controls",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "valid-unanswered",
+      "group": "controls",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "client-score-inflated",
+      "group": "controls",
+      "expect": "RESCORED",
+      "categories": [
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "client-score-deflated",
+      "group": "controls",
+      "expect": "RESCORED",
+      "categories": [
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "case-normalized-code",
+      "group": "controls",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "valid-split-summary",
+      "group": "controls",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "valid-start-detail",
+      "group": "controls",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "valid-joker",
+      "group": "controls",
+      "expect": "JOKER_EXCLUDED",
+      "categories": [
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "valid-variant-b",
+      "group": "controls",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "missing-forms-diagnostic",
+      "group": "limits",
+      "expect": "DIAGNOSTIC_ONLY",
+      "categories": [
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "diagnostic-only",
+      "code": "",
+      "scored": 5,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "consistent-public-key-forgery",
+      "group": "limits",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED",
+        "ARCHITECTURAL LIMIT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "copied-html-hash-forgery",
+      "group": "limits",
+      "expect": "REVIEW_ONLY",
+      "categories": [
+        "CLIENT-CONTROLLED",
+        "ARCHITECTURAL LIMIT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "full-year-other-test",
+      "group": "routing",
+      "expect": "OTHER_TEST",
+      "categories": [
+        "HARDENED"
+      ],
+      "status": "PASS",
+      "classification": "other-test",
+      "code": "",
+      "scored": 0,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "replay-exact-ciphertext",
+      "group": "replay",
+      "expect": "REPLAY_REJECTED",
+      "categories": [
+        "DETECTED",
+        "BEST-EFFORT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "replay-reencrypted-same",
+      "group": "replay",
+      "expect": "REPLAY_REJECTED",
+      "categories": [
+        "DETECTED",
+        "BEST-EFFORT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "replay-score-only-reencrypted",
+      "group": "replay",
+      "expect": "REPLAY_REJECTED",
+      "categories": [
+        "DETECTED",
+        "BEST-EFFORT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 1,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "replay-changed-answer-same-attempt",
+      "group": "replay",
+      "expect": "REPLAY_REJECTED",
+      "categories": [
+        "DETECTED",
+        "BEST-EFFORT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "replay-new-attempt-same-identity",
+      "group": "replay",
+      "expect": "REPLAY_REJECTED",
+      "categories": [
+        "DETECTED",
+        "BEST-EFFORT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "replay-same-attempt-other-identity",
+      "group": "replay",
+      "expect": "REPLAY_REJECTED",
+      "categories": [
+        "DETECTED",
+        "BEST-EFFORT"
+      ],
+      "status": "PASS",
+      "classification": "current",
+      "code": "",
+      "scored": 5,
+      "effective": 0,
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    }
+  ],
+  "scope": "Actual generated HTML in jsdom; native Node RSA-OAEP/AES-GCM, independent public-key-only hostile payload creation; controlled DOM/IndexedDB. Original CSP/native desktop browser is a separate gate.",
+  "negativeControlMethod": "Each oracle is rerun against a deliberately weakened generated verifier in memory. Exact diagnostic codes are part of rejection oracles: a secondary rejection with the wrong code is a detected guard regression, not evidence of successful forgery acceptance.",
+  "categories": [
+    "PREVENTED",
+    "DETECTED",
+    "HARDENED",
+    "BEST-EFFORT",
+    "CLIENT-CONTROLLED",
+    "ARCHITECTURAL LIMIT",
+    "SERVER REQUIRED"
+  ],
+  "limits": [
+    "Consistent public-key forgeries and copied expected HTML hashes can reach private scoring; REVIEW_REQUIRED, never runtime authenticated",
+    "Forms policy and unaltered owner-imported CSV are attested, not live-inspected",
+    "Telemetry contradictions are detectable; consistent fabricated telemetry is CLIENT-CONTROLLED",
+    "Private replay persistence is same-profile best effort; full wipe/new profile needs server trust",
+    "Mobile ANALYZED / NOT TESTED; another device MIMO TECHNICKÝ DOSAH – POUZE DOZOR",
+    "F7 content encryption, E6 residual/rotation, physical E7 and E9/E10 remain blocking; NOT READY"
+  ]
+}

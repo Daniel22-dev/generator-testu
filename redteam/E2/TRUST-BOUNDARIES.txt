@@ -1,0 +1,64 @@
+GIT 7.1.78 — E2 — HRANICE DŮVĚRY
+
+TRUSTED BUILD / SOUKROMÝ PC VLASTNÍKA
+assembleTestHtml vytvoří testId, manifest a privátní varianty.
+assembleSecureOfflinePackage serializuje explicitní veřejný kontrakt,
+vypočítá hash hotového studentského HTML a uloží jeho referenci do
+soukromého verifieru. Answer key, RSA private key a roster patří pouze
+vlastníkovi. Tato důvěra předpokládá nepozměněný privátní verifier.
+Soubory v redteam/E2 obsahují pouze evidence, nikoli teacher fixture.
+
+UNTRUSTED CLIENT / STUDENT
+Student zná veřejný RSA klíč a smí vytvořit libovolný ciphertext.
+Hash public HTML si spočítá nebo převezme; může jej uvést i upravený
+runtime. Shoda s privátní referencí je CLAIM_MATCHES_REFERENCE, nikoli
+důkaz běhu původního runtime. Odpovědi, identity/code, variantu,
+attemptId, časy, joker a securityEvents uvádí klient. I konzistentně
+vypadající události zůstávají PRESENT_UNVERIFIED. Žádný příznak z payloadu
+typu serverVerified/trustAssessment/AUTHORIZED nemůže povolit klasifikaci.
+Prázdné, chybějící a neplatné securityEvents dostanou diagnostiku.
+
+TRUSTED VERIFIER / SOUKROMÝ PC VLASTNÍKA
+verifyText dešifruje, kontroluje stávající test/manifest/obal/variantu
+a existenci kódu a potom scorePayload přepočítá skóre podle privátního
+answer key. submissionTrust vzniká až zde a nepřebírá trusted bity
+z payloadu. OK/current znamená pouze tento technický průchod.
+resultTrust pro exporty znovu vynutí CLIENT-CONTROLLED a REVIEW_REQUIRED;
+ani změněné uložené trust bity nemohou udělat výsledek autorizovaným.
+Odmítnuté řádky neuvádějí provedené bodování ani ověřenou build vazbu.
+
+EXTERNÍ KOTVY / E3 PENDING
+Při správném nastavení Google Forms je ověřený školní účet a timestamp
+odpovědi externí kotvou. CSV však sám o sobě není důkazem, že Form byl
+správně nastaven; jeho export musí dodat vlastník z důvěryhodného zdroje.
+E2 zachovává formIdentity/formTimestamp jako oddělená importní metadata.
+Neporovnává účet s rosterem a nemá důvěryhodnou dolní mez publikace.
+Proto vždy NOT_VALIDATED. E3 musí tyto vazby vynutit pro klasifikaci.
+
+ZOBRAZENÍ / EXPORTY
+Výsledky: OPRAVENO — PŮVOD NEPROKÁZÁN; vyžaduje kontrolu.
+Dashboard: návrhy známek k posouzení a informativní průměr.
+Feedback: notice platí i pro score-only a prostý text.
+CSV results/submissions/index: osm trust sloupců, classification authorization.
+JSON: trustContract, authorizedClassificationCount=0, explicitní trust každého řádku.
+HTML archiv: souhrn, stav a individuální feedback uvádí neprokázaný původ.
+Žolík dál vyloučen z návrhů klasifikace; duplicate/conflict workflow zachován.
+
+GARANCE
+PREVENTED: v testovaných exportech se klientské trusted bity nestanou
+  autorizací klasifikace; skóre z payloadu nepřebije privátní přepočet.
+DETECTED: prázdná/chybějící/neplatná telemetrie dostane varování o chybějícím
+  podkladu. Nejde o důkaz, že student podváděl.
+HARDENED: jednotná explicitní trust diagnostika ve všech cestách exportu.
+CLIENT-CONTROLLED: runtime self-hash, časy a bezpečnostní události.
+ARCHITECTURAL LIMIT: konzistentní podvrh pod vlastní identitou může mít
+  všechny veřejné build hodnoty; serverless verifier neprokáže původ JS.
+SERVER REQUIRED: globální autorita pokusu napříč browser profily/storage;
+  serverová varianta je DEFERRED – SERVER VERSION.
+BEST-EFFORT: třídní odemykací kód pod osobním dozorem, varianty zadání.
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhé zařízení fotící displej a AI.
+
+READINESS
+NOT READY – BLOCKING ISSUE. Odstranění falešného tvrzení o autenticitě
+není dokončení E3 ani oprava všech způsobů W1. Obsah před startem je
+stále plaintext, historické veřejné úniky nezměněny. E3–E10 pending.

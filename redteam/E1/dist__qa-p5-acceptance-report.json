@@ -1,0 +1,91 @@
+{
+  "schema": "ghrab-p5-acceptance-result-v2",
+  "appId": "generator",
+  "appVersion": "7.1.77",
+  "stage": "P5-R2",
+  "summary": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "status": "passed",
+  "passed": [
+    {
+      "id": "acceptance.source",
+      "detail": "release-acceptance.json"
+    },
+    {
+      "id": "acceptance.schema",
+      "detail": "ghrab-release-acceptance-v1"
+    },
+    {
+      "id": "acceptance.stage",
+      "detail": "P5"
+    },
+    {
+      "id": "acceptance.appId",
+      "detail": "generator"
+    },
+    {
+      "id": "acceptance.version",
+      "detail": "7.1.77 vs 7.1.77"
+    },
+    {
+      "id": "acceptance.server-optional",
+      "detail": "false"
+    },
+    {
+      "id": "acceptance.server-status",
+      "detail": "prepared-not-connected"
+    },
+    {
+      "id": "acceptance.github-status",
+      "detail": "not-yet-uploaded"
+    },
+    {
+      "id": "acceptance.not-runtime-published",
+      "detail": "dist/config/release-acceptance.json"
+    },
+    {
+      "id": "file.dist/qa-p5-runtime-report.json",
+      "detail": "dist/qa-p5-runtime-report.json"
+    },
+    {
+      "id": "status.dist/qa-p5-runtime-report.json",
+      "detail": "passed"
+    },
+    {
+      "id": "file.dist/qa-p3-browser-report.json",
+      "detail": "dist/qa-p3-browser-report.json"
+    },
+    {
+      "id": "status.dist/qa-p3-browser-report.json",
+      "detail": "passed"
+    },
+    {
+      "id": "file.dist/qa-p5-release-report.json",
+      "detail": "dist/qa-p5-release-report.json"
+    },
+    {
+      "id": "status.dist/qa-p5-release-report.json",
+      "detail": "passed"
+    },
+    {
+      "id": "runtime.scripts-executed",
+      "detail": "true"
+    },
+    {
+      "id": "runtime.transport",
+      "detail": "local-http"
+    },
+    {
+      "id": "runtime.zero-blockers",
+      "detail": "{\"critical\":0,\"serious\":0,\"moderate\":0,\"minor\":0,\"overflows\":0,\"initFailures\":0,\"browserExceptions\":0,\"qaErrors\":0,\"blockers\":0}"
+    },
+    {
+      "id": "source.no-secret-files",
+      "detail": ""
+    }
+  ],
+  "failed": []
+}
