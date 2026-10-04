@@ -1,0 +1,12 @@
+{
+  "command": "npm test",
+  "startedAt": "2026-10-03T21:25:34.213684+00:00",
+  "finishedAt": "2026-10-03T21:27:11.563443+00:00",
+  "exitCode": 0,
+  "complete": true,
+  "bytes": 75812,
+  "rawLogBytes": 75856,
+  "rawLogSha256": "0fec7104cfabb3056c27d171751a176fb50895b702598a70681d7b663b31f17e",
+  "logSha256": "494ebe6e81f8d0fd731d20a29736fec19eca58404807b3a65a9ca0b9263a236c",
+  "normalization": "ANSI/trailing whitespace removed after raw completion and matching size validation"
+}

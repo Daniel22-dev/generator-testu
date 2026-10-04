@@ -1,0 +1,90 @@
+{
+  "status": "PASS",
+  "controls": [
+    {
+      "baseline": "7.1.77",
+      "case": "trust",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: private verifier must construct trust assessment"
+    },
+    {
+      "baseline": "7.1.77",
+      "case": "telemetry",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: telemetry must have a private unverified assessment"
+    },
+    {
+      "baseline": "7.1.77",
+      "case": "ui",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:"
+    },
+    {
+      "baseline": "7.1.77",
+      "case": "exports",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: runtime_authenticity"
+    },
+    {
+      "baseline": "7.1.77",
+      "case": "credentials",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "baseline": "7.1.77",
+      "case": "browser",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "baseline": "7.1.76",
+      "case": "trust",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: private verifier must construct trust assessment"
+    },
+    {
+      "baseline": "7.1.76",
+      "case": "telemetry",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: telemetry must have a private unverified assessment"
+    },
+    {
+      "baseline": "7.1.76",
+      "case": "ui",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:"
+    },
+    {
+      "baseline": "7.1.76",
+      "case": "exports",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: runtime_authenticity"
+    },
+    {
+      "baseline": "7.1.76",
+      "case": "credentials",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    },
+    {
+      "baseline": "7.1.76",
+      "case": "browser",
+      "exit": 1,
+      "expectedFailure": true,
+      "diagnostic": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    }
+  ],
+  "syntheticOnly": true
+}

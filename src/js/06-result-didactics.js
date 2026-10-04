@@ -75,7 +75,15 @@ function renderQualityDiagnostics(){
   const verdict = q.score >= 8.5 ? 'výborné' : (q.score >= 7 ? 'dobré' : (q.score >= 5 ? 'potřebuje kontrolu' : 'rizikové'));
   panel.innerHTML = `<summary><div class="quality-title">🧪 Diagnostika kvality vygenerovaného testu</div><div class="quality-score">${q.score}/10 · ${esc(verdict)}</div></summary>` +
     `<div class="quality-list">${q.checks.map(c => `<div class="quality-item ${esc(c.level)}"><span>${c.level==='ok'?'✅':(c.level==='bad'?'❌':'⚠️')}</span><div><strong>${esc(c.title)}</strong><br>${esc(c.detail)}</div></div>`).join('')}</div>`;
+  renderStartCode();
   renderDidacticReview();
+}
+function renderStartCode(){
+  let box=$('privateStartCode');if(box)box.remove();
+  if(!generatedPackage||!generatedPackage.startCode)return;
+  box=document.createElement('div');box.id='privateStartCode';box.className='note warn';
+  box.textContent='Startovní kód: '+generatedPackage.startCode+' — ukaž až při zahájení. Není to odemykací kód třídy. Kód je také v soukromém verifieru. Studentský soubor zveřejni co nejpozději.';
+  $('qualityPanel').insertAdjacentElement('beforebegin',box);
 }
 // ── Didaktická kontrola po vygenerování (pravidlová, BOD 5–8 + 15) ─────────────
 function analyzeDidactics(st, data){

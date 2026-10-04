@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "version": "7.1.81",
+  "browser": "153.0.8010.0",
+  "syntheticOnly": true,
+  "platformScope": "desktop Chromium; real mobile NOT TESTED",
+  "checks": [
+    "public-key forged payload through real Forms CSV import",
+    "score recalculated from private answer key",
+    "matching self-hash does not authorize",
+    "nonempty client telemetry stays unverified",
+    "UI declares unproven origin",
+    "actual CSV/JSON/score-only feedback downloads require review",
+    "no pageerror; original student/verifier CSP"
+  ],
+  "limitation": "A public-key forge consistent with the roster account and publication/Forms window can still pass. Runtime provenance is unproven even with matched E3 anchors."
+}

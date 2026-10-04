@@ -1,0 +1,194 @@
+GIT — RED-TEAM MASTER PROMPT v2 — E1 PŘEDÁVACÍ CHECKPOINT
+Datum: 2026-10-03
+Verze: 7.1.77, lokální větev candidate
+Stav: NOT READY – BLOCKING ISSUE
+Dokončeno: E0 a E1. E2–E10 nejsou dokončeny. Nejde o finální release.
+
+A. PŮVODNÍ STAV
+Vstupní 7.1.76 export obsahoval ucitelPinHash, recoveryCodeHash,
+učitelský režim/retry/reset a hashe studentských kódů. Soukromý roster
+zahazoval e-mail. Skutečný verifier přijímal nově vyrobený veřejným klíčem
+zašifrovaný výsledek s prázdnou telemetrií, nemožnými časy a cizím Forms
+účtem jako current/OK/100. Podrobnosti a veřejná historie jsou v E0 TXT.
+
+B. PROVEDENÉ ZMĚNY
+1. securePublicCfg je explicitní veřejný kontrakt bez teacher/recovery
+   credentialů, rosteru, identityCodeHashes, studentHashes a roster salt.
+   Veřejné skupiny obsahují pouze key/name/a11y. Jediný přípustný
+   secret-derived údaj je unlockCodeHash s doménou classroom-unlock.
+2. Nový 13da-secure-student-isolation.js parsuje skutečný runtime pomocí
+   již dostupného Acorn parseru. Před serializací odstraní učitelské
+   funkce, retry/reset a výpočty veřejného členství v rosteru. Zbylou
+   šablonu znovu parsuje a kontroluje zakázané symboly. Assembler před
+   prvním exportem vyčká na lazy načtení lokálního Acorn assetu; selhání
+   načtení blokuje export. Nejde o minifikaci ani runtime skrývání tlačítek.
+3. Studentské HTML nemá teacher modal/panel ani retry/reset ovládání.
+   Odevzdaný nebo cizí rozpracovaný pokus zobrazí kontaktování učitele.
+   Legitimní opakování vyžaduje nový test a nové kódy.
+4. Kontrola studentského kódu v prohlížeči je pouze syntaktická. Při více
+   skupinách student zvolí učitelem přidělenou variantu; soukromý verifier
+   nadále kontroluje vazbu kódu/identity na variantu. Veřejný membership
+   oracle byl odstraněn, kontrola identity se tím nepřesouvá na klienta.
+5. Odemykání používá jeden kód pro test/třídu. PBKDF2-SHA256/120000,
+   uppercase normalizace a classroom-unlock|testId jsou oddělené od
+   historických teacher/recovery domén. Učitelský secret zámek neodemkne.
+   Odemykání zachová attemptId, deadline, identitu, odpovědi a události.
+   Hash je offline zkoušitelný a odemčení lze změnou runtime obejít.
+6. assertSecureStudentIsolation rekurzivně kontroluje známá zakázaná
+   konfigurační a answer-key pole; kontroluje i privátní parametry RSA
+   publicKey a zakázané funkce v HTML. Zakázané pole export zastaví.
+7. rosterForVerifier zachovává code,label,email pouze u učitele. Samotné
+   uložení e-mailu ještě nevynucuje shodu s Forms; to čeká na E3.
+8. Nápověda rozlišuje secure export od staršího okamžitého výsledku.
+   Opraveno přetečení štítku pracovního release na 320 px.
+9. Verze 7.1.77 je současně v RELEASE, newest-first RELEASE.changes
+   (10 položek), package/lockfile, PWA a QA/GARP identitách. Obnoven SBOM,
+   AI assurance fingerprint a externí workflow piny skutečného trust
+   anchoru. Release acceptance zakazuje produkční použití a čeká na CI.
+10. Npm gates zahrnují nové skutečné exportní a Chromium testy. Dva PDF
+    testy respektují volitelný CHROMIUM_PATH; defaultní CI browser nezměněn.
+
+Historická raw šablona secureStudentScript zůstává v GENERÁTORU pro
+migraci a dosavadní unit testy. Secure student export používá výhradně
+isolatedSecureStudentScript. Režim okamžité známky zůstává legacy režim
+s učitelskými funkcemi a není určen pro tento přísný red-team experiment.
+Sdílený formulář generátoru stále vyžaduje historický Teacher/Admin secret;
+secure export ho ani jeho hash nezahrnuje. Zjednodušení tohoto UI čeká E2.
+
+C. ODSTRANĚNÉ ZRANITELNOSTI V NOVÉM SECURE EXPORTU
+PREVENTED: serializace známých teacher/recovery credentialů, rosterových
+hashů a zakázaných učitelských funkcí. Skutečný syntetický artefakt nemá
+raw credentialy, roster kód ani e-mail a nemá privátní RSA parametry.
+PREVENTED: učitelský heslový retry/reset ve studentském HTML.
+HARDENED: fail-closed kontrola assembleru a absence parseru. Mutace
+teacher/recovery hashů, code hashů, studentHashes, privátního JWK a
+answer-key pole jsou negativními kontrolami skutečného exportního flow.
+To není tvrzení, že E6 prokázala absenci libovolného odvozeného answer key
+ve všech myslitelných typech, a není to oprava starých veřejných souborů.
+
+D. ZMÍRNĚNÉ ZRANITELNOSTI A OVĚŘENÍ
+HARDENED: běžný start → odpověď → zámek → reload → odemčení → odevzdání
+zachovává pokus. Po odevzdání reload nepovolí další pokus. Cizí aktivní
+identita nemá reset. Starší tamper-evident persistence nebyla odstraněna.
+BEST-EFFORT: společný odemykací kód je procedurální brzda pod dozorem.
+Šifrování výsledku dál používá WebCrypto AES-GCM/RSA-OAEP bez plaintext
+fallbacku; scoring ve verifieru zůstává autoritativní.
+
+Finální testování na 7.1.77:
+- npm ci: exact lockfile závislosti instalovány;
+- npm test: PASS, včetně lint/build, R3, R5, GARP static, headless a workflow;
+- R5: 39 PASS / 0 FAIL / 0 ERROR; workflow: 55 PASS / 0 FAIL;
+- check:redteam-isolation: PASS, 7 skupin kontrol;
+- check:redteam-isolation-browser: PASS, první export v čisté browser relaci
+  načte lokální parser přesně jednou; skutečný desktop WebCrypto + IDB,
+  žádná pageerror, lock/reload/submit prošly;
+- lokální qa:p5:ci: PASS, včetně D7/D8, PDF runtime/quality, GARP 2.7,
+  platform, browser/runtime/XSS a axe; P5 release 46/46, acceptance 19/19;
+- runtime: 0 blockerů, 0 přetečení na 1280/390/320 px, 0 JS výjimek;
+- axe: 0 critical/serious/moderate/minor ve 4 testovaných stavech;
+- git diff --check: PASS.
+
+Negativní kontroly:
+- check:redteam-isolation proti původnímu skutečně sestavenému generátoru
+  7.1.76: očekávaný exit 1, AssertionError: ucitelPinHash;
+- browser test proti témuž původnímu generátoru: očekávaný exit 1,
+  teacherLogin je function místo undefined;
+- mutace zakázaných exportních polí a chybějícího parseru: odmítnuty.
+Nové gates tedy prokazatelně reagují na původní chybu, ne pouze na komentáře.
+Existující legacy testy, které vyžadovaly teacher/retry ve secure HTML,
+byly nahrazeny kontrolami jejich absence; instant role tests zůstávají.
+
+Prostředí: Node 24.19.0, npm 11.9.0, Playwright 1.61.1 dle lockfile,
+Chromium 153.0.8010.0 přes CHROMIUM_PATH. CI používá svůj připnutý browser;
+GitHub Actions nebyly spuštěny. Šlo o lokální ekvivalent, ne důkaz stejného
+CI runneru. Některé starší harnessy odemykají centrální access gate a
+runtime/axe harness upravuje CSP pro inicializaci; tyto výsledky nejsou
+autorizací produkčního přístupu. Nový student Chromium probe použil
+skutečné vygenerované HTML s jeho CSP. Reálné mobily: ANALYZED / NOT TESTED.
+Žádné reálné studentské osobní údaje nebyly použity v lokálních fixture.
+
+E. OTEVŘENÉ BODY A ARCHITEKTONICKÉ LIMITY
+F1 — FIXED pro nově vygenerovaný secure student artefakt a zkoušené
+secret-derived údaje. Přípustný odemykací hash je jen procedurální brzda.
+F2 — STILL PRESENT: klientský self-hash není trust anchor autenticity.
+F3 — STILL PRESENT: securityEvents/časy jsou CLIENT-CONTROLLED.
+F4 — PARTIALLY FIXED: běžný reload v testovaném profilu zpevněn;
+   úplný restart/jiný browser/anonymní/reset storage čeká E4.
+F5 — STILL PRESENT: staré teacher/code hashe v repozitáři a Pages nebyly
+   odstraněny. Rozsah 12 commitů/11 blobů; žádné globální tvrzení o cache.
+F6 — PARTIALLY FIXED: e-mail je zachován jen v soukromém rosteru;
+   porovnání s Forms ani důvěryhodné časové okno nejsou vynuceny.
+F7 — STILL PRESENT: otázky jsou plaintext. Povinné AES-GCM + PBKDF2
+   se startovním kódem ≥40 bitů je stále nutné implementovat a testovat.
+F8 — PARTIALLY FIXED: přibyly exportní negativní kontroly a důkaz podvrhu,
+   ale kompletní E8 matice/diagnostika ještě není dokončena.
+
+Znovu spuštěný probe na E1 vrátil W1-W3b current/OK/100 s cizím Forms
+účtem, nemožnými časy a prázdnými událostmi. E1 tedy W1 neopravil.
+Opakované přímé verifyText vrací current; stávající UI přitom obsahuje
+agregaci identických duplicit. E3/E8 musí ověřit celý import a replay.
+
+ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED: globální autorita pokusu
+napříč profily a úplným resetem zařízení vyžaduje externí autoritu;
+serverová verze je DEFERRED – SERVER VERSION. Forms je dostupná externí
+kotva, kterou musíme využít už teď. Ani po její integraci nepůjde
+prokázat běh nezměněného JavaScriptu na studentově kontrolovaném zařízení.
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhý telefon fotící obrazovku a AI
+na něm. Vlastník dozoruje osobně celou hodinu a druhé zařízení zakazuje
+pravidly. Odemykací kód není technická náhrada tohoto dozoru.
+
+F. W1–W3 / DALŠÍ RED-TEAM MATICE
+W1: vyrobený payload → STILL PRESENT. E3 musí odmítat prokazatelně
+nekonzistentní stavy; syntakticky a sémanticky konzistentní podvrh z vlastní
+identity nelze pouze veřejným šifrováním odlišit od poctivého klienta.
+W2: teacher/code-hash oracle nového exportu → PREVENTED v E1 zkouškách;
+širší answer-key leakage všech typů + deployment/history → E6 pending.
+W3a: odpovědi předané spolužákovi → BEST-EFFORT, dozor/varianty;
+software neověří původ znalosti v odpovědi.
+W3b: naivní přeposlání pod druhým Forms účtem → STILL PRESENT, priorita E3.
+Sofistikované přebindování na vlastní platný kód → CLIENT-CONTROLLED /
+ARCHITECTURAL LIMIT; neoznačovat za vyřešené prostým párováním e-mailu.
+Screenshot → systémový AI asistent → návrat → payload: E5/E7/E8 pending.
+Pouhý overlay bypass není vítězná podmínka; přijatý podvrh je W1.
+
+G. RELEASE READINESS A PŘESNÝ DALŠÍ KROK
+NOT READY – BLOCKING ISSUE. Blokuje W1, nevynucené Forms vazby, plaintext
+zadání, veřejné historické úniky a nedokončené E2–E10 acceptance.
+Local candidate nebyl pushnut, main nebyla změněna a deploy neproběhl.
+
+Pokračuj ze zdrojů 7.1.77, nezahazuj E1 opravy:
+1. E2: označit klientský hash/časy/telemetrii jako nedůvěryhodné ve verifier
+   UI/CSV/archivu; výsledek bez ověření externích kotev nesmí být označen
+   za legitimní. Zpřesnit public/private kontrakty a shared credential UI.
+2. E3, nejvyšší priorita: schema/limity, odpovědi proti privátní struktuře,
+   test/manifest/variant/kód binding, povinný ověřený Forms e-mail ↔ roster,
+   skutečná publikace → Forms timestamp kotva, nemožné časy/stavy,
+   identické i přešifrované duplicity. Chybějící externí kotvy fail-closed
+   pro klasifikaci; nikoli tiché OK. Testovat skutečný importní flow.
+3. F7: obsah šifrovat AES-GCM se samostatným náhodným salt/IV a PBKDF2
+   startovním kódem ≥40 bitů, vytvořeným u učitele a nepřítomným v HTML.
+   Nezaměnit ho s odemykacím kódem. Negativní kontroly plaintext leakage,
+   chybný kód, bitová změna ciphertextu a chybějící WebCrypto.
+4. E4–E6: storage/replay, runtime a skutečné artefakty všech typů. Veřejné
+   historické soubory nahradit/odstranit a řešit historii konkrétním plánem;
+   přepsání historie je odlišný destruktivní krok, ne část tohoto checkpointu.
+5. E7: ruční iOS/Android checklist pro vlastníka, vždy ANALYZED / NOT TESTED.
+6. E8: známé podvrhy s jednotlivými negativními kontrolami; E9 regrese/CI;
+   E10 GARP 2.7 candidate → chráněná main → deploy z main a ověření release.
+Po každé etapě znovu ZIP + prostý předávací TXT dle master promptu.
+
+Reprodukce: npm ci; npm test; npx playwright install chromium;
+npm run qa:p5:ci. Případně CHROMIUM_PATH=/cesta/k/chromium npm run qa:p5:ci.
+Probe otevřené W1: GIT_REDTEAM_BASELINE_REPORT=/tmp/e1-probe.json
+node scripts/redteam-baseline.mjs (stejný shellový příkaz s env před node).
+Negativní kontrola E0: nastav GIT_REDTEAM_GENERATOR_HTML na dist/index.html
+sestavený z E0 ZIPu a spusť check:redteam-isolation, případně browser gate.
+Očekávej FAIL, nikoli GREEN. Přiložené logs/json jsou průběžné důkazy,
+nikoli živá Forms konfigurace nebo certifikace reálného mobilu.
+
+Obsah ZIP: úplný zdrojový projekt bez node_modules/.git/dist a bez
+vygenerovaných studentských/verifier fixture či PDF s klíčem. Built teacher
+artefakty a privátní klíče testů nejsou součástí balíčku. Evidence obsahuje
+jen syntetické výsledky a veřejná metadata bez hodnot tajemství.
+
+SHA-256 původního vstupního ZIP: 0c8ca337922200c154834b0fa833d3a7e9800cc65a118cfa49287704e671716c

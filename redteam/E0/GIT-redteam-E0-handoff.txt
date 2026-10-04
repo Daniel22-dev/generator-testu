@@ -1,0 +1,149 @@
+GIT — RED-TEAM MASTER PROMPT v2 — E0 FORENZNÍ BASELINE
+Datum: 2026-10-03
+Vstup: generator-testu-main(3).zip, skutečná verze 7.1.76
+Stav: NOT READY – BLOCKING ISSUE
+Toto je checkpoint E0. Nejde o finální report E0–E10 ani o schválení testu pro třídu.
+
+1. HLAVNÍ NÁLEZ A PRVNÍ BLOKUJÍCÍ PROBLÉM
+W1 je prakticky reprodukovatelný. Lokální harness spustil skutečný generátor,
+vytvořil studentský test a jeho soukromý verifier se syntetickými identitami.
+Pomocí veřejného RSA klíče vyrobil nový zašifrovaný payload se správnými
+odpověďmi, prázdnými securityEvents, startedAt v roce 2040 a submittedAt
+v roce 2000. Importní metadata obsahovala Forms e-mail druhého studenta.
+verifyText vrátil classification=current, status=OK, pct=100.
+
+Nejde o získání privátního klíče ani změnu autoritativního skóre: verifier
+skóre sám přepočetl ze zvolených odpovědí. Problém je přijetí nedůvěryhodně
+vyrobených odpovědí a nekonzistentních metadat jako validního výsledku.
+Důvěryhodný Forms e-mail ani čas nebyly v tomto řetězci účinně vynuceny.
+Nejsilnější otevřený blok je tedy W1/E3. E1 současně odstraní přímo
+opravitelný únik secret-derived dat a veřejný seznam hashů kódů.
+
+Opakované přímé volání verifyText se stejným ciphertextem opět vrací current.
+Tento probe nepřidává řádky do RESULTS: sám o sobě neprokazuje dvojí
+započtení v UI. Existující agregace umí označit identické duplicity a
+vyřazovat je; end-to-end replay a přešifrované podvrhy musí ověřit E3/E8.
+
+2. SKUTEČNÝ RUNTIME FLOW A HRANICE DŮVĚRY
+BUILD: assembleTestHtml → varianty s klíči + privátní roster →
+assembleSecureOfflinePackage → stripVariantsForStudent → securePublicCfg →
+buildSecureStudentHtml. RSA klíčový pár vzniká u učitele. Učitelský verifier
+obsahuje privátní RSA JWK a úplné varianty; student má veřejný RSA JWK.
+Manifest a SHA-256 hotového student HTML vznikají v generátoru.
+
+STUDENT: secureStudentScript → startTest → RESP + lokální události →
+secureAnswers → encryptPayloadForTeacher → SECURE-ANSWERS-V1.
+Výsledkový balíček používá hybridní AES-GCM/RSA-OAEP šifrování.
+Klientská studentHtmlSha256, startedAt/submittedAt, identita, groupKey,
+securityEvents, odpovědi a statistiky změn jsou CLIENT-CONTROLLED.
+Upravený runtime může vložit očekávaný hash bez běhu původního HTML.
+
+VERIFIER: verifyText rozbalí a dešifruje → kontroluje testId/manifest a
+některé vazby varianty/identity → scorePayload opravuje podle privátního
+klíče odpovědí → RESULTS a diagnostika/statistiky.
+Shoda testId/manifestHash ověřuje vazbu na známý build, nikoli původ
+payloadu. Správné RSA šifrování neprokazuje AUTHENTICITY runtime.
+
+CONFIDENTIALITY: oddělení answer key a privátního klíče je smysluplné.
+INTEGRITY: AES-GCM brání změně již hotového ciphertextu bez klíče relace,
+ale nezabrání studentovi vytvořit nový platně zašifrovaný obsah.
+AUTHENTICITY: veřejný klíč ani klientem hlášený hash ji neprokazují.
+CLIENT-SIDE TELEMETRY: prázdný seznam událostí není důkaz nepodvádění.
+
+3. F1–F8 PROTI BASELINE
+F1 — STILL PRESENT. Skutečně vygenerované secure student HTML má
+ucitelPinHash, recoveryCodeHash a učitelské funkce. Má také dva hashe
+šestiznakových studentských kódů v syntetické fixture. Jde o offline
+oracly pro hádání; nebyl prováděn slovníkový útok na reálné credentialy.
+Společný odemykací hash třídy je podle zadání přípustná procedurální brzda,
+nikoli bezpečnostní hranice. Ostatní teacher/recovery data musí z exportu pryč.
+
+F2 — STILL PRESENT. Studentův self-reported hash může být zkopírován do
+podvrhu. Trusted hash uložený ve verifieru nedokazuje jeho skutečné použití.
+
+F3 — STILL PRESENT. Události vytváří studentův prohlížeč. Prázdná telemetrie
+s nemožnými časy prošla verifikačním vstupem jako OK. E2 musí opravit
+význam diagnostiky; E3 musí kontrolovat sémantiku a externí kotvy.
+
+F4 — PARTIALLY FIXED. Zdroj má HMAC pečetě, revize a sekundární IndexedDB
+stav. To zpevňuje běžný reload/rollback téhož profilu. Kompletní restart,
+anonymní režim, jiný prohlížeč a úplný reset storage nejsou tímto E0
+checkpointem vyhodnoceny jako PASS. Lokální stav nemá globální autoritu.
+
+F5 — STILL PRESENT. Ve veřejné dosažitelné historii byly nalezeny
+teacher-derived údaje v osmi HTML blobech; čtyři současné HTML mají hashe
+studentských kódů. Ověřené čtyři Pages URL vracely HTTP 200 a bajtově
+odpovídaly main. Učitelský verifier ani privátní RSA JWK nebyl při kontrole
+nalezen v dosažitelných objektech. To není důkaz absence všech možných
+odvozených answer keys ani absence ve všech cache/fork/archive místech.
+
+F6 — STILL PRESENT. rosterForVerifier zahazuje e-mail. Párování Forms
+e-mail ↔ kód není v testované cestě vynuceno. Nastavení skutečných Forms
+nebylo kontrolováno; povinný checklist je níže.
+
+F7 — STILL PRESENT. Otázky jsou čitelné ve veřejném HTML před startem.
+Hybridní šifrování výsledku nešifruje zadání. Povinné šifrování obsahu
+AES-GCM + PBKDF2 ze startovního kódu alespoň 40 bitů chybí.
+
+F8 — PARTIALLY FIXED. Existuje diagnostika, auditní události a některé
+kontroly duplicit. Chybí úplná odmítací matice E8 a vyhodnocení externích
+kotev. Současný probe ukazuje kritickou mezeru, není to E8 acceptance PASS.
+
+4. VEŘEJNÝ REPOZITÁŘ A ROZSAH DŮKAZŮ
+Repo: https://github.com/Daniel22-dev/interaktivni-testy
+HEAD: 2af3fade24465511503dc9f215f7d91ab4a066b1
+Rozsah: všechny inzerované refs, 12 dosažitelných commitů, 11 blobů.
+Inzerována byla refs/heads/main. Nebyly testovány orphan objekty, smazané
+vzdálené refs, forky, CDN cache ani oddělené GitHub Actions artefakty.
+
+Nálezy v současných souborech: Appearance.html, PAST PERFECT.html,
+Unidad 1.html, Unit 5 revision.html obsahují teacher hash a hashe kódů.
+Další teacher-derived nálezy: brona-test_student_test.html,
+english-or-czenglish-aktivita_student_test.html,
+relative-clauses_student_test.html a historický nemcina-test.html.
+Evidence zveřejňuje jen cestu, objekt a typ nálezu; žádné hodnoty tajemství.
+Nebyla změněna historie ani obsah vzdáleného repozitáře.
+
+5. W1–W3 A GARANCE
+W1: STILL PRESENT; podvrh je přijat. Šifrování znamená CONFIDENTIALITY,
+nikoli AUTHENTICITY. Opravitelné vazby a validace mají nejvyšší prioritu.
+W2: teacher hash a kódové hashe jsou dostupné; únik skutečného answer key
+nebyl tímto probe prokázán. Izolace všech typů a deploymentu čeká na E6.
+W3a: předání získaných odpovědí jinému studentovi na stejných úlohách
+nelze z odpovědí rozlišit od znalosti; dozor a varianty jsou BEST-EFFORT.
+W3b: cizí Forms e-mail v probe neblokuje cizí kód. Sofistikované přebindování
+na vlastní platný kód je další CLIENT-CONTROLLED / ARCHITECTURAL LIMIT.
+Pouhé odstranění zámku není výhra. Řetězec AI → podvržený přijatý výsledek
+se naopak musí vyhodnocovat jako W1.
+
+Zámek/odemykací kód: BEST-EFFORT, pod osobním dozorem vlastníka celých
+přibližně 40 minut. Zakázaný druhý telefon: MIMO TECHNICKÝ DOSAH – POUZE
+DOZOR. Serverové autority pokusů: DEFERRED – SERVER VERSION. Nevydávat
+zákaz druhého telefonu za technickou detekci ani SERVER REQUIRED řešení.
+
+6. GOOGLE FORMS — CHECKLIST PRO VLASTNÍKA, NEOVĚŘENO
+[ ] přihlášení školním účtem a omezení na školní doménu;
+[ ] sběr ověřeného e-mailu Googlem, nikoli volného textového e-mailu;
+[ ] jedna odpověď na účet a správné oprávnění/uzavření formuláře;
+[ ] export ověřeného e-mailu a Forms timestamp s jasnou zónou;
+[ ] záznam skutečného okamžiku publikace/startu u učitele;
+[ ] E3: verifier odmítá neshodu e-mailu s privátním rosterem;
+[ ] E3: čas payloadu kontroluje proti publikace → Forms timestamp oknu;
+[ ] oddělený hlásící formulář s pokusem, výsledkem a reprodukcí průniku.
+Syntetická metadata v harnessu neověřují nastavení skutečného Forms.
+
+7. REPRODUKCE A DALŠÍ KROK
+ZIP obsahuje původní produktové zdroje 7.1.76 a dva forenzní helpery.
+Po rozbalení: npm ci; npm run build; node scripts/redteam-baseline.mjs.
+Očekávaný důkaz zranitelnosti je W1-W3b current/OK/100, nikoli PASS
+bezpečnostní acceptance. npm run build na původním zdroji prošel.
+Původní baseline nebyla v E0 vydávána za kompletně regresně certifikovanou.
+
+Navazující E1 odstraňuje teacher/recovery schopnosti a rosterové oracly
+ze secure student exportu. Navazující E2/E3 musí zpevnit trust model,
+Forms vazby, časové kotvy, schema a replay diagnostiku. F7 zůstává povinné.
+E7 na reálných mobilech bude vždy ANALYZED / NOT TESTED z pohledu modelu.
+Kandidát musí později projít candidate → chráněná main → deploy z main;
+žádný vzdálený release ani deploy nebyl proveden.
+
+SHA-256 původního vstupního ZIP: 0c8ca337922200c154834b0fa833d3a7e9800cc65a118cfa49287704e671716c

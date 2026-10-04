@@ -1,0 +1,15 @@
+# 7.1.80 — Red-team v2 / E4 persistence checkpoint
+
+E4 makes browser-local attempt recovery and submission recovery durable. A signed ciphertext outbox is written before the submitted guard. Refresh or a real browser restart preserves the original attempt, deadline and answers; a crash between the two submission transactions recovers exactly the same ciphertext. Repeated submission does not re-encrypt it.
+
+Native Web Locks exclude concurrent student tabs sharing the same origin, test and browser profile. Unsupported browsers retain best-effort persistence without that concurrency guarantee. Malformed signed records, unavailable IndexedDB, inconsistent guards and changed unsigned shadows are treated as integrity failures. Read-only inspection no longer rewrites signed records, avoiding a stale background read overwriting newer state. A failed active-state write locks editing and cannot be bypassed with the classroom unlock code. Encryption failure restarts monitoring and the timer without extending the deadline. When IndexedDB already holds the ciphertext but localStorage or the guard write fails, the result remains downloadable and the attempt stays submitted.
+
+The private verifier records bounded, strictly validated digest observations on the owner's private computer outside school. They survive restart and clearing the visible working set. Re-importing the same validated submission reconstructs one row and still deduplicates repeats in that set. Different content under the same identity or attempt conflicts with earlier observations. Scores and trust assessments are recomputed from the original submission and newly confirmed Forms policy; no stored trust flags are accepted. This ledger is local owner-controlled evidence, not authentication or a global one-response authority.
+
+Validation uses actual generated HTML with the original CSP, native desktop Chromium WebCrypto/IndexedDB/Web Locks, persistent browser profiles and a private file-origin verifier. Separate fault tests cover guard-write failure, encryption failure, localStorage quota failure active-state write failure and unreadable IndexedDB. Historical 7.1.76 and 7.1.79 builds are negative controls. Both `npm test` and the local P5 CI equivalent include the new gates; the native browser gate is part of P5.
+
+Full storage deletion, incognito, a separate browser profile and a coherent rollback of both signed stores remain **ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED**. The separate-profile test used Chromium; Firefox, Safari, iOS and Android remain **ANALYZED / NOT TESTED**. Runtime provenance remains **CLIENT-CONTROLLED** and classification remains **REVIEW_REQUIRED**.
+
+**NOT READY – BLOCKING ISSUE.** E5–E10, F7 start-code content encryption, manual checks and live exact-SHA GitHub validation remain pending. This is a candidate-only checkpoint with no upload, promotion or deployment. Server work remains **DEFERRED – SERVER VERSION**. The 1,770,000-byte initial-entry budget established in E3 is unchanged.
+
+Detailed results and limits are in `redteam/E4/GIT-redteam-E4-7.1.80-handoff.txt`.

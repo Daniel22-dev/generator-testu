@@ -1,3 +1,5 @@
+> **7.1.80 — RED-TEAM v2 / E4 checkpoint.** Pokus i zašifrovaný výsledek přežijí restart ve stejném profilu. Outbox obnoví přerušené odevzdání, podporované Web Locks brání souběhu karet a soukromá replay evidence verifieru přetrvá restart. Úplné smazání storage, anonymní režim a jiný profil jsou **ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED**. Původ runtime zůstává CLIENT-CONTROLLED; známky vyžadují REVIEW_REQUIRED. **NOT READY – BLOCKING ISSUE:** E5–E10 a F7 čekají. Viz RELEASE-NOTES-7.1.80.md.
+
 > **7.1.75 — bezpečnostní rozdělení credentialů.** Teacher/Admin secret je tajný privilegovaný údaj pouze pro učitele; Classroom Recovery Code je per-test provozní kód pouze pro odemknutí aktuálního zámku. Obě větve mají oddělenou kryptografickou doménu, Recovery Code nemůže otevřít teacher panel/retry/reset a raw credentialy se neukládají do studentského HTML, historie, šablon, exportu zadání ani AI/manual promptů. Viz RELEASE-NOTES-7.1.75.md.
 
 > **7.1.74 — zpevnění workflow žolíka.** Po spuštění bezpečného testu se volba žolíka, identita pokusu, attempt ID, deadline a stav zámku lokálně zapečetí; běžný reload už nemůže změnit volbu ani resetovat čas. Verifier žolíkový pokus zachová pro kontrolu a bezpečnost, ale vyřadí jej z klasifikačních statistik; CSV obsahuje explicitní stav žolíka/klasifikace. D7 navíc obsahuje klikací Chromium regresní test tohoto workflow. Viz RELEASE-NOTES-7.1.74.md.
@@ -28,7 +30,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.76
+**Aktuální verze:** 7.1.80 (E4 checkpoint, candidate)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

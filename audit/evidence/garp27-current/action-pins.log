@@ -1,0 +1,12 @@
+$ npm run check:actions
+EXIT=0
+
+STDOUT
+
+> generator-testu@7.1.86 check:actions
+> node scripts/check-action-pins.mjs
+
+✅  Externí GitHub Actions jsou připnuté plným commit SHA (34 použití).
+
+STDERR
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

@@ -459,7 +459,10 @@ function generatorSettingsBackdropClick(event){
 function updateSimpleSecretsHelper(){
   const helper = $('simpleSecretsHelper');
   if (!helper) return;
-  const teacherMissing = !teacherAccessCodeValue();
+  const teacherRequired = requiresTeacherAccessCode();
+  const teacherField = $('teacherAccessCodeField');
+  if(teacherField) teacherField.classList.toggle('hidden',!teacherRequired);
+  const teacherMissing = teacherRequired && !teacherAccessCodeValue();
   const recoveryMissing = typeof requiresRecoveryCode === 'function' && requiresRecoveryCode() && !recoveryCodeValue();
   helper.classList.toggle('hidden', !isSimpleMode() || (!teacherMissing && !recoveryMissing));
 }

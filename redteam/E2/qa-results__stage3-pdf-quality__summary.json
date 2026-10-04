@@ -1,0 +1,41 @@
+{
+  "schema": "ghrab-stage3-pdf-quality-v1",
+  "status": "passed",
+  "contract": {
+    "studentLeaksKey": false,
+    "teacherHasKey": true,
+    "czechLabels": true
+  },
+  "pagination": {
+    "cuts": [
+      0,
+      883,
+      1808,
+      2733,
+      3478,
+      4521,
+      5373,
+      6268
+    ],
+    "brokenQuestions": 0,
+    "brokenLines": 0,
+    "orphanExerciseStarts": 0,
+    "verticalMarginPx": 40,
+    "contentHeightPx": 1043,
+    "logoOk": true
+  },
+  "pdfResults": [
+    {
+      "file": "student_esk-PDF-audit-P-li-lu-ou-k-k_TSHKT9J-09FD4082.pdf",
+      "bytes": 1759195,
+      "pages": 6,
+      "withKey": false
+    },
+    {
+      "file": "ucitel_klic_esk-PDF-audit-P-li-lu-ou-k-k_TSHKT9J-09FD4082.pdf",
+      "bytes": 2094334,
+      "pages": 7,
+      "withKey": true
+    }
+  ]
+}

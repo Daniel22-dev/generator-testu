@@ -1,0 +1,167 @@
+{
+  "schema": "git-redteam-e3-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.79",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "completedStages": [
+    "E0",
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "pendingStages": [
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "sourceBranch": "candidate",
+  "baseCommit": "d481999bb4f39019e0d8eb734ad66cac297f7674",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "npmTest": "PASS / complete terminal workflow marker",
+  "localP5Equivalent": "PASS / complete acceptance report",
+  "githubActionsExecuted": false,
+  "desktopChromium": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "baselineNegativeControlCount": 16,
+  "nativeAnswerTypesCovered": 21,
+  "release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.79",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-03T15:57:29.408Z",
+    "distBytes": 2557521,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1635145,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1585662,
+    "entryCriticalBytes": 1757481,
+    "largestInlineScriptBytes": 157947,
+    "precacheBytes": 2180920,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1585662,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "performanceBudgetRecalibration": {
+    "entryCriticalBytesBefore": 1750000,
+    "entryCriticalBytesAfter": 1770000,
+    "otherSixSizeCaps": "unchanged",
+    "reason": "new private E3 validation code included in initial generator; original cap failed and was explicitly recalibrated, not claimed to pass"
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 8
+  },
+  "residualForgery": {
+    "technicalAcceptance": "current / OK / 100",
+    "externalIdentity": "MATCHED_FORMS_ROSTER",
+    "externalTimeWindow": "WITHIN_PUBLICATION_FORMS_WINDOW",
+    "runtimeAuthenticity": "CLIENT-CONTROLLED",
+    "classificationAuthorization": "REVIEW_REQUIRED"
+  },
+  "externalAnchorProvenance": "Owner-attested Forms settings and unaltered CSV; no live config proof",
+  "replayScope": "one private verifier working session; cleared/new session is E4 pending",
+  "teacherStoragePolicy": "private owner PC outside school, never public repo/history",
+  "sourceSnapshots": {
+    "7.1.76": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+    "7.1.78": "c56b13e6f4a9fab2587f8672d62b9ea2cfc489c33d1ecc7fb647389976be40c8"
+  },
+  "evidenceScope": "Synthetic summaries and normalized logs only; no generated private HTML/key/roster/PDF fixtures. Public scan remains E0 historical snapshot.",
+  "logNormalization": "ANSI sequences/trailing whitespace and redundant terminal blank lines removed in copied evidence; assertions and outcomes preserved.",
+  "axeIncomplete": [
+    {
+      "page": "index.html",
+      "width": 1280,
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 1280,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 120
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 390,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 109
+        }
+      ]
+    }
+  ],
+  "axeHarnessCspBypassed": true,
+  "newE3BrowserOriginalCsp": true
+}

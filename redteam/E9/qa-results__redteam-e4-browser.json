@@ -1,0 +1,28 @@
+{
+  "stage": "E4",
+  "version": "7.1.85",
+  "status": "PASS",
+  "selected": "all",
+  "checks": [
+    "restart-outbox",
+    "parallel-tabs",
+    "integrity",
+    "interrupted-submit",
+    "private-replay-restart",
+    "storage-and-profile-limits"
+  ],
+  "guarantees": "HARDENED / DETECTED, same origin and browser profile only; tab exclusion requires native Web Locks; unsupported browsers use BEST-EFFORT",
+  "limits": [
+    "Full origin storage wipe permits a fresh local attempt",
+    "Incognito context has a separate storage namespace",
+    "Coherent replay of both signed stores with the preserved MAC key cannot be distinguished from the original local state",
+    "Independent Chromium browser profile has no shared local attempt ledger; Firefox/Safari not tested"
+  ],
+  "storageIsolation": "ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED",
+  "privateReplayRecovery": "Identical validated submission reconstructs one working row; different persisted content conflicts. No score/trust bits restored.",
+  "otherEngines": "ANALYZED / NOT TESTED",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "teacherLocation": "private owner PC outside school",
+  "runtime": "CLIENT-CONTROLLED",
+  "classification": "REVIEW_REQUIRED"
+}

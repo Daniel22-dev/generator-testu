@@ -1,0 +1,126 @@
+{
+  "schema": "git-redteam-e6-publication-gate-v1",
+  "version": "7.1.85",
+  "status": "PASS",
+  "syntheticOnly": true,
+  "checks": [
+    "generated-student-and-private-pair",
+    "all-21-exercise-types",
+    "export-answer-derivative-rejection",
+    "hidden-data-comments-scripts-attributes",
+    "private-pair-byte-and-identity-binding",
+    "publication-allowlist-and-no-private-copy",
+    "deleted-blob-and-all-ref-history"
+  ],
+  "negativeArtifactMutations": [
+    {
+      "id": "hidden-json",
+      "findings": [
+        "answer-derived-data",
+        "script-not-statically-parsable",
+        "unexpected-script-or-hidden-json"
+      ]
+    },
+    {
+      "id": "template-hidden-json",
+      "findings": [
+        "external-or-embedded-artifact"
+      ]
+    },
+    {
+      "id": "single-script-hidden-answer",
+      "findings": [
+        "hidden-answer-property"
+      ]
+    },
+    {
+      "id": "unused-teacher-module",
+      "findings": [
+        "teacher-runtime-capability",
+        "unexpected-script-or-hidden-json"
+      ]
+    },
+    {
+      "id": "teacher-hash-comment",
+      "findings": [
+        "teacher-or-roster-data"
+      ]
+    },
+    {
+      "id": "teacher-secret-comment",
+      "findings": [
+        "teacher-or-roster-data"
+      ]
+    },
+    {
+      "id": "answer-hash-comment",
+      "findings": [
+        "answer-derived-data"
+      ]
+    },
+    {
+      "id": "attribute",
+      "findings": [
+        "secret-bearing-attribute"
+      ]
+    },
+    {
+      "id": "source-map",
+      "findings": [
+        "source-map"
+      ]
+    },
+    {
+      "id": "external-script",
+      "findings": [
+        "unexpected-script-or-hidden-json"
+      ]
+    },
+    {
+      "id": "private-pem",
+      "findings": [
+        "private-key-pem"
+      ]
+    },
+    {
+      "id": "private-rsa",
+      "findings": [
+        "private-jwk",
+        "private-or-unknown-jwk-parameter"
+      ]
+    },
+    {
+      "id": "nested-roster",
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "teacher-or-roster-data",
+        "unexpected-public-group-field"
+      ]
+    },
+    {
+      "id": "hidden-config",
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "teacher-or-roster-data",
+        "unexpected-public-config-field"
+      ]
+    },
+    {
+      "id": "executable-cfg",
+      "findings": [
+        "script-not-statically-parsable",
+        "secure-student-format-required"
+      ]
+    }
+  ],
+  "scope": "Actual generated artifacts, native Node WebCrypto, static nonexecuting scanner, temporary owner-side private pairing and synthetic deleted-file Git history. No actual student data saved.",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "limits": [
+    "No proof that arbitrary prose/encoded data hides no answers or secrets",
+    "F7 question encryption pending; no public deployment or history rewrite",
+    "Private verifier is trusted owner-side input, not a server signature",
+    "Native mobile: ANALYZED / NOT TESTED"
+  ]
+}

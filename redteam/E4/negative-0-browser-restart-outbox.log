@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: submitted ciphertext must recover after a real browser restart
+
+false !== true
+
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-storage-browser-e4.mjs:30:104
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-storage-browser-e4.mjs:19:71)
+    at async file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-storage-browser-e4.mjs:24:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

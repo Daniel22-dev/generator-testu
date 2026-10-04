@@ -1,0 +1,88 @@
+{
+  "schema": "garp27-application-migration-profile-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.86",
+  "serverApproval": "DEFERRED_BY_OWNER_DECISION",
+  "requiredComponents": [
+    {
+      "componentId": "AG-01-policy",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-02-identity",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-03-request-api-ai",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-04-egress",
+      "required": true,
+      "serverDependent": true
+    },
+    {
+      "componentId": "AG-05-files",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-06-data-lifecycle",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-07-release",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-08-architecture",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-09-inventory",
+      "required": true,
+      "serverDependent": false
+    },
+    {
+      "componentId": "AG-10-live-health",
+      "required": true,
+      "serverDependent": true
+    },
+    {
+      "componentId": "AG-11-recovery",
+      "required": true,
+      "serverDependent": true
+    },
+    {
+      "componentId": "AG-12-orchestration",
+      "required": true,
+      "serverDependent": true
+    }
+  ],
+  "trustedEvidence": {
+    "version-contract": "d270d1fb9d798cc391d87c90a994c0bca18ef674f96351f0b82e45613a5348d6",
+    "garp27-contracts": "aaf7e2a2a4a0c1d76914939e201128a5681fecbe662c6638959cf10a38b19438",
+    "garp27-architecture": "e96864dc27089c309da678e9e4fd24acbfc90f0292bbc2ac1587b0c11e452a18",
+    "garp27-policy-mutations": "de3164e09483c84f08a36ca8ab89f00b0bfd6e4be5d98c1d99c928e3aad7996c",
+    "garp27-mutations": "72f3211c11c9d86b4686ee1aacea5eee3be813041be0663937f5729d2be8bad7",
+    "garp27-auto-patch": "7f7201ef74500b72635a7ecb4452f68b864a2728379507a4e40fb3d16ed8b355",
+    "legacy-garp25-static": "563e7f6362550976a82b1658631064062958cd3cbad8527b67c9cfcfcc165502",
+    "production-readiness": "4aecccd0bd06336c1cd3e35164745d1ff796437718e30469793823615bf10969",
+    "action-pins": "a241b90db0a6aedf2f8b0fc88570e498889cb77c00c9eeafc459841a76c296d1",
+    "sensitive-scan": "4c3b08b9ce7f6b93a5cda9853223ff2feeb46584286f4fccce9064b364a655da"
+  },
+  "maxEvidenceAgeHours": 168,
+  "releaseIdentity": {
+    "appId": "generator",
+    "appVersion": "7.1.86",
+    "sourceCommit": "b5801cccc88140ea683d9cf0278deb92c7771f8d"
+  },
+  "releaseIdentityResolution": "The foundation gate replaces sourceCommit with GITHUB_SHA when available; local archive review uses a deterministic source-tree SHA-1 surrogate and labels it as such in evidence."
+}

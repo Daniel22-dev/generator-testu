@@ -1,0 +1,25 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.85 qa:redteam:ci
+> node scripts/run-redteam-ci-e9.mjs
+
+PASS npm test
+PASS npm run qa:garp27:foundation
+PASS npm run qa:p5:ci
+node:fs:2483
+    return binding.writeFileUtf8(
+                   ^
+
+Error: ENOENT: no such file or directory, open 'qa-results/redteam-e9-ci/4-node-scripts/check-redteam-evidence-e9.mjs.log'
+    at Object.writeFileSync (node:fs:2483:20)
+    at file:///workspace/scratch/ebcee4a4dd99/work-e9/source/generator-testu-7.1.85/scripts/run-redteam-ci-e9.mjs:14:92
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'qa-results/redteam-e9-ci/4-node-scripts/check-redteam-evidence-e9.mjs.log'
+}
+
+Node.js v24.19.0

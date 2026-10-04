@@ -1,0 +1,57 @@
+E6 / 7.1.82 — příprava a kontrola studentské publikace
+Stav celého kandidáta: NOT READY – BLOCKING ISSUE.
+
+Používej na soukromém PC vlastníka mimo školu. Teacher Verifier,
+privátní RSA, answer key a roster nesmějí do žádného veřejného repa,
+jeho historie ani na školní server či školní počítač.
+
+Po npm ci a npm run build ověř skutečné soubory z generátoru:
+  node scripts/student-publication.mjs file /private/student.html
+  node scripts/student-publication.mjs prepare /private/student.html /private/verifier.html /private/new-publication
+  node scripts/student-publication.mjs directory /private/new-publication
+
+Výstup prepare: přesné student.html jako index.html, prázdné
+.nojekyll a veřejný student-publication.json s názvem souboru a SHA-256.
+Soukromý verifier se načte pouze pro porovnání a nikdy se nekopíruje.
+Cílová složka musí být nová. Odmítnutí ponechá výstup nevytvořený.
+Porovnává se soukromý studentHtmlSha256, test ID, manifest, verze
+generátoru a dvojice RSA public/private klíčů. Verifier je důvěryhodný
+vstup vlastníka; tato shoda není podpis serveru ani důkaz původu runtime.
+
+PASS znamená průchod lokálním publication preflight. Neopravňuje
+nasazení: F7 stále chybí a otázky jsou zatím čitelné před zahájením.
+Manifest proto nese NOT READY – BLOCKING ISSUE. Do veřejné složky
+nepřidávej verifier, JSON s daty, ZIP, sourcemapu, zálohu, klíč či debug.
+Kontrola souboru nikdy nespouští načtený JavaScript ani jeho závislosti.
+Kontroluje statický CFG/STUDENT_VARIANTS, strukturu, komentáře,
+atributy, další skripty, známé privátní a answer derivované položky.
+Samostatná data schovaná v template nebo externí script se odmítají.
+Obecně nelze dokázat absenci libovolně zakódovaného tajemství ani
+nápovědy v legitimním textu zadání. Potřebná je i kontrola obsahu učitelem.
+
+Historie: na lokálním read-only mirroru cílového studentského repa:
+  node scripts/student-publication.mjs history /private/public-history.git
+  python scripts/audit-public-student-repository-e6.py --mirror /private/public-history.git --output /private/e6-public-audit
+
+Výchozí cíl auditu: Daniel22-dev/interaktivni-testy.
+Mirror se musí shodovat se všemi čerstvě dostupnými veřejnými refs.
+Audit načte všechny unikátní bloby ze všech commitů těchto refs,
+i dříve smazané soubory, a všechny HTML v aktuálním main přes Pages.
+V JSON jsou typy nálezů, cesty, SHA-256 a počty, nikdy hodnoty tajemství.
+Vrácené FAIL pro veřejnou historii je očekávaný aktuální nález,
+nikoli porucha testovacího nástroje. Legacy mapové/výukové stránky
+mimo secure formát vyžadují samostatné posouzení; odmítnutí formátu
+samo neprokazuje únik credentialu.
+
+Nejsou pokryty neadvertisované/smazané refs, nedosažitelné objekty,
+cache, cizí kopie a někdejší smazané Actions artefakty. Aktuálně
+vypsané nulové forks/artefakty neprokazují absenci externích kopií.
+Generátor dist je jiný produkt obsahující legitimní teacher builder;
+tento studentský gate nepoužívej jako zákaz jeho zdrojových modulů.
+
+Regrese: npm test a npm run qa:p5:ci obsahují E6 behavior gate.
+Historické negativní kontroly s explicitními originálními snapshoty:
+  GIT_REDTEAM_BASELINE_HTML=/private/generator-7.1.76.html GIT_REDTEAM_E5_HTML=/private/generator-7.1.81.html npm run check:redteam-publication-negative
+
+Žádný z těchto příkazů nepublikuje, nepřepisuje vzdálenou historii,
+nerotuje tajemství, nenahrává soukromé soubory ani nemění GitHub.

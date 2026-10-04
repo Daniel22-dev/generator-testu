@@ -1,0 +1,22 @@
+{
+  "schema": "git-student-history-scan-v1",
+  "status": "PASS",
+  "refs": [
+    "refs/heads/main faea1ffbd9c683b7b679c2e7336b13b0e00d90df"
+  ],
+  "reachableCommits": 2,
+  "reachableBlobs": 1,
+  "inventory": [
+    {
+      "blob": "35067b76918dcf49cf85f129e61f556fbac9f83c",
+      "paths": [
+        "README.md"
+      ],
+      "bytes": 20,
+      "sha256": "8b912323894ae65c3dafd17e25157a60b95c9516b5129b0f3377494b6bea2a89"
+    }
+  ],
+  "findings": [],
+  "secretValuesOmitted": true,
+  "scope": "All unique blobs reachable from available refs, including deleted files in older commits. Deleted/unadvertised refs, unreachable objects, caches, forks and detached Actions artifacts are outside this scan."
+}

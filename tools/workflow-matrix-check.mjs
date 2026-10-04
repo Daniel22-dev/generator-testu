@@ -557,7 +557,7 @@ await okAsync('instant runtime odmítne cizí jednorázový kód', async()=>{
 });
 
 // 17) Secure veřejná konfigurace nese pouze solené hashe roster kódů.
-await okAsync('secure konfigurace používá pouze hashované jednorázové kódy', async()=>{
+await okAsync('secure konfigurace nepřenáší roster ani hashe jednorázových kódů', async()=>{
   resetBase();
   w.eval("Object.assign(state,{identityMode:'oneTimeCode',testMode:'bezny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B'});rosterEntries=[{email:'a@example.com',label:'a',code:'ABC234'}];enforceModeConstraints();");
   const salt='0123456789abcdef0123456789abcdef';
@@ -565,9 +565,9 @@ await okAsync('secure konfigurace používá pouze hashované jednorázové kód
   assert(hashes.length===1&&/^[A-Za-z0-9_-]{43}$/.test(hashes[0]),'secure roster nemá SHA-256 hash');
   const publicCfg=w.securePublicCfg({identityMode:'oneTimeCode',identityCodeScheme:'sha256-v1',identityCodeHashes:hashes,diffGroups:[],diffRosterSalt:salt,uiLang:'cs',resultMode:'secureOffline'},{publicJwk:{kty:'RSA'},crypto:'RSA-OAEP-256'});
   const serialized=JSON.stringify(publicCfg);
-  assert(publicCfg.identityMode==='oneTimeCode'&&publicCfg.identityCodeHashes.length===1,'secure config ztratil roster');
+  assert(publicCfg.identityMode==='oneTimeCode'&&!('identityCodeHashes' in publicCfg)&&!('diffRosterSalt' in publicCfg),'secure config přenáší roster deriváty');
   assert(!serialized.includes('ABC234')&&!serialized.includes('a@example.com'),'secure config obsahuje čitelný kód/e-mail');
-  return '1 salted SHA-256 hash';
+  return 'roster validation remains teacher-only';
 });
 
 // 18) Reprezentativní výstupová matice přes obě rozložení, odevzdávání, randomizaci,
@@ -636,7 +636,8 @@ ok('legacy uložený týmový kód se při startu smaže',()=>{
   w.clearLegacySchoolSecurityCode();
   assert(w.localStorage.getItem('sestavovac_school_security_code_v1')===null,'legacy týmový kód zůstal v localStorage');
 });
-ok('simple helper se zobrazuje jen když chybí učitelský přístupový kód',()=>{
+ok('instant simple helper se zobrazuje jen když chybí učitelský přístupový kód',()=>{
+  w.eval("state.resultMode='instant';");
   setVal('ucitelPin',''); setVal('heslo',''); w.updateSimpleSecretsHelper();
   const helper=w.document.getElementById('simpleSecretsHelper');
   assert(helper&&!helper.classList.contains('hidden'),'helper se nezobrazil při chybějícím kódu');
@@ -721,14 +722,9 @@ await okAsync('secure tabs: submit až na konci a strict odchod zamkne test', as
   const gd=await createGeneratedDom(pkg.studentHtml);
   try{
     gd.window.document.getElementById('studentName').value='Student';
+    if(gd.window.document.getElementById('startCode'))gd.window.document.getElementById('startCode').value=pkg.startCode;
     await gd.window.startTest();
-    // Stejný učitelský kód otevře teacher panel přes teacher-pin doménu.
-    gd.window.openTeacherModal();
-    gd.window.document.getElementById('teacherName').value='Daniel Teacher';
-    gd.window.document.getElementById('teacherPin').value='teach-abcdef-123456';
-    await gd.window.teacherLogin();
-    assert(!gd.window.document.getElementById('teacherPanel').classList.contains('hidden'),'učitelský kód neotevřel teacher panel');
-    gd.window.closeTeacherModal();
+    assert(!gd.window.document.getElementById('teacherModal')&&typeof gd.window.teacherLogin==='undefined','secure student přenáší učitelský mód');
     const submit=gd.window.document.getElementById('secureSubmitCard');
     assert(submit&&submit.classList.contains('hidden'),'secure submit je vidět už u prvního cvičení');
     gd.window.switchExercise(1);
@@ -772,7 +768,7 @@ ok('finální učitelský workflow má regresní pojistky',()=>{
 });
 
 // 25) Jednorázový device lock lze znovu povolit stejným učitelským přístupovým kódem.
-await okAsync('učitelský přístupový kód odemkne další spuštění na stejném zařízení', async()=>{
+await okAsync('secure studentský soubor nepovolí další spuštění po odevzdání', async()=>{
   resetBase();
   w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',feedbackMode:'none',odevzdavani:'B',layout:'tabs',exerciseDetail:true,pocet:1,exerciseConfig:[{typ:'multiple choice',pocetOtazek:1,body:1}]});enforceModeConstraints();");
   const fakeDerive=w.deriveSecretHash;w.deriveSecretHash=realGeneratorDeriveSecretHash;
@@ -785,15 +781,13 @@ await okAsync('učitelský přístupový kód odemkne další spuštění na ste
     assert(await gd.window.setSubmittedLocked(),'signed submitted guard se nepodařilo připravit');
     assert(await gd.window.submittedLocked(),'signed submitted guard není aktivní');
     gd.window.document.getElementById('studentName').value='Student';
+    if(gd.window.document.getElementById('startCode'))gd.window.document.getElementById('startCode').value=pkg.startCode;
     await gd.window.startTest();
     const modal=gd.window.document.querySelector('.s-modal-bd');
     assert(modal,'po device locku se neotevřelo učitelské odemčení');
-    modal.querySelector('[data-retry-code]').value='teach-abcdef-123456';
-    modal.querySelector('[data-retry-ok]').click();
-    const deadline=Date.now()+4000;
-    while(Date.now()<deadline&&!gd.window.document.getElementById('intro').classList.contains('hidden'))await new Promise(r=>setTimeout(r,50));
-    assert(!(await gd.window.submittedLocked()),'device lock zůstal uložen');
-    assert(gd.window.document.getElementById('intro').classList.contains('hidden'),'test se po učitelském odemčení znovu nespustil');
+    assert(!modal.querySelector('[data-retry-code]'),'studentský soubor obsahuje privilegované povolení retry');
+    assert(await gd.window.submittedLocked(),'submitted guard byl zrušen');
+    assert(!gd.window.document.getElementById('intro').classList.contains('hidden'),'test se znovu spustil');
   }finally{gd.close();}
 });
 

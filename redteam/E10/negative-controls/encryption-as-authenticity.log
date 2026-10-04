@@ -1,0 +1,22 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'PREVENTED'
+- 'CLIENT-CONTROLLED'
+
+    at file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-trust-e2.mjs:27:12
+    at check (file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-trust-e2.mjs:8:77)
+    at file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-trust-e2.mjs:24:9 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'PREVENTED',
+  expected: 'CLIENT-CONTROLLED',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

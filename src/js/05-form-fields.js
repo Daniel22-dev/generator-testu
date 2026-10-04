@@ -582,17 +582,19 @@ function isWeakCredentialSecret(s, teacherName){
   return false;
 }
 function isWeakSecret(s){ return isWeakCredentialSecret(s, trim('ucitelJmeno')); }
-function credentialPolicyErrors(teacherSecret, recoveryCode, recoveryRequired, teacherName){
+function credentialPolicyErrors(teacherSecret, recoveryCode, recoveryRequired, teacherName, teacherRequired=true){
   const teacher=normalizeCredentialInput(teacherSecret);
   const recovery=normalizeCredentialInput(recoveryCode);
   const errors=[];
-  if(!teacher) errors.push('Doplň tajný učitelský / administrátorský kód.');
-  else if(teacher.length<12) errors.push('Učitelský / administrátorský kód musí mít aspoň 12 znaků (slabý kód jde offline uhádnout).');
-  else if(isWeakCredentialSecret(teacher,teacherName)) errors.push('Učitelský / administrátorský kód je příliš běžný — zvol méně odhadnutelný.');
+  if(teacherRequired){
+    if(!teacher) errors.push('Doplň tajný učitelský / administrátorský kód.');
+    else if(teacher.length<12) errors.push('Učitelský / administrátorský kód musí mít aspoň 12 znaků (slabý kód jde offline uhádnout).');
+    else if(isWeakCredentialSecret(teacher,teacherName)) errors.push('Učitelský / administrátorský kód je příliš běžný — zvol méně odhadnutelný.');
+  }
   if(recoveryRequired && !recovery) errors.push('Tento režim vyžaduje Recovery kód pro odemknutí testu.');
   if(recovery && recovery.length<8) errors.push('Recovery kód musí mít aspoň 8 znaků. Doporučeno: vygenerovaný formát REC-XXXX-XXXX.');
   else if(recovery && isWeakCredentialSecret(recovery,teacherName)) errors.push('Recovery kód je příliš běžný — vygeneruj nový per-test kód.');
-  if(teacher && recovery && teacher===recovery) errors.push('Recovery kód nesmí být stejný jako tajný učitelský / administrátorský kód.');
+  if(teacherRequired && teacher && recovery && teacher===recovery) errors.push('Recovery kód nesmí být stejný jako tajný učitelský / administrátorský kód.');
   return Array.from(new Set(errors));
 }
 
@@ -712,8 +714,10 @@ function validate() {
   const teacherSecret = (typeof syncTeacherAccessCode === 'function') ? syncTeacherAccessCode() : trim('ucitelPin');
   const recoveryCode = (typeof syncRecoveryCode === 'function') ? syncRecoveryCode() : trim('recoveryCode');
   const recoveryRequired = typeof requiresRecoveryCode === 'function' ? requiresRecoveryCode() : (state.testMode === 'prisny' || !!state.screenGuard);
-  const credentialErrors = credentialPolicyErrors(teacherSecret, recoveryCode, recoveryRequired, trim('ucitelJmeno'));
-  const secretOk = !!trim('ucitelJmeno') && credentialErrors.length===0;
+  const teacherRequired = requiresTeacherAccessCode();
+  const credentialErrors = credentialPolicyErrors(teacherSecret, recoveryCode, recoveryRequired, trim('ucitelJmeno'),teacherRequired);
+  const secretOk = (!teacherRequired || !!trim('ucitelJmeno')) && credentialErrors.length===0;
+  updateSimpleSecretsHelper();
   const groupsOk = state.diferencovany==='NE' || (state.skupiny.length>0 && state.skupiny.every(g => plainText(g.nazev).length > 0 && plainText(g.podminky).length > 0 && Array.isArray(g.studenti) && g.studenti.length > 0));
   // Jednorázové kódy bez vygenerovaného rosteru = verifier nemá seznam a kontrola
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
@@ -723,7 +727,7 @@ function validate() {
   $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
   if (!rosterOk) msg.push('Identita „individuální kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
-  if (!trim('ucitelJmeno')) msg.push('Doplň jméno pro učitelský mód.');
+  if (teacherRequired && !trim('ucitelJmeno')) msg.push('Doplň jméno pro učitelský mód.');
   msg.push(...credentialErrors);
   if (!groupsOk) msg.push('Každá diferencovaná skupina potřebuje název, podmínky a alespoň jednoho studenta/kód.');
   if(!groupLogic.ok) msg.push(...groupLogic.messages);

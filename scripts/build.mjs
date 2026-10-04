@@ -75,13 +75,20 @@ function compactJsWhitespace(source, file) {
     fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
   }
   let out = '', end = 0;
-  for (const token of tokens) {
+  for (let ti=0;ti<tokens.length;ti++) {
+    const token=tokens[ti];
     const gap = clean.slice(end, token.start);
-    if (/\r|\n/.test(gap)) out += '\n'.repeat(Math.max(1, (gap.match(/\r\n|\r|\n/g) || []).length));
-    else if (gap.length) out += ' ';
+    if (/\r|\n/.test(gap)) out += '\n';
+    else if (gap.length) {
+      const prev=tokens[ti-1];
+      const left=clean[end-1]||'',right=clean[token.start]||'';
+      if((/[\w$\\]/.test(left)&&/[\w$\\]/.test(right))||(['num','regexp'].includes(prev?.type.label))||(/[+\-/?.]/.test(left)&&/[+\-/*.]/.test(right)))out+=' ';
+    }
     out += clean.slice(token.start, token.end);
     end = token.end;
   }
+  const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType:'script',allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
+  try{if(semantic(clean)!==semantic(out))fail('JS compaction changed AST: '+file);}catch(e){fail('JS compaction invalid: '+file+' '+e.message);}
   return out;
 }
 

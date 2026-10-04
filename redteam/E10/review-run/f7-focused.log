@@ -1,0 +1,22 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [Object: null prototype] {}
+- {}
+
+    at file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-content-e10.mjs:18:12
+    at test (file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-content-e10.mjs:11:34)
+    at file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-content-e10.mjs:15:9 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object: null prototype] {},
+  expected: {},
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

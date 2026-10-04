@@ -1,0 +1,220 @@
+{
+  "schema": "ghrab-d8-final-audit-v1",
+  "appVersion": "7.1.81",
+  "generatedAt": "2026-10-03T17:44:24.503Z",
+  "status": "PASS",
+  "counts": {
+    "total": 29,
+    "passed": 29,
+    "failed": 0
+  },
+  "acceptedLimitations": [
+    "Split-screen detection is heuristic browser telemetry. It cannot prove that no second device was used and intentionally remains a soft signal.",
+    "School-server LIVE validation remains deferred by owner decision; it is outside the current serverless release acceptance scope."
+  ],
+  "results": [
+    {
+      "group": "A",
+      "id": "1",
+      "title": "prefill_v3 restores rcTopic and warns about non-persisted attachments",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "A",
+      "id": "2",
+      "title": "Reading default/count contract remains explicit",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "A",
+      "id": "3",
+      "title": "Listening default/count contract remains explicit",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "A",
+      "id": "4",
+      "title": "Listening multimodal routing supports audio/video and YouTube provider input",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "A",
+      "id": "5",
+      "title": "Basic/Standard/Challenge preserve curriculum, types, counts and points in both prompt paths",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "A",
+      "id": "6",
+      "title": "content drift tracks source/topic/count/differentiation inputs",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "1",
+      "title": "Teacher Verifier exposes seven-panel information architecture",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "2",
+      "title": "technical identity/build/integrity data live in Technical panel, not Dashboard intro",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "3",
+      "title": "navigation has icon/text hierarchy and explicit active markers",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "4",
+      "title": "dark and light themes define distinct real palettes",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "5",
+      "title": "fullscreen follows browser state and exposes unsupported/rejected fallback",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "6",
+      "title": "Results use unified security-signal text",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "7",
+      "title": "distribution/item analytics use effectiveResults",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "B",
+      "id": "8",
+      "title": "metadata mismatch is a soft Security signal; split-window is explicitly heuristic/non-authoritative",
+      "status": "PASS",
+      "detail": "accepted limitation: browser telemetry cannot prove absence of a second device or every split-screen layout"
+    },
+    {
+      "group": "C",
+      "id": "1",
+      "title": "direct PDF uses origin-clean DOM rasterizer and no foreignObject",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "C",
+      "id": "2",
+      "title": "student PDF path is generated without answer-key flag",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "C",
+      "id": "3",
+      "title": "teacher PDF/key path remains distinct",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "C",
+      "id": "4",
+      "title": "school logo is embedded through verified PNG data URI",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "C",
+      "id": "5",
+      "title": "Czech PDF labels keep diacritics and stale unaccented labels are absent",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "C",
+      "id": "6",
+      "title": "safe pagination and print fallback remain present",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "D",
+      "id": "1",
+      "title": "P5 mandatory path includes D7 browser/PDF regression runner",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "D",
+      "id": "2",
+      "title": "D7 runner covers analytics, IA/security, joker browser workflow, PDF runtime/quality and verifier UI runtime",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "D",
+      "id": "3",
+      "title": "Journey clears stale evidence, covers config/state flows and binds artifact to exact SHA",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "D",
+      "id": "4",
+      "title": "Safe Promotion requires green P5 and Journey checks on certified SHA",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "D",
+      "id": "5",
+      "title": "D7 removes sensitive browser fixtures/PDFs and retains only safe summaries",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "CLEANUP",
+      "id": "1",
+      "title": "dead direct legacy template helpers are absent",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "CLEANUP",
+      "id": "2",
+      "title": "obsolete source slicing state/helper are absent and representative-chunk help is accurate",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "CLEANUP",
+      "id": "3",
+      "title": "legacy saved template IDs still migrate forward",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "CLEANUP",
+      "id": "4",
+      "title": "dead pedagogicalPreset state is absent",
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
+}

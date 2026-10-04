@@ -1,0 +1,197 @@
+[
+  {
+    "id": "Q-crypto: stejný plaintext v obou rolích → různé hashe",
+    "status": "PASS",
+    "detail": "domény oddělené"
+  },
+  {
+    "id": "P-crypto: stejný Recovery plaintext, jiný testId → jiný hash",
+    "status": "PASS",
+    "detail": "testId je součástí soli"
+  },
+  {
+    "id": "Q-ui instant: Teacher == Recovery blokuje krok 3",
+    "status": "PASS",
+    "detail": "next3 disabled + hláška"
+  },
+  {
+    "id": "R: přísný test bez Recovery kódu se nesestaví (fail-closed)",
+    "status": "PASS",
+    "detail": "assembleTestHtml vyhodí chybu"
+  },
+  {
+    "id": "S/T instant: raw credentialy nejsou v HTML",
+    "status": "PASS",
+    "detail": "lockOnLeave=true, hasRecoveryUnlock=true"
+  },
+  {
+    "id": "C instant: Recovery neotevře učitelský panel",
+    "status": "PASS",
+    "detail": "panel zůstal skrytý"
+  },
+  {
+    "id": "F instant: Teacher/Admin otevře učitelský panel",
+    "status": "PASS",
+    "detail": "OK (i lowercase)"
+  },
+  {
+    "id": "instant: pagehide zamkne",
+    "status": "PASS",
+    "detail": "lockScreen"
+  },
+  {
+    "id": "H instant: Teacher/Admin neodemkne zámek",
+    "status": "PASS",
+    "detail": "zůstává zamčeno"
+  },
+  {
+    "id": "B instant: špatný Recovery neodemkne",
+    "status": "PASS",
+    "detail": "zůstává zamčeno"
+  },
+  {
+    "id": "A instant: správný Recovery odemkne",
+    "status": "PASS",
+    "detail": "odemčeno (i lowercase)"
+  },
+  {
+    "id": "I/N instant: attemptId a odpovědi zachovány",
+    "status": "PASS",
+    "detail": "AMUSKQCCANU5WK2"
+  },
+  {
+    "id": "O instant: LOCK→UNLOCK→LOCK→UNLOCK uspořádané a provázané",
+    "status": "PASS",
+    "detail": "lock>recovery-unlock>lock>recovery-unlock"
+  },
+  {
+    "id": "AB instant: dvojklik / unlock bez zámku nevytvoří falešný audit",
+    "status": "PASS",
+    "detail": "beze změny"
+  },
+  {
+    "id": "instant: recovery-unlock nezvyšuje počet varování v OVR4",
+    "status": "PASS",
+    "detail": "shoda"
+  },
+  {
+    "id": "P instant: Recovery z testu A neodemkne test B",
+    "status": "PASS",
+    "detail": "B zůstal zamčen"
+  },
+  {
+    "id": "S/T secure: raw credentialy nejsou ve student HTML",
+    "status": "PASS",
+    "detail": "student 104 kB"
+  },
+  {
+    "id": "secure: raw credentialy nejsou ani ve Verifieru",
+    "status": "PASS",
+    "detail": "OK"
+  },
+  {
+    "id": "secure: test běží a pečeť existuje",
+    "status": "PASS",
+    "detail": "AMUSKQD34SC4RKJXRWI"
+  },
+  {
+    "id": "C/F secure: student nemá učitelský mód ani autentizační funkci",
+    "status": "PASS",
+    "detail": "teacher capability absent"
+  },
+  {
+    "id": "H secure: Teacher/Admin neodemkne zámek",
+    "status": "PASS",
+    "detail": "LOCKED=true"
+  },
+  {
+    "id": "B secure: špatný Recovery neodemkne",
+    "status": "PASS",
+    "detail": "LOCKED=true + bad-unlock"
+  },
+  {
+    "id": "A secure: správný Recovery odemkne",
+    "status": "PASS",
+    "detail": "LOCKED=false"
+  },
+  {
+    "id": "I–N secure: odemčení nevytvoří nový pokus",
+    "status": "PASS",
+    "detail": "7 polí beze změny; lockReason=\"adv-lock-1\""
+  },
+  {
+    "id": "AB secure: dvojité odeslání / unlock bez zámku",
+    "status": "PASS",
+    "detail": "beze změny"
+  },
+  {
+    "id": "AB secure: souběžné dvojité odemčení jednoho zámku",
+    "status": "PASS",
+    "detail": "1 záznam"
+  },
+  {
+    "id": "AA secure: reload po recovery unlocku nevytvoří nový pokus ani nový deadline",
+    "status": "PASS",
+    "detail": "attemptId + deadline zachovány"
+  },
+  {
+    "id": "AA secure: reload zamčeného pokusu zámek neobejde",
+    "status": "PASS",
+    "detail": "zůstává zamčeno"
+  },
+  {
+    "id": "E secure: studentský soubor nepovoluje reset cizí identity",
+    "status": "PASS",
+    "detail": "blocked; no reset capability"
+  },
+  {
+    "id": "D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo",
+    "status": "PASS",
+    "detail": "submitted remains locked"
+  },
+  {
+    "id": "Verifier: hlavní skript se naparsuje",
+    "status": "PASS",
+    "detail": "1 inline skript(ů) OK"
+  },
+  {
+    "id": "AC/AD + export: Verifier zachová lock jako signál, recovery jako audit, CSV nese údaje",
+    "status": "PASS",
+    "detail": "lock=hard, recovery=info, issues=4; CSV: \"securitySignals\",\"securityAuditInfo\",\"recoveryUnlocks\""
+  },
+  {
+    "id": "U: snapshot / stav pro uložení bez raw credentialů",
+    "status": "PASS",
+    "detail": "čisté"
+  },
+  {
+    "id": "U: export zadání (JSON) bez raw credentialů",
+    "status": "PASS",
+    "detail": "2507 B čistých"
+  },
+  {
+    "id": "U: historie (sanitizeStoredRecord) odstraní klíče i hodnoty",
+    "status": "PASS",
+    "detail": "klíče i hodnoty pryč"
+  },
+  {
+    "id": "W: import legacy záznamu s jedním „heslo\" nevyrobí dva credentialy",
+    "status": "PASS",
+    "detail": "po importu Teacher=\"\", Recovery=\"\""
+  },
+  {
+    "id": "X: AI prompt neobsahuje raw credentialy",
+    "status": "PASS",
+    "detail": "jen placeholdery"
+  },
+  {
+    "id": "Q-bypass: applySettingsWithoutAi nesmí sestavit test s Teacher == Recovery",
+    "status": "PASS",
+    "detail": "odmítnuto"
+  },
+  {
+    "id": "Q-bypass: slabý Teacher (6 znaků) přes applySettingsWithoutAi",
+    "status": "PASS",
+    "detail": "odmítnuto"
+  }
+]

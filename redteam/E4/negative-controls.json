@@ -1,0 +1,186 @@
+{
+  "stage": "E4",
+  "status": "PASS",
+  "controls": [
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "test": "restart-outbox",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-browser-restart-outbox.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "test": "parallel-tabs",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-browser-parallel-tabs.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "test": "integrity",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-browser-integrity.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "test": "interrupted-submit",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-browser-interrupted-submit.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "test": "private-replay-restart",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-browser-private-replay-restart.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "fault",
+      "test": "guard-write-failure",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-fault-guard-write-failure.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "fault",
+      "test": "crypto-failure",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-fault-crypto-failure.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "fault",
+      "test": "outbox-local-quota",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-fault-outbox-local-quota.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "fault",
+      "test": "active-write-failure",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-fault-active-write-failure.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "fault",
+      "test": "unavailable-idb",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-0-fault-unavailable-idb.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "browser",
+      "test": "restart-outbox",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-browser-restart-outbox.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "browser",
+      "test": "parallel-tabs",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-browser-parallel-tabs.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "browser",
+      "test": "integrity",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-browser-integrity.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "browser",
+      "test": "interrupted-submit",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-browser-interrupted-submit.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "browser",
+      "test": "private-replay-restart",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-browser-private-replay-restart.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "fault",
+      "test": "guard-write-failure",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-fault-guard-write-failure.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "fault",
+      "test": "crypto-failure",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-fault-crypto-failure.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "fault",
+      "test": "outbox-local-quota",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-fault-outbox-local-quota.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "fault",
+      "test": "active-write-failure",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-fault-active-write-failure.log"
+    },
+    {
+      "baseline": "e3-generator-7.1.79.html",
+      "sha256": "30b561ead12ac99dc707a2dbe482aebd6f314d7feafd841c6088a35a072fa9c3",
+      "kind": "fault",
+      "test": "unavailable-idb",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "logFile": "negative-1-fault-unavailable-idb.log"
+    }
+  ]
+}

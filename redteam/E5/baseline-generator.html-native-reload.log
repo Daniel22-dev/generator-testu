@@ -1,0 +1,17 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: a native reload must retain and pair departure audit
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-runtime-browser-e5.mjs:16:318
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-runtime-browser-e5.mjs:11:71)
+    at async file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-runtime-browser-e5.mjs:14:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

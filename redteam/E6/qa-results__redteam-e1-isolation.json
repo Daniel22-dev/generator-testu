@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "syntheticOnly": true,
+  "checks": [
+    "real artifact has no teacher mode, credential hashes, roster or code membership oracle",
+    "private verifier retains code to email mapping and independent answer scoring",
+    "classroom unlock preserves attempt, deadline, identity, answers and history",
+    "foreign identity cannot reset an active attempt",
+    "submitted guard denies another attempt and output has no student grade",
+    "negative controls: teacher hash, code hashes, private JWK and answer key are rejected",
+    "negative control: missing parser fails closed instead of serializing legacy runtime"
+  ]
+}

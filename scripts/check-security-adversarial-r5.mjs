@@ -40,6 +40,8 @@ function configure(over, t = TEACH, r = REC) {
   setVal('nazev', 'ADV test'); setVal('proKoho', '1.A'); setVal('latka', 'x'); setVal('ucitelJmeno', TEACHER_NAME);
   setVal('ucitelPin', t); setVal('recoveryCode', r);
 }
+const startCodes=new Map();
+const originalAssemble=w.assembleTestHtml;w.assembleTestHtml=async(...args)=>{const pkg=await originalAssemble(...args);if(pkg?.startCode)startCodes.set(pkg.testId,pkg.startCode);return pkg;};
 const build = async () => w.assembleTestHtml(w.eval('state'), JSON.parse(JSON.stringify(GEN)));
 function fakeIndexedDb(shared=new Map()){
   const dbs=shared;
@@ -86,6 +88,7 @@ function genDom(h, storage, idbState=new Map()) {
       if (storage) for (const [k, v] of Object.entries(storage)) x.localStorage.setItem(k, v);
     }
   });
+  const inp=d.window.document.getElementById('startCode');if(inp)inp.value=startCodes.get(d.window.eval('CFG.testId'))||'';
   return d.window;
 }
 const dumpStorage = x => { const o = {}; for (let i = 0; i < x.localStorage.length; i++) { const k = x.localStorage.key(i); o[k] = x.localStorage.getItem(k); } return o; };
@@ -106,8 +109,8 @@ await T('P-crypto: stejný Recovery plaintext, jiný testId → jiný hash', asy
 });
 
 // ───────────── Q: validace v generátoru ─────────────
-await T('Q-ui: Teacher == Recovery blokuje krok 3', async () => {
-  configure({ testMode: 'prisny', resultMode: 'secureOffline', screenGuard: true });
+await T('Q-ui instant: Teacher == Recovery blokuje krok 3', async () => {
+  configure({ testMode: 'bezny', resultMode: 'instant', screenGuard: true });
   setVal('ucitelPin', 'SAME-SECRET-123456'); setVal('recoveryCode', 'same-secret-123456'); w.validate();
   must(w.document.getElementById('next3').disabled, 'next3 povolen'); return 'next3 disabled + hláška';
 });
@@ -204,13 +207,11 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
   const lockShown = () => !x.document.getElementById('lockScreen').classList.contains('hidden');
   const unlock = async v => { x.document.getElementById('unlockInp').value = v; await x.tryUnlock(); await x.flushPendingAttemptWrites(); };
   x.eval("lockTest('adv-lock-1')"); await sleep(20);
-  await T('C secure: Recovery neotevře teacher panel', async () => {
-    x.document.getElementById('teacherName').value = TEACHER_NAME; x.document.getElementById('teacherPin').value = REC;
-    await x.teacherLogin(); must(x.document.getElementById('teacherPanel').classList.contains('hidden'), 'Recovery otevřel panel'); return 'skrytý';
-  });
-  await T('F secure: Teacher/Admin otevře teacher panel', async () => {
-    x.document.getElementById('teacherPin').value = TEACH; await x.teacherLogin();
-    must(!x.document.getElementById('teacherPanel').classList.contains('hidden'), 'login selhal'); x.teacherLogout(); return 'OK';
+  await T('C/F secure: student nemá učitelský mód ani autentizační funkci', async () => {
+    must(!x.document.getElementById('teacherModal') && !x.document.getElementById('teacherPin'), 'teacher UI serialized');
+    must(typeof x.teacherLogin === 'undefined' && typeof x.teacherSecretMatches === 'undefined', 'teacher runtime serialized');
+    must(!pack.studentHtml.includes('ucitelPinHash') && !pack.studentHtml.includes('recoveryCodeHash'), 'legacy credential hash serialized');
+    return 'teacher capability absent';
   });
   await T('H secure: Teacher/Admin neodemkne zámek', async () => { await unlock(TEACH); must(S('LOCKED') === true, 'Teacher odemkl'); return 'LOCKED=true'; });
   await T('B secure: špatný Recovery neodemkne', async () => { await unlock('REC-WRNG-0000'); must(S('LOCKED') === true, 'odemčeno'); return 'LOCKED=true + bad-unlock'; });
@@ -244,38 +245,38 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
     y.document.getElementById('studentName').value = 'Alice'; await y.startTest(); await sleep(50);
     const s = s0;
     must(y.eval('ATTEMPT_ID') === s.attemptId, 'nový attemptId'); must(Number(y.eval('TIMER_DEADLINE')) === s.timerDeadline, 'nový deadline');
-    must(y.eval('LOCKED') === false, 'stav zámku nesedí'); return 'attemptId + deadline zachovány';
+    must(y.eval('LOCKED') === true, 'strict reload se musí obnovit zamčený');
+    y.document.getElementById('unlockInp').value=REC;await y.tryUnlock();
+    must(y.eval('LOCKED') === false, 'běžný recovery unlock obnoveného pokusu nefunguje');return 'attemptId + deadline zachovány; strict reload zamčený a recovery funkční';
   });
   await T('AA secure: reload zamčeného pokusu zámek neobejde', async () => {
     const y = genDom(pack.studentHtml, lockedStorage, cloneIdbState(lockedIdb)); await sleep(200);
     y.document.getElementById('studentName').value = 'Alice'; await y.startTest(); await sleep(50);
     must(y.eval('LOCKED') === true && !y.document.getElementById('lockScreen').classList.contains('hidden'), 'reload odemkl'); return 'zůstává zamčeno';
   });
-  await T('E secure: Recovery nezruší rozpracovaný pokus jiné identity; Teacher ano', async () => {
+  await T('E secure: studentský soubor nepovoluje reset cizí identity', async () => {
     const y = genDom(pack.studentHtml, aliceStorage, cloneIdbState(aliceIdb)); await sleep(200);
-    y.document.getElementById('studentName').value = 'Bob'; y.document.getElementById('jokerNo').click(); await y.startTest(); await sleep(50);
-    const box = () => y.document.querySelector('.s-modal-bd input[type=password]');
-    must(box(), 'modal reset se neobjevil');
-    box().value = REC; y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click(); await sleep(900);
-    const k = y.eval("storageKey('activeAttempt')");
-    must(y.localStorage.getItem(k) !== null, 'Recovery zrušil cizí pokus');
-    box().value = TEACH; y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click(); await sleep(900);
-    must(y.localStorage.getItem(k) === null, 'Teacher reset nefunguje'); return 'Recovery ne, Teacher ano';
+    try {
+      y.document.getElementById('studentName').value = 'Bob'; y.document.getElementById('jokerNo').click(); await y.startTest();
+      must(y.document.querySelector('.s-modal-bd'), 'foreign identity not blocked');
+      must(!y.document.querySelector('.s-modal-bd input[type=password]'), 'secret reset entry point exported');
+      must(y.localStorage.getItem(y.eval("storageKey('activeAttempt')")) !== null, 'foreign active state deleted');
+      must(typeof y.clearSubmittedLocked === 'undefined', 'retry capability exported');
+      return 'blocked; no reset capability';
+    } finally { y.close(); }
   });
   // odevzdání pro Verifier + retry
   x.document.getElementById('unlockInp').value = REC; await x.tryUnlock();
   await x.submitSecureTest(); await sleep(300);
   submissionTxt = x.document.getElementById('answerBackup').value;
-  await T('D/G secure: retry po odevzdání — Recovery ne, Teacher ano', async () => {
+  await T('D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo', async () => {
     must((await x.submittedLocked()) === true, 'není submitted');
-    x.document.getElementById('studentName').value = 'Alice'; await x.startTest(); await sleep(50);
-    const inp = () => x.document.querySelector('[data-retry-code]');
-    must(inp(), 'retry modal chybí');
-    inp().value = REC; x.document.querySelector('[data-retry-ok]').click(); await sleep(900);
-    must((await x.submittedLocked()) === true, 'Recovery povolil retry');
-    inp().value = TEACH; x.document.querySelector('[data-retry-ok]').click(); await sleep(900);
-    must((await x.submittedLocked()) === false, 'Teacher retry nefunguje'); return 'Recovery ne, Teacher ano';
+    await x.startTest();
+    must(!x.document.querySelector('[data-retry-code]'), 'retry credential form serialized');
+    must((await x.submittedLocked()) === true, 'submitted guard cleared');
+    return 'submitted remains locked';
   });
+
 }
 
 // ───────────── Verifier (vyžaduje opravený 13f) ─────────────
@@ -288,13 +289,14 @@ await T('AC/AD + export: Verifier zachová lock jako signál, recovery jako audi
   const v = genDom(pack.teacherHtml); await sleep(300);
   must(typeof v.bulkVerifyPasted === 'function', 'Verifier nemá funkce (skript nenaběhl)');
   v.document.getElementById('pasteBox').value = submissionTxt; await v.bulkVerifyPasted(); await sleep(300);
-  const r = v.eval('RESULTS[0]'); must(r && r.status === 'OK', 'výsledek není OK: ' + (r && r.error));
+  const r = v.eval('RESULTS[0]'); must(r && r.status === 'DIAGNOSTIC_ONLY', 'záloha není diagnostická: ' + (r && r.error));
   const sig = v.eval('securitySignalsFor(RESULTS[0],duplicateInfo())');
   const lock = sig.find(s => s.key === 'locked' || /uzamkl/.test(s.label)); const ru = sig.find(s => /recovery/.test(s.label));
   must(lock && lock.sev === 'hard', 'lock signál potlačen'); must(ru && ru.sev === 'info', 'recovery není audit/info');
   const issues = v.eval('securityIssueCount(RESULTS[0])'); const nonInfo = sig.filter(s => s.sev !== 'info').length;
   must(issues === nonInfo, 'recovery se započítává do problémů');
-  let csv = ''; v.downloadText = (c) => { csv = c; }; v.downloadResultsCsv();
+  must(v.effectiveResults().length===0,'diagnostická záloha vstoupila do klasifikace');
+  let csv = ''; v.downloadText = (c) => { csv = c; }; v.downloadIndexCsv();
   must(/recovery/i.test(csv.split('\n')[0]), 'CSV hlavička bez recovery sloupce');
   return `lock=hard, recovery=info, issues=${issues}; CSV: ${csv.split('\n')[0].split(';').filter(h => /recovery|security|lock/i.test(h)).join(',')}`;
 });

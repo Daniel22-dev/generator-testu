@@ -172,7 +172,7 @@ let stage3Fixture = null;
 await checkAsync('secureOffline: student + teacher verifier se sestaví', async () => {
   const labels = w.getLabels('cs');
   const rosterSalt = 'fedcba9876543210fedcba9876543210';
-  w.eval("rosterEntries=[{email:'student@example.com',label:'student',code:'ABC234'}];");
+  w.eval("rosterEntries=[{email:'student@example.invalid',label:'student',code:'ABC234'}];");
   const identityCodeHashes = await w.buildPublicIdentityCodeHashes({identityMode:'oneTimeCode'}, rosterSalt);
   const cfg = {
     generatorVersion: 'headless', buildHash: 'testhash1', releaseDate: '2026-07-09', releaseStatus: 'test', generatedAt: '2026-07-09T00:00:00Z',
@@ -190,13 +190,13 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
     __default: [{ title: 'MC', type: 'multiple choice', points_total: 1, points_each: 1, items: [{ question: 'Choose A.', options: ['A', 'B'], correct: 0 }] }],
     g1: [{ title: 'MC', type: 'multiple choice', points_total: 1, points_each: 1, items: [{ question: 'Choose B.', options: ['A', 'B'], correct: 1 }] }]
   };
-  const pkg = await w.assembleSecureOfflinePackage({}, cfg, variants);
+  const pkg = await w.assembleSecureOfflinePackage({__outputFields:{recoveryCode:'REC-AB12-CD34'}}, cfg, variants);
   if (!pkg || pkg.mode !== 'secureOffline') throw new Error('nevznikl secureOffline balík');
   if (!pkg.studentHtml || !pkg.teacherHtml) throw new Error('chybí student/teacher HTML');
   if (!/STUDENT_VARIANTS/.test(pkg.studentHtml)) throw new Error('studentský HTML neobsahuje varianty');
   if (/correct\s*:\s*0/.test(pkg.studentHtml)) throw new Error('studentský HTML pravděpodobně obsahuje answer key');
   if (/ABC234|student@example\.invalid/.test(pkg.studentHtml)) throw new Error('studentský HTML obsahuje čitelný kód/e-mail z rosteru');
-  if (!/studentHashes/.test(pkg.studentHtml)) throw new Error('studentský HTML neobsahuje hashovaný roster');
+  if (/studentHashes|identityCodeHashes|ucitelPinHash|recoveryCodeHash/.test(pkg.studentHtml)) throw new Error('studentský HTML obsahuje teacher/roster deriváty');
   if (!/^([a-f0-9]{64})$/i.test(pkg.studentHtmlSha256 || '') || !/^([a-f0-9]{64})$/i.test(pkg.teacherHtmlSha256 || '')) throw new Error('hash nemá očekávaný SHA-256 hex formát');
   const studentDom = new JSDOM(pkg.studentHtml, {
     runScripts: 'dangerously',
@@ -215,12 +215,12 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
   await new Promise(r => setTimeout(r, 80));
   try {
     if (await studentDom.window.identityAllowed('ABC234') !== true) throw new Error('platný jednorázový kód nebyl přijat');
-    if (await studentDom.window.identityAllowed('UNKNOWN1') !== false) throw new Error('neplatný jednorázový kód nebyl odmítnut');
+    if (await studentDom.window.identityAllowed('!?') !== false) throw new Error('syntakticky neplatný kód nebyl odmítnut');
     const validKey = await studentDom.window.chooseVariant('ABC234');
     const invalidKey = await studentDom.window.chooseVariant('UNKNOWN1');
     if (validKey !== 'g1') throw new Error('platný roster kód nevybral variantu g1');
-    if (invalidKey !== '') throw new Error('neplatný roster kód nebyl odmítnut');
-    const payload = {v:1,testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:pkg.studentHtmlSha256,attemptId:'ATT-STAGE3-001',student:'ABC234',identityMode:'oneTimeCode',code:'ABC234',groupKey:'g1',startedAt:'2026-09-15T17:00:00Z',submittedAt:'2026-09-15T17:05:00Z',jokerUsed:false,jokerSelectedAt:'',resp:{'0_0':1},answerChangeStats:{},totalAnswerChanges:0,securityEvents:[],userAgent:'headless-stage3'};
+    if (invalidKey !== 'g1') throw new Error('jediná veřejná varianta není dostupná; autoritu kódu řeší verifier');
+    const payload = {v:1,testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:pkg.studentHtmlSha256,attemptId:'ATT-STAGE3-001',student:'ABC234',identityMode:'oneTimeCode',code:'ABC234',groupKey:'g1',startedAt:'2026-09-15T17:00:00Z',submittedAt:'2026-09-15T17:05:00Z',jokerUsed:false,jokerSelectedAt:'',resp:{'0_0':1},answerChangeStats:{},totalAnswerChanges:0,securityEvents:[{type:'attempt-start',t:'2026-09-15T17:00:00Z'}],userAgent:'headless-stage3'};
     const packed = await studentDom.window.encryptPayloadForTeacher(payload);
     const answerTxt = 'SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:pkg.studentHtmlSha256,payload:packed},null,2);
     let copied='';
@@ -252,7 +252,7 @@ await checkAsync('secureOffline: student + teacher verifier se sestaví', async 
     studentDom.window.close();
   }
   const legacyCfg={...cfg,testId:'HEADLESS-LEGACY-NOFORMS',formsSubmissionUrl:''};
-  const legacyPkg=await w.assembleSecureOfflinePackage({},legacyCfg,variants);
+  const legacyPkg=await w.assembleSecureOfflinePackage({__outputFields:{recoveryCode:'REC-AB12-CD34'}},legacyCfg,variants);
   if(/id=\"formsSubmissionBox\"/.test(legacyPkg.studentHtml)) throw new Error('Stage 4 Forms UI pronikl do legacy testu bez konfigurace');
   if(!/Odevzdat a vytvořit answers\.txt/.test(legacyPkg.studentHtml)) throw new Error('Stage 4 změnil legacy answers.txt primární workflow');
   return `${Math.round(pkg.studentHtml.length/1024)} kB student / ${Math.round(pkg.teacherHtml.length/1024)} kB verifier + roster + Stage 4 Forms/fallback OK`;
@@ -286,28 +286,30 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
   try{
     const tw=teacherDom.window;
     if(!tw.document.getElementById('formsCsvFile')) throw new Error('chybí CSV import ovladač');
+    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'E-mailová adresa',timestampHeader:'Časové razítko',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true});
     const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
     const currentPack=JSON.parse(stage3Fixture.answerTxt.replace(/^SECURE-ANSWERS-V1\s*/,''));
     const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({...currentPack,payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
     const csv=['Časové razítko,E-mailová adresa,Odevzdávací kód,Poznámka',
-      [q('15. 9. 2026 19:20:00'),q('student-one'),q(stage3Fixture.answerTxt),q('valid')].join(','),
-      [q('15. 9. 2026 19:21:00'),q('student-one'),q(stage3Fixture.answerTxt),q('duplicate')].join(','),
+      [q('15. 9. 2026 19:20:00'),q('student@example.invalid'),q(stage3Fixture.answerTxt),q('valid')].join(','),
+      [q('15. 9. 2026 19:21:00'),q('student@example.invalid'),q(stage3Fixture.answerTxt),q('duplicate')].join(','),
       [q('15. 9. 2026 19:22:00'),q('missing-one'),q(''),q('missing')].join(','),
       [q('15. 9. 2026 19:23:00'),q('bad-one'),q(bad),q('bad')].join(',')].join('\r\n');
     const parsed=tw.parseFormsCsvText(csv);
-    if(parsed.delimiter!==','||parsed.identityIndex!==1||parsed.timestampIndex!==0||parsed.payloadIndex!==2) throw new Error('detekce Google Forms CSV');
+    if(parsed.delimiter!==','||parsed.identityIndex!==1||parsed.timestampIndex!==0) throw new Error('detekce Google Forms CSV');
     const summary=await tw.importFormsCsvText(csv,'forms-export.csv');
     const results=tw.eval('RESULTS');
     if(summary.rows!==4||summary.ok!==2||summary.missing!==1||summary.invalid!==1||summary.otherTests!==0||summary.ambiguous!==0) throw new Error('špatný import summary '+JSON.stringify(summary));
     if(summary.duplicates.exact!==1||summary.duplicates.conflicts!==0) throw new Error('duplicity nebyly zachyceny');
-    if(results.length!==2||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student-one'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
+    if(results.length!==4||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student@example.invalid'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
     if(!results[1].exactDuplicate) throw new Error('identická duplicita nebyla označena');
-    if(results.some(r=>r.status!=='OK')) throw new Error('celoroční import nesmí plnit výsledkovou sadu neplatnými řádky');
+    if(results.slice(2).some(r=>r.status!=='CHYBA')) throw new Error('odmítnuté řádky musí zůstat v diagnostice');
+    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true});
     const semi='Timestamp;Email Address;Result\n'+[q('x'),q('student-two'),q(stage3Fixture.answerTxt)].join(';')+'\n';
     const p2=tw.parseFormsCsvText(semi);
-    if(p2.delimiter!==';'||p2.identityIndex!==1||p2.payloadIndex!==2) throw new Error('středníkový CSV export');
+    if(p2.delimiter!==';'||p2.identityIndex!==1) throw new Error('středníkový CSV export');
     return '4 řádky: 2 OK / 1 chybí / 1 neplatný + duplicity + CSV ,/;';
-  } finally { teacherDom.window.close(); }
+  } finally { await new Promise(r=>setTimeout(r,0));teacherDom.window.close(); }
 });
 
 // Etapa 1 — jednoduchý workflow musí být redukovaný na tři pedagogické účely.
@@ -375,7 +377,7 @@ await checkAsync('stage5 simple: původní kroky se obnoví', async () => {
 check('stage5 security: jeden pokus je pouze vysvětlení existujícího chování', () => {
   const el=w.document.getElementById('attemptProtectionInfo');
   const text=String(el?.textContent||'');
-  if(!el||!/bezpečném offline režimu/i.test(text)||!/další pokus na tomto zařízení automaticky uzamčen/i.test(text)) throw new Error('chybí přesné vysvětlení secure-offline ochrany opakovaného pokusu');
+  if(!el||!/bezpečném offline režimu/i.test(text)||!/stejném profilu prohlížeče uzamčen/i.test(text)||!/nemá učitelský reset/i.test(text)||!/smazání celého úložiště/i.test(text)) throw new Error('chybí přesné vysvětlení lokální ochrany, absence resetu nebo limitu smazání storage');
   if(el.querySelector('input,select,textarea,button')) throw new Error('Etapa 5 přidala nový ovladač pokusu');
   return 'read-only secure-offline explanation';
 });

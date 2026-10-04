@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: ["private-or-answer-derived-property","private-public-config","secure-student-mode-required","teacher-or-roster-data","teacher-runtime-capability","unexpected-public-config-field"]
+
+'FAIL' !== 'PASS'
+
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-publication-e6.mjs:19:53
+    at group (file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-publication-e6.mjs:11:77)
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-publication-e6.mjs:18:9 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'FAIL',
+  expected: 'PASS',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

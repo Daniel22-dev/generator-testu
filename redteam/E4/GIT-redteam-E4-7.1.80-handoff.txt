@@ -1,0 +1,153 @@
+GIT RED-TEAM v2 — E4 / ATTEMPT, REPLAY, STORAGE
+Verze 7.1.80; datum 2026-10-03; větev candidate.
+Výchozí commit: 8242a19d98ac4699472edc3d5839a714902a911f (E3 / 7.1.79).
+Stav: NOT READY – BLOCKING ISSUE.
+E4 je dokončený lokální checkpoint. Proběhly E0–E4; E5–E10 a F7 čekají.
+Nebylo provedeno nahrání na GitHub, PR, merge, promotion ani deployment.
+Server: DEFERRED – SERVER VERSION.
+
+PŮVODNÍ STAV A ZMĚNY
+Pokus už měl HMAC podpis, neexportovatelný klíč a dvě místní kopie stavu.
+Po odevzdání ale přežil jen zákaz dalšího pokusu; zašifrovaný výsledek byl
+pouze v paměti. Replay evidence verifieru byla pouze v aktuální relaci.
+Souběžné karty neměly společný zámek. Neplatný JSON se mohl jevit jako
+chybějící místní záznam, nepodepsaný shadow mohl změnit odpovědi bez
+výslovného označení a selhané šifrování neobnovovalo časovač a dohled.
+
+E4 ukládá podepsaný ciphertext outbox před submitted guardem. Pád mezi
+těmito transakcemi obnoví tentýž výsledek a uzavře původní pokus. Obnova
+nepřepočítává ani znovu nešifruje odevzdání. Po obnovení stránky stiskni
+zahájení testu; existující outbox zobrazí dokončený původní pokus.
+Opakované odevzdání další ciphertext nevytvoří. Selhání localStorage po
+úspěšném IDB zápisu ponechá výsledek dostupný ke stažení a pokus uzavřený.
+Při selhání před uložením ciphertextu se obnoví časovač a dohled, bez
+prodloužení deadline. Selhání aktivního zápisu zablokuje další úpravy;
+běžný odemykací kód třídy neodstraní integrity failure.
+
+Native Web Locks drží jedinou aktivní kartu pro stejný origin/test/profil.
+Bez této podpory je souběh BEST-EFFORT; univerzální záruka se neuděluje.
+Poškozený JSON, nedostupné IDB, nesoulad guardu a pozměněný unsigned
+shadow se označí a zablokují. Čtení už nepřepisuje podepsané záznamy,
+takže starší asynchronní inspekce sama nezapíše starý stav přes nový.
+IDB open má timeout a blocked/abort handling. Lokální kopie si zachovají
+tamper evidence; neprovádí se tiché zahlazení detekovaného nesouladu.
+
+Soukromý verifier uchovává omezenou evidenci digestů a attempt IDs.
+Neukládá do tohoto ledgeru klíč odpovědí, roster, ciphertext ani skóre.
+Restart a vyčištění viditelné sady tuto evidenci nemažou. Stejný původní
+validovaný záznam obnoví jedinou položku pracovní sady; další kopie téže
+položky se nezapočítá. Odlišný obsah pod stejnou identitou či attempt ID
+zůstane konfliktem i po restartu. Skóre a soukromé trust assessment se
+počítají znovu; Forms kotvy musí vlastník znovu potvrdit. Poškozený nebo
+nedostupný ledger blokuje příjem Forms výsledku před bodováním. Nejde
+o důkaz autora ani o globální zákaz opakovaného exportu stejného CSV.
+Verifier patří pouze na soukromý PC vlastníka mimo školu; ne na školní
+server, školní počítač, veřejný origin ani do veřejné historie repozitáře.
+
+OVĚŘENÍ NA SKUTEČNÉM RUNTIME — PASS
+Desktop Chromium 153.0.8010.0; Playwright 1.61.1; původní CSP; skutečné
+WebCrypto, IndexedDB a Web Locks. Žádné pageerrors. Zavření/restart
+probíhalo mezi samostatnými Chromium procesy se zachovaným diskovým
+profilem, nikoli jen simulací reloadu. Verifier měl soukromý file origin.
+
+1. Refresh: stejný attempt ID, deadline a odpovědi.
+2. Restart prohlížeče: stejný rozpracovaný pokus, bez resetu času.
+3. Restart po odevzdání: přesně shodný ciphertext, bez nového pokusu.
+4. Opakované submit volání: shodný původní výsledek, bez re-encryption.
+5. Smazání pouze localStorage: IDB zachová aktivní i odevzdaný pokus.
+6. Dvě současně zahajované karty: pouze jedna aktivní; zavření vítězné
+   karty dovolí obnovu původního pokusu v druhé kartě.
+7. Malformed JSON a změna unsigned shadow: integrity lock.
+8. Pád mezi skutečným outbox zápisem a guard zápisem: obnova ciphertextu
+   a doplnění submitted guardu, bez replacement attempt.
+9. Restart soukromého verifieru: kotvy se znovu potvrzují, známý záznam
+   obnoví jednu položku a opakovaná kopie se vyloučí.
+10. Vyčištění pracovní sady: historie digestů zůstává; odlišný starší/
+    nový pokus téže identity se odmítne i v nové relaci.
+11. Poškozený soukromý ledger: odmítnutí před bodováním.
+12. Smazání IDB při zachování místních signed records: chybějící MAC
+    klíč blokuje obnovení nového aktivního pokusu.
+
+PORUCHOVÉ TESTY — PASS
+Pět skupin používá skutečně vygenerovaný runtime s WebCrypto a
+simulovaným IDB; důkaz skutečného restartu patří k browser testu výše:
+- selhání submitted guard zápisu po outboxu: výsledek dostupný, pokus
+  uzavřený, nová relace obnoví přesný ciphertext a doplní guard;
+- chyba šifrování: obnoví dohled a časovač, deadline zůstane původní;
+- localStorage quota/write failure při uloženém IDB ciphertextu:
+  zachová download a submitted stav;
+- selhání aktivního zápisu: LOCKED, původní attempt/deadline; odemykací
+  kód třídy integrity failure neobejde;
+- odmítnuté IDB čtení: absence úložiště se nesmí tvářit jako nový pokus.
+
+NEGATIVNÍ KONTROLY — PASS, 20/20
+Deset bezpečnostních skupin bylo spuštěno proti dvěma nezávislým
+skutečným generátorům: 7.1.76 a předchozímu E3 buildu 7.1.79.
+Každá skončila očekávaným AssertionError a exit code 1; chybějící
+harness závislost se za platnou negativní kontrolu nepovažuje.
+Hashes a všech 20 logů jsou v redteam/E4/negative-controls.json a .log.
+Kontroly architektonických limitů mají očekávaný průchod nového pokusu;
+jejich cílem je doložit hranici, nikoli vykazovat prevenci.
+
+REGRESE A MÍSTNÍ CI EKVIVALENT — PASS
+npm test: kompletní běh, závěrečný Workflow audit 55 PASS / 0 FAIL.
+npm run qa:p5:ci: kompletní místní běh, finální acceptance report.
+Quality: 35/35; release: 46/46; acceptance: 19/19.
+Runtime: 0 blockers, exceptions, init failures a overflows.
+Lint: 0 chyb; 8 dřívějších upozornění.
+Entry critical bytes: 1765584; limit 1 770 000 z E3
+zůstal beze změny. Ostatní limity se v E4 také neměnily.
+Automatizované axe: 4 stavy, 0 potvrzených violations. Zůstávají
+incomplete kontroly: ARIA 5 uzlů v generátoru v obou šířkách a kontrast
+120/109 uzlů v manuálu. Ty vyžadují ruční ověření; plná přístupnost se
+netvrdí. Standardní axe harness obchází CSP pro svou injekci, zatímco
+E4 browser test běží s původní CSP.
+Zachovány regrese E1 izolace, E2 trust, E3 schema/Forms/replay, R3/R5,
+D7/D8, verifier UI, PDF runtime/quality a workflow. PDF ani vygenerované
+teacher/student fixtures se do checkpoint ZIP nepřidávají.
+Nové gates jsou v npm test / P5; skutečný browser gate je v P5.
+Při závěrečném souběhu jeden běh narazil na přestavované dist soubory;
+nebyl uznán. Finální dva běhy proběhly postupně a oba jsou kompletní.
+Izolované VM fixture testy byly doplněny o existující integrity state;
+pozdní callback po zavření jsdom okna už nesahá na zaniklý document.
+
+DOLOŽENÉ ARCHITEKTONICKÉ LIMITY
+ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED:
+- úplné smazání localStorage i IDB umožní nový lokální pokus;
+- anonymní kontext má vlastní úložiště a může vytvořit vlastní pokus;
+- samostatný Chromium profil nemá společný ledger a může vytvořit
+  vlastní pokus; jiný browser engine nebyl fyzicky spuštěn;
+- konzistentní rollback obou signed stores se zachovaným MAC klíčem
+  je nerozlišitelný od původního legitimního lokálního stavu;
+- smazání/private edit replay ledgeru nebo jiný soukromý profil není
+  globální authoritative evidence jedné odpovědi.
+HMAC a neexportovatelnost klíče jsou HARDENED / DETECTED proti běžným
+zásahům a restartu, nikoli důkaz proti vlastníkovi klientského runtime.
+Re-encryption/duplicate detekce verifieru zůstává lokální. Souhlasný
+payload vytvořený s veřejným klíčem a odpovídající Forms účet/časové
+kotvy nadále může dát technický návrh 100 %; runtime provenance zůstává
+CLIENT-CONTROLLED a klasifikace vždy REVIEW_REQUIRED. Encryption,
+self-hash, klientský čas a telemetrie nedokazují původ ani poctivost.
+Forms nastavení a nezměněnost CSV potvrzuje vlastník; nebyly ověřeny
+na živém Google Forms. Čas publikace nenahrazuje generatedAt.
+
+ZBÝVÁ
+E5 runtime/screen guard; E6 veřejný build a Git historie; E7 checklist
+reálných mobilů; E8 úplná forgery matice; E9 finální regrese/CI;
+E10 release candidate podle GARP 2.7. F7: obsah testu za AES-GCM/PBKDF2
+startovním kódem s alespoň 40 bity entropie stále není hotový.
+iPhone/iPad Safari, Android a ostatní skutečné browser enginy:
+ANALYZED / NOT TESTED. Druhé zařízení a dohledové chování:
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR.
+GitHub Actions exact-SHA, protected-main promotion, živý deployment,
+živé AI a ruční accessibility kontroly nebyly provedeny. Veřejný scan
+je pouze historický E0 snapshot; E4 jej neaktualizoval.
+NOT READY – BLOCKING ISSUE zůstává platné. Nejde o release pro ostrý
+třídní experiment ani o globálně garantovaný zákaz replay bez serveru.
+
+PŘEDÁNÍ
+Zdrojový candidate ZIP 7.1.80, release poznámky, testy a sanitizované
+JSON/log evidence. Bez node_modules, dist, .git, privátních RSA klíčů,
+skutečného rosteru, hotových teacher HTML a testovacích PDF.
+GARP 2.7 piny a SemVer identity aktualizovány společně, RELEASE.changes
+má nejnovější položku nahoře a nejvýše deset záznamů. Žádné publikování.

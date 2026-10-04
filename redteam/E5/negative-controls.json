@@ -1,0 +1,313 @@
+{
+  "stage": "E5",
+  "status": "PASS",
+  "controls": [
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "away-during-lock",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-away-during-lock.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "beforeunload-lock",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-beforeunload-lock.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "locked-responses",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-locked-responses.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "clipboard-block",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-clipboard-block.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "split-reload",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-split-reload.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "unlock-race",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-unlock-race.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "lifecycle-lock",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-lifecycle-lock.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "submitted-responses",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-submitted-responses.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "id": "verifier-audit",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-verifier-audit.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "away-during-lock",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-away-during-lock.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "beforeunload-lock",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-beforeunload-lock.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "locked-responses",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-locked-responses.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "clipboard-block",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-clipboard-block.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "split-reload",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-split-reload.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "unlock-race",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-unlock-race.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "lifecycle-lock",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-lifecycle-lock.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "submitted-responses",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-submitted-responses.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "id": "verifier-audit",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-verifier-audit.log",
+      "kind": "runtime"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "native-reload",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-native-reload.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "native-fullscreen-exit",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-native-fullscreen-exit.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "native-history",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-native-history.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "controlled-freeze-resume",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-controlled-freeze-resume.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "native-inert-keyboard",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-native-inert-keyboard.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "native-split-persistence",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-native-split-persistence.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "controlled-pageshow-reconciliation",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-controlled-pageshow-reconciliation.log"
+    },
+    {
+      "baseline": "baseline-generator.html",
+      "sha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "kind": "browser",
+      "id": "controlled-fullscreen-rejection",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "baseline-generator.html-controlled-fullscreen-rejection.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "native-reload",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-native-reload.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "native-fullscreen-exit",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-native-fullscreen-exit.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "native-history",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-native-history.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "controlled-freeze-resume",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-controlled-freeze-resume.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "native-inert-keyboard",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-native-inert-keyboard.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "native-split-persistence",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-native-split-persistence.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "controlled-pageshow-reconciliation",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-controlled-pageshow-reconciliation.log"
+    },
+    {
+      "baseline": "e4-generator-7.1.80.html",
+      "sha256": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9",
+      "kind": "browser",
+      "id": "controlled-fullscreen-rejection",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "log": "e4-generator-7.1.80.html-controlled-fullscreen-rejection.log"
+    }
+  ],
+  "scope": "Nine generated-runtime and eight Chromium guard/audit groups against real historical exports. Native/controlled scope is retained in the browser gate. iPad keyboard exception is an unchanged-regression test."
+}

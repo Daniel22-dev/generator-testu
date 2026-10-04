@@ -44,7 +44,7 @@ function rosterMakeCode(){
   catch(e){for(var j=0;j<n;j++)o+=ab[Math.floor(Math.random()*ab.length)];}
   return o;
 }
-function rosterForVerifier(){ return (rosterEntries||[]).map(function(e){ return {code:e.code,label:e.label}; }); }
+function rosterForVerifier(){ return (rosterEntries||[]).map(function(e){ return {code:e.code,label:e.label,email:e.email}; }); }
 function rosterRender(msg){
   var box=document.getElementById('rosterResult'); if(!box)return;
   if(msg){ box.innerHTML='<span style="color:var(--err)">'+rosterEscHtml(msg)+'</span>'; return; }

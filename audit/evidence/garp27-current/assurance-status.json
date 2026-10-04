@@ -1,0 +1,153 @@
+{
+  "schema": "garp27-assurance-status-v1",
+  "garpVersion": "2.7",
+  "environment": "local-ci",
+  "releaseIdentity": {
+    "appId": "generator",
+    "appVersion": "7.1.86",
+    "sourceCommit": "b5801cccc88140ea683d9cf0278deb92c7771f8d"
+  },
+  "overall": "DERIVE",
+  "components": [
+    {
+      "componentId": "AG-01-policy",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "garp27-contracts",
+          "sha256": "aaf7e2a2a4a0c1d76914939e201128a5681fecbe662c6638959cf10a38b19438"
+        },
+        {
+          "id": "garp27-policy-mutations",
+          "sha256": "de3164e09483c84f08a36ca8ab89f00b0bfd6e4be5d98c1d99c928e3aad7996c"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-02-identity",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "legacy-garp25-static",
+          "sha256": "563e7f6362550976a82b1658631064062958cd3cbad8527b67c9cfcfcc165502"
+        },
+        {
+          "id": "production-readiness",
+          "sha256": "4aecccd0bd06336c1cd3e35164745d1ff796437718e30469793823615bf10969"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-03-request-api-ai",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "legacy-garp25-static",
+          "sha256": "563e7f6362550976a82b1658631064062958cd3cbad8527b67c9cfcfcc165502"
+        },
+        {
+          "id": "garp27-architecture",
+          "sha256": "e96864dc27089c309da678e9e4fd24acbfc90f0292bbc2ac1587b0c11e452a18"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-05-files",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "legacy-garp25-static",
+          "sha256": "563e7f6362550976a82b1658631064062958cd3cbad8527b67c9cfcfcc165502"
+        },
+        {
+          "id": "sensitive-scan",
+          "sha256": "4c3b08b9ce7f6b93a5cda9853223ff2feeb46584286f4fccce9064b364a655da"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-06-data-lifecycle",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "legacy-garp25-static",
+          "sha256": "563e7f6362550976a82b1658631064062958cd3cbad8527b67c9cfcfcc165502"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-07-release",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "garp27-auto-patch",
+          "sha256": "7f7201ef74500b72635a7ecb4452f68b864a2728379507a4e40fb3d16ed8b355"
+        },
+        {
+          "id": "production-readiness",
+          "sha256": "4aecccd0bd06336c1cd3e35164745d1ff796437718e30469793823615bf10969"
+        },
+        {
+          "id": "action-pins",
+          "sha256": "a241b90db0a6aedf2f8b0fc88570e498889cb77c00c9eeafc459841a76c296d1"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-08-architecture",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "garp27-architecture",
+          "sha256": "e96864dc27089c309da678e9e4fd24acbfc90f0292bbc2ac1587b0c11e452a18"
+        },
+        {
+          "id": "garp27-mutations",
+          "sha256": "72f3211c11c9d86b4686ee1aacea5eee3be813041be0663937f5729d2be8bad7"
+        }
+      ]
+    },
+    {
+      "componentId": "AG-09-inventory",
+      "presence": "PRESENT",
+      "health": "HEALTHY",
+      "effectiveness": "PASS",
+      "evidenceFreshness": "FRESH",
+      "observedAt": "2026-10-04T06:25:22.358Z",
+      "evidenceRefs": [
+        {
+          "id": "garp27-architecture",
+          "sha256": "e96864dc27089c309da678e9e4fd24acbfc90f0292bbc2ac1587b0c11e452a18"
+        }
+      ]
+    }
+  ]
+}

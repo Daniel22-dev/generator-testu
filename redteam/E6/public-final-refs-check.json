@@ -1,0 +1,21 @@
+{
+  "schema": "git-redteam-e6-final-public-metadata-v1",
+  "checkedAt": "2026-10-03T19:55:15.653868+00:00",
+  "repository": "Daniel22-dev/interaktivni-testy",
+  "refs": [
+    {
+      "ref": "refs/heads/main",
+      "sha": "2af3fade24465511503dc9f215f7d91ab4a066b1"
+    }
+  ],
+  "latestPagesRun": {
+    "head_sha": "2af3fade24465511503dc9f215f7d91ab4a066b1",
+    "updated_at": "2026-10-02T05:57:40Z",
+    "conclusion": "success"
+  },
+  "workflowRunCount": 11,
+  "unchangedSinceFullE6Audit": true,
+  "source": "Read-only GitHub connector GET git/refs and actions/runs?per_page=1",
+  "scope": "Fresh metadata, not a second full Pages content scan",
+  "githubWrites": false
+}

@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import vm from 'node:vm';
 
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
-const secure = read('src/js/13e-secure-student-runtime.js');
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant = read('src/js/14b-instant-test-runtime.js');
 
 function assert(cond, msg){
@@ -93,19 +93,19 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
     btoa:s=>Buffer.from(s,'binary').toString('base64'), setTimeout:()=>1, clearTimeout:()=>{},
     CFG:{testId:TEST_ID,ucitelPinHash:teacherHash,recoveryCodeHash:recoveryHash,ucitelJmeno:'Teacher'},
     b64UrlFromBufferLocal:buf=>Buffer.from(new Uint8Array(buf)).toString('base64url'),
-    $:id=>els[id]||makeEl(), t:(k,f)=>f||k, renderTeacherRuntimeInfo:()=>{},
+    $:id=>els[id]||makeEl(), document:{visibilityState:'visible'},applyGuardUi:()=>{}, t:(k,f)=>f||k, renderTeacherRuntimeInfo:()=>{},
   };
   vm.createContext(ctx);
   vm.runInContext(`
     let ATTEMPT_ID='ATT-E3-001', ACTIVE_IDENTITY_HASH='IDENTITY-HASH-001', ACTIVE_KEY='VARIANT-B', STARTED_AT='2026-10-02T15:00:00.000Z';
-    let TIMER_DEADLINE=1999999999999, LOCKED=true, LOCK_REASON='Student left window', UNLOCK_BUSY=false, SUBMITTED=false;
+    let TIMER_DEADLINE=1999999999999, LOCKED=true, LOCK_REASON='Student left window', UNLOCK_BUSY=false, SUBMITTED=false, PERSIST_INTEGRITY_BLOCK=false,GUARD_EPOCH=0;
     let JOKER_USED=true, JOKER_SELECTED_AT='2026-10-02T15:00:05.000Z', JOKER_CHOICE=true;
     let RESP={q1:'A',q2:'B'}, SEC_EVENTS=[{t:'2026-10-02T15:05:00.000Z',type:'locked',detail:'Student left window'}];
     let LOCK_TAPS=0, LOCK_TAP_TIMER=null; let __lastSeal=null;
     function recordSec(type,detail){SEC_EVENTS.push({t:'NOW',type,detail});}
     function saveActiveAttemptSeal(seal){__lastSeal=JSON.parse(JSON.stringify(seal));return true;}
   `,ctx);
-  for(const fn of ['deriveSecretHash','teacherSecretMatches','recoveryCodeMatches','persistActiveAttemptSeal','lockTap','normLoginName','tryUnlock','teacherLogin']){
+  for(const fn of ['deriveSecretHash','teacherSecretMatches','recoveryCodeMatches','securityEventSnapshot','persistActiveAttemptSeal','lockTap','normLoginName','tryUnlock','teacherLogin']){
     vm.runInContext(extractFunction(secure,fn),ctx);
   }
   assert(await vm.runInContext(`teacherSecretMatches(${JSON.stringify(TEACHER)})`,ctx), 'E3 secure dynamic: Teacher/Admin secret matches Teacher/Admin branch');

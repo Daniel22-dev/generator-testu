@@ -1,0 +1,651 @@
+{
+  "schema": "git-redteam-e9-local-checkpoint-v1",
+  "stage": "E9",
+  "version": "7.1.85",
+  "date": "2026-10-04",
+  "branch": "candidate",
+  "baselineE8Commit": "ea33fe020bc84cfce2497b86447df4dd97abef8b",
+  "baselineSourceZip": "GIT-redteam-E8-7.1.84.zip",
+  "baselineZipSha256": "f223522be500f7bc4cc07e8e00c97448ae49122aaa99264f05364a011ec92b9e",
+  "stageStatus": "LOCAL REGRESSION AND CI CONFIGURATION COMPLETE / PASS",
+  "releaseReadiness": "NOT READY – BLOCKING ISSUE",
+  "canonicalCommand": "npm run qa:redteam:ci",
+  "process": {
+    "command": [
+      "npm",
+      "run",
+      "qa:redteam:ci"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-04T05:41:26.727056+00:00",
+    "completedAt": "2026-10-04T05:47:15.118054+00:00",
+    "version": "7.1.85",
+    "logFile": "e9-ci-final.log",
+    "logBytes": 295,
+    "logSha256": "4265ce5878821418ca6261df2ccb6ae08f1d72aadb60cb037bdaed24b89484fe",
+    "scope": "Local installed exact-lockfile dependencies; no GitHub Actions or real mobile run"
+  },
+  "sourceSnapshot": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 502,
+    "sha256": "f621417f182a09cd5bb06d3a440e6329c05759ed4cd5108cbecc369d55faa1af",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "sourceUnchanged": true,
+  "ciEnvironment": "local-equivalent",
+  "githubActionsExecuted": false,
+  "freshNpmCiSucceeded": false,
+  "dependencyVersionAudit": {
+    "status": "PASS",
+    "installedVersionsMatched": 112,
+    "notApplicableOptionalPackages": [
+      "fsevents (Darwin)"
+    ],
+    "freshOfflineInstall": "FAILED / ENOTCACHED",
+    "tarballIntegrityVerified": false
+  },
+  "reportAdmission": {
+    "reportCount": 34,
+    "negativeControls": 11
+  },
+  "negativeControls": {
+    "exportMutants": 7,
+    "ciWiringMutants": 14,
+    "evidenceMutants": 11,
+    "nativeMutants": 2,
+    "E8perCaseOracles": 108
+  },
+  "nativeBrowser": {
+    "browser": "153.0.8010.0",
+    "cases": 12,
+    "integrityLocks": 0,
+    "preservedAttempt": 12,
+    "scope": "Desktop Chromium only; flushed audit reload, pending audit reload and graceful persisted-profile restart; answer explicitly flushed before audit queue",
+    "physicalMobile": "ANALYZED / NOT TESTED",
+    "abruptOsKillTested": false,
+    "reliabilityCertified": false
+  },
+  "E8": {
+    "caseCount": 108,
+    "rejections": 89,
+    "replaySequences": 6,
+    "controls": 13,
+    "negativeControls": 108
+  },
+  "garp27": {
+    "status": "FOUNDATION_PASS_LIVE_NOT_TESTED",
+    "summary": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0
+    },
+    "sourceIdentity": {
+      "value": "6d89f8924693c30fab8bbbd18081a50c9524a94e",
+      "kind": "local-source-tree-sha1-surrogate"
+    },
+    "liveStatus": "NOT_TESTED"
+  },
+  "p5Release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "p5Acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.85",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-04T05:46:56.792Z",
+    "distBytes": 2569542,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1647166,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1597683,
+    "entryCriticalBytes": 1769502,
+    "largestInlineScriptBytes": 155483,
+    "precacheBytes": 2192941,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1597683,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "entryCriticalBudget": {
+    "limit": 1770000,
+    "changed": false,
+    "headroom": 498
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "axeIncomplete": [],
+  "currentReports": [
+    {
+      "source": "qa-results/redteam-e1-isolation.json",
+      "file": "qa-results__redteam-e1-isolation.json",
+      "sha256": "67e757a379e4e802368c28dd6b94d50edfa7d1db20791ae1e1abc7f075638feb"
+    },
+    {
+      "source": "qa-results/redteam-e1-browser.json",
+      "file": "qa-results__redteam-e1-browser.json",
+      "sha256": "95a28e63ee237ac69cce6e7a5f0c6c96f8c67b26b5b660fff383cf94cc1c4def"
+    },
+    {
+      "source": "qa-results/redteam-e2-trust.json",
+      "file": "qa-results__redteam-e2-trust.json",
+      "sha256": "dfd94c357a18f4fec39fd76e0bcbd9a73ae0a48302af2a0ac18c55c3201a24bb"
+    },
+    {
+      "source": "qa-results/redteam-e2-browser.json",
+      "file": "qa-results__redteam-e2-browser.json",
+      "sha256": "12d6303cbd555f8060461254169c1ee5c7e26609cd91ca2b4f3a68249f944a63"
+    },
+    {
+      "source": "qa-results/redteam-e3-verifier.json",
+      "file": "qa-results__redteam-e3-verifier.json",
+      "sha256": "fda3fee7fb9d27b15d7777f849cf674a5070a9b130ff53bbffad3e86ff32cfad"
+    },
+    {
+      "source": "qa-results/redteam-e3-browser.json",
+      "file": "qa-results__redteam-e3-browser.json",
+      "sha256": "180e4e2c1983a4154e4aad73263db6906cc38853e8a0d8efa0beefbf5d6a8a6d"
+    },
+    {
+      "source": "qa-results/redteam-e4-faults.json",
+      "file": "qa-results__redteam-e4-faults.json",
+      "sha256": "29f5110d61cf29650771ae251c6409bff77fdd6c18c4cef9c01e38c3e7b3aa7c"
+    },
+    {
+      "source": "qa-results/redteam-e4-browser.json",
+      "file": "qa-results__redteam-e4-browser.json",
+      "sha256": "1056ae66de1199ba566f0379660f85823b5a3af6dbb390ac378c93751162dd73"
+    },
+    {
+      "source": "qa-results/redteam-e5-runtime.json",
+      "file": "qa-results__redteam-e5-runtime.json",
+      "sha256": "101b338818b686a4df52c29e3f21efc9b556fad53b27d9abb4333902a6ba1f75"
+    },
+    {
+      "source": "qa-results/redteam-e5-browser.json",
+      "file": "qa-results__redteam-e5-browser.json",
+      "sha256": "51fcc185a94c0d6b3172a39206240e835e32d6546bdb42e7cfc64cb33c1a837e"
+    },
+    {
+      "source": "qa-results/redteam-e6-publication.json",
+      "file": "qa-results__redteam-e6-publication.json",
+      "sha256": "7893f86b0e283e7ecc292592f7e76d1ea18aed6aef625a65d74b2c67a69649e9"
+    },
+    {
+      "source": "qa-results/redteam-e7-mobile-protocol.json",
+      "file": "qa-results__redteam-e7-mobile-protocol.json",
+      "sha256": "5906aea8db7de4835bb398dc75f5c58a717263edced11763a0cc3073d22289d6"
+    },
+    {
+      "source": "qa-results/redteam-e7-recorder.json",
+      "file": "qa-results__redteam-e7-recorder.json",
+      "sha256": "5d23861e0f3425ca2dc16a28aeec48bfe1fe7c2523c123b1ba2e27d9b3126d19"
+    },
+    {
+      "source": "qa-results/redteam-e8-forgery.json",
+      "file": "qa-results__redteam-e8-forgery.json",
+      "sha256": "d9865c84569fdad63fc99baa8502e7e8ca859ffa7f5f2d5bad1ed90c2e17d374"
+    },
+    {
+      "source": "qa-results/redteam-e8-retention.json",
+      "file": "qa-results__redteam-e8-retention.json",
+      "sha256": "3cf68403207b116ae5c19291c007b439bb598d38963be8050f4d7929d76c12b8"
+    },
+    {
+      "source": "qa-results/redteam-e8-browser.json",
+      "file": "qa-results__redteam-e8-browser.json",
+      "sha256": "0045c5c9e51af4e2c8c0a8981383c302bc2d9865609f7cd9ea09c5b93b3f4656"
+    },
+    {
+      "source": "qa-results/redteam-e9-ci-contract.json",
+      "file": "qa-results__redteam-e9-ci-contract.json",
+      "sha256": "83674778bdd351f591e4b048f42377499a9edc22ca0c483c9d597abf971ff7a9"
+    },
+    {
+      "source": "qa-results/redteam-e9-negative.json",
+      "file": "qa-results__redteam-e9-negative.json",
+      "sha256": "c37f552052ee636c1e040bf28ffc31275e73ba634001276cd5580a2f994432a9"
+    },
+    {
+      "source": "qa-results/redteam-e9-restart-browser.json",
+      "file": "qa-results__redteam-e9-restart-browser.json",
+      "sha256": "1ec50d66650b012e7144c964663e63fadfdc9c61ea2cef59653ce09ee22059dc"
+    },
+    {
+      "source": "qa-results/security-behavior-r3.json",
+      "file": "qa-results__security-behavior-r3.json",
+      "sha256": "fb301f04be687c35dd6e47829af87ee4df0be8e50f5fcb58d83e83738cb0d5fe"
+    },
+    {
+      "source": "qa-results/adversarial-harness-r5.json",
+      "file": "qa-results__adversarial-harness-r5.json",
+      "sha256": "c4f192d3e79fd21b028a3ef0c71e5e82173aa18cc1cba90e855681507b36b251"
+    },
+    {
+      "source": "qa-results/d7-regressions.json",
+      "file": "qa-results__d7-regressions.json",
+      "sha256": "53bc651bcf02a305548d5a352c38956cec370e86c8ba5dafa1b45f183ff9c734"
+    },
+    {
+      "source": "qa-results/d8-final-audit.json",
+      "file": "qa-results__d8-final-audit.json",
+      "sha256": "7a3fbd7c2d01e94646b98149767662cf54604c66f9f151fa47e01d4b8696c726"
+    },
+    {
+      "source": "qa-results/stage3-pdf-runtime/summary.json",
+      "file": "qa-results__stage3-pdf-runtime__summary.json",
+      "sha256": "d943abb2a1df6d93138e3c30b9656aa39483e8aac3eb5f45b3f382825b616905"
+    },
+    {
+      "source": "qa-results/stage3-pdf-quality/summary.json",
+      "file": "qa-results__stage3-pdf-quality__summary.json",
+      "sha256": "c35bbe61b1f2fcc124414a9116198cf707870ad80bd018d80e9dd3848ea39da0"
+    },
+    {
+      "source": "qa-results/verifier-ui-runtime/summary.json",
+      "file": "qa-results__verifier-ui-runtime__summary.json",
+      "sha256": "c0a19b260c330edd99a5129ab459e5861abe7be27f1bbaae6ebed2b7fd0bef4c"
+    },
+    {
+      "source": "dist/qa-p3-browser-report.json",
+      "file": "dist__qa-p3-browser-report.json",
+      "sha256": "195729041c4e3ebfe4cbad91aa05adb1f12e19d851a76de42c170cc301dd2d96"
+    },
+    {
+      "source": "dist/qa-p5-runtime-report.json",
+      "file": "dist__qa-p5-runtime-report.json",
+      "sha256": "f1ab9a9fa555ea9bcea20cd650cc8be07224a81a3bac02d4931e541828288132"
+    },
+    {
+      "source": "dist/qa-p5-xss-sinks-report.json",
+      "file": "dist__qa-p5-xss-sinks-report.json",
+      "sha256": "d23c4fb1215e73ae12225f1678538be291b8d5b0e2bca6dc062fbf9b59d0ea8b"
+    },
+    {
+      "source": "dist/qa-p5-axe-runtime-report.json",
+      "file": "dist__qa-p5-axe-runtime-report.json",
+      "sha256": "c9478aab41ce1f3951080ff8d5ff68c123cb6797be9c71db798c0cab1507c33a"
+    },
+    {
+      "source": "dist/qa-p5-release-report.json",
+      "file": "dist__qa-p5-release-report.json",
+      "sha256": "d0795f0a4afbd8c530e2f3b38d4eef39792f104753c0bf4c0e0f3e6c88639066"
+    },
+    {
+      "source": "dist/qa-p5-acceptance-report.json",
+      "file": "dist__qa-p5-acceptance-report.json",
+      "sha256": "a3c8ef95a9a251599580a51e6399e3fc496daad0351f16ae25040f155b15f0ce"
+    },
+    {
+      "source": "dist/quality-report.json",
+      "file": "dist__quality-report.json",
+      "sha256": "a602961a3ba0d2762aeeed73fcd98ecd55992670a4b4696917f0fa256599f6b7"
+    },
+    {
+      "source": "audit/evidence/garp27-current/foundation-summary.json",
+      "file": "audit__evidence__garp27-current__foundation-summary.json",
+      "sha256": "d93a6867492278bbe172ac2ca050bc70e0146556549638d36cbb1c42aeec000e"
+    },
+    {
+      "source": "qa-results/redteam-e9-evidence.json",
+      "file": "qa-results__redteam-e9-evidence.json",
+      "sha256": "c4ab005c3b93ee2c1f63decb75e31e8a605029805fe21dcbad8e5cd53c508218"
+    },
+    {
+      "source": "qa-results/redteam-e9-ci-run.json",
+      "file": "qa-results__redteam-e9-ci-run.json",
+      "sha256": "978dbdbbdc9632adbd40194fc215e3a8bb09b05ccf10ee5dd6340bd86023d4c6"
+    }
+  ],
+  "stepLogs": [
+    {
+      "command": "npm test",
+      "file": "ci-process/step-1.log",
+      "originalRuntimeLogName": "1-npm-test.log",
+      "sha256": "358609597b4e58c670bb50286dcaba13d4eadaa5877863a6b685d42a8e0e091f",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run qa:garp27:foundation",
+      "file": "ci-process/step-2.log",
+      "originalRuntimeLogName": "2-npm-run-qa-garp27-foundation.log",
+      "sha256": "2038aadc37e0ac6e25487a88ded6fe7fa32f3d57a48ccd3e452bedc377f70062",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run qa:p5:ci",
+      "file": "ci-process/step-3.log",
+      "originalRuntimeLogName": "3-npm-run-qa-p5-ci.log",
+      "sha256": "e6d99630c50cc0206287813c3ef78c1f09a6eaa58a50d9202e88b5dc78fba999",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/check-redteam-evidence-e9.mjs",
+      "file": "ci-process/step-4.log",
+      "originalRuntimeLogName": "4-node-scripts-check-redteam-evidence-e9.mjs.log",
+      "sha256": "4becd58877a7fbbb6c95bfe9708361133de3dd24b40d49c905dd0bd0d132f8e3",
+      "exitCode": 0
+    }
+  ],
+  "reviewRun": {
+    "status": "FAIL / NOT FINAL CERTIFICATION",
+    "cause": "Stale ci.p5-gate required old direct command; replaced with complete E9 wiring validation. Source review also completed before final full rerun.",
+    "file": "review-run/ci-run.json",
+    "notCountedAsPass": true
+  },
+  "loggingFailure": {
+    "status": "FAIL / NOT FINAL CERTIFICATION",
+    "cause": "All four checks passed, but writing the last log failed due to slash in command-derived filename. Safe filenames and a CI mutation added; complete rerun required.",
+    "file": "logging-failure/chain.log"
+  },
+  "physicalMobileCasePairsNotRun": 146,
+  "liveFormsInspected": false,
+  "remoteMainProtectionVerified": false,
+  "publication": "No push, PR, merge, deployment or Support message",
+  "productionAlgorithms": "E8 guard/verifier unchanged; E9 adds regression/CI checks and checkpoint metadata",
+  "blockingIssues": [
+    "F7 AES-GCM/PBKDF2 start-code content encryption (>=40 bits) missing",
+    "E7 physical mobile testing not executed",
+    "E6 historical cache/raw purge and private credential rotation unconfirmed",
+    "Actual GitHub Actions on exact candidate SHA and E10 release path pending"
+  ],
+  "architecturalLimits": [
+    "Consistent public-key forgery / copied hash: CLIENT-CONTROLLED / REVIEW_REQUIRED",
+    "Full reset/new profile: ARCHITECTURAL LIMIT / SERVER REQUIRED for trusted global state",
+    "Second device: MIMO TECHNICKÝ DOSAH – POUZE DOZOR"
+  ],
+  "evidenceFiles": [
+    {
+      "file": "E9-FINDINGS.txt",
+      "sha256": "6847cb8a56410e4e2449432c1cb15f0b0234a2fae51ceb0586aa6a11e44221c0"
+    },
+    {
+      "file": "E9-REGRESSION-MATRIX.txt",
+      "sha256": "d7ff308c45c6c2e9aa78d8801fcb124ee598d3614bf9368645e4cd26327ef02e"
+    },
+    {
+      "file": "audit__evidence__garp27-current__foundation-summary.json",
+      "sha256": "d93a6867492278bbe172ac2ca050bc70e0146556549638d36cbb1c42aeec000e"
+    },
+    {
+      "file": "ci-process/source-start.json",
+      "sha256": "159a941689bd204541752ae06853bd13003ba8da66d08e215b4bbbe25ad801a8"
+    },
+    {
+      "file": "ci-process/step-1.log",
+      "sha256": "358609597b4e58c670bb50286dcaba13d4eadaa5877863a6b685d42a8e0e091f"
+    },
+    {
+      "file": "ci-process/step-2.log",
+      "sha256": "2038aadc37e0ac6e25487a88ded6fe7fa32f3d57a48ccd3e452bedc377f70062"
+    },
+    {
+      "file": "ci-process/step-3.log",
+      "sha256": "e6d99630c50cc0206287813c3ef78c1f09a6eaa58a50d9202e88b5dc78fba999"
+    },
+    {
+      "file": "ci-process/step-4.log",
+      "sha256": "4becd58877a7fbbb6c95bfe9708361133de3dd24b40d49c905dd0bd0d132f8e3"
+    },
+    {
+      "file": "dependency-version-audit.json",
+      "sha256": "3ca6ee46dc9d03a0de7ee989c78b91bdc96b1401fda47cf967b5be83c92d355f"
+    },
+    {
+      "file": "dist__qa-p3-browser-report.json",
+      "sha256": "195729041c4e3ebfe4cbad91aa05adb1f12e19d851a76de42c170cc301dd2d96"
+    },
+    {
+      "file": "dist__qa-p5-acceptance-report.json",
+      "sha256": "a3c8ef95a9a251599580a51e6399e3fc496daad0351f16ae25040f155b15f0ce"
+    },
+    {
+      "file": "dist__qa-p5-axe-runtime-report.json",
+      "sha256": "c9478aab41ce1f3951080ff8d5ff68c123cb6797be9c71db798c0cab1507c33a"
+    },
+    {
+      "file": "dist__qa-p5-release-report.json",
+      "sha256": "d0795f0a4afbd8c530e2f3b38d4eef39792f104753c0bf4c0e0f3e6c88639066"
+    },
+    {
+      "file": "dist__qa-p5-runtime-report.json",
+      "sha256": "f1ab9a9fa555ea9bcea20cd650cc8be07224a81a3bac02d4931e541828288132"
+    },
+    {
+      "file": "dist__qa-p5-xss-sinks-report.json",
+      "sha256": "d23c4fb1215e73ae12225f1678538be291b8d5b0e2bca6dc062fbf9b59d0ea8b"
+    },
+    {
+      "file": "dist__quality-report.json",
+      "sha256": "a602961a3ba0d2762aeeed73fcd98ecd55992670a4b4696917f0fa256599f6b7"
+    },
+    {
+      "file": "e9-ci-final-completion.json",
+      "sha256": "1fa4f2c292be208bf6bcfa10d4e432c4ed9fbea006f2e654401a2d4e6de07643"
+    },
+    {
+      "file": "e9-ci-final.log",
+      "sha256": "4265ce5878821418ca6261df2ccb6ae08f1d72aadb60cb037bdaed24b89484fe"
+    },
+    {
+      "file": "e9-npm-ci-offline.log",
+      "sha256": "8cde64bdb37b7751ba26cbf4322534bbb98a1130a6d0e2c3daf3e620bbc63a0a"
+    },
+    {
+      "file": "logging-failure/chain.log",
+      "sha256": "9788fb59a2a800bce0f37b3e275156cc6e956587b73cda35e13cf3b6792377c0"
+    },
+    {
+      "file": "logging-failure/completion.json",
+      "sha256": "51c831014999c5e67ada25bd52ac6ad3c587b0f157551c0c78642dc3a7b941c1"
+    },
+    {
+      "file": "logging-failure/evidence-admission.json",
+      "sha256": "ad461c7d4fb0a1c422a0f15980b23aca76a91616fd745ba51416d8dbd15817a9"
+    },
+    {
+      "file": "logging-failure/foundation.log",
+      "sha256": "d7e641df191879b0fe5b032bb8721e2f893ac3d07ebe4b790f4ec1b24a4b2342"
+    },
+    {
+      "file": "logging-failure/npm-test.log",
+      "sha256": "b42079ca1c3d549f4a28c8d25ea6f2780b3e553d9fed3d6f9742beac55cdebb7"
+    },
+    {
+      "file": "logging-failure/p5.log",
+      "sha256": "ba3f53b230be36167bb001d93894083982bf3dbb223b10f4b2424cc60511b3cd"
+    },
+    {
+      "file": "negative-controls/encryption-as-authenticity.log",
+      "sha256": "61686c4f3b2f6da09eab4f9bf977f2e6b6c47cb2abc5a70101c520271d8f6f93"
+    },
+    {
+      "file": "negative-controls/forms-identity-bypass.log",
+      "sha256": "83f07b16981386fdf9dba72b169b39a8d49888570f2f2c59bab0fceddd8356be"
+    },
+    {
+      "file": "negative-controls/frozen-guard-disabled.log",
+      "sha256": "f94c9e5a304e9eab8a73467d0eb959a17af2a5bbf17a3771684d101a7e206830"
+    },
+    {
+      "file": "negative-controls/navigation-guard-disabled.log",
+      "sha256": "a39985fe08436a72904707493bacf821fd653caa1e24ec6cf5fb26deda0ef22c"
+    },
+    {
+      "file": "negative-controls/persistence-fail-open.log",
+      "sha256": "494d6ef67cbfa495b2609cf5634673d09b8a4677fb749bfe106182523fc3f9d4"
+    },
+    {
+      "file": "negative-controls/publication-answer-leak.log",
+      "sha256": "e16d6aa2c60291b58e47b796535371ad44396dae4363864b6163fba0823358c2"
+    },
+    {
+      "file": "negative-controls/teacher-hash-leak.log",
+      "sha256": "77dd4d114eb9d08cce3b5d3cc077193e45435cd050ccfbf5ad7798d5b372337f"
+    },
+    {
+      "file": "qa-results__adversarial-harness-r5.json",
+      "sha256": "c4f192d3e79fd21b028a3ef0c71e5e82173aa18cc1cba90e855681507b36b251"
+    },
+    {
+      "file": "qa-results__d7-regressions.json",
+      "sha256": "53bc651bcf02a305548d5a352c38956cec370e86c8ba5dafa1b45f183ff9c734"
+    },
+    {
+      "file": "qa-results__d8-final-audit.json",
+      "sha256": "7a3fbd7c2d01e94646b98149767662cf54604c66f9f151fa47e01d4b8696c726"
+    },
+    {
+      "file": "qa-results__redteam-e1-browser.json",
+      "sha256": "95a28e63ee237ac69cce6e7a5f0c6c96f8c67b26b5b660fff383cf94cc1c4def"
+    },
+    {
+      "file": "qa-results__redteam-e1-isolation.json",
+      "sha256": "67e757a379e4e802368c28dd6b94d50edfa7d1db20791ae1e1abc7f075638feb"
+    },
+    {
+      "file": "qa-results__redteam-e2-browser.json",
+      "sha256": "12d6303cbd555f8060461254169c1ee5c7e26609cd91ca2b4f3a68249f944a63"
+    },
+    {
+      "file": "qa-results__redteam-e2-trust.json",
+      "sha256": "dfd94c357a18f4fec39fd76e0bcbd9a73ae0a48302af2a0ac18c55c3201a24bb"
+    },
+    {
+      "file": "qa-results__redteam-e3-browser.json",
+      "sha256": "180e4e2c1983a4154e4aad73263db6906cc38853e8a0d8efa0beefbf5d6a8a6d"
+    },
+    {
+      "file": "qa-results__redteam-e3-verifier.json",
+      "sha256": "fda3fee7fb9d27b15d7777f849cf674a5070a9b130ff53bbffad3e86ff32cfad"
+    },
+    {
+      "file": "qa-results__redteam-e4-browser.json",
+      "sha256": "1056ae66de1199ba566f0379660f85823b5a3af6dbb390ac378c93751162dd73"
+    },
+    {
+      "file": "qa-results__redteam-e4-faults.json",
+      "sha256": "29f5110d61cf29650771ae251c6409bff77fdd6c18c4cef9c01e38c3e7b3aa7c"
+    },
+    {
+      "file": "qa-results__redteam-e5-browser.json",
+      "sha256": "51fcc185a94c0d6b3172a39206240e835e32d6546bdb42e7cfc64cb33c1a837e"
+    },
+    {
+      "file": "qa-results__redteam-e5-runtime.json",
+      "sha256": "101b338818b686a4df52c29e3f21efc9b556fad53b27d9abb4333902a6ba1f75"
+    },
+    {
+      "file": "qa-results__redteam-e6-publication.json",
+      "sha256": "7893f86b0e283e7ecc292592f7e76d1ea18aed6aef625a65d74b2c67a69649e9"
+    },
+    {
+      "file": "qa-results__redteam-e7-mobile-protocol.json",
+      "sha256": "5906aea8db7de4835bb398dc75f5c58a717263edced11763a0cc3073d22289d6"
+    },
+    {
+      "file": "qa-results__redteam-e7-recorder.json",
+      "sha256": "5d23861e0f3425ca2dc16a28aeec48bfe1fe7c2523c123b1ba2e27d9b3126d19"
+    },
+    {
+      "file": "qa-results__redteam-e8-browser.json",
+      "sha256": "0045c5c9e51af4e2c8c0a8981383c302bc2d9865609f7cd9ea09c5b93b3f4656"
+    },
+    {
+      "file": "qa-results__redteam-e8-forgery.json",
+      "sha256": "d9865c84569fdad63fc99baa8502e7e8ca859ffa7f5f2d5bad1ed90c2e17d374"
+    },
+    {
+      "file": "qa-results__redteam-e8-retention.json",
+      "sha256": "3cf68403207b116ae5c19291c007b439bb598d38963be8050f4d7929d76c12b8"
+    },
+    {
+      "file": "qa-results__redteam-e9-ci-contract.json",
+      "sha256": "83674778bdd351f591e4b048f42377499a9edc22ca0c483c9d597abf971ff7a9"
+    },
+    {
+      "file": "qa-results__redteam-e9-ci-run.json",
+      "sha256": "978dbdbbdc9632adbd40194fc215e3a8bb09b05ccf10ee5dd6340bd86023d4c6"
+    },
+    {
+      "file": "qa-results__redteam-e9-evidence.json",
+      "sha256": "c4ab005c3b93ee2c1f63decb75e31e8a605029805fe21dcbad8e5cd53c508218"
+    },
+    {
+      "file": "qa-results__redteam-e9-negative.json",
+      "sha256": "c37f552052ee636c1e040bf28ffc31275e73ba634001276cd5580a2f994432a9"
+    },
+    {
+      "file": "qa-results__redteam-e9-restart-browser.json",
+      "sha256": "1ec50d66650b012e7144c964663e63fadfdc9c61ea2cef59653ce09ee22059dc"
+    },
+    {
+      "file": "qa-results__security-behavior-r3.json",
+      "sha256": "fb301f04be687c35dd6e47829af87ee4df0be8e50f5fcb58d83e83738cb0d5fe"
+    },
+    {
+      "file": "qa-results__stage3-pdf-quality__summary.json",
+      "sha256": "c35bbe61b1f2fcc124414a9116198cf707870ad80bd018d80e9dd3848ea39da0"
+    },
+    {
+      "file": "qa-results__stage3-pdf-runtime__summary.json",
+      "sha256": "d943abb2a1df6d93138e3c30b9656aa39483e8aac3eb5f45b3f382825b616905"
+    },
+    {
+      "file": "qa-results__verifier-ui-runtime__summary.json",
+      "sha256": "c0a19b260c330edd99a5129ab459e5861abe7be27f1bbaae6ebed2b7fd0bef4c"
+    },
+    {
+      "file": "review-run/chain.log",
+      "sha256": "860984f3897e236fc012b1cb717c61741e2611b34278c4316eb958c3cb231951"
+    },
+    {
+      "file": "review-run/ci-run.json",
+      "sha256": "6e1547f8a97e2000400486ad3c7ef5d7a58e42ac1afc67752420bfe043cd4c47"
+    },
+    {
+      "file": "review-run/completion.json",
+      "sha256": "4159984acd2f79c898e5c2f8d78dfd2f09e12210a032fd412a80ed4fbcd2f8a5"
+    },
+    {
+      "file": "review-run/p5-release.json",
+      "sha256": "7d172d39b2a005569ed425c09de5291220a7363172eacb29d38f2757d220f28a"
+    },
+    {
+      "file": "review-run/p5.log",
+      "sha256": "bf42a5fffb45e9a7fcc98f7e337b78694fea115eddf0ef8f086f764ec694e3b6"
+    }
+  ]
+}

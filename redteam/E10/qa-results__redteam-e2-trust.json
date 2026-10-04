@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "version": "7.1.86",
+  "syntheticOnly": true,
+  "checks": [
+    "trust",
+    "telemetry",
+    "ui",
+    "exports",
+    "credentials"
+  ],
+  "forgedPayload": {
+    "technicalAcceptance": "current",
+    "score": 100,
+    "runtimeAuthenticity": "CLIENT-CONTROLLED",
+    "classificationAuthorization": "REVIEW_REQUIRED"
+  },
+  "limitation": "E3 anchors constrain the input; matching anchors still leave runtime CLIENT-CONTROLLED and classification REVIEW_REQUIRED."
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "ghrab-stage3-pdf-runtime-v1",
+  "status": "passed",
+  "results": [
+    {
+      "file": "student_QA-bezpe-n-test_TSF3RCV-9AC6A83A.pdf",
+      "bytes": 117303
+    },
+    {
+      "file": "ucitel_klic_QA-bezpe-n-test_TSF3RCV-9AC6A83A.pdf",
+      "bytes": 115617
+    }
+  ]
+}

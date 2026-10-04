@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: an active write failure must block further editing
+
+false !== true
+
+    at file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-storage-faults-e4.mjs:23:324
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-storage-faults-e4.mjs:6:71)
+    at async file:///workspace/scratch/ebcee4a4dd99/work-e10/source/generator-testu-7.1.86/scripts/check-redteam-storage-faults-e4.mjs:22:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

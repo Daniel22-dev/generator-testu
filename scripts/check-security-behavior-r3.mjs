@@ -34,6 +34,8 @@ function configure(over={},teacher=TEACH,recovery=REC){
   w.eval(`Object.assign(state,{appMode:'advanced',jazyk:'angli\u010dtina',instrJazyk:'cs',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],cas:15,odevzdavani:'B',randomizace:'NE',layout:'classic',tema:'default',zolicek:'NE',diferencovany:'NE',overeni:'NE',anonymizace:'ANO',identityMode:'name',testMode:'bezny',resultMode:'instant',screenGuard:true,feedbackMode:'brief',body:5},${JSON.stringify(over)});rosterEntries=[];`);
   setVal('nazev','R3 test');setVal('proKoho','1.A');setVal('latka','x');setVal('ucitelJmeno',TEACHER_NAME);setVal('ucitelPin',teacher);setVal('recoveryCode',recovery);
 }
+const startCodes=new Map();
+const originalAssemble=w.assembleTestHtml;w.assembleTestHtml=async(...args)=>{const pkg=await originalAssemble(...args);if(pkg?.startCode)startCodes.set(pkg.testId,pkg.startCode);return pkg;};
 const build=async()=>w.assembleTestHtml(w.eval('state'),JSON.parse(JSON.stringify(GEN)));
 function fakeIndexedDb(shared=new Map()){
   const dbs=shared;
@@ -69,7 +71,7 @@ function genDom(html,storage,idbState=new Map()){const dom=new JSDOM(html,{runSc
   Object.defineProperty(x,'indexedDB',{value:fakeIndexedDb(idbState),configurable:true});
   Object.defineProperty(x,'__qaIdbState',{value:idbState,configurable:true});
   if(storage)for(const [k,v] of Object.entries(storage))x.localStorage.setItem(k,v);
-}});return dom;}
+}});const inp=dom.window.document.getElementById('startCode');if(inp)inp.value=startCodes.get(dom.window.eval('CFG.testId'))||'';return dom;}
 function dumpStorage(x){const out={};for(let i=0;i<x.localStorage.length;i++){const k=x.localStorage.key(i);out[k]=x.localStorage.getItem(k)}return out}
 
 await test('R2-direct-same-secret',async()=>{
@@ -103,10 +105,9 @@ await test('R1-verifier-generated-script',async()=>{
 });
 await test('R3-secure-privilege-boundary',async()=>{
   const d=genDom(pack.studentHtml);const x=d.window;await sleep(150);x.document.getElementById('studentName').value='Alice';await x.startTest();x.lockTest('r3-lock');await sleep(20);
-  x.document.getElementById('teacherName').value=TEACHER_NAME;x.document.getElementById('teacherPin').value=REC;await x.teacherLogin();must(x.document.getElementById('teacherPanel').classList.contains('hidden'),'Recovery opened secure teacher panel');
-  x.document.getElementById('teacherPin').value=TEACH;await x.teacherLogin();must(!x.document.getElementById('teacherPanel').classList.contains('hidden'),'Teacher/Admin secure login failed');x.teacherLogout();
+  must(!x.document.getElementById('teacherModal')&&typeof x.teacherLogin==='undefined'&&typeof x.teacherSecretMatches==='undefined','teacher capability serialized in secure student');
   x.document.getElementById('unlockInp').value=TEACH;await x.tryUnlock();must(x.eval('LOCKED')===true,'Teacher/Admin unlocked secure lock');x.document.getElementById('unlockInp').value=REC;await x.tryUnlock();must(x.eval('LOCKED')===false,'Recovery did not unlock secure lock');
-  const storage=dumpStorage(x);const activeKey=x.eval("storageKey('activeAttempt')");const y=genDom(pack.studentHtml,storage,d.window.__qaIdbState).window;await sleep(150);y.document.getElementById('studentName').value='Bob';await y.startTest();await sleep(30);const box=()=>y.document.querySelector('.s-modal-bd input[type=password]');must(box(),'active-attempt reset modal missing');box().value=REC;y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click();await sleep(850);must(y.localStorage.getItem(activeKey)!==null,'Recovery reset foreign active attempt');box().value=TEACH;y.document.querySelector('.s-modal-bd .s-modal-btn.primary').click();await sleep(850);must(y.localStorage.getItem(activeKey)===null,'Teacher/Admin reset failed');y.close();d.window.close();return 'login/unlock/reset separated';
+  const storage=dumpStorage(x);const activeKey=x.eval("storageKey('activeAttempt')");const y=genDom(pack.studentHtml,storage,d.window.__qaIdbState).window;await sleep(150);y.document.getElementById('studentName').value='Bob';await y.startTest();await sleep(30);must(y.document.querySelector('.s-modal-bd'),'foreign active attempt not blocked');must(!y.document.querySelector('.s-modal-bd input[type=password]'),'reset capability exported');must(y.localStorage.getItem(activeKey)!==null,'foreign state cleared');y.close();d.window.close();return 'teacher absent; classroom unlock preserves attempt; foreign identity blocked';
 });
 
 fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/security-behavior-r3.json',JSON.stringify(results,null,2));

@@ -1,0 +1,45 @@
+{
+  "syntheticOnly": true,
+  "findings": [
+    {
+      "id": "F1",
+      "observed": {
+        "teacherHash": true,
+        "recoveryHash": true,
+        "teacherMode": true
+      },
+      "detail": "actual generated student HTML"
+    },
+    {
+      "id": "code-hashes",
+      "observed": {
+        "count": 2
+      },
+      "detail": "six-character codes have an offline membership oracle"
+    },
+    {
+      "id": "F7",
+      "observed": true,
+      "detail": "questions readable in the public artifact before start"
+    },
+    {
+      "id": "F6-roster",
+      "observed": false,
+      "detail": "rosterForVerifier currently drops email"
+    },
+    {
+      "id": "W1-W3b",
+      "observed": {
+        "classification": "current",
+        "status": "OK",
+        "pct": 100
+      },
+      "detail": "public-key encrypted forged payload, impossible times, empty telemetry, wrong verified email"
+    },
+    {
+      "id": "duplicate",
+      "observed": "current",
+      "detail": "same ciphertext imported twice"
+    }
+  ]
+}

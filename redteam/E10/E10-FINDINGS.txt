@@ -1,0 +1,120 @@
+GIT — E10 RELEASE CANDIDATE / 7.1.86 / 2026-10-04
+RELEASE READINESS: NOT READY – BLOCKING ISSUE
+
+A. PŮVODNÍ STAV
+E9 7.1.85 měl povinné E1–E8 regrese, 108 forgery scénářů a 12 nativních
+lifecycle scénářů. Zadání bylo před startem čitelné v STUDENT_VARIANTS.
+Publikace krátce před začátkem tento F7 blocker neodstraňovala.
+Automatická promotion/deploy cesta kontrolovala technické testy, ale
+nebránila vydání checkpointu s otevřenými provozními blockery.
+Audit E10 navíc ověřil, že surový studentský secure export postrádal CSP
+meta. Dřívější tvrzení o původní studentské CSP nebylo pro tento export
+podložené. Historické reporty zůstávají zachované, nejsou novou certifikací.
+
+B. PROVEDENÉ ZMĚNY
+- Student variants se nejprve zbaví answer key a teacher materialu.
+  Teprve pak se zašifrují AES-256-GCM, 128bit tag, 12byte IV, 16byte salt.
+  PBKDF2-SHA256, 210000 iterací. Additional authenticated data váže testId
+  a manifestHash. Pevné schéma, žádný plaintext fallback ani eval.
+- Náhodný startovní kód: 10 nezávislých uniformních symbolů base32 =
+  50 bitů. CSPRNG getRandomValues, bitová maska 31 bez modulo bias.
+  Bez WebCrypto/CSPRNG nevznikne export. Kód není odemykací kód třídy.
+- Kód je pouze v aktuálním generator package a soukromém verifieru.
+  Generátor jej zobrazí vlastníkovi; student obsahuje jen šifrotext.
+  Vlastník ukáže kód na tabuli až při startu a publikuje co nejpozději.
+- Prázdný/chybný kód, poškozený ciphertext/tag/salt/IV či změněná vazba
+  nezahájí pokus, nespustí čas a nezobrazí otázky. Po správném kódu je
+  plaintext pouze v RAM. Input se vymaže; kód/klíč/otázky nejsou v místním
+  persistence stavu ani ve výsledkovém payloadu.
+- Reload vyžaduje nové zadání startovního kódu. Zachová původní pokus,
+  start, deadline a flushované odpovědi; strict resume zůstává zamčený.
+  Classroom unlock je nadále procedurální brzda. Odevzdání se šifruje
+  RSA-OAEP+AES-GCM, skóre nezávisle přepočítá private verifier.
+- Student export má explicitní CSP meta: default/object/frame/base/form
+  uzavřené, connect jen self, obrázky data, bez unsafe-eval a bez serverové
+  frame-ancestors. script/style unsafe-inline zachovává současné inline
+  obsluhy a renderer; CSP není úplná ochrana před inline XSS ani DRM.
+- Kompakce zachová tokeny a nutné line breaks; redundantní whitespace
+  odpadne. Před/po se porovnává úplný sémantický AST. Velikostní budget
+  se nezvýšil; minifikace není bezpečnostní hranice.
+- Nový E10 canonical runner: npm test → GARP foundation → P5 CI →
+  navazující E9/E10 evidence admission, source snapshot před/po a log hashes.
+  F7 VM i nativní testy jsou povinné. Test driver zadává skutečný privátní
+  syntetický kód; produkční decryptor se neobchází. Dvě izolované legacy
+  runtime unit fixtures mají výslovný stub F7, jejich cílem je persistence;
+  důkaz F7 tvoří skutečné generované artefakty, nikoli tyto fixtures.
+- Safe-promotion obě certifikace používají celý řetězec. Před merge a před
+  main deploy je samostatné --require-ready. NOT READY nebo neuzavřený
+  blocker způsobí assertion failure. Devět kontrol dokládá tuto brzdu.
+  Konečný remote SHA/CI stav uvádí samostatný předávací TXT; tento report
+  popisuje lokálně zmrazený candidate snapshot.
+
+C. ODSTRANĚNÉ ZRANITELNOSTI
+PREVENTED: přímé čtení vygenerovaných otázek před znalostí startovního
+kódu z veřejného studentského souboru. To neplatí pro uniklý privátní kód,
+učitelský soubor nebo libovolný text, který vlastník vloží do názvu testu.
+DETECTED: poškození šifrotextu a nesoulad test/manifest binding; chybný kód
+nebo chybějící krypto. Neexistuje plaintext náhradní cesta.
+HARDENED: technické GREEN samo nepovoluje release s otevřenými blockery.
+Student nemá answer key, private key, roster/code hashes ani teacher mód;
+21 typů úloh se po legálním dešifrování kontroluje v E6 regresi.
+
+D. ZMÍRNĚNÉ ZRANITELNOSTI
+HARDENED / BEST-EFFORT: browser-local active/submitted guards, podepsané
+persistence záznamy, bounded audit s původním start/joker markerem, běžný
+same-profile restart, focus/navigation/lifecycle guard a recovery.
+DETECTED: známé nemožné podvrhy, cizí identity/testy/varianty/manifesty,
+Forms/roster nesoulad, duplicate/replay. E8 má 108 scénářů a 108 per-case
+negativních kontrol; 13 konzistentních kontrol nejsou falešně odmítány.
+CLIENT-CONTROLLED: konzistentní PK forgery může být dešifrována a skórována,
+ale klasifikace zůstane REVIEW_REQUIRED / DECRYPTED_NOT_AUTHENTICATED.
+Šifrování obsahu ani odevzdání neověřuje původ runtime nebo autora výsledku.
+
+E. ARCHITEKTONICKÉ LIMITY
+CLIENT-CONTROLLED: po zveřejnění startovního kódu vlastník klienta může
+číst zadání, upravovat runtime, obcházet guard, vyrábět konzistentní payload
+a kopírovat self-hash. Skóre z payloadu není autorita. Telemetrie není důkaz
+podvodu ani důkaz původního běhu; porovnává se s reprodukovatelným hlášením.
+ARCHITECTURAL LIMIT / SERVER REQUIRED: důvěryhodný globální attempt/replay
+stav proti wipe/new profile, autentická historie runtime. Školní server je
+DEFERRED – SERVER VERSION a nebyl přidán jako podmínka tohoto experimentu.
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR: druhý telefon fotografující obrazovku
+nevidí browser ani server. Je zakázán pravidly; vlastník osobně dozoruje.
+E7 je vždy ANALYZED / NOT TESTED. Desktop Chromium není iOS Safari ani
+Android. 146 fyzických profile-case dvojic nebylo tímto agentem provedeno.
+File protocol zůstává blokovaný původní environment policy. Ověřená offline
+cesta znamená již načtený samostatný studentský dokument v podporovaném
+HTTP(S) prostředí s vypnutou sítí; není to povolení spouštět libovolné file:.
+
+F. RED-TEAM MATRIX — W1–W3
+W1: prázdná telemetrie, nemožné časy, cizí test/manifest/varianta/identita,
+změna skóre, replay/duplicate. Známé rozpory DETECTED; verifier přepočítá
+skóre. Konzistentní PK forgery CLIENT-CONTROLLED / REVIEW_REQUIRED.
+W2: prohledat veřejný HTML, hidden JSON, nested data, answer derivatives,
+privátní klíče a teacher/runtime materiál. Aktuální export a 21 typů mají
+negativní leak kontroly. Před startem otázky pouze šifrované. Historické
+raw/cache a starší credential incident vyžadují samostatně uzavřít.
+W3a: screenshot/OCR/AI či přeposlání odpovědí na jednom zařízení po startu
+nelze technicky vyloučit. BEST-EFFORT guard a diagnostika; incident porovnat
+s hlášením. Druhé zařízení MIMO TECHNICKÝ DOSAH – POUZE DOZOR.
+W3b: hotový kód druhý odevzdá pod svým školním účtem. Důvěryhodný Forms
+email musí souhlasit s privátním rosterem, běžný nesoulad DETECTED.
+Přebindovaný konzistentní klient je stále CLIENT-CONTROLLED; neslibovat
+podpis/autenticitu. Odeslání z účtu spolužáka je zakázané pravidly.
+Každý student podá oddělené reprodukovatelné hlášení: co zkoušel, co podle
+něj prošlo, jak to zopakovat. Odměna není založená pouze na průchodu payloadu.
+
+G. RELEASE READINESS
+NOT READY – BLOCKING ISSUE.
+F7 je implementováno. Lokální výsledek a source/log hashes jsou v
+checkpoint-manifest.json. Přesný remote CI stav je v předávacím TXT.
+Před spuštěním experimentu zbývají owner-side potvrzení a E6 incident:
+- historický raw/cache purge a rotace dříve vystavených private credentials;
+- ověřené školní Forms email/domain/one-response, původní CSV a publish time;
+- fyzický checklist z E7 pro skutečná zařízení, bez změny tvrzení, že je agent
+  osobně neotestoval.
+Candidate technická certifikace se nesmí zaměnit za main/production release.
+Čisté npm ci a GitHub Actions jsou potvrzené jen při skutečném remote běhu
+na přesném SHA. Místní verze 112 závislostí odpovídají lockfile; E9 offline
+install skončil ENOTCACHED. Žádné falešné potvrzení tarball integrity.
+Bez číselného marketingového bezpečnostního skóre.

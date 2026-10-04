@@ -1,0 +1,34 @@
+// Desktop Chromium with native WebCrypto/IndexedDB and unchanged generated CSP.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {chromium} from 'playwright';
+import {enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
+let browser;
+try{
+  configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode'});
+  w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");const pkg=await build();
+  browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});const student=await browser.newPage(),verifier=await browser.newPage(),errors=[];
+  for(const page of [student,verifier])page.on('pageerror',e=>errors.push(e.message));
+  await student.route('http://127.0.0.1:18779/student.html',r=>r.fulfill({status:200,contentType:'text/html',body:pkg.studentHtml}));
+  await verifier.route('http://127.0.0.1:18779/verifier.html',r=>r.fulfill({status:200,contentType:'text/html',body:pkg.teacherHtml}));
+  const publishedAt=new Date(Date.now()-60000).toISOString();
+  await student.goto('http://127.0.0.1:18779/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});
+  await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
+  await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const nativeTxt=await student.locator('#answerBackup').inputValue();assert.ok(nativeTxt.startsWith('SECURE-ANSWERS-V1'));
+  await verifier.goto('http://127.0.0.1:18779/verifier.html');await verifier.evaluate(()=>showVerifierPanel('results'));
+  assert.equal(await verifier.locator('#formsSchoolDomain').count(),1,'owner Forms policy UI is required');await verifier.locator('#formsSchoolDomain').fill('example.invalid');await verifier.locator('#formsPublishedAt').fill(publishedAt);await verifier.locator('#formsEmailHeader').fill('Email Address');await verifier.locator('#formsTimestampHeader').fill('Timestamp');
+  for(const id of ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed'])await verifier.locator('#'+id).check();await verifier.getByRole('button',{name:'Použít kotvy',exact:true}).click();
+  const q=s=>'"'+s.replaceAll('"','""')+'"',csv=(txt,email='synthetic-a@example.invalid')=>'Timestamp,Email Address,Result\n'+[new Date().toISOString(),email,txt].map(q).join(',');
+  await verifier.locator('#formsCsvFile').setInputFiles({name:'native-e3.csv',mimeType:'text/csv',buffer:Buffer.from(csv(nativeTxt))});await verifier.waitForFunction(()=>LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===1);
+  const valid=await verifier.evaluate(()=>({status:RESULTS[0].status,pct:RESULTS[0].pct,trust:resultTrust(RESULTS[0]),effective:effectiveResults().length}));
+  assert.equal(valid.status,'OK');assert.equal(valid.pct,100);assert.equal(valid.effective,1);assert.equal(valid.trust.externalIdentity,'MATCHED_FORMS_ROSTER');assert.equal(valid.trust.externalTimeWindow,'WITHIN_PUBLICATION_FORMS_WINDOW');assert.equal(valid.trust.runtimeAuthenticity,'CLIENT-CONTROLLED');
+  const forgeries=await student.evaluate(async txt=>{const p=await (async()=>{ /* Only the verifier has the private key; use the native payload before encryption. */return await secureAnswers();})();
+    const out=[];for(const patch of [{securityEvents:[]},{startedAt:'2040-01-01T12:00:00Z',submittedAt:'2000-01-01T12:00:00Z'},{resp:{'0_0':999}},{groupKey:'fake'},{serverVerified:true}])out.push('SECURE-ANSWERS-V1\n'+JSON.stringify({testId:CFG.testId,manifestHash:CFG.manifestHash,payload:await encryptPayloadForTeacher({...p,...patch})}));return out;
+  },nativeTxt);
+  for(const txt of forgeries){const bad=await verifier.evaluate(async text=>{const s=await importFormsCsvText(text,'bad-e3.csv');return {invalid:s.invalid,last:RESULTS.at(-1).status,score:RESULTS.at(-1).total,effective:effectiveResults().length};},csv(txt));assert.equal(bad.invalid,1);assert.equal(bad.last,'CHYBA');assert.equal(bad.score,0);assert.equal(bad.effective,1);}
+  const wrong=await verifier.evaluate(async text=>{await importFormsCsvText(text,'wrong-account.csv');return RESULTS.at(-1).validationCodes;},csv(nativeTxt,'other@example.invalid'));assert.ok(wrong.includes('anchors.identity-mismatch'));
+  await verifier.evaluate(async text=>importFormsCsvText(text,'duplicate-e3.csv'),csv(nativeTxt));assert.equal(await verifier.evaluate(()=>effectiveResults().length),1);assert.equal(await verifier.evaluate(()=>classificationStatus(RESULTS.at(-1))),'REJECTED');
+  await verifier.evaluate(()=>showVerifierPanel('results'));assert.ok((await verifier.locator('#resultTable').innerText()).includes('PŮVOD NEPROKÁZÁN'));assert.ok((await verifier.locator('#resultTable').innerText()).includes('ODMÍTNUTO')||(await verifier.locator('#resultTable').innerText()).includes('DUPLICITA'));
+  for(const [fn,verify] of [['downloadResultsCsv',s=>{assert.ok(s.includes('MATCHED_FORMS_ROSTER'));assert.equal(s.split('\n').length,2);assert.ok(s.includes('REVIEW_REQUIRED'));}],['downloadIndexCsv',s=>assert.ok(s.includes('REJECTED'))],['downloadArchiveJson',s=>{const data=JSON.parse(s);assert.equal(data.metadata.authorizedClassificationCount,0);assert.equal(data.results.filter(r=>r.classificationStatus==='REJECTED').length,7);}]]){const downloading=verifier.waitForEvent('download');await verifier.evaluate(name=>window[name](),fn);const stream=await(await downloading).createReadStream(),parts=[];for await(const p of stream)parts.push(p);verify(Buffer.concat(parts).toString('utf8'));}
+  assert.deepEqual(errors,[]);const report={status:'PASS',version:w.eval('RELEASE.version'),browser:await browser.version(),syntheticOnly:true,platformScope:'desktop Chromium; real iOS/Android NOT TESTED',checks:['Native student submit -> actual CSV file input -> Forms anchors -> private score','Empty telemetry/impossible clocks/invalid answer/variant/trusted bits rejected before scoring','Wrong school account rejected','Repeated CSV import retains replay ledger and excludes duplicate','Real results/index/archive downloads preserve rejection and review status','Original CSP, real WebCrypto/IndexedDB, no pageerrors'],limits:['Live Forms settings are owner attested, not inspected','Private E4 digest observations survive same-profile restart; full wipe requires server','Runtime CLIENT-CONTROLLED even after anchors match']};fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/redteam-e3-browser.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
+}finally{await browser?.close();gdom.window.close();}

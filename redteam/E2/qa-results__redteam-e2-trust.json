@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "version": "7.1.78",
+  "syntheticOnly": true,
+  "checks": [
+    "trust",
+    "telemetry",
+    "ui",
+    "exports",
+    "credentials"
+  ],
+  "forgedPayload": {
+    "technicalAcceptance": "current",
+    "score": 100,
+    "runtimeAuthenticity": "CLIENT-CONTROLLED",
+    "classificationAuthorization": "REVIEW_REQUIRED"
+  },
+  "limitation": "E3 identity/time/schema/replay enforcement is pending. E2 marks technical acceptance as unverified, not a legitimate submission."
+}

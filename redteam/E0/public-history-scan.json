@@ -1,0 +1,74 @@
+{
+  "repository": "Daniel22-dev/interaktivni-testy",
+  "head": "2af3fade24465511503dc9f215f7d91ab4a066b1",
+  "refs": [
+    "2af3fade24465511503dc9f215f7d91ab4a066b1 refs/heads/main"
+  ],
+  "reachableCommits": 12,
+  "reachableBlobs": 11,
+  "findings": [
+    {
+      "path": "Appearance.html",
+      "object": "32479c527eae79465eeda536818e7adbf7f8361b",
+      "indicators": [
+        "teacher-derived-data",
+        "student-code-hashes"
+      ]
+    },
+    {
+      "path": "PAST PERFECT.html",
+      "object": "194e02d45c1c4978c9e99e44705de2683eefaf70",
+      "indicators": [
+        "teacher-derived-data",
+        "student-code-hashes"
+      ]
+    },
+    {
+      "path": "Unidad 1.html",
+      "object": "7fa3ab5babd3f03e16bf10dd5d7f5cc7ee120257",
+      "indicators": [
+        "teacher-derived-data",
+        "student-code-hashes"
+      ]
+    },
+    {
+      "path": "Unit 5 revision.html",
+      "object": "94bc1b3cec4f4eab80cda66c1a9d050b7dd33599",
+      "indicators": [
+        "teacher-derived-data",
+        "student-code-hashes"
+      ]
+    },
+    {
+      "path": "brona-test_student_test.html",
+      "object": "673db5da88ac37972b2c02fd06edcf0db4271351",
+      "indicators": [
+        "teacher-derived-data"
+      ]
+    },
+    {
+      "path": "english-or-czenglish-aktivita_student_test.html",
+      "object": "518100f84ced7a0b185a854a1403e2ba67d4b2b3",
+      "indicators": [
+        "teacher-derived-data"
+      ]
+    },
+    {
+      "path": "relative-clauses_student_test.html",
+      "object": "d6ebfd09279905ba048d51939600f60365f9ff73",
+      "indicators": [
+        "teacher-derived-data"
+      ]
+    },
+    {
+      "path": "nemcina-test.html",
+      "object": "73928cddb35932d751e77a3d5375694edbcf5bc4",
+      "indicators": [
+        "teacher-derived-data"
+      ]
+    }
+  ],
+  "scope": "all advertised refs reachable objects; not orphan objects, deleted remote refs, forks, caches or detached Actions artifacts",
+  "syntheticOnly": false,
+  "secretValuesOmitted": true
+}

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const secure = fs.readFileSync('src/js/13e-secure-student-runtime.js', 'utf8');
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js', 'utf8'));
 const instant = fs.readFileSync('src/js/14b-instant-test-runtime.js', 'utf8');
 const errors = [];
 if (!/TIMER_DEADLINE\s*-\s*Date\.now\(\)/.test(secure)) errors.push('secure runtime nepočítá zbývající čas z TIMER_DEADLINE - Date.now()');

@@ -1,0 +1,67 @@
+{
+  "stage": "E10",
+  "version": "7.1.86",
+  "status": "PASS",
+  "startedAt": "2026-10-04T06:22:31.603Z",
+  "completedAt": "2026-10-04T06:28:53.560Z",
+  "environment": "local-equivalent",
+  "sourceCommit": null,
+  "node": "v24.19.0",
+  "syntheticOnly": true,
+  "sourceBefore": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 510,
+    "sha256": "589ab89f326108263950224ea43fd3ebc96bba491401b66801ce12bd15109c00",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "sourceAfter": {
+    "algorithm": "SHA256(path\\0sha256\\0size\\n)",
+    "fileCount": 510,
+    "sha256": "589ab89f326108263950224ea43fd3ebc96bba491401b66801ce12bd15109c00",
+    "scope": "Executable source, public assets, security/vendor contracts, CI workflows and release inputs; audit outputs/checksum ledgers excluded"
+  },
+  "sourceUnchanged": true,
+  "results": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "pass": true,
+      "log": "1-npm-test.log",
+      "logBytes": 78546,
+      "logSha256": "4e4505ff84f2ed1ab23d3dd92d2353b2bccd722fbbf77d9f4eee9dd091af827a",
+      "completedAt": "2026-10-04T06:24:59.529Z"
+    },
+    {
+      "command": "npm run qa:garp27:foundation",
+      "exitCode": 0,
+      "pass": true,
+      "log": "2-npm-run-qa-garp27-foundation.log",
+      "logBytes": 3849,
+      "logSha256": "c35cc9a728db5a38812cc947015ee7a76eda607e0cd6524cb36445f9f71bf884",
+      "completedAt": "2026-10-04T06:25:22.445Z"
+    },
+    {
+      "command": "npm run qa:p5:ci",
+      "exitCode": 0,
+      "pass": true,
+      "log": "3-npm-run-qa-p5-ci.log",
+      "logBytes": 145646,
+      "logSha256": "9023241cbd3552bd74e55664e3549d1badd655e2faa40c83bf45398b2ff2ff0a",
+      "completedAt": "2026-10-04T06:28:53.413Z"
+    },
+    {
+      "command": "node scripts/check-redteam-evidence-e10.mjs",
+      "exitCode": 0,
+      "pass": true,
+      "log": "4-node-scripts-check-redteam-evidence-e10.mjs.log",
+      "logBytes": 89,
+      "logSha256": "671e2ada764ea2da4ce7cf3fd28713bdb507a2a63e9071081641ff4b2512795f",
+      "completedAt": "2026-10-04T06:28:53.529Z"
+    }
+  ],
+  "limits": [
+    "Local execution is not a GitHub Actions run",
+    "Physical E7 mobile remains ANALYZED / NOT TESTED",
+    "Passing regressions does not authorize classroom release"
+  ]
+}

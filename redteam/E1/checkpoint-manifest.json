@@ -1,0 +1,36 @@
+{
+  "schema": "git-redteam-e1-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.77",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "completedStages": [
+    "E0",
+    "E1"
+  ],
+  "pendingStages": [
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "sourceBranch": "candidate",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "npmTest": "PASS",
+  "localP5Equivalent": "PASS",
+  "githubActionsExecuted": false,
+  "desktopChromium": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "baselineIsolationNegativeControlExit": 1,
+  "baselineBrowserNegativeControlExit": 1,
+  "residualForgery": "current / OK / 100",
+  "inputArchiveSha256": "0c8ca337922200c154834b0fa833d3a7e9800cc65a118cfa49287704e671716c",
+  "evidenceScope": "Synthetic local fixtures and advertised-ref public history metadata; private teacher artifacts excluded.",
+  "coldGeneratorFirstExport": "PASS: actual desktop browser loads local Acorn once before first export"
+}

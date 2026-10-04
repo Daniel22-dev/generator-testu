@@ -1,0 +1,84 @@
+{
+  "stage": "E10",
+  "version": "7.1.86",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "opaque-artifact-private-secret",
+      "status": "PASS"
+    },
+    {
+      "id": "missing-short-wrong-and-classroom-code",
+      "status": "PASS"
+    },
+    {
+      "id": "cipher-tamper-and-binding",
+      "status": "PASS"
+    },
+    {
+      "id": "fresh-code-salt-iv-and-cross-package",
+      "status": "PASS"
+    },
+    {
+      "id": "correct-code-memory-only-and-independent-scoring",
+      "status": "PASS"
+    },
+    {
+      "id": "missing-webcrypto-fails-closed",
+      "status": "PASS"
+    }
+  ],
+  "negativeControls": [
+    {
+      "id": "altered-data",
+      "detected": true
+    },
+    {
+      "id": "altered-tag",
+      "detected": true
+    },
+    {
+      "id": "altered-iv",
+      "detected": true
+    },
+    {
+      "id": "altered-salt",
+      "detected": true
+    },
+    {
+      "id": "altered-iterations",
+      "detected": true
+    },
+    {
+      "id": "altered-algorithm",
+      "detected": true
+    },
+    {
+      "id": "altered-extra-field",
+      "detected": true
+    },
+    {
+      "id": "no-randomness-no-export",
+      "detected": true
+    },
+    {
+      "id": "actual-7.1.85-build",
+      "detected": true,
+      "actualExit": 1
+    }
+  ],
+  "entropyBits": 50,
+  "kdf": {
+    "name": "PBKDF2-SHA256",
+    "iterations": 210000
+  },
+  "cipher": "AES-256-GCM",
+  "aad": "testId+manifestHash",
+  "scope": "Actual opaque generated artifact, production decryptor and private scoring; synthetic inputs only",
+  "physicalMobile": "ANALYZED / NOT TESTED",
+  "limits": [
+    "After the start code is disclosed, a client owner can inspect content.",
+    "Encryption protects pre-start confidentiality; no result or runtime authentication.",
+    "Publish encrypted student artifacts as late as possible."
+  ]
+}

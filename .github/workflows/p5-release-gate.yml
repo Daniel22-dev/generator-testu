@@ -34,25 +34,34 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
-      - name: Run P5 R2 release gate
-        run: npm run qa:p5:ci
+      - name: Run E9 regression, foundation and final P5 admission
+        run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
-      - name: Enforce GARP 2.7 foundation admission and legacy regressions
-        run: npm run qa:garp27:foundation
-        env:
-          GARP27_EXTERNAL_TRUST_SHA256: cec55afcaf452924091ef5566f8f1b5592ffb3758b187c6bf4a3be2416c83b1f
+          GARP27_EXTERNAL_TRUST_SHA256: c5bd32c64d8da7c57e3be5e15b02cb7d64d171a3e7893f7455b1b80b2ea78106
       - name: Upload audit evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: p5-r2-${{ github.sha }}
+          if-no-files-found: error
           path: |
             dist/qa-p5-*.json
             dist/qa-p3-browser-report.json
             dist/quality-report.json
             qa-results/d7-regressions.json
             qa-results/d8-final-audit.json
+            qa-results/redteam-e*.json
+            qa-results/security-behavior-r3.json
+            qa-results/adversarial-harness-r5.json
+            qa-results/redteam-e7-mobile-protocol.json
+            qa-results/redteam-e7-recorder.json
+            qa-results/redteam-e8-forgery.json
+            qa-results/redteam-e8-retention.json
+            qa-results/redteam-e8-browser.json
             qa-results/stage3-pdf-runtime/summary.json
             qa-results/stage3-pdf-quality/summary.json
             qa-results/verifier-ui-runtime/summary.json
+            qa-results/redteam-e9-*.json
+            qa-results/redteam-e9-negative/*.log
+            qa-results/redteam-e10-ci/*.log
+            audit/evidence/garp27-current/

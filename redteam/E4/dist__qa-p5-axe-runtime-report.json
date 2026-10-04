@@ -1,0 +1,80 @@
+{
+  "schema": "ghrab-p5-axe-runtime-v1",
+  "appId": "generator",
+  "appVersion": "7.1.80",
+  "requestedVersion": "4.12.1",
+  "installedVersion": "4.12.1",
+  "status": "passed",
+  "scriptsExecuted": true,
+  "transport": "local-http",
+  "protectedScriptsUnlocked": true,
+  "cspBypassedForHarness": true,
+  "policy": "WCAG 2 A/AA, 2.1 A/AA a 2.2 AA; critical, serious a moderate blokují release.",
+  "pages": [
+    {
+      "page": "index.html",
+      "width": 1280,
+      "axeVersion": "4.12.1",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "axeVersion": "4.12.1",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 1280,
+      "axeVersion": "4.12.1",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 120
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 390,
+      "axeVersion": "4.12.1",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 109
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "note": "CSP je v runtime harnessu odstraněna pouze proto, aby bylo možné odemknout chráněné inline skripty; její přítomnost a serverové hlavičky kontroluje samostatná bezpečnostní brána."
+}

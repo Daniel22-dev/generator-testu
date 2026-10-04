@@ -1,0 +1,45 @@
+{
+  "stage": "E9",
+  "version": "7.1.85",
+  "status": "FAIL",
+  "startedAt": "2026-10-04T05:26:30.704Z",
+  "completedAt": "2026-10-04T05:32:24.405Z",
+  "environment": "local-equivalent",
+  "sourceCommit": null,
+  "node": "v24.19.0",
+  "syntheticOnly": true,
+  "results": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "pass": true,
+      "log": "1-npm-test.log",
+      "logBytes": 77610,
+      "logSha256": "6026b51c62ddec36febd3bd56a4feceef9bc0daff66294e8968d857726deac5d",
+      "completedAt": "2026-10-04T05:28:44.414Z"
+    },
+    {
+      "command": "npm run qa:garp27:foundation",
+      "exitCode": 0,
+      "pass": true,
+      "log": "2-npm-run-qa:garp27:foundation.log",
+      "logBytes": 3849,
+      "logSha256": "1b9c42f4e4f51e6d9a0a6e7684377800c754d6957c9d80d36a2e5fd599974ca4",
+      "completedAt": "2026-10-04T05:29:06.535Z"
+    },
+    {
+      "command": "npm run qa:p5:ci",
+      "exitCode": 1,
+      "pass": false,
+      "log": "3-npm-run-qa:p5:ci.log",
+      "logBytes": 144218,
+      "logSha256": "bf42a5fffb45e9a7fcc98f7e337b78694fea115eddf0ef8f086f764ec694e3b6",
+      "completedAt": "2026-10-04T05:32:24.405Z"
+    }
+  ],
+  "limits": [
+    "Local execution is not a GitHub Actions run",
+    "Physical E7 mobile remains ANALYZED / NOT TESTED",
+    "Passing regressions does not authorize classroom release"
+  ]
+}

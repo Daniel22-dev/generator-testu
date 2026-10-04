@@ -24,7 +24,7 @@ const outputWorkflow = read('src/js/08a-output-workflow.js');
 const secureHelpers = read('src/js/13a-secure-helpers.js');
 const securePackage = read('src/js/13c-secure-package.js');
 const secureStudentShell = read('src/js/13d-secure-student-shell.js');
-const secureStudentRuntime = read('src/js/13e-secure-student-runtime.js');
+const secureStudentRuntime = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const assembler = read('src/js/13g-assemble-test-html.js');
 const instantRuntime = read('src/js/14b-instant-test-runtime.js');
 const releaseGuides = read('src/js/14d-generator-release-guides.js');
@@ -63,7 +63,7 @@ forbidText(formFields, /students\.join\s*\(/, 'Diferenciace muze primo spojovat 
 requireText(secureHelpers, /async function buildPublicDiffGroups\(/, 'Chybi transformace seznamu studentu na verejne hashe.');
 requireText(secureHelpers, /GIT-DIFF-ROSTER-V1\|/, 'Hash rosteru nema oddeleny domenovy prefix.');
 requireText(assembler, /diffGroups:\s*publicDiffGroups/, 'Vystupni konfigurace nepouziva hashovany roster.');
-requireText(securePackage, /studentHashes:Array\.isArray\(g\.studentHashes\)/, 'Secure studentsky balicek neprenasi jen hashovany roster.');
+requireText(securePackage, /identityValidation:'teacher-verifier-only'/, 'Secure studentsky balicek nema teacher-only kontrolu identity.');
 requireText(instantRuntime, /await resolveStudentGroup\(n\)/, 'Instant runtime nevybira variantu podle hashovane identity.');
 requireText(secureStudentRuntime, /await chooseVariant\(name\)/, 'Secure runtime nevybira variantu podle hashovane identity.');
 requireText(secureStudentShell, /\.btn-fullscreen\{[^}]*display:flex[^}]*width:100%[^}]*margin:10px 0 12px/s, 'Secure studentsky fullscreen nema vlastni radek a bezpecne svisle odsazeni.');
@@ -71,7 +71,8 @@ forbidText([securePackage, secureStudentRuntime, instantRuntime, assembler].join
 requireText(secureStudentRuntime, /if\(\(CFG\.diffGroups\|\|\[\]\)\.length&&!ACTIVE_KEY\)/, 'Secure runtime neodmita neznamy diferenciacni identifikator.');
 requireText(instantRuntime, /if\(\(CFG\.diffGroups\|\|\[\]\)\.length&&!g\)/, 'Instant runtime neodmita neznamy diferenciacni identifikator.');
 forbidText(assistantKb, /buildStudentPackage|accessGroups|group\.pin|group\.password|buildAccessManifest|restoreAnswers|buildLocalTeacherMap|group\.anonymize/, 'Interni poradce obsahuje zastaraly symbol nebo stary bezpecnostni model.');
-requireText(assistantKb, /SHA-256 otisk|SHA-256 hash/, 'Interni poradce nevysvetluje hashovany roster.');
+requireText(assistantKb, /Bezpečný studentský export neobsahuje roster ani hashe identifikačních kódů/, 'Interni poradce nevysvetluje izolaci rosteru v bezpecnem exportu.');
+requireText(assistantKb, /okamžitou známkou[^.]*solené hashe/, 'Interni poradce nevysvetluje legacy hashovy roster v instant exportu.');
 requireText(assistantKb, /rozpracované odpovědi[^.]*neobnov|rozpracovaný pokus[^.]*neobnov/i, 'Interni poradce neuvadi omezeni obnovy rozpracovaneho testu.');
 forbidText(shell, /Poslat jména do promptu|data-val=['"]NE['"][^>]*onclick=['"][^'"]*anonymizace/is, 'UI stale nabizi odeslani skutecnych jmen do AI.');
 requireText(shell, /data-ghrab-access=['"]checking['"]/, 'HTML neni fail-closed pred centralnim overenim.');

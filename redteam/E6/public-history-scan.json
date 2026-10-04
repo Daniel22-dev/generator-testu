@@ -1,0 +1,241 @@
+{
+  "schema": "git-student-history-scan-v1",
+  "status": "FAIL",
+  "refs": [
+    "refs/heads/main 2af3fade24465511503dc9f215f7d91ab4a066b1"
+  ],
+  "reachableCommits": 12,
+  "reachableBlobs": 11,
+  "inventory": [
+    {
+      "blob": "32479c527eae79465eeda536818e7adbf7f8361b",
+      "paths": [
+        "Appearance.html"
+      ],
+      "bytes": 98175,
+      "sha256": "c45ee5dc5d64307d2f3efaee99bcff0d931471cf3c22fdb17808ed0a2313aac2"
+    },
+    {
+      "blob": "194e02d45c1c4978c9e99e44705de2683eefaf70",
+      "paths": [
+        "PAST PERFECT.html"
+      ],
+      "bytes": 100954,
+      "sha256": "66f69fd4f2a6181281f813112025eed8bd9f4514d1a1a9a82f00f0292be6d784"
+    },
+    {
+      "blob": "35067b76918dcf49cf85f129e61f556fbac9f83c",
+      "paths": [
+        "README.md"
+      ],
+      "bytes": 20,
+      "sha256": "8b912323894ae65c3dafd17e25157a60b95c9516b5129b0f3377494b6bea2a89"
+    },
+    {
+      "blob": "ec73edcdb4ad714c4274977467250a483ddad02f",
+      "paths": [
+        "Státy Latinské Ameriky a hlavní města - slepá mapa.html"
+      ],
+      "bytes": 50409,
+      "sha256": "569a3a5f6e859fbf393181f0b516548a80027c1a911c5b36aa7435387a807d87"
+    },
+    {
+      "blob": "7fa3ab5babd3f03e16bf10dd5d7f5cc7ee120257",
+      "paths": [
+        "Unidad 1.html"
+      ],
+      "bytes": 97955,
+      "sha256": "a580b4c155429337bfe300485b9bed160c473eab22f07b8e4ba0edf0e9ef2713"
+    },
+    {
+      "blob": "94bc1b3cec4f4eab80cda66c1a9d050b7dd33599",
+      "paths": [
+        "Unit 5 revision.html"
+      ],
+      "bytes": 96810,
+      "sha256": "dca178eed8fe1ac4b4cf962814fb6b1c3b4b8e7fdbd802363eb842a5279e3b05"
+    },
+    {
+      "blob": "673db5da88ac37972b2c02fd06edcf0db4271351",
+      "paths": [
+        "brona-test_student_test.html"
+      ],
+      "bytes": 48107,
+      "sha256": "55fbd09c7009de1b3fcec08c46c86b64d2b81f276d7ec4a967f99719c4b1fde7"
+    },
+    {
+      "blob": "518100f84ced7a0b185a854a1403e2ba67d4b2b3",
+      "paths": [
+        "english-or-czenglish-aktivita_student_test.html"
+      ],
+      "bytes": 52568,
+      "sha256": "a0c9834e9598a09f6aac29a8d965a00b31610150747f4b7de742a9896e2b62be"
+    },
+    {
+      "blob": "d6ebfd09279905ba048d51939600f60365f9ff73",
+      "paths": [
+        "relative-clauses_student_test.html"
+      ],
+      "bytes": 76259,
+      "sha256": "437ca3572116e5a28652da177e89db9f36cbcaa890d8be9eb1eb3cb3d06e025b"
+    },
+    {
+      "blob": "a4c29007d9b191b7f48f45768175ef8c97460f53",
+      "paths": [
+        "unit4_food_test_vB.html"
+      ],
+      "bytes": 45575,
+      "sha256": "a9e99d9a434d0bb677f3fdaa5c59e7e3736032c5ed975a8d6cadf2f1bd8a157e"
+    },
+    {
+      "blob": "73928cddb35932d751e77a3d5375694edbcf5bc4",
+      "paths": [
+        "nemcina-test.html"
+      ],
+      "bytes": 66549,
+      "sha256": "a67a4478ecdb02a0ca8167c85d0ee67a4a229c2f3db72300b8a46245c7dc01cf"
+    }
+  ],
+  "findings": [
+    {
+      "blob": "32479c527eae79465eeda536818e7adbf7f8361b",
+      "paths": [
+        "Appearance.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field"
+      ]
+    },
+    {
+      "blob": "194e02d45c1c4978c9e99e44705de2683eefaf70",
+      "paths": [
+        "PAST PERFECT.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field"
+      ]
+    },
+    {
+      "blob": "ec73edcdb4ad714c4274977467250a483ddad02f",
+      "paths": [
+        "Státy Latinské Ameriky a hlavní města - slepá mapa.html"
+      ],
+      "findings": [
+        "hidden-answer-property",
+        "secure-student-format-required"
+      ]
+    },
+    {
+      "blob": "7fa3ab5babd3f03e16bf10dd5d7f5cc7ee120257",
+      "paths": [
+        "Unidad 1.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field"
+      ]
+    },
+    {
+      "blob": "94bc1b3cec4f4eab80cda66c1a9d050b7dd33599",
+      "paths": [
+        "Unit 5 revision.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field"
+      ]
+    },
+    {
+      "blob": "673db5da88ac37972b2c02fd06edcf0db4271351",
+      "paths": [
+        "brona-test_student_test.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field",
+        "unexpected-scoring-policy-field"
+      ]
+    },
+    {
+      "blob": "518100f84ced7a0b185a854a1403e2ba67d4b2b3",
+      "paths": [
+        "english-or-czenglish-aktivita_student_test.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field",
+        "unexpected-scoring-policy-field"
+      ]
+    },
+    {
+      "blob": "d6ebfd09279905ba048d51939600f60365f9ff73",
+      "paths": [
+        "relative-clauses_student_test.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field"
+      ]
+    },
+    {
+      "blob": "a4c29007d9b191b7f48f45768175ef8c97460f53",
+      "paths": [
+        "unit4_food_test_vB.html"
+      ],
+      "findings": [
+        "hidden-answer-property",
+        "secure-student-format-required"
+      ]
+    },
+    {
+      "blob": "73928cddb35932d751e77a3d5375694edbcf5bc4",
+      "paths": [
+        "nemcina-test.html"
+      ],
+      "findings": [
+        "private-or-answer-derived-property",
+        "private-public-config",
+        "secure-student-mode-required",
+        "teacher-or-roster-data",
+        "teacher-runtime-capability",
+        "unexpected-public-config-field",
+        "unexpected-scoring-policy-field"
+      ]
+    }
+  ],
+  "secretValuesOmitted": true,
+  "scope": "All unique blobs reachable from available refs, including deleted files in older commits. Deleted/unadvertised refs, unreachable objects, caches, forks and detached Actions artifacts are outside this scan.",
+  "repository": "Daniel22-dev/interaktivni-testy",
+  "observedAt": "2026-10-03T18:25:57.992739+00:00",
+  "freshRefsMatchImmutableMirror": true
+}

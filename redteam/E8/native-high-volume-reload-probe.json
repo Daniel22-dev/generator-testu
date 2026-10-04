@@ -1,0 +1,35 @@
+{
+  "stage": "E8",
+  "version": "7.1.84",
+  "status": "HARDENED / BROADER RELIABILITY NOT CERTIFIED",
+  "scope": "Additional desktop Chromium 180-record reload experiment, separate from the stable forged-payload/CSV gate",
+  "observed": "One reload preserved attempt ID/time/deadline/lock but lost attempt-start marker; the repeat passed. Another earlier trial reached the hidden unlock field but its driver timed out before normal five-tap reveal.",
+  "hypothesis": "Interrupted native unload writes can select the persistence-integrity path; that path also used a last-119 slice and discarded origin markers. This cause is not proved for the recorded native failure.",
+  "remediation": "Origin markers survive the integrity path. Two valid signed copies with a guard-only, non-weakening revision difference reconcile to the newer conservative state; identity/answers/deadline/joker differences or lock weakening still fail closed. Both MACs must validate. Controlled tests and the native E5 reload regression verify this; five post-fix native high-volume observations retained origin/deadline without integrity locks.",
+  "category": [
+    "BEST-EFFORT",
+    "HARDENED"
+  ],
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "followup": "E9 must broaden native reload/pending-write repeatability coverage; five favorable observations do not prove all browser/lifecycle cases.",
+  "evidence": [
+    "native-high-volume-reload-failure.log",
+    "native-high-volume-reload-retry-pass.log"
+  ],
+  "followupObservations": {
+    "runs": 5,
+    "originAndDeadlineRetained": 5,
+    "ordinaryReloadWithoutIntegrityLock": 4,
+    "integrityLockAfterOrdinaryReload": 1,
+    "source": "qa-results__redteam-e8-native-retention-probe.json",
+    "interpretation": "Origin retention is hardened; one native ordinary reload still blocked. Root cause and repeatability remain open."
+  },
+  "reproduction": "CHROMIUM_PATH=/path/to/chromium node scripts/probe-redteam-native-retention-e8.mjs",
+  "postSignedReconciliationObservations": {
+    "runs": 5,
+    "originAndDeadlineRetained": 5,
+    "integrityLocks": 0,
+    "source": "qa-results__redteam-e8-native-retention-probe.json",
+    "certification": false
+  }
+}

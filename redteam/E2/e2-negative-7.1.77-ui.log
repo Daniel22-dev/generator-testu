@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(v.document.getElementById('resultTable').textContent.includes('PŮVOD NEPROKÁZÁN'))
+
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-trust-e2.mjs:49:12
+    at check (file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-trust-e2.mjs:8:77)
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-trust-e2.mjs:47:9 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

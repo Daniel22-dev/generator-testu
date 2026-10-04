@@ -1,0 +1,211 @@
+{
+  "schema": "git-redteam-e5-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.81",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "completedStages": [
+    "E0",
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "pendingStages": [
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "sourceBranch": "candidate",
+  "baseCommit": "ebc464de2254666317fb2df2d36024d733946b42",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "npmTest": "PASS / complete terminal marker and matching log byte count",
+  "localP5Equivalent": "PASS / completed process and final acceptance report",
+  "githubActionsExecuted": false,
+  "desktopChromium": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "otherBrowserEngines": "ANALYZED / NOT TESTED",
+  "nativeFreezeResume": "ANALYZED / NOT TESTED – visible headless page did not dispatch the CDP lifecycle events",
+  "nativeBFCacheEligibility": "ANALYZED / NOT TESTED",
+  "browserGroups": [
+    "native-reload",
+    "native-fullscreen-exit",
+    "native-history",
+    "controlled-freeze-resume",
+    "native-inert-keyboard",
+    "native-split-persistence",
+    "controlled-pageshow-reconciliation",
+    "controlled-fullscreen-rejection"
+  ],
+  "generatedRuntimeGroups": [
+    "away-during-lock",
+    "beforeunload-lock",
+    "locked-responses",
+    "clipboard-block",
+    "split-reload",
+    "unlock-race",
+    "lifecycle-lock",
+    "ipad-keyboard-model",
+    "submitted-responses",
+    "verifier-audit"
+  ],
+  "nativeEvidence": [
+    "reload + beforeunload/pagehide",
+    "Fullscreen entry/exit with user gesture",
+    "same-document history traversal",
+    "inert keyboard focus exclusion",
+    "IndexedDB and Web Locks"
+  ],
+  "controlledEvidence": [
+    "freeze/resume event dispatch",
+    "sample tick acceleration",
+    "persisted pageshow reconciliation",
+    "fullscreen API rejection",
+    "lock trigger for keyboard test"
+  ],
+  "browserObservations": [
+    "CDP freeze/active did not dispatch lifecycle events on the visible headless page: native freeze/resume NOT TESTED.",
+    "Real viewport/screen ratio and IndexedDB reload; six sample ticks were accelerated by explicit calls, not 12 elapsed seconds.",
+    "persisted pageshow/pagehide deliberately dispatched: reconciliation proven, native BFCache eligibility NOT TESTED.",
+    "Fullscreen rejection branch uses controlled API rejection, with no unhandled pageerror."
+  ],
+  "historicalNegativeControlCount": 34,
+  "sourceSnapshots": {
+    "7.1.76": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+    "7.1.80": "27a31b8a16464fd96570002a1e0f0196e7d598c0eea4386d2eb14100678fede9"
+  },
+  "release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.81",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-03T17:44:35.103Z",
+    "distBytes": 2569767,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1647391,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1597908,
+    "entryCriticalBytes": 1769727,
+    "largestInlineScriptBytes": 158045,
+    "precacheBytes": 2193166,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1597908,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "entryCriticalBudget": {
+    "limit": 1770000,
+    "changedInE5": false
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "axeIncomplete": [
+    {
+      "page": "index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 120
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 109
+        }
+      ]
+    }
+  ],
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 8
+  },
+  "limits": [
+    "Native freeze/resume and BFCache eligibility NOT TESTED on this platform",
+    "Viewport split/overlay detection BEST-EFFORT; no browser DRM",
+    "No screenshot, second-device or developer-tools prevention",
+    "Native event proof is the separate Chromium gate",
+    "No prevention of client-owner edits, screenshots, overlays, other profiles or other devices",
+    "iPad keyboard exemption is a heuristic with a known visible-focus blind spot"
+  ],
+  "screenGuard": "Fullscreen exit is monitored after actual entry; it is not a mandatory unsupported-browser gate. Split/keyboard detection remains heuristic. Strict clipboard handlers are blocked; standard large paste is metadata-only audit.",
+  "teacherStoragePolicy": "private owner PC outside school, never public repo/history",
+  "externalAnchorProvenance": "Owner-attested Forms settings and unaltered CSV; no live configuration proof",
+  "runtimeProvenance": "CLIENT-CONTROLLED",
+  "classificationAuthorization": "REVIEW_REQUIRED",
+  "serverDecision": "DEFERRED – SERVER VERSION",
+  "evidenceScope": "Synthetic summaries and logs only. Private generated HTML/RSA keys/rosters/PDF excluded. Public scan remains E0 historical snapshot. Legacy instant mode receives regression coverage, not new secure-runtime guarantees.",
+  "logNormalization": "ANSI, trailing whitespace and redundant terminal blank lines removed in copied evidence; outcomes preserved."
+}

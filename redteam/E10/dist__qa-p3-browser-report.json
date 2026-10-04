@@ -1,0 +1,47 @@
+{
+  "schema": "ghrab-p3-browser-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.86",
+  "chromium": "system",
+  "launch": {
+    "dynamicDebugPort": true,
+    "readinessSource": "own DevToolsActivePort",
+    "profileIsolation": "unique temporary directory"
+  },
+  "result": {
+    "checks": {
+      "platformPresent": true,
+      "version": true,
+      "a11yContract": true,
+      "performanceContract": true,
+      "moduleContract": true,
+      "skipLink": true,
+      "liveRegion": true,
+      "inputName": true,
+      "iconName": true,
+      "imageAlt": true,
+      "dialogName": true,
+      "initialFocus": true,
+      "tabWrap": true,
+      "shiftTabWrap": true,
+      "escapeClosed": true,
+      "focusReturned": true,
+      "announcement": true,
+      "performance": true,
+      "lazy": true
+    },
+    "failed": [],
+    "activeElement": "launcher",
+    "snapshot": {
+      "contract": "ghrab-performance-v1",
+      "now": 323.6000000014901,
+      "domContentLoadedMs": 32.100000001490116,
+      "loadMs": 33.20000000111759,
+      "transferBytes": 0,
+      "decodedBytes": 0,
+      "jsHeapUsedBytes": 10000000,
+      "resourceCount": 0
+    }
+  },
+  "status": "passed"
+}

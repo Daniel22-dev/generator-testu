@@ -1,0 +1,81 @@
+E6 — konkrétní návrh odstranění veřejných blokátorů
+Zdroj: Daniel22-dev/interaktivni-testy, veřejné main
+2af3fade24465511503dc9f215f7d91ab4a066b1.
+Audit 2026-10-03: 12 dostupných commitů, 11 unikátních blobů,
+9 současných HTML na Pages; všech 9 je byte-exact shodných s main.
+Žádný z níže uvedených vzdálených zásahů zatím nebyl proveden.
+
+1. PŘEDMĚT ODSTRANĚNÍ Z VEŘEJNÉHO STROMU A DOSTUPNÉ HISTORIE
+Tyto cesty obsahují zakázaný teacher credential hash / učitelské
+capabilities; první čtyři navíc studentské/code membership hashe:
+  Appearance.html
+  PAST PERFECT.html
+  Unidad 1.html
+  Unit 5 revision.html
+  brona-test_student_test.html
+  english-or-czenglish-aktivita_student_test.html
+  relative-clauses_student_test.html
+  nemcina-test.html
+Poslední soubor už v main není, ale jeho blob je stále dosažitelný.
+Konkrétní blob/SHA-256 a evidence jsou v public-history-scan.json.
+Hodnoty hashů, kódy, jména žáků ani tajemství se do návrhu nekopírují.
+
+2. LEGACY SOUBORY MIMO SCHVÁLENÝ SECURE EXPERIMENT
+  unit4_food_test_vB.html
+  Státy Latinské Ameriky a hlavní města - slepá mapa.html
+První má v klientském JavaScriptu strukturované správné odpovědi
+(ans/correct/answers); druhý má veřejné country/capital mapové údaje
+a vlastní klientský scorer. Jsou to jiné legacy výukové aplikace,
+nikoli nové secureOffline exporty. Veřejné mapové údaje samy
+neprokazují únik credentialu. Pro hodnocený experiment se oba
+odmítají: potřebují oddělené tréninkové použití, nebo regeneraci
+novým secure formátem bez veřejného answer key. Nesmějí být vydávány
+za E6 ověřený studentský build pro ostrý experiment.
+
+3. KONKRÉTNÍ CÍLOVÝ STAV
+Pro experiment připravit nový studentský export s již splněným F7;
+Teacher Verifier, answer key a code-email roster ponechat výhradně
+na soukromém PC vlastníka mimo školu. Každý zveřejňovaný studentský
+soubor prověřit E6 preflight a přesně spárovat s tímto verifierem.
+Veřejná složka smí obsahovat pouze tento student HTML, .nojekyll
+a minimální veřejný SHA manifest. Před zveřejněním musí být vyřešeny
+i dosud neprošlé E7–E10 a podmínky celého master promptu.
+Do té doby má být původní repozitář vyřazen jako distribuční cesta
+pro ostrý experiment. Nový kandidát 7.1.82 není nyní k publikaci.
+
+4. HISTORIE A KOPIE
+Pouhé odstranění osmi cest v novém head commitu neodstraní staré
+bloby. Potřebný je kontrolovaný rewrite všech příslušných refs nebo
+nahrazení repozitáře čistou historií a vyřazení původního veřejného
+obsahu; konkrétní postup musí zachovat chtěné jiné výukové materiály.
+Rewrite zasahuje do sdílené historie. Před případným vzdáleným
+zásahem je nutné samostatné výslovné schválení tohoto rozsahu.
+Soukromá záloha stávajícího stavu může být pouze na PC vlastníka.
+Nesmí se přidat jako ZIP, backup větev či tag do veřejného repa.
+Při změně veřejné historie ověřit Pages, všechny dostupné refs,
+releases/Actions artefakty a staré přímé cesty znovu; vyžádat
+odstranění poskytovatelem z cache/detached refs, pokud zůstávají
+dostupné. Externí kopie ani neadvertisované objekty nelze certifikovat.
+
+5. ODVOZENÁ TAJEMSTVÍ
+Všechny teacher/recovery credentialy, jejichž odvozenina byla v těchto
+artefaktech veřejná, považovat za kompromitované a na soukromém PC
+vlastníka vytvořit nové hodnoty pro budoucí testy. Staré jednorázové
+studentské kódy/hashové členství znovu nepoužívat; vytvořit nový
+soukromý code-email roster. Není tvrzeno, že hodnoty byly prolomeny.
+E6 nezjistilo privátní RSA v prohledaných veřejných HTML; nulový
+indikátor není důkaz absence v libovolně zakódovaném obsahu.
+U nových testů se RSA generuje nově podle dosavadního procesu.
+
+6. OVĚŘOVACÍ PODMÍNKY PO ODSTRANĚNÍ
+- čerstvé veřejné refs a scan všech jejich dosažitelných blobů;
+- žádná původní teacher/recovery/code-hash data nebo answer key;
+- byte-exact zveřejněný student souhlasí se soukromým verifierem;
+- žádný verifier/private key/roster/JSON záloha/map/ZIP/debug;
+- skutečný čas publikace je nezávislá kotva od generatedAt;
+- Forms verified email/doména/jedna odpověď a nový roster podle
+  E3; REVIEW_REQUIRED a CLIENT-CONTROLLED zůstávají zachované;
+- F7 a navazující akceptační etapy jsou skutečně splněny.
+
+Tento dokument je připravený rozsah k posouzení, nikoli záznam
+vykonaného purge nebo povolení deploymentu. Stav: PUBLICATION BLOCKED.

@@ -1,0 +1,8 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> generator-testu@7.1.77 checkpoint:redteam-e2
+> node scripts/bump-redteam-e2.mjs
+
+✅ CycloneDX 1.7 SBOM vytvořen: /workspace/scratch/ebcee4a4dd99/work/generator-testu-main/security/sbom/generator-testu-7.1.78.cdx.json (113 komponent).
+✅ AI assurance fingerprint vytvořen: 2cef7cb790826918fca539946ebe0d38b9bb80d1e6617fd7c06a5932e4613d8d
+Prepared 7.1.78 with 10 newest-first changes and matched GARP 2.7 pins.

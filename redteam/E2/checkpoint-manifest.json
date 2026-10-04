@@ -1,0 +1,48 @@
+{
+  "schema": "git-redteam-e2-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.78",
+  "readiness": "NOT READY \u2013 BLOCKING ISSUE",
+  "completedStages": [
+    "E0",
+    "E1",
+    "E2"
+  ],
+  "pendingStages": [
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "sourceBranch": "candidate",
+  "baseCommit": "72fdbb057bcb35f3eab24b6121f2390fabb0f692",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "npmTest": "PASS",
+  "localP5Equivalent": "PASS",
+  "githubActionsExecuted": false,
+  "desktopChromium": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "baselineNegativeControlCount": 12,
+  "browserInstanceMutationControl": "PASS / expected rejection",
+  "residualForgery": {
+    "technicalAcceptance": "current / OK / 100",
+    "runtimeAuthenticity": "CLIENT-CONTROLLED",
+    "classificationAuthorization": "REVIEW_REQUIRED",
+    "externalIdentity": "NOT_VALIDATED",
+    "externalTimeWindow": "NOT_VALIDATED"
+  },
+  "originalInputArchiveSha256": "0c8ca337922200c154834b0fa833d3a7e9800cc65a118cfa49287704e671716c",
+  "evidenceScope": "Synthetic local fixtures and summaries only; no generated student/verifier HTML, private RSA or PDF fixtures. Public scan is the historical E0 snapshot, not a fresh E2 scan.",
+  "startupFailure": "One earlier P5 retry hit Chromium startup timeout. Original cause was not established; port/profile allocation and startup diagnostics hardened, final complete P5 passed.",
+  "lint": {
+    "errors": 0,
+    "warnings": 8
+  },
+  "logNormalization": "Committed log copies remove trailing whitespace and extra blank lines at EOF; assertions and diagnostics are unchanged."
+}

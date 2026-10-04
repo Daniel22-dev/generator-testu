@@ -1,0 +1,67 @@
+{
+  "schema": "git-redteam-e7-local-protocol-gate-v1",
+  "stage": "E7",
+  "version": "7.1.86",
+  "protocolVersion": "7.1.83",
+  "status": "PASS",
+  "scope": "Authored protocol consistency and deliberate contract mutations only; not physical mobile evidence",
+  "mobileStageStatus": "ANALYZED / NOT TESTED",
+  "physicalDevicesTested": false,
+  "caseCount": 40,
+  "profileCaseCount": {
+    "iphone-safari": 35,
+    "ipad-safari": 37,
+    "android-chrome": 37,
+    "android-alt-chromium": 37
+  },
+  "negativeControls": [
+    {
+      "id": "false-mobile-green",
+      "expectedRejected": true
+    },
+    {
+      "id": "false-mobile-pass",
+      "expectedRejected": true
+    },
+    {
+      "id": "headless-as-physical",
+      "expectedRejected": true
+    },
+    {
+      "id": "missing-ipad",
+      "expectedRejected": true
+    },
+    {
+      "id": "executed-before-owner",
+      "expectedRejected": true
+    },
+    {
+      "id": "screenshot-prevented",
+      "expectedRejected": true
+    },
+    {
+      "id": "second-device-server",
+      "expectedRejected": true
+    },
+    {
+      "id": "no-negative-control",
+      "expectedRejected": true
+    },
+    {
+      "id": "no-ai-coverage",
+      "expectedRejected": true
+    },
+    {
+      "id": "no-reset-boundary",
+      "expectedRejected": true
+    },
+    {
+      "id": "fake-authentication",
+      "expectedRejected": true
+    },
+    {
+      "id": "threshold-drift",
+      "expectedRejected": true
+    }
+  ]
+}

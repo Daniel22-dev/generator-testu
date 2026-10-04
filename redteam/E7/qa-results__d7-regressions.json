@@ -1,0 +1,90 @@
+{
+  "schema": "ghrab-d7-regressions-v1",
+  "version": "7.1.83",
+  "startedAt": "2026-10-03T21:33:55.912Z",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "d7-ci-wiring",
+      "script": "scripts/check-d7-ci-wiring.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 62
+    },
+    {
+      "name": "verifier-v2-contract",
+      "script": "scripts/check-teacher-verifier-v2.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 63
+    },
+    {
+      "name": "verifier-effective-analytics",
+      "script": "scripts/check-verifier-effective-analytics.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 59
+    },
+    {
+      "name": "verifier-ia-security",
+      "script": "scripts/check-verifier-ia-security.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 65
+    },
+    {
+      "name": "joker-workflow-real-browser",
+      "script": "scripts/check-joker-workflow-browser.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 2058
+    },
+    {
+      "name": "stage3-pdf-contract",
+      "script": "scripts/check-stage3-pdf.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 56
+    },
+    {
+      "name": "generate-verifier-fixtures",
+      "script": "scripts/qa-generate-fixtures.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 3244
+    },
+    {
+      "name": "stage3-pdf-real-browser",
+      "script": "scripts/check-stage3-pdf-runtime.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 731
+    },
+    {
+      "name": "stage3-pdf-quality",
+      "script": "scripts/check-stage3-pdf-quality.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1278
+    },
+    {
+      "name": "verifier-ui-real-browser",
+      "script": "scripts/check-verifier-ui-runtime.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1966
+    }
+  ],
+  "completedAt": "2026-10-03T21:34:05.502Z",
+  "sensitiveArtifactsRemoved": true
+}

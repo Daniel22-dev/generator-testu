@@ -1,0 +1,142 @@
+GIT RED TEAM v2 — E8 — GIT 7.1.84 — 2026-10-04
+FORGED PAYLOAD TEST HARNESS
+Global readiness: NOT READY – BLOCKING ISSUE
+
+PROVEN CHANGES
+E8-001 / DETECTED / HARDENED
+7.1.83 accepted four contradictory attempt-start cases: missing start,
+duplicate start, start time differing from startedAt, and foreign attempt detail.
+7.1.84 requires exactly one start matching the declared start time and, when
+present/nonempty, the attempt ID. Minimal historical payloads without detail
+remain supported. This consistency check is not runtime attestation.
+
+E8-002 / DETECTED / HARDENED
+7.1.83 accepted four impossible split-window summaries: smallMs > totalMs,
+percentage disagreement, zero totalMs, and missing numeric measurements.
+7.1.84 checks integer measurements, positive total and derived percentage.
+The measurements themselves remain CLIENT-CONTROLLED.
+
+E8-003 / DETECTED / HARDENED
+7.1.83 accepted a joker-used event without the choice, or a declared choice
+without the event. 7.1.84 requires the matching single event and selection time.
+The private configuration allowlist is now explicit (true / ANO). A joker in a
+disabled test was ALREADY rejected by 7.1.83; this is regression coverage,
+not a newly proven exploit. Valid joker results remain JOKER_EXCLUDED.
+
+E8-004 / HARDENED / BEST-EFFORT
+The 7.1.83 runtime's last-120 snapshot discarded start/joker markers after a
+long event history. Actual generated-runtime baseline probes reproduce this
+for ordinary and joker attempts. 7.1.84 retains original origin markers plus
+a bounded recent tail, at most 120 persisted records, in merge, active body,
+compatibility persistence, reload and the integrity-lock path. Start, identity, attempt ID, deadline,
+answers and joker selection survive the tested reload; normal recovery unlock
+and encrypted submission then pass the private verifier. This is neither a
+complete audit trail nor protection against the client owner.
+
+TEST CONTRACT
+The 108-case harness independently creates ciphertext using ONLY the emitted
+PUBLIC RSA key and native Node AES-GCM/RSA-OAEP. It then runs the actual emitted
+private verifier. No private-key access is needed by the hostile producer.
+89 structurally/semantically invalid cases are rejected before scoring,
+6 replay sequences are excluded, and 13 controls cover scoring and limits.
+Cases include foreign student, assigned/existing variant, test, manifest/hash,
+complete identity rebinding versus the Forms account, impossible time windows,
+contradictory telemetry, changed answers, claimed score, malformed/duplicate
+JSON, invalid UTF-8, ciphertext tampering, replay and full-year routing.
+The existing E3 regression still exercises all 21 base answer types.
+The E4 browser replay fixture changes its start-event detail together with the
+new attempt ID, so it reaches the persisted replay gate rather than failing
+the earlier E8 consistency check. Production validation is not weakened.
+Older verbose changelog entries are condensed within the existing ten-entry
+limit to preserve the unchanged performance budget; full stage reports remain.
+
+Every one of the 108 oracles is rerun against a deliberately weakened GENERATED
+verifier in memory. Rejection oracles include the exact diagnostic code: a
+secondary rejection with a different code detects a removed guard, but does
+NOT prove acceptance of that invalid payload. Crypto controls substitute the
+decryptor, score controls improperly trust client scores, replay controls omit
+duplicate rebuilding, and trust controls falsely grant authenticity. All must
+be caught. Four long-history controls weaken the ordinary and integrity student snapshots.
+The desktop Chromium gate includes a removed-start-check negative control
+that actually accepts the contradictory encrypted payload and scores it.
+
+NATIVE DESKTOP SCOPE
+Unchanged generated CSP, native WebCrypto and IndexedDB, actual student submit,
+owner policy UI, actual CSV file input, 13 malicious imports, duplicate import,
+real results/index/archive downloads, and a consistent public-key forgery.
+No generated private teacher HTML, private RSA JWK, roster or test plaintext
+is written as a deliverable by these fixtures. All identities are synthetic.
+The generator jsdom fixture supplies a synthetic permit and fake IndexedDB;
+that is not evidence about a live signed-in generator or mobile devices.
+
+LIMITS THAT REMAIN
+CLIENT-CONTROLLED / ARCHITECTURAL LIMIT:
+A fully consistent forged payload can be encrypted with the public key and
+reach private answer scoring. Copied expected HTML hash, successful decryption,
+self-reported times or consistent telemetry do not authenticate the runtime.
+The tests require CLIENT-CONTROLLED and REVIEW_REQUIRED, never AUTHENTICATED.
+In-range client pct/grade are informational and IGNORED: answers are privately
+rescored. Score inflation/deflation is not itself rejected as malformed data.
+A diagnostic backup without Forms anchors remains outside classification.
+Other-test rows in a full-year CSV are filtered without scoring.
+
+BEST-EFFORT / SERVER REQUIRED:
+Replay observations persist on the same private owner profile. Full deletion
+or another profile cannot be made authoritative by a local-only verifier.
+Live Forms verified-email/domain/one-response settings and unaltered CSV remain
+owner-attested. The local fixture does not inspect a real Forms deployment.
+
+Mobile E7: ANALYZED / NOT TESTED, 40 scenarios / 4 profiles / 146 NOT RUN pairs.
+Another device: MIMO TECHNICKÝ DOSAH – POUZE DOZOR.
+F7: question content is still plaintext before an adequately strong start code;
+AES-GCM/PBKDF2 start encryption is pending. E6 historical-cache purge and
+private credential rotation remain unconfirmed; last recorded historical raw
+response was 200 on 2026-10-03, not a fresh E8 check. E9 regression/CI and E10
+protected-main promotion/deploy remain separate stages. No Support message,
+GitHub push, merge, publishing or deployment is performed in E8.
+
+REPRODUCIBLE LOCAL COMMANDS (after installing the pinned lockfile)
+npm run build
+npm run check:redteam-forgery
+CHROMIUM_PATH=/path/to/chromium npm run check:redteam-forgery-browser
+npm test
+npm run qa:garp27:foundation
+CHROMIUM_PATH=/path/to/chromium npm run qa:p5:ci
+The GARP gates require GARP27_EXTERNAL_TRUST_SHA256 to match the trusted
+security/garp27/trust-anchor.json pin. Completion logs and current JSON evidence
+are included with this checkpoint. Local CI equivalent is not GitHub Actions.
+
+BASELINE PROVENANCE
+Recovered source: GIT-redteam-E7-7.1.83.zip
+ZIP SHA256: 86616433e73df28c462249140e16374ae57b22d2a72133ca7d6754c57eaa738d
+Original E7 source commit recorded by the handoff:
+bc3edde8a2cbcef959a89976853f328e12cba044
+Local restoration baseline commit:
+d8ff2d71f8a14766378ea217962999d3805fd3ae
+The local restoration is not the original Git commit. A stale separate working
+folder was left untouched; this candidate starts from the verified E7 archive.
+The baseline generator SHA256 is in baseline-7.1.83-forgery-probe.json.
+
+E8-005 / HARDENED / BEST-EFFORT — SIGNED-STATE RECONCILIATION
+Native high-volume reload first lost a start marker; after preserving markers,
+one of five legitimate reloads still produced an integrity lock. Ordinary E5
+native reload also exposed this mismatch. These are preserved diagnostic
+observations, not silently retried or counted as PASS evidence.
+
+Two copies with valid MACs and different revisions can differ only in guard
+metadata during interrupted unload writes. Such a non-weakening transition
+now selects the newer signed state. Active-state identity, start, deadline,
+variant, joker choice, answers and answer-change fields must be identical;
+an older lock cannot be weakened. attemptGuard bodies must be identical.
+Malformed MACs, answer replay, identity/time/choice changes and other record
+kinds still fail closed. Controlled tests cover both copy directions and
+unsafe answer replay; refuse-all and accept-all mutants are both detected.
+The native E5 reload regression passes, and five post-fix native high-volume
+observations retained origin and deadline without an integrity lock.
+
+This hardens a concrete signed-state divergence case; it does not prove the
+exact timing/root cause of every prior native failure or all reload scenarios.
+The supplemental native probe remains OBSERVATION ONLY / NOT CERTIFIED.
+Broader native lifecycle/pending-write repeatability remains an E9 follow-up;
+physical mobile execution is still absent. Global release remains NOT READY.
+Reproduce: CHROMIUM_PATH=/path/to/chromium node scripts/probe-redteam-native-retention-e8.mjs

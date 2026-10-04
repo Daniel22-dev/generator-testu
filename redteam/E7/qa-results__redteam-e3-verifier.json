@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "version": "7.1.83",
+  "syntheticOnly": true,
+  "checks": [
+    "schema",
+    "answers",
+    "identity",
+    "time",
+    "replay",
+    "csv",
+    "json"
+  ],
+  "scope": "actual generated HTML, RSA-OAEP/AES-GCM, direct import and CSV import",
+  "limits": [
+    "Owner attests Forms settings and unaltered CSV; no live configuration proof",
+    "Private E4 digest observations survive restart; full storage deletion or another profile needs server trust",
+    "Consistent public-key forgeries remain possible; runtime CLIENT-CONTROLLED",
+    "Mobile NOT TESTED; F7 and E5–E10 pending"
+  ]
+}

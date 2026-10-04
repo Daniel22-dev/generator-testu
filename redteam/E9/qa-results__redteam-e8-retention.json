@@ -1,0 +1,37 @@
+{
+  "stage": "E8",
+  "version": "7.1.85",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "long-history-reload-default",
+      "status": "PASS",
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "long-history-integrity-default",
+      "status": "PASS",
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "long-history-reload-joker",
+      "status": "PASS",
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "long-history-integrity-joker",
+      "status": "PASS",
+      "negativeControl": "DETECTED_WEAKENED_BUILD"
+    },
+    {
+      "id": "signed-guard-only-divergence-preserves-lock-and-rejects-answer-replay",
+      "status": "PASS",
+      "negativeControl": "DETECTED_2_WEAKENED_BUILDS"
+    }
+  ],
+  "scope": "Actual generated student start, 180 runtime audit records, signed active-state persistence, same-profile reload, recovery unlock, encrypted submit and private scoring; controlled jsdom/IndexedDB, native Node crypto.",
+  "limits": [
+    "Only start/joker markers plus a bounded recent tail are retained; this is not a complete or authenticated audit trail",
+    "Physical mobile NOT TESTED; runtime CLIENT-CONTROLLED"
+  ]
+}

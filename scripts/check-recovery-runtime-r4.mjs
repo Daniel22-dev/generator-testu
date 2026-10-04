@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const secure = fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8');
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
 const instant = fs.readFileSync('src/js/14b-instant-test-runtime.js','utf8');
 
 function ok(cond,msg){
@@ -39,7 +39,7 @@ function plainFn(src,name){
 
 ok(/LOCK_REASON='',UNLOCK_BUSY=false/.test(secure),'secure runtime declares unlock busy state');
 ok(/if\(!LOCKED\|\|UNLOCK_BUSY\)return;/.test(secure),'secure tryUnlock is a no-op unless locked and serializes concurrent unlocks');
-ok(/UNLOCK_BUSY=true;try\{/.test(secure)&&/finally\{UNLOCK_BUSY=false;\}/.test(secure),'secure unlock busy flag is fail-safe via try/finally');
+ok(/UNLOCK_BUSY=true;var guardEpoch=GUARD_EPOCH;try\{/.test(secure)&&/finally\{UNLOCK_BUSY=false;\}/.test(secure),'secure unlock busy flag is fail-safe via try/finally');
 ok(/unlockBusy=false/.test(instant),'instant runtime declares unlock busy state');
 ok(/if\(!locked\|\|unlockBusy\)return;/.test(instant),'instant tryUnlock is a no-op unless locked and serializes concurrent unlocks');
 ok(/unlockBusy=true;try\{/.test(instant)&&/finally\{unlockBusy=false;\}/.test(instant),'instant unlock busy flag is fail-safe via try/finally');
@@ -48,7 +48,7 @@ ok(/warningCount=securityCounts\(\)\.warnings/.test(instant),'instant warningCou
 const secureTry=fnBlock(secure,'tryUnlock');
 const sctx={setTimeout,clearTimeout};vm.createContext(sctx);
 vm.runInContext(`
-let LOCKED=true,LOCK_REASON='focus lost',UNLOCK_BUSY=false,LOCK_TAPS=5;
+let LOCKED=true,LOCK_REASON='focus lost',UNLOCK_BUSY=false,LOCK_TAPS=5,PERSIST_INTEGRITY_BLOCK=false,GUARD_EPOCH=0;
 let SEC_EVENTS=[{t:'LOCK-1',type:'locked',detail:'focus lost'}];
 const elements={
  unlockInp:{value:'REC-OK'},
@@ -56,6 +56,7 @@ const elements={
  unlockReveal:{classList:{add(){}}},
  lockReasonBox:{textContent:''}
 };
+const document={visibilityState:"visible"};function applyGuardUi(){}
 function $(id){return elements[id];}
 function t(_k,f){return f;}
 let matchCalls=0,persistCalls=0;

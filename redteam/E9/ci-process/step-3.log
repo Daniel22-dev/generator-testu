@@ -1,0 +1,3771 @@
+
+> generator-testu@7.1.85 qa:p5:ci
+> npm run qa:lock && npm run qa:garp23 && npm run build && npm run check:redteam-isolation && npm run check:redteam-trust && npm run check:redteam-verifier && npm run check:redteam-storage && npm run check:redteam-runtime && npm run check:redteam-publication && npm run check:redteam-mobile && npm run check:redteam-forgery && npm run check:redteam-isolation-browser && npm run check:redteam-trust-browser && npm run check:redteam-verifier-browser && npm run check:redteam-storage-browser && npm run check:redteam-runtime-browser && npm run check:redteam-mobile-recorder && npm run check:redteam-forgery-browser && npm run check:redteam-regression-negative && npm run check:redteam-restart-browser && npm run qa:d7:ci && npm run check:d8-final-audit && npm run garp25:prep-static && npm run qa:garp27:static && npm run verify:platform && npm run qa:quality && npm run qa:browser && npm run qa:runtime && npm run qa:xss && npm run qa:axe && AXE_REQUIRED=1 node scripts/qa-p5-release.mjs && node scripts/qa-p5-acceptance.mjs && npm run check:redteam-ci
+
+
+> generator-testu@7.1.85 qa:lock
+> node scripts/qa-p5-lock.mjs
+
+{
+  "schema": "ghrab-p5-lock-audit-v1",
+  "status": "passed",
+  "package": "generator-testu",
+  "version": "7.1.85",
+  "directDependencies": 7,
+  "lockedPackages": 113,
+  "registry": "https://registry.npmjs.org"
+}
+
+> generator-testu@7.1.85 qa:garp23
+> npm run check:ai-operations && npm run test:suite-session && node scripts/qa-garp23-security.mjs
+
+
+> generator-testu@7.1.85 check:ai-operations
+> node scripts/check-ai-operation-registry.mjs
+
+PASS ai-operations registry parity: 11 operations; runtime input types normalized to GHRAB AI Core 1.0.0.
+
+> generator-testu@7.1.85 test:suite-session
+> node scripts/test-suite-session-lifecycle.mjs
+
+{
+  "schema": "ghrab-generator-suite-session-test-v1",
+  "platformVersion": "1.1.2",
+  "syntheticDataOnly": true,
+  "checks": [
+    {
+      "ok": true,
+      "name": "Platform 1.1.2 exact vendor SHA-256",
+      "detail": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack waits for runtime cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child clears synthetic Generator canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves other child namespace",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves non-content telemetry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child preserves global suite generation tombstone",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "F-02 records seen and cleanup complete",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Open-child ack exists after cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay clears pending canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Delayed-open replay acknowledges generation",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Reload after replay does not repeat destructive cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab cross-context signal clears canaries",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab stale tab persistence is locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Multi-tab autosave cannot restore canary",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document cleans despite shared seen ack",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "BFCache stale document stays locked",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed synthetic delete failure is observable",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed does not falsely acknowledge",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Fail-closed status records failure",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work reports successful cleanup",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work clears Generator-owned local/session data and targeted handoff",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work removes shared access permit",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work preserves other app namespace",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work preserves unrelated telemetry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Manual end-work preserves global suite generation tombstone",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "G-01 settings UI exposes explicit end-work cleanup button",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "G-01 cleanup button requires confirmation before invoking generatorEndWork",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "G-01 implementation does not use broad browser storage clear",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Forms onboarding documents required metadata placeholders",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Forms onboarding derives and requires Test ID/name/group entry IDs",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Secure test validates and seals Forms metadata mapping into generated config",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Secure student public config carries only the validated Forms metadata mapping",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Student runtime prefills per-test metadata without manual student entry",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Verifier filters imported submissions by cryptographically decrypted payload identity",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Verifier locates payload column by content rather than fixed CSV position",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Full-year CSV import classifies other tests without adding them to current results",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Forms metadata mismatches are visible but non-authoritative",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Exact duplicates are suppressed and distinct attempts require an explicit teacher decision",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Verifier exposes separate current-test result and submission exports",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Analytics/export path uses deduplicated explicitly resolved effective results",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Large CSV import yields to the browser and reports progress",
+      "detail": ""
+    },
+    {
+      "ok": true,
+      "name": "Negative control detects disabled cleanup (weakened copy fails as required)",
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 42,
+    "passed": 42,
+    "failed": 0
+  },
+  "status": "passed"
+}
+{
+  "schema": "ghrab-garp23-security-regression-v1",
+  "syntheticOnly": true,
+  "airStructural": {
+    "attempts": 24,
+    "mutationFamilies": 4,
+    "boundaryEscapes": 0,
+    "officialCorpus": {
+      "vectors": 18,
+      "wrapperAttempts": 54,
+      "boundaryEscapes": 0,
+      "sha256": "3560e60fd78a9cc81cfef1d7d2c3ba52b270ac5f38d582cc0cded3aa31183a6d"
+    },
+    "behavioralLiveModel": "NOT TESTED"
+  },
+  "privacyCanary": {
+    "type": "example.invalid",
+    "preflightBlocked": true
+  },
+  "pc01": {
+    "reviewedApplicationCallSites": 9,
+    "callSites": [
+      {
+        "file": "src/features/preview-editor.js",
+        "line": 540,
+        "operation": "acceptable-answer-enrichment"
+      },
+      {
+        "file": "src/features/testlab.js",
+        "line": 510,
+        "operation": "diagnostic-ping"
+      },
+      {
+        "file": "src/js/01-core.js",
+        "line": 1106,
+        "operation": "generator-help-answer"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 415,
+        "operation": "reading-source-analysis"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 512,
+        "operation": "listening-question-suggestions"
+      },
+      {
+        "file": "src/js/03-ui-render.js",
+        "line": 621,
+        "operation": "reading-package-suggestion"
+      },
+      {
+        "file": "src/js/08-manual-editor.js",
+        "line": 387,
+        "operation": "attempt?'generation-repair':'exercise-generation'"
+      },
+      {
+        "file": "src/js/09-selftest-keycheck.js",
+        "line": 355,
+        "operation": "answer-key-verification"
+      },
+      {
+        "file": "src/js/12-prompt-builder.js",
+        "line": 127,
+        "operation": "grading-scale-parse"
+      }
+    ]
+  },
+  "endWork": {
+    "lifecycleHarness": "scripts/test-suite-session-lifecycle.mjs",
+    "platformVersion": "1.1.2",
+    "contract": "ghrab-suite-session-v1"
+  },
+  "studentPackage": {
+    "canonicalTypesChecked": 21,
+    "answerKeyCanaryAbsent": true
+  },
+  "negativeControls": [
+    "weakened-production-boundary-detected",
+    "new-unreviewed-ai-call-detected",
+    "same-line-multiple-ai-calls-detected",
+    "template-context-ai-call-flagged-for-review",
+    "raw-differentiation-egress-detected",
+    "suite-session-negative-control-detected-by-lifecycle-harness",
+    "answer-key-strip-leak-detected",
+    "same-origin-selftest-sandbox-weakening-detected",
+    "same-origin-print-sandbox-weakening-detected",
+    "benign-pseudonymous-preflight-allowed",
+    "other-app-storage-preserved"
+  ],
+  "passed": 82,
+  "failed": 0,
+  "failures": []
+}
+
+> generator-testu@7.1.85 prebuild
+> npm run check:credential-security && npm run check:security-forensics && npm run check:secret-hygiene && npm run check:security-adversarial && npm run check:e1-remediation && npm run check:r2-credential-policy && npm run check:r3-test-infrastructure && npm run check:r4-recovery-runtime && npm run check:r5-adversarial-wiring && npm run check:f0-ci-trust-pin && npm run check:f2-journey-migration && npm run check:ai-operations && npm run check:exercise-help && npm run check:verifier-generated-syntax && npm run check:embedded-script-terminators && npm run check:studio-manifest
+
+
+> generator-testu@7.1.85 check:credential-security
+> node scripts/check-security-credential-e1.mjs && node scripts/check-security-credential-e2.mjs && node scripts/check-security-credential-e3.mjs
+
+PASS E1: teacher/admin secret field exists
+PASS E1: separate recovery field exists
+PASS E1: UI clearly distinguishes secret teacher credential from recovery
+PASS E1: step 3 no longer claims one shared code
+PASS E1: both credentials are marked sensitive
+PASS E1: recovery has independent value/sync helpers
+PASS E1: teacher and recovery generation helpers are separate
+PASS E1: teacher secret is no longer mirrored into legacy unlock field
+PASS E1: recovery generation uses randomChunk/WebCrypto path
+PASS E1: strict mode or screenGuard requires recovery
+PASS E1: UI mode changes trigger recovery provisioning
+PASS E1: validation rejects identical teacher/recovery values
+PASS E1: teacher secret retains minimum 12-character strength gate
+PASS E1: manual recovery code has a minimum strength floor
+PASS E1: persistence sanitizer includes recovery raw value
+PASS E1: download guidance uses recovery, not teacher secret
+PASS E1 credential model + generator UX gate
+PASS E2: assembly reads Teacher/Admin and Recovery from separate inputs
+PASS E2: teacher hash is derived only from Teacher/Admin secret
+PASS E2: recovery hash is derived only from Classroom Recovery Code
+PASS E2: output CFG uses explicit recovery names
+PASS E2: new assembly no longer emits legacy unlock hash/domain names
+PASS E2: guarded test assembly fails closed through shared credential policy
+PASS E2: secure public CFG has only a procedural classroom unlock hash
+PASS E2: secure package has no legacy unlock output field
+PASS E2: secure runtime unlock uses recovery-code branch
+PASS E2: secure runtime teacher login remains teacher-pin only
+PASS E2: secure runtime no longer accepts legacy unlock branch
+PASS E2: instant lock-screen builder uses recovery capability flag
+PASS E2: instant runtime unlock uses recovery-code branch
+PASS E2: instant runtime teacher login remains teacher-pin only
+PASS E2: instant runtime uses recovery capability flag
+PASS E2: instant runtime no longer accepts legacy unlock branch
+PASS E2: raw Teacher/Admin secret is not a CFG property
+PASS E2: raw Recovery Code is not a CFG property
+PASS E2: generated-output scanner rejects raw recoveryCode field/reference
+PASS E2: synthetic instant student HTML does not contain raw Teacher/Admin secret
+PASS E2: synthetic instant student HTML does not contain raw Recovery Code
+PASS E2: synthetic instant student HTML contains only the two derived credential hashes
+PASS E2: secure student public CFG drops raw Teacher/Admin and Recovery values
+PASS E2: secure student public CFG drops both legacy credential hashes
+PASS E2: Teacher/Admin and Recovery hashes are cryptographically domain-separated
+PASS E2: same Recovery Code is bound to testId and not portable between tests
+PASS E2: Recovery Code hash cannot equal teacher credential hash even for identical plaintext
+PASS E2: Teacher/Admin normalization is stable
+PASS E2: Recovery normalization is stable
+PASS E2: generator PBKDF2 helper explicitly recognizes only the two current credential domains
+PASS E2: legacy unlock-password domain removed from new generator helper
+PASS E2 cryptographic credential separation gate
+PASS E3 secure: submitted retry accepts only Teacher/Admin authorization
+PASS E3 secure: active-attempt reset accepts only Teacher/Admin authorization
+PASS E3 secure: tryUnlock accepts only Classroom Recovery authorization
+PASS E3 secure: teacher login accepts only Teacher/Admin authorization
+PASS E3 secure: Teacher/Admin helper is limited to retry, reset and teacher login plus its definition
+PASS E3 secure: Recovery helper is limited to tryUnlock plus its definition
+PASS E3 secure: hidden 5x lock-tap reveal is preserved
+PASS E3 instant: tryUnlock accepts only Classroom Recovery authorization
+PASS E3 instant: teacher login accepts only Teacher/Admin authorization
+PASS E3 instant: generic cross-role secret matcher was removed
+PASS E3 instant: role-specific helpers are each used only by their matching operation
+PASS E3 instant: hidden 5x lock-tap reveal is preserved
+PASS E3 secure dynamic: Teacher/Admin secret matches Teacher/Admin branch
+PASS E3 secure dynamic: Recovery Code cannot authenticate as Teacher/Admin
+PASS E3 secure dynamic: Recovery Code matches Recovery branch
+PASS E3 secure dynamic: Teacher/Admin secret does not substitute for Recovery Code
+PASS E3 secure dynamic: Recovery Code does not open teacher panel
+PASS E3 secure dynamic: Teacher/Admin secret opens teacher panel
+PASS E3 secure dynamic: Teacher/Admin secret cannot unlock through the Recovery path
+PASS E3 secure dynamic: Recovery unlock preserves attemptId, deadline, identity, variant, joker choice, start time and answers
+PASS E3 secure dynamic: valid Recovery Code unlocks the current attempt
+PASS E3 secure dynamic: Recovery unlock appends to existing securityEvents instead of replacing them
+PASS E3 secure dynamic: persisted active-attempt seal retains immutable attempt identity/variant/joker/deadline
+PASS E3 secure dynamic: fewer than five lock taps do not reveal Recovery input
+PASS E3 secure dynamic: fifth lock tap reveals Recovery input
+PASS E3 instant dynamic: Recovery Code does not open teacher panel
+PASS E3 instant dynamic: Teacher/Admin secret opens teacher panel
+PASS E3 instant dynamic: Teacher/Admin secret cannot unlock through Recovery path
+PASS E3 instant dynamic: Recovery unlock preserves attempt id, deadline, variant and joker state
+PASS E3 instant dynamic: valid Recovery Code unlocks and appends an audit event
+PASS E3 instant dynamic: fewer than five lock taps do not reveal Recovery input
+PASS E3 instant dynamic: fifth lock tap reveals Recovery input
+PASS E3 runtime privilege-boundary gate
+
+> generator-testu@7.1.85 check:security-forensics
+> node scripts/check-security-forensics-e4.mjs
+
+PASS E4 secure: successful Classroom Recovery unlock has explicit recovery-unlock event
+PASS E4 secure: recovery-unlock preserves previous lock reason and lock timestamp
+PASS E4 instant: successful Classroom Recovery unlock has explicit recovery-unlock event
+PASS E4 instant: recovery-unlock preserves previous lock reason
+PASS E4 verifier: recovery unlock is rendered as audit/info, not hard/soft issue
+PASS E4 verifier: audit-only recovery unlock is excluded from security issue count
+PASS E4 exports: results CSV retains audit info and full security event timeline
+PASS E4 exports: archive JSON retains result objects including securityEvents
+PASS E4 secure dynamic: repeated lock/recovery-unlock cycles remain ordered and reconstructible
+PASS E4 secure dynamic: each recovery unlock carries its own preceding lock reason
+PASS E4 verifier dynamic: recovery unlock alone does not count as a security issue
+PASS E4 verifier dynamic: recovery unlock remains visible as audit information
+PASS E4 verifier dynamic: lock count and both reasons are visible
+PASS E4 verifier dynamic: recovery count and linked lock reasons are visible
+PASS E4 verifier dynamic: exported timeline preserves event order
+PASS E4 forensic audit gate
+
+> generator-testu@7.1.85 check:secret-hygiene
+> node scripts/check-security-secret-hygiene-e5.mjs
+
+✅ E5: both credential DOM fields remain marked sensitive
+✅ E5: persistent storage has explicit raw-credential key denylist
+✅ E5: stored state is recursively stripped before persistence/export
+✅ E5: current live credential values are recursively redacted from arbitrary stored string fields
+✅ E5: imported/legacy state is recursively stripped before use
+✅ E5: migration physically scrubs the current snapshot
+✅ E5: every template write passes through secret sanitizer
+✅ E5: every history write passes through secret sanitizer
+✅ E5: assignment export passes through secret sanitizer
+✅ E5: imported assignment is scrubbed before state replacement
+✅ E5: manual/AI prompt uses Teacher/Admin placeholder
+✅ E5: manual/AI prompt uses Classroom Recovery placeholder
+✅ E5: obsolete one-code placeholder is gone
+✅ E5: prompt no longer instructs AI to use one shared credential
+✅ E5: prompt documents the one-purpose recovery boundary
+✅ E5: prompt documents independent per-test derivation domains
+✅ E5: current security guide describes the split credential workflow
+✅ E5: changing Recovery Code after generation is tracked as output drift
+✅ E5: generated HTML smoke check rejects leaked local credential placeholders
+✅ E5: SecretScanner has dedicated raw test credential rules
+✅ E5: SecretScanner covers teacher, recovery and placeholder leaks
+✅ E5 dynamic: persisted artifact removes raw secret LEGACY-RAW…
+✅ E5 dynamic: persisted artifact removes raw secret TEACH-RAW-…
+✅ E5 dynamic: persisted artifact removes raw secret REC-AB12-C…
+✅ E5 dynamic: persisted artifact removes raw secret NESTED-TEA…
+✅ E5 dynamic: persisted artifact removes raw secret NESTED-REC…
+✅ E5 dynamic: stored prompt replaces Teacher/Admin line with placeholder
+✅ E5 dynamic: stored prompt replaces Recovery line with placeholder
+✅ E5 dynamic: sanitizer preserves non-secret nested data
+✅ E5 dynamic: live credential values are redacted even under non-sensitive field names
+✅ E5 dynamic: SecretScanner built-in regression suite passes (20/20)
+✅ E5 dynamic: derived credential hash fields remain allowed in student HTML
+✅ E5 dynamic: raw Recovery Code is blocked by SecretScanner
+
+✅ E5 secret hygiene gate PASS.
+
+> generator-testu@7.1.85 check:security-adversarial
+> node scripts/check-security-adversarial-e6.mjs
+
+PASS E6: secure recovery credential has one runtime authority: unlock
+PASS E6: secure teacher login uses Teacher/Admin only
+PASS E6: secure submitted retry uses Teacher/Admin only
+PASS E6: secure active-attempt reset uses Teacher/Admin only
+PASS E6: instant recovery credential has one runtime authority: unlock
+PASS E6: instant teacher login uses Teacher/Admin only
+PASS E6: generator retains distinct credential derivation domains
+PASS E6: obsolete shared unlock derivation domain cannot re-enter new output
+PASS E6: same plaintext cannot cross Teacher/Recovery role boundary
+PASS E6: Recovery Code material cannot replay across testId boundary
+PASS E6: persistence deny/sanitizer retains ucitelPin coverage
+PASS E6: persistence deny/sanitizer retains recoveryCode coverage
+PASS E6: persistence deny/sanitizer retains heslo coverage
+PASS E6: Verifier keeps Recovery Unlock audit-only
+PASS E6: Verifier export preserves forensic timeline
+PASS E6: secure runtime retains sealed attempt/deadline persistence
+PASS E6 adversarial security gate
+
+> generator-testu@7.1.85 check:e1-remediation
+> node scripts/check-e1-remediation.mjs
+
+PASS student persistence is signed, revisioned, redundant and submit-race hardened
+PASS teacher verifier rejects forged student-variant binding before scoring
+E1 REMEDIATION STATIC/DYNAMIC GATE PASSED
+
+> generator-testu@7.1.85 check:r2-credential-policy
+> node scripts/check-credential-policy-r2.mjs
+
+PASS R2: valid distinct credentials pass
+PASS R2: same plaintext is rejected
+PASS R2: weak Teacher/Admin secret is rejected
+PASS R2: missing required Recovery Code is rejected
+PASS R2: weak Recovery Code is rejected
+PASS R2: Recovery Code may be absent when not required
+PASS R2: UI validation uses shared credential policy
+PASS R2: settings drift/apply path uses shared credential policy
+PASS R2: assembleTestHtml captures current output fields before policy evaluation
+PASS R2: current credential fields override stale __outputFields snapshot
+PASS R2: assembleTestHtml enforces shared credential policy
+PASS R2: assembleTestHtml fails closed on credential policy errors
+PASS R2 credential policy gate
+
+> generator-testu@7.1.85 check:r3-test-infrastructure
+> node scripts/check-test-infrastructure-r3.mjs
+
+PASS R3: D7 fixture uses a policy-compliant Teacher/Admin secret
+PASS R3: D7 fixture provides a separate Recovery Code
+PASS R3: D7 fixture no longer seeds the legacy shared code
+PASS R3: workflow resetBase seeds a separate Recovery Code
+PASS R3: workflow matrix no longer derives the legacy unlock-password branch
+PASS R3: workflow matrix no longer asserts the one-code model
+PASS R3: workflow matrix exercises separate Teacher and Recovery runtime inputs
+PASS R3: E6 no longer checks nonexistent authorization functions
+PASS R3: E6 targets real retry/reset runtime functions
+PASS R3: R3 behavioral gate executes the built generator and drift path
+PASS R3: R3 behavioral gate parses the generated Teacher Verifier
+PASS R3: R3 behavioral gate has an npm script
+PASS R3: npm test requires the R3 behavioral gate after build
+PASS R3 test infrastructure gate
+
+> generator-testu@7.1.85 check:r4-recovery-runtime
+> node scripts/check-recovery-runtime-r4.mjs
+
+PASS R4: secure runtime declares unlock busy state
+PASS R4: secure tryUnlock is a no-op unless locked and serializes concurrent unlocks
+PASS R4: secure unlock busy flag is fail-safe via try/finally
+PASS R4: instant runtime declares unlock busy state
+PASS R4: instant tryUnlock is a no-op unless locked and serializes concurrent unlocks
+PASS R4: instant unlock busy flag is fail-safe via try/finally
+PASS R4: instant warningCount tracks warning-class events only
+PASS R4: secure concurrent recovery unlock releases the lock
+PASS R4: secure concurrent recovery unlock performs exactly one PBKDF2 match
+PASS R4: secure one lock produces exactly one recovery-unlock audit event
+PASS R4: secure unlock on an already unlocked attempt is a no-op
+PASS R4: instant concurrent recovery unlock releases the lock
+PASS R4: instant concurrent recovery unlock performs exactly one PBKDF2 match
+PASS R4: instant one lock produces exactly one recovery-unlock audit event
+PASS R4: instant recovery-unlock and lock events do not inflate warningCount
+PASS R4: instant unlock on an already unlocked attempt is a no-op
+PASS R4: instant warningCount increments only for warning-class events
+PASS R4 recovery runtime gate
+
+> generator-testu@7.1.85 check:r5-adversarial-wiring
+> node scripts/check-adversarial-wiring-r5.mjs
+
+PASS R5: behavioral R5 gate covers: Q-crypto: stejný plaintext v obou rolích
+PASS R5: behavioral R5 gate covers: A instant: správný Recovery odemkne
+PASS R5: behavioral R5 gate covers: C instant: Recovery neotevře učitelský panel
+PASS R5: behavioral R5 gate covers: AB instant: dvojklik / unlock bez zámku
+PASS R5: behavioral R5 gate covers: instant: recovery-unlock nezvyšuje počet varování
+PASS R5: behavioral R5 gate covers: A secure: správný Recovery odemkne
+PASS R5: behavioral R5 gate covers: AB secure: souběžné dvojité odemčení jednoho zámku
+PASS R5: behavioral R5 gate covers: AA secure: reload zamčeného pokusu zámek neobejde
+PASS R5: behavioral R5 gate covers: E secure: studentský soubor nepovoluje reset cizí identity
+PASS R5: behavioral R5 gate covers: D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo
+PASS R5: behavioral R5 gate covers: Verifier: hlavní skript se naparsuje
+PASS R5: behavioral R5 gate covers: AC/AD + export: Verifier zachová lock jako signál, recovery jako audit, CSV nese údaje
+PASS R5: behavioral R5 gate covers: U: snapshot / stav pro uložení bez raw credentialů
+PASS R5: behavioral R5 gate covers: W: import legacy záznamu s jedním „heslo" nevyrobí dva credentialy
+PASS R5: behavioral R5 gate covers: X: AI prompt neobsahuje raw credentialy
+PASS R5: behavioral R5 gate covers: Q-bypass: applySettingsWithoutAi nesmí sestavit test s Teacher == Recovery
+PASS R5: behavioral R5 gate covers: Q-bypass: slabý Teacher (6 znaků) přes applySettingsWithoutAi
+PASS R5: R5 runs the built generator and parses generated HTML
+PASS R5: R5 writes a machine-readable result artifact
+PASS R5: R5 behavioral npm script is defined
+PASS R5: npm test requires the full R5 adversarial gate after build
+PASS R5: R4 runtime gate is defined
+PASS R5: prebuild requires the R4 recovery runtime gate
+PASS R5 adversarial wiring gate
+
+> generator-testu@7.1.85 check:f0-ci-trust-pin
+> node scripts/check-ci-trust-pin-f0.mjs
+
+PASS F0 CI trust pin gate: 7 workflow pin(s) match b3ccc3ed25c94fb8dd0e7902f3102ff1fd004493827301b2e9c0de690a4a60a3
+
+> generator-testu@7.1.85 check:f2-journey-migration
+> node scripts/check-f2-journey-migration.mjs
+
+PASS F2: audit fixture declares independent Teacher/Admin secret
+PASS F2: audit fixture declares independent Recovery code
+PASS F2: Teacher/Admin and Recovery audit credentials are distinct
+PASS F2: audit fixture populates recoveryCode field
+PASS F2: legacy heslo fixture is empty
+PASS F2: identity journey contains no legacy unlock-password
+PASS F2: identity journey contains no legacy CFG.hesloHash
+PASS F2: identity journey contains no legacy secretMatches(
+PASS F2: identity journey proves Recovery cannot teacher-login
+PASS F2: identity journey proves Teacher cannot recovery-unlock
+PASS F2: identity journey reveals Recovery input through the five-tap lock affordance
+PASS F2: identity journey opens Verifier fallback details before paste
+PASS F2: browser matrix opens Verifier fallback details before paste
+PASS F2: instant joker journey confirms irreversible choice
+PASS F2: secure joker journey confirms irreversible choice
+PASS F2: primary journey no longer searches for the removed shared-code button
+PASS F2: primary journey uses the current Teacher/Admin generator
+PASS F2: primary journey knows the current Recovery generator
+PASS F2: strict journey proves Teacher/Admin cannot unlock
+PASS F2: strict journey proves Recovery can unlock
+PASS F2: primary journey discloses Verifier emergency fallback before paste
+PASS F2: identity suite scenario cardinality stays 8
+PASS F2 journey E2E migration gate
+
+> generator-testu@7.1.85 check:ai-operations
+> node scripts/check-ai-operation-registry.mjs
+
+PASS ai-operations registry parity: 11 operations; runtime input types normalized to GHRAB AI Core 1.0.0.
+
+> generator-testu@7.1.85 check:exercise-help
+> node scripts/check-exercise-type-help.mjs
+
+PASS: 38 exercise types have complete contextual help; Simple mode exposes item/point controls without advanced manual controls.
+
+> generator-testu@7.1.85 check:verifier-generated-syntax
+> node scripts/check-verifier-generated-script-syntax-r1.mjs
+
+PASS R1: inline verifier script 1/1 parses.
+PASS R1: generated verifier contains renderTable().
+PASS R1: generated verifier contains downloadResultsCsv().
+PASS R1: generated verifier contains parseFormsCsvText().
+PASS R1: generated verifier contains bulkVerifyPasted().
+PASS R1: generated verifier contains downloadDirectPdf().
+R1 generated Teacher Verifier syntax gate PASS.
+
+> generator-testu@7.1.85 check:embedded-script-terminators
+> node scripts/check-embedded-script-terminators.mjs
+
+✅ Embedded-script terminator guard: PASS (src/js, src/features)
+
+> generator-testu@7.1.85 check:studio-manifest
+> node scripts/check-studio-manifest-template.mjs
+
+✅ Studio manifest template: generator 7.1.85, cache ghrab-generator-v7.1.85
+
+> generator-testu@7.1.85 build
+> node scripts/build.mjs
+
+✅ Generátor 7.1.85: Core 1.0.0 SHA-256 OK · 11 operací · 41 initial modulů + 2 lazy features · 1557.4 kB
+[P3] generator 7.1.85: platform 1.1.2, HTML 2, cache ghrab-generator-v7.1.85
+
+> generator-testu@7.1.85 postbuild
+> node scripts/ghrab-platform-conformance.mjs
+
+{
+  "schema": "ghrab-platform-conformance-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "total": 115,
+  "passed": 115,
+  "failed": 0,
+  "checks": [
+    {
+      "label": "dist exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite dist has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite source has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "consumer schema",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "package ↔ consumer version",
+      "ok": true,
+      "detail": "7.1.85 / 7.1.85"
+    },
+    {
+      "label": "platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact exports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact imports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "native export formats declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy JSON import policy declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "cache naming",
+      "ok": true,
+      "detail": "ghrab-generator-v7.1.85"
+    },
+    {
+      "label": "storage migration declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage namespace sestavovac_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.state.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_tpl_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.templates.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_hist_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.history.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_mode",
+      "ok": true,
+      "detail": "ghrab.generator.theme.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_model",
+      "ok": true,
+      "detail": "ghrab.generator.ai.model.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.local.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key_session",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.session.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_data_notice_v1",
+      "ok": true,
+      "detail": "ghrab.generator.ai.data-notice.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_school_security_code_v1",
+      "ok": true,
+      "detail": "ghrab.generator.security-code.v1"
+    },
+    {
+      "label": "storage namespace genOnboardingDone_v1",
+      "ok": true,
+      "detail": "ghrab.generator.onboarding-done.v1"
+    },
+    {
+      "label": "storage namespace genWelcomeShown_session",
+      "ok": true,
+      "detail": "ghrab.generator.welcome-shown.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_",
+      "ok": true,
+      "detail": "ghrab.generator.legacy."
+    },
+    {
+      "label": "vendor ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.consumer.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/platform-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/brand-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist platform-build-info.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built consumer identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform manifest contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built service-worker contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built artifact contracts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest migration id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest canonical prefix",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact exports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact imports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical logo manifest hash",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no inline school logo base64",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no legacy school logo reference",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no obsolete top-level platform references in satellite build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "platform contract present in build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "full eligible HTML documents found",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker canonical cache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker contract marker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker legacy cleanup list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker update protocol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker platform precache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker P3 asset list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no automatic skipWaiting during install",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no-store bypass",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no obsolete satellite platform asset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA manifest exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA app identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime suite session contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime previous platform rejected",
+      "ok": true,
+      "detail": "1.1.1"
+    },
+    {
+      "label": "runtime current accepted",
+      "ok": true,
+      "detail": "1.1.2"
+    },
+    {
+      "label": "runtime n+1 accepted",
+      "ok": true,
+      "detail": "1.2.0"
+    },
+    {
+      "label": "runtime major rejected",
+      "ok": true,
+      "detail": "2.0.0"
+    },
+    {
+      "label": "storage alias reads migrated value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical storage value created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage alias writes canonical key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration idempotent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration rollback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "rollback restored original value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 create",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 peek",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 take",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge consumes once",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope SHA-256",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrap",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope detection",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrapMaybe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy artifact compatibility",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme contract runtime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact compatibility facade",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "accessibility runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "performance runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy module runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy script loader available",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
+
+> generator-testu@7.1.85 check:redteam-isolation
+> node scripts/check-redteam-isolation.mjs
+
+PASS real artifact has no teacher mode, credential hashes, roster or code membership oracle
+PASS private verifier retains code to email mapping and independent answer scoring
+PASS classroom unlock preserves attempt, deadline, identity, answers and history
+PASS foreign identity cannot reset an active attempt
+PASS submitted guard denies another attempt and output has no student grade
+PASS negative controls: teacher hash, code hashes, private JWK and answer key are rejected
+PASS negative control: missing parser fails closed instead of serializing legacy runtime
+
+> generator-testu@7.1.85 check:redteam-trust
+> node scripts/check-redteam-trust-e2.mjs
+
+PASS E2 trust
+PASS E2 telemetry
+PASS E2 ui
+PASS E2 exports
+PASS E2 credentials
+{
+  "status": "PASS",
+  "version": "7.1.85",
+  "syntheticOnly": true,
+  "checks": [
+    "trust",
+    "telemetry",
+    "ui",
+    "exports",
+    "credentials"
+  ],
+  "forgedPayload": {
+    "technicalAcceptance": "current",
+    "score": 100,
+    "runtimeAuthenticity": "CLIENT-CONTROLLED",
+    "classificationAuthorization": "REVIEW_REQUIRED"
+  },
+  "limitation": "E3 anchors constrain the input; matching anchors still leave runtime CLIENT-CONTROLLED and classification REVIEW_REQUIRED."
+}
+
+> generator-testu@7.1.85 check:redteam-verifier
+> node scripts/check-redteam-verifier-e3.mjs
+
+PASS E3 schema
+PASS E3 answers
+PASS E3 identity
+PASS E3 time
+PASS E3 replay
+PASS E3 csv
+PASS E3 json
+{
+  "status": "PASS",
+  "version": "7.1.85",
+  "syntheticOnly": true,
+  "checks": [
+    "schema",
+    "answers",
+    "identity",
+    "time",
+    "replay",
+    "csv",
+    "json"
+  ],
+  "scope": "actual generated HTML, RSA-OAEP/AES-GCM, direct import and CSV import",
+  "limits": [
+    "Owner attests Forms settings and unaltered CSV; no live configuration proof",
+    "Private E4 digest observations survive restart; full storage deletion or another profile needs server trust",
+    "Consistent public-key forgeries remain possible; runtime CLIENT-CONTROLLED",
+    "Mobile NOT TESTED; F7 and E5–E10 pending"
+  ]
+}
+
+> generator-testu@7.1.85 check:redteam-storage
+> node scripts/check-redteam-storage-faults-e4.mjs
+
+PASS E4 fault guard-write-failure
+PASS E4 fault crypto-failure
+PASS E4 fault outbox-local-quota
+PASS E4 fault active-write-failure
+PASS E4 fault unavailable-idb
+{
+  "stage": "E4",
+  "version": "7.1.85",
+  "status": "PASS",
+  "selected": "all",
+  "checks": [
+    "guard-write-failure",
+    "crypto-failure",
+    "outbox-local-quota",
+    "active-write-failure",
+    "unavailable-idb"
+  ],
+  "scope": "Generated-runtime fault injection using WebCrypto and simulated IDB; real restart proof is the separate native browser gate",
+  "guarantees": "HARDENED / BEST-EFFORT",
+  "limits": "No proof against client-owner editing or complete storage rollback"
+}
+
+> generator-testu@7.1.85 check:redteam-runtime
+> node scripts/check-redteam-runtime-e5.mjs
+
+PASS E5 runtime away-during-lock
+PASS E5 runtime beforeunload-lock
+PASS E5 runtime locked-responses
+PASS E5 runtime clipboard-block
+PASS E5 runtime split-reload
+PASS E5 runtime unlock-race
+PASS E5 runtime lifecycle-lock
+PASS E5 runtime ipad-keyboard-model
+PASS E5 runtime submitted-responses
+PASS E5 runtime verifier-audit
+{
+  "stage": "E5",
+  "version": "7.1.85",
+  "status": "PASS",
+  "checks": [
+    "away-during-lock",
+    "beforeunload-lock",
+    "locked-responses",
+    "clipboard-block",
+    "split-reload",
+    "unlock-race",
+    "lifecycle-lock",
+    "ipad-keyboard-model",
+    "submitted-responses",
+    "verifier-audit"
+  ],
+  "scope": "Actual generated HTML with native Node WebCrypto and simulated DOM/IndexedDB. Lifecycle, dimensions, clipboard and iPad inputs are controlled injections, not real device evidence.",
+  "runtime": "CLIENT-CONTROLLED",
+  "guarantees": "HARDENED / DETECTED / BEST-EFFORT",
+  "mobile": "ANALYZED / NOT TESTED",
+  "limits": [
+    "Native event proof is the separate Chromium gate",
+    "No prevention of client-owner edits, screenshots, overlays, other profiles or other devices",
+    "iPad keyboard exemption is a heuristic with a known visible-focus blind spot"
+  ]
+}
+
+> generator-testu@7.1.85 check:redteam-publication
+> node scripts/check-redteam-publication-e6.mjs
+
+PASS E6 generated-student-and-private-pair
+PASS E6 all-21-exercise-types
+PASS E6 export-answer-derivative-rejection
+PASS E6 hidden-data-comments-scripts-attributes
+PASS E6 private-pair-byte-and-identity-binding
+PASS E6 publication-allowlist-and-no-private-copy
+PASS E6 deleted-blob-and-all-ref-history
+
+> generator-testu@7.1.85 check:redteam-mobile
+> node scripts/check-redteam-mobile-e7.mjs
+
+PASS E7 local protocol gate: 40 cases / 4 profiles / 12 rejected mutations. Physical mobile: ANALYZED / NOT TESTED.
+
+> generator-testu@7.1.85 check:redteam-forgery
+> node scripts/check-redteam-forgery-e8.mjs && node scripts/check-redteam-forgery-retention-e8.mjs
+
+{"stage":"E8","version":"7.1.85","status":"PASS","cases":108,"rejections":89,"replay":6,"controls":13,"negativeControls":108,"baselineGaps":0}
+{"stage":"E8","version":"7.1.85","status":"PASS","checks":[{"id":"long-history-reload-default","status":"PASS","negativeControl":"DETECTED_WEAKENED_BUILD"},{"id":"long-history-integrity-default","status":"PASS","negativeControl":"DETECTED_WEAKENED_BUILD"},{"id":"long-history-reload-joker","status":"PASS","negativeControl":"DETECTED_WEAKENED_BUILD"},{"id":"long-history-integrity-joker","status":"PASS","negativeControl":"DETECTED_WEAKENED_BUILD"},{"id":"signed-guard-only-divergence-preserves-lock-and-rejects-answer-replay","status":"PASS","negativeControl":"DETECTED_2_WEAKENED_BUILDS"}],"scope":"Actual generated student start, 180 runtime audit records, signed active-state persistence, same-profile reload, recovery unlock, encrypted submit and private scoring; controlled jsdom/IndexedDB, native Node crypto.","limits":["Only start/joker markers plus a bounded recent tail are retained; this is not a complete or authenticated audit trail","Physical mobile NOT TESTED; runtime CLIENT-CONTROLLED"]}
+
+> generator-testu@7.1.85 check:redteam-isolation-browser
+> node scripts/check-redteam-isolation-browser.mjs
+
+{
+  "status": "PASS",
+  "browser": "153.0.8010.0",
+  "syntheticOnly": true,
+  "platformScope": "desktop Chromium; not real mobile",
+  "checks": [
+    "cold generator loads bundled parser before first export",
+    "teacher capability absent",
+    "real WebCrypto + IndexedDB",
+    "locked reload retains ID/deadline/answers",
+    "classroom unlock preserves attempt",
+    "encrypted submission",
+    "submitted reload cannot retry"
+  ]
+}
+
+> generator-testu@7.1.85 check:redteam-trust-browser
+> node scripts/check-redteam-trust-browser-e2.mjs
+
+{
+  "status": "PASS",
+  "version": "7.1.85",
+  "browser": "153.0.8010.0",
+  "syntheticOnly": true,
+  "platformScope": "desktop Chromium; real mobile NOT TESTED",
+  "checks": [
+    "public-key forged payload through real Forms CSV import",
+    "score recalculated from private answer key",
+    "matching self-hash does not authorize",
+    "nonempty client telemetry stays unverified",
+    "UI declares unproven origin",
+    "actual CSV/JSON/score-only feedback downloads require review",
+    "no pageerror; original student/verifier CSP"
+  ],
+  "limitation": "A public-key forge consistent with the roster account and publication/Forms window can still pass. Runtime provenance is unproven even with matched E3 anchors."
+}
+
+> generator-testu@7.1.85 check:redteam-verifier-browser
+> node scripts/check-redteam-verifier-browser-e3.mjs
+
+{
+  "status": "PASS",
+  "version": "7.1.85",
+  "browser": "153.0.8010.0",
+  "syntheticOnly": true,
+  "platformScope": "desktop Chromium; real iOS/Android NOT TESTED",
+  "checks": [
+    "Native student submit -> actual CSV file input -> Forms anchors -> private score",
+    "Empty telemetry/impossible clocks/invalid answer/variant/trusted bits rejected before scoring",
+    "Wrong school account rejected",
+    "Repeated CSV import retains replay ledger and excludes duplicate",
+    "Real results/index/archive downloads preserve rejection and review status",
+    "Original CSP, real WebCrypto/IndexedDB, no pageerrors"
+  ],
+  "limits": [
+    "Live Forms settings are owner attested, not inspected",
+    "Private E4 digest observations survive same-profile restart; full wipe requires server",
+    "Runtime CLIENT-CONTROLLED even after anchors match"
+  ]
+}
+
+> generator-testu@7.1.85 check:redteam-storage-browser
+> node scripts/check-redteam-storage-browser-e4.mjs
+
+PASS E4 restart-outbox
+PASS E4 parallel-tabs
+PASS E4 integrity
+PASS E4 interrupted-submit
+PASS E4 private-replay-restart
+PASS E4 storage-and-profile-limits
+{
+  "stage": "E4",
+  "version": "7.1.85",
+  "status": "PASS",
+  "selected": "all",
+  "checks": [
+    "restart-outbox",
+    "parallel-tabs",
+    "integrity",
+    "interrupted-submit",
+    "private-replay-restart",
+    "storage-and-profile-limits"
+  ],
+  "guarantees": "HARDENED / DETECTED, same origin and browser profile only; tab exclusion requires native Web Locks; unsupported browsers use BEST-EFFORT",
+  "limits": [
+    "Full origin storage wipe permits a fresh local attempt",
+    "Incognito context has a separate storage namespace",
+    "Coherent replay of both signed stores with the preserved MAC key cannot be distinguished from the original local state",
+    "Independent Chromium browser profile has no shared local attempt ledger; Firefox/Safari not tested"
+  ],
+  "storageIsolation": "ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED",
+  "privateReplayRecovery": "Identical validated submission reconstructs one working row; different persisted content conflicts. No score/trust bits restored.",
+  "otherEngines": "ANALYZED / NOT TESTED",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "teacherLocation": "private owner PC outside school",
+  "runtime": "CLIENT-CONTROLLED",
+  "classification": "REVIEW_REQUIRED"
+}
+
+> generator-testu@7.1.85 check:redteam-runtime-browser
+> node scripts/check-redteam-runtime-browser-e5.mjs
+
+PASS E5 browser native-reload
+PASS E5 browser native-fullscreen-exit
+PASS E5 browser native-history
+PASS E5 browser controlled-freeze-resume
+PASS E5 browser native-inert-keyboard
+PASS E5 browser native-split-persistence
+PASS E5 browser controlled-pageshow-reconciliation
+PASS E5 browser controlled-fullscreen-rejection
+{
+  "stage": "E5",
+  "version": "7.1.85",
+  "browser": "153.0.8010.0",
+  "status": "PASS",
+  "checks": [
+    "native-reload",
+    "native-fullscreen-exit",
+    "native-history",
+    "controlled-freeze-resume",
+    "native-inert-keyboard",
+    "native-split-persistence",
+    "controlled-pageshow-reconciliation",
+    "controlled-fullscreen-rejection"
+  ],
+  "observations": [
+    "CDP freeze/active did not dispatch lifecycle events on the visible headless page: native freeze/resume NOT TESTED.",
+    "Real viewport/screen ratio and IndexedDB reload; six sample ticks were accelerated by explicit calls, not 12 elapsed seconds.",
+    "persisted pageshow/pagehide deliberately dispatched: reconciliation proven, native BFCache eligibility NOT TESTED.",
+    "Fullscreen rejection branch uses controlled API rejection, with no unhandled pageerror."
+  ],
+  "originalCsp": true,
+  "native": [
+    "reload + beforeunload/pagehide",
+    "Fullscreen entry/exit with user gesture",
+    "same-document history traversal",
+    "inert keyboard focus exclusion",
+    "IndexedDB and Web Locks"
+  ],
+  "controlled": [
+    "freeze/resume event dispatch",
+    "sample tick acceleration",
+    "persisted pageshow reconciliation",
+    "fullscreen API rejection",
+    "lock trigger for keyboard test"
+  ],
+  "runtime": "CLIENT-CONTROLLED",
+  "mobile": "ANALYZED / NOT TESTED",
+  "otherEngines": "ANALYZED / NOT TESTED",
+  "limits": [
+    "Native freeze/resume and BFCache eligibility NOT TESTED on this platform",
+    "Viewport split/overlay detection BEST-EFFORT; no browser DRM",
+    "No screenshot, second-device or developer-tools prevention"
+  ]
+}
+
+> generator-testu@7.1.85 check:redteam-mobile-recorder
+> node scripts/check-redteam-mobile-recorder-e7.mjs
+
+PASS E7 offline recorder / 5 checks; physical mobile ANALYZED / NOT TESTED.
+
+> generator-testu@7.1.85 check:redteam-forgery-browser
+> node scripts/check-redteam-forgery-browser-e8.mjs
+
+{"stage":"E8","version":"7.1.85","status":"PASS","browser":"153.0.8010.0","syntheticOnly":true,"rejectedForgeries":13,"negativeControls":1,"checks":["native-submit-file-csv-policy-private-score","empty-telemetry","missing-attempt-start","duplicated-attempt-start","attempt-start-wrong-time","attempt-start-wrong-id","split-small-exceeds-total","split-percent-disagrees","joker-disabled-in-private-config","joker-event-without-choice","end-before-start","foreign-manifest-inner","forms-wrong-account","ciphertext-gcm-tamper","file-csv-replay-excluded","real-csv-index-archive-downloads","consistent-public-key-forgery-client-score-rescored-review-only","native-weakened-build-accepts-missing-start-negative-control"],"scope":"Desktop Chromium with unchanged generated CSP and native WebCrypto/IndexedDB; real student submit, actual CSV file input, policy UI and real downloads. Deliberately weakened verifier is an in-memory negative control.","limits":["Physical iOS/iPadOS/Android ANALYZED / NOT TESTED","Live Forms policy not inspected; owner attestation only","Consistent public-key forgery reaches private scoring but remains CLIENT-CONTROLLED / REVIEW_REQUIRED","No deployment or GitHub Actions run; NOT READY"]}
+
+> generator-testu@7.1.85 check:redteam-regression-negative
+> node scripts/check-redteam-regression-negative-e9.mjs
+
+PASS E9 negative teacher-hash-leak
+PASS E9 negative encryption-as-authenticity
+PASS E9 negative forms-identity-bypass
+PASS E9 negative persistence-fail-open
+PASS E9 negative navigation-guard-disabled
+PASS E9 negative frozen-guard-disabled
+PASS E9 negative publication-answer-leak
+
+> generator-testu@7.1.85 check:redteam-restart-browser
+> node scripts/check-redteam-restart-browser-e9.mjs
+
+{"stage":"E9","version":"7.1.85","status":"PASS","browser":"153.0.8010.0","syntheticOnly":true,"checks":[{"id":"flushed-reload-default-1","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":0,"retained":120,"score":20,"classification":"REVIEW_REQUIRED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue flushed"},{"id":"pending-reload-default-1","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":0,"retained":120,"score":20,"classification":"REVIEW_REQUIRED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue deliberately not flushed"},{"id":"profile-restart-default-1","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":0,"retained":120,"score":20,"classification":"REVIEW_REQUIRED","outcome":"HARDENED / RECOVERED","scope":"Graceful native browser shutdown and reopening of the same persisted profile"},{"id":"flushed-reload-joker-1","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":1,"retained":120,"score":20,"classification":"JOKER_EXCLUDED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue flushed"},{"id":"pending-reload-joker-1","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":1,"retained":120,"score":20,"classification":"JOKER_EXCLUDED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue deliberately not flushed"},{"id":"profile-restart-joker-1","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":1,"retained":120,"score":20,"classification":"JOKER_EXCLUDED","outcome":"HARDENED / RECOVERED","scope":"Graceful native browser shutdown and reopening of the same persisted profile"},{"id":"flushed-reload-default-2","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":0,"retained":120,"score":20,"classification":"REVIEW_REQUIRED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue flushed"},{"id":"pending-reload-default-2","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":0,"retained":120,"score":20,"classification":"REVIEW_REQUIRED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue deliberately not flushed"},{"id":"profile-restart-default-2","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":0,"retained":120,"score":20,"classification":"REVIEW_REQUIRED","outcome":"HARDENED / RECOVERED","scope":"Graceful native browser shutdown and reopening of the same persisted profile"},{"id":"flushed-reload-joker-2","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":1,"retained":120,"score":20,"classification":"JOKER_EXCLUDED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue flushed"},{"id":"pending-reload-joker-2","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":1,"retained":120,"score":20,"classification":"JOKER_EXCLUDED","outcome":"HARDENED / RECOVERED","scope":"Native reload; 180 real recordSec calls; write queue deliberately not flushed"},{"id":"profile-restart-joker-2","status":"PASS","integrityLock":false,"originPreserved":true,"deadlinePreserved":true,"answerPreserved":true,"startMarkerCount":1,"jokerMarkerCount":1,"retained":120,"score":20,"classification":"JOKER_EXCLUDED","outcome":"HARDENED / RECOVERED","scope":"Graceful native browser shutdown and reopening of the same persisted profile"}],"negativeControls":[{"id":"lost-origin-default","detected":true,"scope":"Intentionally weakened generated runtime with recalculated test-only CSP script hash"},{"id":"lost-origin-joker","detected":true,"scope":"Intentionally weakened generated runtime with recalculated test-only CSP script hash"}],"physicalMobile":"ANALYZED / NOT TESTED","runtime":"CLIENT-CONTROLLED","limits":["12 favorable desktop lifecycle cases are regression evidence, not exhaustive reliability certification","Graceful browser shutdown is not abrupt OS/process kill, power failure or mobile suspension","Pending writes may cause an integrity lock requiring investigation; this is distinct from successful recovery","Full storage wipe, new profiles and client-owner runtime edits remain architectural limits"]}
+
+> generator-testu@7.1.85 qa:d7:ci
+> node scripts/qa-d7-regressions.mjs
+
+
+=== D7 d7-ci-wiring ===
+PASS qa:p5:ci includes the D7 verifier/PDF regression gate
+PASS qa:p5 keeps local/release parity with the D7 regression gate
+PASS D7 runner includes check-teacher-verifier-v2.mjs
+PASS D7 runner includes check-verifier-effective-analytics.mjs
+PASS D7 runner includes check-verifier-ia-security.mjs
+PASS D7 runner includes check-stage3-pdf.mjs
+PASS D7 runner includes check-stage3-pdf-runtime.mjs
+PASS D7 runner includes check-stage3-pdf-quality.mjs
+PASS D7 runner includes check-verifier-ui-runtime.mjs
+PASS Journey workflow cleans stale evidence before the run
+PASS Journey workflow includes config_extra_suite for count/differentiation coverage
+PASS Journey artifact is bound to the exact SHA
+PASS Safe Promotion waits for independent P5 and Journey checks
+PASS Safe Promotion requires both independent checks to be green
+PASS P5 artifact retains non-sensitive D7 evidence summaries
+PASS D7 CI wiring contract
+
+=== D7 verifier-v2-contract ===
+✅  Teacher Verifier 2.0 shell exists.
+✅  Navigation contains all seven Stage B panels in canonical order.
+✅  Generated navigation binds panel id and aria-controls.
+✅  Generated panels expose aria-hidden state.
+✅  Panel switching marks the active navigation item.
+✅  Panel switching exposes hidden/visible regions to accessibility APIs.
+✅  Keyboard navigation is present.
+✅  Theme toggle persists preference.
+✅  Default verifier theme defines a real dark palette.
+✅  Light verifier theme defines an explicit light palette.
+✅  Theme tokens cover cards, form controls and modal surfaces.
+✅  Fullscreen toggle uses explicit request/exit capability resolution.
+✅  Fullscreen state follows browser fullscreenchange events.
+✅  Fullscreen button exposes active state and changing label.
+✅  Unsupported fullscreen produces explicit user feedback.
+✅  Fullscreen failure produces actionable fallback feedback.
+✅  Results health summary exposes unresolved attempts.
+✅  Security signal filter is present.
+✅  Google Forms metadata mismatch is promoted into the Security signal model.
+✅  Low-level identity/build/integrity metadata live in the Technical panel.
+✅  Navigation exposes icon + label hierarchy.
+✅  Teacher-only archive route is clearly labeled.
+✅  Student-facing feedback route is separated from teacher archive.
+✅  Security signals retain non-accusatory interpretation.
+✅  RSA-OAEP/AES-GCM verifier decryption remains present.
+✅  SECURE-ANSWERS-V1 parser remains present.
+✅  Effective results exclude duplicates/hard replay conflicts and preserve legacy attempt decisions.
+✅  Results CSV remains blocked on unresolved attempt conflicts.
+✅  Results status is sourced from the unified Security signal model.
+✅  Item analysis remains available and uses effective results.
+✅  Distribution analytics use effective results.
+✅  Item analytics use effective results.
+✅  Security filtering is display-only over existing signals.
+✅  Stage B did not introduce a parallel scoring/decryption authority.
+✅  V2 UI module contains presentation/orchestration only.
+Teacher Verifier 2.0 contract PASS.
+
+=== D7 verifier-effective-analytics ===
+PASS exact duplicate: effectiveResults má 2 výsledky
+PASS exact duplicate: distributionStats.n používá effectiveResults
+PASS exact duplicate: průměr není nafouknut duplicitou
+PASS exact duplicate: itemAnalysisRows.n používá effectiveResults
+PASS unresolved attempts: konflikt je detekován
+PASS unresolved attempts: oba Alice pokusy jsou do rozhodnutí vyřazeny
+PASS unresolved attempts: distribuce obsahuje jen efektivní výsledky
+PASS unresolved attempts: položková analýza obsahuje jen efektivní výsledky
+PASS resolved attempt: konflikt po výběru zmizí
+PASS resolved attempt: započítá se jen zvolený pokus
+PASS resolved attempt: distribuce používá zvolený pokus
+PASS resolved attempt: položková analýza používá zvolený pokus
+PASS joker: resolvedResults zachová žolíkový výsledek pro kontrolu
+PASS joker: effectiveResults vyřadí žolíka z klasifikace
+PASS joker: třídní statistika žolíka nezapočítá
+PASS joker: položková analýza žolíka nezapočítá
+PASS contract: distributionStats je napojen na effectiveResults
+PASS contract: itemAnalysisRows je napojen na effectiveResults
+PASS contract: analysisHtml je napojen na effectiveResults
+PASS Teacher Verifier effective analytics regression
+
+=== D7 verifier-ia-security ===
+PASS metadata mismatch vytváří právě jeden security signál
+PASS metadata mismatch používá samostatný signal code
+PASS Google Forms metadata mismatch je měkký, nikoli tvrdý signál
+PASS security label zachovává jasné označení METADATA MISMATCH
+PASS security detail zachovává konkrétní důvod nesouladu
+PASS security KPI počítá metadata mismatch, prázdnou telemetrii a neověřené kotvy odděleně
+PASS Results/CSV text čerpá metadata mismatch ze sjednoceného signal modelu
+PASS nalezen dashboard intro segment
+PASS Dashboard intro neobsahuje low-level údaj Creator ID:
+PASS Dashboard intro neobsahuje low-level údaj Kontrola integrity:
+PASS Dashboard intro neobsahuje low-level údaj studentHtmlSha256
+PASS Dashboard intro neobsahuje low-level údaj manifestHash
+PASS Dashboard vysvětluje, kde jsou technická metadata
+PASS Technické údaje obsahují autora, build a integrity metadata
+PASS navigace používá ikonovou a textovou hierarchii všech sedmi panelů
+PASS aktivní desktop panel má jednoznačný vizuální marker
+PASS aktivní mobilní panel má jednoznačný spodní marker
+PASS Dashboard security KPI používá stejnou resolvedResults populaci jako Security panel
+PASS Results status používá sjednocený security signal text
+PASS Results už neduplikuje metadata mismatch druhým paralelním varováním
+PASS D5 Teacher Verifier IA/security regression
+
+=== D7 joker-workflow-real-browser ===
+PASS browser harness běží na důvěryhodném localhost originu
+PASS studentský runtime se načetl v novém browser kontextu
+PASS student spustí test s volbou „Dělám test“
+PASS první start zapečetí volbu NE, attempt ID a absolutní deadline
+PASS studentský runtime se načetl v novém browser kontextu
+PASS reload dokončí asynchronní obnovu zapečetěné volby žolíka
+PASS po reloadu jsou přepínače žolíka uzamčené na původní volbě
+PASS disabled tlačítko nemůže po reloadu přepnout NE → ANO
+PASS jiná identita narazí na učitelsky chráněný aktivní pokus
+PASS jiná identita se bez učitelského resetu do testu nedostane
+PASS původní identita může obnovit tentýž pokus
+PASS obnovení zachová attempt ID, deadline a volbu žolíka
+PASS obnovení zachová bezpečnostní zámek a auditní událost
+PASS studentský runtime se načetl v novém browser kontextu
+PASS volba žolíka otevře explicitní potvrzení před startem
+PASS před potvrzením ještě pokus neběží ani není zapečetěn
+PASS po potvrzení se žolíkový pokus spustí
+PASS potvrzený žolík se zapečetí v aktivním pokusu
+PASS studentský runtime se načetl v novém browser kontextu
+PASS selhání uložení aktivního pokusu vyvolá fail-closed hlášku
+PASS bez spolehlivé pečeti se bezpečný test nespustí
+PASS joker workflow real-browser click test
+
+=== D7 stage3-pdf-contract ===
+PASS contract
+PASS student direct PDF
+PASS teacher direct PDF
+PASS binary PDF header
+PASS application/pdf blob
+PASS origin-clean DOM rasterizer
+PASS safe pagination
+PASS print fallback
+PASS embedded school logo config
+PASS Czech labels
+PASS student filename
+PASS teacher filename
+PASS Stage 3 PDF contract
+
+=== D7 generate-verifier-fixtures ===
+✅ QA exportní fixtures vytvořeny: instant, student, teacher verifier
+
+=== D7 stage3-pdf-real-browser ===
+PASS student_QA-bezpe-n-test_TTEEMNM-1CB8DB5A.pdf 117588 B
+PASS ucitel_klic_QA-bezpe-n-test_TTEEMNM-1CB8DB5A.pdf 115901 B
+PASS Stage 3 direct PDF real-browser runtime
+
+=== D7 stage3-pdf-quality ===
+PASS student_esk-PDF-audit-P-li-lu-ou-k-k_TTEEMNM-1CB8DB5A.pdf 1759275 B / 6 stran
+PASS ucitel_klic_esk-PDF-audit-P-li-lu-ou-k-k_TTEEMNM-1CB8DB5A.pdf 2094482 B / 7 stran
+PASS pagination cuts: 0, 883, 1808, 2733, 3478, 4521, 5373, 6268
+PASS Stage 3 PDF quality
+
+=== D7 verifier-ui-real-browser ===
+PASS Teacher Verifier V2 shell se v Chromium inicializoval
+PASS dark theme ma skutecnou tmavou paletu {"theme":"dark","body":"rgb(11, 18, 32)","card":"rgb(17, 24, 39)","nav":"rgb(16, 24, 39)","input":"rgb(15, 23, 42)","modal":"rgb(17, 24, 39)"}
+PASS light theme ma samostatnou svetlou paletu {"theme":"light","body":"rgb(244, 246, 251)","card":"rgb(255, 255, 255)","nav":"rgb(243, 244, 246)","input":"rgb(255, 255, 255)","modal":"rgb(255, 255, 255)"}
+PASS theme control vystavuje aktivni light stav pres aria
+PASS fullscreen vstup aktualizuje stav tlacitka i body
+PASS fullscreenchange/Esc ekvivalent vrati UI do neaktivniho stavu
+PASS nepodporovany fullscreen ma explicitni feedback
+PASS odmitnuty fullscreen ma F11 fallback feedback
+PASS Teacher Verifier D4 theme/fullscreen real-browser runtime
+D7 verifier/PDF regression gate PASS. Evidence: /workspace/scratch/ebcee4a4dd99/work-e9/source/generator-testu-7.1.85/qa-results/d7-regressions.json
+
+> generator-testu@7.1.85 check:d8-final-audit
+> node scripts/check-d8-final-audit.mjs
+
+PASS A.1 prefill_v3 restores rcTopic and warns about non-persisted attachments
+PASS A.2 Reading default/count contract remains explicit
+PASS A.3 Listening default/count contract remains explicit
+PASS A.4 Listening multimodal routing supports audio/video and YouTube provider input
+PASS A.5 Basic/Standard/Challenge preserve curriculum, types, counts and points in both prompt paths
+PASS A.6 content drift tracks source/topic/count/differentiation inputs
+PASS B.1 Teacher Verifier exposes seven-panel information architecture
+PASS B.2 technical identity/build/integrity data live in Technical panel, not Dashboard intro
+PASS B.3 navigation has icon/text hierarchy and explicit active markers
+PASS B.4 dark and light themes define distinct real palettes
+PASS B.5 fullscreen follows browser state and exposes unsupported/rejected fallback
+PASS B.6 Results use unified security-signal text
+PASS B.7 distribution/item analytics use effectiveResults
+PASS B.8 metadata mismatch is a soft Security signal; split-window is explicitly heuristic/non-authoritative — accepted limitation: browser telemetry cannot prove absence of a second device or every split-screen layout
+PASS C.1 direct PDF uses origin-clean DOM rasterizer and no foreignObject
+PASS C.2 student PDF path is generated without answer-key flag
+PASS C.3 teacher PDF/key path remains distinct
+PASS C.4 school logo is embedded through verified PNG data URI
+PASS C.5 Czech PDF labels keep diacritics and stale unaccented labels are absent
+PASS C.6 safe pagination and print fallback remain present
+PASS D.1 P5 mandatory path includes D7 browser/PDF regression runner
+PASS D.2 D7 runner covers analytics, IA/security, joker browser workflow, PDF runtime/quality and verifier UI runtime
+PASS D.3 Journey clears stale evidence, covers config/state flows and binds artifact to exact SHA
+PASS D.4 Safe Promotion requires green P5 and Journey checks on certified SHA
+PASS D.5 D7 removes sensitive browser fixtures/PDFs and retains only safe summaries
+PASS CLEANUP.1 dead direct legacy template helpers are absent
+PASS CLEANUP.2 obsolete source slicing state/helper are absent and representative-chunk help is accurate
+PASS CLEANUP.3 legacy saved template IDs still migrate forward
+PASS CLEANUP.4 dead pedagogicalPreset state is absent
+D8 final audit PASS: 29/29 checks passed.
+
+> generator-testu@7.1.85 garp25:prep-static
+> npm run garp25:selftest && npm run garp25:sync-rewrite && npm run garp25:sbom:check && npm run garp25:ai-evidence:check && npm run garp25:sw && npm run garp25:sw-offline && npm run garp25:vendored && npm run garp25:leaks
+
+
+> generator-testu@7.1.85 garp25:selftest
+> node security/garp25/tools/selftest-garp251.mjs
+
+{
+  "status": "PASS",
+  "checks": 59,
+  "passed": 59,
+  "failed": []
+}
+
+> generator-testu@7.1.85 garp25:sync-rewrite
+> node scripts/test-ai-core-version-rewrite.mjs
+
+{
+  "status": "PASS",
+  "checks": [
+    "targeted-json-keys-only",
+    "brandVersion-preserved",
+    "build-CORE_VERSION-only"
+  ]
+}
+
+> generator-testu@7.1.85 garp25:sbom:check
+> node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.85.cdx.json --check
+
+✅ CycloneDX 1.7 SBOM odpovídá lockfile: 113 komponent.
+
+> generator-testu@7.1.85 garp25:ai-evidence:check
+> node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check
+
+✅ AI assurance fingerprint current: 0d4597b55fa5660f603834e3d805d3dae6f4357a5e9f7ef7f2ae4d41a56a875e
+
+> generator-testu@7.1.85 garp25:sw
+> node security/garp25/tools/check-sw-security-freeze.mjs dist/sw.js dist security/security-critical-assets.json
+
+{
+  "status": "PASS",
+  "serviceWorker": "dist/sw.js",
+  "criticalListSource": "security/security-critical-assets.json",
+  "precachedEntries": 28,
+  "precacheSources": [
+    {
+      "source": "addAll:expression",
+      "entries": [
+        "./",
+        "./index.html",
+        "./frame-guard.js",
+        "./manifest.webmanifest",
+        "./access/access-gate.css",
+        "./access/deployment-config.js",
+        "./access/reporter-bootstrap.js",
+        "./access/error-reporter.js",
+        "./access/error-reporter.css",
+        "./access/error-reporter-adapter.js",
+        "./manual/",
+        "./manual/index.html",
+        "./icons/icon-32.png",
+        "./icons/icon-192.png",
+        "./icons/icon-512.png",
+        "./icons/apple-touch-icon.png",
+        "./config/brand-manifest.json",
+        "./config/platform-manifest.json",
+        "./assets/brand/school-logo.png",
+        "./ghrab-platform.consumer.json",
+        "./access/suite-session-cleanup.js",
+        "./ghrab/ghrab-platform.js",
+        "./features/testlab.js",
+        "./features/preview-editor.js"
+      ]
+    },
+    {
+      "source": "map-add:GHRAB_PLATFORM_P3_ASSETS",
+      "entries": [
+        "./ghrab/ghrab-platform.css",
+        "./ghrab/ghrab-artifact-envelope-v1.schema.json",
+        "./ghrab/ghrab-app-registry-v2.schema.json",
+        "./ghrab/ghrab-platform-manifest-1.1.2.json",
+        "./assets/brand/school-logo.png",
+        "./ghrab-platform.consumer.json"
+      ]
+    }
+  ],
+  "unresolvedCacheWrites": [],
+  "cacheFirstDetected": true,
+  "policySchema": "ghrab-sw-security-assets-v2",
+  "structuralNetworkOnlyGuard": true,
+  "structuralNetworkFirstFallbackGuard": true,
+  "criticalAssetsInDeployment": [
+    "config/deployment.json",
+    "config/deployment.school-server.json"
+  ],
+  "networkFirstFallbackAssetsInDeployment": [
+    "access/suite-session-cleanup.js",
+    "ghrab/ghrab-platform.js"
+  ],
+  "findings": [],
+  "checkerRevision": "garp-2.5.1-r3-runtime-failsafe-routing",
+  "note": "Static bounded analysis. PASS means network-only authorization/revocation/integrity assets are never cached and route through networkOnlyNoStore, while declared freshness-sensitive offline fail-safe scripts are install-cached and route networkFirst with cache fallback. Does not replace SIM-07 browser revocation/offline tests."
+}
+
+> generator-testu@7.1.85 garp25:sw-offline
+> node scripts/test-sw-offline-failsafe.mjs
+
+PASS install-created-cache
+PASS cleanup-precached
+PASS platform-precached
+PASS cleanup-online-network-first
+PASS platform-online-network-first
+PASS cleanup-offline-cache-fallback
+PASS platform-offline-cache-fallback
+PASS revocation-remains-network-only-no-cache-fallback
+PASS integrity-remains-network-only-no-cache-fallback
+{
+  "status": "PASS",
+  "checks": 9,
+  "cacheName": "ghrab-generator-v7.1.85",
+  "policy": "network-first support layers + network-only authorization/revocation/integrity"
+}
+
+> generator-testu@7.1.85 garp25:vendored
+> node security/garp25/tools/check-vendored-consistency.mjs security/vendored-consistency.generator.json
+
+{
+  "status": "PASS",
+  "canonicalRoot": "..",
+  "components": [
+    {
+      "id": "platform-js",
+      "sha256": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "id": "platform-css",
+      "sha256": "eb465488df46f3d1672d721094800b0be3eb1278924b7699873a483f130b07ad"
+    },
+    {
+      "id": "artifact-envelope-schema",
+      "sha256": "8edeaaadd72c7bf60285440dd59eb31d0e7139755e1e4642d5ab457816e46d58"
+    },
+    {
+      "id": "app-registry-schema",
+      "sha256": "47c797999eb93fbd918b968b90a8f8545f938db486fe635b19efcc7936b5672f"
+    },
+    {
+      "id": "school-logo",
+      "sha256": "300396a48cc36d8c2abda0aea673273d4d985476ba88fb0430630ef89ac86770"
+    }
+  ],
+  "declaredCopies": 11,
+  "checkedCopies": 6,
+  "profileCopiesNotBuilt": 5,
+  "conditionalCopies": [
+    {
+      "path": "dist-school-server/ghrab/ghrab-platform.js",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-platform.css",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-artifact-envelope-v1.schema.json",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/ghrab/ghrab-app-registry-v2.schema.json",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    },
+    {
+      "path": "dist-school-server/assets/brand/school-logo.png",
+      "whenRootExists": "dist-school-server",
+      "status": "DECLARED_PROFILE_NOT_BUILT"
+    }
+  ],
+  "drift": 0,
+  "findings": []
+}
+
+> generator-testu@7.1.85 garp25:leaks
+> node security/garp25/tools/scan-deployment-leaks.mjs dist
+
+{
+  "status": "PASS",
+  "root": "/workspace/scratch/ebcee4a4dd99/work-e9/source/generator-testu-7.1.85/dist",
+  "info": [
+    "INFO-binary-not-scanned:assets/brand/school-logo.png",
+    "INFO-binary-not-scanned:icons/apple-touch-icon.png",
+    "INFO-binary-not-scanned:icons/icon-192.png",
+    "INFO-binary-not-scanned:icons/icon-32.png",
+    "INFO-binary-not-scanned:icons/icon-512.png",
+    "INFO-binary-not-scanned:icons/icon-maskable-512.png"
+  ]
+}
+
+> generator-testu@7.1.85 qa:garp27:static
+> npm run qa:garp27:contracts && npm run qa:garp27:architecture && npm run qa:garp27:policy-mutations && npm run qa:garp27:mutations && npm run qa:garp27:auto-patch
+
+
+> generator-testu@7.1.85 qa:garp27:contracts
+> node scripts/garp27/contract-gate.mjs
+
+{
+  "classification": "GARP27_CONTRACT_GATE",
+  "status": "PASS",
+  "garpVersion": "2.7",
+  "consolidationRevision": "2026-09-23-r2",
+  "appId": "generator",
+  "serverPhase": "DEFERRED_BY_OWNER_DECISION",
+  "results": [
+    {
+      "id": "package-selftest",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"PACKAGE_SELFTEST\",\n  \"status\": \"PASS\",\n  \"checks\": 19,\n  \"passed\": 19,\n  \"scope\": \"package-integrity-and-contract-consistency-only\",\n  \"appBehaviorTest\": false,\n  \"liveTest\": false,\n  \"checkDigest\": \"ddc64e0f88ff82e4af9440a3e8f5dcabafa83eb7ab45bf7efb2d84b4b34f47e5\",\n  \"details\": [\n    {\n      \"id\": \"file:00-CTI-ME.txt\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:01-GARP-2.7-BEZPECNOSTNI-PROTOKOL.md\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:02-AUDIT-VSTUPNIHO-BALIKU.md\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:03-RED-TEAM-KATALOG.json\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:04-IMPLEMENTACNI-ZADANI.txt\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:10-CONSOLIDATION-R2-G02.md\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/CONTRACTS/garp27-core.json\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/INVENTORY/ecosystem-apps.json\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/TOOLS/validate-policy.mjs\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/TOOLS/validate-assurance.mjs\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/TOOLS/validate-auto-patch.mjs\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/TOOLS/validate-live-status.mjs\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/TOOLS/validate-runtime-test-request.mjs\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"file:MASTER/TOOLS/contract-selftest.mjs\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"red-team-catalog-nonempty\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"garp-version-2.7\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"server-deferred\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"policy-semantic-contract-complete\",\n      \"pass\": true\n    },\n    {\n      \"id\": \"ecosystem-inventory-nonempty-unique\",\n      \"pass\": true\n    }\n  ]\n}",
+      "stderr": ""
+    },
+    {
+      "id": "trusted-package-check-digest",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "expectedDigest": "ddc64e0f88ff82e4af9440a3e8f5dcabafa83eb7ab45bf7efb2d84b4b34f47e5",
+      "observedDigest": "ddc64e0f88ff82e4af9440a3e8f5dcabafa83eb7ab45bf7efb2d84b4b34f47e5"
+    },
+    {
+      "id": "contract-selftest",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"PASS\",\n  \"checks\": 25,\n  \"passed\": 25,\n  \"scope\": \"reference-validator-positive-negative-tests\",\n  \"appBehaviorTest\": false,\n  \"liveTest\": false,\n  \"g02\": {\n    \"status\": \"PASS\",\n    \"checks\": 5\n  },\n  \"results\": [\n    {\n      \"id\": \"A01-positive-foundation-with-live-deferred\",\n      \"expectedExit\": 0,\n      \"actualExit\": 0,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"PASS\\\",\\n  \\\"derivedOverall\\\": \\\"FOUNDATION_PASS_LIVE_NOT_TESTED\\\",\\n  \\\"foundationPass\\\": true,\\n  \\\"liveStatus\\\": \\\"NOT_TESTED\\\",\\n  \\\"notes\\\": []\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A01-reject-contradictory-pass\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Assurance admission failed\\\",\\n  \\\"details\\\": {\\n    \\\"derivedOverall\\\": \\\"FAIL\\\",\\n    \\\"errors\\\": [\\n      \\\"AG-01-policy: failing assurance axes\\\",\\n      \\\"overall mismatch: declared=PASS derived=FAIL\\\"\\n    ]\\n  }\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A01-reject-pass-without-evidence\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Assurance admission failed\\\",\\n  \\\"details\\\": {\\n    \\\"derivedOverall\\\": \\\"FAIL\\\",\\n    \\\"errors\\\": [\\n      \\\"AG-01-policy: evidence required\\\"\\n    ]\\n  }\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A01-reject-duplicate-components\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Assurance admission failed\\\",\\n  \\\"details\\\": {\\n    \\\"derivedOverall\\\": \\\"FAIL\\\",\\n    \\\"errors\\\": [\\n      \\\"components must be unique\\\"\\n    ]\\n  }\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A01-A04-reject-missing-environment\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Assurance admission failed\\\",\\n  \\\"details\\\": {\\n    \\\"derivedOverall\\\": \\\"FAIL\\\",\\n    \\\"errors\\\": [\\n      \\\"environment required\\\"\\n    ]\\n  }\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A01-reject-untrusted-evidence\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Assurance admission failed\\\",\\n  \\\"details\\\": {\\n    \\\"derivedOverall\\\": \\\"FAIL\\\",\\n    \\\"errors\\\": [\\n      \\\"AG-01-policy: untrusted evidence policy\\\"\\n    ]\\n  }\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A02-A03-positive-committed\",\n      \"expectedExit\": 0,\n      \"actualExit\": 0,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"PASS\\\",\\n  \\\"state\\\": \\\"COMMITTED\\\",\\n  \\\"releaseId\\\": \\\"rel-4\\\",\\n  \\\"sequence\\\": 3,\\n  \\\"gates\\\": 2\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A02-reject-empty-gates\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Auto-patch admission failed\\\",\\n  \\\"details\\\": [\\n    \\\"gate foundation: missing\\\",\\n    \\\"gate architecture: missing\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A02-reject-all-gates-na\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Auto-patch admission failed\\\",\\n  \\\"details\\\": [\\n    \\\"gate foundation: N/A forbidden\\\",\\n    \\\"gate architecture: N/A forbidden\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A03-reject-untrusted-source-and-evidence\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Auto-patch admission failed\\\",\\n  \\\"details\\\": [\\n    \\\"source not trusted/allowlisted\\\",\\n    \\\"gate foundation: untrusted evidence gate1\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A03-reject-replay-sequence\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Auto-patch admission failed\\\",\\n  \\\"details\\\": [\\n    \\\"replay sequence below trusted minimum\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A03-valid-transition-prepared-validated\",\n      \"expectedExit\": 0,\n      \"actualExit\": 0,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"PASS\\\",\\n  \\\"transition\\\": \\\"PREPARED>VALIDATED\\\",\\n  \\\"releaseId\\\": \\\"rel-4\\\",\\n  \\\"sequence\\\": 3\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A03-reject-direct-prepared-committed\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"Auto-patch state transition rejected\\\",\\n  \\\"details\\\": [\\n    \\\"forbidden transition PREPARED>COMMITTED\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A04-A05-policy-positive-2.7\",\n      \"expectedExit\": 0,\n      \"actualExit\": 0,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"PASS\\\",\\n  \\\"contract\\\": \\\"garp27-policy-v1\\\",\\n  \\\"appId\\\": \\\"demo\\\",\\n  \\\"appVersion\\\": \\\"1.0.0\\\",\\n  \\\"inventory\\\": \\\"/tmp/garp27-contract-GVvK3L/inventory.json\\\"\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A04-A05-policy-reject-empty-and-2.6\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"garpVersion must be 2.7; legacy 2.5/2.6 requires explicit migration review\\\",\\n    \\\"identity: required non-empty object\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A04-policy-reject-placeholder\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"incident.response: forbidden placeholder value\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"G02-reject-untouched-template\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"appId not present in inventory: replace-with-app-id\\\",\\n    \\\"appVersion 0.0.0 is not admissible\\\",\\n    \\\"identity: requires at least 1 semantic field(s) from [rule, controls, authentication, authorization, session, standaloneProfile, schoolProfile, provider, roles]\\\",\\n    \\\"requestApiAi: requires at least 1 semantic field(s) from [registry, registeredOperations, controls, operations, agentic, requestPolicy, aiPolicy, maxCallsPerOperation, modelPolicy]\\\",\\n    \\\"egress: requires at least 1 semantic field(s) from [standalone, school, crossApp, allowedDestinations, allowedEgress, defaultDeny, networkPolicy, providerEgress]\\\",\\n    \\\"files: requires at least 1 semantic field(s) from [currentBoundary, serverBoundary, uploads, imports, uploadPolicy, importPolicy, quarantine, allowedMimeTypes, maxBytes]\\\",\\n    \\\"dataLifecycle: requires at least 1 semantic field(s) from [classification, storage, retention, deletion, retentionDays, temporaryDataTtlMinutes, securityLogContentPolicy]\\\",\\n    \\\"release: requires at least 1 semantic field(s) from [activeAuthority, promotion, publicAssurance, signing, signedReleaseRequired, antiRollbackRequired, rollback, releasePolicy]\\\",\\n    \\\"inventory: requires at least 1 semantic field(s) from [source, architecturePolicy, changeRule, components, dependencies, inventoryPolicy]\\\",\\n    \\\"securityHealth: requires at least 1 semantic field(s) from [localCi, live, failureMode, checks, monitoring, assurance, healthPolicy]\\\",\\n    \\\"incident: requires at least 1 semantic field(s) from [current, future, response, escalation, contacts, incidentPolicy]\\\",\\n    \\\"recovery: requires at least 1 semantic field(s) from [current, future, rollback, restore, backup, recoveryPolicy]\\\",\\n    \\\"appId: placeholder substring: replace-with\\\",\\n    \\\"identity.mode: forbidden placeholder value\\\",\\n    \\\"requestApiAi.mode: forbidden placeholder value\\\",\\n    \\\"egress.mode: forbidden placeholder value\\\",\\n    \\\"files.mode: forbidden placeholder value\\\",\\n    \\\"dataLifecycle.mode: forbidden placeholder value\\\",\\n    \\\"release.mode: forbidden placeholder value\\\",\\n    \\\"inventory.mode: forbidden placeholder value\\\",\\n    \\\"securityHealth.mode: forbidden placeholder value\\\",\\n    \\\"incident.mode: forbidden placeholder value\\\",\\n    \\\"recovery.mode: forbidden placeholder value\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"G02-reject-unknown-app-id\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"appId not present in inventory: ghost-app\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"G02-reject-zero-version\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"appVersion 0.0.0 is not admissible\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"G02-reject-mode-only-sections\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"identity: requires at least 1 semantic field(s) from [rule, controls, authentication, authorization, session, standaloneProfile, schoolProfile, provider, roles]\\\",\\n    \\\"requestApiAi: requires at least 1 semantic field(s) from [registry, registeredOperations, controls, operations, agentic, requestPolicy, aiPolicy, maxCallsPerOperation, modelPolicy]\\\",\\n    \\\"egress: requires at least 1 semantic field(s) from [standalone, school, crossApp, allowedDestinations, allowedEgress, defaultDeny, networkPolicy, providerEgress]\\\",\\n    \\\"files: requires at least 1 semantic field(s) from [currentBoundary, serverBoundary, uploads, imports, uploadPolicy, importPolicy, quarantine, allowedMimeTypes, maxBytes]\\\",\\n    \\\"dataLifecycle: requires at least 1 semantic field(s) from [classification, storage, retention, deletion, retentionDays, temporaryDataTtlMinutes, securityLogContentPolicy]\\\",\\n    \\\"release: requires at least 1 semantic field(s) from [activeAuthority, promotion, publicAssurance, signing, signedReleaseRequired, antiRollbackRequired, rollback, releasePolicy]\\\",\\n    \\\"inventory: requires at least 1 semantic field(s) from [source, architecturePolicy, changeRule, components, dependencies, inventoryPolicy]\\\",\\n    \\\"securityHealth: requires at least 1 semantic field(s) from [localCi, live, failureMode, checks, monitoring, assurance, healthPolicy]\\\",\\n    \\\"incident: requires at least 1 semantic field(s) from [current, future, response, escalation, contacts, incidentPolicy]\\\",\\n    \\\"recovery: requires at least 1 semantic field(s) from [current, future, rollback, restore, backup, recoveryPolicy]\\\",\\n    \\\"identity.mode: forbidden placeholder value\\\",\\n    \\\"requestApiAi.mode: forbidden placeholder value\\\",\\n    \\\"egress.mode: forbidden placeholder value\\\",\\n    \\\"files.mode: forbidden placeholder value\\\",\\n    \\\"dataLifecycle.mode: forbidden placeholder value\\\",\\n    \\\"release.mode: forbidden placeholder value\\\",\\n    \\\"inventory.mode: forbidden placeholder value\\\",\\n    \\\"securityHealth.mode: forbidden placeholder value\\\",\\n    \\\"incident.mode: forbidden placeholder value\\\",\\n    \\\"recovery.mode: forbidden placeholder value\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"G02-reject-placeholder-substring\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"GARP 2.7 policy is not admissible\\\",\\n  \\\"details\\\": [\\n    \\\"incident.response: placeholder substring: replace-with\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A04-live-false-pass-rejected\",\n      \"expectedExit\": 1,\n      \"actualExit\": 1,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"FAIL\\\",\\n  \\\"message\\\": \\\"False LIVE PASS is forbidden while server phase is deferred\\\",\\n  \\\"details\\\": [\\n    \\\"serverApproval is not APPROVED\\\"\\n  ]\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A04-live-deferred-is-not-tested\",\n      \"expectedExit\": 3,\n      \"actualExit\": 3,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"LIVE_TEST\\\",\\n  \\\"status\\\": \\\"NOT_TESTED\\\",\\n  \\\"reason\\\": \\\"SERVER_PHASE_DEFERRED\\\",\\n  \\\"serverApproval\\\": \\\"DEFERRED_BY_OWNER_DECISION\\\"\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A06-unsafe-production-is-not-tested\",\n      \"expectedExit\": 3,\n      \"actualExit\": 3,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"LIVE_TEST\\\",\\n  \\\"status\\\": \\\"NOT_TESTED\\\",\\n  \\\"reason\\\": \\\"PRODUCTION_PRECONDITIONS_NOT_MET\\\",\\n  \\\"testId\\\": \\\"RVP-01\\\"\\n}\",\n      \"stderr\": \"\"\n    },\n    {\n      \"id\": \"A06-safe-approved-production-request\",\n      \"expectedExit\": 0,\n      \"actualExit\": 0,\n      \"pass\": true,\n      \"stdout\": \"{\\n  \\\"classification\\\": \\\"CONTRACT_TEST\\\",\\n  \\\"status\\\": \\\"PASS\\\",\\n  \\\"testId\\\": \\\"RVP-01\\\",\\n  \\\"environment\\\": \\\"production\\\",\\n  \\\"safetyClass\\\": \\\"PROD_SAFE_CONDITIONAL\\\",\\n  \\\"executionAllowed\\\": true\\n}\",\n      \"stderr\": \"\"\n    }\n  ]\n}",
+      "stderr": ""
+    },
+    {
+      "id": "g02-reference-contract",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "observed": {
+        "status": "PASS",
+        "checks": 5
+      }
+    },
+    {
+      "id": "generator-policy",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"PASS\",\n  \"contract\": \"garp27-policy-v1\",\n  \"appId\": \"generator\",\n  \"appVersion\": \"7.1.85\",\n  \"inventory\": \"/workspace/scratch/ebcee4a4dd99/work-e9/source/generator-testu-7.1.85/vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json\"\n}",
+      "stderr": ""
+    },
+    {
+      "id": "live-deferred",
+      "expectedExit": 3,
+      "actualExit": 3,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"LIVE_TEST\",\n  \"status\": \"NOT_TESTED\",\n  \"reason\": \"SERVER_PHASE_DEFERRED\",\n  \"serverApproval\": \"DEFERRED_BY_OWNER_DECISION\"\n}",
+      "stderr": ""
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0
+  }
+}
+
+> generator-testu@7.1.85 qa:garp27:architecture
+> node scripts/garp27/architecture-integrity.mjs
+
+{
+  "classification": "FOUNDATION_ARCHITECTURE_INTEGRITY",
+  "schema": "garp27-architecture-integrity-report-v1",
+  "garpVersion": "2.7",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "status": "PASS",
+  "trustMode": "LOCAL_PIN",
+  "scope": {
+    "sourceFiles": 184,
+    "artifactFiles": 39
+  },
+  "checks": [
+    {
+      "id": "G27-AUTH",
+      "pass": true,
+      "detail": "active authority"
+    },
+    {
+      "id": "G27-VERSION",
+      "pass": true,
+      "detail": "version binding"
+    },
+    {
+      "id": "G27-G02",
+      "pass": true,
+      "detail": "r2 inventory"
+    },
+    {
+      "id": "required:package-lock.json",
+      "pass": true,
+      "detail": "package-lock.json"
+    },
+    {
+      "id": "required:public/ai-operations.json",
+      "pass": true,
+      "detail": "public/ai-operations.json"
+    },
+    {
+      "id": "required:public/config/deployment.json",
+      "pass": true,
+      "detail": "public/config/deployment.json"
+    },
+    {
+      "id": "required:public/config/deployment.school-server.json",
+      "pass": true,
+      "detail": "public/config/deployment.school-server.json"
+    },
+    {
+      "id": "required:public/config/data-manifest.json",
+      "pass": true,
+      "detail": "public/config/data-manifest.json"
+    },
+    {
+      "id": "required:src/config/release-acceptance.json",
+      "pass": true,
+      "detail": "src/config/release-acceptance.json"
+    },
+    {
+      "id": "required:security/garp27/garp-policy.json",
+      "pass": true,
+      "detail": "security/garp27/garp-policy.json"
+    },
+    {
+      "id": "required:security/garp27/capability-inventory.json",
+      "pass": true,
+      "detail": "security/garp27/capability-inventory.json"
+    },
+    {
+      "id": "required:vendor/garp-2.7-consolidated-r2/MASTER/CONTRACTS/garp27-core.json",
+      "pass": true,
+      "detail": "vendor/garp-2.7-consolidated-r2/MASTER/CONTRACTS/garp27-core.json"
+    },
+    {
+      "id": "required:vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json",
+      "pass": true,
+      "detail": "vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json"
+    },
+    {
+      "id": "policy-digest",
+      "pass": true,
+      "detail": "policy digest"
+    },
+    {
+      "id": "inventory-digest",
+      "pass": true,
+      "detail": "inventory digest"
+    },
+    {
+      "id": "garp-policy-digest",
+      "pass": true,
+      "detail": "garp policy digest"
+    },
+    {
+      "id": "vendor-digest",
+      "pass": true,
+      "detail": "64 2c653aa771c16ce1b610492bf5bf9d57c37af4987c85109de6cbb7cf8aa9a2fb"
+    },
+    {
+      "id": "core-digest",
+      "pass": true,
+      "detail": "core digest"
+    },
+    {
+      "id": "ecosystem-digest",
+      "pass": true,
+      "detail": "inventory digest"
+    },
+    {
+      "id": "tool:scripts/garp27/architecture-integrity.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/architecture-integrity.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/mutation-tests.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/mutation-tests.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/contract-gate.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/contract-gate.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/policy-admission-mutations.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/policy-admission-mutations.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/auto-patch-contract.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/auto-patch-contract.mjs"
+    },
+    {
+      "id": "tool:scripts/garp27/foundation-gate.mjs",
+      "pass": true,
+      "detail": "scripts/garp27/foundation-gate.mjs"
+    },
+    {
+      "id": "source-scope",
+      "pass": true,
+      "detail": "184"
+    },
+    {
+      "id": "resolver",
+      "pass": true,
+      "detail": "0 unresolved"
+    },
+    {
+      "id": "forbidden-edges",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "id": "artifact-present",
+      "pass": true,
+      "detail": "39"
+    },
+    {
+      "id": "artifact-paths",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "id": "artifact-fragments",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "id": "artifact-index",
+      "pass": true,
+      "detail": "index version"
+    },
+    {
+      "id": "artifact-sw",
+      "pass": true,
+      "detail": "sw version"
+    },
+    {
+      "id": "artifact-aiops",
+      "pass": true,
+      "detail": "ai ops version"
+    },
+    {
+      "id": "ai-operations",
+      "pass": true,
+      "detail": "operations"
+    },
+    {
+      "id": "provider-tools",
+      "pass": true,
+      "detail": "tools"
+    },
+    {
+      "id": "agentic-boundary",
+      "pass": true,
+      "detail": "partial/no autonomous"
+    },
+    {
+      "id": "egress",
+      "pass": true,
+      "detail": "profiles"
+    },
+    {
+      "id": "live-deferred",
+      "pass": true,
+      "detail": "server deferred"
+    },
+    {
+      "id": "fallback",
+      "pass": true,
+      "detail": "no fallback"
+    },
+    {
+      "id": "single-authority",
+      "pass": true,
+      "detail": "0"
+    }
+  ],
+  "findings": [],
+  "summary": {
+    "total": 41,
+    "passed": 41,
+    "failed": 0,
+    "critical": 0,
+    "high": 0
+  }
+}
+
+> generator-testu@7.1.85 qa:garp27:policy-mutations
+> node scripts/garp27/policy-admission-mutations.mjs
+
+{
+  "classification": "GARP27_G02_APP_POLICY_MUTATION_TEST",
+  "status": "PASS",
+  "garpVersion": "2.7",
+  "consolidationRevision": "2026-09-23-r2",
+  "syntheticOnly": true,
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "results": [
+    {
+      "id": "G02-app-positive-current-policy",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"PASS\",\n  \"contract\": \"garp27-policy-v1\",\n  \"appId\": \"generator\",\n  \"appVersion\": \"7.1.85\",\n  \"inventory\": \"/workspace/scratch/ebcee4a4dd99/work-e9/source/generator-testu-7.1.85/vendor/garp-2.7-consolidated-r2/MASTER/INVENTORY/ecosystem-apps.json\"\n}",
+      "stderr": ""
+    },
+    {
+      "id": "G02-app-reject-unknown-app-id",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"FAIL\",\n  \"message\": \"GARP 2.7 policy is not admissible\",\n  \"details\": [\n    \"appId not present in inventory: ghost-app\"\n  ]\n}",
+      "stderr": ""
+    },
+    {
+      "id": "G02-app-reject-zero-version",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"FAIL\",\n  \"message\": \"GARP 2.7 policy is not admissible\",\n  \"details\": [\n    \"appVersion 0.0.0 is not admissible\"\n  ]\n}",
+      "stderr": ""
+    },
+    {
+      "id": "G02-app-reject-invalid-semver",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"FAIL\",\n  \"message\": \"GARP 2.7 policy is not admissible\",\n  \"details\": [\n    \"appVersion is not valid semver: 7.1\"\n  ]\n}",
+      "stderr": ""
+    },
+    {
+      "id": "G02-app-reject-mode-only-sections",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"FAIL\",\n  \"message\": \"GARP 2.7 policy is not admissible\",\n  \"details\": [\n    \"identity: requires at least 1 semantic field(s) from [rule, controls, authentication, authorization, session, standaloneProfile, schoolProfile, provider, roles]\",\n    \"requestApiAi: requires at least 1 semantic field(s) from [registry, registeredOperations, controls, operations, agentic, requestPolicy, aiPolicy, maxCallsPerOperation, modelPolicy]\",\n    \"egress: requires at least 1 semantic field(s) from [standalone, school, crossApp, allowedDestinations, allowedEgress, defaultDeny, networkPolicy, providerEgress]\",\n    \"files: requires at least 1 semantic field(s) from [currentBoundary, serverBoundary, uploads, imports, uploadPolicy, importPolicy, quarantine, allowedMimeTypes, maxBytes]\",\n    \"dataLifecycle: requires at least 1 semantic field(s) from [classification, storage, retention, deletion, retentionDays, temporaryDataTtlMinutes, securityLogContentPolicy]\",\n    \"release: requires at least 1 semantic field(s) from [activeAuthority, promotion, publicAssurance, signing, signedReleaseRequired, antiRollbackRequired, rollback, releasePolicy]\",\n    \"inventory: requires at least 1 semantic field(s) from [source, architecturePolicy, changeRule, components, dependencies, inventoryPolicy]\",\n    \"securityHealth: requires at least 1 semantic field(s) from [localCi, live, failureMode, checks, monitoring, assurance, healthPolicy]\",\n    \"incident: requires at least 1 semantic field(s) from [current, future, response, escalation, contacts, incidentPolicy]\",\n    \"recovery: requires at least 1 semantic field(s) from [current, future, rollback, restore, backup, recoveryPolicy]\",\n    \"identity.mode: forbidden placeholder value\",\n    \"requestApiAi.mode: forbidden placeholder value\",\n    \"egress.mode: forbidden placeholder value\",\n    \"files.mode: forbidden placeholder value\",\n    \"dataLifecycle.mode: forbidden placeholder value\",\n    \"release.mode: forbidden placeholder value\",\n    \"inventory.mode: forbidden placeholder value\",\n    \"securityHealth.mode: forbidden placeholder value\",\n    \"incident.mode: forbidden placeholder value\",\n    \"recovery.mode: forbidden placeholder value\"\n  ]\n}",
+      "stderr": ""
+    },
+    {
+      "id": "G02-app-reject-placeholder-substring",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true,
+      "stdout": "{\n  \"classification\": \"CONTRACT_TEST\",\n  \"status\": \"FAIL\",\n  \"message\": \"GARP 2.7 policy is not admissible\",\n  \"details\": [\n    \"incident.response: placeholder substring: replace-with\"\n  ]\n}",
+      "stderr": ""
+    }
+  ]
+}
+
+> generator-testu@7.1.85 qa:garp27:mutations
+> node scripts/garp27/mutation-tests.mjs
+
+{
+  "classification": "GARP27_MUTATION_TEST",
+  "status": "PASS",
+  "syntheticOnly": true,
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "results": [
+    {
+      "id": "G27-AR-POS",
+      "expected": "PASS",
+      "observed": "PASS",
+      "pass": true,
+      "failedChecks": []
+    },
+    {
+      "id": "G27-AR01-forbidden-source-edge",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "forbidden-edges"
+      ]
+    },
+    {
+      "id": "G27-AR02-production-test-bypass",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "artifact-fragments"
+      ]
+    },
+    {
+      "id": "G27-AR03-uninventoried-ai-operation",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "ai-operations"
+      ]
+    },
+    {
+      "id": "G27-AR03-uninventoried-provider-tool",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "provider-tools"
+      ]
+    },
+    {
+      "id": "G27-AR03-school-local-key-bypass",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "egress"
+      ]
+    },
+    {
+      "id": "G27-AR04-policy-self-edit",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "policy-digest"
+      ]
+    },
+    {
+      "id": "G27-AR04-tool-self-edit",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "tool:scripts/garp27/architecture-integrity.mjs"
+      ]
+    },
+    {
+      "id": "G27-AR05-vendored-master-drift",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "vendor-digest"
+      ]
+    },
+    {
+      "id": "G27-AR05-conflicting-active-authority",
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "pass": true,
+      "failedChecks": [
+        "single-authority"
+      ]
+    }
+  ]
+}
+
+> generator-testu@7.1.85 qa:garp27:auto-patch
+> node scripts/garp27/auto-patch-contract.mjs
+
+{
+  "classification": "GARP27_AUTO_PATCH_CONTRACT",
+  "status": "PASS",
+  "liveAutoPatchClaim": false,
+  "note": "Synthetic GARP admission/state-machine checks plus static verification of the existing verified-release dispatch workflow. Live dispatch behavior remains separately evidenced by deployment.",
+  "results": [
+    {
+      "id": "prepared-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "validated-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "committed-admission",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "transition-prepared-validated",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "transition-validated-committed",
+      "expectedExit": 0,
+      "actualExit": 0,
+      "pass": true
+    },
+    {
+      "id": "negative-empty-gates",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "pass": true
+    },
+    {
+      "id": "actual-release-identity-verified",
+      "pass": true
+    },
+    {
+      "id": "actual-studio-dispatch-bounded",
+      "pass": true
+    },
+    {
+      "id": "actual-dispatch-after-live-check",
+      "pass": true
+    }
+  ]
+}
+
+> generator-testu@7.1.85 verify:platform
+> node scripts/ghrab-platform-conformance.mjs
+
+{
+  "schema": "ghrab-platform-conformance-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "total": 115,
+  "passed": 115,
+  "failed": 0,
+  "checks": [
+    {
+      "label": "dist exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite dist has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "satellite source has no duplicate platform tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "consumer schema",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "package ↔ consumer version",
+      "ok": true,
+      "detail": "7.1.85 / 7.1.85"
+    },
+    {
+      "label": "platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact exports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact imports declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "native export formats declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy JSON import policy declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "cache naming",
+      "ok": true,
+      "detail": "ghrab-generator-v7.1.85"
+    },
+    {
+      "label": "storage migration declared",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage namespace sestavovac_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.state.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_tpl_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.templates.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_hist_v5_13_0",
+      "ok": true,
+      "detail": "ghrab.generator.history.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_mode",
+      "ok": true,
+      "detail": "ghrab.generator.theme.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_model",
+      "ok": true,
+      "detail": "ghrab.generator.ai.model.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.local.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_key_session",
+      "ok": true,
+      "detail": "ghrab.generator.ai.key.session.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_gemini_data_notice_v1",
+      "ok": true,
+      "detail": "ghrab.generator.ai.data-notice.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_school_security_code_v1",
+      "ok": true,
+      "detail": "ghrab.generator.security-code.v1"
+    },
+    {
+      "label": "storage namespace genOnboardingDone_v1",
+      "ok": true,
+      "detail": "ghrab.generator.onboarding-done.v1"
+    },
+    {
+      "label": "storage namespace genWelcomeShown_session",
+      "ok": true,
+      "detail": "ghrab.generator.welcome-shown.v1"
+    },
+    {
+      "label": "storage namespace sestavovac_",
+      "ok": true,
+      "detail": "ghrab.generator.legacy."
+    },
+    {
+      "label": "vendor ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-platform.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-artifact-envelope-v1.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash ghrab-app-registry-v2.schema.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "vendor hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist hash school-logo.png",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist ghrab-platform.consumer.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/platform-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist config/brand-manifest.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist platform-build-info.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built consumer identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform manifest contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built platform cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built service-worker contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "built artifact contracts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest migration id",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest canonical prefix",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact exports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "data manifest artifact imports",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical logo manifest hash",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no inline school logo base64",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no legacy school logo reference",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no obsolete top-level platform references in satellite build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "platform contract present in build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "full eligible HTML documents found",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "exactly one platform loader manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "exactly one platform config manual/index.html",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "label": "app identity manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme root contract manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker canonical cache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker contract marker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker legacy cleanup list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker update protocol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker platform precache",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker P3 asset list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "no automatic skipWaiting during install",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no-store bypass",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "service worker no obsolete satellite platform asset",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA manifest exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA platform contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA cache metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "PWA app identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime identity",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime suite session contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "runtime previous platform rejected",
+      "ok": true,
+      "detail": "1.1.1"
+    },
+    {
+      "label": "runtime current accepted",
+      "ok": true,
+      "detail": "1.1.2"
+    },
+    {
+      "label": "runtime n+1 accepted",
+      "ok": true,
+      "detail": "1.2.0"
+    },
+    {
+      "label": "runtime major rejected",
+      "ok": true,
+      "detail": "2.0.0"
+    },
+    {
+      "label": "storage alias reads migrated value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "canonical storage value created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage alias writes canonical key",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration idempotent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "storage migration rollback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "rollback restored original value",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 create",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 peek",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge v2 take",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "Studio Bridge consumes once",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope SHA-256",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrap",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope detection",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact envelope unwrapMaybe",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "legacy artifact compatibility",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "theme contract runtime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "artifact compatibility facade",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "accessibility runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "performance runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy module runtime contract",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "lazy script loader available",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
+
+> generator-testu@7.1.85 qa:quality
+> node scripts/qa-p3-quality.mjs
+
+{
+  "schema": "ghrab-p3-quality-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "contracts": {
+    "accessibility": "ghrab-a11y-v1",
+    "performance": "ghrab-performance-v1",
+    "modules": "ghrab-lazy-modules-v1"
+  },
+  "metrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.85",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-04T05:46:56.792Z",
+    "distBytes": 2569542,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1647166,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1597683,
+    "entryCriticalBytes": 1769502,
+    "largestInlineScriptBytes": 155483,
+    "precacheBytes": 2192941,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1597683,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "budget": {
+    "distBytes": 2600000,
+    "entryHtmlBytes": 1600000,
+    "entryCriticalBytes": 1770000,
+    "largestInlineScriptBytes": 170000,
+    "precacheBytes": 2200000,
+    "largestFileBytes": 1600000,
+    "duplicateLargeBytes": 20000
+  },
+  "precacheAssets": [
+    "access/access-gate.css",
+    "access/deployment-config.js",
+    "access/error-reporter-adapter.js",
+    "access/error-reporter.css",
+    "access/error-reporter.js",
+    "access/reporter-bootstrap.js",
+    "access/suite-session-cleanup.js",
+    "assets/brand/school-logo.png",
+    "config/brand-manifest.json",
+    "config/platform-manifest.json",
+    "features/preview-editor.js",
+    "features/testlab.js",
+    "frame-guard.js",
+    "ghrab-platform.consumer.json",
+    "ghrab/ghrab-app-registry-v2.schema.json",
+    "ghrab/ghrab-artifact-envelope-v1.schema.json",
+    "ghrab/ghrab-platform-manifest-1.1.2.json",
+    "ghrab/ghrab-platform.css",
+    "ghrab/ghrab-platform.js",
+    "icons/apple-touch-icon.png",
+    "icons/icon-192.png",
+    "icons/icon-32.png",
+    "icons/icon-512.png",
+    "index.html",
+    "manifest.webmanifest",
+    "manual/index.html"
+  ],
+  "duplicateGroups": [],
+  "checks": [
+    {
+      "id": "dist.exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "platform.version",
+      "ok": true,
+      "detail": "1.1.2"
+    },
+    {
+      "id": "contract.a11y",
+      "ok": true,
+      "detail": "ghrab-a11y-v1"
+    },
+    {
+      "id": "contract.performance",
+      "ok": true,
+      "detail": "ghrab-performance-v1"
+    },
+    {
+      "id": "contract.modules",
+      "ok": true,
+      "detail": "ghrab-lazy-modules-v1"
+    },
+    {
+      "id": "platform.runtime",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "platform.styles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.reduced-motion",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.focus-visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.skip-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.html-documents",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "id": "a11y.lang:index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.viewport:index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.zoom:index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.title:index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.main:index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.runtime:index.html",
+      "ok": true,
+      "detail": "platform=1; engine=0"
+    },
+    {
+      "id": "a11y.lang:manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.viewport:manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.zoom:manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.title:manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.main:manual/index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "a11y.runtime:manual/index.html",
+      "ok": true,
+      "detail": "platform=1; engine=0"
+    },
+    {
+      "id": "module.exists:features/testlab.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "module.referenced:features/testlab.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "module.exists:features/preview-editor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "module.referenced:features/preview-editor.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "budget.distBytes",
+      "ok": true,
+      "detail": "2569542 <= 2600000"
+    },
+    {
+      "id": "budget.entryHtmlBytes",
+      "ok": true,
+      "detail": "1597683 <= 1600000"
+    },
+    {
+      "id": "budget.entryCriticalBytes",
+      "ok": true,
+      "detail": "1769502 <= 1770000"
+    },
+    {
+      "id": "budget.largestInlineScriptBytes",
+      "ok": true,
+      "detail": "155483 <= 170000"
+    },
+    {
+      "id": "budget.precacheBytes",
+      "ok": true,
+      "detail": "2192941 <= 2200000"
+    },
+    {
+      "id": "budget.largestFileBytes",
+      "ok": true,
+      "detail": "1597683 <= 1600000"
+    },
+    {
+      "id": "budget.duplicateLargeBytes",
+      "ok": true,
+      "detail": "0 <= 20000"
+    },
+    {
+      "id": "budget.minimum-count",
+      "ok": true,
+      "detail": "7"
+    }
+  ],
+  "warnings": [],
+  "summary": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  }
+}
+
+> generator-testu@7.1.85 qa:browser
+> node scripts/qa-p3-browser.mjs
+
+{
+  "schema": "ghrab-p3-browser-result-v1",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "chromium": "system",
+  "launch": {
+    "dynamicDebugPort": true,
+    "readinessSource": "own DevToolsActivePort",
+    "profileIsolation": "unique temporary directory"
+  },
+  "result": {
+    "checks": {
+      "platformPresent": true,
+      "version": true,
+      "a11yContract": true,
+      "performanceContract": true,
+      "moduleContract": true,
+      "skipLink": true,
+      "liveRegion": true,
+      "inputName": true,
+      "iconName": true,
+      "imageAlt": true,
+      "dialogName": true,
+      "initialFocus": true,
+      "tabWrap": true,
+      "shiftTabWrap": true,
+      "escapeClosed": true,
+      "focusReturned": true,
+      "announcement": true,
+      "performance": true,
+      "lazy": true
+    },
+    "failed": [],
+    "activeElement": "launcher",
+    "snapshot": {
+      "contract": "ghrab-performance-v1",
+      "now": 323.29999999981374,
+      "domContentLoadedMs": 28.199999999254942,
+      "loadMs": 28.799999999813735,
+      "transferBytes": 0,
+      "decodedBytes": 0,
+      "jsHeapUsedBytes": 10000000,
+      "resourceCount": 0
+    }
+  },
+  "status": "passed"
+}
+
+> generator-testu@7.1.85 qa:runtime
+> node scripts/qa-p5-runtime.mjs
+
+{
+  "schema": "ghrab-p5-runtime-audit-v2",
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "status": "passed",
+  "pagesScanned": 2,
+  "statesScanned": 15,
+  "summary": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  }
+}
+
+> generator-testu@7.1.85 qa:xss
+> node scripts/qa-p5-xss-sinks.mjs
+
+{
+  "schema": "ghrab-p5-xss-sink-audit-v1",
+  "appId": "generator",
+  "counts": {
+    "innerHTML": 160,
+    "insertAdjacentHTML": 8,
+    "outerHTML": 5,
+    "documentWrite": 0,
+    "eval": 0,
+    "newFunction": 0
+  },
+  "baseline": {
+    "innerHTML": 161,
+    "insertAdjacentHTML": 8,
+    "outerHTML": 5,
+    "documentWrite": 0,
+    "eval": 0,
+    "newFunction": 0
+  },
+  "csp": {
+    "unsafeInlineScript": true,
+    "unsafeInlineStyle": true
+  },
+  "evidence": [
+    {
+      "file": "src/features/preview-editor.js",
+      "kind": "innerHTML",
+      "count": 6
+    },
+    {
+      "file": "src/features/testlab.js",
+      "kind": "innerHTML",
+      "count": 5
+    },
+    {
+      "file": "src/js/01-core.js",
+      "kind": "innerHTML",
+      "count": 8
+    },
+    {
+      "file": "src/js/02-state-persistence.js",
+      "kind": "innerHTML",
+      "count": 6
+    },
+    {
+      "file": "src/js/03-ui-render.js",
+      "kind": "innerHTML",
+      "count": 14
+    },
+    {
+      "file": "src/js/04-templates.js",
+      "kind": "innerHTML",
+      "count": 11
+    },
+    {
+      "file": "src/js/05-form-fields.js",
+      "kind": "innerHTML",
+      "count": 10
+    },
+    {
+      "file": "src/js/06-result-didactics.js",
+      "kind": "innerHTML",
+      "count": 10
+    },
+    {
+      "file": "src/js/07-gemini.js",
+      "kind": "innerHTML",
+      "count": 3
+    },
+    {
+      "file": "src/js/07z-ai-core-integration.js",
+      "kind": "innerHTML",
+      "count": 1
+    },
+    {
+      "file": "src/js/08-manual-editor.js",
+      "kind": "innerHTML",
+      "count": 12
+    },
+    {
+      "file": "src/js/08a-output-workflow.js",
+      "kind": "innerHTML",
+      "count": 1
+    },
+    {
+      "file": "src/js/09-selftest-keycheck.js",
+      "kind": "innerHTML",
+      "count": 13
+    },
+    {
+      "file": "src/js/10-testlab.js",
+      "kind": "innerHTML",
+      "count": 3
+    },
+    {
+      "file": "src/js/12-prompt-builder.js",
+      "kind": "innerHTML",
+      "count": 8
+    },
+    {
+      "file": "src/js/13e-secure-student-runtime.js",
+      "kind": "innerHTML",
+      "count": 8
+    },
+    {
+      "file": "src/js/13eb-secure-teacher-verifier-v2-ui.js",
+      "kind": "innerHTML",
+      "count": 2
+    },
+    {
+      "file": "src/js/13f-secure-teacher-verifier.js",
+      "kind": "innerHTML",
+      "count": 13
+    },
+    {
+      "file": "src/js/13fa-secure-teacher-verifier-pdf.js",
+      "kind": "innerHTML",
+      "count": 1
+    },
+    {
+      "file": "src/js/14b-instant-test-runtime.js",
+      "kind": "innerHTML",
+      "count": 12
+    },
+    {
+      "file": "src/js/14b-instant-test-runtime.js",
+      "kind": "insertAdjacentHTML",
+      "count": 3
+    },
+    {
+      "file": "src/js/14d-generator-release-guides.js",
+      "kind": "innerHTML",
+      "count": 5
+    },
+    {
+      "file": "src/js/50-cs-module.js",
+      "kind": "innerHTML",
+      "count": 1
+    },
+    {
+      "file": "src/js/50-cs-module.js",
+      "kind": "insertAdjacentHTML",
+      "count": 5
+    },
+    {
+      "file": "src/js/50-cs-module.js",
+      "kind": "outerHTML",
+      "count": 5
+    },
+    {
+      "file": "src/shell.html",
+      "kind": "innerHTML",
+      "count": 1
+    },
+    {
+      "file": "public/access/error-reporter.js",
+      "kind": "innerHTML",
+      "count": 2
+    },
+    {
+      "file": "public/manual/index.html",
+      "kind": "innerHTML",
+      "count": 4
+    }
+  ],
+  "limitations": [
+    "This is a regression inventory, not proof that every HTML sink is safe.",
+    "Current inline-script architecture may still require unsafe-inline until CSP refactoring."
+  ],
+  "failures": [],
+  "status": "passed"
+}
+
+> generator-testu@7.1.85 qa:axe
+> node scripts/qa-p5-axe-runtime.mjs
+
+{
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "status": "passed",
+  "summary": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "note": "CSP je v runtime harnessu odstraněna pouze proto, aby bylo možné odemknout chráněné inline skripty; její přítomnost a serverové hlavičky kontroluje samostatná bezpečnostní brána."
+}
+{
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "axeRequired": true,
+  "summary": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "status": "passed",
+  "failed": []
+}
+{
+  "appId": "generator",
+  "appVersion": "7.1.85",
+  "status": "passed",
+  "summary": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "failed": []
+}
+
+> generator-testu@7.1.85 check:redteam-ci
+> node scripts/check-redteam-ci-e9.mjs
+
+PASS E9 CI wiring and 14 negative controls
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Inicializační krok selhal: loadGeminiKey Error: Chybí ověřená deployment konfigurace.
+    at genConfigurationError (https://qa.local/generator-testu/:20:62)
+    at genDeploymentConfig (https://qa.local/generator-testu/:21:123)
+    at genDeploymentKind (https://qa.local/generator-testu/:22:43)
+    at genSchoolMode (https://qa.local/generator-testu/:23:33)
+    at updateGeminiStatus (https://qa.local/generator-testu/:115:44)
+    at setGeminiKey (https://qa.local/generator-testu/:82:1)
+    at loadGeminiKey (https://qa.local/generator-testu/:95:1)
+    at safeInitStep (https://qa.local/generator-testu/:38:14)
+    at init (https://qa.local/generator-testu/:48:1)
+    at https://qa.local/generator-testu/:67:3 {
+  code: 'CONFIGURATION_ERROR'
+}
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[runtime] index.html @ 1280px
+[runtime] index.html @ 390px
+[runtime] index.html @ 320px
+[runtime] manual/index.html @ 1280px
+[runtime] manual/index.html @ 390px
+[runtime] manual/index.html @ 320px
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.

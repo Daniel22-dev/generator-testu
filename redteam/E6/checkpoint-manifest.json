@@ -1,0 +1,222 @@
+{
+  "schema": "git-redteam-e6-local-checkpoint-v1",
+  "date": "2026-10-03",
+  "version": "7.1.82",
+  "readiness": "NOT READY – BLOCKING ISSUE",
+  "stageE6": "Local audit/implementation/tests complete; public acceptance BLOCKED by existing exposed artifacts/history",
+  "completedLocalStages": [
+    "E0",
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "pending": [
+    "E6 public cleanup and rotation",
+    "F7 content start encryption",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "sourceBranch": "candidate",
+  "baseCommit": "459565963be926c5902ae47cce699600aab711eb",
+  "githubWrites": false,
+  "deploymentPerformed": false,
+  "npmTest": "PASS / complete terminal marker and matching raw log bytes",
+  "localP5Equivalent": "PASS / completed process and final acceptance report",
+  "githubActionsForCandidateExecuted": false,
+  "desktopChromium": "153.0.8010.0",
+  "playwright": "1.61.1",
+  "realMobile": "ANALYZED / NOT TESTED",
+  "nativeFreezeResume": "ANALYZED / NOT TESTED",
+  "nativeBFCacheEligibility": "ANALYZED / NOT TESTED",
+  "publicationGroups": [
+    "generated-student-and-private-pair",
+    "all-21-exercise-types",
+    "export-answer-derivative-rejection",
+    "hidden-data-comments-scripts-attributes",
+    "private-pair-byte-and-identity-binding",
+    "publication-allowlist-and-no-private-copy",
+    "deleted-blob-and-all-ref-history"
+  ],
+  "negativeArtifactMutationCount": 15,
+  "historicalNegativeControlCount": 2,
+  "historicalNegativeControls": [
+    {
+      "version": "7.1.76",
+      "case": "generated-student-and-private-pair",
+      "sourceSha256": "e7e557d4acedd0334518132131514eeb31a0dc800840deb7c0854fe4e793993b",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "reason": "AssertionError; no missing dependency, syntax/runtime error or timeout accepted",
+      "log": "redteam/E6/negative-7.1.76.log"
+    },
+    {
+      "version": "7.1.81",
+      "case": "export-answer-derivative-rejection",
+      "sourceSha256": "e991dfd1a5a89df8b1306da2380d43a11a4f51d9a1df126bc8dc151f6fd973f3",
+      "exitCode": 1,
+      "expectedRejected": true,
+      "reason": "AssertionError; no missing dependency, syntax/runtime error or timeout accepted",
+      "log": "redteam/E6/negative-7.1.81.log"
+    }
+  ],
+  "publicAudit": {
+    "repository": "Daniel22-dev/interaktivni-testy",
+    "head": "2af3fade24465511503dc9f215f7d91ab4a066b1",
+    "startedAt": "2026-10-03T18:25:20.319352+00:00",
+    "finishedAt": "2026-10-03T18:26:20.005197+00:00",
+    "refsStable": true,
+    "reachableCommits": 12,
+    "reachableBlobs": 11,
+    "liveHtmlFiles": 9,
+    "liveMatchesHead": 9,
+    "liveTeacherHashFiles": 7,
+    "liveStudentHashFiles": 4,
+    "teacherHashHistoricalOnlyPath": "nemcina-test.html",
+    "publicStatus": "FAIL / PUBLICATION BLOCKED",
+    "listedActionsArtifacts": 0,
+    "listedForks": 0,
+    "privateRsaKnownIndicatorsDetected": false,
+    "arbitraryEncodedDataExclusionProven": false
+  },
+  "release": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "acceptance": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0
+  },
+  "quality": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "warnings": 0
+  },
+  "qualityMetrics": {
+    "schema": "ghrab-performance-report-v1",
+    "appId": "generator",
+    "appVersion": "7.1.82",
+    "platformVersion": "1.1.2",
+    "measuredAt": "2026-10-03T19:54:09.820Z",
+    "distBytes": 2569977,
+    "jsBytes": 537457,
+    "cssBytes": 24284,
+    "htmlBytes": 1647601,
+    "fileCount": 39,
+    "fullHtmlCount": 2,
+    "entryHtmlBytes": 1598118,
+    "entryCriticalBytes": 1769937,
+    "largestInlineScriptBytes": 157885,
+    "precacheBytes": 2193376,
+    "precacheAssetCount": 26,
+    "largestFileBytes": 1598118,
+    "largestFilePath": "index.html",
+    "duplicateLargeBytes": 0
+  },
+  "entryCriticalBudget": {
+    "limit": 1770000,
+    "changedInE6": false,
+    "initialExcessBytes": 158,
+    "remediation": "Shorter duplicate comments and E6 release note, equivalent grouped field regex; security behavior retained. Initial incomplete P5 and stale fingerprint run excluded from accepted evidence."
+  },
+  "runtime": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "overflows": 0,
+    "initFailures": 0,
+    "browserExceptions": 0,
+    "qaErrors": 0,
+    "blockers": 0
+  },
+  "axe": {
+    "scanned": 4,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "blockers": 0
+  },
+  "axeIncomplete": [
+    {
+      "page": "index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "help": "Elements must only use permitted ARIA attributes",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 1280,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 120
+        }
+      ]
+    },
+    {
+      "page": "manual/index.html",
+      "width": 390,
+      "checks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 109
+        }
+      ]
+    }
+  ],
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 8
+  },
+  "teacherStoragePolicy": "private owner PC outside school, never public repo/history",
+  "externalAnchorProvenance": "Owner-attested Forms settings/private roster; no live Forms configuration proof",
+  "runtimeProvenance": "CLIENT-CONTROLLED",
+  "classificationAuthorization": "REVIEW_REQUIRED",
+  "serverDecision": "DEFERRED – SERVER VERSION",
+  "scope": "Synthetic generated output and sanitized reports only. Actual public raw HTML and private generated RSA/verifier data excluded from deliverable. Static file pairing is trusted owner-side input, not server authentication.",
+  "limits": [
+    "No proof that arbitrary prose/encoded data hides no answers or secrets",
+    "F7 question encryption pending; no public deployment or history rewrite",
+    "Private verifier is trusted owner-side input, not a server signature",
+    "Native mobile: ANALYZED / NOT TESTED",
+    "All unique blobs reachable from available refs, including deleted files in older commits. Deleted/unadvertised refs, unreachable objects, caches, forks and detached Actions artifacts are outside this scan.",
+    "No deletion/unadvertised refs, orphan objects, caches or historical detached artifacts are certified absent.",
+    "Zero listed forks/artifacts is current repository metadata, not proof against external copies.",
+    "A static format rejection of unrelated legacy educational HTML is not by itself a confirmed credential leak.",
+    "Questions remain plaintext until F7. No public repository write, secret rotation or history purge was performed."
+  ],
+  "evidenceReports": 24,
+  "publicCleanupPerformed": false,
+  "credentialRotationPerformed": false
+}

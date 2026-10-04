@@ -1,0 +1,245 @@
+{
+  "schema": "ghrab-p5-release-certification-v2",
+  "appId": "generator",
+  "appVersion": "7.1.77",
+  "generatedAt": "2026-10-03T13:19:01.289Z",
+  "axeRequired": true,
+  "checks": [
+    {
+      "id": "version.package-consumer",
+      "ok": true,
+      "detail": "7.1.77 / 7.1.77"
+    },
+    {
+      "id": "stage.p5",
+      "ok": true,
+      "detail": "P5"
+    },
+    {
+      "id": "dependencies.declared",
+      "ok": true,
+      "detail": "acorn,axe-core,eslint,globals,jsdom,playwright,pngjs"
+    },
+    {
+      "id": "dependencies.axe-pinned",
+      "ok": true,
+      "detail": "4.12.1"
+    },
+    {
+      "id": "dependencies.playwright-pinned",
+      "ok": true,
+      "detail": "1.61.1"
+    },
+    {
+      "id": "lock.has-packages",
+      "ok": true,
+      "detail": 114
+    },
+    {
+      "id": "lock.version",
+      "ok": true,
+      "detail": "7.1.77"
+    },
+    {
+      "id": "dist.exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "report.quality.exists",
+      "ok": true,
+      "detail": "quality-report.json"
+    },
+    {
+      "id": "report.quality.passed",
+      "ok": true,
+      "detail": "{\"total\":35,\"passed\":35,\"failed\":0,\"warnings\":0}"
+    },
+    {
+      "id": "report.quality.version",
+      "ok": true,
+      "detail": "7.1.77"
+    },
+    {
+      "id": "report.browser.exists",
+      "ok": true,
+      "detail": "qa-p3-browser-report.json"
+    },
+    {
+      "id": "report.browser.passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "report.browser.version",
+      "ok": true,
+      "detail": "7.1.77"
+    },
+    {
+      "id": "report.runtime.exists",
+      "ok": true,
+      "detail": "qa-p5-runtime-report.json"
+    },
+    {
+      "id": "report.runtime.passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "report.runtime.version",
+      "ok": true,
+      "detail": "7.1.77"
+    },
+    {
+      "id": "runtime.scripts-executed",
+      "ok": true,
+      "detail": "true"
+    },
+    {
+      "id": "runtime.local-http",
+      "ok": true,
+      "detail": "local-http"
+    },
+    {
+      "id": "runtime.no-blockers",
+      "ok": true,
+      "detail": "{\"critical\":0,\"serious\":0,\"moderate\":0,\"minor\":0,\"overflows\":0,\"initFailures\":0,\"browserExceptions\":0,\"qaErrors\":0,\"blockers\":0}"
+    },
+    {
+      "id": "report.xss.exists",
+      "ok": true,
+      "detail": "qa-p5-xss-sinks-report.json"
+    },
+    {
+      "id": "report.xss.passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "report.xss.version",
+      "ok": true,
+      "detail": "n/a"
+    },
+    {
+      "id": "xss.no-regression",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "id": "report.axe.exists",
+      "ok": true,
+      "detail": "qa-p5-axe-runtime-report.json"
+    },
+    {
+      "id": "report.axe.passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "report.axe.version",
+      "ok": true,
+      "detail": "7.1.77"
+    },
+    {
+      "id": "axe.scripts-executed",
+      "ok": true,
+      "detail": "true"
+    },
+    {
+      "id": "axe.no-blockers",
+      "ok": true,
+      "detail": "{\"scanned\":4,\"critical\":0,\"serious\":0,\"moderate\":0,\"minor\":0,\"blockers\":0}"
+    },
+    {
+      "id": "platform.js",
+      "ok": true,
+      "detail": "199d03d9dc9263a9e74ed1f1102df0324f3b63e78704f1c70aeacec5feec530c"
+    },
+    {
+      "id": "platform.css",
+      "ok": true,
+      "detail": "eb465488df46f3d1672d721094800b0be3eb1278924b7699873a483f130b07ad"
+    },
+    {
+      "id": "source.no-src-platform",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "source.no-public-platform",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "source.vendor-platform",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "pwa.manifest",
+      "ok": true,
+      "detail": "manifest.webmanifest"
+    },
+    {
+      "id": "pwa.id",
+      "ok": true,
+      "detail": "./"
+    },
+    {
+      "id": "pwa.start-url-stable",
+      "ok": true,
+      "detail": "./"
+    },
+    {
+      "id": "pwa.scope",
+      "ok": true,
+      "detail": "./"
+    },
+    {
+      "id": "pwa.service-worker",
+      "ok": true,
+      "detail": "sw.js"
+    },
+    {
+      "id": "pwa.no-install-skipwaiting",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "pwa.no-store-aware",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "secrets.no-forbidden-files",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ci.p5-workflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ci.clean-install",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ci.browser-install",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "ci.p5-gate",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 46,
+    "passed": 46,
+    "failed": 0
+  },
+  "status": "passed"
+}

@@ -1,0 +1,197 @@
+GIT — RED-TEAM MASTER PROMPT v2 — E3 PŘEDÁVACÍ CHECKPOINT
+Datum: 2026-10-03
+Verze: 7.1.79, lokální větev candidate
+Stav: NOT READY – BLOCKING ISSUE
+Dokončeno: E0, E1, E2, E3. E4–E10 pending. Nejde o finální release.
+
+A. PŮVODNÍ STAV A VÝSLEDEK E3
+E0 na skutečném původním generátoru prokázala přijetí veřejným RSA
+klíčem zašifrovaného podvrhu s cizím Forms e-mailem, nemožnými časy
+2040 → 2000 a prázdnou telemetrií jako current / OK / 100 %.
+E2 toto přijetí označila za neprokázané a vyžadující kontrolu.
+E3 prokazatelné nekonzistence odmítá před bodováním. Kontroluje také
+externí účet/čas a opakování při importu. Konzistentní podvrh správně
+zašifrovaný veřejným klíčem je stále možný: úspěšné dešifrování ani
+shoda rosteru/časů neprokazuje běh původního studentského runtime.
+
+B. PROVEDENÉ ZMĚNY
+1. 13ed-secure-verifier-validation.js: limity obalu a JSON, známá pole,
+   zákaz duplicitních JSON klíčů (i v dešifrovaném plaintextu), prototypových
+   klíčů, příliš hlubokých/velkých struktur. Striktní verze, identita,
+   kód, attempt ID, varianta, čas a objekt odpovědí. Odpovědi se kontrolují
+   podle privátního zadání pro všech 21 základních typů (ostatní UI styly
+   se mapují na základní typy). Neznámé otázky, špatné datové typy,
+   rozměry, rozsahy indexů a hodnoty mimo nabízené možnosti se odmítají.
+   Nevyplněné položky zůstávají validní; skóre se přepočítá z privátního
+   klíče. Informativní pct/grade se nepoužívají k bodování.
+2. Kontrola testId, manifestu, varianty, identity a tvrzeného HTML hashe
+   před skórováním. Dešifrovaný cizí test se ve celoročním CSV oddělí;
+   vnější metadata nenahrazují identitu dešifrovaného výsledku. U cizího
+   obalu, který tento privátní klíč nedešifruje, jde jen o other-test hint.
+3. Prázdná/chybějící/neplatná telemetrie, události mimo uvedený pokus,
+   nemožné pořadí start/odevzdání, nesoulad kódu a identity, neplatná
+   volba žolíka a nesouhlasící statistiky změn se odmítají. Neprázdné
+   konzistentní události zůstávají PRESENT_UNVERIFIED / CLIENT-CONTROLLED.
+4. 13ee-secure-verifier-anchors.js: privátní nastavení školní domény,
+   skutečného času publikace, IANA pásma CSV a přesných systémových
+   sloupců. Povinná potvrzení vlastníka: ověřený e-mail přihlášeného
+   účtu, omezení domény, jedna odpověď na účet, nezměněný vlastní export
+   a správné pásmo. Verifier živé nastavení Formu neověřuje.
+5. Privátní roster musí obsahovat unikátní 6znakové kódy a unikátní
+   školní e-maily. Forms e-mail se porovná s e-mailem daného kódu.
+   Pouhé přihlášení nebo libovolný e-mail ve školní doméně nestačí.
+   Školní doména se nehádá. Jmenný režim bez této vazby nepřijímá Forms
+   výsledky jako návrhy ke klasifikaci.
+6. Dolní časová kotva je publikace zadaná vlastníkem, nikdy generatedAt.
+   Horní kotva je systémový čas odeslání z vlastního Forms CSV. Start,
+   odevzdání, události i volba žolíka musí být v tomto okně. Podporované
+   časy: ISO s explicitním offsetem nebo český d.m.y H:mm:ss v nastaveném
+   pásmu (výchozí Europe/Prague). Neexistující/nejednoznačné časy při DST
+   se odmítají. Sekundový čas CSV reprezentuje příslušnou sekundu včetně
+   posledních 999 ms; nejde o další toleranci posunu hodin.
+7. 13ef-secure-verifier-replay.js: kanonický digest dešifrovaného obsahu
+   rozpozná shodný obsah i při novém RSA/AES zašifrování a jiném pořadí
+   JSON klíčů. Klientské pct/grade se z digestu vypouštějí. Identická
+   duplicita i sémantické opakování jsou REJECTED a nezapočítávají se.
+   Různé pokusy stejné identity nebo konflikt jednoho attempt ID vyloučí
+   dotčené výsledky; běžná volba pokusu tuto E3 blokaci neobejde.
+   Detekce platí pro pracovní sadu v jedné relaci verifieru. Nové otevření
+   verifieru/vyčištění sady není globální replay ochrana; pokračuje E4.
+8. CSV import přidává řádky do pracovní sady. Změna kotev nebo výslovné
+   Vyčistit pracovní sadu ji vyčistí. Pro payload se prohledají všechny
+   sloupce; více payloadů je nejednoznačné a odmítne se. Limity 20 MB /
+   5000 datových řádků / 100 sloupců; špatné uvozovky, šířky řádků,
+   prázdné/duplicitní hlavičky a chybějící zvolené systémové sloupce se
+   odmítají. Odmítnuté řádky zůstávají v diagnostice a archivu.
+9. Platná nouzová TXT záloha bez Forms kotev je DIAGNOSTIC_ONLY. Lze
+   prohlížet přepočet, události a feedback; nevstupuje do klasifikačních
+   návrhů, třídní statistiky ani položkové analýzy. Index/JSON archiv
+   zachovávají diagnostiku. UI a všechny exportní trasy nesou neprokázaný
+   původ a stav diagnostiky/odmítnutí/review. Uživatel vidí konkrétní
+   důvod i strojový validation code; export má replay status/error.
+10. Privátní pozorování kotev jsou navázána na skutečný ověřený řádek
+    pomocí WeakMap. Uložené klientské trusted bits nemohou obnovit toto
+    pozorování ani udělit autorizaci klasifikace. Po shodě kotev je stále
+    REVIEW_REQUIRED; authorizedClassificationCount zůstává 0.
+11. Secure runtime zaznamená čas odevzdání až po závěrečné split-summary
+    události a výpočtu self-hashe. Vlastní běžné odevzdání proto nevytváří
+    událost po submittedAt. Self-hash nadále není runtime attestation.
+12. SemVer/GARP 2.7 identity a piny jsou aktualizovány společně; nejnovější
+    RELEASE.changes je první a seznam má nejvýše 10 položek. GARP cesta
+    zůstává candidate → chráněný main → deployment z main.
+
+C. CO JE PREVENTED / DETECTED / HARDENED
+PREVENTED: bodování známých strukturálních nekonzistencí, cizí identity
+vůči rosteru/Forms, chybných bindingů a časů mimo potvrzené externí okno.
+DETECTED: exact/semantic duplicate a konfliktní identity/attempt ID
+v aktuální pracovní sadě. Tyto výsledky se vylučují z návrhů a statistik.
+HARDENED: CSV/JSON parser, limity, rich diagnostika a exportní kontrakty.
+BEST-EFFORT: soukromé párování podle vlastního CSV a nastavení potvrzeného
+vlastníkem; konzistence je kontrolovatelná, původ exportu nikoli kryptograficky.
+CLIENT-CONTROLLED: self-hash, lokální časy, události a klientský runtime.
+
+D. KONTROLY A DŮKAZY
+První P5 narazilo na statický entryCriticalBytes budget: 1 757 172 B
+oproti 1 750 000 B po přidání privátních E3 kontrol do generátoru. Limit
+byl vědomě rekalibrován na 1 770 000 B (+20 000 B, přibližně 1,14 %).
+Ostatních šest velikostních limitů a runtime/assertion gates zůstaly
+stejné. Toto je změna schváleného lokálního budgetu, nikoli důkaz
+zrychlení nebo pass původního limitu. Finální měření je v quality reportu.
+
+npm test: PASS; lint 0 errors / 8 existujících warnings.
+Lokální qa:p5:ci: PASS; release 46/46, acceptance 19/19.
+Quality 35/35; runtime 0 blockers/overflows/browser exceptions.
+Axe: 0 automaticky potvrzených violations ve 4 stavech; incomplete výsledky
+(ARIA v generátoru, kontrast manuálu) odpovídají E2 a stále vyžadují
+ruční posouzení.
+Standardní P5 axe harness odstraňuje CSP pro odemčení chráněných skriptů;
+CSP má samostatné statické brány. Nový E3 student/verifier browser gate
+naopak zachovává původní generované CSP.
+Desktop Chromium 153.0.8010.0 / Playwright 1.61.1.
+Finální výsledky lokálních příkazů jsou v checkpoint-manifest.json a
+přiložených normalizovaných logech. Žádný PASS níže necertifikuje live
+Forms, veřejný deployment, skutečnou GitHub Actions instanci nebo mobil.
+
+Artefaktový gate check-redteam-verifier-e3.mjs používá skutečný generátor,
+skutečný studentský veřejný klíč a skutečný privátní verifier:
+- schema: verze, typy, neznámá pole, telemetrie, žolík a statistiky změn;
+- answers: 21 základních typů, validní 100% průchod a 21 neplatných tvarů;
+- identity: nesprávný účet/doména, chybějící kotvy, kód, varianta/manifest/
+  test, neúplný či duplicitní roster; mutace serializovaných trusted bits;
+- time: nemožné/invalidní časy, publikace/Forms meze, události, DST a
+  přesný poslední milisekundový bod v sekundové kotvě;
+- replay: identický ciphertext, nové zašifrování stejného obsahu, jiný
+  pokus stejné identity, konflikt stejného attempt ID, blokace ruční volby;
+- csv: více payloadů v různých sloupcích, missing/invalid diagnostika,
+  opakovaný import, chyby hlaviček/šířky/uvozovek, BOM/středník a TXT fallback;
+- json: duplicitní klíče obalu i skutečně dešifrovaného obsahu, prototype
+  keys, nadlimitní TXT a neplatné IV/algorithm/unknown envelope fields.
+
+Desktop Chromium gate check-redteam-verifier-browser-e3.mjs zachovává CSP,
+používá reálné WebCrypto/IndexedDB, běžný native submit a skutečný CSV file
+input, nastavení kotev přes UI a skutečné CSV/JSON downloads. Ověřuje
+odmítnutí poškozených podvrhů, nesprávného účtu a duplicit při novém importu.
+E2 gate současně zachovává negativní závěr o runtime autenticitě při shodě
+kotev: konzistentní veřejným klíčem šifrovaný podvrh projde technickou
+kontrolou a přepočtem, ale zůstává CLIENT-CONTROLLED / REVIEW_REQUIRED.
+
+Každá ze 7 nových skupin + nový browser gate mají negativní kontrolu na
+skutečném archivovaném buildu 7.1.76 a E2 buildu 7.1.78. Všech 16 musí
+skončit očekávaným FAIL / exit 1. Kontroly dokazují citlivost testů na
+původní slabiny; nedokazují nemožnost všech budoucích podvrhů.
+
+E. ZBÝVAJÍCÍ LIMITY A BLOKERY
+ARCHITECTURAL LIMIT: veřejný šifrovací klíč dovoluje vytvořit konzistentní
+nový payload. Student pod svým ověřeným účtem může uvést uvěřitelné časy,
+odpovědi a události. Shoda externích kotev neprokazuje původní běh JS.
+Zfalšovaný CSV export nebo nesprávné potvrzení vlastníka rovněž nelze
+v offline verifieru samo o sobě odhalit. Neupravovat CSV před importem.
+
+ARCHITECTURAL LIMIT / SERVER REQUIRED: globální single-attempt/replay,
+nezměnitelný pokus napříč prohlížeči/zařízeními, autoritativní čas a
+serverová session nejsou vyřešeny client-side. E4 zkoumá lokální hardening.
+Školní server: DEFERRED – SERVER VERSION.
+
+F7 — BLOCKING ISSUE: obsah veřejného studentského HTML stále není chráněn
+AES-GCM/PBKDF2 startovním kódem s alespoň 40 bity entropie. Předstartovní
+otázky tedy ještě nejsou považovány za chráněné. Toto E3 neopravuje.
+
+E6/public history: dostupná je pouze dřívější E0 inventura veřejného repa,
+nikoli čerstvá E3 kontrola historie/deploymentu. E6 se musí dokončit.
+Teacher verifier, privátní RSA, answer key a roster patří výhradně na
+soukromý počítač vlastníka mimo školu; nikdy do veřejného repa/historie.
+
+E7: ANALYZED / NOT TESTED. Desktop Chromium ani emulovaný viewport není
+reálné iOS Safari/Android. Žádné mobile GREEN. Fyzický pilot čeká vlastníka.
+Screenshot, druhý telefon, komunikace/spolupráce, externí fotografování:
+MIMO TECHNICKÝ DOSAH – POUZE DOZOR. Browserový guard není DRM.
+
+E8/E9/E10: cílené lokální E3 testy nejsou kompletní experimentální E8
+harness ani finální CI/release certifikace. Lokální úplné regrese a P5
+nenahrazují GitHub Actions, chráněnou propagaci ani ověření live deploymentu.
+
+F. JAK POUŽÍT TENTO CANDIDATE A NAVÁZAT
+1. Nepropagovat tento checkpoint do classroom experimentu.
+2. Na soukromém počítači vygenerovat nový verifier i student z verze 7.1.79;
+   staré verifier HTML nezíská nové kontroly aktualizací generátoru.
+3. Soukromý roster musí mít školní e-mail pro každý kód, bez duplikátů.
+4. Ve Forms vlastník skutečně zapne sběr OVĚŘENÝCH školních e-mailů,
+   omezení domény a jednu odpověď na účet. Ručně položená otázka na
+   e-mail nemá tuto vlastnost. Vybere správný systémový sloupec exportu.
+5. Zapsat skutečný čas publikace a pásmo exportu; nezaměňovat s vytvořením
+   HTML. Potvrdit checklist a načíst vlastní nezměněný CSV export.
+6. Další autorizovaná etapa je E4: lokální persistence, active/submitted
+   attempt, refresh/restart, storage deletion/private mode/other browser,
+   a přesné rozlišení hardeningu od SERVER REQUIRED. E4 není touto etapou
+   dokončena. F7 a E5–E10 nadále musí být dotaženy před rozhodnutím o release.
+
+G. RELEASE READINESS
+NOT READY – BLOCKING ISSUE.
+Důvody: otevřený F7, E4–E10, neprovedený fyzický mobile pilot, aktuální
+live/public-history/Forms/CI certifikace chybí a runtime původ zůstává
+architektonicky neprokazatelný. Lokální testy nejsou marketingové skóre.
+
+Provenience: výchozí E2 commit d481999bb4f39019e0d8eb734ad66cac297f7674.
+Zdrojový ZIP zahrnuje kód, testy a syntetické souhrny/logy. Nezahrnuje
+.git, node_modules, dist, qa-results, vygenerované privátní HTML/key/roster,
+PDF ani runtime-only deployment. GitHub změny/publikace: žádné.

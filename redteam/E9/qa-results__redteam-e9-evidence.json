@@ -1,0 +1,195 @@
+{
+  "stage": "E9",
+  "version": "7.1.85",
+  "status": "PASS",
+  "startedAt": "2026-10-04T05:41:27.008Z",
+  "completedAt": "2026-10-04T05:47:14.939Z",
+  "scope": "Complete current-version process chain, report admission and SHA256 binding; local execution is not remote CI",
+  "reportCount": 34,
+  "reports": [
+    {
+      "file": "qa-results/redteam-e1-isolation.json",
+      "sha256": "67e757a379e4e802368c28dd6b94d50edfa7d1db20791ae1e1abc7f075638feb"
+    },
+    {
+      "file": "qa-results/redteam-e1-browser.json",
+      "sha256": "95a28e63ee237ac69cce6e7a5f0c6c96f8c67b26b5b660fff383cf94cc1c4def"
+    },
+    {
+      "file": "qa-results/redteam-e2-trust.json",
+      "sha256": "dfd94c357a18f4fec39fd76e0bcbd9a73ae0a48302af2a0ac18c55c3201a24bb"
+    },
+    {
+      "file": "qa-results/redteam-e2-browser.json",
+      "sha256": "12d6303cbd555f8060461254169c1ee5c7e26609cd91ca2b4f3a68249f944a63"
+    },
+    {
+      "file": "qa-results/redteam-e3-verifier.json",
+      "sha256": "fda3fee7fb9d27b15d7777f849cf674a5070a9b130ff53bbffad3e86ff32cfad"
+    },
+    {
+      "file": "qa-results/redteam-e3-browser.json",
+      "sha256": "180e4e2c1983a4154e4aad73263db6906cc38853e8a0d8efa0beefbf5d6a8a6d"
+    },
+    {
+      "file": "qa-results/redteam-e4-faults.json",
+      "sha256": "29f5110d61cf29650771ae251c6409bff77fdd6c18c4cef9c01e38c3e7b3aa7c"
+    },
+    {
+      "file": "qa-results/redteam-e4-browser.json",
+      "sha256": "1056ae66de1199ba566f0379660f85823b5a3af6dbb390ac378c93751162dd73"
+    },
+    {
+      "file": "qa-results/redteam-e5-runtime.json",
+      "sha256": "101b338818b686a4df52c29e3f21efc9b556fad53b27d9abb4333902a6ba1f75"
+    },
+    {
+      "file": "qa-results/redteam-e5-browser.json",
+      "sha256": "51fcc185a94c0d6b3172a39206240e835e32d6546bdb42e7cfc64cb33c1a837e"
+    },
+    {
+      "file": "qa-results/redteam-e6-publication.json",
+      "sha256": "7893f86b0e283e7ecc292592f7e76d1ea18aed6aef625a65d74b2c67a69649e9"
+    },
+    {
+      "file": "qa-results/redteam-e7-mobile-protocol.json",
+      "sha256": "5906aea8db7de4835bb398dc75f5c58a717263edced11763a0cc3073d22289d6"
+    },
+    {
+      "file": "qa-results/redteam-e7-recorder.json",
+      "sha256": "5d23861e0f3425ca2dc16a28aeec48bfe1fe7c2523c123b1ba2e27d9b3126d19"
+    },
+    {
+      "file": "qa-results/redteam-e8-forgery.json",
+      "sha256": "d9865c84569fdad63fc99baa8502e7e8ca859ffa7f5f2d5bad1ed90c2e17d374"
+    },
+    {
+      "file": "qa-results/redteam-e8-retention.json",
+      "sha256": "3cf68403207b116ae5c19291c007b439bb598d38963be8050f4d7929d76c12b8"
+    },
+    {
+      "file": "qa-results/redteam-e8-browser.json",
+      "sha256": "0045c5c9e51af4e2c8c0a8981383c302bc2d9865609f7cd9ea09c5b93b3f4656"
+    },
+    {
+      "file": "qa-results/redteam-e9-ci-contract.json",
+      "sha256": "83674778bdd351f591e4b048f42377499a9edc22ca0c483c9d597abf971ff7a9"
+    },
+    {
+      "file": "qa-results/redteam-e9-negative.json",
+      "sha256": "c37f552052ee636c1e040bf28ffc31275e73ba634001276cd5580a2f994432a9"
+    },
+    {
+      "file": "qa-results/redteam-e9-restart-browser.json",
+      "sha256": "1ec50d66650b012e7144c964663e63fadfdc9c61ea2cef59653ce09ee22059dc"
+    },
+    {
+      "file": "qa-results/security-behavior-r3.json",
+      "sha256": "fb301f04be687c35dd6e47829af87ee4df0be8e50f5fcb58d83e83738cb0d5fe"
+    },
+    {
+      "file": "qa-results/adversarial-harness-r5.json",
+      "sha256": "c4f192d3e79fd21b028a3ef0c71e5e82173aa18cc1cba90e855681507b36b251"
+    },
+    {
+      "file": "qa-results/d7-regressions.json",
+      "sha256": "53bc651bcf02a305548d5a352c38956cec370e86c8ba5dafa1b45f183ff9c734"
+    },
+    {
+      "file": "qa-results/d8-final-audit.json",
+      "sha256": "7a3fbd7c2d01e94646b98149767662cf54604c66f9f151fa47e01d4b8696c726"
+    },
+    {
+      "file": "qa-results/stage3-pdf-runtime/summary.json",
+      "sha256": "d943abb2a1df6d93138e3c30b9656aa39483e8aac3eb5f45b3f382825b616905"
+    },
+    {
+      "file": "qa-results/stage3-pdf-quality/summary.json",
+      "sha256": "c35bbe61b1f2fcc124414a9116198cf707870ad80bd018d80e9dd3848ea39da0"
+    },
+    {
+      "file": "qa-results/verifier-ui-runtime/summary.json",
+      "sha256": "c0a19b260c330edd99a5129ab459e5861abe7be27f1bbaae6ebed2b7fd0bef4c"
+    },
+    {
+      "file": "dist/qa-p3-browser-report.json",
+      "sha256": "195729041c4e3ebfe4cbad91aa05adb1f12e19d851a76de42c170cc301dd2d96"
+    },
+    {
+      "file": "dist/qa-p5-runtime-report.json",
+      "sha256": "f1ab9a9fa555ea9bcea20cd650cc8be07224a81a3bac02d4931e541828288132"
+    },
+    {
+      "file": "dist/qa-p5-xss-sinks-report.json",
+      "sha256": "d23c4fb1215e73ae12225f1678538be291b8d5b0e2bca6dc062fbf9b59d0ea8b"
+    },
+    {
+      "file": "dist/qa-p5-axe-runtime-report.json",
+      "sha256": "c9478aab41ce1f3951080ff8d5ff68c123cb6797be9c71db798c0cab1507c33a"
+    },
+    {
+      "file": "dist/qa-p5-release-report.json",
+      "sha256": "d0795f0a4afbd8c530e2f3b38d4eef39792f104753c0bf4c0e0f3e6c88639066"
+    },
+    {
+      "file": "dist/qa-p5-acceptance-report.json",
+      "sha256": "a3c8ef95a9a251599580a51e6399e3fc496daad0351f16ae25040f155b15f0ce"
+    },
+    {
+      "file": "dist/quality-report.json",
+      "sha256": "a602961a3ba0d2762aeeed73fcd98ecd55992670a4b4696917f0fa256599f6b7"
+    },
+    {
+      "file": "audit/evidence/garp27-current/foundation-summary.json",
+      "sha256": "d93a6867492278bbe172ac2ca050bc70e0146556549638d36cbb1c42aeec000e"
+    }
+  ],
+  "negativeControls": [
+    {
+      "id": "missing-report",
+      "detected": true
+    },
+    {
+      "id": "stale-report",
+      "detected": true
+    },
+    {
+      "id": "wrong-version",
+      "detected": true
+    },
+    {
+      "id": "failed-VM",
+      "detected": true
+    },
+    {
+      "id": "missing-forgery-negative",
+      "detected": true
+    },
+    {
+      "id": "failed-export-negative",
+      "detected": true
+    },
+    {
+      "id": "partial-native-matrix",
+      "detected": true
+    },
+    {
+      "id": "invented-mobile-proof",
+      "detected": true
+    },
+    {
+      "id": "failed-adversarial-list",
+      "detected": true
+    },
+    {
+      "id": "increased-budget",
+      "detected": true
+    },
+    {
+      "id": "failed-foundation",
+      "detected": true
+    }
+  ],
+  "physicalMobile": "ANALYZED / NOT TESTED",
+  "releaseReadiness": "NOT READY – BLOCKING ISSUE"
+}

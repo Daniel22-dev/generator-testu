@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: a restored page must reconcile and lock before allowing edits
+
+false !== true
+
+    at file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-runtime-browser-e5.mjs:43:67
+    at async group (file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-runtime-browser-e5.mjs:11:71)
+    at async file:///workspace/scratch/ebcee4a4dd99/work/generator-testu-main/scripts/check-redteam-runtime-browser-e5.mjs:41:3 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

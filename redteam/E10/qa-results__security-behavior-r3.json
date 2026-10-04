@@ -1,0 +1,32 @@
+[
+  {
+    "id": "R2-direct-same-secret",
+    "status": "PASS",
+    "detail": "fail-closed"
+  },
+  {
+    "id": "R2-direct-weak-teacher",
+    "status": "PASS",
+    "detail": "fail-closed"
+  },
+  {
+    "id": "R2-drift-bypass",
+    "status": "PASS",
+    "detail": "invalid drift cannot rebuild"
+  },
+  {
+    "id": "R3-instant-privilege-boundary",
+    "status": "PASS",
+    "detail": "login/unlock separated"
+  },
+  {
+    "id": "R1-verifier-generated-script",
+    "status": "PASS",
+    "detail": "1 script(s) parsed"
+  },
+  {
+    "id": "R3-secure-privilege-boundary",
+    "status": "PASS",
+    "detail": "teacher absent; classroom unlock preserves attempt; foreign identity blocked"
+  }
+]

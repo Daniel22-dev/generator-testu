@@ -1,0 +1,26 @@
+GIT E10 — vlastník před prvním studentským během
+1. Soukromý verifier, roster, answer key a privátní klíč pouze na soukromém
+   PC mimo školu. Studentům patří výhradně šifrovaný student_test.html.
+2. Uzavřít E6 incident: potvrdit historické raw/cache purge a rotaci dříve
+   vystavených private credentials. Aktuální čistá main neprokazuje cache purge.
+3. Forms: školní doména, ověřený email, jedna odpověď; zachovat původní CSV
+   a čas publikace. V private verifieru nastavit kotvy a roster; diagnózy
+   nebrat za autorizační rozhodnutí jen proto, že je payload dešifrovaný.
+4. Pro E7 ruční checklist na iPhone/iPad Safari + Android: zadat nový
+   startovní kód z private verifieru, zkusit wrong code a reload před/po
+   startu, striktní lock, classroom recovery, odevzdání do Forms. Odpověď,
+   start/deadline a attempt musí po reloadu zůstat původní. Device matrix
+   z redteam/E7 zůstává ANALYZED / NOT TESTED pro provedení tímto agentem.
+5. Pro každou třídu/novou variantu sestavit nový balíček s novým startovním
+   kódem. Po editaci zadání stáhnout nový student soubor i jeho private
+   verifier; starý kód nepatří k novému souboru. Ověřit code v self-testu.
+6. Šifrovaný student soubor zveřejnit co nejpozději. Kód ukázat na tabuli
+   teprve při zahájení; nesdílet v URL, publikovaných souborech či repu.
+   Classroom unlock je oddělený kód, procedurální brzda při osobním dozoru.
+7. Připravit samostatný hlásící formulář: pokus, údajný průnik, reprodukce.
+   Druhé zařízení zakázané a hlídané dozorem, technicky neviditelné.
+8. Teprve po doloženém uzavření blockerů změnit release readiness spolu
+   s novým verzovaným release kontraktem a certifikací na přesném SHA.
+   Ověřit candidate → chráněná main → deploy jen main. --require-ready
+   musí zůstat povinné před merge/deploy; NOT READY checkpoint nepublikovat
+   jako produkční experiment. Nepřepisovat stav E7 na agent-tested GREEN.

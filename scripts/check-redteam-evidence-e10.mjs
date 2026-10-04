@@ -1,0 +1,11 @@
+import './check-redteam-evidence-e9.mjs';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+const version=JSON.parse(fs.readFileSync('package.json')).version,startedAt=process.env.GIT_REDTEAM_E9_RUN_STARTED_AT;
+const files=['qa-results/redteam-e9-evidence.json','qa-results/redteam-e10-content.json','qa-results/redteam-e10-browser.json','qa-results/redteam-e10-release.json'];
+const records=files.map(file=>({file,data:JSON.parse(fs.readFileSync(file)),mtime:fs.statSync(file).mtimeMs,sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex')}));
+function validate(rows){for(const r of rows){assert.equal(r.data.version,version);assert.equal(r.data.status,'PASS');assert.ok(r.mtime>=Date.parse(startedAt)-1);}const [old,content,browser,release]=rows.map(r=>r.data);assert.equal(old.reportCount,34);assert.equal(content.entropyBits,50);assert.equal(content.checks.length,6);assert.ok(content.negativeControls.length>=8);assert.equal(browser.checks.length,6);assert.equal(browser.negativeControls.length,1);assert.equal(browser.exceptions,0);assert.equal(browser.physicalMobile,'ANALYZED / NOT TESTED');assert.equal(release.releaseBlocked,true);assert.equal(release.releaseReadiness,'NOT READY – BLOCKING ISSUE');assert.equal(release.negativeControls.length,9);}
+validate(records);const negativeControls=[];
+for(const [id,mutate] of [['stale-content',r=>r[1].mtime=0],['reduced-entropy',r=>r[1].data.entropyBits=20],['missing-native-negative',r=>r[2].data.negativeControls=[]],['false-release-ready',r=>r[3].data.releaseBlocked=false]]){const broken=structuredClone(records);mutate(broken);assert.throws(()=>validate(broken),{name:'AssertionError'},id);negativeControls.push({id,detected:true});}
+fs.writeFileSync('qa-results/redteam-e10-evidence.json',JSON.stringify({stage:'E10',version,status:'PASS',startedAt,completedAt:new Date().toISOString(),reportCount:38,reports:records.map(({file,sha256})=>({file,sha256})),negativeControls,releaseReadiness:'NOT READY – BLOCKING ISSUE',scope:'34 E9 reports plus its admission and 3 E10 reports; local evidence is not remote CI or deployment approval.'},null,2)+'\n');console.log('PASS E10 evidence admission');

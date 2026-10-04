@@ -1,0 +1,21 @@
+{
+  "schema": "git-release-readiness-e10-v1",
+  "version": "7.1.86",
+  "status": "NOT READY – BLOCKING ISSUE",
+  "blockers": [
+    {
+      "id": "E7_PHYSICAL",
+      "required": "Owner must execute and record physical iPhone/iPad Safari and Android profiles; currently ANALYZED / NOT TESTED."
+    },
+    {
+      "id": "E6_INCIDENT",
+      "required": "Historical raw/cache purge and owner private credential rotation require verified closure."
+    },
+    {
+      "id": "LIVE_FORMS",
+      "required": "Owner must verify school email/domain, one response, original CSV and publication time."
+    }
+  ],
+  "f7": "IMPLEMENTED; current-version gates required",
+  "remotePath": "Exact candidate SHA CI, protected main PR merge, deploy only main. Not executed for this checkpoint."
+}
