@@ -640,6 +640,7 @@ function workflowGroupValidation(){
 
 function validate() {
   enforceModeConstraints();
+  refreshWorkflowContext();
   const jazykOk = !!state.jazyk;
   $('next0').disabled = !(trim('nazev') && trim('proKoho') && jazykOk && trim('latka'));
 
@@ -651,8 +652,9 @@ function validate() {
     ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => String(ex.typ||'').trim() && isAllowedExerciseType(normalizeType(ex.typ || '')) && Number.isInteger(ex.pocetOtazek) && ex.pocetOtazek>=1 && ex.pocetOtazek<=30 && (scoringTypeFor(ex.typ)!=='matching'||ex.pocetOtazek>=2) && Number.isInteger(ex.body) && ex.body>=1 && ex.body<=999)
     : ((typeStats.count > 0 || (trim('vlastniTyp') && !customTypeDisabled && !customTypeUnsupported)) && typeStats.count <= 10 && typeStats.count === state.pocet);
   const listeningOk=hasListeningSource();
-  $('next1').disabled = !(hasTyp && state.uroven.length > 0 && listeningOk);
+  $('next1').disabled = !(hasTyp && state.uroven.length > 0 && listeningOk && !readingNeedsReview());
   const hint1=$('validHint1'), step1Msg=[];
+  if(readingNeedsReview())step1Msg.push('Reading vyžaduje kontrolu po změně úrovně nebo zdroje. Otevři jeho nastavení.');
   if(customTypeUnsupported) step1Msg.push('Vlastní typ cvičení není technicky podporován. Použij některý z nabízených typů nebo jeho běžný synonymní název (např. gap fill).');
   if(!hasConfiguredExercises(state) && typeStats.count>10) step1Msg.push('Vybráno je '+typeStats.count+' cvičení, ale jeden test podporuje nejvýše 10.');
   else if(!hasConfiguredExercises(state) && typeStats.count>0 && typeStats.count!==state.pocet) step1Msg.push('Počet cvičení se musí přesně shodovat s počtem zvolených typů ('+typeStats.count+').');
@@ -723,7 +725,7 @@ function validate() {
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
   const rosterOk = (state.identityMode || 'name') !== 'oneTimeCode'
     || (state.participantMode==='later' && state.resultMode==='secureOffline' && state.diferencovany!=='ANO')
-    || (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries) && rosterEntries.length > 0);
+    || (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries) && rosterEntries.length > 0 && rosterSelectionReady());
   const groupLogic=workflowGroupValidation();
   const participantsDeferredOk=state.participantMode!=='later'||state.identityMode!=='oneTimeCode'||(state.resultMode==='secureOffline'&&state.diferencovany!=='ANO');
   $('next3').disabled = !(participantsDeferredOk && secretOk && groupsOk && rosterOk && groupLogic.ok);

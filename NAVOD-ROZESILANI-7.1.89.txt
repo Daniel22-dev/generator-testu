@@ -1,0 +1,48 @@
+GIT 7.1.89 - VÝBĚR PŘÍJEMCŮ AŽ V HODINĚ
+================================================
+
+Základní princip
+Pro opravu nebo dopisování vytvoříš NOVÝ test. V GIT připravíš osobní kódy celé skupině. Teprve v Sheets ve třídě zaškrtneš, komu se má poslat e-mail. Změna tohoto výběru nemění test, Test ID, verifier ani vydané kódy.
+
+DŮLEŽITÉ: Aktualizace GIT sama nezmění dosavadní Apps Script v tvé tabulce. Níže uvedený rozesílač je nutné jednou nainstalovat. Staré tlačítko pro hromadné rozesílání nemusí zaškrtávací políčka respektovat. Po přechodu používej pouze nové menu GIT - kódy.
+
+1. JEDNORÁZOVÁ INSTALACE V GOOGLE SHEETS
+1) Nejprve zálohuj dosavadní skript; ideálně instalaci vyzkoušej v kopii tabulky bez studentských dat.
+2) V tabulce otevři Rozšíření > Apps Script (Extensions > Apps Script).
+3) Vytvoř soubor skriptu, například GIT_kody. Vlož do něj celý obsah souboru public/tools/GIT-ROZESILANI-KODU.gs z tohoto balíčku.
+4) V projektu musí být pouze jedna funkce onOpen(). Pokud už existuje, nevkládej druhou: z nového souboru odstraň řádek function onOpen(){gitCodesMenu();} a do těla původní onOpen přidej gitCodesMenu();. Ostatní nesouvisející funkce nemaž.
+5) Ulož projekt a obnov stránku tabulky. Objeví se menu GIT - kódy. Nevyžaduje se nasazení jako webová aplikace ani časový spouštěč.
+6) Při prvním spuštění potvrď požadovaná oprávnění po jejich kontrole. Skript pracuje s tabulkou a odesílá e-maily; není v něm čtení obsahu poštovní schránky ani AI.
+7) Nejprve proveď zkušební rozeslání jen na vlastní e-mail. U ostré tabulky odstraň nebo zřetelně vyřaď staré rozesílací tlačítko; nový skript je za tebe automaticky neodstraňuje.
+
+2. PŘÍPRAVA KAŽDÉHO NOVÉHO TESTU
+1) V GIT nejprve vyber jazyk a CEFR, vlož podklad, potom zvol cvičení a bodování.
+2) U osobních kódů vlož e-maily CELÉ skupiny a zvol přípravu kódů pro celou skupinu. Pokud znovu používáš otevřenou konfiguraci minulého testu, novou sadu vytvářej pouze před dokončením nového testu, nikoli kvůli výběru příjemců.
+3) Vytvoř a zkontroluj nový test. Uschovej odpovídající soukromý verifier. Zveřejni pouze STUDENTSKÝ soubor na obvyklém HTTPS odkazu.
+4) CSV s kódy stáhni až po vytvoření tohoto testu, aby obsahovalo jeho Test ID. Při stažení dříve bude Test ID prázdné; v nastavení rozesílače je pak nutné doplnit skutečné ID z testu nebo verifieru.
+5) V Sheets importuj CSV přes Soubor > Importovat > Nahrát > Vložit nové listy. Pro každý nový test použij novou záložku/list. Nepřepisuj již použitý seznam jiným testem.
+6) V novém listu otevři GIT - kódy > 1. Nastavit tento list / test. Potvrď Test ID, vlož HTTPS odkaz na STUDENTSKÝ test a předmět e-mailu. Odkaz skript nestahuje: jeho správnost a dostupnost ověř sám.
+7) Rozesílač doplní sloupce odeslat, odeslano a stav. Nové CSV má odeslat u všech FALSE; nastavení z toho udělá nezaškrtnutá políčka. Příprava nic neodesílá.
+
+3. VE TŘÍDĚ
+1) Zjisti, kdo skutečně píše. Ve sloupci odeslat zaškrtni POUZE tyto studenty. Řádky ostatních nemaž.
+2) Otevři GIT - kódy > 2. Náhled a odeslat ZAŠKRTNUTÝM.
+3) Zkontroluj konkrétní příjemce, jejich počet, Test ID a odkaz. Teprve potvrzení odešle e-maily.
+4) Každý dostane samostatnou zprávu s odkazem a vlastním kódem. Po odeslání se políčko odškrtne a zapíše se stav a čas. Ostatní nic nedostanou.
+
+Příklad: Domluveni byli A, B a C. Dorazí jen A a C: zaškrtneš A a C. B přijde později: zaškrtneš jen B a znovu použiješ stejné menu. A ani C se znovu nerozesílají. Test, kódy ani verifier se nemění.
+
+Pro celou skupinu je samostatná vědomá volba Označit všechny dosud neodeslané. Sama také nic neposílá; odeslání vyžaduje náhled a potvrzení.
+
+4. CHYBY A OPAKOVANÉ ODESLÁNÍ
+- Při omylu před potvrzením stiskni Zrušit, oprav políčka a otevři náhled znovu.
+- Stav ODESLANO znamená, že MailApp přijal odeslání bez chyby; není to potvrzení doručení ani přečtení.
+- U nejistého stavu po chybě odesílání nezapínej slepě další pokus. Nejprve zkontroluj Odeslanou poštu. Pokud je skutečně třeba e-mail poslat znovu, použij menu Ručně povolit opakování pro jeden e-mail. Tato volba nic sama neposílá: potom daného studenta zaškrtni a potvrď náhled.
+- Nesnaž se opakování obejít smazáním sloupce stav nebo zkopírováním listu. Skript vede soukromý záznam podle Test ID a e-mailu.
+- Během rozesílání neupravuj řádky ani sloupce a nenech tabulku souběžně editovat druhého uživatele. Skript změny kontroluje, ale pošta a tabulka nejsou jedna atomická transakce.
+- Pokud nový student v původní celé skupině vůbec nebyl, nevymýšlej mu kód ručně v Sheets. To je změna seznamu pro verifier, ne pouhý výběr příjemců. Řeš ji v GIT před rozesláním odpovídajícího exportu.
+
+5. BEZPEČNOST A HRANICE
+Tabulka s osobními kódy je soukromá. Nesdílej ji studentům a nepromítej ji na plátno. Pro hlášení chyb použij anonymizované údaje. Verifier, startovní kód a učitelská tajemství se tímto rozesílačem neposílají. Studentský kód není učitelské heslo ani kód odemknutí obrazovky.
+
+Nové ovládání bylo prověřeno simulacemi, nikoli skutečným odesláním z tvého Google účtu. Před ostrým použitím je nutná zkouška instalace, oprávnění a jednoho e-mailu na vlastní adrese.

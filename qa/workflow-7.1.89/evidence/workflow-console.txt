@@ -1,0 +1,951 @@
+{
+  "scope": "Actual source modules, Chromium about:blank, synthetic signed access, in-memory storage and mocked AI. No production transport/build/mobile certification.",
+  "total": 24,
+  "passed": 24,
+  "results": [
+    {
+      "name": "CEFR and source precede exercise selection",
+      "status": "PASS"
+    },
+    {
+      "name": "Detail toggle preserves counts and points and hides type list",
+      "status": "PASS"
+    },
+    {
+      "name": "Missing CEFR prevents Reading AI",
+      "status": "PASS"
+    },
+    {
+      "name": "Reading preview analyses source, then generates and adopts only after click",
+      "status": "PASS"
+    },
+    {
+      "name": "Changing CEFR marks approved Reading stale and blocks prompt",
+      "status": "PASS"
+    },
+    {
+      "name": "Keeping original after level change preserves text explicitly",
+      "status": "PASS"
+    },
+    {
+      "name": "Shared source change also marks stale",
+      "status": "PASS"
+    },
+    {
+      "name": "New shared source only for other exercises freezes Reading source",
+      "status": "PASS"
+    },
+    {
+      "name": "Cancel Reading restores all new source controls and text",
+      "status": "PASS"
+    },
+    {
+      "name": "Verbatim source cannot be rewritten by AI response",
+      "status": "PASS"
+    },
+    {
+      "name": "Main AI generation rejects rewritten approved passage",
+      "status": "PASS"
+    },
+    {
+      "name": "Main AI generation accepts exact approved passage",
+      "status": "PASS"
+    },
+    {
+      "name": "Own-source Reading request excludes unrelated shared source",
+      "status": "PASS"
+    },
+    {
+      "name": "Adapt source has a distinct adaptation instruction",
+      "status": "PASS"
+    },
+    {
+      "name": "Closing dialog discards late AI response; reopened dialog is unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Wrong AI question count rejected without adopting partial output",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability uses explicit request; repeated unchanged request is cached",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability request excludes private roster codes and teacher credentials",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability cache invalidates on material change",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability rejects malformed/duplicate/unknown types and renders hostile text inert",
+      "status": "PASS"
+    },
+    {
+      "name": "Adding student preserves previously issued codes",
+      "status": "PASS"
+    },
+    {
+      "name": "Unselecting participant removes them from CSV, preserving issued-code registry",
+      "status": "PASS"
+    },
+    {
+      "name": "CSV for entire group defaults every recipient OFF",
+      "status": "PASS"
+    },
+    {
+      "name": "Private verifier is explained instead of adding admin secret to secure student",
+      "status": "PASS"
+    }
+  ],
+  "browser_errors": []
+}
+{
+  "scope": "Real source rendering and shuffle functions in Chromium DOM; synthetic fixture data. No full encrypted export or end-to-end grading claim.",
+  "total": 40,
+  "passed": 40,
+  "results": [
+    {
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "true/false",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "open answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "short answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "word order",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "word formation",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "error correction",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "ordering",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "status": "PASS",
+      "orderA": [
+        31,
+        11,
+        1,
+        41,
+        51,
+        21
+      ],
+      "orderB": [
+        31,
+        51,
+        11,
+        21,
+        1,
+        41
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "matching",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "multiple choice",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "true/false",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "open answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "short answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "word order",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "word formation",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "error correction",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "reading comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "listening comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "dialogue completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "cloze text",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "multi-select",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "ordering",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "table-completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "transformation-chain",
+      "status": "PASS",
+      "orderA": [
+        31,
+        11,
+        21,
+        51,
+        1,
+        41
+      ],
+      "orderB": [
+        11,
+        51,
+        1,
+        21,
+        31,
+        41
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "error-tagging",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "categorisation-board",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "matching",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    }
+  ]
+}

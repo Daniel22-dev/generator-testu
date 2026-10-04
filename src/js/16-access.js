@@ -106,6 +106,8 @@ function generatorClearRuntimeState(){
   // Stop late asynchronous work before clearing references so an in-flight AI
   // response cannot repopulate the just-ended shared-device session.
   try { geminiCancelRequested=true; } catch(_e) {}
+  try { cancelComprehensionTask(); } catch(_e) {}
+  try { suitabilityCache.clear();suitabilityDisplayedKey='';suitabilityPending=false;geminiDataNoticeAcceptedInMemory=false; } catch(_e) {}
   try { if(currentGeminiAbortController) currentGeminiAbortController.abort(); } catch(_e) {}
   try { currentGeminiAbortController=null; } catch(_e) {}
   try { clearTimeout(geminiCooldownTimer); geminiCooldownTimer=null; geminiCooldownUntil=0; } catch(_e) {}
@@ -118,7 +120,7 @@ function generatorClearRuntimeState(){
   try { fileObjects=[]; } catch(_e) {}
   try { fileReadPromises=[]; } catch(_e) {}
   try { generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; } catch(_e) {}
-  try { rosterEntries=[]; variantSeq=0; variantSlug=''; } catch(_e) {}
+  try { rosterEntries=[]; rosterIssuedCodes.clear(); rosterIssuedState=null; variantSeq=0; variantSlug=''; } catch(_e) {}
   try { lastSelfTest=null; secureGapsAcknowledged=false; } catch(_e) {}
   try { akvWeakRows=[]; lastKeyCheck=null; keyDiffsAcknowledged=false; selfTestStaleReason=''; } catch(_e) {}
   try { _liAiDraft=null; _rcAiDraft=null; } catch(_e) {}

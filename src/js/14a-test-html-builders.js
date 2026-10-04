@@ -310,7 +310,7 @@ function buildMatchingHtml(ei, items, pts, L) {
     '<div class="match-grid">' +
     items.map((item,li) =>
       '<div class="match-row">' +
-      '<div class="match-left">' + H(item.left||'') + '</div>' +
+      '<div class="match-left"><b class="match-num">' + (li+1) + '. </b>' + H(item.left||'') + '</div>' +
       '<select class="match-sel" data-ei="' + ei + '" data-li="' + li + '" onchange="updateMatch(' + ei + ',' + li + ',this.value)">' +
       '<option value="">— ' + H(L.choose) + ' —</option>' +
       rightItems.map(r => '<option value="' + r.origIdx + '">' + H(r.text) + '</option>').join('') +

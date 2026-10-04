@@ -2,7 +2,7 @@
   "schema": "garp27-capability-inventory-v1",
   "garpVersion": "2.7",
   "appId": "generator",
-  "appVersion": "7.1.88",
+  "appVersion": "7.1.89",
   "dataClass": "D3",
   "agentic": true,
   "aiOperations": [
@@ -16,7 +16,8 @@
     "answer-key-verification",
     "acceptable-answer-enrichment",
     "generator-help-answer",
-    "diagnostic-ping"
+    "diagnostic-ping",
+    "exercise-suitability"
   ],
   "providerTools": [
     "url_context"

@@ -386,7 +386,7 @@ async function requestValidatedExerciseData(st,filePack,useUrlContext){
     if(geminiCancelRequested)throw new Error('Generov\u00e1n\u00ed zru\u0161eno.');
     const data=await callGeminiJSON(prompt+correction,filePack.parts,{urlContext:useUrlContext,operation:attempt?'generation-repair':'exercise-generation'});
     if(geminiCancelRequested)throw new Error('Generov\u00e1n\u00ed zru\u0161eno.');
-    try{normalizeAllVariants(st,data,getApiDiffGroups(st));return data;}
+    try{validateApprovedReadingContent(st,data);normalizeAllVariants(st,data,getApiDiffGroups(st));return data;}
     catch(error){
       if(!error.isExerciseValidation && !/variant/.test(String(error.message)))throw error;
       if(attempt===1)throw error;

@@ -1,0 +1,549 @@
+{
+  "input_zip_sha256": "c9ce6e1481a048ecbd5a1c8c19862e861fc808a8a4d7a9d15c8aeb19c8d0a86c",
+  "from_version": "7.1.88",
+  "to_version": "7.1.89",
+  "note": "Candidate; supplemental evidence only. No production deployment.",
+  "changed_files": [
+    {
+      "path": ".github/workflows/deploy.yml",
+      "status": "modified",
+      "sha256": "f15d6a569dc6bf58064a36e1c80c156b487a1c4601577fc2970bf88cc3d56e13",
+      "bytes": 11678
+    },
+    {
+      "path": ".github/workflows/p3-quality.yml",
+      "status": "modified",
+      "sha256": "04bb168b85915e4e8bf4a87e198b3d944ca4812250dff1bd30b6655bccd85bfa",
+      "bytes": 1074
+    },
+    {
+      "path": ".github/workflows/p4-release.yml",
+      "status": "modified",
+      "sha256": "e037369713786b95bb24d17a3e46ad0b0cc27ddbde836b6c2d8ebc017cc1b080",
+      "bytes": 1069
+    },
+    {
+      "path": ".github/workflows/p5-release-gate.yml",
+      "status": "modified",
+      "sha256": "95d4998c9efc040b4236322dc90dfd62554a30553bbd3b6b57025f266445b4e2",
+      "bytes": 2680
+    },
+    {
+      "path": ".github/workflows/safe-promotion.yml",
+      "status": "modified",
+      "sha256": "aac3d5c51756075235628d38efb0fb1f54328f92fe2d1d3b6ee90253bc834ed8",
+      "bytes": 19440
+    },
+    {
+      "path": ".github/workflows/stage-b-full-validation.yml",
+      "status": "modified",
+      "sha256": "02f43b4edfbd9578ce101f5556c8ff60a860d32fa8b18ea018d2b391fff78a62",
+      "bytes": 3147
+    },
+    {
+      "path": "NAVOD-ROZESILANI-7.1.89.txt",
+      "status": "added",
+      "sha256": "9a9325fda7da02464efd35f6c6fad9b91ace30080e4416c5df7c6bf7c7bd49b6",
+      "bytes": 5593
+    },
+    {
+      "path": "QA-WORKFLOW-7.1.89.md",
+      "status": "added",
+      "sha256": "f10597e1799000213653bdfd548d1e4a1742e0ffdec6f2b067e2ee1084324216",
+      "bytes": 1733
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "f926f218a1b6d9d529dd57f365635a1abe92df64b76788c6f3820e242f21c5e0",
+      "bytes": 26847
+    },
+    {
+      "path": "RELEASE-NOTES-7.1.89.md",
+      "status": "added",
+      "sha256": "a1c4df2e4ff36ba13a49c6f8b41a738982a8283562f6b37176a603c0594ce39d",
+      "bytes": 2937
+    },
+    {
+      "path": "REPORT-UPRAV-7.1.89.txt",
+      "status": "added",
+      "sha256": "706c0f562467e3587f3ef622ac91d174557b3c87a17637bcde377ca1e3e4679f",
+      "bytes": 5091
+    },
+    {
+      "path": "ghrab-platform.consumer.json",
+      "status": "modified",
+      "sha256": "1cd8aaf3faed32aa103459d3e3218add9fa70202c5172eafb82d3f55fd889a8a",
+      "bytes": 4347
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified",
+      "sha256": "920c06a285b560ecf18ceb5060328c91dcb1dbfa1e5a122f012bd814c15d678d",
+      "bytes": 52486
+    },
+    {
+      "path": "package.json",
+      "status": "modified",
+      "sha256": "15f3a3a6fbfb00b15904f61faeff5f3b9087cf0d81b97609ec448920b475b49a",
+      "bytes": 15499
+    },
+    {
+      "path": "public/access/error-reporter-adapter.js",
+      "status": "modified",
+      "sha256": "90f5d0e6e811e24dca775bbd5513b9d56ab875d928c6fcf8c910a13ae6b3f1cf",
+      "bytes": 771
+    },
+    {
+      "path": "public/ai-operations.json",
+      "status": "modified",
+      "sha256": "1bbc8f1ec2b9d35834f58ce65950563697a98ff3f945630828693f897892b149",
+      "bytes": 6212
+    },
+    {
+      "path": "public/config/data-manifest.json",
+      "status": "modified",
+      "sha256": "135bd0d578913c2ac0fef246ca78e7eca86609f43175bdb1e81cb53ef0a2e332",
+      "bytes": 9701
+    },
+    {
+      "path": "public/config/platform-manifest.json",
+      "status": "modified",
+      "sha256": "a4467fb32096f72d92ca1da41343a75da93d7b778102b3bde603dae73a16cf0b",
+      "bytes": 1924
+    },
+    {
+      "path": "public/config/security-headers.json",
+      "status": "modified",
+      "sha256": "96bce703e22ea777e3292402e00c3164f5fa16cee0b1fe9eed99c58ff1c63cba",
+      "bytes": 1819
+    },
+    {
+      "path": "public/ghrab-platform.consumer.json",
+      "status": "modified",
+      "sha256": "1cd8aaf3faed32aa103459d3e3218add9fa70202c5172eafb82d3f55fd889a8a",
+      "bytes": 4347
+    },
+    {
+      "path": "public/manifest.webmanifest",
+      "status": "modified",
+      "sha256": "fe1a231f1d623704a5bad61ac9a9c8adbb821544ada12b4e34e63e94dd087eef",
+      "bytes": 1138
+    },
+    {
+      "path": "public/manual/index.html",
+      "status": "modified",
+      "sha256": "59f1d5bbcf01bd99d2f0b92ca15011000cffa8b2e198e322c8143c8b5f05d64a",
+      "bytes": 46602
+    },
+    {
+      "path": "public/manual/rozesilani-kodu.html",
+      "status": "added",
+      "sha256": "46d7de2b03c951958ec97fd52aa480f65a0ac34db65bd6aa32e09de9edba0636",
+      "bytes": 6800
+    },
+    {
+      "path": "public/sw.js",
+      "status": "modified",
+      "sha256": "128d0202122013af7098bc182bae9b17c79344bde49b51be3c65bbeaa13eed1a",
+      "bytes": 4950
+    },
+    {
+      "path": "public/tools/GIT-ROZESILANI-KODU.gs",
+      "status": "added",
+      "sha256": "837b8f0fb543286fbfc4fa270e5ed2289900fc8f99090a1184a1dca04d3be77e",
+      "bytes": 14648
+    },
+    {
+      "path": "qa/qa-manifest.json",
+      "status": "modified",
+      "sha256": "8ddbcb2f66381589c4a50178ff667116274ee6235250c01f57df2394b8e14e65",
+      "bytes": 1923
+    },
+    {
+      "path": "qa/workflow-7.1.89/README.md",
+      "status": "added",
+      "sha256": "b19462493278e265a9905492705775f511fc3d374a2d45505cc9bfcaec9ac7d4",
+      "bytes": 1604
+    },
+    {
+      "path": "qa/workflow-7.1.89/browser_full.py",
+      "status": "added",
+      "sha256": "22dab416726425a9025a9881f00db94ec530912a628ec5f913789313c6692a7e",
+      "bytes": 3535
+    },
+    {
+      "path": "qa/workflow-7.1.89/browser_smoke.py",
+      "status": "added",
+      "sha256": "c706949df65a91029ee9114de8bc64219f4ef8adefeb145b22f5e1a37c1e32ed",
+      "bytes": 6921
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/01-workflow.png",
+      "status": "added",
+      "sha256": "718519c5dbec44b73695c6ceca3db38c7729f2c808c3c01e1235faff21745b24",
+      "bytes": 442241
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/02-reading.png",
+      "status": "added",
+      "sha256": "10006f9e7831612d64a23be18b51723cab0f894e12e26614b3976898496f678a",
+      "bytes": 488797
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/03-nested-confirmation.png",
+      "status": "added",
+      "sha256": "beeec9ee798c9d1d13fa09c97a4ad261dacb830d3bf67154a41f1ac5d9b233b3",
+      "bytes": 136434
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/browser-smoke.txt",
+      "status": "added",
+      "sha256": "c08889a57599e4e594f48bdcfca66c4cc96327b0485370b6ce0f4288100916ab",
+      "bytes": 486
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/build.log",
+      "status": "added",
+      "sha256": "545984a19e30eef5610853c684a1f62850ec2ffdfca42dfab50dbb255152aa14",
+      "bytes": 19671
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-action-pins.log",
+      "status": "added",
+      "sha256": "73de535f4f1c7483335e25f7d84143e272b675f2f451ef0f05c6f6ad1868c544",
+      "bytes": 79
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-ai-operation-registry.log",
+      "status": "added",
+      "sha256": "4a7d5d028042262dd149a3e1afe8b09b0a607bcdab209bbd76852f6104d9bf7e",
+      "bytes": 106
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-ci-trust-pin-f0.log",
+      "status": "added",
+      "sha256": "201446fc97689312c50ae34acf27c21e10aabe079a05bf807ea38a4f65526426",
+      "bytes": 116
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-credential-policy-r2.log",
+      "status": "added",
+      "sha256": "cc09ccef6347b8ff64f22e8c8cb995d244b0f0dc2b404dc463327c9685463c37",
+      "bytes": 703
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-csp.log",
+      "status": "added",
+      "sha256": "ea22b4427ad3ab5214b97fd2a89c57d31a0e6d72d87a49dcc4e8c583638521f6",
+      "bytes": 1017
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-d7-ci-wiring.log",
+      "status": "added",
+      "sha256": "e06b1e09feb49e70d60d512f91a31baf1a98706f43591a7071646cd5454ac7ad",
+      "bytes": 911
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-deadline-timers.log",
+      "status": "added",
+      "sha256": "1436dbfb038e851b1c5f4b18e3fbedebea39dac8c42971165732550274567c20",
+      "bytes": 83
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-embedded-script-terminators.log",
+      "status": "added",
+      "sha256": "3340f5c2b9c72ec57a53bfe458842579efa26a869e58b3638cdadc0dd8c042cd",
+      "bytes": 66
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-exercise-type-help.log",
+      "status": "added",
+      "sha256": "610287b6278eb7f2eb0bab9924d599070599b4f93bfa06ca179fed39911f4200",
+      "bytes": 1032
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-lockfile-registry.log",
+      "status": "added",
+      "sha256": "9ad332ebc087bab6c52dd1b48a574b3c7c827ee27d6f72aa1c6dd3e9a46e6199",
+      "bytes": 81
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-qa-manifest.log",
+      "status": "added",
+      "sha256": "2bdf965e6e2cccdfcbb1158160bdf54d614aa915362e632e3bc98ffe64bb7f2e",
+      "bytes": 59
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-runtime-ux-regressions.log",
+      "status": "added",
+      "sha256": "8398d8cd7a2b0355e6e6070d1c5b879e304f7df75b3143f5575de431cf7b71c2",
+      "bytes": 1045
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-sensitive-data.log",
+      "status": "added",
+      "sha256": "07bc47c339ec60dda7f04a59ff5575091d23ab1cd1b7bfd346ba41ba268a07f5",
+      "bytes": 88
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-source-structure.log",
+      "status": "added",
+      "sha256": "33229c88e78a9051ca548d68071d00870d9ce51a3086d1bbe1ae4d4739edd23b",
+      "bytes": 91
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/check-versions.log",
+      "status": "added",
+      "sha256": "6b1b2a4dabbe4e88726923a4361622faf0aceb80aaa5dbe6080b4a69548e4ca3",
+      "bytes": 41
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/init-errors.json",
+      "status": "added",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/mailer-console.txt",
+      "status": "added",
+      "sha256": "fa1d6a2113e0b2f840f5790515f7583d7c8f7e0472acb4c729bb74d44f197ad8",
+      "bytes": 2295
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/mailer-tests.json",
+      "status": "added",
+      "sha256": "fa1d6a2113e0b2f840f5790515f7583d7c8f7e0472acb4c729bb74d44f197ad8",
+      "bytes": 2295
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/privacy-dialog-tests.json",
+      "status": "added",
+      "sha256": "d5cf8077a871e908019c858fffd2717530744ae5db7db677d8582a0ee146b7b4",
+      "bytes": 869
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/shuffle-tests.json",
+      "status": "added",
+      "sha256": "cd6531c984928e94297baf807bb4c803f15410b02c310752ecd6aace0a15b82e",
+      "bytes": 11451
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/static-checks.json",
+      "status": "added",
+      "sha256": "2cc2963a78b2b8a9ac8371156a911b23707efdff7afc8039b9510197946e00e8",
+      "bytes": 1990
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/syntax-checks.json",
+      "status": "added",
+      "sha256": "c9357c134665497d334f09ca1525b74e118f51325703f022d41b2b51b4a3301b",
+      "bytes": 41
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/workflow-console.txt",
+      "status": "added",
+      "sha256": "2e42cf54f4c4a52016a542038b9e0d9382d7587967104e31f892b0d23c15d3ea",
+      "bytes": 14407
+    },
+    {
+      "path": "qa/workflow-7.1.89/evidence/workflow-tests.json",
+      "status": "added",
+      "sha256": "724f9831a18f5d7d2eb838492b345c7bc7d3b65a7639bf78bcaafefa9960326d",
+      "bytes": 2954
+    },
+    {
+      "path": "qa/workflow-7.1.89/shuffle-tests.js",
+      "status": "added",
+      "sha256": "c7c1e5fe37d9f8ddf7b901dae2e76f61631f4d38cca76e3179dc3c5826c8d194",
+      "bytes": 4907
+    },
+    {
+      "path": "qa/workflow-7.1.89/test-mailer.mjs",
+      "status": "added",
+      "sha256": "f8e23cf76748cbeaa14230e067d09ef5551d091b26cb9e3984ed8142b12daa8e",
+      "bytes": 8427
+    },
+    {
+      "path": "qa/workflow-7.1.89/workflow-tests.js",
+      "status": "added",
+      "sha256": "44b2f1d9587e307ac7d51cdcc9d166bcbf56bd535d1cfb28308c769cd8044f1a",
+      "bytes": 11067
+    },
+    {
+      "path": "reporter-test.config.json",
+      "status": "modified",
+      "sha256": "d4b13e758892e6f7053c8585a9a536dddd38b3193886aaf29f0db2e0463179c9",
+      "bytes": 955
+    },
+    {
+      "path": "scripts/build.mjs",
+      "status": "modified",
+      "sha256": "cda49f80d609ee0e115d61142248da2a5cb534ed8ac9ae338008feafeeb3416b",
+      "bytes": 14395
+    },
+    {
+      "path": "scripts/generate-ai-assurance-fingerprint.mjs",
+      "status": "modified",
+      "sha256": "09307a5bdb81d4fe4c256c0433539d2f6bf8eba99ea86a72b991dadf36898d24",
+      "bytes": 4017
+    },
+    {
+      "path": "security/evidence/ai-assurance-fingerprint.json",
+      "status": "modified",
+      "sha256": "7b4ecf9d4b1910830d8e81d2ee6c6fe59abb4f448e7805968b3dca92ecd6f50f",
+      "bytes": 4519
+    },
+    {
+      "path": "security/garp27/application-migration-profile.json",
+      "status": "modified",
+      "sha256": "3a4bc67863db1d1aea0783fc3a81e26872e7dadbb6a0cf4bc20de851fd14f80d",
+      "bytes": 1922
+    },
+    {
+      "path": "security/garp27/architecture-policy.json",
+      "status": "modified",
+      "sha256": "c176380a5194979213c1763da307dd2ceae50375fe4d969ba2e2b02728f027b6",
+      "bytes": 1742
+    },
+    {
+      "path": "security/garp27/capability-inventory.json",
+      "status": "modified",
+      "sha256": "a772a702354a29c2ff2ec950ee899f8fe80eb74641fcfc334e9945eb2b9a1085",
+      "bytes": 2118
+    },
+    {
+      "path": "security/garp27/garp-policy.json",
+      "status": "modified",
+      "sha256": "db85c87a4fd1cae2116b76ed3d65b7987f28e5287181be96c3556c37776e1ff3",
+      "bytes": 4856
+    },
+    {
+      "path": "security/garp27/trust-anchor.json",
+      "status": "modified",
+      "sha256": "67923b71190e7e4fa0dbccf27963f61a22e3b53a48e9cb72cbb856142655430f",
+      "bytes": 2060
+    },
+    {
+      "path": "security/sbom/generator-testu-7.1.89.cdx.json",
+      "status": "added",
+      "sha256": "2a8df9065a844810f5d58b32efe5d61f66ee404328a4c76f735d04b4be24dc46",
+      "bytes": 102597
+    },
+    {
+      "path": "src/config/release-acceptance.json",
+      "status": "modified",
+      "sha256": "b123b2102389dc6e7a0703da7156a002c89353648de39db49a51ec8be815da7e",
+      "bytes": 2788
+    },
+    {
+      "path": "src/js/01-core.js",
+      "status": "modified",
+      "sha256": "df78f0f732e4e9c449695a994bb3c1330a8c76ccec50e23c6b1d9bb4312f41e7",
+      "bytes": 165171
+    },
+    {
+      "path": "src/js/02-state-persistence.js",
+      "status": "modified",
+      "sha256": "9c76cd7e84d138d93ee1db8aa2d626a44823c883d2b8be7fb910e58414f6932c",
+      "bytes": 53583
+    },
+    {
+      "path": "src/js/03-ui-render.js",
+      "status": "modified",
+      "sha256": "f5ebffaca9c5afce15a2c465211db94dc64775bfa6afc398a86aa355a4499c30",
+      "bytes": 55969
+    },
+    {
+      "path": "src/js/05-form-fields.js",
+      "status": "modified",
+      "sha256": "6dc8307584a4d53936526af6a818a9d9003e4d727f6adb92761aff83f9ddb2e4",
+      "bytes": 121251
+    },
+    {
+      "path": "src/js/05a-comprehension-dialogs.js",
+      "status": "modified",
+      "sha256": "305f3fb6db413ae3e19a3e9bc893d0ac454702c0e21c515ae90c70876165580b",
+      "bytes": 7058
+    },
+    {
+      "path": "src/js/05b-workflow-context.js",
+      "status": "added",
+      "sha256": "f5ff537586c3c7051a6ab47aa802d2c30f87314947d01a2b57fa459543371979",
+      "bytes": 11277
+    },
+    {
+      "path": "src/js/05c-exercise-suitability.js",
+      "status": "added",
+      "sha256": "b39453c523e2aa168f2e2e6a0d511e133b50317cc36aea30832858a3c700507d",
+      "bytes": 8357
+    },
+    {
+      "path": "src/js/07-gemini.js",
+      "status": "modified",
+      "sha256": "7b2e1e07ca9eb70d6de4254c04cdf585cfd26df5a491ac362d3eb2b851f00eb0",
+      "bytes": 56845
+    },
+    {
+      "path": "src/js/07z-ai-core-integration.js",
+      "status": "modified",
+      "sha256": "085a61c2826647fcc19685764b69ebb570de44e87bfa29a3a9542caf8346575d",
+      "bytes": 14586
+    },
+    {
+      "path": "src/js/08-manual-editor.js",
+      "status": "modified",
+      "sha256": "197fc4d51d04c5a46ac21644a2b45e0b0ab3fa8102a99672b130f8275bef0adf",
+      "bytes": 68117
+    },
+    {
+      "path": "src/js/08a-output-workflow.js",
+      "status": "modified",
+      "sha256": "28d8ec3bd3c4243a6058e9a4e5a23fd1c017dd2d88037cce062ac4508080c89d",
+      "bytes": 15840
+    },
+    {
+      "path": "src/js/10-testlab.js",
+      "status": "modified",
+      "sha256": "6454c87681de20c37ec648475bcf38f0011d3adfe7eea9e092df60c029b21ff2",
+      "bytes": 15420
+    },
+    {
+      "path": "src/js/13e-secure-student-runtime.js",
+      "status": "modified",
+      "sha256": "54b8e097da9035a35a63633b03d94326ab9bf111abb5809abeb4fe936e0090a9",
+      "bytes": 85511
+    },
+    {
+      "path": "src/js/14a-test-html-builders.js",
+      "status": "modified",
+      "sha256": "ab12905aaba619bf0233c7f55602e51949946c7c185af41d1be4c58752f0d2c4",
+      "bytes": 30644
+    },
+    {
+      "path": "src/js/14b-instant-test-runtime.js",
+      "status": "modified",
+      "sha256": "893edbf56a52b310343ed0640e0120d177733ff792efdf2fe6a991a32c7c0feb",
+      "bytes": 60104
+    },
+    {
+      "path": "src/js/16-access.js",
+      "status": "modified",
+      "sha256": "8181996c355bfdfbdece11f50ee4c182522d41c6fe8dc417a3c3d6405a1b29c9",
+      "bytes": 11047
+    },
+    {
+      "path": "src/shell.html",
+      "status": "modified",
+      "sha256": "f3082e320f8273e7902e8fbec8e19cdf8dae872f3a369eb9b30de23bfa28c2fd",
+      "bytes": 119408
+    },
+    {
+      "path": "src/styles.css",
+      "status": "modified",
+      "sha256": "4799dcda16b8198c4ef9452793b33c74c90e180fd66854a67ef672e74c4ec359",
+      "bytes": 162074
+    }
+  ],
+  "deleted_files": []
+}

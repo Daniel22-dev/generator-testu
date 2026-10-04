@@ -1,0 +1,16 @@
+PASS qa:p5:ci includes the D7 verifier/PDF regression gate
+PASS qa:p5 keeps local/release parity with the D7 regression gate
+PASS D7 runner includes check-teacher-verifier-v2.mjs
+PASS D7 runner includes check-verifier-effective-analytics.mjs
+PASS D7 runner includes check-verifier-ia-security.mjs
+PASS D7 runner includes check-stage3-pdf.mjs
+PASS D7 runner includes check-stage3-pdf-runtime.mjs
+PASS D7 runner includes check-stage3-pdf-quality.mjs
+PASS D7 runner includes check-verifier-ui-runtime.mjs
+PASS Journey workflow cleans stale evidence before the run
+PASS Journey workflow includes config_extra_suite for count/differentiation coverage
+PASS Journey artifact is bound to the exact SHA
+PASS Safe Promotion waits for independent P5 and Journey checks
+PASS Safe Promotion requires both independent checks to be green
+PASS P5 artifact retains non-sensitive D7 evidence summaries
+PASS D7 CI wiring contract

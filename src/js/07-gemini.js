@@ -38,7 +38,9 @@ function loadGeminiModel(){
   try { localStorage.removeItem('sestavovac_gemini_model'); } catch(_){}
 }
 
+let geminiDataNoticeAcceptedInMemory=false;
 async function ensureGeminiDataNotice(){
+  if(geminiDataNoticeAcceptedInMemory)return true;
   if(window.GHRAB_PLATFORM?.isSchoolProfile?.()) return true;
   try { if (sessionStorage.getItem(GEMINI_DATA_NOTICE_SESSION_SK) === 'accepted') return true; } catch(_){}
   const ok = await uiConfirm(
@@ -46,7 +48,7 @@ async function ensureGeminiDataNotice(){
     'Kontrola dat před odesláním do AI',
     true
   );
-  if (ok) { try { if(generatorPersistenceAllowed()) sessionStorage.setItem(GEMINI_DATA_NOTICE_SESSION_SK, 'accepted'); } catch(_){} }
+  if (ok) { geminiDataNoticeAcceptedInMemory=true; try { if(generatorPersistenceAllowed()) sessionStorage.setItem(GEMINI_DATA_NOTICE_SESSION_SK, 'accepted'); } catch(_){} }
   return ok;
 }
 
@@ -647,7 +649,9 @@ function repairGeminiJson(raw){
 }
 
 async function callGeminiJSON(prompt, extraParts=[], opts={}){
+  if(opts.signal?.aborted)throw new DOMException(geminiCancelledMessage(),'AbortError');
   if (!(await ensureGeminiDataNotice())) throw new Error('AI požadavek byl zrušen před odesláním dat.');
+  if(opts.signal?.aborted)throw new DOMException(geminiCancelledMessage(),'AbortError');
   lastGeminiJsonRepaired = false;
   lastGeminiRawResponse = null;
   if(!geminiApiKey)throw new Error('Gemini API klíč není nastaven. Zadej ho v panelu AI připojení na první stránce.');
@@ -660,9 +664,11 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
   let lastErr = null;
 
   for(let attempt=1; attempt<=maxAttempts; attempt++){
-    if(geminiCancelRequested) throw new Error(geminiCancelledMessage());
+    if(geminiCancelRequested||opts.signal?.aborted) throw new Error(geminiCancelledMessage());
     lastGeminiJsonRepaired = false;
     const ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+    const abortFromCaller=()=>{geminiCancelRequested=true;if(ctrl)ctrl.abort();};
+    if(opts.signal)opts.signal.addEventListener('abort',abortFromCaller,{once:true});
     currentGeminiAbortController = ctrl;
     const timer = ctrl ? setTimeout(()=>{ if(!geminiCancelRequested) ctrl.abort(); }, GEMINI_TIMEOUT_MS) : null;
     let res;
@@ -674,6 +680,7 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
         signal:ctrl?ctrl.signal:undefined
       });
     }catch(e){
+      if(opts.signal?.aborted)throw new DOMException(geminiCancelledMessage(),'AbortError');
       if(e&&e.name==='AbortError'){
         if(geminiCancelRequested)throw new Error(geminiCancelledMessage());
         lastErr = new Error(geminiTimeoutErrorMessage(model, attempt));
@@ -684,11 +691,14 @@ async function callGeminiJSON(prompt, extraParts=[], opts={}){
       if(attempt < maxAttempts){ await geminiWaitBeforeRetry(attempt, maxAttempts, null, 'síť', null); continue; }
       throw lastErr;
     }finally{
+      if(opts.signal)opts.signal.removeEventListener('abort',abortFromCaller);
       if(timer)clearTimeout(timer);
       currentGeminiAbortController = null;
     }
 
+    if(opts.signal?.aborted||geminiCancelRequested)throw new DOMException(geminiCancelledMessage(),'AbortError');
     const data=await res.json().catch(()=>({}));
+    if(opts.signal?.aborted||geminiCancelRequested)throw new DOMException(geminiCancelledMessage(),'AbortError');
     if(!res.ok){
       const apiStatus=data?.error?.status ? String(data.error.status) : '';
       const isQuota = res.status === 429 || /RESOURCE_EXHAUSTED/i.test(apiStatus);

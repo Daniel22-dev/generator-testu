@@ -1,0 +1,104 @@
+{
+  "scope": "Actual source modules, Chromium about:blank, synthetic signed access, in-memory storage and mocked AI. No production transport/build/mobile certification.",
+  "total": 24,
+  "passed": 24,
+  "results": [
+    {
+      "name": "CEFR and source precede exercise selection",
+      "status": "PASS"
+    },
+    {
+      "name": "Detail toggle preserves counts and points and hides type list",
+      "status": "PASS"
+    },
+    {
+      "name": "Missing CEFR prevents Reading AI",
+      "status": "PASS"
+    },
+    {
+      "name": "Reading preview analyses source, then generates and adopts only after click",
+      "status": "PASS"
+    },
+    {
+      "name": "Changing CEFR marks approved Reading stale and blocks prompt",
+      "status": "PASS"
+    },
+    {
+      "name": "Keeping original after level change preserves text explicitly",
+      "status": "PASS"
+    },
+    {
+      "name": "Shared source change also marks stale",
+      "status": "PASS"
+    },
+    {
+      "name": "New shared source only for other exercises freezes Reading source",
+      "status": "PASS"
+    },
+    {
+      "name": "Cancel Reading restores all new source controls and text",
+      "status": "PASS"
+    },
+    {
+      "name": "Verbatim source cannot be rewritten by AI response",
+      "status": "PASS"
+    },
+    {
+      "name": "Main AI generation rejects rewritten approved passage",
+      "status": "PASS"
+    },
+    {
+      "name": "Main AI generation accepts exact approved passage",
+      "status": "PASS"
+    },
+    {
+      "name": "Own-source Reading request excludes unrelated shared source",
+      "status": "PASS"
+    },
+    {
+      "name": "Adapt source has a distinct adaptation instruction",
+      "status": "PASS"
+    },
+    {
+      "name": "Closing dialog discards late AI response; reopened dialog is unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Wrong AI question count rejected without adopting partial output",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability uses explicit request; repeated unchanged request is cached",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability request excludes private roster codes and teacher credentials",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability cache invalidates on material change",
+      "status": "PASS"
+    },
+    {
+      "name": "Suitability rejects malformed/duplicate/unknown types and renders hostile text inert",
+      "status": "PASS"
+    },
+    {
+      "name": "Adding student preserves previously issued codes",
+      "status": "PASS"
+    },
+    {
+      "name": "Unselecting participant removes them from CSV, preserving issued-code registry",
+      "status": "PASS"
+    },
+    {
+      "name": "CSV for entire group defaults every recipient OFF",
+      "status": "PASS"
+    },
+    {
+      "name": "Private verifier is explained instead of adding admin secret to secure student",
+      "status": "PASS"
+    }
+  ],
+  "browser_errors": []
+}

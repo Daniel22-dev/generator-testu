@@ -105,8 +105,8 @@ function boundedReviewBatches(items,lengthOf){
 // vidět u stažení a u změn bez vlivu na obsah je může použít bez nového AI generování.
 const DRIFT_SETTINGS=[['body','body'],['cas','čas'],['gradeTyp','stupnice'],['testMode','účel testu'],['resultMode','způsob výsledku'],['identityMode','identita studenta'],['feedbackMode','zpětná vazba'],['layout','rozložení'],['randomizace','pořadí otázek'],['tema','vzhled'],['zolicek','žolík'],['fuzzyTolerance','tolerance překlepů'],['odevzdavani','odevzdávání'],['screenGuard','hlídání obrazovky']];
 const DRIFT_FIELDS=[['nazev','název'],['proKoho','pro koho'],['vlastniSkala','stupnice'],['ucitelJmeno','jméno učitele'],['ucitelPin','učitelský/admin kód'],['recoveryCode','Recovery kód']];
-const DRIFT_CONTENT=['jazyk','instrJazyk','uroven','kombinovat','diferencovany','skupiny','zadaniTab','urls','sourceUseMode','rcLength','rcTopic','readingQuestionCount','listeningQuestionCount','differentiationLevel','ageGroup','ageGroupCustom'];
-const DRIFT_CONTENT_FIELDS=['latka','zadaniText','zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','poznamky'];
+const DRIFT_CONTENT=['jazyk','instrJazyk','uroven','kombinovat','diferencovany','skupiny','zadaniTab','urls','sourceUseMode','readingSourceScope','readingSourceAction','rcLength','rcTopic','readingQuestionCount','listeningQuestionCount','differentiationLevel','ageGroup','ageGroupCustom'];
+const DRIFT_CONTENT_FIELDS=['latka','zadaniText','zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingSourceText','readingTopicCustom','readingText','readingQuestions','poznamky'];
 function settingsDrift(){
   const src=lastAssembled&&lastAssembled.sourceState;if(!src||!lastGenData||window.__GHRAB_GENERATOR_WORKFLOW_ID__)return null;
   const same=(a,b)=>JSON.stringify(a==null?null:a)===JSON.stringify(b==null?null:b),out=new Set();

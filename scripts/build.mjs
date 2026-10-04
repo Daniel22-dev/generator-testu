@@ -19,7 +19,7 @@ const CORE_VERSION = '1.0.0';
 const CORE_DIR = path.resolve('vendor', `ghrab-ai-core-${CORE_VERSION}`);
 const CORE_FILE = `ghrab-ai-core-${CORE_VERSION}.js`;
 const CORE_MANIFEST = `ghrab-ai-core-manifest-${CORE_VERSION}.json`;
-const EXPECTED_AI_OPERATIONS = 11;
+const EXPECTED_AI_OPERATIONS = 12;
 // Staré názvy modulů zůstávají v repozitáři jen jako náhrobky pro nahrávání přes GitHub web.
 const MIGRATION_TOMBSTONES = new Set(['13-secure-export.js', '14-test-html-builders.js']);
 

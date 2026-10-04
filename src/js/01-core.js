@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.88',
+  version: '7.1.89',
   date:    '2026-10-04',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'WORKFLOW (7.1.89): CEFR a podklad před cvičeními; Reading s vlastním zdrojem a kontrolou změn; viditelné AI potvrzení; poradce vhodnosti; souvislé číslování po zamíchání; rozesílání jen zaškrtnutým v Sheets. Samostatná instalace rozesílače a úplné CI jsou nutné.',
     'WORKFLOW AUDIT (7.1.88): kanonická konfigurace cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní/odložení účastníci. Přebalení kódů bez AI, povinná obnova kontrol a soukromý roster.',
     'RED-TEAM E10 CI FIX (7.1.87): smoke gate respektuje oddělený private verifier; klikací sady používají jeho startovní kód. Sjednocena dokumentace a release metadata. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E10 (7.1.86): zadání šifrované AES-GCM/PBKDF2; startovní kód 50 bitů jen učiteli. Fail-closed start, reload a offline testy; readiness brání merge/deploy. E7/Forms/E6 čekají. NOT READY.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E6 (7.1.82): student preflight, private verifier pairing, public SHA manifest a scan Git historie odmítají answer/teacher deriváty. Tehdejší živý public build/historie blokovaly release. NOT READY.',
     'RED-TEAM E5 / RUNTIME (7.1.81): strict reload/history/freeze/fullscreen zamknou test a zachovají audit. Paste/drop a běžné změny za zámkem blokovány. Split přežije reload; odemčení kontroluje nový odchod. Native a negativní testy; mobily NOT TESTED, CLIENT-CONTROLLED.',
     'RED-TEAM E4 / STORAGE (7.1.80): restart zachovává pokus, deadline a ciphertext outbox. Web Locks omezují souběh; poškozený stav má integrity lock. Soukromá replay evidence přežije restart. Native Chromium a negativní kontroly. Úplné smazání nebo jiný profil vyžaduje server; CLIENT-CONTROLLED.',
-    'RED-TEAM E3 / VERIFIER (7.1.79): schéma a 21 typů odpovědí před bodováním; soukromé Forms účet→roster a publikace→Forms kotvy. Zálohy pouze diagnostické. Replay/konflikty vyřazeny; CSV zachovává pracovní sadu. Artefaktové/browser negativní kontroly. Runtime CLIENT-CONTROLLED.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -234,7 +234,7 @@ const THEME_SPECS = {
 };
 
 const DOM_FIELDS = ['nazev','proKoho','latka','zadaniText',
-  'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
+  'zadaniFileNote','zadaniUrlNote','listeningFocus','listeningQuestions','listeningTranscript','readingTopicCustom','readingText','readingQuestions','readingSourceText','casCustom','bodyCustom','ucitelJmeno','poznamky','vlastniSkala'];
 const SENSITIVE_FIELD_IDS = ['heslo','ucitelPin','recoveryCode'];
 const LEGACY_SCHOOL_SECURITY_CODE_KEY = 'sestavovac_school_security_code_v1';
 const GOOGLE_FORMS_SUBMISSION_URL_KEY = 'sestavovac_google_forms_submission_url_v1';
@@ -259,7 +259,7 @@ const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','
 const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
-  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, readingConfigured:false, listeningConfigured:false, sourceUseMode:'auto',
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, readingConfigured:false, listeningConfigured:false, sourceUseMode:'auto', readingSourceScope:'shared', readingSourceAction:'generate', readingProvenance:null,
   cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name', participantMode:'all',
   body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfigSaved:false, exerciseConfig:[],
   fuzzyTolerance:'off',
@@ -306,6 +306,7 @@ function languageText(){ return state.jazyk || ''; }
 
 // ═══ App modal/toast helpers: no native alert/confirm/prompt in generator UI ═══
 let uiModalResolver = null;
+let uiModalPreviousFocus = null;
 function ensureToastStack(){
   let stack = document.getElementById('uiToastStack');
   if (!stack) {
@@ -330,7 +331,13 @@ function uiToast(message, type='ok', timeout=3600){
 }
 function closeUiModal(value){
   const modal = document.getElementById('uiModal');
-  if (modal) modal.remove();
+  if (modal) {
+    if (typeof modal.close === 'function' && modal.open) modal.close();
+    modal.remove();
+  }
+  const focus = uiModalPreviousFocus;
+  uiModalPreviousFocus = null;
+  if (focus && focus.isConnected) focus.focus({preventScroll:true});
   document.removeEventListener('keydown', uiModalKeyHandler);
   const resolve = uiModalResolver;
   uiModalResolver = null;
@@ -339,7 +346,7 @@ function closeUiModal(value){
 function uiModalKeyHandler(e){
   const modal = document.getElementById('uiModal');
   if (!modal) return;
-  if (e.key === 'Escape') closeUiModal(null);
+  if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); closeUiModal(null); }
   if (e.key === 'Enter') {
     const input = modal.querySelector('.ui-modal-input');
     if (input && document.activeElement === input) closeUiModal(input.value.trim());
@@ -349,25 +356,32 @@ function uiModal({title='Potvrzení', message='', input=false, defaultValue='', 
   if (uiModalResolver) closeUiModal(null);
   return new Promise(resolve => {
     uiModalResolver = resolve;
-    const backdrop = document.createElement('div');
+    uiModalPreviousFocus = document.activeElement;
+    const backdrop = document.createElement('dialog');
     backdrop.id = 'uiModal';
     backdrop.className = 'ui-modal-backdrop';
     backdrop.setAttribute('role', 'dialog');
     backdrop.setAttribute('aria-modal', 'true');
+    backdrop.setAttribute('aria-labelledby', 'uiModalTitle');
+    backdrop.setAttribute('aria-describedby', 'uiModalMessage');
     const inputHtml = input ? `<input class="ui-modal-input" type="text" value="${esc(defaultValue)}" aria-label="${esc(title)}">` : '';
     // html:true → message je důvěryhodné HTML složené v kódu (ne vstup uživatele).
     const bodyHtml = html ? message : esc(message);
     backdrop.innerHTML = `
       <div class="ui-modal-box${boxClass ? ' ' + boxClass : ''}">
-        <div class="ui-modal-head">${esc(title)}</div>
-        <div class="ui-modal-body">${bodyHtml}</div>
+        <div class="ui-modal-head" id="uiModalTitle">${esc(title)}</div>
+        <div class="ui-modal-body" id="uiModalMessage">${bodyHtml}</div>
         ${inputHtml}
         <div class="ui-modal-actions">
           ${cancelText ? `<button type="button" class="ui-modal-btn" data-ui-cancel>${esc(cancelText)}</button>` : ''}
           <button type="button" class="ui-modal-btn primary${danger ? ' danger' : ''}" data-ui-ok>${esc(okText)}</button>
         </div>
       </div>`;
-    document.body.appendChild(backdrop);
+    const activeDialog = Array.from(document.querySelectorAll('dialog[open]')).pop();
+    (typeof backdrop.showModal === 'function' ? document.body : (activeDialog || document.body)).appendChild(backdrop);
+    backdrop.addEventListener('cancel', e => { e.preventDefault(); e.stopPropagation(); closeUiModal(null); });
+    if (typeof backdrop.showModal === 'function') backdrop.showModal();
+    else backdrop.setAttribute('open','');
     const inputEl = backdrop.querySelector('.ui-modal-input');
     const okBtn = backdrop.querySelector('[data-ui-ok]');
     const cancelBtn = backdrop.querySelector('[data-ui-cancel]');

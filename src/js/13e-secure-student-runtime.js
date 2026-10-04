@@ -87,14 +87,19 @@ function testDownload(){try{const blob=new Blob([t('downloadTestText','TEST DOWN
 
 function seedHash(str){let h=2166136261;str=String(str||'');for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 function seededRandom(seed){let x=seed>>>0;return function(){x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
-function shuffleElementChildren(parent, selector, seed){if(!parent)return;const nodes=[...parent.querySelectorAll(':scope > '+selector)];if(nodes.length<2)return;const rnd=seededRandom(seed);for(let i=nodes.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[nodes[i],nodes[j]]=[nodes[j],nodes[i]];}nodes.forEach(n=>parent.appendChild(n));}
-function shuffleOptionButtons(box, seed){if(!box)return;const nodes=[...box.children];if(nodes.length<2)return;const rnd=seededRandom(seed);for(let i=nodes.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[nodes[i],nodes[j]]=[nodes[j],nodes[i]];}nodes.forEach((n,idx)=>{const b=n.querySelector('b');if(b)b.textContent=String.fromCharCode(65+idx)+'.';box.appendChild(n);});}
-function shuffleSelectOptions(sel, seed){if(!sel)return;const first=sel.querySelector('option[value=""]');const opts=[...sel.querySelectorAll('option')].filter(o=>o!==first);if(opts.length<2)return;const rnd=seededRandom(seed);for(let i=opts.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}if(first)sel.appendChild(first);opts.forEach(o=>sel.appendChild(o));}
+function shuffleElementChildren(parent, selector, seed){if(!parent)return;const nodes=[...parent.querySelectorAll(':scope > '+selector)];if(nodes.length<2)return;nodes.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});nodes.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=nodes.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[nodes[i],nodes[j]]=[nodes[j],nodes[i]];}nodes.forEach(n=>parent.appendChild(n));}
+function shuffleOptionButtons(box, seed){if(!box)return;const nodes=[...box.children];if(nodes.length<2)return;nodes.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});nodes.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=nodes.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[nodes[i],nodes[j]]=[nodes[j],nodes[i]];}nodes.forEach((n,idx)=>{const b=n.querySelector('b');if(b)b.textContent=String.fromCharCode(65+idx)+'.';box.appendChild(n);});}
+function shuffleSelectOptions(sel, seed){if(!sel)return;const first=sel.querySelector('option[value=""]');const opts=[...sel.querySelectorAll('option')].filter(o=>o!==first);if(opts.length<2)return;opts.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});opts.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=opts.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}if(first)sel.appendChild(first);opts.forEach(o=>sel.appendChild(o));}
 function applyRuntimeRandomization(){
   if(!CFG.randomizace)return;
   const base=seedHash([CFG.testId,$('studentName')&&$('studentName').value,ACTIVE_KEY,STARTED_AT].join('|'));
   document.querySelectorAll('.ex-panel .card, #exerciseArea > .card').forEach((card,ei)=>{
     shuffleElementChildren(card,'.q',base+ei*101);
+    card.querySelectorAll(':scope > .q').forEach((node,index)=>{
+      const label=node.querySelector('.qhead > b');
+      if(label)label.textContent=t('question','Question')+' '+(index+1);
+      node.dataset.displayNumber=String(index+1);
+    });
     // Míchání otázek je přesouvá appendem na konec karty. navrow (Další/Předchozí) je
     // přímým dítětem karty hned za otázkami, takže by skončil NAD nimi → tlačítka by
     // vyskočila pod nadpis. Po zamíchání proto navrow vrátíme na konec, aby zůstal dole.
