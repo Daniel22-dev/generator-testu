@@ -262,7 +262,7 @@ await okAsync('Reading se zdrojem funguje end-to-end v Simple/Advanced a ve vsec
     for(const c of cases){
       resetBase();
       setVal('zadaniText','Travel vocabulary source: journey, accommodation, departure.');
-      w.eval("Object.assign(state,{zadaniTab:'text',uroven:['B1'],typyCviceni:['reading comprehension'],rcLength:'medium',rcTopic:'Cestovani',sourceUseMode:'auto'});");
+      w.eval("Object.assign(state,{zadaniTab:'text',uroven:['B1'],typyCviceni:['reading comprehension'],rcLength:'medium',rcTopic:'Cestovani',sourceUseMode:'auto',readingQuestionCount:1});");
       if(c.appMode==='simple') w.chooseSimplePurpose(c.purpose);
       else w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',testMode:${JSON.stringify(c.testMode)}});enforceModeConstraints();`);
       const actualMode=w.eval('state.testMode');
