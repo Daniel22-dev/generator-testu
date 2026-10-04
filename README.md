@@ -34,7 +34,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.88 (opravy workflow; rozsah řízené studentské red-team zkoušky)
+**Aktuální verze:** 7.1.89 (workflow + distribuce kódů; rozsah řízené studentské red-team zkoušky)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 
