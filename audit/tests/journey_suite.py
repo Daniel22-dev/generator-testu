@@ -528,7 +528,7 @@ try:
   assert j.ev(B)=='','editor change is not settings drift'
   j.ev("()=>goTo(2)");p.locator('#bodyBtns [data-val=\"50\"]').click();p.locator('#timeBtns [data-val=\"45\"]').click();j.ev("()=>goTo(4)");p.wait_for_timeout(200)
   w=j.ev(B);assert 'body' in w and 'čas' in w,('changed settings must be visible at download (F-30)',w)
-  p.get_by_role('button',name=re.compile('Použít nové nastavení')).click();p.wait_for_timeout(1500)
+  p.get_by_role('button',name=re.compile('Použít nové nastavení')).click();p.wait_for_function('!outputMutationBusy',timeout=30000)
   a=j.ev("()=>({pts:lastAssembled.variants.__default.reduce((s,e)=>s+e.points_total,0),cas:lastAssembled.cfg.cas,q:lastGenData.exercises[0].items[0].question,grading:!!exportChecklist.grading,calls:__aiLog.length})")
   assert a=={'pts':50,'cas':45,'q':'Edited','grading':False,'calls':1},('apply without AI keeps content, resets grading check',a)
   j.ev("()=>goTo(1)");p.fill('#zadaniText','Completely different source text.');j.ev("()=>goTo(4)");p.wait_for_timeout(200)
