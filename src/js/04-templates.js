@@ -243,7 +243,7 @@ function renderSourceMeters(){
 }
 
 function toggleType(t) {
-  const currentTypes = sanitizeExerciseTypeList(state.typyCviceni || []);
+  const currentTypes = uniqueExerciseTypes(state.typyCviceni || []);
   const wasSelected = currentTypes.includes(normalizeType(t));
   if (!wasSelected && currentTypes.length >= 10) {
     try { uiToast('Jeden test může mít nejvýše 10 cvičení. Odeber některý typ nebo použij podrobné nastavení.', 'warn', 5000); } catch(_){}
@@ -261,21 +261,11 @@ function toggleType(t) {
   // Comprehension typy vyžadují další nastavení — když je učitel nově zaškrtne,
   // upozorni: doroluj na blok a krátce ho zvýrazni, ať si doladění nikdo nepřehlédne.
   if (!wasSelected && (normalizeType(t) === 'listening comprehension' || normalizeType(t) === 'reading comprehension')) {
-    flashCompBlock(normalizeType(t) === 'listening comprehension' ? 'listeningBlock' : 'readingBlock');
+    openComprehensionDialog(normalizeType(t));
   }
 }
 
-function flashCompBlock(id){
-  const el = document.getElementById(id);
-  if (!el || el.classList.contains('hidden')) return;
-  setTimeout(() => {
-    el.scrollIntoView({ behavior:'smooth', block:'center' });
-    el.classList.remove('comp-flash');
-    void el.offsetWidth; // restart animace
-    el.classList.add('comp-flash');
-    setTimeout(() => el.classList.remove('comp-flash'), 3000);
-  }, 60);
-}
+function flashCompBlock(id){ openComprehensionDialog(id === 'listeningBlock' ? 'listening comprehension' : 'reading comprehension'); }
 
 function pickVariant(v) {
   // Varianta A vyžaduje okamžitý režim A současně alespoň stručnou zpětnou vazbu.

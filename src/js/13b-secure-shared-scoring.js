@@ -37,6 +37,28 @@ function __isCzechSafe(){try{return typeof hooks.isCzech==='function'&&!!hooks.i
 function __csPolicySafe(){try{var p=typeof hooks.csScoringPolicy==='function'?hooks.csScoringPolicy():{};return (p&&typeof p==='object')?p:{};}catch(_){return {};}}
 function normForScore(s,type){var p=__csPolicySafe();if(__isCzechSafe()&&p.enabled){var v=String(s==null?'':s).normalize('NFC');if(p.diacritics===false)v=stripDia(v);if(!p.capitalization)v=v.toLowerCase();if(!p.punctuation)v=v.replace(/[.!?,;:"'()\[\]{}„“‚‘–—-]/g,' ');v=v.replace(/\s+/g,' ').trim();return v;}return norm(s);}
 function textScore(given,correct,alts,type){var g=normForScore(given,type);if(!g)return 0;var all=[normForScore(correct,type)].concat((alts||[]).map(function(x){return normForScore(x,type);})).filter(Boolean);if(!all.length)return 0;var isEs=__isSpanishSafe(),isCs=__isCzechSafe(),gNo=g.normalize('NFD').replace(/[\u0301\u0308]/g,''),best=0,fuzzy=isCs?0:fuzzyCredit(type);for(var i=0;i<all.length;i++){var c=all[i];if(g===c)return 1;if(isEs&&gNo===c.normalize('NFD').replace(/[\u0301\u0308]/g,'')){best=Math.max(best,0.5);continue;}if(fuzzy>0&&c.length>=6&&lev(g,c)<=1)best=Math.max(best,fuzzy);}return best;}
+// Accept only exact declared answers or the complete changed span of a keyed
+// corrected sentence. Never accept arbitrary substrings or partial multi-error repairs.
+function correctionAnswers(item,type){
+  var it=item||{},keys=[it.correction||it.answer||''].concat(Array.isArray(it.alt_answers)?it.alt_answers:[]).filter(Boolean);
+  if(__isCzechSafe())return keys;
+  var original=normForScore(it.sentence||it.prompt||'',type).split(' ').filter(Boolean),out=keys.slice();
+  if(type==='error-tagging'){
+    var tokens=Array.isArray(it.tokens)?it.tokens.slice():String(it.sentence||'').trim().split(/\s+/);
+    var index=Number(it.error_token_index);
+    if(Number.isInteger(index)&&index>=0&&index<tokens.length)keys.forEach(function(key){var words=normForScore(key,type).split(' ').filter(Boolean);if(words.length>=tokens.length)return;var full=tokens.slice();full[index]=key;out.push(full.join(' '));});
+  }else if(type==='error correction'&&original.length>=3){
+    keys.forEach(function(key){
+      var fixed=normForScore(key,type).split(' ').filter(Boolean),prefix=0,suffix=0;
+      while(prefix<original.length&&prefix<fixed.length&&original[prefix]===fixed[prefix])prefix++;
+      while(suffix<original.length-prefix&&suffix<fixed.length-prefix&&original[original.length-1-suffix]===fixed[fixed.length-1-suffix])suffix++;
+      // Two unchanged context words prevent treating a fragment key as a full sentence.
+      if(prefix+suffix>=2&&prefix+suffix<fixed.length&&!(prefix===original.length&&prefix===fixed.length))out.push(fixed.slice(prefix,fixed.length-suffix).join(' '));
+    });
+  }
+  return out;
+}
+function correctionScore(given,item,type){var keys=correctionAnswers(item,type);return textScore(given,keys[0]||'',keys.slice(1),type);}
 function indexNorm(s){return (__isCzechSafe()&&__csPolicySafe().enabled)?normForScore(s,'multiple choice'):norm(s);}
 function correctIndex(it){if(!it||!Array.isArray(it.options))return -1;if(typeof it.correct==='number'){if(!Number.isInteger(it.correct)||it.correct<0||it.correct>=it.options.length)return -1;return it.correct;}var c=String(it.correct==null?'':it.correct).trim();if(/^\d+$/.test(c)){var ni=Number(c);return (ni>=0&&ni<it.options.length)?ni:-1;}var byText=it.options.map(String).findIndex(function(x){return indexNorm(x)===indexNorm(c);});if(byText>=0)return byText;if(c.length===1){var letter=c.toUpperCase().charCodeAt(0)-65;if(letter>=0&&it.options[letter]!=null)return letter;}return -1;}
 function accepted(it,fields){var vals=[];fields.forEach(function(k){if(Array.isArray(it[k]))vals=vals.concat(it[k]);else if(it[k]!=null)vals.push(it[k]);});return vals.map(function(x){return String(x);}).filter(Boolean);}
@@ -75,12 +97,12 @@ function transformationChainScore(val,transformations,pts,type){var st=transform
 /* error-tagging: student vybere chybný token, určí typ chyby a napíše opravu.
    ČÁSTEČNÉ bodování: token / typ chyby / oprava mají stejnou váhu. Oprava používá
    textScore, tedy stejnou normalizaci jako ostatní textové odpovědi. */
-function errorTaggingStats(val,item,type){var v=(val&&typeof val==='object'&&!Array.isArray(val))?val:{};var gotToken=(v.token!=null)?v.token:((v.tokenIndex!=null)?v.tokenIndex:v.error_token_index);var tokenOk=gotToken!=null&&typeof gotToken!=='boolean'&&String(gotToken).trim()!==''&&Number.isInteger(Number(gotToken))&&Number(gotToken)===Number(item&&item.error_token_index);var gotType=(v.etype!=null)?v.etype:((v.errorType!=null)?v.errorType:v.error_type);var typeOk=norm(gotType)===norm(item&&item.error_type);var gotCorr=(v.corr!=null)?v.corr:((v.correction!=null)?v.correction:v.answer);var corrScore=textScore(gotCorr,item&&item.correction,Array.isArray(item&&item.alt_answers)?item.alt_answers:[],type||'error-tagging');return {token:tokenOk?1:0,etype:typeOk?1:0,corr:corrScore,total:3};}
+function errorTaggingStats(val,item,type){var v=(val&&typeof val==='object'&&!Array.isArray(val))?val:{};var gotToken=(v.token!=null)?v.token:((v.tokenIndex!=null)?v.tokenIndex:v.error_token_index);var tokenOk=gotToken!=null&&typeof gotToken!=='boolean'&&String(gotToken).trim()!==''&&Number.isInteger(Number(gotToken))&&Number(gotToken)===Number(item&&item.error_token_index);var gotType=(v.etype!=null)?v.etype:((v.errorType!=null)?v.errorType:v.error_type);var typeOk=norm(gotType)===norm(item&&item.error_type);var gotCorr=(v.corr!=null)?v.corr:((v.correction!=null)?v.correction:v.answer);var corrScore=correctionScore(gotCorr,item,type||'error-tagging');return {token:tokenOk?1:0,etype:typeOk?1:0,corr:corrScore,total:3};}
 function errorTaggingScore(val,item,pts,type){var st=errorTaggingStats(val,item,type);return pts*((st.token+st.etype+st.corr)/st.total);}
-return {norm:norm,stripDia:stripDia,lev:lev,fuzzyCredit:fuzzyCredit,normForScore:normForScore,textScore:textScore,indexNorm:indexNorm,correctIndex:correctIndex,accepted:accepted,itemPoint:itemPoint,scoreBlanks:scoreBlanks,multiSelectStats:multiSelectStats,multiSelectScore:multiSelectScore,orderingStats:orderingStats,orderingScore:orderingScore,highlightEvidenceScore:highlightEvidenceScore,categoryBoardStats:categoryBoardStats,categoryBoardScore:categoryBoardScore,tableCompletionStats:tableCompletionStats,tableCompletionScore:tableCompletionScore,transformationChainStats:transformationChainStats,transformationChainScore:transformationChainScore,errorTaggingStats:errorTaggingStats,errorTaggingScore:errorTaggingScore};
+return {correctionAnswers:correctionAnswers,correctionScore:correctionScore,norm:norm,stripDia:stripDia,lev:lev,fuzzyCredit:fuzzyCredit,normForScore:normForScore,textScore:textScore,indexNorm:indexNorm,correctIndex:correctIndex,accepted:accepted,itemPoint:itemPoint,scoreBlanks:scoreBlanks,multiSelectStats:multiSelectStats,multiSelectScore:multiSelectScore,orderingStats:orderingStats,orderingScore:orderingScore,highlightEvidenceScore:highlightEvidenceScore,categoryBoardStats:categoryBoardStats,categoryBoardScore:categoryBoardScore,tableCompletionStats:tableCompletionStats,tableCompletionScore:tableCompletionScore,transformationChainStats:transformationChainStats,transformationChainScore:transformationChainScore,errorTaggingStats:errorTaggingStats,errorTaggingScore:errorTaggingScore};
 }
 
-const SHARED_SCORING_EXPORTS=Object.freeze(['norm','stripDia','lev','fuzzyCredit','normForScore','textScore','indexNorm','correctIndex','accepted','itemPoint','scoreBlanks','multiSelectStats','multiSelectScore','orderingStats','orderingScore','highlightEvidenceScore','categoryBoardStats','categoryBoardScore','tableCompletionStats','tableCompletionScore','transformationChainStats','transformationChainScore','errorTaggingStats','errorTaggingScore']);
+const SHARED_SCORING_EXPORTS=Object.freeze(['correctionAnswers','correctionScore','norm','stripDia','lev','fuzzyCredit','normForScore','textScore','indexNorm','correctIndex','accepted','itemPoint','scoreBlanks','multiSelectStats','multiSelectScore','orderingStats','orderingScore','highlightEvidenceScore','categoryBoardStats','categoryBoardScore','tableCompletionStats','tableCompletionScore','transformationChainStats','transformationChainScore','errorTaggingStats','errorTaggingScore']);
 const SHARED_SCORING_JS=[
   'var __ghrabSharedScoringApi=('+createSharedScoringApi.toString()+')({',
   'isSpanish:function(){try{return !!__isSpanish();}catch(_){return false;}},',

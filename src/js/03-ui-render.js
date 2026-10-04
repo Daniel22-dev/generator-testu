@@ -127,6 +127,8 @@ function applyVisualState() {
     ? '<strong>Režim jednorázových kódů:</strong> do skupin vlož výhradně právě vygenerované kódy. Každý kód musí být právě v jedné skupině; průvodce jiné kombinace nepovolí.'
     : 'Vytvoř skupiny, popiš podmínky a přidej každého studenta právě jednou. Doporučeny jsou anonymní školní kódy místo skutečných jmen.';
   if (state.diferencovany === 'ANO') renderGroups();
+  const participantMode=$('participantMode');if(participantMode)participantMode.value=state.participantMode||'all';
+  rosterRenderParticipants();
   renderTeacherMapping();
   renderSourceMeters();
 
@@ -163,6 +165,7 @@ function applyVisualState() {
   const rcCount=$('readingQuestionCount');if(rcCount)rcCount.value=String(Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4)));
   const liCount=$('listeningQuestionCount');if(liCount)liCount.value=String(Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4)));
   renderRcTopics();
+  renderComprehensionSummaries();
 
   // ── Šablona jako autorita: zamkni (zašedni) volby, které šablona řídí ──────────
   // V pokročilém režimu s aktivní šablonou jsou režim/bezpečnost/hodnocení zamčené
@@ -308,8 +311,19 @@ function pickNum(key, value) {
   if (key === 'anonymizace') value = 'ANO';
 
   if (key === 'pocet' && !state.exerciseDetail) {
-    const selected = typeof globalExerciseTypes === 'function' ? globalExerciseTypes() : sanitizeExerciseTypeList(state.typyCviceni || []);
+    if(state.exerciseConfigSaved){
+      if(Number(value)<state.exerciseConfig.length){
+        state.exerciseConfig=state.exerciseConfig.slice(0,Math.max(1,Number(value)));
+        state.pocet=state.exerciseConfig.length;state.typyCviceni=uniqueExerciseTypes(state.exerciseConfig.map(ex=>ex.typ));
+        state.body=state.exerciseConfig.reduce((sum,ex)=>sum+ex.body,0);
+        applyVisualState();validate();saveSnapshot();return;
+      }
+      try { uiToast('Počet odpovídá uloženým řádkům. Pro změnu počtu otevři podrobné nastavení.', 'info', 4000); } catch(_){}
+      applyVisualState(); return;
+    }
+    let selected = typeof globalExerciseTypes === 'function' ? globalExerciseTypes() : sanitizeExerciseTypeList(state.typyCviceni || []);
     if (selected.length) {
+      if(Number(value)<selected.length){selected=selected.slice(0,Math.max(1,Number(value)));state.typyCviceni=selected.slice();}
       state.pocet = selected.length;
       syncExerciseConfigFromGlobalTypes();
       if (Number(value) !== selected.length) {
@@ -324,7 +338,7 @@ function pickNum(key, value) {
     state[key] = value;
     if (key==='cas') setVal('casCustom', value);
     if (key==='body') { setVal('bodyCustom', value); syncExercisePoints(); }
-    if (key==='pocet') { syncExerciseConfig(); renderSmartTimeTip(); }
+    if (key==='pocet') { syncExerciseConfig(); state.typyCviceni=uniqueExerciseTypes(state.exerciseConfig.map(ex=>ex.typ)); renderSmartTimeTip(); }
   }
   applyVisualState(); validate(); saveSnapshot();
 }
@@ -352,7 +366,7 @@ function setComprehensionQuestionCount(type,value){
   const canonical=normalizeType(type),n=Math.max(1,Math.min(30,parseInt(value,10)||4));
   const key=canonical==='reading comprehension'?'readingQuestionCount':'listeningQuestionCount';
   state[key]=n;
-  if(state.exerciseDetail&&Array.isArray(state.exerciseConfig))state.exerciseConfig.forEach(ex=>{if(normalizeType(ex.typ||'')===canonical)ex.pocetOtazek=n});
+  if(hasConfiguredExercises(state)&&Array.isArray(state.exerciseConfig))state.exerciseConfig.forEach(ex=>{if(normalizeType(ex.typ||'')===canonical)ex.pocetOtazek=n});
   const el=document.getElementById(key);if(el)el.value=String(n);
   if(typeof renderExerciseConfig==='function'&&state.exerciseDetail)renderExerciseConfig();
   validate();saveSnapshot();

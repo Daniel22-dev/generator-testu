@@ -92,7 +92,8 @@ async function okAsync(name, fn){
 function assert(cond,msg){ if(!cond) throw new Error(msg); }
 function setVal(id,v){ const el=w.document.getElementById(id); if(!el) throw new Error('chybí #'+id); el.value=v; }
 function resetBase(){
-  w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',jazyk:'angličtina',instrJazyk:'target',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfig:[],body:30,gradeTyp:'skola',odevzdavani:'B',testMode:'bezny',resultMode:'instant',feedbackMode:'brief',identityMode:'name',randomizace:'NE',layout:'tabs',zolicek:'NE',diferencovany:'NE',skupiny:[],screenGuard:false,cas:30,fileNames:[],urls:[''],aiGradeScale:null,aiGradeRaw:''}); rosterEntries=[];`);
+  w.closeComprehensionDialog(false);
+  w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',jazyk:'angličtina',instrJazyk:'target',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfigSaved:false,exerciseConfig:[],body:30,gradeTyp:'skola',odevzdavani:'B',testMode:'bezny',resultMode:'instant',feedbackMode:'brief',identityMode:'name',randomizace:'NE',layout:'tabs',zolicek:'NE',diferencovany:'NE',skupiny:[],screenGuard:false,cas:30,fileNames:[],urls:[''],aiGradeScale:null,aiGradeRaw:''}); rosterEntries=[];`);
   setVal('nazev','Workflow test'); setVal('proKoho','1.A'); setVal('latka','Present simple');
   setVal('vlastniSkala','');
   setVal('listeningTranscript',''); setVal('ucitelJmeno','Daniel Teacher');
@@ -342,7 +343,7 @@ ok('legacy vlastní typ cvičení není v UI dostupný',()=>{
 });
 ok('Simple: položky a body lze otevřít a znovu sbalit',()=>{
   resetBase();
-  w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',simpleTemplate:'fl_standard',pocet:2,typyCviceni:['multiple choice','translation'],exerciseDetail:false,exerciseConfig:[]});applySimpleDefaults();applyVisualState();");
+  w.eval("Object.assign(state,{appMode:'simple',workPreset:'quick',simpleTemplate:'fl_standard',pocet:2,typyCviceni:['multiple choice','translation'],exerciseDetail:false,exerciseConfigSaved:false,exerciseConfig:[]});applySimpleDefaults();applyVisualState();");
   w.toggleExDetail();
   let st=JSON.parse(w.eval('JSON.stringify(state)'));
   assert(st.exerciseDetail===true,'Simple detail se po otevření vrátil na false');
@@ -363,7 +364,7 @@ ok('Typy, počet a detail zůstávají 1:1 synchronní včetně Readingu',()=>{
   resetBase();
   w.eval("Object.assign(state,{pocet:6,typyCviceni:[],exerciseDetail:false,exerciseConfig:[{typ:'translation',pocetOtazek:5,body:5},{typ:'word order',pocetOtazek:5,body:5},{typ:'true/false',pocetOtazek:5,body:5}],body:30});applyVisualState();validate();");
   const types=['multiple choice','fill-in-the-blank','translation','reading comprehension','word formation','true/false'];
-  types.forEach(t=>w.toggleType(t));
+  types.forEach(t=>{w.toggleType(t);w.closeComprehensionDialog(true);});
   let st=JSON.parse(w.eval('JSON.stringify(state)'));
   assert(st.pocet===types.length,'počet se nepřepočítal podle typů: '+st.pocet);
   assert(JSON.stringify(st.typyCviceni)===JSON.stringify(types),'globální typy nesedí: '+JSON.stringify(st.typyCviceni));
@@ -391,7 +392,7 @@ ok('Typy, počet a detail zůstávají 1:1 synchronní včetně Readingu',()=>{
 
 ok('Změna typu v detailu okamžitě aktualizuje Reading blok',()=>{
   resetBase();
-  w.eval("Object.assign(state,{pocet:1,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfig:[]});applyVisualState();validate();");
+  w.eval("Object.assign(state,{pocet:1,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfigSaved:false,exerciseConfig:[]});applyVisualState();validate();");
   w.toggleExDetail();
   assert(w.document.getElementById('readingBlock').classList.contains('hidden'),'Reading blok je před změnou neočekávaně viditelný');
   w.updateExField(0,'typ','reading comprehension');

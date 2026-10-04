@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.87">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.88">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
-<script src="./frame-guard.js?v=7.1.87"></script>
+<script src="./frame-guard.js?v=7.1.88"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generátor testů</title>
 <meta name="theme-color" content="#f59e0b">
@@ -201,26 +201,10 @@
           <button class="tag-btn" data-val="10" onclick="pickNum('pocet',10)">10</button>
         </div>
         <div class="field-hint">Jakmile začneš vybírat konkrétní typy, platí <strong>1 vybraný typ = 1 cvičení</strong> a počet se přepočítává automaticky. Chceš-li stejný typ použít vícekrát, otevři podrobné nastavení.</div>
-        <button class="btn-exdetail" id="btnExDetail" type="button" aria-expanded="false" aria-controls="exConfigList exTotals" onclick="toggleExDetail()">
-          <span>⚙️ Nastavit cvičení podrobně</span><span class="bxd-arrow">▼</span>
-        </button>
-        <div class="field-hint simple-only simple-exdetail-hint">Volitelné: můžeš nechat vše na Generátoru, nebo si u každého cvičení určit <strong>typ, počet položek a body</strong>. U Reading comprehension nastavíš délku textu níže (60–100 / 130–190 / 240–340 slov).</div>
-        <div class="ex-table hidden" id="exConfigList"></div>
-        <div class="ex-totals hidden" id="exTotals"></div>
-        <div class="hybrid-banner" id="hybridBanner">
-          <div class="hybrid-banner-row">
-            <div class="hybrid-banner-icon">⚡</div>
-            <div class="hybrid-banner-text">
-              Test obsahuje <strong id="hybridComplexCount"></strong> — složitá se vygenerují každé zvlášť, jednoduchá najednou. <strong>Žádná akce není potřeba.</strong>
-              <div class="hybrid-banner-types" id="hybridComplexList"></div>
-            </div>
-          </div>
-          <div class="hybrid-fallback">Pokud by generování přesto selhalo, u problematického cvičení se zobrazí možnost zadat ho ručně (✏️).</div>
-        </div>
       </div>
 
       <div class="field" id="globalTypesField">
-        <div class="field-label">Typy cvičení <button class="tt-icon" data-tip="Typy jsou rozdělené podle pedagogické funkce: co daná úloha u žáka skutečně měří. Vyber napříč kategoriemi pro vyvážený test. Claude rozmístí typy rovnoměrně do cvičení.">?</button></div>
+        <div class="field-label">Typy cvičení <button class="tt-icon" data-tip="Typy jsou rozdělené podle pedagogické funkce: co daná úloha u žáka skutečně měří. Vyber napříč kategoriemi pro vyvážený test. Každý zvolený typ vytvoří právě jedno cvičení.">?</button></div>
         <div class="field-hint">Vyber vše, co chceš použít. Najetím myší na kartu zobrazíš stručný popis a příklad; na dotykovém zařízení použij ikonu <strong>i</strong>.</div>
         <div class="ped-filter advanced-only" id="pedFilter">
           <span>Zobrazit funkci:</span>
@@ -294,7 +278,6 @@
             </div>
           </div>
         </div>
-        <div class="small-muted" style="margin-top:8px"><strong>Listening comprehension:</strong> přidej zdroj poslechu pro tvorbu testu — nahraj audio/video soubor, vlož odkaz na audio/video, nebo přilož dokument s transkriptem a hotovými cvičeními. <strong>Audio je jen pro učitele:</strong> ve studentském testu se audio nepřehrává ani nezobrazuje odkaz; poslech pouští učitel. Učitelský verifier má obsahovat transkript/audio script.</div>
       </div>
 
       <div class="validation-hint" id="validHint1" role="status" aria-live="polite"></div>
@@ -312,6 +295,20 @@
         </div>
       </div>
 
+      <div class="field" id="ageGroupField">
+        <div class="field-label">Věková skupina / ročník <button class="tt-icon" data-tip="Ovlivní témata, délku vět, míru abstrakce a kulturní reference v testu. Pošle se AI spolu s CEFR úrovní.">?</button></div>
+        <div class="field-hint">Volitelné, ale doporučené. Upraví témata a formulace podle věku žáků.</div>
+        <div class="btn-row choice-card-grid three-col centered-cards" id="ageGroupBtns">
+          <button class="tag-btn" data-val="lower" onclick="pickAgeGroup('lower')"><span class="choice-card-title">nižší gymnázium</span><span class="choice-card-desc">11–15 let · přístupnější témata a formulace</span></button>
+          <button class="tag-btn" data-val="upper" onclick="pickAgeGroup('upper')"><span class="choice-card-title">vyšší gymnázium</span><span class="choice-card-desc">15–19 let · standardní středoškolská náročnost</span></button>
+          <button class="tag-btn" data-val="maturita" onclick="pickAgeGroup('maturita')"><span class="choice-card-title">maturitní ročník</span><span class="choice-card-desc">zaměření na zkouškový styl a vyšší samostatnost</span></button>
+          <button class="tag-btn" data-val="adult" onclick="pickAgeGroup('adult')"><span class="choice-card-title">dospělí</span><span class="choice-card-desc">věcnější kontexty a dospělé tematické okruhy</span></button>
+          <button class="tag-btn" data-val="custom" onclick="pickAgeGroup('custom')"><span class="choice-card-title">vlastní…</span><span class="choice-card-desc">zadej vlastní popis ročníku nebo skupiny</span></button>
+        </div>
+        <input type="text" id="ageGroupCustom" placeholder="Vlastní popis ročníku / skupiny (např. tercie, 2. ročník SŠ)…" class="hidden" style="margin-top:8px" oninput="onAgeCustomInput()">
+        <div class="field-hint" id="ageGroupNote" style="margin-top:8px"></div>
+      </div>
+
       <div class="field">
         <div class="field-label">Jazyková úroveň <span style="font-weight:400;color:var(--t4);text-transform:none;letter-spacing:0;font-size:10px">(SERR / CEFR)</span> <button class="tt-icon" data-tip="Úrovně dle Společného evropského referenčního rámce. A1 = začátečník, C2 = téměř rodilý mluvčí. Kombinací vytvoříš test vhodný pro smíšenou třídu.">?</button></div>
         <div class="field-hint" id="cefrHint">Vyber jednu úroveň — nebo zapni kombinaci pro smíšené třídy</div>
@@ -326,20 +323,6 @@
         <button class="tag-btn" id="btnKombinovat" onclick="toggleKombinovat()" style="font-size:12px">🔀 Kombinovat úrovně</button>
         <div class="cefr-selected hidden" id="cefrSelected"></div>
         <div class="cefr-desc" id="cefrDesc"></div>
-      </div>
-
-      <div class="field">
-        <div class="field-label">Věková skupina / ročník <button class="tt-icon" data-tip="Ovlivní témata, délku vět, míru abstrakce a kulturní reference v testu. Pošle se AI spolu s CEFR úrovní.">?</button></div>
-        <div class="field-hint">Volitelné, ale doporučené. Upraví témata a formulace podle věku žáků.</div>
-        <div class="btn-row choice-card-grid three-col centered-cards" id="ageGroupBtns">
-          <button class="tag-btn" data-val="lower" onclick="pickAgeGroup('lower')"><span class="choice-card-title">nižší gymnázium</span><span class="choice-card-desc">11–15 let · přístupnější témata a formulace</span></button>
-          <button class="tag-btn" data-val="upper" onclick="pickAgeGroup('upper')"><span class="choice-card-title">vyšší gymnázium</span><span class="choice-card-desc">15–19 let · standardní středoškolská náročnost</span></button>
-          <button class="tag-btn" data-val="maturita" onclick="pickAgeGroup('maturita')"><span class="choice-card-title">maturitní ročník</span><span class="choice-card-desc">zaměření na zkouškový styl a vyšší samostatnost</span></button>
-          <button class="tag-btn" data-val="adult" onclick="pickAgeGroup('adult')"><span class="choice-card-title">dospělí</span><span class="choice-card-desc">věcnější kontexty a dospělé tematické okruhy</span></button>
-          <button class="tag-btn" data-val="custom" onclick="pickAgeGroup('custom')"><span class="choice-card-title">vlastní…</span><span class="choice-card-desc">zadej vlastní popis ročníku nebo skupiny</span></button>
-        </div>
-        <input type="text" id="ageGroupCustom" placeholder="Vlastní popis ročníku / skupiny (např. tercie, 2. ročník SŠ)…" class="hidden" style="margin-top:8px" oninput="onAgeCustomInput()">
-        <div class="field-hint" id="ageGroupNote" style="margin-top:8px"></div>
       </div>
 
       <div class="field">
@@ -384,12 +367,17 @@
 
       <div class="field hidden" id="listeningBlock">
         <div class="field-label">🎧 Listening comprehension — doplňující zadání <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ listening comprehension. Slouží k doplnění zaměření otázek, transkriptu nebo vlastních hotových otázek bez ohledu na to, zda jako hlavní zdroj používáš text, soubor nebo odkaz.">?</button></div>
-        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>listening comprehension</strong> — audio/video nebo odkaz na nahrávku nahraj <strong>nahoře v sekci Konkrétní zadání → Soubory / Odkazy</strong>; tady dole pak jen urči, na co se mají otázky ptát (případně vlož transkript nebo vlastní hotové otázky). Bez zdroje k poslechu nebude mít test z čeho čerpat.</span></div>
-        <div class="field-hint">📎 Samotnou nahrávku (audio/video) nebo odkaz na ni dej <strong>výše do „Konkrétní zadání → Soubory / Odkazy"</strong> — listening formáty jsou tam mezi podporovanými. Tento blok slouží jen k doladění zaměření otázek, transkriptu nebo vlastních hotových otázek. Ve studentském testu se audio nepřehrává; poslech pouští učitel.</div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span><strong>Listening comprehension</strong> potřebuje nahrávku, odkaz nebo transkript. Nastav zdroj a zaměření; můžeš vložit i vlastní otázky.</span></div>
+        <div class="field-hint">📎 Nahrávku nebo odkaz nastav zde. Můžeš využít i zdroj již vložený v Konkrétním zadání, nebo pouze transkript. Přidání nahrávky či odkazu přepne aktivní zdroj testu. Ve studentském testu se audio nepřehrává; poslech pouští učitel.</div>
         <div class="tip-box" style="margin-bottom:10px">
           <div class="tip-title">Shrnutí funkčnosti</div>
-          <div class="tip-body">Můžeš současně nahrát audio/video nebo vložit URL a tady určit, na co se mají otázky ptát. Pokud máš vlastní otázky, transkript nebo hotové cvičení, vlož je sem — generátor je pošle do Gemini společně s aktivním zdrojem. Teacher verifier dostane transkript/audio script a správné odpovědi; student uvidí jen informaci, že poslech pustí učitel.</div>
+          <div class="tip-body">Vlastní otázky a transkript se pošlou AI s aktivním zdrojem. Verifier obsahuje přepis a klíč; student dostane pokyn k poslechu, který pustí učitel.</div>
         </div>
+        <label class="rc-sub-label" for="compListeningUrl">Odkaz na nahrávku</label>
+        <input id="compListeningUrl" type="url" placeholder="https://…" aria-label="Odkaz na poslech">
+        <label class="rc-sub-label" for="compListeningFile">Nahrávka ze zařízení</label>
+        <input id="compListeningFile" type="file" accept="audio/*,video/*,.pdf,.docx,.txt" onchange="comprehensionAddListeningFiles(this)">
+        <div id="compListeningSources" class="small-muted"></div>
         <div class="rc-sub-label">Počet otázek <button class="tt-icon" data-tip="Tento počet je společný pro AI návrh i finální Listening cvičení. Pokud používáš podrobné nastavení, změna se propíše i tam.">?</button></div>
         <select id="listeningQuestionCount" onchange="setComprehensionQuestionCount('listening comprehension',this.value)" style="max-width:220px;margin-bottom:10px">
           <option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option>
@@ -407,7 +395,7 @@
 
       <div class="field hidden" id="readingBlock">
         <div class="field-label">📖 Reading comprehension — délka, téma, text <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ reading comprehension. Nastav délku a téma textu (téma se mění podle CEFR). Text i otázky můžeš napsat ručně, nebo je nechat navrhnout AI a schválit. Jeden text na cvičení, otázky pod ním.">?</button></div>
-        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span>Vybral(a) jsi <strong>reading comprehension</strong> — zvol délku a případně téma. Pokud je nahoře aktivní zdroj, AI ho použije podle volby <strong>„Jak má AI použít tento podklad?“</strong>; bez zdroje vytvoří text přímo podle zvolené CEFR úrovně.</span></div>
+        <div class="comp-needs-setup"><span class="cns-ico">⚠️</span><span><strong>Reading comprehension</strong>: zvol délku a téma. Aktivní zdroj se použije podle volby <strong>„Jak má AI použít tento podklad?“</strong>; bez zdroje vznikne text podle CEFR.</span></div>
         <div class="field-hint">Jeden souvislý text na cvičení; otázky se vážou na něj (text se neopakuje u každé otázky).</div>
         <div class="btn-row" id="rcLenBtns">
           <button class="tag-btn" data-val="short" onclick="pickRcLength('short')">Krátký (~60–100 slov)</button>
@@ -433,6 +421,25 @@
         <div class="ai-prev hidden" id="rcAiPreview"></div>
         <textarea id="readingText" rows="5" placeholder="Souvislý text k přečtení (nepovinné). Můžeš ho napsat ručně, nebo sem vložit návrh AI. Pokud ho vyplníš, použije se přesně tento text." oninput="onInput()"></textarea>
         <textarea id="readingQuestions" rows="4" placeholder="Otázky k textu (nepovinné). Ručně nebo z návrhu AI. Pokud je vyplníš, použijí se přesně tyto otázky bez přidávání dalších." style="margin-top:8px" oninput="onInput()"></textarea>
+      </div>
+
+      <div class="field" id="exerciseDetailField">
+        <button class="btn-exdetail" id="btnExDetail" type="button" aria-expanded="false" aria-controls="exConfigList exTotals" onclick="toggleExDetail()">
+          <span>⚙️ Nastavit cvičení podrobně</span><span class="bxd-arrow">▼</span>
+        </button>
+        <div class="field-hint simple-only simple-exdetail-hint">Volitelné: můžeš nechat vše na Generátoru, nebo si u každého cvičení určit <strong>typ, počet položek a body</strong>. U Reading comprehension nastavíš délku textu v samostatném dialogu (60–100 / 130–190 / 240–340 slov).</div>
+        <div class="ex-table hidden" id="exConfigList"></div>
+        <div class="ex-totals hidden" id="exTotals"></div>
+        <div class="hybrid-banner" id="hybridBanner">
+          <div class="hybrid-banner-row">
+            <div class="hybrid-banner-icon">⚡</div>
+            <div class="hybrid-banner-text">
+              Test obsahuje <strong id="hybridComplexCount"></strong> s možností ručního zadání. <strong>Zvol AI, nebo Ručně u příslušného řádku.</strong> Rozdělení generování řídí automaticky velikost a struktura testu.
+              <div class="hybrid-banner-types" id="hybridComplexList"></div>
+            </div>
+          </div>
+          <div class="hybrid-fallback">Pokud by generování přesto selhalo, u problematického cvičení se zobrazí možnost zadat ho ručně (✏️).</div>
+        </div>
       </div>
 
       <div class="nav">
@@ -519,10 +526,14 @@
       <div class="field" id="rosterField">
         <div class="field-label">🔑 Kódy studentů (roster) <button class="tt-icon" data-tip="Použije se u režimu „individuální kód“. Vlep e-maily skupiny z IS, vygeneruj kódy a pak vygeneruj test. Mapování kód → e-mail a označení studenta se ukládá jen do soukromého učitelského verifieru a CSV. Studentský bezpečný export neobsahuje roster ani hashe kódů. Kódy jsou pokaždé nové.">?</button></div>
         <div class="field-hint">Pro režim „individuální kód". Vlep e-maily skupiny (jeden na řádek nebo oddělené čárkou), vygeneruj kódy, pak vygeneruj test.</div>
-        <textarea id="rosterEmails" rows="4" placeholder="balaz@ghrabuvka, novak@ghrabuvka" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:13px"></textarea>
+        <textarea id="rosterEmails" oninput="rosterRefreshParticipants()" rows="4" placeholder="balaz@ghrabuvka, novak@ghrabuvka" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:13px"></textarea>
+        <div class="participant-controls"><label>Účastníci testu <select id="participantMode" onchange="rosterSetParticipantMode(this.value)"><option value="all">Celá skupina</option><option value="selected">Vybraní studenti</option><option value="later">Účastníky doplním později</option></select></label><input id="participantSearch" type="search" placeholder="Najít e-mail studenta" aria-label="Najít studenta" oninput="rosterRenderParticipants()"></div>
+        <div id="participantList" class="participant-list"></div>
+        <p class="small-muted">Vyber účastníky; seznam skupiny zůstane zachovaný. „Doplním později“ připraví obsah, ale stažení uzamkne do doplnění kódů. Počet studentů nemění otázky.</p>
         <div class="btn-row" style="margin-top:8px;gap:8px">
           <button type="button" class="btn-edit" onclick="rosterGenerate()">🔑 Vygenerovat kódy</button>
           <button type="button" class="btn-edit" style="opacity:.85" onclick="rosterDownloadCsv()">⬇ Stáhnout CSV (e-mail, kód)</button>
+          <button type="button" class="btn-edit" onclick="rosterApplyToOutput()">Použít kódy v hotovém testu (bez AI)</button>
         </div>
         <p class="small-muted">Každému studentovi předej soukromě jen jeho kód. CSV s e-maily a kódy nesdílej se třídou. Pro další test vygeneruj nové kódy. Bez serveru nelze zaručit jednorázové použití napříč zařízeními; duplicitní odevzdání ověřuje učitel.</p>
         <div id="rosterResult" class="small-muted" style="margin-top:8px">Zatím žádné kódy. Vlep e-maily a klikni na „Vygenerovat kódy".</div>
@@ -1039,6 +1050,10 @@
 </div>
 
 <div class="save-indicator" id="saveIndicator">✓ Uloženo</div>
+
+<template id="compDialogTemplate"><div class="comp-head"><h2></h2><button type="button" class="ghost" aria-label="Zavřít nastavení" onclick="closeComprehensionDialog(false)">✕</button></div><div class="comp-context"></div><div class="comp-content"></div><div class="comp-error" role="alert"></div><div class="comp-actions"><button type="button" class="ghost" onclick="closeComprehensionDialog(false)">Zrušit změny</button><button type="button" class="btn-next" onclick="closeComprehensionDialog(true)">Uložit nastavení</button></div></template>
+<template id="compSummaryTemplate"><div class="comp-summary-card"><div><strong></strong><span></span></div><button type="button" class="btn-edit"></button></div></template>
+<template id="participantRowTemplate"><label class="participant-row"><input type="checkbox"><span></span></label></template>
 
 {{JS_MAIN_TAGS}}
 

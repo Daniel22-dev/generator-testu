@@ -443,7 +443,7 @@ function tlChecks(){
       var s = normalizeLoadedState({});
       if (s.splitGenerate !== false) return tlFail('catBoard lock + nová pole (regrese)', 'normalizeLoadedState({}).splitGenerate není false, je: ' + s.splitGenerate);
       // manualMode default v exerciseConfig
-      var s2 = normalizeLoadedState({ exerciseConfig: [{typ:'ordering', pocetOtazek:2, body:4}] });
+      var s2 = normalizeLoadedState({ exerciseDetail:true, exerciseConfig: [{typ:'ordering', pocetOtazek:2, body:4}] });
       if (!s2.exerciseConfig || !s2.exerciseConfig.length) return tlFail('catBoard lock + nová pole (regrese)', 'normalizeLoadedState nevrátil exerciseConfig.');
       if (s2.exerciseConfig[0].manualMode !== false) return tlFail('catBoard lock + nová pole (regrese)', 'Nové cvičení v načteném stavu by mělo mít manualMode=false, má: ' + s2.exerciseConfig[0].manualMode);
       // catBoard buildContentPrompt lock: count musí být 1 bez ohledu na pocetOtazek

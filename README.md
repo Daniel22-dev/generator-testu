@@ -1,4 +1,4 @@
-> **7.1.87 — RED-TEAM v2 / E10, vydání pro řízenou zkoušku.** Šifrované zadání se otevře startovním kódem z odpovídajícího soukromého verifieru. Vlastník 4. 10. 2026 schválil publikaci: E6 odloženo, Forms zkontrolovány vlastníkem, fyzické E7 proběhne při testování 6. a 9. 10. 2026. Technické kontroly přesného SHA zůstávají povinné. Viz [RELEASE-NOTES-7.1.87.md](RELEASE-NOTES-7.1.87.md).
+> **7.1.88 — audit a opravy workflow.** Výběr cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní nebo odložení účastníci. Viz [RELEASE-NOTES-7.1.88.md](RELEASE-NOTES-7.1.88.md). Rozsah vydání zůstává řízená studentská red-team zkouška; E6 je odložené a fyzické E7 naplánované na 6. a 9. 10. 2026.
 
 > **Historický checkpoint 7.1.80 — RED-TEAM v2 / E4.** Pokus i zašifrovaný výsledek přežijí restart ve stejném profilu. Outbox obnoví přerušené odevzdání, podporované Web Locks brání souběhu karet a soukromá replay evidence verifieru přetrvá restart. Úplné smazání storage, anonymní režim a jiný profil jsou **ARCHITECTURAL LIMIT – SERVER TRUST REQUIRED**. Původ runtime zůstává CLIENT-CONTROLLED; známky vyžadují REVIEW_REQUIRED. **NOT READY – BLOCKING ISSUE:** E5–E10 a F7 čekají. Viz RELEASE-NOTES-7.1.80.md.
 
@@ -32,7 +32,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.87 (E10 CI oprava; schváleno pro řízenou studentskou red-team zkoušku)
+**Aktuální verze:** 7.1.88 (opravy workflow; rozsah řízené studentské red-team zkoušky)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

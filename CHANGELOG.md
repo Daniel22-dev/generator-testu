@@ -1,3 +1,7 @@
+## 7.1.88 – 2026-10-04
+
+Opravy výběru a zachování detailů cvičení, Reading/Listening dialogy, přesné opravné fragmenty, vybraní nebo odložení účastníci a přebalení kódů bez AI. Přidány funkční a nativní browser regresní sady do P5. Podrobnosti: [RELEASE-NOTES-7.1.88.md](RELEASE-NOTES-7.1.88.md).
+
 ## 7.1.77 — 2026-10-03 — RED-TEAM v2 / E1 izolace studentského exportu
 
 - odstraněny teacher/recovery credentialy, učitelské funkce, retry/reset a veřejné rosterové hashe z bezpečného studentského HTML; export při nalezení zakázaných polí selže;

@@ -444,7 +444,7 @@ check('reading source: simple vynutí pouze Automaticky', () => {
   return 'auto only';
 });
 check('reading source: explicitní Reading téma má prioritu před tématem zdroje', () => {
-  w.eval("Object.assign(state,{appMode:'advanced',workPreset:'full',jazyk:'angličtina',uroven:['B2'],zadaniTab:'text',sourceUseMode:'content',typyCviceni:['reading comprehension'],pocet:1,body:5,exerciseDetail:false,rcTopic:'Práce a kariéra'});");
+  w.eval("Object.assign(state,{appMode:'advanced',workPreset:'full',jazyk:'angličtina',uroven:['B2'],zadaniTab:'text',sourceUseMode:'content',typyCviceni:['reading comprehension'],pocet:1,body:5,exerciseDetail:false,exerciseConfigSaved:false,rcTopic:'Práce a kariéra'});");
   w.document.getElementById('zadaniText').value='Environment test: recycling, pollution, renewable energy, carbon footprint.';
   const prompt=w.buildContentPrompt(w.eval('state'),[]);
   for(const needle of ['READING TOPIC PRIORITY','supplied READING TOPIC is mandatory','Práce a kariéra','Use source facts only as support inside that Reading topic']){

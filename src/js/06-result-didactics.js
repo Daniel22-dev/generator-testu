@@ -226,7 +226,7 @@ function renderResult() {
     ['🎯',cefrLabel()],['🧭',getTestModeLabel(state.testMode)],['🧩',getLayoutLabel()],['🔐',getResultModeLabel(state.resultMode)],['📱','Device-aware safe'],['⏱',state.cas+' min'],
     ['📝',state.pocet+' cv.'],
     ...((() => {
-      if (state.exerciseDetail && state.exerciseConfig.length) {
+      if (hasConfiguredExercises(state) && state.exerciseConfig.length) {
         const sum = state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0);
         return sum > 0 ? [['🏆', sum+' b']] : [];
       }
