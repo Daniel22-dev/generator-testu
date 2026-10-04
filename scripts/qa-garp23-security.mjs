@@ -248,6 +248,7 @@ const expectedAiCalls = [
   ['src/js/03-ui-render.js','reading-source-analysis'],
   ['src/js/03-ui-render.js','listening-question-suggestions'],
   ['src/js/03-ui-render.js','reading-package-suggestion'],
+  ['src/js/05c-exercise-suitability.js','exercise-suitability'],
   ['src/js/01-core.js','generator-help-answer'],
   ['src/js/09-selftest-keycheck.js','answer-key-verification'],
   ['src/js/12-prompt-builder.js','grading-scale-parse'],
