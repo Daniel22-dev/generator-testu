@@ -32,11 +32,16 @@ function normalizeLoadedState(s) {
   if (s.manualMode === undefined) s.manualMode = false;
   if (Array.isArray(s.exerciseConfig)) s.exerciseConfig.forEach(function(ex){ if (ex.manualMode === undefined) ex.manualMode = false; });
 
-  if (s.exerciseDetail && Array.isArray(s.exerciseConfig) && s.exerciseConfig.length) {
+  s.exerciseConfigSaved = s.exerciseConfigSaved === true;
+  if (hasConfiguredExercises(s) && Array.isArray(s.exerciseConfig) && s.exerciseConfig.length) {
     s.pocet = Math.min(10, s.exerciseConfig.length);
     s.exerciseConfig = s.exerciseConfig.slice(0, s.pocet);
+    s.typyCviceni = uniqueExerciseTypes(s.exerciseConfig.map(ex=>ex.typ));
   } else {
-    const loadedTypes = sanitizeExerciseTypeList(s.typyCviceni || []).slice(0, 10);
+    s.exerciseConfigSaved = false;
+    const loadedTypes = uniqueExerciseTypes(s.typyCviceni || []).slice(0, 10);
+    // Discard stale hidden rows. The current selected types rebuild them on demand.
+    s.exerciseConfig = [];
     if (loadedTypes.length) {
       s.typyCviceni = loadedTypes;
       s.pocet = loadedTypes.length;
@@ -690,8 +695,10 @@ function applyMode() {
 
 // ═══ Persistence ══════════════════════════════════════════════════════════════
 function saveSnapshot() {
+  if(typeof compDraft!=='undefined'&&compDraft)return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
+    if(typeof compDraft!=='undefined'&&compDraft)return;
     try {
       const dom = {};
       DOM_FIELDS.forEach(id => { dom[id] = val(id); });
@@ -744,7 +751,7 @@ function flashSave() {
 // ═══ Templates ════════════════════════════════════════════════════════════════
 function loadTemplates(){return readArr(TPL_KEY)}
 function saveTemplates(t){return safeSetItem(TPL_KEY,JSON.stringify(sanitizeStoredArray(t)))}
-const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni zadaniTab urls rcLength rcTopic readingQuestionCount listeningQuestionCount sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard feedbackMode differentiationLevel'.split(' ');
+const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni zadaniTab urls rcLength rcTopic readingQuestionCount listeningQuestionCount sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfigSaved exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard feedbackMode differentiationLevel'.split(' ');
 function getTemplatePrefill(){const p={};TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));p.skupinyCount=(state.skupiny||[]).length;p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||'');return p}
 function getTemplateDomPrefill(){const dom={};DOM_FIELDS.forEach(id=>{if(!SENSITIVE_FIELD_IDS.includes(id))dom[id]=cloneSafeStoredValue(val(id))});return dom}
 function applyTemplatePrefill(p){if(!p)return;TEMPLATE_PREFILL_KEYS.forEach(k=>{if(p[k]!==undefined)state[k]=cloneSafeStoredValue(p[k])});const n=Math.max(0,Math.min(12,Number(p.skupinyCount)||0)),names=Array.isArray(p.skupinyNazvy)?p.skupinyNazvy:[];state.skupiny=[];if((state.diferencovany||'NE')==='ANO')for(let i=0;i<n;i++)state.skupiny.push({id:groupIdCounter++,nazev:names[i]||('Skupina '+(i+1)),podminky:'',studenti:[]})}

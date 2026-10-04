@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.87',
+  version: '7.1.88',
   date:    '2026-10-04',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'WORKFLOW AUDIT (7.1.88): kanonická konfigurace cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní/odložení účastníci. Přebalení kódů bez AI, povinná obnova kontrol a soukromý roster.',
     'RED-TEAM E10 CI FIX (7.1.87): smoke gate respektuje oddělený private verifier; klikací sady používají jeho startovní kód. Sjednocena dokumentace a release metadata. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E10 (7.1.86): zadání šifrované AES-GCM/PBKDF2; startovní kód 50 bitů jen učiteli. Fail-closed start, reload a offline testy; readiness brání merge/deploy. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E9 (7.1.85): společný CI řetězec, záporné kontroly exportu/zapojení/evidence a nativní obnova pokusu. GARP před P5 zachová reporty. E7 fyzicky netestováno; F7 chybí. NOT READY.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E5 / RUNTIME (7.1.81): strict reload/history/freeze/fullscreen zamknou test a zachovají audit. Paste/drop a běžné změny za zámkem blokovány. Split přežije reload; odemčení kontroluje nový odchod. Native a negativní testy; mobily NOT TESTED, CLIENT-CONTROLLED.',
     'RED-TEAM E4 / STORAGE (7.1.80): restart zachovává pokus, deadline a ciphertext outbox. Web Locks omezují souběh; poškozený stav má integrity lock. Soukromá replay evidence přežije restart. Native Chromium a negativní kontroly. Úplné smazání nebo jiný profil vyžaduje server; CLIENT-CONTROLLED.',
     'RED-TEAM E3 / VERIFIER (7.1.79): schéma a 21 typů odpovědí před bodováním; soukromé Forms účet→roster a publikace→Forms kotvy. Zálohy pouze diagnostické. Replay/konflikty vyřazeny; CSV zachovává pracovní sadu. Artefaktové/browser negativní kontroly. Runtime CLIENT-CONTROLLED.',
-    'RED-TEAM E2 / TRUST BOUNDARIES (7.1.78): soukromý přepočet oddělen od původu. Hash/časy/telemetrie CLIENT-CONTROLLED; šifrování neověřuje autora. UI/CSV/archivy REVIEW_REQUIRED. Secure generátor nevyžaduje Teacher/Admin secret. Artefaktové/browser a historické negativní kontroly.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -259,9 +259,9 @@ const ALLOWED_FILE_EXT = ['pdf','txt','md','markdown','csv','tsv','json','rtf','
 const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
-  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, sourceUseMode:'auto',
-  cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
-  body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfig:[],
+  pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, readingConfigured:false, listeningConfigured:false, sourceUseMode:'auto',
+  cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name', participantMode:'all',
+  body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfigSaved:false, exerciseConfig:[],
   fuzzyTolerance:'off',
   aiGradeScale:null, aiGradeRaw:'',
   tema:'modern', zolicek:'NE', diferencovany:'NE',
@@ -1403,8 +1403,10 @@ async function setAppMode(mode){
     // Nestačí jej jen skrýt: staré skupiny, roster kódů ani detailní konfigurace
     // se po pozdějším návratu do Advanced nesmějí nečekaně znovu objevit.
     state.exerciseDetail = false;
+    state.exerciseConfigSaved = false;
     state.exerciseConfig = [];
     state.skupiny = [];
+    try { if(typeof rosterSelectedEmails!=='undefined')rosterSelectedEmails.clear(); if(typeof rosterKnownEmails!=='undefined')rosterKnownEmails.clear(); } catch(_){}
     try { if (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries)) rosterEntries.length = 0; } catch(_) {}
     applySimpleDefaults();
   }

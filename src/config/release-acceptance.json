@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.87",
+  "appVersion": "7.1.88",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,14 +40,14 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "REDTEAM-V2-E10-OWNER-RELEASE-2026-10-04",
+  "revision": "WORKFLOW-UPDATE-2026-10-04",
   "runtimeAudit": {
     "required": true,
-    "scriptsExecuted": true,
+    "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
-    "browserRuntimeExecuted": true,
+    "browserRuntimeExecuted": false,
     "transport": "Local exact-lockfile dependency checks, desktop Chromium reporter and fixture workflow; complete frozen E10 chain required for this candidate.",
-    "note": "7.1.87 fixes secure generation, hidden credential settings and current workflow fixtures. Owner authorized publication on 2026-10-04: E6 deferred, Forms owner-reported checked, E7 physical mobile testing scheduled for 2026-10-06 and 2026-10-09. Exact-SHA CI and deployment verification remain required; physical devices are not certified.",
+    "note": "7.1.88 workflow changes require current-version local regressions and exact-SHA CI. Existing owner authorization is for supervised student red-team only; E6 deferred, live Forms owner-reported checked, physical mobile tests scheduled for 2026-10-06 and 2026-10-09.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false

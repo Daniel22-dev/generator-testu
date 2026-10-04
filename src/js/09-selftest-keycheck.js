@@ -403,6 +403,7 @@ async function akvApplySelected(){
 let secureGapsAcknowledged = false;
 function isSecurePackage(){ return !!(generatedPackage && generatedPackage.mode === 'secureOffline'); }
 function secureDownloadAllowed(){
+  if(outputParticipantsPending())return false;
   if(!isSecurePackage()) return true;            // gate platí jen pro secure balíček
   if(!lastSelfTest) return false;                // self-test ještě neproběhl
   if(!lastSelfTest.ok) return false;             // self-test našel chybu bodování / krypto / hard error
@@ -429,7 +430,9 @@ function updateSecureDownloadGate(){
   [btnMain,btnStu,btnTea].forEach(b=>{ if(b){ b.disabled=!allowed; b.classList.toggle('gate-locked',!allowed); } });
   if(!banner) return;
   banner.classList.remove('hidden');
-  if(!lastSelfTest){
+  if(outputParticipantsPending()){
+    if(banner){banner.classList.remove('hidden');banner.innerHTML='<strong>Obsah je připraven. Doplň účastníky testu.</strong> V části Kódy studentů vyber studenty, vygeneruj kódy a použij je v hotovém testu (bez AI). Potom spusť self-test a stáhni nový balíček.';}
+  } else if(!lastSelfTest){
     banner.className='st-box st-warn';
     banner.innerHTML=(selfTestStaleReason?'🔁 <strong>Test se změnil — spusť self-test znovu.</strong> '+esc(selfTestStaleReason)+' ':'🔒 <strong>Před stažením klasifikovaného testu spusť self-test bodování.</strong> Ověří, že se body počítají správně — špatná známka je horší než nespustitelný test. ')+'<button type="button" class="gate-run-btn" onclick="runScoringSelfTest()" title="Spustí vygenerovaný test proti reálnému kódu hodnocení a ověří, že 100 % správných odpovědí dá 100 % bodů a 0 % správných dá 0. Bez úspěšného běhu se stažení neodemkne.">🧪 Spustit self-test</button>';
   } else if(lastSelfTest.hasErrors){
@@ -465,7 +468,8 @@ function enforceSecureGate(){
   if(secureDownloadAllowed()) return true;
   updateSecureDownloadGate();
   const banner=$('secureGateBanner'); if(banner) banner.scrollIntoView({behavior:'smooth',block:'center'});
-  if(!lastSelfTest) uiAlert('Před stažením klasifikovaného testu spusť self-test bodování (tlačítko 🧪). Ověří, že se body počítají správně.','Self-test je povinný');
+  if(outputParticipantsPending())uiAlert('Vyber účastníky, vygeneruj kódy a použij je v hotovém testu (bez AI).','Doplň účastníky');
+  else if(!lastSelfTest) uiAlert('Před stažením klasifikovaného testu spusť self-test bodování (tlačítko 🧪). Ověří, že se body počítají správně.','Self-test je povinný');
   else if(lastSelfTest.hasErrors) uiAlert('Self-test našel chybu v bodování. Stažení je zablokované, dokud ji neopravíš a self-test znovu neproběhne bez chyb.','Bodování má chybu');
   else if(lastSelfTest.hasGaps && !secureGapsAcknowledged) uiAlert('Self-test našel položky bez klíče správné odpovědi. Doplň je v editoru, nebo potvrď, že je budeš opravovat ručně.','Potvrď mezery');
   else if(!teacherReviewSatisfied()) uiAlert('Stroj ověřil technické bodování, ale obsahovou správnost musí potvrdit učitel. Dokonči čtyři krátké body v učitelské kontrole (obsah, klíč, bodování a bezpečné sdílení).','Učitelská kontrola je povinná');

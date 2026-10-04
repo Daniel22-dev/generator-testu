@@ -54,14 +54,16 @@ function rosterRender(msg){
 }
 function rosterGenerate(){
   var ta=document.getElementById('rosterEmails'); var raw=ta?ta.value:'';
-  var parsed=rosterParseEmails(raw);
-  if(!parsed.length){ rosterEntries=[]; rosterRender('Vlož aspoň jeden e-mail ve tvaru prijmeni@domena.'); validate(); return; }
+  var parsed=rosterChosenParticipants();
+  if(!parsed.length){ rosterEntries=[]; rosterRender('Vlož alespoň jeden e-mail a vyber studenty, kteří test píší.'); validate(); return; }
   var used={};
   parsed.forEach(function(e){ var c; do{ c=rosterMakeCode(); }while(used[c]); used[c]=1; e.code=c; });
   rosterEntries=parsed; rosterRender('');validate();
 }
 function rosterDownloadCsv(){
   if(!rosterEntries.length){ rosterRender('Nejdřív vygeneruj kódy.'); return; }
+  const sealed=lastAssembled&&lastAssembled.sourceState&&lastAssembled.sourceState.__roster;
+  if(sealed&&JSON.stringify(sealed)!==JSON.stringify(rosterForVerifier())){rosterRender('Kódy se liší od hotového testu. Nejdřív je použij v hotovém testu (bez AI), pak stáhni CSV.');return;}
   var lines=['email,student,code'];
   rosterEntries.forEach(function(e){ lines.push([e.email,e.label,e.code].map(function(x){ var v=String(x==null?'':x); if(/^[=+@-]/.test(v))v="'"+v; return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')); });
   try{ downloadBlobFile(lines.join('\n'),'kody_'+outputSlug()+'.csv','text/csv;charset=utf-8'); }
@@ -129,4 +131,54 @@ async function downloadGeneratedTeacherVerifier() {
   // při přeposílání), kde UI hlášku nikdo nevidí.
   try { downloadBlobFile(generatedPackage.teacherHtml, teacherVerifierFileName()); }
   catch(e){ setGenErr('Stažení učitelského verifieru se nezdařilo: '+(e&&e.message?e.message:e)); }
+}
+
+// Participant selection is private in-memory data, never sent to the model or snapshots.
+let rosterSelectedEmails = new Set();
+let rosterKnownEmails = new Set();
+function rosterSetParticipantMode(mode){if(mode==='selected'&&state.participantMode!=='selected')rosterSelectedEmails.clear();state.participantMode=['all','selected','later'].includes(mode)?mode:'all';if($('participantMode'))$('participantMode').value=state.participantMode;rosterRefreshParticipants();validate();saveSnapshot();}
+function outputParticipantsPending(){return !!(lastAssembled&&lastAssembled.sourceState&&lastAssembled.sourceState.identityMode==='oneTimeCode'&&lastAssembled.sourceState.participantMode==='later');}
+function rosterRefreshParticipants(){
+  const parsed=rosterParseEmails(val('rosterEmails')),known=new Set(parsed.map(e=>e.email));
+  rosterSelectedEmails=new Set(Array.from(rosterSelectedEmails).filter(email=>known.has(email)));
+  // Existing selections survive edits to the full group. New names need an explicit choice.
+  if(!rosterKnownEmails.size&&state.participantMode!=='selected')parsed.forEach(e=>rosterSelectedEmails.add(e.email));
+  rosterKnownEmails=known;
+  rosterRenderParticipants();
+}
+function rosterRenderParticipants(){
+  const box=$('participantList');if(!box)return;
+  const selected=state.participantMode==='selected',query=val('participantSearch').trim().toLowerCase();
+  const parsed=rosterParseEmails(val('rosterEmails'));
+  box.classList.toggle('hidden',!selected);
+  box.replaceChildren(...(selected?parsed.flatMap((e,index)=>{
+    if(query&&!e.email.includes(query))return [];
+    const row=$('participantRowTemplate').content.firstElementChild.cloneNode(true),input=row.firstElementChild;
+    input.checked=rosterSelectedEmails.has(e.email);input.onchange=()=>rosterToggleParticipant(index,input.checked);
+    row.lastElementChild.textContent=e.email;return [row];
+  }):[]));
+}
+function rosterToggleParticipant(index,on){
+  const entry=rosterParseEmails(val('rosterEmails'))[index];if(!entry)return;
+  if(on)rosterSelectedEmails.add(entry.email);else rosterSelectedEmails.delete(entry.email);
+}
+function rosterChosenParticipants(){
+  if(state.participantMode==='later')return [];
+  const parsed=rosterParseEmails(val('rosterEmails'));
+  return state.participantMode==='selected'?parsed.filter(e=>rosterSelectedEmails.has(e.email)):parsed;
+}
+async function rosterApplyToOutput(){
+  if(!lastAssembled||!lastGenData){rosterRender('Nejdřív vytvoř obsah testu.');return;}
+  if(!rosterEntries.length){rosterRender('Nejdřív vygeneruj kódy vybraným studentům.');return;}
+  if(outputMutationBusy||window.__GHRAB_GENERATOR_WORKFLOW_ID__)return;
+  const st=outputEditState();
+  if(st.diferencovany==='ANO'){rosterRender('U diferencovaného testu nejprve uprav také kódy ve skupinách a vytvoř test znovu.');return;}
+  st.identityMode='oneTimeCode';st.participantMode=state.participantMode==='all'?'all':'selected';st.__roster=rosterForVerifier();
+  try{
+    await commitAnswerData(lastGenData,outputStamp(),st,{freshArtifact:true,reason:'Změnili se účastníci testu. Spusť self-test nového balíčku.'});
+    exportChecklist={};renderExportChecklist(true);updateSecureDownloadGate();
+    goTo(4);
+    uiToast('Kódy použity bez AI. Zopakuj kontroly a stáhni nový pár souborů.','ok',6500);
+    rosterRender('Proveď kontroly a nahraď studentský soubor i verifier novým párem. Staré soubory na zařízeních studentů zůstanou platné.');
+  }catch(error){rosterRender('Účastníky se nepodařilo použít: '+error.message);}
 }

@@ -44,7 +44,7 @@ function renderCefrInfo() {
 
 // ═══ Smart time tip ═══════════════════════════════════════════════════════════
 function getActiveTypesForTime() {
-  if (state.exerciseDetail && state.exerciseConfig.length) {
+  if (hasConfiguredExercises(state) && state.exerciseConfig.length) {
     const configured = state.exerciseConfig
       .map(e => e.typ)
       .filter(t => t && t !== '— Claude vybere —');
@@ -600,7 +600,7 @@ function credentialPolicyErrors(teacherSecret, recoveryCode, recoveryRequired, t
 
 function workflowTypeStats(){
   const custom=trim('vlastniTyp');
-  const types=sanitizeExerciseTypeList([...(state.typyCviceni||[]), ...(custom?[custom]:[])]);
+  const types=uniqueExerciseTypes([...(state.typyCviceni||[]), ...(custom?[custom]:[])]);
   return {types, count:types.length, distinct:new Set(types).size};
 }
 function hasListeningSource(){
@@ -647,23 +647,23 @@ function validate() {
   const customTypeDisabled = isDisabledExerciseType(trim('vlastniTyp'));
   const customTypeUnsupported = !!trim('vlastniTyp') && !isAllowedExerciseType(normalizeType(trim('vlastniTyp')));
   const typeStats=workflowTypeStats();
-  const hasTyp = state.exerciseDetail
-    ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => isAllowedExerciseType(normalizeType(ex.typ || 'multiple choice')) && Number.isInteger(ex.pocetOtazek) && ex.pocetOtazek>=1 && ex.pocetOtazek<=30 && (scoringTypeFor(ex.typ)!=='matching'||ex.pocetOtazek>=2) && Number.isInteger(ex.body) && ex.body>=1 && ex.body<=999)
+  const hasTyp = hasConfiguredExercises(state)
+    ? state.exerciseConfig.length === state.pocet && state.exerciseConfig.every(ex => String(ex.typ||'').trim() && isAllowedExerciseType(normalizeType(ex.typ || '')) && Number.isInteger(ex.pocetOtazek) && ex.pocetOtazek>=1 && ex.pocetOtazek<=30 && (scoringTypeFor(ex.typ)!=='matching'||ex.pocetOtazek>=2) && Number.isInteger(ex.body) && ex.body>=1 && ex.body<=999)
     : ((typeStats.count > 0 || (trim('vlastniTyp') && !customTypeDisabled && !customTypeUnsupported)) && typeStats.count <= 10 && typeStats.count === state.pocet);
   const listeningOk=hasListeningSource();
   $('next1').disabled = !(hasTyp && state.uroven.length > 0 && listeningOk);
   const hint1=$('validHint1'), step1Msg=[];
   if(customTypeUnsupported) step1Msg.push('Vlastní typ cvičení není technicky podporován. Použij některý z nabízených typů nebo jeho běžný synonymní název (např. gap fill).');
-  if(!state.exerciseDetail && typeStats.count>10) step1Msg.push('Vybráno je '+typeStats.count+' cvičení, ale jeden test podporuje nejvýše 10.');
-  else if(!state.exerciseDetail && typeStats.count>0 && typeStats.count!==state.pocet) step1Msg.push('Počet cvičení se musí přesně shodovat s počtem zvolených typů ('+typeStats.count+').');
+  if(!hasConfiguredExercises(state) && typeStats.count>10) step1Msg.push('Vybráno je '+typeStats.count+' cvičení, ale jeden test podporuje nejvýše 10.');
+  else if(!hasConfiguredExercises(state) && typeStats.count>0 && typeStats.count!==state.pocet) step1Msg.push('Počet cvičení se musí přesně shodovat s počtem zvolených typů ('+typeStats.count+').');
   if(!listeningOk) step1Msg.push('Listening comprehension vyžaduje zdroj: audio/video soubor, URL nebo transkript. Bez zdroje by student neměl co poslouchat.');
-  if(state.exerciseDetail&&!hasTyp)step1Msg.push('Zkontroluj počet položek (1–30, párování nejméně 2) a celé body (1–999) u každého cvičení.');
+  if(hasConfiguredExercises(state)&&!hasTyp)step1Msg.push('Zkontroluj počet položek (1–30, párování nejméně 2) a celé body (1–999) u každého cvičení.');
   if(hint1) hint1.textContent=step1Msg.join(' ');
 
-  const hasBody = state.exerciseDetail
+  const hasBody = hasConfiguredExercises(state)
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0) > 0
     : state.body > 0;
-  const effTotalBody = state.exerciseDetail && state.exerciseConfig && state.exerciseConfig.length
+  const effTotalBody = hasConfiguredExercises(state) && state.exerciseConfig && state.exerciseConfig.length
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0)
     : state.body;
   // AI-přečtená stupnice platí, jen pokud sedí na aktuální text pole (jinak ji zneplatníme).
@@ -676,7 +676,7 @@ function validate() {
   const scaleGaps=gradeScaleGaps(parsedForValidation);
   const scaleOverlaps=gradeScaleOverlaps(parsedForValidation);
   const gradeOk = state.gradeTyp !== 'vlastni' || ((localScaleValid || aiScaleValid) && scaleGaps.length===0 && scaleOverlaps.length===0);
-  $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk && (state.exerciseDetail||Number(state.body)>=Number(state.pocet)));
+  $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk && (hasConfiguredExercises(state)||Number(state.body)>=Number(state.pocet)));
   if(typeof renderGenerationEstimate==='function')renderGenerationEstimate();
   const skala = $('vlastniSkala');
   const skalaErr = $('vlastniSkalaErr');
@@ -722,10 +722,13 @@ function validate() {
   // Jednorázové kódy bez vygenerovaného rosteru = verifier nemá seznam a kontrola
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
   const rosterOk = (state.identityMode || 'name') !== 'oneTimeCode'
+    || (state.participantMode==='later' && state.resultMode==='secureOffline' && state.diferencovany!=='ANO')
     || (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries) && rosterEntries.length > 0);
   const groupLogic=workflowGroupValidation();
-  $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
+  const participantsDeferredOk=state.participantMode!=='later'||state.identityMode!=='oneTimeCode'||(state.resultMode==='secureOffline'&&state.diferencovany!=='ANO');
+  $('next3').disabled = !(participantsDeferredOk && secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
+  if(!participantsDeferredOk)msg.push('Odložený výběr účastníků je dostupný pro bezpečný offline test bez diferenciace. Dokud účastníky nedoplníš, studentský export je uzamčen.');
   if (!rosterOk) msg.push('Identita „individuální kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
   if (teacherRequired && !trim('ucitelJmeno')) msg.push('Doplň jméno pro učitelský mód.');
   msg.push(...credentialErrors);
@@ -802,7 +805,7 @@ function getLayoutLabel(layout = state.layout) {
 
 function usesListeningComprehension() {
   const own = trim('vlastniTyp').toLowerCase();
-  const configured = state.exerciseDetail
+  const configured = hasConfiguredExercises(state)
     ? state.exerciseConfig.map(e => String(e.typ || '').toLowerCase())
     : state.typyCviceni.map(t => String(t || '').toLowerCase());
   if (own.includes('listening') || own.includes('poslech')) return true;
@@ -810,7 +813,7 @@ function usesListeningComprehension() {
 }
 function usesReadingComprehension() {
   const own = trim('vlastniTyp').toLowerCase();
-  const configured = state.exerciseDetail
+  const configured = hasConfiguredExercises(state)
     ? state.exerciseConfig.map(e => String(e.typ || '').toLowerCase())
     : state.typyCviceni.map(t => String(t || '').toLowerCase());
   if (own.includes('reading')) return true;
@@ -898,9 +901,12 @@ function defaultExercisePoints() {
 // Globální výběr typů je v běžném režimu zároveň seznamem cvičení.
 // Pořadí je stabilní podle pořadí výběru; duplicity mohou vzniknout pouze po
 // návratu z detailní konfigurace, kde lze stejný typ použít vícekrát.
+function hasConfiguredExercises(st){ return !!(st.exerciseDetail || st.exerciseConfigSaved); }
+function uniqueExerciseTypes(types){ return Array.from(new Set(sanitizeExerciseTypeList((types||[]).filter(t=>String(t||'').trim())))); }
+
 function globalExerciseTypes() {
   const custom = trim('vlastniTyp');
-  return sanitizeExerciseTypeList([...(state.typyCviceni || []), ...(custom ? [custom] : [])]).slice(0, 10);
+  return uniqueExerciseTypes([...(state.typyCviceni || []), ...(custom ? [custom] : [])]).slice(0, 10);
 }
 
 function sameExerciseType(a, b) {
@@ -914,6 +920,7 @@ function sameExerciseType(a, b) {
 // zvolené kartičky (typicky Reading comprehension).
 function syncExerciseConfigFromGlobalTypes() {
   const types = globalExerciseTypes();
+  state.exerciseConfigSaved = false;
   const previous = Array.isArray(state.exerciseConfig) ? state.exerciseConfig : [];
 
   if (!types.length) {
@@ -926,7 +933,7 @@ function syncExerciseConfigFromGlobalTypes() {
   state.pocet = types.length;
   const defaultPts = defaultExercisePoints();
   state.exerciseConfig = types.map((type, i) => {
-    const old = previous[i] || null;
+    const old = previous.find(ex => sameExerciseType(ex.typ, type)) || null;
     const sameType = !!old && sameExerciseType(old.typ, type);
     const oldCount = old ? Number(old.pocetOtazek) : NaN;
     const oldBody = old ? Number(old.body) : NaN;
@@ -934,7 +941,7 @@ function syncExerciseConfigFromGlobalTypes() {
       ? oldCount
       : defaultItemCount(type);
     return {
-      ...(old || {}),
+      ...(sameType ? old : {}),
       typ: type,
       pocetOtazek: normalizeType(type) === 'categorisation-board' ? 1 : count,
       body: Number.isInteger(oldBody) && oldBody >= 1 && oldBody <= 999 ? oldBody : defaultPts,
@@ -974,7 +981,7 @@ function syncExerciseConfig() {
     const i = state.exerciseConfig.length;
     const custom = trim('vlastniTyp');
     const typePool = sanitizeExerciseTypeList([...state.typyCviceni, ...(custom ? [custom] : [])]);
-    const initialType = typePool[i % Math.max(typePool.length, 1)] || '';
+    const initialType = ''; // New detail row requires an explicit type selection.
     const initialCount = typeof defaultItemCount === 'function' && initialType
       ? defaultItemCount(initialType)
       : 8;
@@ -988,7 +995,7 @@ function syncExerciseConfig() {
   // Shrink
   state.exerciseConfig = state.exerciseConfig.slice(0, n);
   // Doplň typy do prázdných řádků z aktuálního globálního výběru (viz výše).
-  seedEmptyExerciseTypes();
+  // Empty detail rows remain empty until the teacher chooses their type.
   // Pokud existuje globální cíl bodů, rozdistribuj rovnoměrně.
   if (state.body > 0 && oldLength!==n) syncExercisePoints();
 }
@@ -1017,7 +1024,8 @@ function toggleExDetail() {
   if (!state.exerciseDetail) {
     // Před otevřením je autoritou globální výběr. Přestav tabulku přesně podle něj,
     // aby se nikdy neobjevila stará skrytá konfigurace z předchozího stavu.
-    if (globalExerciseTypes().length) syncExerciseConfigFromGlobalTypes();
+    if (state.exerciseConfigSaved) { state.pocet = state.exerciseConfig.length; }
+    else if (globalExerciseTypes().length) syncExerciseConfigFromGlobalTypes();
     else syncExerciseConfig();
     state.exerciseDetail = true;
   } else {
@@ -1028,7 +1036,8 @@ function toggleExDetail() {
       try { uiToast('Nejdřív nastav platný typ u každého cvičení. Pak lze podrobné nastavení skrýt.', 'warn', 5000); } catch(_){}
       return;
     }
-    state.typyCviceni = usedTypes.map(t => specialStyleKey(t) || normalizeType(t));
+    state.typyCviceni = uniqueExerciseTypes(usedTypes.map(t => specialStyleKey(t) || normalizeType(t)));
+    state.exerciseConfigSaved = true;
     state.pocet = state.exerciseConfig.length;
     const sum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
     if (sum > 0) { state.body = sum; setVal('bodyCustom', sum); }
@@ -1055,7 +1064,11 @@ function updateExField(i, field, value) {
     const id=canonical==='reading comprehension'?'readingQuestionCount':canonical==='listening comprehension'?'listeningQuestionCount':'';
     if(id&&document.getElementById(id))document.getElementById(id).value=String(state[id]);
   }
-  if (field === 'typ') { renderSmartTimeTip();
+  if (field === 'typ') {
+    state.exerciseConfig[i].manualMode = false;
+    state.exerciseConfig[i].pocetOtazek = defaultItemCount(value);
+    state.typyCviceni = uniqueExerciseTypes(state.exerciseConfig.map(ex => ex.typ));
+    renderSmartTimeTip();
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;
     renderExerciseConfig();
     // Typ řídí i navazující Reading/Listening bloky; překresli je okamžitě.
@@ -1103,7 +1116,7 @@ function renderExerciseConfig() {
     '<span></span><span>Typ cvičení</span>' +
     '<span style="text-align:center">Položek</span>' +
     '<span style="text-align:center">Body</span>' +
-    '<span style="text-align:right">b/pol.</span></div>';
+    '<span class="ex-source-head">Tvorba</span><span style="text-align:right">b/pol.</span></div>';
 
   // Normalizace: catBoard má vždy 1 položku — opravíme i uložený stav, ne jen displej.
   state.exerciseConfig.forEach(function(ex){ if(normalizeType(ex.typ||'')==='categorisation-board' && ex.pocetOtazek!==1) ex.pocetOtazek=1; });
@@ -1128,7 +1141,7 @@ function renderExerciseConfig() {
         : '<input type="number" min="1" max="30" value="'+ex.pocetOtazek+'" oninput="updateExField('+i+',\'pocetOtazek\',this.value)">'}
       <input type="number" min="0" max="999" value="${ex.body}"
         oninput="updateExField(${i},'body',this.value)">
-      <div class="ex-manual-toggle" title="AI: generuje Gemini · Ručně: zadáš přes formulář" style="${isManualSupported(ex.typ||'') ? '' : 'display:none'}"><button type="button" class="ex-manual-btn${!ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',false)" title="Generovat AI">🤖</button><button type="button" class="ex-manual-btn${ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',true)" title="Zadat ručně">✏️</button></div>
+      <div class="ex-manual-toggle" title="AI: generuje Gemini · Ručně: zadáš přes formulář" style="${isManualSupported(ex.typ||'') ? '' : 'display:none'}"><button type="button" class="ex-manual-btn${!ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',false)" title="Generovat AI">🤖 AI</button><button type="button" class="ex-manual-btn${ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',true)" title="Zadat ručně">✏️ Ručně</button></div>
       <div class="ex-bpp">${bpp}</div>
     </div>`;
   }).join('');
@@ -1603,7 +1616,7 @@ function buildPrompt() {
   const recoveryCode = '__CLASSROOM_RECOVERY_CODE_DOPLN_LOKALNE__';
   const poznamky = trim('poznamky');
   const body = (() => {
-    if (state.exerciseDetail && state.exerciseConfig.length) {
+    if (hasConfiguredExercises(state) && state.exerciseConfig.length) {
       const sum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
       return sum > 0 ? sum : null;
     }
@@ -1613,7 +1626,7 @@ function buildPrompt() {
   const randomText = state.randomizace === 'ANO'
     ? 'Otázky v rámci cvičení promíchej při každém spuštění stabilním Fisher-Yates shuffle; po kliknutí na odpověď už pořadí neměň.'
     : 'Pořadí otázek ponech pevné a stejné pro všechny studenty.';
-  const exerciseText = state.exerciseDetail && state.exerciseConfig.length > 0
+  const exerciseText = hasConfiguredExercises(state) && state.exerciseConfig.length > 0
     ? buildExerciseDetail()
     : `Typy cvičení: ${typy || 'dle uvážení'}\nCelkový počet bodů: ${body ? body + ' bodů; rozděl rozumně mezi cvičení' : 'neurčen — nastav dle uvážení'}`;
   const diffText = state.diferencovany === 'ANO'

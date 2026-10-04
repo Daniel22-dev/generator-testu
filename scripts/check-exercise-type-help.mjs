@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import {JSDOM} from 'jsdom';
 
 const read = (file) => fs.readFileSync(file, 'utf8');
 const shell = read('src/shell.html');
@@ -8,15 +9,15 @@ const stateUi = read('src/js/02-state-persistence.js');
 const formFields = read('src/js/05-form-fields.js');
 const styles = read('src/styles.css');
 
-const start = shell.indexOf('id="typyBtns"');
-const end = shell.indexOf('<div class="small-muted"', start);
-if (start < 0 || end < 0) {
+const dom = new JSDOM(shell);
+const chooser = dom.window.document.getElementById('typyBtns');
+if (!chooser) {
   console.error('FAIL: exercise type chooser block not found');
   process.exit(1);
 }
 
-const block = shell.slice(start, end);
-const types = [...block.matchAll(/data-val="([^"]+)"/g)].map((match) => match[1]);
+const types = [...chooser.querySelectorAll('[data-val]')].map(button => button.dataset.val);
+dom.window.close();
 const duplicateValues = (values) => [...new Set(values.filter((value, index) => values.indexOf(value) !== index))];
 
 const registryMatch = helpSource.match(/const\s+EXERCISE_TYPE_HELP\s*=\s*Object\.freeze\((\{[\s\S]*?\})\);/);

@@ -233,7 +233,7 @@ function scoreItem(ex,item,ans,pts){
   }
   if(ex.type==='true/false')return ans.val===!!item.correct?pts:0;
   if(ex.type==='fill-in-the-blank'){var fk=Array.isArray(item.answers)?item.answers:[item.answer];var fv=Array.isArray(ans.vals)?ans.vals:(ans.val!=null?[ans.val]:[]);return scoreBlanks(fk,fv,item.alt_answers,pts,ex.type,true);}
-  if(ex.type==='error correction')return pts*textScore(ans.val,item.correction,item.alt_answers,ex.type);
+  if(ex.type==='error correction')return pts*correctionScore(ans.val,item,ex.type);
   if(ex.type==='word order')return pts*textScore(ans.val,item.correct_sentence||item.answer,item.alt_answers,ex.type);
   if(ex.type==='translation')return pts*textScore(ans.val,item.answer||item.translation,item.alt_answers,ex.type);
   if(ex.type==='sentence transformation')return pts*textScore(ans.val,item.answer,item.alt_answers,ex.type);

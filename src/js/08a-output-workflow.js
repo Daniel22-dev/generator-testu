@@ -6,10 +6,10 @@ let generationUiLocked=[];
 function generationPlan(st){
   const specs=buildExerciseSpecs(st), groups=getApiDiffGroups(st), factor=Math.max(1,groups.length);
   if(!specs.length||specs.length>10)throw new Error('Test mus\u00ed obsahovat 1 a\u017e 10 cvi\u010den\u00ed.');
-  if(!st.exerciseDetail&&sanitizeExerciseTypeList(st.typyCviceni||[]).length!==specs.length)throw new Error('Po\u010det cvi\u010den\u00ed se neshoduje s po\u010dtem vybran\u00fdch typ\u016f.');
-  if(!st.exerciseDetail&&Number(st.body)<specs.length)throw new Error('Celkov\u00fd po\u010det bod\u016f mus\u00ed b\u00fdt alespo\u0148 po\u010det cvi\u010den\u00ed.');
+  if(!hasConfiguredExercises(st)&&sanitizeExerciseTypeList(st.typyCviceni||[]).length!==specs.length)throw new Error('Po\u010det cvi\u010den\u00ed se neshoduje s po\u010dtem vybran\u00fdch typ\u016f.');
+  if(!hasConfiguredExercises(st)&&Number(st.body)<specs.length)throw new Error('Celkov\u00fd po\u010det bod\u016f mus\u00ed b\u00fdt alespo\u0148 po\u010det cvi\u010den\u00ed.');
   const config=specs.map((s,i)=>{
-    const old=st.exerciseDetail&&st.exerciseConfig?st.exerciseConfig[i]:null;
+    const old=hasConfiguredExercises(st)&&st.exerciseConfig?st.exerciseConfig[i]:null;
     const rawCount=old?Number(old.pocetOtazek):s.count;
     if(!Number.isInteger(rawCount)||rawCount<1||rawCount>30)throw new Error('Cvi\u010den\u00ed '+(i+1)+': podporov\u00e1no je 1 a\u017e 30 polo\u017eek.');
     if(s.type==='matching'&&s.count<2)throw new Error('P\u00e1rov\u00e1n\u00ed pot\u0159ebuje alespo\u0148 dva p\u00e1ry.');
