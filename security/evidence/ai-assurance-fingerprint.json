@@ -6,7 +6,7 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "54d5ce8eff4fdd54281c63cafd00cb336ea38300d477879d0b418c37c89b6ef7",
+  "fingerprint": "8803a57272364b43a604bf7ae0554cb44d2e7c0c59c1cb2437756b1d2766b356",
   "files": [
     {
       "path": "src/js/01-core.js",
@@ -25,13 +25,13 @@
     },
     {
       "path": "src/js/05b-workflow-context.js",
-      "size": 11277,
-      "sha256": "f5ff537586c3c7051a6ab47aa802d2c30f87314947d01a2b57fa459543371979"
+      "size": 11346,
+      "sha256": "4badbc2446a252cac3c8ad8b57cde6a22ed42753bb7b3a91ecb356e3fcf947fb"
     },
     {
       "path": "src/js/05c-exercise-suitability.js",
-      "size": 8357,
-      "sha256": "b39453c523e2aa168f2e2e6a0d511e133b50317cc36aea30832858a3c700507d"
+      "size": 9398,
+      "sha256": "7a2d1033ef7bc42632d2cdc840a8c2831987f9baf77a42c58b9e9dbc3912c152"
     },
     {
       "path": "src/js/07-gemini.js",
@@ -70,8 +70,8 @@
     },
     {
       "path": "src/features/preview-editor.js",
-      "size": 64792,
-      "sha256": "ff680c18afb08c7ccaef6c73b92915131bebbe79ee8c78aaf2156b0f451c3c2c"
+      "size": 65149,
+      "sha256": "c2dbbee4b38efb1c81ed0b73fb6716af51da640feb6d268dec98ae1f585fe723"
     },
     {
       "path": "src/features/testlab.js",
