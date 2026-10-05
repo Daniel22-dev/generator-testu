@@ -5,12 +5,6 @@
   "note": "Owner authorized controlled student red-team deployment after technical gates; further independent review waived, not passed. This manifest excludes its own bytes. Workflow changes refresh only the GARP 2.7 r2 external trust pin.",
   "changed_files": [
     {
-      "path": "--check",
-      "status": "added",
-      "sha256": "cd917bed3b9f99f3b01a22e974f5167784f0af5f49da0ec82e63a3da056cf8b6",
-      "bytes": 4519
-    },
-    {
       "path": ".github/workflows/deploy.yml",
       "status": "modified",
       "sha256": "861b70821215203e87d1dd2dcefc7d8f5be5b2e2ed98699cefe5c263ee015a4a",
@@ -57,6 +51,12 @@
       "status": "modified",
       "sha256": "c523cbb9a1216a9a0e6ef39591c2a590f6b09ebb92913a385ecb1ab65a4af7e1",
       "bytes": 55049
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "0d2ae174aac4b45af6139b248e3a05732edeef8aacd330d1d6c2f31c13d88300",
+      "bytes": 27750
     },
     {
       "path": "RELEASE-NOTES-7.1.93.md",
