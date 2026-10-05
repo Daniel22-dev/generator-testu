@@ -8,7 +8,7 @@ async function runWorkflowComponentTests(){
     Object.assign(state,{appMode:'advanced',workPreset:'advanced',jazyk:'angli\u010dtina',instrJazyk:'cs',uroven:['B1'],pocet:1,typyCviceni:['reading comprehension'],body:8,exerciseDetail:false,exerciseConfigSaved:false,zadaniTab:'text',readingQuestionCount:4,readingConfigured:false,readingSourceScope:'shared',readingSourceAction:'generate'});
     DOM_FIELDS.forEach(id=>{if($(id))setVal(id,'');});
     setVal('nazev','Synthetic QA');setVal('proKoho','Synthetic group');setVal('latka','School vocabulary');setVal('zadaniText','A school library lends books.');
-    fileObjects=[];fileReadPromises=[];currentGeminiAbortController=null;rosterEntries=[];rosterIssuedCodes.clear();rosterIssuedState=state;rosterSelectedEmails.clear();rosterKnownEmails.clear();lastAssembled=null;
+    fileObjects=[];fileReadPromises=[];currentGeminiAbortController=null;rosterEntries=[];rosterIssuedCodes.clear();rosterIssuedState=state;lastAssembled=null;
     geminiApiKey='synthetic-not-real';geminiDataNoticeAcceptedInMemory=true;applyVisualState();validate();
   }
   const questions=()=>[1,2,3,4].map(n=>({q:'Question '+n,a:'Answer '+n}));
