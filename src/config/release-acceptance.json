@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.89",
+  "appVersion": "7.1.90",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "WORKFLOW-DISTRIBUTION-2026-10-04",
+  "revision": "AUDIT-7.1.90-PRE-STUDENT-TEST-2026-10-04",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.89 is a source candidate, not deployed. Local component DOM and mailer tests do not certify the production build, permit/CSP chain, WebCrypto export, full grading, live Google delivery, Safari or physical iPad. Exact pinned npm installation was unavailable. Complete frozen E10 regression and exact-SHA CI remain required. Historical owner authorization is limited to controlled supervised red-team and is not technical certification for these changes.",
+    "note": "7.1.90 targeted pre-student audit applied on top of the current green 7.1.89 CI baseline. Exact-lockfile CI remains required after upload. Chromium emulation covered the new scoring/randomization/iOS guard paths; physical iPhone/iPad/Android gates remain pending for the scheduled controlled tests.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Source candidate 7.1.89 requires full exact-lockfile CI and live integration acceptance before deployment. Existing owner-approved scope is controlled student red-team only. Companion Apps Script must be separately installed; no live spreadsheet or mail was changed.",
+  "note": "Source candidate 7.1.90 includes targeted pre-student fixes for productive scoring, stable randomization, verifier navigation/type labels and iOS keyboard/split handling. Physical mobile checks remain mandatory; companion Apps Script and live integration acceptance remain separate.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
