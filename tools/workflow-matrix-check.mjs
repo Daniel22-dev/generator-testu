@@ -96,7 +96,7 @@ function resetBase(){
   w.eval(`Object.assign(state,{appMode:'advanced',workPreset:'advanced',simpleTemplate:'',jazyk:'angličtina',instrJazyk:'target',uroven:['B1'],kombinovat:false,pocet:1,typyCviceni:['multiple choice'],exerciseDetail:false,exerciseConfigSaved:false,exerciseConfig:[],body:30,gradeTyp:'skola',odevzdavani:'B',testMode:'bezny',resultMode:'instant',feedbackMode:'brief',identityMode:'name',randomizace:'NE',layout:'tabs',zolicek:'NE',diferencovany:'NE',skupiny:[],screenGuard:false,cas:30,fileNames:[],urls:[''],aiGradeScale:null,aiGradeRaw:''}); rosterEntries=[];`);
   setVal('nazev','Workflow test'); setVal('proKoho','1.A'); setVal('latka','Present simple');
   w.eval("Object.assign(state,{readingQuestionCount:4,listeningQuestionCount:4,readingConfigured:false,listeningConfigured:false,readingSourceScope:'shared',readingSourceAction:'generate',readingProvenance:null}); rosterEntries=[]; rosterIssuedCodes=new Map(); rosterIssuedState=state;");
-  setVal('rosterEmails',''); setVal('participantSearch','');
+  setVal('rosterEmails','');
   setVal('readingText',''); setVal('readingQuestions',''); setVal('readingSourceText',''); setVal('readingTopicCustom','');
   setVal('listeningTranscript',''); setVal('listeningQuestions',''); setVal('listeningFocus','');
   setVal('vlastniSkala','');
