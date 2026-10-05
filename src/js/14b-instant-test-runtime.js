@@ -240,8 +240,8 @@ function scoreItem(ex,item,ans,pts){
   if(ex.type==='error correction')return pts*correctionScore(ans.val,item,ex.type);
   if(ex.type==='word order')return pts*textScore(ans.val,item.correct_sentence||item.answer,item.alt_answers,ex.type);
   if(ex.type==='translation')return pts*textScore(ans.val,item.answer||item.translation,item.alt_answers,ex.type);
-  if(ex.type==='sentence transformation')return pts*textScore(ans.val,item.answer,item.alt_answers,ex.type);
-  if(ex.type==='word formation')return pts*textScore(ans.val,item.answer,item.alt_answers,ex.type);
+  if(ex.type==='sentence transformation')return pts*gapTextScore(ans.val,productiveText(item),[item.answer].concat(item.alt_answers||[]),[item.keyword],ex.type);
+  if(ex.type==='word formation')return pts*gapTextScore(ans.val,productiveText(item),[item.answer].concat(item.alt_answers||[]),[item.base_word],ex.type);
   if(ex.type==='categorization')return norm(ans.val)===norm(item.correct_category||item.category||item.answer)?pts:0;
   if(ex.type==='cloze text'){var ck=Array.isArray(item.answers)?item.answers:[item.answer];var cv=Array.isArray(ans.vals)?ans.vals:(ans.val!=null?[ans.val]:[]);return scoreBlanks(ck,cv,item.alt_answers,pts,ex.type,false);}
   if(ex.type==='multi-select')return multiSelectScore(ans&&ans.vals,item.correct,pts);
