@@ -886,6 +886,7 @@ export const projectGlobals = {
   "variantSlug": 'writable',
   "variantSummary": 'writable',
   "verifierAnchorSettingsHtml": 'writable',
+  "verifierFormsStatusHtml": 'writable',
   "verifyGeneratorAssistantKB": 'writable',
   "waitForFileReads": 'writable',
   "workflowFileIds": 'writable',

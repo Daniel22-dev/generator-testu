@@ -14,11 +14,21 @@ def enter_start_code(p,code):
  p.locator('#startCode').fill(code)
 def configure_forms_anchors(p,published_at,email_header='Email Address',timestamp_header='Timestamp'):
  # Synthetic owner attestation for these fixtures; this does not inspect a live Form.
- p.locator('#formsSchoolDomain').fill('example.invalid');p.locator('#formsPublishedAt').fill(published_at)
+ # The production UI keeps the detailed verification form in the Security panel.
+ domain=p.locator('#formsSchoolDomain')
+ if not domain.is_visible():
+  trigger=p.locator('#formsVerifySummaryBtn')
+  if trigger.count():trigger.click()
+  else:p.locator('[data-v2-panel="security"]').click()
+ domain.wait_for(state='visible')
+ domain.fill('example.invalid');p.locator('#formsPublishedAt').fill(published_at)
+ advanced=p.locator('.forms-verify-advanced')
+ if advanced.count() and not p.locator('#formsEmailHeader').is_visible():advanced.evaluate('el=>{el.open=true}')
  p.locator('#formsEmailHeader').fill(email_header);p.locator('#formsTimestampHeader').fill(timestamp_header)
  for field in ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed']:p.locator('#'+field).check()
- p.get_by_role('button',name='Použít kotvy',exact=True).click()
+ p.get_by_role('button',name='Uložit nastavení ověření',exact=True).click()
  assert p.evaluate('!!FORMS_ANCHOR_POLICY'),p.locator('#formsAnchorStatus').inner_text()
+ if p.locator('[data-v2-panel="results"]').count():p.locator('[data-v2-panel="results"]').click()
 def answer(p,ex,ei,mode,language):
  t=ex['type']
  for qi,it in enumerate(ex['items']):

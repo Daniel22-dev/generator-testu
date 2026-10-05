@@ -7,9 +7,16 @@ function teacherPreviewCode(){
   return r?String(r.code):'';
 }
 function teacherPreviewHtml(html,code){
-  if(!code)return String(html||'');
+  let out=String(html||'');
+  // Náhled je učitelská simulace, ne ostrý studentský pokus. Příznak se vloží
+  // před runtime skripty, aby preview nesdílelo zámek karty ani trvalý stav pokusu.
+  const marker='<script>window.__GHRAB_TEACHER_PREVIEW__=true;<\/script>';
+  out=/<head\b[^>]*>/i.test(out)
+    ? out.replace(/<head\b[^>]*>/i,tag=>tag+marker)
+    : marker+out;
+  if(!code)return out;
   const value=String(code).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  return String(html||'').replace(/<input(?=[^>]*\bid=["']studentName["'])[^>]*>/i,tag=>{
+  return out.replace(/<input(?=[^>]*\bid=["']studentName["'])[^>]*>/i,tag=>{
     const clean=tag.replace(/\s+type=(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'').replace(/\s+value=(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'');
     return clean.replace(/^<input/i,'<input type="password"').replace(/>$/,' value="'+value+'">');
   });
