@@ -4,6 +4,7 @@ function verifierAnchorSettingsHtml(){return '<section class="card forms-verify-
 const SECURE_VERIFIER_ANCHORS_JS=String.raw`
 let FORMS_ANCHOR_POLICY=null;
 function refreshFormsVerificationSummary(){
+  if(typeof document==='undefined')return;
   const text=document.getElementById('formsVerifySummaryText'),btn=document.getElementById('formsVerifySummaryBtn'),box=document.getElementById('formsVerifySummary');
   if(!text||!btn||!box)return;
   const ready=!!FORMS_ANCHOR_POLICY;

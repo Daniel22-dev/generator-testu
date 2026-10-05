@@ -22,6 +22,8 @@ def configure_forms_anchors(p,published_at,email_header='Email Address',timestam
   else:p.locator('[data-v2-panel="security"]').click()
  domain.wait_for(state='visible')
  domain.fill('example.invalid');p.locator('#formsPublishedAt').fill(published_at)
+ advanced=p.locator('.forms-verify-advanced')
+ if advanced.count() and not p.locator('#formsEmailHeader').is_visible():advanced.evaluate('el=>{el.open=true}')
  p.locator('#formsEmailHeader').fill(email_header);p.locator('#formsTimestampHeader').fill(timestamp_header)
  for field in ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed']:p.locator('#'+field).check()
  p.get_by_role('button',name='Uložit nastavení ověření',exact=True).click()
