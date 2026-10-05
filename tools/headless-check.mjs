@@ -291,8 +291,8 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
     const currentPack=JSON.parse(stage3Fixture.answerTxt.replace(/^SECURE-ANSWERS-V1\s*/,''));
     const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({...currentPack,payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
     const csv=['Časové razítko,E-mailová adresa,Odevzdávací kód,Poznámka',
-      [q('15. 9. 2026 19:20:00'),q('student@example.invalid'),q(stage3Fixture.answerTxt),q('valid')].join(','),
-      [q('15. 9. 2026 19:21:00'),q('student@example.invalid'),q(stage3Fixture.answerTxt),q('duplicate')].join(','),
+      [q('15. 9. 2026 19:15:00'),q('student@example.invalid'),q(stage3Fixture.answerTxt),q('valid')].join(','),
+      [q('15. 9. 2026 19:16:00'),q('student@example.invalid'),q(stage3Fixture.answerTxt),q('duplicate')].join(','),
       [q('15. 9. 2026 19:22:00'),q('missing-one'),q(''),q('missing')].join(','),
       [q('15. 9. 2026 19:23:00'),q('bad-one'),q(bad),q('bad')].join(',')].join('\r\n');
     const parsed=tw.parseFormsCsvText(csv);

@@ -14,11 +14,14 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.90',
-  date:    '2026-10-04',
+  version: '7.1.93',
+  date:    '2026-10-05',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'PŘEHLED PRŮBĚHU (7.1.93): výsledková historie s úplným dostupným záznamem, soukromé termíny podle individuálního plánu a čitelné časové pásmo. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
+    'HISTORIE POKUSU (7.1.92): uchování kritických událostí a součtů při obnově; soukromé ověření konzistence a zpětná kompatibilita. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
+    'SOUKROMÉ OVĚŘENÍ (7.1.91): samostatné Recovery údaje exportů, časové kotvy a přehled bezpečnostních událostí. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
     'AUDIT PŘED TESTOVÁNÍM (7.1.90): úlohy s mezerou uznají doplnění i celou větu; pořadí otázek stabilní po reloadu a verifier ukáže číslo u studenta; error-tagging nemíchá slova; typ cvičení a výběr studenta ve výsledcích; iOS klávesnice bez falešného zámku/splitu; pokyn Nerušit. Mobily emulace; fyzicky 6. a 9. 10.',
     'WORKFLOW (7.1.89): CEFR a podklad před cvičeními; Reading s vlastním zdrojem a kontrolou změn; viditelné AI potvrzení; poradce vhodnosti; souvislé číslování po zamíchání; rozesílání jen zaškrtnutým v Sheets. Samostatná instalace rozesílače a úplné CI jsou nutné.',
     'WORKFLOW AUDIT (7.1.88): kanonická konfigurace cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní/odložení účastníci. Přebalení kódů bez AI, povinná obnova kontrol a soukromý roster.',
@@ -26,9 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E10 (7.1.86): zadání šifrované AES-GCM/PBKDF2; startovní kód 50 bitů jen učiteli. Fail-closed start, reload a offline testy; readiness brání merge/deploy. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E9 (7.1.85): společný CI řetězec, záporné kontroly exportu/zapojení/evidence a nativní obnova pokusu. GARP před P5 zachová reporty. E7 fyzicky netestováno; F7 chybí. NOT READY.',
     'RED-TEAM E8 (7.1.84): 108 forgery scénářů, negativní kontroly, skutečný CSV import a dlouhá historie po reloadu. Verifier odmítá rozporné start/joker/split události; klientské skóre přepočítá. Konzistentní forgery zůstává CLIENT-CONTROLLED / REVIEW_REQUIRED. NOT READY.',
-    'RED-TEAM E7 (7.1.83): 40 ručních mobilních scénářů, offline checklist a negativní kontroly záznamníku. iPhone/iPad/Android ANALYZED / NOT TESTED. F7, E6 residual/rotace a E8–E10 čekají; NOT READY.',
-    'RED-TEAM E6 (7.1.82): student preflight, private verifier pairing, public SHA manifest a scan Git historie odmítají answer/teacher deriváty. Tehdejší živý public build/historie blokovaly release. NOT READY.',
-    'RED-TEAM E5 / RUNTIME (7.1.81): strict reload/history/freeze/fullscreen zamknou test a zachovají audit. Paste/drop a běžné změny za zámkem blokovány. Split přežije reload; odemčení kontroluje nový odchod. Native a negativní testy; mobily NOT TESTED, CLIENT-CONTROLLED.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -1299,7 +1299,7 @@ function syncRecoveryCode(){
   return normalized;
 }
 function onTeacherAccessCodeInput(){ syncTeacherAccessCode(); updateSimpleSecretsHelper(); onInput(); }
-function onRecoveryCodeInput(){ syncRecoveryCode(); updateSimpleSecretsHelper(); onInput(); }
+function onRecoveryCodeInput(){ recoveryCodeEditedByTeacher=true; syncRecoveryCode(); updateSimpleSecretsHelper(); onInput(); }
 function setTeacherAccessCode(value){
   setVal('ucitelPin', normalizeCredentialInput(value));
   syncTeacherAccessCode();
@@ -1321,6 +1321,7 @@ function fillRecoveryCode(){
   let code='';
   do { code='REC-' + randomChunk(4) + '-' + randomChunk(4); } while(code===teacherAccessCodeValue());
   setRecoveryCode(code);
+  recoveryCodeEditedByTeacher=false;
   updateSimpleSecretsHelper(); validate(); saveSnapshot();
   uiToast('Vygenerován nový per-test Recovery kód. Můžeš jej použít pro odemčení zámku; tajný učitelský/admin kód zůstává oddělený.', 'info', 5200);
 }

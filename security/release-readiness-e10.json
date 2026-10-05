@@ -1,14 +1,14 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.90",
+  "version": "7.1.93",
   "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
   "blockers": [],
   "f7": "IMPLEMENTED; current-version gates required",
-  "remotePath": "Exact candidate SHA CI, protected main PR merge and deploy only main remain required. Owner approval permits the controlled experiment; technical regressions must pass for the new SHA.",
+  "remotePath": "Owner explicitly requested direct controlled deployment after fixes and technical gates on 2026-10-05. Existing exact-SHA candidate and protected-main certification remain required; deploy only main. A further independent review is waived, not passed.",
   "scope": "CONTROLLED_STUDENT_RED_TEAM_ONLY",
   "ownerDecision": {
     "recordedOn": "2026-10-05",
-    "source": "Explicit owner instruction to review and implement the audited 7.1.90 changes; scope remains controlled supervised student red-team only.",
+    "source": "Explicit owner instruction on 2026-10-05 15:46 Europe/Prague: no further independent review; deploy after corrections and technical testing; also provide ZIP fallback.",
     "authorizeGithubPublication": true,
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",
@@ -28,11 +28,19 @@
         "2026-10-09"
       ],
       "note": "Physical mobile behavior will be tested during the supervised Tuesday and Friday student experiment."
+    },
+    "independentReview": {
+      "status": "FURTHER_REVIEW_WAIVED_BY_OWNER",
+      "reviewedVersion": "7.1.92",
+      "currentVersion": "7.1.93",
+      "currentVersionIndependentlyReviewed": false
     }
   },
   "limitations": [
     "Publication is authorized for the supervised student red-team experiment; physical mobile compatibility is not certified.",
     "E6 remains deferred and open; a clean current branch does not prove historical cache removal.",
-    "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication."
+    "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication.",
+    "Physical phones and live Forms for this new export were not independently exercised. Further independent review of 7.1.93 was explicitly waived by owner; this is not an independent PASS.",
+    "Exact candidate and protected-main CI must complete before the existing promotion workflow may deploy."
   ]
 }

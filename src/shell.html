@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.90">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.93">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
-<script src="./frame-guard.js?v=7.1.90"></script>
+<script src="./frame-guard.js?v=7.1.93"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generátor testů</title>
 <meta name="theme-color" content="#f59e0b">
@@ -825,7 +825,7 @@
           <input type="password" id="recoveryCode" placeholder="Např. REC-AB12-CD34" autocomplete="new-password" oninput="onRecoveryCodeInput()">
           <button type="button" class="btn-eye" onclick="toggleSecret('recoveryCode', this)" aria-label="Zobrazit nebo skrýt Recovery kód">👁</button>
         </div>
-        <button type="button" class="btn-helper" onclick="fillRecoveryCode()">🎲 Vygenerovat odemykací kód třídy</button>
+        <button type="button" class="btn-helper" onclick="replaceRecoveryCode()">🎲 Vygenerovat odemykací kód třídy</button>
         <div class="small-muted">Pro každý nový test používej nový společný kód třídy. Jde o procedurální brzdu pod osobním dozorem; jeho otisk v HTML lze zkoušet offline. Nesmí být stejný jako tajný učitelský/admin kód.</div>
         <input type="hidden" id="heslo" value="" aria-hidden="true">
       </div>

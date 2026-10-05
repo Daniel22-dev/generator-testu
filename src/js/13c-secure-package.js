@@ -195,7 +195,7 @@ async function assembleSecureOfflinePackage(st, cfg, variants) {
   const teacherCfg = Object.assign({}, cfg, { startCode:content.code, privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256, schoolLogoDataUri:await secureSchoolLogoDataUri() });
   const teacherHtml = buildSecureTeacherVerifierHtml(teacherCfg, variants);
   const teacherHtmlSha256 = await sha256HexText(teacherHtml);
-  return {
+  const pkg={
     mode:'secureOffline',
     startCode:content.code,
     studentHtml,
@@ -213,4 +213,6 @@ async function assembleSecureOfflinePackage(st, cfg, variants) {
     studentHtmlSha256,
     teacherHtmlSha256
   };
+  await registerSecureRecoveryExport(pkg,unlockCode);
+  return pkg;
 }

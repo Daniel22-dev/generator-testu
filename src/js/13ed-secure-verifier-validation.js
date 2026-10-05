@@ -74,7 +74,7 @@ function e3AnswerValid(ex,it,value){
 }
 function validateSecurePayload(p){
   e3Require(e3Object(p),'schema.shape','Payload musí být objekt.');e3SafeTree(p);
-  const fields=['v','testId','manifestHash','studentHtmlSha256','attemptId','student','identityMode','code','groupKey','startedAt','submittedAt','jokerUsed','jokerSelectedAt','resp','answerChangeStats','totalAnswerChanges','securityEvents','userAgent','pct','grade'];
+  const fields=['v','testId','manifestHash','studentHtmlSha256','attemptId','student','identityMode','code','groupKey','startedAt','submittedAt','jokerUsed','jokerSelectedAt','resp','answerChangeStats','totalAnswerChanges','securityEvents','routineHistoryTruncated','criticalEvents','criticalCounters','criticalOverflow','criticalHistoryLegacy','userAgent','pct','grade'];
   e3Require(Object.keys(p).every(k=>fields.includes(k)),'schema.fields','Payload obsahuje nepodporovaná pole.');
   e3Require(p.v===1,'schema.version','Nepodporovaná verze payloadu.');
   for(const key of ['testId','manifestHash','attemptId','student','identityMode','groupKey'])e3Require(e3String(p[key],180)&&p[key].trim().length>0,'schema.identity','Chybějící nebo neplatné pole '+key+'.');
@@ -94,7 +94,14 @@ function validateSecurePayload(p){
   if(p.answerChangeStats!==undefined){e3Require(e3Object(p.answerChangeStats),'schema.changes','Neplatná statistika změn.');for(const [key,n] of Object.entries(p.answerChangeStats)){e3Require(specs.has(key)&&Number.isInteger(n)&&n>=0&&n<=100000,'schema.changes','Neplatný počet změn '+key+'.');changes+=n;}}
   if(p.totalAnswerChanges!==undefined)e3Require(Number.isInteger(p.totalAnswerChanges)&&p.totalAnswerChanges===changes,'schema.changes','Součet změn odpovědí nesedí.');
   e3Require(Array.isArray(p.securityEvents)&&p.securityEvents.length>0&&p.securityEvents.length<=2048,'schema.telemetry','Prázdná, chybějící nebo neplatná telemetrie.');
-  for(const event of p.securityEvents){
+  e3Require(p.routineHistoryTruncated===undefined||typeof p.routineHistoryTruncated==='boolean','schema.telemetry','Neplatné označení běžné historie.');
+  if(p.criticalEvents!==undefined||p.criticalCounters!==undefined||p.criticalOverflow!==undefined||p.criticalHistoryLegacy!==undefined){
+    e3Require(Array.isArray(p.criticalEvents)&&p.criticalEvents.length<=902&&e3Object(p.criticalCounters)&&typeof p.criticalOverflow==='boolean'&&typeof p.criticalHistoryLegacy==='boolean','schema.critical-history','Neplatná struktura kritické historie.');
+    e3Require(Object.keys(p.criticalCounters).sort().join(',')==='badUnlocks,locks,resumes,unlocks'&&Object.values(p.criticalCounters).every(n=>Number.isInteger(n)&&n>=0&&n<=902),'schema.critical-counters','Neplatné čítače kritické historie.');
+    e3Require(p.securityEvents.length+p.criticalEvents.length<=2048,'schema.telemetry','Součet běžné a kritické historie překračuje 2048 událostí.');
+    e3Require(p.criticalEvents.every((e,i)=>e3Object(e)&&['locked','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'].includes(e.type)&&e.criticalSeq===i+1),'schema.critical-history','Neplatné pořadí nebo typ kritické události.');
+  }
+  for(const event of p.securityEvents.concat(p.criticalEvents||[])){
     e3Require(e3Object(event)&&e3String(event.type,64)&&/^[a-z0-9-]+$/.test(event.type),'schema.event','Neplatný bezpečnostní záznam.');
     const at=e3Iso(event.t);e3Require(Number.isFinite(at)&&at<=end&&(at>=start||event.type==='joker-used'&&at===e3Iso(p.jokerSelectedAt)),'time.event','Událost je mimo klientem uvedený pokus.');
     for(const [key,value] of Object.entries(event))e3Require(e3String(value,2000)||typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=1e12||typeof value==='boolean','schema.event','Nepodporovaná hodnota události '+key+'.');
