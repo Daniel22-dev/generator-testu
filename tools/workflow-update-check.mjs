@@ -120,6 +120,7 @@ try{
     assert(built.includes('Wake up'));const api=w.createSharedScoringDiagnosticApi();assert.equal(api.orderingScore([0,1,2],exercise.items[0].correct_order,2),2);assert.equal(api.orderingScore([1,0,2],exercise.items[0].correct_order,2),0);
   });
   await check('žádná neošetřená runtime chyba',()=>assert.deepEqual(errors,[]));
+  fs.mkdirSync('qa-results',{recursive:true});
   fs.writeFileSync('qa-results/workflow-update.json',JSON.stringify({status:'passed',checks:passes,version:read('RELEASE.version'),liveAi:false,physicalMobile:false},null,2)+'\n');
   console.log('Workflow update: '+passes+' PASS / 0 FAIL');
 }finally{w.closeComprehensionDialog(false);dom.window.close();}
