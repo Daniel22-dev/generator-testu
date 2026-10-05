@@ -477,7 +477,6 @@ async function generateTest(){
   if([0,1,2,3].some(n=>$('next'+n)&&$('next'+n).disabled)){setGenErr('Nejdřív doplň povinná pole v krocích nastavení.');return;}
   let plan;try{plan=generationPlan(state);}catch(error){setGenErr(error.message);return;}
   const workState=JSON.parse(JSON.stringify(state));
-  if(workState.identityMode==='oneTimeCode'&&workState.participantMode==='later')workState.__roster=[];
   workState.exerciseDetail=true;workState.exerciseConfig=plan.config;workState.pocet=plan.config.length;
   // NEOFICIÁLNÍ kopie (cizí fork/hosting) → generování je zakázané. Tvrdá zarážka.
   // Oficiální adresa je jediná produkční cesta; file:// a localhost jsou vývojové prostředí.
