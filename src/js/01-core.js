@@ -29,7 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E7 (7.1.83): 40 ručních mobilních scénářů, offline checklist a negativní kontroly záznamníku. iPhone/iPad/Android ANALYZED / NOT TESTED. F7, E6 residual/rotace a E8–E10 čekají; NOT READY.',
     'RED-TEAM E6 (7.1.82): student preflight, private verifier pairing, public SHA manifest a scan Git historie odmítají answer/teacher deriváty. Tehdejší živý public build/historie blokovaly release. NOT READY.',
     'RED-TEAM E5 / RUNTIME (7.1.81): strict reload/history/freeze/fullscreen zamknou test a zachovají audit. Paste/drop a běžné změny za zámkem blokovány. Split přežije reload; odemčení kontroluje nový odchod. Native a negativní testy; mobily NOT TESTED, CLIENT-CONTROLLED.',
-    'RED-TEAM E4 / STORAGE (7.1.80): restart zachovává pokus, deadline a ciphertext outbox. Web Locks omezují souběh; poškozený stav má integrity lock. Soukromá replay evidence přežije restart. Native Chromium a negativní kontroly. Úplné smazání nebo jiný profil vyžaduje server; CLIENT-CONTROLLED.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
