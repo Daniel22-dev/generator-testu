@@ -366,10 +366,10 @@
           </div>
         </div>
       </div>
-      <section id="suitabilityPanel" class="workflow-advisor suitability-advisor" aria-labelledby="suitabilityTitle">
-        <div class="workflow-advisor-kicker">Kontrola celé sady cvičení</div>
-        <div class="workflow-advisor-head"><div><h3 id="suitabilityTitle">Vhodnost vybraných cvičení k podkladu</h3><p class="small-muted suitability-scope">Tato kontrola se vztahuje na všechna vybraná cvičení, ne jen na Reading.</p></div><button type="button" class="btn-edit suitability-ai-btn" id="suitabilityAiBtn" onclick="assessExerciseSuitability()">✨ Získat AI posudek</button></div>
-        <p class="small-muted suitability-privacy">Základní kontrola proběhne bez AI. AI posudek je dobrovolný, spotřebuje jeden AI požadavek a nic v testu sám nezmění. Před odesláním anonymizuj podklad.</p>
+      <section id="suitabilityPanel" class="workflow-advisor" aria-labelledby="suitabilityTitle">
+        <div class="small-muted">Kontrola celé sady cvičení</div>
+        <div class="workflow-advisor-head"><div><h3 id="suitabilityTitle">Vhodnost vybraných cvičení k podkladu</h3><p class="small-muted">Platí pro všechna vybraná cvičení, ne jen Reading.</p></div><button type="button" class="btn-edit" id="suitabilityAiBtn" onclick="assessExerciseSuitability()">✨ Získat AI posudek</button></div>
+        <p class="small-muted">Základní kontrola je bez AI. AI posudek je dobrovolný, nic sám nezmění; podklad před odesláním anonymizuj.</p>
         <div id="suitabilityLocal" aria-live="polite"></div><div id="suitabilityResult" aria-live="polite"></div>
       </section>
 
@@ -425,7 +425,7 @@
       <div class="field hidden" id="readingBlock">
         <div class="reading-source-controls">
           <label for="readingSourceScope">Jaký podklad má Reading použít?</label>
-          <select id="readingSourceScope" onchange="setReadingSourceOption('readingSourceScope',this.value)"><option value="shared">Podklad testu z části „Konkrétní zadání“</option><option value="own">Samostatný podklad pouze pro Reading</option></select><p class="reading-control-help">Podklad testu je materiál, který už máš vložený pro celý test — text, soubor nebo odkaz. Samostatný podklad použij, když má Reading vycházet z jiného materiálu než ostatní cvičení.</p>
+          <select id="readingSourceScope" onchange="setReadingSourceOption('readingSourceScope',this.value)"><option value="shared">Podklad testu z části „Konkrétní zadání“</option><option value="own">Samostatný podklad pouze pro Reading</option></select><p class="small-muted">Podklad testu = materiál z „Konkrétního zadání“. Samostatný podklad použij jen pro jiný Reading.</p>
           <div id="readingOwnSourceWrap" class="hidden"><label for="readingSourceText">Samostatný podklad pro Reading</label><textarea id="readingSourceText" rows="4" oninput="onInput()" placeholder="Vlož text, seznam slov nebo fakta. Ostatní cvičení tento podklad nepoužijí."></textarea><label for="readingSourceFile">Načíst TXT / MD / DOCX</label><input id="readingSourceFile" type="file" accept=".txt,.md,.docx" onchange="loadReadingOwnSource(this)"><p class="small-muted">PDF, fotografie a webové odkazy lze použít ve společném podkladu. Pro přesné zachování z nich vlož zkontrolovaný text.</p></div>
           <label for="readingSourceAction">Co má AI s podkladem udělat?</label>
           <select id="readingSourceAction" onchange="setReadingSourceOption('readingSourceAction',this.value)"><option value="generate">Vytvořit nový čtecí text podle podkladu</option><option value="adapt">Přepracovat podklad na zvolenou úroveň CEFR</option><option value="verbatim">Zachovat text beze změny a vytvořit jen otázky</option></select>
@@ -434,7 +434,7 @@
         <div id="readingReviewNotice" class="workflow-review hidden" role="status"></div>
 
         <div class="field-label">📖 Reading comprehension — délka, téma, text <button class="tt-icon" data-tip="Tento blok se zobrazí, když je vybraný typ reading comprehension. Nastav délku a téma textu (téma se mění podle CEFR). Text i otázky můžeš napsat ručně, nebo je nechat navrhnout AI a schválit. Jeden text na cvičení, otázky pod ním.">?</button></div>
-        <div class="comp-needs-setup"><span class="cns-ico">i</span><span><strong>Bez nečekaného přepisování:</strong> když později změníš CEFR nebo podklad, už schválený Reading zůstane zachovaný. Aplikace ti nabídne, zda ho aktualizovat, nebo ponechat.</span></div><div class="reading-answer-note"><strong>Jak odpovídá student?</strong><span>U Reading comprehension student vybírá odpověď z nabízených možností. Nejde o volnou odpověď.</span></div>
+        <div class="comp-needs-setup"><span class="cns-ico">i</span><span><strong>Bez nečekaného přepisování:</strong> když později změníš CEFR nebo podklad, už schválený Reading zůstane zachovaný. Aplikace ti nabídne, zda ho aktualizovat, nebo ponechat.</span></div><div class="comp-needs-setup"><span class="cns-ico">i</span><span><strong>Jak odpovídá student?</strong> Student vybírá odpověď z nabízených možností; nejde o volnou odpověď.</span></div>
         <div class="field-hint">Jeden souvislý text na cvičení; otázky se vážou na něj (text se neopakuje u každé otázky).</div>
         <div class="btn-row" id="rcLenBtns">
           <button class="tag-btn" data-val="short" onclick="pickRcLength('short')">Krátký (~60–100 slov)</button>
@@ -555,7 +555,7 @@
           <button type="button" class="btn-edit" onclick="rosterDownloadCsv()">Stáhnout CSV pro Sheets</button>
         </div>
         <div id="rosterResult" class="small-muted" style="margin-top:8px"></div>
-        <div class="roster-tools-card"><strong>Rozesílání přes Google Sheets</strong><span>Rozesílač odešle pouze řádky, které jsou ve sloupci <strong>odeslat</strong> zaškrtnuté a ještě nebyly odeslány.</span><div class="roster-tools-links"><a href="./tools/GIT-ROZESILANI-KODU.gs" download>Stáhnout Apps Script</a><a href="./manual/rozesilani-kodu.html" target="_blank" rel="noopener">Postup nastavení a rozeslání</a></div></div>
+        <div class="workflow-review"><strong>Google Sheets:</strong> odešlou se jen zaškrtnuté, dosud neodeslané řádky. <a href="./tools/GIT-ROZESILANI-KODU.gs" download>Apps Script</a> · <a href="./manual/rozesilani-kodu.html" target="_blank" rel="noopener">Návod</a></div>
         <p class="small-muted">CSV obsahuje osobní údaje a kódy. Nesdílej jej se třídou ani neposílej do AI. Kódy zůstávají stejné během přípravy jednoho testu; pro nový test začni novou přípravu. Bez serveru nelze zaručit jednorázové použití napříč zařízeními.</p>
       </div>
 
