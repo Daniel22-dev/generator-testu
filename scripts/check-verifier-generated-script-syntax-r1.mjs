@@ -11,6 +11,7 @@ const dependencyFiles = [
   'src/js/13ed-secure-verifier-validation.js',
   'src/js/13ee-secure-verifier-anchors.js',
   'src/js/13ef-secure-verifier-replay.js',
+  'src/js/13eg-secure-verifier-history.js',
   'src/js/13fa-secure-teacher-verifier-pdf.js',
 ];
 const context = vm.createContext({

@@ -1,5 +1,20 @@
 ## 7.1.90 – 2026-10-05 – cílený audit před studentským testováním
 
+## 7.1.93 — 2026-10-05 (candidate)
+
+Uchování dostupné výsledkové historie, označení jejího rozsahu a soukromé termíny podle individuálního plánu v Europe/Prague.
+Vlastník autorizoval řízené nasazení po technických kontrolách; další nezávislou revizi vynechal. Fyzické zkoušky dosud neproběhly.
+
+## 7.1.92 — 2026-10-05 (candidate)
+
+Uchování kritických událostí pokusu při obnovení a soukromé ověření jejich konzistence.
+Nezávislá kontrola a fyzické zkoušky dosud čekají.
+
+## 7.1.91 — 2026-10-05 (candidate)
+
+Recovery údaje pro samostatné exporty, soukromé časové kotvy a viditelnost historie při ověření. Studentský runtime zůstává zachován.
+Nezávislá kontrola a fyzické zkoušky dosud čekají.
+
 - error correction z 7.1.89: uznává celou větu i přesný změněný úsek; nový regresní kontrakt pokrývá kladné i záporné případy;
 - word formation a sentence/key word transformation: má-li zadání právě jednu mezeru `___`, uzná se doplnění i celá věta; bez mezery zůstává nutná přesná odpověď;
 - randomizace: seed z ID pokusu, varianty a času startu; verifier dopočítá číslo otázky u studenta; slova věty u error-tagging se nemíchají; instant feedback používá pořadí studenta;

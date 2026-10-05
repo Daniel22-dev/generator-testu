@@ -124,7 +124,7 @@ async function downloadGeneratedStudentTest() {
   if (!enforceSecureGate()) return;
   // Finální kontrola bajtů: nesmí to být omylem učitelský verifier / answer key.
   if (!(await guardExport(outputSlug('student_test')+'.html', generatedPackage.studentHtml, 'student', 'studentský test'))) return;
-  try { downloadBlobFile(generatedPackage.studentHtml, outputSlug('student_test')+'.html'); }
+  try { downloadBlobFile(generatedPackage.studentHtml, outputSlug('student_test')+'.html'); rememberSecureRecoveryExport(generatedPackage); }
   catch(e){ setGenErr('Stažení studentského testu se nezdařilo: '+(e&&e.message?e.message:e)); }
 }
 function teacherVerifierFileName(){ return 'DO_NOT_SEND_TEACHER_VERIFIER_contains_answers_'+outputSlug()+'_'+(generatedPackage&&generatedPackage.testId?generatedPackage.testId:'test')+'.html'; }
@@ -161,7 +161,7 @@ async function downloadGeneratedTeacherVerifier() {
   if (!(await guardExport(teacherVerifierFileName(), generatedPackage.teacherHtml, 'teacher', 'učitelský verifier'))) return;
   // Varování přímo v názvu souboru — přežije i mimo aplikaci (ve složce stažených,
   // při přeposílání), kde UI hlášku nikdo nevidí.
-  try { downloadBlobFile(generatedPackage.teacherHtml, teacherVerifierFileName()); }
+  try { downloadBlobFile(generatedPackage.teacherHtml, teacherVerifierFileName()); rememberSecureRecoveryExport(generatedPackage); }
   catch(e){ setGenErr('Stažení učitelského verifieru se nezdařilo: '+(e&&e.message?e.message:e)); }
 }
 

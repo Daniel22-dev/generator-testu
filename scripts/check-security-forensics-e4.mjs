@@ -47,6 +47,11 @@ assert(/results:RESULTS/.test(verifier), 'E4 exports: archive JSON retains resul
   vm.createContext(ctx);
   vm.runInContext(fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8'),ctx);
   vm.runInContext(vm.runInContext('SECURE_VERIFIER_TRUST_JS',ctx),ctx);
+  vm.runInContext(fs.readFileSync('src/js/13eg-secure-verifier-history.js','utf8'),ctx);
+  vm.runInContext(vm.runInContext('SECURE_VERIFIER_HISTORY_JS',ctx),ctx);
+  vm.runInContext(extractFunction(fs.readFileSync('src/js/13ee-secure-verifier-anchors.js','utf8'),'privatePlannedMinutes'),ctx);
+  vm.runInContext(extractFunction(fs.readFileSync('src/js/13ed-secure-verifier-validation.js','utf8'),'e3Canonical'),ctx);
+  vm.runInContext(extractFunction(fs.readFileSync('src/js/13ed-secure-verifier-validation.js','utf8'),'e3Object'),ctx);
   for(const fn of ['eventCount','eventTime','eventDetails','recoveryUnlockEvents','legacyUnlockEvents','securityEventTimelineText','securitySignalsFor','securityIssueCount','securitySignalText','securityAuditText']) vm.runInContext(extractFunction(verifier,fn),ctx);
   const onlyAudit={status:'OK',securityEvents:[{t:'1',type:'recovery-unlock',detail:'unlocked',lockReason:'left window'}],details:[],answerChangeStats:{}};
   ctx.r=onlyAudit;

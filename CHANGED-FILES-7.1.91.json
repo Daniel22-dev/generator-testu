@@ -1,0 +1,303 @@
+{
+  "input_zip_sha256": "7afddfabd72a88b6a6daf29e8fabebd97aad582431b8631153b97ac2104b66f2",
+  "from_version": "7.1.90",
+  "to_version": "7.1.91",
+  "note": "Source candidate for independent review; no publication or deployment. This manifest excludes its own bytes. Workflow changes only refresh the GARP 2.7 r2 external trust pin.",
+  "changed_files": [
+    {
+      "path": ".github/workflows/deploy.yml",
+      "status": "modified",
+      "sha256": "f34c4602e175459184e6ea0ecbb3e827f7bb254a114f00d7b2e9b1d8eb939e35",
+      "bytes": 11678
+    },
+    {
+      "path": ".github/workflows/p3-quality.yml",
+      "status": "modified",
+      "sha256": "344eb6aad6d496f215ba9fc042f856d41b599edf0e508ce5fe4bc4b40609bb52",
+      "bytes": 1074
+    },
+    {
+      "path": ".github/workflows/p4-release.yml",
+      "status": "modified",
+      "sha256": "96e0bb92929d952e22ab7c5b0971b1b298a0df3fa8d84839c7a2689191d694ec",
+      "bytes": 1069
+    },
+    {
+      "path": ".github/workflows/p5-release-gate.yml",
+      "status": "modified",
+      "sha256": "e67facc0ee4a20943fb3019ea402a3911ca664144b316b5dc9f4780f85d97a48",
+      "bytes": 2680
+    },
+    {
+      "path": ".github/workflows/safe-promotion.yml",
+      "status": "modified",
+      "sha256": "b5faef497c1e179920cea722f19f425e5dbab672abd23f9a5e0cf7afb3c8aef9",
+      "bytes": 19440
+    },
+    {
+      "path": ".github/workflows/stage-b-full-validation.yml",
+      "status": "modified",
+      "sha256": "0f01e027da270f857d09ca9f5ce969ae009ea6f9760d2162977570987b43d93d",
+      "bytes": 3147
+    },
+    {
+      "path": "APP-generator-GARP.txt",
+      "status": "modified",
+      "sha256": "1e6a274093d32999e777fab9eee606fc832f9dda2b3968b8ff9f9f7bc77c4ed7",
+      "bytes": 10712
+    },
+    {
+      "path": "CHANGELOG.md",
+      "status": "modified",
+      "sha256": "ad60de550df65c4ed07396af05c3c80938ecb239cb45fa650ebab3e498cbbc5b",
+      "bytes": 54531
+    },
+    {
+      "path": "RELEASE-NOTES-7.1.91.md",
+      "status": "added",
+      "sha256": "ffa294a0f30ac2edb09a7666a21d58f6e3c0eb49dea53920f70befe0ba5da01e",
+      "bytes": 347
+    },
+    {
+      "path": "eslint-globals.generated.mjs",
+      "status": "modified",
+      "sha256": "2667c16c549656453a8485291b5cc5b1534e5faa57ca0d2f424c92fd4d8d1d2b",
+      "bytes": 32180
+    },
+    {
+      "path": "ghrab-platform.consumer.json",
+      "status": "modified",
+      "sha256": "1e4e736e746d8993098d23655832421d303719b8b20a68671ea9b8df89b10441",
+      "bytes": 4347
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified",
+      "sha256": "f0b33e9cb505806686acdb3e6c96f788217b9f98d72494fe190a92c417a828ad",
+      "bytes": 52486
+    },
+    {
+      "path": "package.json",
+      "status": "modified",
+      "sha256": "eed6bd0947c5d92ac2579739d8dfa582803b2cf09e4e69c514cf82c3489a2bbf",
+      "bytes": 16075
+    },
+    {
+      "path": "public/access/error-reporter-adapter.js",
+      "status": "modified",
+      "sha256": "b474e79d4c4ae2492dfc0930dad590d588232f0f84d831ed3b6e80d0bddabe15",
+      "bytes": 771
+    },
+    {
+      "path": "public/ai-operations.json",
+      "status": "modified",
+      "sha256": "9294c5d879165b7f42407025f9e2023dc7b91c85555f6f6e7526001c740f0d11",
+      "bytes": 6212
+    },
+    {
+      "path": "public/config/data-manifest.json",
+      "status": "modified",
+      "sha256": "618919a4c03a22b950a87584afe491e2a008602462c7a7c88f6490b8d8a074af",
+      "bytes": 9701
+    },
+    {
+      "path": "public/config/platform-manifest.json",
+      "status": "modified",
+      "sha256": "49a4e58e1dcaad38db8d1a77621b7942d4431e79a3548da6ee55431bf7087bb9",
+      "bytes": 1924
+    },
+    {
+      "path": "public/config/security-headers.json",
+      "status": "modified",
+      "sha256": "1dc6f52f13b8fbfc4cc5dc687f101ef43183dafd46a03999fb33cc541958c9d7",
+      "bytes": 1819
+    },
+    {
+      "path": "public/ghrab-platform.consumer.json",
+      "status": "modified",
+      "sha256": "1e4e736e746d8993098d23655832421d303719b8b20a68671ea9b8df89b10441",
+      "bytes": 4347
+    },
+    {
+      "path": "public/manifest.webmanifest",
+      "status": "modified",
+      "sha256": "83fabcf7b2d7000d3544b8e2c09c819ece6990057eb84072f34297300072f611",
+      "bytes": 1138
+    },
+    {
+      "path": "public/manual/index.html",
+      "status": "modified",
+      "sha256": "5977c8a1b06c8066bf52a544e3560732839d464ad06a739858d57e9fcf8861af",
+      "bytes": 46602
+    },
+    {
+      "path": "public/sw.js",
+      "status": "modified",
+      "sha256": "653b2842f82add46144e6fb008426f915de20eeff3b373ed5b08ca2f4a4d8055",
+      "bytes": 4950
+    },
+    {
+      "path": "qa/qa-manifest.json",
+      "status": "modified",
+      "sha256": "b34e66fd36e562e9ff25c685a0e48e04cb76b1f13c025ceb089a781c016f3a6a",
+      "bytes": 1923
+    },
+    {
+      "path": "reporter-test.config.json",
+      "status": "modified",
+      "sha256": "b252a13ed3b1f6cb4f8e31acc116133a75ccc0c2e38a70418311b9d2634755a5",
+      "bytes": 955
+    },
+    {
+      "path": "scripts/check-private-review-contract.mjs",
+      "status": "added",
+      "sha256": "11b83ef3e60229a953bc610f8f60855d31718691d6a219b9c005cc64d252266b",
+      "bytes": 2156
+    },
+    {
+      "path": "scripts/check-security-forensics-e4.mjs",
+      "status": "modified",
+      "sha256": "a47b3213a7ab4a2d71eb9108a6674971af4bbc5de50e3682242caa1e15e609c7",
+      "bytes": 7266
+    },
+    {
+      "path": "scripts/check-verifier-generated-script-syntax-r1.mjs",
+      "status": "modified",
+      "sha256": "5571b5926ef60cb72efa127b9bfb15a624bd02daf1b49651495db6a01bb7628e",
+      "bytes": 3512
+    },
+    {
+      "path": "scripts/check-verifier-ia-security.mjs",
+      "status": "modified",
+      "sha256": "0103efb72bedb3a213a17d5b42e6463acb29b437552ddf051a9a0d49f23df916",
+      "bytes": 5552
+    },
+    {
+      "path": "security/evidence/ai-assurance-fingerprint.json",
+      "status": "modified",
+      "sha256": "da2c5b351597bec8d4fce3710b782d80f7819e458c4d586748d4176763f2e451",
+      "bytes": 4519
+    },
+    {
+      "path": "security/garp27/application-migration-profile.json",
+      "status": "modified",
+      "sha256": "3bf8e73b2553dc4e0a15d33e8add245d454f1dcf7b01a100333093df773aee34",
+      "bytes": 1922
+    },
+    {
+      "path": "security/garp27/architecture-policy.json",
+      "status": "modified",
+      "sha256": "736f5b7b5780a5fbc396430432831c92cd5d58ed9a209b09f873723d0c73566f",
+      "bytes": 1742
+    },
+    {
+      "path": "security/garp27/capability-inventory.json",
+      "status": "modified",
+      "sha256": "aa35782c4ffe976c9ab396e60f412c027daa364663979ef99c2cfe27d4f7f395",
+      "bytes": 2118
+    },
+    {
+      "path": "security/garp27/garp-policy.json",
+      "status": "modified",
+      "sha256": "f68f8de81f2f0fd3a44bf5f0dbd2a6f5244c636ff2153b911b3589f2a0059714",
+      "bytes": 4856
+    },
+    {
+      "path": "security/garp27/trust-anchor.json",
+      "status": "modified",
+      "sha256": "e3040c0bf5bef7db2074fbf6eda3c8d76b96e31cbb4201c9ea254248f9acf100",
+      "bytes": 2011
+    },
+    {
+      "path": "security/release-readiness-e10.json",
+      "status": "modified",
+      "sha256": "de83701fce6f1361eb9ae6d4c7f2afff637dbbd09b2b298388fd72e250f40eee",
+      "bytes": 2037
+    },
+    {
+      "path": "security/sbom/generator-testu-7.1.91.cdx.json",
+      "status": "added",
+      "sha256": "2c93569b2ff7c52c0475b16570bdcdfdd356c0311aafa38c7a851a9c219081eb",
+      "bytes": 102597
+    },
+    {
+      "path": "src/config/release-acceptance.json",
+      "status": "modified",
+      "sha256": "63e8c684d08f4eb9a7027c800bee89b8dbaae6246c4ea0cd6aaf8474f42d0894",
+      "bytes": 2604
+    },
+    {
+      "path": "src/js/01-core.js",
+      "status": "modified",
+      "sha256": "af5f8c12388fcf8fdec49acfcfa2768db17a1cac4586ad7d1e11933e112bc678",
+      "bytes": 164990
+    },
+    {
+      "path": "src/js/07z-ai-core-integration.js",
+      "status": "modified",
+      "sha256": "ee1df9fedbbeb794c79a72eb719b80968f51094381df3cc5cc072ff5b1a1446f",
+      "bytes": 14586
+    },
+    {
+      "path": "src/js/08b-secure-export-credentials.js",
+      "status": "added",
+      "sha256": "0364cc93add8f9d385e541f61d925cc4216de8665ed365eca5f844bc3dab5a51",
+      "bytes": 1569
+    },
+    {
+      "path": "src/js/10-testlab.js",
+      "status": "modified",
+      "sha256": "e50ea8b17e9172979e3bd36c1fc67dd8253fa555a7dc6dd33fc8379b8d7060d3",
+      "bytes": 13215
+    },
+    {
+      "path": "src/js/13c-secure-package.js",
+      "status": "modified",
+      "sha256": "2566861e5ba08fc723ef0b9d3d0ce902d7502eac5bc5e917b4844619361eb50f",
+      "bytes": 11817
+    },
+    {
+      "path": "src/js/13ee-secure-verifier-anchors.js",
+      "status": "modified",
+      "sha256": "25083809642ca008e1dc0ce2add025bd73f6ba55e8652d331ed996f9b34841af",
+      "bytes": 11007
+    },
+    {
+      "path": "src/js/13eg-secure-verifier-history.js",
+      "status": "added",
+      "sha256": "c0e829af7b094b80e9da83c9c67ffe481588c79ff07c847fd36297394f350812",
+      "bytes": 2367
+    },
+    {
+      "path": "src/js/13f-secure-teacher-verifier.js",
+      "status": "modified",
+      "sha256": "3bc21e3323cc5ba0eca3658a0b3ff24c3585028b0422eb6cfa201fad575b8281",
+      "bytes": 91789
+    },
+    {
+      "path": "src/js/13fa-secure-teacher-verifier-pdf.js",
+      "status": "modified",
+      "sha256": "ee13e800a9ed1be38cecf3f6cb37f4e9b3a0edf9582cafe6ec542408dbcca7d1",
+      "bytes": 14208
+    },
+    {
+      "path": "src/js/13g-assemble-test-html.js",
+      "status": "modified",
+      "sha256": "a531625ed7dd234db3e60a495b84fce8d9e3792dfb4f0555b5d724edba5106b1",
+      "bytes": 11162
+    },
+    {
+      "path": "src/shell.html",
+      "status": "modified",
+      "sha256": "cd9212db3e77d3748f140158a37c3397774d811c9df26421b87c314dad1adf71",
+      "bytes": 118922
+    },
+    {
+      "path": "tools/headless-check.mjs",
+      "status": "modified",
+      "sha256": "c1f84c5d652798688947b69941fa743309fe5edc3b8558fe65530c04a92f9c55",
+      "bytes": 36381
+    }
+  ],
+  "deleted_files": []
+}

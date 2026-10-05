@@ -1,4 +1,5 @@
 async function assembleTestHtml(st, genData) {
+  if(st.resultMode==='secureOffline'&&(st.testMode==='prisny'||st.screenGuard))await prepareSecureRecoveryExport(st);
   const sourceState=JSON.parse(JSON.stringify(st));
   const outputFieldIds=['nazev','proKoho','vlastniSkala','ucitelPin','recoveryCode','ucitelJmeno','latka','zadaniText','poznamky'];
   const liveOutputFields=Object.fromEntries(outputFieldIds.map(id=>[id,trim(id)]));

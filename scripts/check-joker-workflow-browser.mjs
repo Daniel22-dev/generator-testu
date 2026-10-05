@@ -5,7 +5,7 @@ import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { setTimeout as sleep } from 'node:timers/promises';
 
-const source=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
+const source=(fs.readFileSync('src/js/13df-secure-critical-history.js','utf8')+'\n'+fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
 const ctx=vm.createContext({});
 vm.runInContext(source+'\n;globalThis.__qaSecureStudentScript=secureStudentScript();',ctx);
 const runtime=ctx.__qaSecureStudentScript;

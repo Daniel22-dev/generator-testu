@@ -9,6 +9,11 @@ const names=['normStudentKey','rebuildDuplicateState','duplicateInfo','effective
 const ctx=vm.createContext({console});
 vm.runInContext(fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8'),ctx);
 vm.runInContext(vm.runInContext('SECURE_VERIFIER_TRUST_JS',ctx),ctx);
+  vm.runInContext(fs.readFileSync('src/js/13eg-secure-verifier-history.js','utf8'),ctx);
+  vm.runInContext(vm.runInContext('SECURE_VERIFIER_HISTORY_JS',ctx),ctx);
+  vm.runInContext(extractFunction(fs.readFileSync('src/js/13ee-secure-verifier-anchors.js','utf8'),'privatePlannedMinutes'),ctx);
+  vm.runInContext(extractFunction(fs.readFileSync('src/js/13ed-secure-verifier-validation.js','utf8'),'e3Canonical'),ctx);
+  vm.runInContext(extractFunction(fs.readFileSync('src/js/13ed-secure-verifier-validation.js','utf8'),'e3Object'),ctx);
 vm.runInContext(`var CONFIG={identityMode:'oneTimeCode',roster:[{code:'ABC234',label:'QA student'}],cas:40};var RESULTS=[];var ATTEMPT_DECISIONS=new Map();\n${names.map(n=>extractFunction(verifier,n)).join('\n')}`,ctx);
 function assert(cond,msg){if(!cond)throw new Error(msg);console.log(`PASS ${msg}`)}
 const row={status:'OK',student:'ABC234',code:'ABC234',submissionDigest:'d5-meta-1',attemptId:'ATT-D5-1',earned:1,total:2,pct:50,grade:'4',groupKey:'__default',securityEvents:[],answerChangeStats:{},totalAnswerChanges:0,details:[],metadataMismatch:['název ve formuláři neodpovídá ověřenému testu'],envelopeMismatch:[]};
