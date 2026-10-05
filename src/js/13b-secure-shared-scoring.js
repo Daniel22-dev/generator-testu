@@ -115,7 +115,7 @@ return {correctionAnswers:correctionAnswers,correctionScore:correctionScore,prod
 const SHARED_SCORING_EXPORTS=Object.freeze(['correctionAnswers','correctionScore','productiveTokens','productiveText','gapTemplate','gapAcceptedKeys','gapTextScore','norm','stripDia','lev','fuzzyCredit','normForScore','textScore','indexNorm','correctIndex','accepted','itemPoint','scoreBlanks','multiSelectStats','multiSelectScore','orderingStats','orderingScore','highlightEvidenceScore','categoryBoardStats','categoryBoardScore','tableCompletionStats','tableCompletionScore','transformationChainStats','transformationChainScore','errorTaggingStats','errorTaggingScore']);
 const SHARED_SCORING_JS=[
   'var __ghrabSharedScoringApi=('+createSharedScoringApi.toString()+')({',
-  'isSpanish:function(){try{return !!__isSpanish();}catch(_){return false;}},'
+  'isSpanish:function(){try{return !!__isSpanish();}catch(_){return false;}},',
   'isCzech:function(){try{return !!__isCzech();}catch(_){return false;}},',
   'csScoringPolicy:function(){try{return __csScoringPolicy();}catch(_){return {};}},',
   'fuzzyMode:function(){try{return __fuzzyMode();}catch(_){return "off";}}',
