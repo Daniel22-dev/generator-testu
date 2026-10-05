@@ -25,12 +25,32 @@ function renderSuitabilityLocal(){
 }
 function renderSuitabilityResult(data,key){
   const box=$('suitabilityResult');box.replaceChildren();
-  const labels={suitable:'Vhodn\u00e9',adapt:'Vhodn\u00e9 po \u00faprav\u011b',unsuitable:'Nevhodn\u00e9',unknown:'Nelze posoudit'};
+  const labels={suitable:'Vhodné',adapt:'Vhodné po úpravě',unsuitable:'Nevhodné',unknown:'Nelze posoudit'};
+  const icons={suitable:'✓',adapt:'↻',unsuitable:'!',unknown:'?'};
+  const grid=document.createElement('div');grid.className='suitability-grid';
   for(const item of data.assessments){
-    const p=document.createElement('p'),b=document.createElement('strong');
-    b.textContent=item.type+' \u2014 '+labels[item.status]+': ';p.append(b,document.createTextNode(item.reason+(item.suggestion?' Doporu\u010den\u00ed: '+item.suggestion:'')));box.append(p);
+    const card=document.createElement('article');card.className='suitability-card status-'+item.status;
+    const head=document.createElement('div');head.className='suitability-card-head';
+    const title=document.createElement('strong');title.className='suitability-card-title';title.textContent=item.type;
+    const pill=document.createElement('span');pill.className='suitability-status';pill.textContent=icons[item.status]+' '+labels[item.status];
+    head.append(title,pill);
+    const reason=document.createElement('p');reason.className='suitability-reason';reason.textContent=item.reason;
+    card.append(head,reason);
+    if(item.suggestion){
+      const suggestion=document.createElement('div');suggestion.className='suitability-suggestion';
+      const label=document.createElement('strong');label.textContent='Doporučení';
+      const body=document.createElement('span');body.textContent=item.suggestion;
+      suggestion.append(label,body);card.append(suggestion);
+    }
+    grid.append(card);
   }
-  if(data.recommendations.length){const p=document.createElement('p');p.textContent='Dal\u0161\u00ed mo\u017en\u00e9 typy: '+data.recommendations.join(', ')+'. V\u00fdb\u011br se nezm\u011bnil; uprav jej pouze podle sv\u00e9ho rozhodnut\u00ed.';box.append(p);}
+  box.append(grid);
+  if(data.recommendations.length){
+    const rec=document.createElement('div');rec.className='suitability-recommendations';
+    const b=document.createElement('strong');b.textContent='Další možné typy';
+    const span=document.createElement('span');span.textContent=data.recommendations.join(', ')+'. Výběr zůstává beze změny — uprav ho jen pokud chceš.';
+    rec.append(b,span);box.append(rec);
+  }
   suitabilityDisplayedKey=key;
 }
 function validateSuitabilityResponse(raw,selected,allowed){
