@@ -42,7 +42,9 @@ need(secure, /function handleLeave\([\s\S]*isTeacherPreviewRuntime\(\)\)return/,
 need(shell, /Kontrola celé sady cvičení[\s\S]*Vhodnost vybraných cvičení k podkladu/, 'Suitability panel clearly scopes itself to all selected exercises');
 need(shell, /Jak odpovídá student\?[\s\S]*vybírá odpověď z nabízených možností/, 'Reading setup explicitly explains the student answer format');
 need(suitability, /suitability-card[\s\S]*suitability-status[\s\S]*suitability-suggestion/, 'AI suitability result uses structured status cards');
-need(anchors, /Ověření importu z Google Forms[\s\S]*Dřívější technický název[\s\S]*Forms kotvy/, 'Verifier explains Forms anchors in teacher-facing language');
+need(anchors, /Ověření Google Forms[\s\S]*bezpečnostní nastavení importu/, 'Verifier explains Google Forms verification in teacher-facing language');
+need(verifier, /Načtení výsledků[\s\S]*verifierFormsStatusHtml\(\)[\s\S]*verifierAnchorSettingsHtml\(\)[\s\S]*Výsledky/, 'Results keeps only a compact Forms verification status while full settings stay separate');
+need(ui, /\['security','Ověření Google Forms'\]/, 'Verifier V2 moves Google Forms verification into Security');
 
 
 if (failed) process.exit(1);
