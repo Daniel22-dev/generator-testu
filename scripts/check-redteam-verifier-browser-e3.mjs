@@ -16,8 +16,12 @@ try{
   await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const nativeTxt=await student.locator('#answerBackup').inputValue();assert.ok(nativeTxt.startsWith('SECURE-ANSWERS-V1'));
   await verifier.goto('http://127.0.0.1:18779/verifier.html');await verifier.evaluate(()=>showVerifierPanel('results'));
-  assert.equal(await verifier.locator('#formsSchoolDomain').count(),1,'owner Forms policy UI is required');await verifier.locator('#formsSchoolDomain').fill('example.invalid');await verifier.locator('#formsPublishedAt').fill(publishedAt);await verifier.locator('#formsEmailHeader').fill('Email Address');await verifier.locator('#formsTimestampHeader').fill('Timestamp');
-  for(const id of ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed'])await verifier.locator('#'+id).check();await verifier.getByRole('button',{name:'Použít kotvy',exact:true}).click();
+  assert.equal(await verifier.locator('#formsSchoolDomain').count(),1,'owner Forms policy UI is required');
+  const formsTrigger=verifier.locator('#formsVerifySummaryBtn');if(await formsTrigger.count())await formsTrigger.click();else await verifier.evaluate(()=>showVerifierPanel('security'));
+  await verifier.locator('#formsSchoolDomain').waitFor({state:'visible'});await verifier.locator('#formsSchoolDomain').fill('example.invalid');await verifier.locator('#formsPublishedAt').fill(publishedAt);
+  const formsAdvanced=verifier.locator('.forms-verify-advanced');if(await formsAdvanced.count()&&!(await verifier.locator('#formsEmailHeader').isVisible()))await formsAdvanced.evaluate(el=>{el.open=true});
+  await verifier.locator('#formsEmailHeader').fill('Email Address');await verifier.locator('#formsTimestampHeader').fill('Timestamp');
+  for(const id of ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed'])await verifier.locator('#'+id).check();await verifier.getByRole('button',{name:'Uložit nastavení ověření',exact:true}).click();await verifier.waitForFunction(()=>!!FORMS_ANCHOR_POLICY);await verifier.evaluate(()=>showVerifierPanel('results'));
   const q=s=>'"'+s.replaceAll('"','""')+'"',csv=(txt,email='synthetic-a@example.invalid')=>'Timestamp,Email Address,Result\n'+[new Date().toISOString(),email,txt].map(q).join(',');
   await verifier.locator('#formsCsvFile').setInputFiles({name:'native-e3.csv',mimeType:'text/csv',buffer:Buffer.from(csv(nativeTxt))});await verifier.waitForFunction(()=>LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===1);
   const valid=await verifier.evaluate(()=>({status:RESULTS[0].status,pct:RESULTS[0].pct,trust:resultTrust(RESULTS[0]),effective:effectiveResults().length}));
