@@ -65,9 +65,14 @@ function applyRuntimeRandomization(){
     });
     var match=list.querySelector('.match-grid');if(match){shuffleNodes(match,'.match-row',base+ei*211);match.querySelectorAll('.match-row').forEach(function(row,i){var label=row.querySelector('.match-num');if(label)label.textContent=(i+1)+'. ';row.dataset.displayNumber=String(i+1);});}
   });
-  document.querySelectorAll('.mc-opts').forEach(function(box,i){shuffleOptionChildren(box,base+i*307);});
+  // Tokeny věty u error-tagging se NEmíchají: pořadí slov je součástí zadání.
+  document.querySelectorAll('.mc-opts:not(.et-list)').forEach(function(box,i){shuffleOptionChildren(box,base+i*307);});
   document.querySelectorAll('select.match-sel').forEach(function(sel,i){shuffleSelectOptions(sel,base+i*401);});
 }
+// Zpětná vazba a přehled odpovědí používají číslo, které student viděl (data-display-number), a jeho pořadí.
+function displayNo(ei,qi){var n=document.getElementById('q_'+ei+'_'+qi);var d=n&&n.dataset?Number(n.dataset.displayNumber):0;return d>0?d:(qi+1);}
+function displayOrder(ei,n){var arr=[];for(var i=0;i<n;i++)arr.push(i);return arr.sort(function(a,b){return displayNo(ei,a)-displayNo(ei,b);});}
+function exerciseTypeLabelClient(ex){var raw=String((ex&&(ex.style||ex.type))||'').trim();return raw?raw.charAt(0).toUpperCase()+raw.slice(1):'';}
 function fmtPtsClient(n){n=Number(n)||0;return Number.isInteger(n)?String(n):String(Math.round(n*100)/100).replace('.',',');}
 function chooseJokerStart(use){jokerStartChoice=!!use;var no=I('jokerChoiceNo'),yes=I('jokerChoiceYes');if(no)no.classList.toggle('selected',!use);if(yes)yes.classList.toggle('selected',!!use);var box=I('jokerChoiceConfirm');if(box){box.style.display='block';box.textContent=use?T('jokerSelectedYes'):T('jokerSelectedNo');box.className='joker-choice-confirm '+(use?'joker-choice-confirm-risk':'joker-choice-confirm-ok');}}
 function jokerWatermarkText(){return T('jokerReport')+' · '+(CFG.studentName||'—')+' · '+CFG.testId+' · '+attemptId;}
@@ -240,8 +245,8 @@ function scoreItem(ex,item,ans,pts){
   if(ex.type==='error correction')return pts*correctionScore(ans.val,item,ex.type);
   if(ex.type==='word order')return pts*textScore(ans.val,item.correct_sentence||item.answer,item.alt_answers,ex.type);
   if(ex.type==='translation')return pts*textScore(ans.val,item.answer||item.translation,item.alt_answers,ex.type);
-  if(ex.type==='sentence transformation')return pts*textScore(ans.val,item.answer,item.alt_answers,ex.type);
-  if(ex.type==='word formation')return pts*textScore(ans.val,item.answer,item.alt_answers,ex.type);
+  if(ex.type==='sentence transformation')return pts*gapTextScore(ans.val,productiveText(item),[item.answer].concat(item.alt_answers||[]),[item.keyword],ex.type);
+  if(ex.type==='word formation')return pts*gapTextScore(ans.val,productiveText(item),[item.answer].concat(item.alt_answers||[]),[item.base_word],ex.type);
   if(ex.type==='categorization')return norm(ans.val)===norm(item.correct_category||item.category||item.answer)?pts:0;
   if(ex.type==='cloze text'){var ck=Array.isArray(item.answers)?item.answers:[item.answer];var cv=Array.isArray(ans.vals)?ans.vals:(ans.val!=null?[ans.val]:[]);return scoreBlanks(ck,cv,item.alt_answers,pts,ex.type,false);}
   if(ex.type==='multi-select')return multiSelectScore(ans&&ans.vals,item.correct,pts);
@@ -294,7 +299,7 @@ function exerciseFeedbackHtml(ei){
   if((CFG.feedbackMode||'brief')==='none')return '';
   var ex=EXS[ei]; if(!ex||ex.type==='matching')return '';
   var h='<div class="ex-feedback-list">';
-  (ex.items||[]).forEach(function(item,qi){var qid=ei+'_'+qi,ans=ANSWERS[qid],pts=pointFor(ex,qi);h+='<div class="ex-feedback-item"><b>Otázka '+(qi+1)+':</b> '+itemFeedbackStatusHtml(ex,item,ans,pts)+'</div>';});
+  displayOrder(ei,(ex.items||[]).length).forEach(function(qi){var item=ex.items[qi],qid=ei+'_'+qi,ans=ANSWERS[qid],pts=pointFor(ex,qi);h+='<div class="ex-feedback-item"><b>Otázka '+displayNo(ei,qi)+':</b> '+itemFeedbackStatusHtml(ex,item,ans,pts)+'</div>';});
   h+='</div>'; return h;
 }
 
@@ -358,9 +363,9 @@ function answerText(ex,item,ans){
   return esc(ans.val||'—');
 }
 function buildAnswersHtml(){
-  var h='';EXS.forEach(function(ex,ei){h+='<div class="ap-sec"><div class="ap-ex-title">'+esc(ex.title||ex.type)+'</div>';
+  var h='';EXS.forEach(function(ex,ei){var tl=exerciseTypeLabelClient(ex),tt=String(ex.title||ex.type||'');h+='<div class="ap-sec"><div class="ap-ex-title">'+esc(tt)+((tl&&tl.toLowerCase()!==tt.toLowerCase())?' <span class="ap-ex-type">· '+esc(tl)+'</span>':'')+'</div>';
     if(ex.type==='matching'){var pairs=(ANSWERS['match_'+ei]||{}).pairs||{};(ex.items||[]).forEach(function(item,li){var right=EXS[ei].items[pairs[li]]||{};var good=(pairs[li]!==undefined&&parseInt(pairs[li],10)===li);var corr=(!good&&CFG.testMode==='procviceci')?'<div class="small"><b>'+esc(T('correctAnswers'))+':</b> '+esc(item.right||'')+'</div>':'';var fb=((CFG.feedbackMode||'brief')!=='none'?'<div class="ap-feedback '+(good?'ap-ok':'ap-bad')+'"><b>'+(good?'✓ Správně':'✕ Chyba')+'</b></div>'+corr+(((CFG.feedbackMode||'brief')==='learning')?csItemFeedbackHtml(item,good,true):''):'');h+='<div class="ap-item"><span class="ap-q">'+(li+1)+'. '+esc(item.left)+'</span><span class="ap-a">'+(right.right?esc(right.right):'—')+'</span>'+fb+'</div>';});}
-    else{(ex.items||[]).forEach(function(item,qi){var ans=ANSWERS[ei+'_'+qi];h+='<div class="ap-item"><span class="ap-q">'+(qi+1)+'.</span><span class="ap-a">'+answerText(ex,item,ans)+'</span>'+itemFeedbackStatusHtml(ex,item,ans,itemPoint(ex,qi))+'</div>';});}
+    else{displayOrder(ei,(ex.items||[]).length).forEach(function(qi){var item=ex.items[qi];var ans=ANSWERS[ei+'_'+qi];h+='<div class="ap-item"><span class="ap-q">'+displayNo(ei,qi)+'.</span><span class="ap-a">'+answerText(ex,item,ans)+'</span>'+itemFeedbackStatusHtml(ex,item,ans,itemPoint(ex,qi))+'</div>';});}
     h+='</div>';});return h;
 }
 
@@ -447,7 +452,7 @@ var secInstalled=false,blurTimer=null,lastBeat=Date.now(),activeEditable=false,s
 function isModalOpen(){return !I('submitModal')?.classList.contains('hidden')||!I('messageModal')?.classList.contains('hidden')||!I('teacherModal')?.classList.contains('hidden')||!I('lockScreen')?.classList.contains('hidden');}
 function isEditable(el){return !!(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'||el.isContentEditable));}
 function recordSecurityEvent(type,detail,extra){var ev={type:type,detail:detail||'',ts:new Date().toISOString()};if(extra&&typeof extra==='object'){Object.keys(extra).forEach(function(k){ev[k]=extra[k];});}securityEvents.push(ev);warningCount=securityCounts().warnings;}
-function isIPadOSWebKitInstant(){try{var ua=String(navigator.userAgent||'');return /iPad/i.test(ua)||(/Macintosh/i.test(ua)&&Number(navigator.maxTouchPoints||0)>1);}catch(_){return false;}}
+function isIPadOSWebKitInstant(){try{var ua=String(navigator.userAgent||'');return /iPad|iPhone|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&Number(navigator.maxTouchPoints||0)>1);}catch(_){return false;}}
 function onEditableFocusIn(e){activeEditable=isEditable(e.target);if(activeEditable)iosKeyboardEditableAt=Date.now();}
 function onEditableFocusOut(e){if(isEditable(e.target))iosKeyboardEditableAt=Date.now();setTimeout(function(){activeEditable=isEditable(document.activeElement);},50);}
 function onIosVisualViewportResize(){iosKeyboardViewportAt=Date.now();}
