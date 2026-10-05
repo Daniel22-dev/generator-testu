@@ -1,0 +1,33 @@
+GIT 7.1.89 - PROVEDENÉ ÚPRAVY A OVĚŘENÍ
+4. 10. 2026 | Výchozí podklad: generator-testu-main(6).zip, verze 7.1.88
+
+VÝSTUP
+Kompletní upravený zdrojový repozitář, samostatný Apps Script pro Sheets a návod k instalaci. Nejde o již nasazenou aplikaci ani o certifikaci celého ekosystému. Původní ZIP zůstal nezměněný. LUDUS sloužil jen jako referenční podklad.
+
+1. DOPISOVÁNÍ A OPRAVY PODLE UPŘESNĚNÉHO ZADÁNÍ
+Vytvoříš nový test a připravíš kódy celé skupině. Až v hodině zaškrtneš přítomné v Sheets. Rozesílač ukáže jejich počet a adresy; po potvrzení pošle e-mail jen jim. Později příchozímu odešleš samostatně, bez změny testu, kódů ostatních a verifieru.
+CSV obsahuje sloupec odeslat s výchozí hodnotou FALSE. Nová sada kódů je zvlášť potvrzovaná operace, nikoli filtr adresátů. Opakované doplnění v GIT zachová již vydané kódy. Pokročilé vytvoření nového exportu je pravdivě pojmenované; pro pouhou změnu příjemců se nepoužívá.
+
+2. PROMÍCHÁNÍ
+Při ZAPNUTÉ volbě promíchání se nejprve promíchají skutečné otázky uvnitř cvičení a potom se zobrazí souvislá čísla 1-N. Nevznikají jiné otázky. Interní ID, hodnoty odpovědí a přiřazené body se nemění. Opakování stejného shuffle se stejnou identitou pokusu nemění pořadí. Náhoda nezaručuje unikátní první otázku u každé dvojice studentů. Dosavadní výchozí volba randomizace nebyla potichu změněna.
+
+3. READING, PODKLADY A VZHLED
+CEFR a podklady jsou před výběrem cvičení. Potvrzení před AI je skutečný nativní dialog nad Readingem, ovladatelný klávesnicí. Stav rozlišuje čekání na souhlas a generování. Zavření ruší požadavek; opožděný výsledek se nepřenese do nově otevřeného okna.
+Reading může použít společný podklad nebo vlastní text/TXT/MD/DOCX. Režimy: nový text podle podkladu, úprava textu na CEFR, doslovné zachování. Změna kontextu označí schválený Reading ke kontrole a zabrání rozpornému generování. Učitel rozhodne, zda jej aktualizovat, zachovat nebo osamostatnit od podkladů ostatních cvičení. Přepsání pevné pasáže AI se kontroluje i ve vrácených datech, nejen instrukcí v promptu.
+Počty, bodování a ovladač podrobností jsou přímo u výběru cvičení. Zachováno je skrytí typů při rozbalení podrobností a jejich návrat po sbalení. Select/search/počty používají společný motiv.
+
+4. PORADCE A KÓDY
+Poradce obsahuje lokální kontrolu předpokladů a samostatný, výslovně spouštěný AI posudek. Zohledňuje způsob použití podkladu: seznam slov může být vhodný pro tvorbu nového Readingu. Výběr nemění automaticky; výsledky bezpečně vykresluje a do změny kontextu používá paměťovou cache. Do požadavku neposílá soukromý seznam kódů ani učitelská hesla.
+Popisy oddělují osobní kód studenta, startovní kód, odemknutí zamčené obrazovky a soukromou správu učitele. Do bezpečného studentského HTML nebylo přidáno administrátorské tajemství. Nový serverový autorizační mechanismus se nepředstírá.
+
+5. SKUTEČNĚ PROVEDENÉ TESTY
+24/24 komponentových kontrol workflow; 40/40 kontrol vykreslení a promíchání ve dvou režimech; 3/3 interakcí s reálným nativním potvrzovacím dialogem; 24/24 simulovaných scénářů Apps Script. Celkem 91 doplňkových scénářů.
+Kontrola syntaxe: 47 zdrojových souborů, bez chyby. Kontroly verzí, zdrojové struktury, citlivých údajů, registru 12 AI operací, Action pinů, GARP trust pinů, timerů, runtime UX, QA manifestu a dalších vybraných statických kontraktů prošly. Přesné výsledky jsou v qa/workflow-7.1.89/evidence.
+
+6. CO TÍM NENÍ OVĚŘENO
+Úplný build a CI: NEDOKONČENO. npm run build prošel řadou předřazených bezpečnostních kontrol, poté skončil na nedostupné připnuté závislosti jsdom; také plná kontrola CSP nemohla běžet bez projektového Acornu. Instalace připnutých balíčků zde nebyla dostupná. Verze závislostí a bezpečnostní kontroly nebyly kvůli tomu oslabeny.
+Prohlížečové testy běžely v izolovaném about:blank s vloženými skutečnými moduly, syntetickým přístupem a paměťovým úložištěm. Žádný skutečný AI požadavek ani e-mail nebyl odeslán. Nejde o test produkčního přihlášení, celého šifrovaného exportu, kompletního bodování, nasazené CSP, Safari nebo fyzického iPadu.
+
+7. PŘED NASAZENÍM
+Použij samostatnou větev/PR; pokud je na GitHubu novější kód, nevracej jej slepě celým starším ZIPem. Změny sluč podle seznamu změněných souborů. Spusť obvyklé plné candidate/PR/security testy se skutečným lockfilem. Teprve po jejich průchodu ověř nasazené přihlášení, jeden AI Reading a export se soukromým verifierem. Samostatně nainstaluj a vyzkoušej Apps Script jen s vlastní adresou. Návod je NAVOD-ROZESILANI-7.1.89.txt a public/manual/rozesilani-kodu.html.
+Tabulku s kódy nesdílej studentům; pro diagnostiku používej anonymizované údaje.

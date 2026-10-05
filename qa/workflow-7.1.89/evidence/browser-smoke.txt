@@ -1,0 +1,6 @@
+ENV {'url': 'about:blank', 'crypto': False, 'state': 'object', 'types': 'object'}
+INIT ERRORS []
+ReadingOpened {'dialog': True, 'context': 'CEFR: C2 · Společný podklad testu · AI vytvoří nový text. Podklad využije podle zvoleného režimu (např. jeho slovní zásobu).', 'nextDisabled': False}
+MODAL {'native': 'DIALOG', 'modal': True, 'focus': '<button type="button" class="ui-modal-btn primary danger" data-ui-ok="">Ano, pokračovat</button>'}
+CONFIRMED True
+FINAL ERRORS []

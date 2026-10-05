@@ -1,0 +1,847 @@
+{
+  "scope": "Real source rendering and shuffle functions in Chromium DOM; synthetic fixture data. No full encrypted export or end-to-end grading claim.",
+  "total": 40,
+  "passed": 40,
+  "results": [
+    {
+      "mode": "secureOffline",
+      "type": "multiple choice",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "true/false",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "fill-in-the-blank",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "open answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "short answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "word order",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "word formation",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "error correction",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "reading comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "listening comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "dialogue completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "cloze text",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "multi-select",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "ordering",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "highlight-evidence",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "table-completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "transformation-chain",
+      "status": "PASS",
+      "orderA": [
+        31,
+        11,
+        1,
+        41,
+        51,
+        21
+      ],
+      "orderB": [
+        31,
+        51,
+        11,
+        21,
+        1,
+        41
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "error-tagging",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "categorisation-board",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "secureOffline",
+      "type": "matching",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        0,
+        4,
+        5,
+        2
+      ],
+      "orderB": [
+        3,
+        5,
+        1,
+        2,
+        0,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "multiple choice",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "true/false",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "fill-in-the-blank",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "open answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "short answer",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "word order",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "word formation",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "error correction",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "reading comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "listening comprehension",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "dialogue completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "cloze text",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "multi-select",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "ordering",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "highlight-evidence",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "table-completion",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "transformation-chain",
+      "status": "PASS",
+      "orderA": [
+        31,
+        11,
+        21,
+        51,
+        1,
+        41
+      ],
+      "orderB": [
+        11,
+        51,
+        1,
+        21,
+        31,
+        41
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "error-tagging",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "categorisation-board",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "mode": "instant",
+      "type": "matching",
+      "status": "PASS",
+      "orderA": [
+        3,
+        1,
+        2,
+        5,
+        0,
+        4
+      ],
+      "orderB": [
+        1,
+        5,
+        0,
+        2,
+        3,
+        4
+      ]
+    }
+  ]
+}

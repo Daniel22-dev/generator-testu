@@ -1,0 +1,92 @@
+[
+  {
+    "check": "check-versions",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-versions.log"
+  },
+  {
+    "check": "check-source-structure",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-source-structure.log"
+  },
+  {
+    "check": "check-action-pins",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-action-pins.log"
+  },
+  {
+    "check": "check-lockfile-registry",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-lockfile-registry.log"
+  },
+  {
+    "check": "check-sensitive-data",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-sensitive-data.log"
+  },
+  {
+    "check": "check-runtime-ux-regressions",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-runtime-ux-regressions.log"
+  },
+  {
+    "check": "check-exercise-type-help",
+    "status": "BLOCKED_MISSING_PINNED_DEPENDENCY",
+    "exit_code": 1,
+    "log": "check-exercise-type-help.log"
+  },
+  {
+    "check": "check-deadline-timers",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-deadline-timers.log"
+  },
+  {
+    "check": "check-embedded-script-terminators",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-embedded-script-terminators.log"
+  },
+  {
+    "check": "check-ai-operation-registry",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-ai-operation-registry.log"
+  },
+  {
+    "check": "check-csp",
+    "status": "BLOCKED_MISSING_PINNED_DEPENDENCY",
+    "exit_code": 1,
+    "log": "check-csp.log"
+  },
+  {
+    "check": "check-ci-trust-pin-f0",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-ci-trust-pin-f0.log"
+  },
+  {
+    "check": "check-qa-manifest",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-qa-manifest.log"
+  },
+  {
+    "check": "check-d7-ci-wiring",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-d7-ci-wiring.log"
+  },
+  {
+    "check": "check-credential-policy-r2",
+    "status": "PASS",
+    "exit_code": 0,
+    "log": "check-credential-policy-r2.log"
+  }
+]

@@ -8,6 +8,8 @@ const files = [
   'src/js/01-core.js',
   'src/js/03-ui-render.js',
   'src/js/05-form-fields.js',
+  'src/js/05b-workflow-context.js',
+  'src/js/05c-exercise-suitability.js',
   'src/js/07-gemini.js',
   'src/js/07z-ai-core-integration.js',
   'src/js/08-manual-editor.js',

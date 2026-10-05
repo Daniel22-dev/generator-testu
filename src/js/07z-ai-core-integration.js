@@ -1,5 +1,5 @@
 /* ===================== GHRAB AI CORE 1.0.0 · GENERÁTOR P1 ===================== */
-const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.88'});
+const GEN_AI_APP=Object.freeze({id:'generator',version:'7.1.89'});
 const GEN_AI_SCHEMA_ID='generator.object.v1';
 const GEN_AI_SCHEMAS=Object.freeze({[GEN_AI_SCHEMA_ID]:{type:'object',additionalProperties:true}});
 const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN_AI_APP.id,operations:Object.freeze({
@@ -13,6 +13,7 @@ const GEN_AI_OPERATIONS=Object.freeze({schema:'ghrab-ai-operations-v1',appId:GEN
   'answer-key-verification':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
   'acceptable-answer-enrichment':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
   'generator-help-answer':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
+  'exercise-suitability':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'balanced',allowedModelProfiles:['balanced','quality'],inputTypes:['text','image','document'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:8192},
   'diagnostic-ping':{outputSchemaId:GEN_AI_SCHEMA_ID,defaultModelProfile:'economy',allowedModelProfiles:['economy','balanced'],inputTypes:['text'],streaming:false,requiredCapabilities:[],expectedOutputs:1,maxOutputTokensHint:1024}
 })});
 const GEN_LOGICAL_REQUEST_TIMEOUT_MS=180000;
@@ -35,6 +36,7 @@ function genEnsureAiCore(){
 function genWorkflowId(opts={}){return opts.workflowId||window.__GHRAB_GENERATOR_WORKFLOW_ID__||undefined}
 function genHasExternalFileData(parts){return (Array.isArray(parts)?parts:[]).some(part=>{const fd=part?.file_data||part?.fileData;return !!(fd?.file_uri||fd?.fileUri)})}
 async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
+  if(opts.signal?.aborted)throw Object.assign(new Error('Cancelled'),{name:'AbortError'});
   if(!(await ensureGeminiDataNotice()))throw new Error('AI požadavek byl zrušen před odesláním dat.');
   if(genSchoolMode()&&opts.urlContext)throw Object.assign(new Error('URL Context zatím školní AI brána nepodporuje. Vlož obsah stránky jako text nebo soubor, případně použij přímý GitHub režim.'),{code:'FEATURE_UNSUPPORTED'});
   if(genSchoolMode()&&genHasExternalFileData(extraParts))throw Object.assign(new Error('Školní AI brána zatím nepřijímá externí video URI (např. YouTube). Pro tuto chvíli nahraj audio/video soubor v přímém režimu nebo vlož transkript.'),{code:'FEATURE_UNSUPPORTED'});
@@ -43,22 +45,25 @@ async function callGeminiJSONCore(prompt,extraParts=[],opts={}){
   genEnsureAiCore();const operation=opts.operation||'test-generation';const registration=GEN_AI_OPERATIONS.operations[operation];if(!registration)throw Object.assign(new Error('Neznámá AI operace: '+operation),{code:'UNREGISTERED_OPERATION'});
   const inputParts=genCoreParts(prompt,extraParts);genPreflight(inputParts);geminiCancelRequested=false;
   const ctrl=typeof AbortController!=='undefined'?new AbortController():null;let hardTimedOut=false;if(ctrl)currentGeminiAbortController=ctrl;
+  const relayAbort=()=>ctrl?.abort();opts.signal?.addEventListener('abort',relayAbort,{once:true});
+  if(opts.signal?.aborted)relayAbort();
   const hardTimer=ctrl?setTimeout(()=>{hardTimedOut=true;ctrl.abort()},GEN_LOGICAL_REQUEST_TIMEOUT_MS):null;
   try{const response=await window.GHRAB_AI.generate({operation,modelProfile:genModelProfile(operation),instructions:aiTrustedSystemInstruction(),inputParts,outputSchemaId:GEN_AI_SCHEMA_ID,options:{reasoningHint:genModelProfile(operation)==='economy'?'minimal':'medium',maxOutputTokensHint:registration.maxOutputTokensHint},privacy:{clientAnonymized:true,preflightPassed:true},usageContext:{expectedOutputs:1,userActions:1},workflowId:genWorkflowId(opts),signal:ctrl?.signal});
     lastGeminiRawResponse=JSON.stringify(response.result);lastGeminiJsonRepaired=false;return response.result;
   }catch(error){if(hardTimedOut)throw Object.assign(new Error('AI část překročila maximální čas '+Math.round(GEN_LOGICAL_REQUEST_TIMEOUT_MS/1000)+' s.'),{code:'TIMEOUT',status:504,providerRequests:Number(error?.providerRequests||0)});throw error}
-  finally{if(hardTimer)clearTimeout(hardTimer);if(currentGeminiAbortController===ctrl)currentGeminiAbortController=null}
+  finally{opts.signal?.removeEventListener('abort',relayAbort);if(hardTimer)clearTimeout(hardTimer);if(currentGeminiAbortController===ctrl)currentGeminiAbortController=null}
 }
 async function genCallCoreResilient(p,x,o){
   try{return await callGeminiJSONCore(p,x,o)}catch(a){
     if(genSchoolMode()||a?.status!==503||a?.code!=='PROVIDER_UNAVAILABLE')throw a;
     await new Promise(r=>setTimeout(r,2000));
-    if(currentGeminiAbortController?.signal?.aborted)throw Object.assign(new Error('Požadavek byl zrušen.'),{name:'AbortError'});
+    if(o.signal?.aborted||geminiCancelRequested||currentGeminiAbortController?.signal?.aborted)throw Object.assign(new Error('Požadavek byl zrušen.'),{name:'AbortError'});
     try{return await callGeminiJSONCore(p,x,o)}catch(b){b.providerRequests=(a.providerRequests||0)+(b.providerRequests||0);throw b}
   }
 }
 const genLegacyCallGeminiJSON=callGeminiJSON;
 callGeminiJSON=async function callGeminiJSONThroughCore(prompt,extraParts=[],opts={}){
+  if(opts.signal?.aborted)throw Object.assign(new Error('Cancelled'),{name:'AbortError'});
   if(opts.__legacyTest===true||window.__TEST_USE_LEGACY_GEMINI__)return genLegacyCallGeminiJSON(prompt,extraParts,opts);
   // GHRAB AI Core 1.0.0 nemá kontrakt pro providerové nástroje. URL Context proto
   // zůstává pouze v přímém Gemini režimu; školní brána jej výše výslovně odmítne.

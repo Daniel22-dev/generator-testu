@@ -1,0 +1,321 @@
+
+> generator-testu@7.1.89 prebuild
+> npm run check:credential-security && npm run check:security-forensics && npm run check:secret-hygiene && npm run check:security-adversarial && npm run check:e1-remediation && npm run check:r2-credential-policy && npm run check:r3-test-infrastructure && npm run check:r4-recovery-runtime && npm run check:r5-adversarial-wiring && npm run check:f0-ci-trust-pin && npm run check:f2-journey-migration && npm run check:ai-operations && npm run check:exercise-help && npm run check:verifier-generated-syntax && npm run check:embedded-script-terminators && npm run check:studio-manifest
+
+
+> generator-testu@7.1.89 check:credential-security
+> node scripts/check-security-credential-e1.mjs && node scripts/check-security-credential-e2.mjs && node scripts/check-security-credential-e3.mjs
+
+PASS E1: teacher/admin secret field exists
+PASS E1: separate recovery field exists
+PASS E1: UI clearly distinguishes secret teacher credential from recovery
+PASS E1: step 3 no longer claims one shared code
+PASS E1: both credentials are marked sensitive
+PASS E1: recovery has independent value/sync helpers
+PASS E1: teacher and recovery generation helpers are separate
+PASS E1: teacher secret is no longer mirrored into legacy unlock field
+PASS E1: recovery generation uses randomChunk/WebCrypto path
+PASS E1: strict mode or screenGuard requires recovery
+PASS E1: UI mode changes trigger recovery provisioning
+PASS E1: validation rejects identical teacher/recovery values
+PASS E1: teacher secret retains minimum 12-character strength gate
+PASS E1: manual recovery code has a minimum strength floor
+PASS E1: persistence sanitizer includes recovery raw value
+PASS E1: download guidance uses recovery, not teacher secret
+PASS E1 credential model + generator UX gate
+PASS E2: assembly reads Teacher/Admin and Recovery from separate inputs
+PASS E2: teacher hash is derived only from Teacher/Admin secret
+PASS E2: recovery hash is derived only from Classroom Recovery Code
+PASS E2: output CFG uses explicit recovery names
+PASS E2: new assembly no longer emits legacy unlock hash/domain names
+PASS E2: guarded test assembly fails closed through shared credential policy
+PASS E2: secure public CFG has only a procedural classroom unlock hash
+PASS E2: secure package has no legacy unlock output field
+PASS E2: secure runtime unlock uses recovery-code branch
+PASS E2: secure runtime teacher login remains teacher-pin only
+PASS E2: secure runtime no longer accepts legacy unlock branch
+PASS E2: instant lock-screen builder uses recovery capability flag
+PASS E2: instant runtime unlock uses recovery-code branch
+PASS E2: instant runtime teacher login remains teacher-pin only
+PASS E2: instant runtime uses recovery capability flag
+PASS E2: instant runtime no longer accepts legacy unlock branch
+PASS E2: raw Teacher/Admin secret is not a CFG property
+PASS E2: raw Recovery Code is not a CFG property
+PASS E2: generated-output scanner rejects raw recoveryCode field/reference
+PASS E2: synthetic instant student HTML does not contain raw Teacher/Admin secret
+PASS E2: synthetic instant student HTML does not contain raw Recovery Code
+PASS E2: synthetic instant student HTML contains only the two derived credential hashes
+PASS E2: secure student public CFG drops raw Teacher/Admin and Recovery values
+PASS E2: secure student public CFG drops both legacy credential hashes
+PASS E2: Teacher/Admin and Recovery hashes are cryptographically domain-separated
+PASS E2: same Recovery Code is bound to testId and not portable between tests
+PASS E2: Recovery Code hash cannot equal teacher credential hash even for identical plaintext
+PASS E2: Teacher/Admin normalization is stable
+PASS E2: Recovery normalization is stable
+PASS E2: generator PBKDF2 helper explicitly recognizes only the two current credential domains
+PASS E2: legacy unlock-password domain removed from new generator helper
+PASS E2 cryptographic credential separation gate
+PASS E3 secure: submitted retry accepts only Teacher/Admin authorization
+PASS E3 secure: active-attempt reset accepts only Teacher/Admin authorization
+PASS E3 secure: tryUnlock accepts only Classroom Recovery authorization
+PASS E3 secure: teacher login accepts only Teacher/Admin authorization
+PASS E3 secure: Teacher/Admin helper is limited to retry, reset and teacher login plus its definition
+PASS E3 secure: Recovery helper is limited to tryUnlock plus its definition
+PASS E3 secure: hidden 5x lock-tap reveal is preserved
+PASS E3 instant: tryUnlock accepts only Classroom Recovery authorization
+PASS E3 instant: teacher login accepts only Teacher/Admin authorization
+PASS E3 instant: generic cross-role secret matcher was removed
+PASS E3 instant: role-specific helpers are each used only by their matching operation
+PASS E3 instant: hidden 5x lock-tap reveal is preserved
+PASS E3 secure dynamic: Teacher/Admin secret matches Teacher/Admin branch
+PASS E3 secure dynamic: Recovery Code cannot authenticate as Teacher/Admin
+PASS E3 secure dynamic: Recovery Code matches Recovery branch
+PASS E3 secure dynamic: Teacher/Admin secret does not substitute for Recovery Code
+PASS E3 secure dynamic: Recovery Code does not open teacher panel
+PASS E3 secure dynamic: Teacher/Admin secret opens teacher panel
+PASS E3 secure dynamic: Teacher/Admin secret cannot unlock through the Recovery path
+PASS E3 secure dynamic: Recovery unlock preserves attemptId, deadline, identity, variant, joker choice, start time and answers
+PASS E3 secure dynamic: valid Recovery Code unlocks the current attempt
+PASS E3 secure dynamic: Recovery unlock appends to existing securityEvents instead of replacing them
+PASS E3 secure dynamic: persisted active-attempt seal retains immutable attempt identity/variant/joker/deadline
+PASS E3 secure dynamic: fewer than five lock taps do not reveal Recovery input
+PASS E3 secure dynamic: fifth lock tap reveals Recovery input
+PASS E3 instant dynamic: Recovery Code does not open teacher panel
+PASS E3 instant dynamic: Teacher/Admin secret opens teacher panel
+PASS E3 instant dynamic: Teacher/Admin secret cannot unlock through Recovery path
+PASS E3 instant dynamic: Recovery unlock preserves attempt id, deadline, variant and joker state
+PASS E3 instant dynamic: valid Recovery Code unlocks and appends an audit event
+PASS E3 instant dynamic: fewer than five lock taps do not reveal Recovery input
+PASS E3 instant dynamic: fifth lock tap reveals Recovery input
+PASS E3 runtime privilege-boundary gate
+
+> generator-testu@7.1.89 check:security-forensics
+> node scripts/check-security-forensics-e4.mjs
+
+PASS E4 secure: successful Classroom Recovery unlock has explicit recovery-unlock event
+PASS E4 secure: recovery-unlock preserves previous lock reason and lock timestamp
+PASS E4 instant: successful Classroom Recovery unlock has explicit recovery-unlock event
+PASS E4 instant: recovery-unlock preserves previous lock reason
+PASS E4 verifier: recovery unlock is rendered as audit/info, not hard/soft issue
+PASS E4 verifier: audit-only recovery unlock is excluded from security issue count
+PASS E4 exports: results CSV retains audit info and full security event timeline
+PASS E4 exports: archive JSON retains result objects including securityEvents
+PASS E4 secure dynamic: repeated lock/recovery-unlock cycles remain ordered and reconstructible
+PASS E4 secure dynamic: each recovery unlock carries its own preceding lock reason
+PASS E4 verifier dynamic: recovery unlock alone does not count as a security issue
+PASS E4 verifier dynamic: recovery unlock remains visible as audit information
+PASS E4 verifier dynamic: lock count and both reasons are visible
+PASS E4 verifier dynamic: recovery count and linked lock reasons are visible
+PASS E4 verifier dynamic: exported timeline preserves event order
+PASS E4 forensic audit gate
+
+> generator-testu@7.1.89 check:secret-hygiene
+> node scripts/check-security-secret-hygiene-e5.mjs
+
+✅ E5: both credential DOM fields remain marked sensitive
+✅ E5: persistent storage has explicit raw-credential key denylist
+✅ E5: stored state is recursively stripped before persistence/export
+✅ E5: current live credential values are recursively redacted from arbitrary stored string fields
+✅ E5: imported/legacy state is recursively stripped before use
+✅ E5: migration physically scrubs the current snapshot
+✅ E5: every template write passes through secret sanitizer
+✅ E5: every history write passes through secret sanitizer
+✅ E5: assignment export passes through secret sanitizer
+✅ E5: imported assignment is scrubbed before state replacement
+✅ E5: manual/AI prompt uses Teacher/Admin placeholder
+✅ E5: manual/AI prompt uses Classroom Recovery placeholder
+✅ E5: obsolete one-code placeholder is gone
+✅ E5: prompt no longer instructs AI to use one shared credential
+✅ E5: prompt documents the one-purpose recovery boundary
+✅ E5: prompt documents independent per-test derivation domains
+✅ E5: current security guide describes the split credential workflow
+✅ E5: changing Recovery Code after generation is tracked as output drift
+✅ E5: generated HTML smoke check rejects leaked local credential placeholders
+✅ E5: SecretScanner has dedicated raw test credential rules
+✅ E5: SecretScanner covers teacher, recovery and placeholder leaks
+✅ E5 dynamic: persisted artifact removes raw secret LEGACY-RAW…
+✅ E5 dynamic: persisted artifact removes raw secret TEACH-RAW-…
+✅ E5 dynamic: persisted artifact removes raw secret REC-AB12-C…
+✅ E5 dynamic: persisted artifact removes raw secret NESTED-TEA…
+✅ E5 dynamic: persisted artifact removes raw secret NESTED-REC…
+✅ E5 dynamic: stored prompt replaces Teacher/Admin line with placeholder
+✅ E5 dynamic: stored prompt replaces Recovery line with placeholder
+✅ E5 dynamic: sanitizer preserves non-secret nested data
+✅ E5 dynamic: live credential values are redacted even under non-sensitive field names
+✅ E5 dynamic: SecretScanner built-in regression suite passes (20/20)
+✅ E5 dynamic: derived credential hash fields remain allowed in student HTML
+✅ E5 dynamic: raw Recovery Code is blocked by SecretScanner
+
+✅ E5 secret hygiene gate PASS.
+
+> generator-testu@7.1.89 check:security-adversarial
+> node scripts/check-security-adversarial-e6.mjs
+
+PASS E6: secure recovery credential has one runtime authority: unlock
+PASS E6: secure teacher login uses Teacher/Admin only
+PASS E6: secure submitted retry uses Teacher/Admin only
+PASS E6: secure active-attempt reset uses Teacher/Admin only
+PASS E6: instant recovery credential has one runtime authority: unlock
+PASS E6: instant teacher login uses Teacher/Admin only
+PASS E6: generator retains distinct credential derivation domains
+PASS E6: obsolete shared unlock derivation domain cannot re-enter new output
+PASS E6: same plaintext cannot cross Teacher/Recovery role boundary
+PASS E6: Recovery Code material cannot replay across testId boundary
+PASS E6: persistence deny/sanitizer retains ucitelPin coverage
+PASS E6: persistence deny/sanitizer retains recoveryCode coverage
+PASS E6: persistence deny/sanitizer retains heslo coverage
+PASS E6: Verifier keeps Recovery Unlock audit-only
+PASS E6: Verifier export preserves forensic timeline
+PASS E6: secure runtime retains sealed attempt/deadline persistence
+PASS E6 adversarial security gate
+
+> generator-testu@7.1.89 check:e1-remediation
+> node scripts/check-e1-remediation.mjs
+
+PASS student persistence is signed, revisioned, redundant and submit-race hardened
+PASS teacher verifier rejects forged student-variant binding before scoring
+E1 REMEDIATION STATIC/DYNAMIC GATE PASSED
+
+> generator-testu@7.1.89 check:r2-credential-policy
+> node scripts/check-credential-policy-r2.mjs
+
+PASS R2: valid distinct credentials pass
+PASS R2: same plaintext is rejected
+PASS R2: weak Teacher/Admin secret is rejected
+PASS R2: missing required Recovery Code is rejected
+PASS R2: weak Recovery Code is rejected
+PASS R2: Recovery Code may be absent when not required
+PASS R2: UI validation uses shared credential policy
+PASS R2: settings drift/apply path uses shared credential policy
+PASS R2: assembleTestHtml captures current output fields before policy evaluation
+PASS R2: current credential fields override stale __outputFields snapshot
+PASS R2: assembleTestHtml enforces shared credential policy
+PASS R2: assembleTestHtml fails closed on credential policy errors
+PASS R2 credential policy gate
+
+> generator-testu@7.1.89 check:r3-test-infrastructure
+> node scripts/check-test-infrastructure-r3.mjs
+
+PASS R3: D7 fixture uses a policy-compliant Teacher/Admin secret
+PASS R3: D7 fixture provides a separate Recovery Code
+PASS R3: D7 fixture no longer seeds the legacy shared code
+PASS R3: workflow resetBase seeds a separate Recovery Code
+PASS R3: workflow matrix no longer derives the legacy unlock-password branch
+PASS R3: workflow matrix no longer asserts the one-code model
+PASS R3: workflow matrix exercises separate Teacher and Recovery runtime inputs
+PASS R3: E6 no longer checks nonexistent authorization functions
+PASS R3: E6 targets real retry/reset runtime functions
+PASS R3: R3 behavioral gate executes the built generator and drift path
+PASS R3: R3 behavioral gate parses the generated Teacher Verifier
+PASS R3: R3 behavioral gate has an npm script
+PASS R3: npm test requires the R3 behavioral gate after build
+PASS R3 test infrastructure gate
+
+> generator-testu@7.1.89 check:r4-recovery-runtime
+> node scripts/check-recovery-runtime-r4.mjs
+
+PASS R4: secure runtime declares unlock busy state
+PASS R4: secure tryUnlock is a no-op unless locked and serializes concurrent unlocks
+PASS R4: secure unlock busy flag is fail-safe via try/finally
+PASS R4: instant runtime declares unlock busy state
+PASS R4: instant tryUnlock is a no-op unless locked and serializes concurrent unlocks
+PASS R4: instant unlock busy flag is fail-safe via try/finally
+PASS R4: instant warningCount tracks warning-class events only
+PASS R4: secure concurrent recovery unlock releases the lock
+PASS R4: secure concurrent recovery unlock performs exactly one PBKDF2 match
+PASS R4: secure one lock produces exactly one recovery-unlock audit event
+PASS R4: secure unlock on an already unlocked attempt is a no-op
+PASS R4: instant concurrent recovery unlock releases the lock
+PASS R4: instant concurrent recovery unlock performs exactly one PBKDF2 match
+PASS R4: instant one lock produces exactly one recovery-unlock audit event
+PASS R4: instant recovery-unlock and lock events do not inflate warningCount
+PASS R4: instant unlock on an already unlocked attempt is a no-op
+PASS R4: instant warningCount increments only for warning-class events
+PASS R4 recovery runtime gate
+
+> generator-testu@7.1.89 check:r5-adversarial-wiring
+> node scripts/check-adversarial-wiring-r5.mjs
+
+PASS R5: behavioral R5 gate covers: Q-crypto: stejný plaintext v obou rolích
+PASS R5: behavioral R5 gate covers: A instant: správný Recovery odemkne
+PASS R5: behavioral R5 gate covers: C instant: Recovery neotevře učitelský panel
+PASS R5: behavioral R5 gate covers: AB instant: dvojklik / unlock bez zámku
+PASS R5: behavioral R5 gate covers: instant: recovery-unlock nezvyšuje počet varování
+PASS R5: behavioral R5 gate covers: A secure: správný Recovery odemkne
+PASS R5: behavioral R5 gate covers: AB secure: souběžné dvojité odemčení jednoho zámku
+PASS R5: behavioral R5 gate covers: AA secure: reload zamčeného pokusu zámek neobejde
+PASS R5: behavioral R5 gate covers: E secure: studentský soubor nepovoluje reset cizí identity
+PASS R5: behavioral R5 gate covers: D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo
+PASS R5: behavioral R5 gate covers: Verifier: hlavní skript se naparsuje
+PASS R5: behavioral R5 gate covers: AC/AD + export: Verifier zachová lock jako signál, recovery jako audit, CSV nese údaje
+PASS R5: behavioral R5 gate covers: U: snapshot / stav pro uložení bez raw credentialů
+PASS R5: behavioral R5 gate covers: W: import legacy záznamu s jedním „heslo" nevyrobí dva credentialy
+PASS R5: behavioral R5 gate covers: X: AI prompt neobsahuje raw credentialy
+PASS R5: behavioral R5 gate covers: Q-bypass: applySettingsWithoutAi nesmí sestavit test s Teacher == Recovery
+PASS R5: behavioral R5 gate covers: Q-bypass: slabý Teacher (6 znaků) přes applySettingsWithoutAi
+PASS R5: R5 runs the built generator and parses generated HTML
+PASS R5: R5 writes a machine-readable result artifact
+PASS R5: R5 behavioral npm script is defined
+PASS R5: npm test requires the full R5 adversarial gate after build
+PASS R5: R4 runtime gate is defined
+PASS R5: prebuild requires the R4 recovery runtime gate
+PASS R5 adversarial wiring gate
+
+> generator-testu@7.1.89 check:f0-ci-trust-pin
+> node scripts/check-ci-trust-pin-f0.mjs
+
+PASS F0 CI trust pin gate: 7 workflow pin(s) match 67923b71190e7e4fa0dbccf27963f61a22e3b53a48e9cb72cbb856142655430f
+
+> generator-testu@7.1.89 check:f2-journey-migration
+> node scripts/check-f2-journey-migration.mjs
+
+PASS F2: audit fixture declares independent Teacher/Admin secret
+PASS F2: audit fixture declares independent Recovery code
+PASS F2: Teacher/Admin and Recovery audit credentials are distinct
+PASS F2: audit fixture populates recoveryCode field
+PASS F2: legacy heslo fixture is empty
+PASS F2: identity journey contains no legacy unlock-password
+PASS F2: identity journey contains no legacy CFG.hesloHash
+PASS F2: identity journey contains no legacy secretMatches(
+PASS F2: identity journey proves Recovery cannot teacher-login
+PASS F2: identity journey proves Teacher cannot recovery-unlock
+PASS F2: identity journey reveals Recovery input through the five-tap lock affordance
+PASS F2: identity journey opens Verifier fallback details before paste
+PASS F2: browser matrix opens Verifier fallback details before paste
+PASS F2: instant joker journey confirms irreversible choice
+PASS F2: secure joker journey confirms irreversible choice
+PASS F2: primary journey no longer searches for the removed shared-code button
+PASS F2: primary journey uses the current Teacher/Admin generator
+PASS F2: primary journey knows the current Recovery generator
+PASS F2: strict journey proves Teacher/Admin cannot unlock
+PASS F2: strict journey proves Recovery can unlock
+PASS F2: primary journey discloses Verifier emergency fallback before paste
+PASS F2: identity suite scenario cardinality stays 8
+PASS F2 journey E2E migration gate
+
+> generator-testu@7.1.89 check:ai-operations
+> node scripts/check-ai-operation-registry.mjs
+
+PASS ai-operations registry parity: 12 operations; runtime input types normalized to GHRAB AI Core 1.0.0.
+
+> generator-testu@7.1.89 check:exercise-help
+> node scripts/check-exercise-type-help.mjs
+
+node:internal/modules/esm/resolve:204
+  const resolvedOption = FSLegacyMainResolve(pkgPath, packageConfig.main, baseStringified);
+                         ^
+
+Error: Cannot find package '/mnt/data/git-work/generator-testu-main/node_modules/jsdom/index.js' imported from /mnt/data/git-work/generator-testu-main/scripts/check-exercise-type-help.mjs
+    at legacyMainResolve (node:internal/modules/esm/resolve:204:26)
+    at packageResolve (node:internal/modules/esm/resolve:778:12)
+    at moduleResolve (node:internal/modules/esm/resolve:854:18)
+    at defaultResolve (node:internal/modules/esm/resolve:984:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:780:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:704:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:687:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:305:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:137:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.16.0

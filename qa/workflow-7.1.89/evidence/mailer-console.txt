@@ -1,0 +1,103 @@
+{
+  "scope": "Node VM, fake Sheets/MailApp only; zero real messages",
+  "passed": 24,
+  "total": 24,
+  "results": [
+    {
+      "name": "Menu never sends mail",
+      "status": "PASS"
+    },
+    {
+      "name": "No checkbox selection sends nobody",
+      "status": "PASS"
+    },
+    {
+      "name": "Only B receives own code; no cc/bcc/other codes",
+      "status": "PASS"
+    },
+    {
+      "name": "Repeated click does not resend",
+      "status": "PASS"
+    },
+    {
+      "name": "Late arrival C alone; existing codes unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "FALSE string is never selected",
+      "status": "PASS"
+    },
+    {
+      "name": "Cancelled confirmation sends nobody",
+      "status": "PASS"
+    },
+    {
+      "name": "Selection changed during confirmation aborts",
+      "status": "PASS"
+    },
+    {
+      "name": "Code changed during confirmation aborts",
+      "status": "PASS"
+    },
+    {
+      "name": "Editing recipient during batch stops remainder",
+      "status": "PASS"
+    },
+    {
+      "name": "Quota failure sends nobody",
+      "status": "PASS"
+    },
+    {
+      "name": "Lock busy sends nobody",
+      "status": "PASS"
+    },
+    {
+      "name": "Duplicate email is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Duplicate code is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Address list injection is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Newline address injection is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Formula in routing cell is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Mixed test IDs rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Unknown send outcome retained; no automatic retry",
+      "status": "PASS"
+    },
+    {
+      "name": "Clearing visible sent status cannot bypass journal",
+      "status": "PASS"
+    },
+    {
+      "name": "Explicit manual retry never changes code or sends on its own",
+      "status": "PASS"
+    },
+    {
+      "name": "Column order is resolved by header name",
+      "status": "PASS"
+    },
+    {
+      "name": "Setup retains FALSE selections and sends nothing",
+      "status": "PASS"
+    },
+    {
+      "name": "Private verifier link rejected",
+      "status": "PASS"
+    }
+  ]
+}

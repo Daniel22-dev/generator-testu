@@ -1,0 +1,35 @@
+{
+  "scope": "Real native dialogs with mock provider; no network or production access tested",
+  "total": 3,
+  "passed": 3,
+  "results": [
+    {
+      "name": "AI consent above Reading; keyboard focus inside; no request before consent",
+      "status": "PASS",
+      "observed": {
+        "native": true,
+        "focusInside": true,
+        "calls": 0
+      }
+    },
+    {
+      "name": "Escape cancels consent only, sends no request and leaves Reading usable",
+      "status": "PASS",
+      "observed": {
+        "calls": 0,
+        "readingStillOpen": true,
+        "buttonReady": true
+      }
+    },
+    {
+      "name": "Explicit consent allows one request and preview without silent adoption",
+      "status": "PASS",
+      "observed": {
+        "calls": 1,
+        "hasPreview": true,
+        "textUnchanged": true,
+        "buttonReady": true
+      }
+    }
+  ]
+}

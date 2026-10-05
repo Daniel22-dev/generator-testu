@@ -38,36 +38,68 @@ function rosterParseEmails(raw){
   toks.forEach(function(tok){ if(!/^[^\s@]+@[^\s@]+$/.test(tok))return; var low=tok.toLowerCase(); if(seen[low])return; seen[low]=1; out.push({email:low,label:low.split('@')[0]}); });
   return out;
 }
-function rosterMakeCode(){
-  var ab='ABCDEFGHJKMNPQRSTUVWXYZ23456789',n=6,o='';
-  try{var a=new Uint32Array(n);crypto.getRandomValues(a);for(var i=0;i<n;i++)o+=ab[a[i]%ab.length];}
-  catch(e){for(var j=0;j<n;j++)o+=ab[Math.floor(Math.random()*ab.length)];}
-  return o;
+
+// One code set per test preparation. Distribution choices live only in Sheets.
+let rosterIssuedCodes = new Map();
+let rosterIssuedState = null;
+function rosterEnsureCodeRegistry(){
+  if(rosterIssuedState!==state){rosterIssuedCodes=new Map();rosterIssuedState=state;rosterEntries=[];}
+  for(const entry of rosterEntries)if(entry.email&&entry.code)rosterIssuedCodes.set(entry.email,{...entry});
 }
-function rosterForVerifier(){ return (rosterEntries||[]).map(function(e){ return {code:e.code,label:e.label,email:e.email}; }); }
+function rosterMakeCode(){
+  if(!globalThis.crypto?.getRandomValues)throw new Error('Bezpečný generátor kódů není dostupný. Otevři aplikaci přes HTTPS.');
+  const ab='ABCDEFGHJKMNPQRSTUVWXYZ23456789',limit=Math.floor(0x100000000/ab.length)*ab.length;
+  let out='';
+  while(out.length<6){const values=new Uint32Array(12);crypto.getRandomValues(values);for(const n of values){if(n<limit)out+=ab[n%ab.length];if(out.length===6)break;}}
+  return out;
+}
+function rosterSyncActiveCodes(){
+  rosterEnsureCodeRegistry();
+  rosterEntries=rosterChosenParticipants().filter(e=>rosterIssuedCodes.has(e.email)).map(e=>({...rosterIssuedCodes.get(e.email),label:e.label}));
+}
+function rosterSelectionReady(){
+  const chosen=rosterChosenParticipants();
+  return chosen.length>0&&chosen.length===rosterEntries.length&&chosen.every(e=>rosterEntries.some(r=>r.email===e.email&&r.code));
+}
+function rosterForVerifier(){return rosterEntries.map(e=>({code:e.code,label:e.label,email:e.email}));}
 function rosterRender(msg){
-  var box=document.getElementById('rosterResult'); if(!box)return;
-  if(msg){ box.innerHTML='<span style="color:var(--err)">'+rosterEscHtml(msg)+'</span>'; return; }
-  if(!rosterEntries.length){ box.innerHTML='Zatím žádné kódy. Vlep e-maily a klikni na „Vygenerovat kódy".'; return; }
-  var rows=rosterEntries.map(function(e){ return '<tr><td style="padding:3px 8px 3px 0">'+rosterEscHtml(e.label)+'</td><td style="padding:3px 10px;font-family:monospace;font-weight:700">'+rosterEscHtml(e.code)+'</td><td style="padding:3px 0;color:var(--t3)">'+rosterEscHtml(e.email)+'</td></tr>'; }).join('');
-  box.innerHTML='<div style="margin-bottom:6px"><b>'+rosterEntries.length+'</b> studentů, kódy vygenerované. Zapečou se do verifieru až při vygenerování testu — při změně kódů test vygeneruj znovu.</div><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="text-align:left;color:var(--t3)"><th style="padding-right:8px">Označení</th><th style="padding-right:10px">Kód</th><th>E-mail</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  const box=$('rosterResult');if(!box)return;
+  box.replaceChildren();
+  if(msg){box.textContent=msg;return;}
+  const head=document.createElement('p');
+  head.textContent=rosterEntries.length
+    ? rosterEntries.length+' kódů připraveno. Doplnění zachová stávající kódy. Kdo e-mail skutečně obdrží, určíš až v Sheets.'
+    : 'Vlož skupinu a připrav kódy. Tato akce nic neodesílá.';
+  box.append(head);
+  if(!rosterEntries.length)return;
+  const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Zobrazit soukromý seznam kódů';details.append(summary);
+  const table=document.createElement('table');table.style.width='100%';
+  for(const e of rosterEntries){const row=document.createElement('tr');for(const value of [e.label,e.code,e.email]){const cell=document.createElement('td');cell.textContent=value;cell.style.overflowWrap='anywhere';row.append(cell);}table.append(row);}
+  details.append(table);box.append(details);
 }
 function rosterGenerate(){
-  var ta=document.getElementById('rosterEmails'); var raw=ta?ta.value:'';
-  var parsed=rosterChosenParticipants();
-  if(!parsed.length){ rosterEntries=[]; rosterRender('Vlož alespoň jeden e-mail a vyber studenty, kteří test píší.'); validate(); return; }
-  var used={};
-  parsed.forEach(function(e){ var c; do{ c=rosterMakeCode(); }while(used[c]); used[c]=1; e.code=c; });
-  rosterEntries=parsed; rosterRender('');validate();
+  rosterEnsureCodeRegistry();const parsed=rosterChosenParticipants();
+  if(!parsed.length){rosterSyncActiveCodes();rosterRender('Vlož skupinu a zvol, komu připravit kód. Pro výběr až v hodině ponech celou skupinu.');validate();return;}
+  const used=new Set(Array.from(rosterIssuedCodes.values(),e=>e.code));
+  try{for(const entry of parsed){if(rosterIssuedCodes.has(entry.email))continue;let code;do{code=rosterMakeCode();}while(used.has(code));used.add(code);rosterIssuedCodes.set(entry.email,{...entry,code});}}
+  catch(error){rosterRender(error.message);return;}
+  rosterSyncActiveCodes();rosterRender();validate();
+}
+async function rosterNewCodeSet(){
+  if(!(await uiConfirm('Vytvořit novou sadu kódů pro NOVÝ test? Již rozeslané soubory ani kódy tím nezneplatníš. Pokud už existuje hotový test, bude nutný nový export a verifier.','Nový test — nové kódy',true)))return;
+  rosterIssuedCodes.clear();rosterEntries=[];rosterGenerate();
 }
 function rosterDownloadCsv(){
-  if(!rosterEntries.length){ rosterRender('Nejdřív vygeneruj kódy.'); return; }
+  rosterSyncActiveCodes();
+  if(!rosterSelectionReady()){rosterRender('Nejdřív připrav / doplň kódy pro celý aktuální výběr.');return;}
   const sealed=lastAssembled&&lastAssembled.sourceState&&lastAssembled.sourceState.__roster;
-  if(sealed&&JSON.stringify(sealed)!==JSON.stringify(rosterForVerifier())){rosterRender('Kódy se liší od hotového testu. Nejdřív je použij v hotovém testu (bez AI), pak stáhni CSV.');return;}
-  var lines=['email,student,code'];
-  rosterEntries.forEach(function(e){ lines.push([e.email,e.label,e.code].map(function(x){ var v=String(x==null?'':x); if(/^[=+@-]/.test(v))v="'"+v; return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(',')); });
-  try{ downloadBlobFile(lines.join('\n'),'kody_'+outputSlug()+'.csv','text/csv;charset=utf-8'); }
-  catch(e){ rosterRender('Stažení CSV selhalo: '+(e&&e.message||e)); }
+  if(sealed&&JSON.stringify(sealed)!==JSON.stringify(rosterForVerifier())){rosterRender('Seznam kódů se liší od hotového testu. Vytvoř novou exportní verzi s těmito kódy. Pro pouhou změnu příjemců ponech skupinu zde a vybírej v Sheets.');return;}
+  const testId=lastAssembled?.cfg?.testId||'';
+  const cell=x=>{let v=String(x??'');if(/^[=+@-]/.test(v))v="'"+v;return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const lines=['email,student,code,test_id,odeslat'];
+  rosterEntries.forEach(e=>lines.push([e.email,e.label,e.code,testId,'FALSE'].map(cell).join(',')));
+  try{downloadBlobFile(lines.join('\n'),'kody_'+outputSlug()+'.csv','text/csv;charset=utf-8');}
+  catch(error){rosterRender('Stažení CSV selhalo: '+error.message);}
 }
 function outputSlug(extra='') {
   const slug = ((lastAssembled&&lastAssembled.sourceState&&lastAssembled.sourceState.__outputFields&&lastAssembled.sourceState.__outputFields.nazev)||trim('nazev') || 'test').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'test';
@@ -144,6 +176,7 @@ function rosterRefreshParticipants(){
   // Existing selections survive edits to the full group. New names need an explicit choice.
   if(!rosterKnownEmails.size&&state.participantMode!=='selected')parsed.forEach(e=>rosterSelectedEmails.add(e.email));
   rosterKnownEmails=known;
+  rosterSyncActiveCodes();rosterRender();
   rosterRenderParticipants();
 }
 function rosterRenderParticipants(){
@@ -151,6 +184,7 @@ function rosterRenderParticipants(){
   const selected=state.participantMode==='selected',query=val('participantSearch').trim().toLowerCase();
   const parsed=rosterParseEmails(val('rosterEmails'));
   box.classList.toggle('hidden',!selected);
+  if($('participantSearch'))$('participantSearch').classList.toggle('hidden',!selected);
   box.replaceChildren(...(selected?parsed.flatMap((e,index)=>{
     if(query&&!e.email.includes(query))return [];
     const row=$('participantRowTemplate').content.firstElementChild.cloneNode(true),input=row.firstElementChild;
@@ -161,6 +195,7 @@ function rosterRenderParticipants(){
 function rosterToggleParticipant(index,on){
   const entry=rosterParseEmails(val('rosterEmails'))[index];if(!entry)return;
   if(on)rosterSelectedEmails.add(entry.email);else rosterSelectedEmails.delete(entry.email);
+  rosterSyncActiveCodes();rosterRender();validate();
 }
 function rosterChosenParticipants(){
   if(state.participantMode==='later')return [];
@@ -171,6 +206,8 @@ async function rosterApplyToOutput(){
   if(!lastAssembled||!lastGenData){rosterRender('Nejdřív vytvoř obsah testu.');return;}
   if(!rosterEntries.length){rosterRender('Nejdřív vygeneruj kódy vybraným studentům.');return;}
   if(outputMutationBusy||window.__GHRAB_GENERATOR_WORKFLOW_ID__)return;
+  rosterSyncActiveCodes();
+  if(!rosterSelectionReady()){rosterRender('Doplň kódy aktuálnímu výběru.');return;}
   const st=outputEditState();
   if(st.diferencovany==='ANO'){rosterRender('U diferencovaného testu nejprve uprav také kódy ve skupinách a vytvoř test znovu.');return;}
   st.identityMode='oneTimeCode';st.participantMode=state.participantMode==='all'?'all':'selected';st.__roster=rosterForVerifier();

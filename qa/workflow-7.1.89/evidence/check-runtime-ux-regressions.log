@@ -1,0 +1,17 @@
+PASS secure runtime detects iPadOS including desktop-class UA
+PASS secure keyboard exception is limited to a visible page
+PASS secure blur path ignores only the iPad keyboard transition before normal leave handling
+PASS secure visibility-hidden path remains fail-closed
+PASS secure pagehide path remains fail-closed
+PASS instant runtime detects iPadOS including desktop-class UA
+PASS instant keyboard exception is limited to a visible page
+PASS instant blur guard preserves normal lock path outside keyboard exception
+PASS instant visibility-hidden path still locks according to policy
+PASS Teacher Verifier presents Google Forms before emergency backup
+PASS Verifier explains that CSV file association/icon is irrelevant
+PASS Google Forms dropzone gives ZIP guidance and imports CSV
+PASS Verifier V2 moves the renamed import card into Results
+PASS Pasted-backup button gives feedback when no payload is present
+PASS Forms import confirms successful completion
+PASS download actions give visible confirmation
+PASS runtime UX regression contract

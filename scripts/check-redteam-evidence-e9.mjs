@@ -27,7 +27,11 @@ function validate(records,version,startedAt){
   assert.equal(get('e7-mobile-protocol').mobileStageStatus,'ANALYZED / NOT TESTED');
   const f=records['audit/evidence/garp27-current/foundation-summary.json'].data;assert.deepEqual(f.summary,{total:12,passed:12,failed:0});assert.equal(f.liveStatus,'NOT_TESTED');
   if(process.env.GITHUB_SHA)assert.deepEqual(f.sourceIdentity,{value:process.env.GITHUB_SHA,kind:'git-commit'});
-  const q=records['dist/quality-report.json'].data;assert.equal(q.budget.entryCriticalBytes,1770000);assert.ok(q.metrics.entryCriticalBytes<=q.budget.entryCriticalBytes);assert.equal(q.summary.failed,0);
+  const q=records['dist/quality-report.json'].data;
+  const expectedBudget=JSON.parse(fs.readFileSync('ghrab-platform.consumer.json')).quality?.performanceBudget||{};
+  assert.deepEqual(q.budget,expectedBudget,'Quality evidence budget must match canonical consumer contract');
+  assert.ok(q.metrics.entryCriticalBytes<=q.budget.entryCriticalBytes);
+  assert.equal(q.summary.failed,0);
 }
 const version=JSON.parse(fs.readFileSync('package.json')).version,startedAt=process.env.GIT_REDTEAM_E9_RUN_STARTED_AT;
 const records=Object.fromEntries(reports.map(file=>[file,{data:JSON.parse(fs.readFileSync(file)),mtimeMs:fs.statSync(file).mtimeMs,sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex')}]));

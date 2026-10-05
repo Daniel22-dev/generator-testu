@@ -1,6 +1,6 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.88",
+  "version": "7.1.89",
   "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
   "blockers": [],
   "f7": "IMPLEMENTED; current-version gates required",
