@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+import vm from 'node:vm';
+const ctx=vm.createContext({});
+vm.runInContext(fs.readFileSync('src/js/13b-secure-shared-scoring.js','utf8')+'\n;globalThis.__api=createSharedScoringDiagnosticApi;',ctx);
+const api=ctx.__api({fuzzyMode:'off'}); let failed=0,passed=0;
+const check=(got,want,msg)=>{if(Math.abs(got-want)<1e-9)passed++;else{failed++;console.error('FAIL '+msg+': expected '+want+', got '+got);}};
+const ec={sentence:'He have been there before.',correction:'He has been there before.',alt_answers:[]};
+for(const [v,w] of [['He has been there before.',1],['has',1],['has been',0],['have',0],['has nonsense whatever',0],['',0]])check(api.correctionScore(v,ec,'error correction'),w,'error correction '+v);
+const wf={sentence:'Her ___ (decide) was final.',base_word:'decide',answer:'decision',alt_answers:[]};
+const WF=v=>api.gapTextScore(v,api.productiveText(wf),[wf.answer],[wf.base_word],'word formation');
+check(WF('decision'),1,'word formation fill'); check(WF('Her decision was final.'),1,'word formation whole'); check(WF('decide'),0,'word formation base'); check(WF('decision was'),0,'word formation extra');
+const kw={prompt:'It is a pity I cannot swim. (WISH)\nI ___ swim.',keyword:'wish',answer:'wish I could',alt_answers:[]};
+const ST=v=>api.gapTextScore(v,api.productiveText(kw),[kw.answer],[kw.keyword],'sentence transformation');
+check(ST('wish I could'),1,'key word fill'); check(ST('I wish I could swim.'),1,'key word whole'); check(ST('I could swim'),0,'key word wrong');
+const full={prompt:'Rewrite in passive: They built the house.',answer:'The house was built.',alt_answers:['The house was built by them.']};
+const FULL=v=>api.gapTextScore(v,api.productiveText(full),[full.answer].concat(full.alt_answers),[full.keyword],'sentence transformation');
+check(FULL('The house was built by them.'),1,'no-gap full alt'); check(FULL('was built'),0,'no-gap fragment');
+check(api.textScore('a dog','I have a dog.',[],'translation'),0,'translation fragment');
+console.log((failed?'FAIL':'PASS')+' productive answer contract: '+passed+' PASS / '+failed+' FAIL');
+if(failed)process.exit(1);
