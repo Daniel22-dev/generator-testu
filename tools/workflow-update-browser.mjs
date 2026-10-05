@@ -62,10 +62,11 @@ try{
   await page.locator('#listeningQuestionCount').selectOption('6');await page.getByRole('button',{name:'Uložit nastavení',exact:true}).click();
   pass('Listening vyžaduje zdroj a uloží počet otázek');
   await page.evaluate(()=>{setVal('rosterEmails','a@example.invalid\nb@example.invalid');rosterRefreshParticipants();state.identityMode='oneTimeCode';applyVisualState();goTo(2);});
-  await page.locator('#participantMode').selectOption('selected');
-  await page.locator('#participantList input').nth(1).check();await page.getByRole('button',{name:'Připravit / doplnit kódy',exact:true}).click();
-  assert.equal(await page.evaluate(()=>rosterEntries.length),1);assert.equal(await page.evaluate(()=>rosterEntries[0].email),'b@example.invalid');
-  pass('Checklist vytvoří kód jen vybranému studentovi');
+  assert.equal(await page.locator('#participantMode').count(),0);assert.equal(await page.locator('#participantList').count(),0);
+  await page.getByRole('button',{name:'Připravit / doplnit kódy',exact:true}).click();
+  assert.equal(await page.evaluate(()=>rosterEntries.length),2);
+  assert.deepEqual(await page.evaluate(()=>rosterEntries.map(x=>x.email)),['a@example.invalid','b@example.invalid']);
+  pass('GIT připraví kódy celé skupině bez operativního výběru účastníků');
   await page.setViewportSize({width:390,height:844});await page.evaluate(()=>goTo(1));await page.locator('#comprehensionSummary button').first().click();
   const box=await page.locator('#readingSettingsDialog').boundingBox();assert(box.width<=390);assert(box.x>=0);
   await page.locator('#readingText').fill('Mobile layout sample passage.');
