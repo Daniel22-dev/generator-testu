@@ -1,3 +1,5 @@
+> **7.1.90 – opravy cíleného auditu před studentským testováním (4.–5. 10. 2026).** Navazuje na 7.1.89. Úlohy s mezerou uznají doplnění i celou větu; po randomizaci verifier ukáže číslo, které viděl student; error-tagging nemíchá slova věty; výsledky ukazují typ cvičení a mají výběr studenta; iPhone/iPad klávesnice nevyvolá falešný zámek ani split. Mobilní chování je zatím automatizovaně ověřeno emulací; fyzické device gates zůstávají. Viz [RELEASE-NOTES-7.1.90.md](RELEASE-NOTES-7.1.90.md).
+
 > **7.1.89 - workflow source candidate.** Last-minute recipient selection in Sheets, Reading provenance and source modes, stacked dialogs, suitability advice and display numbering after shuffle. Full CI and a separate Apps Script installation are required; no deployment was performed. See [release notes](RELEASE-NOTES-7.1.89.md), [Czech instructions](NAVOD-ROZESILANI-7.1.89.txt) and [validation limits](QA-WORKFLOW-7.1.89.md).
 
 > **7.1.88 — audit a opravy workflow.** Výběr cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní nebo odložení účastníci. Viz [RELEASE-NOTES-7.1.88.md](RELEASE-NOTES-7.1.88.md). Rozsah vydání zůstává řízená studentská red-team zkouška; E6 je odložené a fyzické E7 naplánované na 6. a 9. 10. 2026.
@@ -34,7 +36,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.89 (workflow + distribuce kódů; rozsah řízené studentské red-team zkoušky)
+**Aktuální verze:** 7.1.90 (opravy auditu před studentským testováním; rozsah řízené studentské red-team zkoušky)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 
