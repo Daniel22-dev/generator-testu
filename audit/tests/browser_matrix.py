@@ -28,6 +28,7 @@ def configure_forms_anchors(p,published_at,email_header='Email Address',timestam
  for field in ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed']:p.locator('#'+field).check()
  p.get_by_role('button',name='Uložit nastavení ověření',exact=True).click()
  assert p.evaluate('!!FORMS_ANCHOR_POLICY'),p.locator('#formsAnchorStatus').inner_text()
+ if p.locator('[data-v2-panel="results"]').count():p.locator('[data-v2-panel="results"]').click()
 def answer(p,ex,ei,mode,language):
  t=ex['type']
  for qi,it in enumerate(ex['items']):
