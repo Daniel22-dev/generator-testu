@@ -24,8 +24,8 @@ let passes=0;
 async function check(label,fn){try{await fn();passes++;console.log('PASS '+label);}catch(error){console.error('FAIL '+label);throw error;}}
 function reset(){
   w.closeComprehensionDialog(false);
-  w.eval("state=JSON.parse(JSON.stringify(DEFAULT));Object.assign(state,{appMode:'advanced',workPreset:'advanced',jazyk:'angličtina',uroven:['B1'],body:50,cas:30});rosterEntries=[];rosterSelectedEmails.clear();rosterKnownEmails.clear();generatedPackage=null;lastAssembled=null;lastGenData=null;generatedTestHtml='';fileObjects=[];fileReadPromises=[];");
-  ['nazev','proKoho','latka','listeningTranscript','rosterEmails','participantSearch'].forEach(id=>set(id,''));
+  w.eval("state=JSON.parse(JSON.stringify(DEFAULT));Object.assign(state,{appMode:'advanced',workPreset:'advanced',jazyk:'angličtina',uroven:['B1'],body:50,cas:30});rosterEntries=[];generatedPackage=null;lastAssembled=null;lastGenData=null;generatedTestHtml='';fileObjects=[];fileReadPromises=[];");
+  ['nazev','proKoho','latka','listeningTranscript','rosterEmails'].forEach(id=>set(id,''));
   set('nazev','Workflow QA');set('proKoho','QA');set('latka','Grammar');set('recoveryCode','REC-AB12-CD34');set('ucitelPin','TEACH-ABCDEF-123456');
   w.applyVisualState();w.validate();
 }
@@ -92,38 +92,20 @@ try{
     assert.equal(api.textScore('its',"it's",[],'translation'),0);
   });
   reset();
-  await check('účastníci: celý roster zůstává, kódy a CSV vznikají jen pro zaškrtnuté',()=>{
-    set('rosterEmails','a@example.invalid\nb@example.invalid\na@example.invalid\nc@example.invalid');w.rosterRefreshParticipants();w.rosterSetParticipantMode('selected');
-    w.eval('rosterSelectedEmails.clear()');w.rosterToggleParticipant(1,true);w.rosterGenerate();
-    assert.equal(read('rosterEntries').length,1);assert.equal(read('rosterEntries[0].email'),'b@example.invalid');
-    assert.equal(w.rosterParseEmails(w.document.getElementById('rosterEmails').value).length,3);
-    let csv='';w.downloadBlobFile=value=>{csv=value;};w.rosterDownloadCsv();assert.match(csv,/b@example.invalid/);assert(!csv.includes('a@example.invalid'));
+  await check('účastníci: GIT vždy připraví kódy a CSV celé skupině',()=>{
+    set('rosterEmails','a@example.invalid\nb@example.invalid\na@example.invalid\nc@example.invalid');w.rosterRefreshParticipants();w.rosterGenerate();
+    assert.equal(read('rosterEntries').length,3);
+    assert.deepEqual(read('rosterEntries.map(x=>x.email)'),['a@example.invalid','b@example.invalid','c@example.invalid']);
+    let csv='';w.downloadBlobFile=value=>{csv=value;};w.rosterDownloadCsv();
+    assert.match(csv,/email,student,code,test_id,odeslat/);assert.match(csv,/a@example.invalid/);assert.match(csv,/b@example.invalid/);assert.match(csv,/c@example.invalid/);
+    assert(csv.split('\n').slice(1).every(line=>line.endsWith(',FALSE')));
+    assert.equal(w.document.getElementById('participantMode'),null);assert.equal(w.document.getElementById('participantList'),null);
   });
-  await check('obsah lze připravit bez účastníků; export je uzamčen',async()=>{
-    w.toggleType('error correction');w.toggleExDetail();w.updateExField(0,'pocetOtazek',1);w.updateExField(0,'body',2);
-    w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',identityMode:'oneTimeCode',diferencovany:'NE'});rosterEntries=[];enforceModeConstraints()");w.rosterSetParticipantMode('later');
-    w.validate();assert.equal(w.document.getElementById('next3').disabled,false);
-    const st=read('state');st.__roster=[];
-    const data={exercises:[{type:'error correction',items:[{sentence:'She go to school every day.',correction:'She goes to school every day.',alt_answers:[],explanation:'Third-person singular.'}]}]};
-    const pkg=await w.assembleTestHtml(st,data);w.eval('lastGenData='+JSON.stringify(data));w.generatedPackage=pkg;
-    // generatedPackage is lexical; store through eval just as generation does.
-    w.__qaPackage=pkg;w.eval('generatedPackage=window.__qaPackage');
-    assert.equal(w.secureDownloadAllowed(),false);assert.equal(w.outputParticipantsPending(),true);
-  });
-  await check('pozdější výběr přebalí stejný obsah bez AI, změní Test ID a zneplatní self-test',async()=>{
-    const old=read('lastAssembled'),calls=[];w.callGeminiJSON=()=>{calls.push('AI');throw new Error('Unexpected AI call');};
-    set('rosterEmails','a@example.invalid\nb@example.invalid');w.rosterSetParticipantMode('selected');w.eval('rosterSelectedEmails.clear()');w.rosterToggleParticipant(0,true);w.rosterGenerate();
-    const unchangedData=read('lastGenData');await w.rosterApplyToOutput();
-    assert.equal(calls.length,0);assert.deepEqual(read('lastGenData'),unchangedData);assert.notEqual(read('lastAssembled.cfg.testId'),old.cfg.testId);
-    assert.equal(w.outputParticipantsPending(),false);assert.equal(read('lastSelfTest'),null);assert.equal(w.secureDownloadAllowed(),false);
-    const pkg=read('generatedPackage');assert(!pkg.studentHtml.includes('a@example.invalid'));assert(!pkg.studentHtml.includes(read('rosterEntries[0].code')));
-    assert.equal(read('lastAssembled.sourceState.__roster').length,1);
-    const verifier=new JSDOM(pkg.teacherHtml,{runScripts:'dangerously',url:'https://school.example/verifier',beforeParse(sw){Object.defineProperty(sw,'crypto',{value:webcrypto});sw.URL.createObjectURL=()=> 'blob:qa';sw.URL.revokeObjectURL=()=>{};}});
-    assert.equal(verifier.window.scoreItemSecure({type:'error correction'},{sentence:'She go to school every day.',correction:'She goes to school every day.'},'goes',2),2);
-    assert.equal(verifier.window.scoreItemSecure({type:'error correction'},{sentence:'She go to school every day.',correction:'She goes to school every day.'},'school',2),0);
-    const codes=JSON.parse(verifier.window.eval('JSON.stringify(CONFIG.roster)'));assert.equal(codes.length,1);assert.equal(codes[0].email,'a@example.invalid');
-    fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/workflow-update-student.html',pkg.studentHtml);fs.writeFileSync('qa-results/workflow-update-verifier.html',pkg.teacherHtml);
-    verifier.window.close();
+  await check('oneTimeCode bez kódů celé skupiny je fail-closed',()=>{
+    reset();set('rosterEmails','a@example.invalid\nb@example.invalid');
+    w.eval("Object.assign(state,{testMode:'prisny',resultMode:'secureOffline',identityMode:'oneTimeCode',diferencovany:'NE'});rosterEntries=[];enforceModeConstraints()");
+    w.validate();assert.equal(w.document.getElementById('next3').disabled,true);
+    w.rosterGenerate();w.validate();assert.equal(read('rosterEntries').length,2);assert.equal(w.document.getElementById('next3').disabled,false);
   });
   reset();
   await check('ruční editor: zadání + klíč se dostanou do hotového testu bez AI',async()=>{

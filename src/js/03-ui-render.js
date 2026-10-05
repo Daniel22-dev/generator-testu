@@ -127,7 +127,6 @@ function applyVisualState() {
     ? '<strong>Režim jednorázových kódů:</strong> do skupin vlož výhradně právě vygenerované kódy. Každý kód musí být právě v jedné skupině; průvodce jiné kombinace nepovolí.'
     : 'Vytvoř skupiny, popiš podmínky a přidej každého studenta právě jednou. Doporučeny jsou anonymní školní kódy místo skutečných jmen.';
   if (state.diferencovany === 'ANO') renderGroups();
-  const participantMode=$('participantMode');if(participantMode)participantMode.value=state.participantMode||'all';
   rosterRenderParticipants();
   renderTeacherMapping();
   renderSourceMeters();

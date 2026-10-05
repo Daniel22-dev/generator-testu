@@ -79,7 +79,7 @@ function rosterRender(msg){
 }
 function rosterGenerate(){
   rosterEnsureCodeRegistry();const parsed=rosterChosenParticipants();
-  if(!parsed.length){rosterSyncActiveCodes();rosterRender('Vlož skupinu a zvol, komu připravit kód. Pro výběr až v hodině ponech celou skupinu.');validate();return;}
+  if(!parsed.length){rosterSyncActiveCodes();rosterRender('Vlož celou skupinu z IS. GIT připravuje kódy vždy všem; příjemce vybereš až v Sheets.');validate();return;}
   const used=new Set(Array.from(rosterIssuedCodes.values(),e=>e.code));
   try{for(const entry of parsed){if(rosterIssuedCodes.has(entry.email))continue;let code;do{code=rosterMakeCode();}while(used.has(code));used.add(code);rosterIssuedCodes.set(entry.email,{...entry,code});}}
   catch(error){rosterRender(error.message);return;}
@@ -165,52 +165,21 @@ async function downloadGeneratedTeacherVerifier() {
   catch(e){ setGenErr('Stažení učitelského verifieru se nezdařilo: '+(e&&e.message?e.message:e)); }
 }
 
-// Participant selection is private in-memory data, never sent to the model or snapshots.
-let rosterSelectedEmails = new Set();
-let rosterKnownEmails = new Set();
-function rosterSetParticipantMode(mode){if(mode==='selected'&&state.participantMode!=='selected')rosterSelectedEmails.clear();state.participantMode=['all','selected','later'].includes(mode)?mode:'all';if($('participantMode'))$('participantMode').value=state.participantMode;rosterRefreshParticipants();validate();saveSnapshot();}
-function outputParticipantsPending(){return !!(lastAssembled&&lastAssembled.sourceState&&lastAssembled.sourceState.identityMode==='oneTimeCode'&&lastAssembled.sourceState.participantMode==='later');}
+// GIT full-roster workflow: operativní výběr příjemců patří výhradně do Sheets.
 function rosterRefreshParticipants(){
-  const parsed=rosterParseEmails(val('rosterEmails')),known=new Set(parsed.map(e=>e.email));
-  rosterSelectedEmails=new Set(Array.from(rosterSelectedEmails).filter(email=>known.has(email)));
-  // Existing selections survive edits to the full group. New names need an explicit choice.
-  if(!rosterKnownEmails.size&&state.participantMode!=='selected')parsed.forEach(e=>rosterSelectedEmails.add(e.email));
-  rosterKnownEmails=known;
-  rosterSyncActiveCodes();rosterRender();
-  rosterRenderParticipants();
+  rosterSyncActiveCodes();rosterRender();validate();saveSnapshot();
 }
-function rosterRenderParticipants(){
-  const box=$('participantList');if(!box)return;
-  const selected=state.participantMode==='selected',query=val('participantSearch').trim().toLowerCase();
-  const parsed=rosterParseEmails(val('rosterEmails'));
-  box.classList.toggle('hidden',!selected);
-  if($('participantSearch'))$('participantSearch').classList.toggle('hidden',!selected);
-  box.replaceChildren(...(selected?parsed.flatMap((e,index)=>{
-    if(query&&!e.email.includes(query))return [];
-    const row=$('participantRowTemplate').content.firstElementChild.cloneNode(true),input=row.firstElementChild;
-    input.checked=rosterSelectedEmails.has(e.email);input.onchange=()=>rosterToggleParticipant(index,input.checked);
-    row.lastElementChild.textContent=e.email;return [row];
-  }):[]));
-}
-function rosterToggleParticipant(index,on){
-  const entry=rosterParseEmails(val('rosterEmails'))[index];if(!entry)return;
-  if(on)rosterSelectedEmails.add(entry.email);else rosterSelectedEmails.delete(entry.email);
-  rosterSyncActiveCodes();rosterRender();validate();
-}
-function rosterChosenParticipants(){
-  if(state.participantMode==='later')return [];
-  const parsed=rosterParseEmails(val('rosterEmails'));
-  return state.participantMode==='selected'?parsed.filter(e=>rosterSelectedEmails.has(e.email)):parsed;
-}
+function rosterRenderParticipants(){}
+function rosterChosenParticipants(){return rosterParseEmails(val('rosterEmails'));}
 async function rosterApplyToOutput(){
   if(!lastAssembled||!lastGenData){rosterRender('Nejdřív vytvoř obsah testu.');return;}
-  if(!rosterEntries.length){rosterRender('Nejdřív vygeneruj kódy vybraným studentům.');return;}
+  if(!rosterEntries.length){rosterRender('Nejdřív připrav kódy celé skupině.');return;}
   if(outputMutationBusy||window.__GHRAB_GENERATOR_WORKFLOW_ID__)return;
   rosterSyncActiveCodes();
-  if(!rosterSelectionReady()){rosterRender('Doplň kódy aktuálnímu výběru.');return;}
+  if(!rosterSelectionReady()){rosterRender('Doplň kódy celé skupině.');return;}
   const st=outputEditState();
   if(st.diferencovany==='ANO'){rosterRender('U diferencovaného testu nejprve uprav také kódy ve skupinách a vytvoř test znovu.');return;}
-  st.identityMode='oneTimeCode';st.participantMode=state.participantMode==='all'?'all':'selected';st.__roster=rosterForVerifier();
+  st.identityMode='oneTimeCode';st.__roster=rosterForVerifier();
   try{
     await commitAnswerData(lastGenData,outputStamp(),st,{freshArtifact:true,reason:'Změnili se účastníci testu. Spusť self-test nového balíčku.'});
     exportChecklist={};renderExportChecklist(true);updateSecureDownloadGate();

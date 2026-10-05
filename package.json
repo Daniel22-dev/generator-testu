@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "check:versions": "node scripts/check-versions.mjs",
-    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && npm run check:exercise-help && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && npm run check:runtime-ux && npm run check:joker-workflow && npm run check:productive-contract && npm run check:randomization-numbering && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run check:redteam-isolation && npm run check:redteam-trust && npm run check:redteam-verifier && npm run check:redteam-storage && npm run check:redteam-runtime && npm run check:redteam-publication && npm run check:redteam-mobile && npm run check:redteam-forgery && npm run check:r3-security-behavior && npm run check:r5-adversarial && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow && npm run check:workflow-update && npm run check:redteam-content && npm run check:redteam-e10 && npm run check:redteam-ci",
+    "test": "node scripts/check-versions.mjs && npm run check:studio-manifest && node scripts/check-qa-manifest.mjs && node scripts/check-lockfile-registry.mjs && node scripts/check-action-pins.mjs && npm run check:exercise-help && node scripts/check-production-readiness.mjs && npm run check:assistant && npm run check:selftest-rpc && node scripts/check-csp.mjs && node scripts/check-source-structure.mjs && npm run check:runtime-ux && npm run check:full-roster-workflow && npm run check:joker-workflow && npm run check:productive-contract && npm run check:randomization-numbering && node scripts/check-sensitive-data.mjs && npm run qa:garp23 && node scripts/check-deadline-timers.mjs && npm run lint && npm run build && npm run check:redteam-isolation && npm run check:redteam-trust && npm run check:redteam-verifier && npm run check:redteam-storage && npm run check:redteam-runtime && npm run check:redteam-publication && npm run check:redteam-mobile && npm run check:redteam-forgery && npm run check:r3-security-behavior && npm run check:r5-adversarial && npm run garp25:prep-static && npm run test:headless:dist && npm run check:precache && npm run test:workflow && npm run check:workflow-update && npm run check:redteam-content && npm run check:redteam-e10 && npm run check:redteam-ci",
     "lint": "node scripts/lint.mjs",
     "check:structure": "node scripts/check-source-structure.mjs",
     "check:sensitive": "node scripts/check-sensitive-data.mjs",
@@ -150,7 +150,8 @@
     "check:workflow-update": "node tools/workflow-update-check.mjs",
     "check:workflow-update-browser": "node tools/workflow-update-browser.mjs",
     "check:productive-contract": "node scripts/check-productive-answer-contract.mjs",
-    "check:randomization-numbering": "node scripts/check-randomization-numbering.mjs"
+    "check:randomization-numbering": "node scripts/check-randomization-numbering.mjs",
+    "check:full-roster-workflow": "node scripts/check-full-roster-workflow.mjs"
   },
   "engines": {
     "node": ">=18"

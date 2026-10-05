@@ -724,13 +724,10 @@ function validate() {
   // Jednorázové kódy bez vygenerovaného rosteru = verifier nemá seznam a kontrola
   // „kód není v seznamu" se tiše vypne. Bez kódů nesmí jít test vygenerovat.
   const rosterOk = (state.identityMode || 'name') !== 'oneTimeCode'
-    || (state.participantMode==='later' && state.resultMode==='secureOffline' && state.diferencovany!=='ANO')
     || (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries) && rosterEntries.length > 0 && rosterSelectionReady());
   const groupLogic=workflowGroupValidation();
-  const participantsDeferredOk=state.participantMode!=='later'||state.identityMode!=='oneTimeCode'||(state.resultMode==='secureOffline'&&state.diferencovany!=='ANO');
-  $('next3').disabled = !(participantsDeferredOk && secretOk && groupsOk && rosterOk && groupLogic.ok);
+  $('next3').disabled = !(secretOk && groupsOk && rosterOk && groupLogic.ok);
   const msg = [];
-  if(!participantsDeferredOk)msg.push('Odložený výběr účastníků je dostupný pro bezpečný offline test bez diferenciace. Dokud účastníky nedoplníš, studentský export je uzamčen.');
   if (!rosterOk) msg.push('Identita „individuální kód" vyžaduje vygenerované kódy studentů — vlep e-maily do pole Kódy studentů (roster) a klikni na „Vygenerovat kódy", nebo přepni identitu na „Jméno".');
   if (teacherRequired && !trim('ucitelJmeno')) msg.push('Doplň jméno pro učitelský mód.');
   msg.push(...credentialErrors);

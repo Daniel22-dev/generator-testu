@@ -549,8 +549,7 @@
         <div class="workflow-review"><strong>Opravný / náhradní test = nový test.</strong> Vygeneruj kódy pro celou skupinu. Ve třídě v Sheets zaškrtneš jen přítomné ve sloupci <strong>odeslat</strong>. Neodeslané kódy zůstanou připravené; změna příjemců nemění test ani verifier.</div>
         <label for="rosterEmails">E-maily celé skupiny z IS</label>
         <textarea id="rosterEmails" oninput="rosterRefreshParticipants()" rows="4" placeholder="Vlož e-maily celé skupiny z IS"></textarea>
-        <div class="participant-controls"><label for="participantMode">Komu připravit kód v GIT?</label><select id="participantMode" onchange="rosterSetParticipantMode(this.value)"><option value="all">Celé skupině; příjemce vyberu v Sheets (doporučeno)</option><option value="selected">Pouze vybraným (vím už předem)</option><option value="later">Nejdřív obsah, skupinu doplním před exportem</option></select><input id="participantSearch" type="search" placeholder="Filtrovat skupinu podle e-mailu" aria-label="Filtrovat skupinu" oninput="rosterRenderParticipants()"></div>
-        <div id="participantList" class="participant-list"></div>
+        <p class="small-muted"><strong>GIT vždy připraví kód celé vložené skupině.</strong> Konkrétní píšící studenty vybírej až v Google Sheets.</p>
         <div class="btn-row" style="margin-top:8px;gap:8px">
           <button type="button" class="btn-edit" onclick="rosterGenerate()">Připravit / doplnit kódy</button>
           <button type="button" class="btn-edit" onclick="rosterDownloadCsv()">Stáhnout CSV pro Sheets</button>

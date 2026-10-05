@@ -260,7 +260,7 @@ const DEFAULT = {
   appMode:'simple', workPreset:'quick',
   jazyk:'', instrJazyk:'target', uroven:[], kombinovat:false,
   pocet:3, typyCviceni:[], zadaniTab:'text', rcLength:'medium', rcTopic:'', readingQuestionCount:4, listeningQuestionCount:4, readingConfigured:false, listeningConfigured:false, sourceUseMode:'auto', readingSourceScope:'shared', readingSourceAction:'generate', readingProvenance:null,
-  cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name', participantMode:'all',
+  cas:30, odevzdavani:'', randomizace:'NE', testMode:'bezny', layout:'tabs', resultMode:'instant', identityMode:'name',
   body:0, gradeTyp:'skola', exerciseDetail:false, exerciseConfigSaved:false, exerciseConfig:[],
   fuzzyTolerance:'off',
   aiGradeScale:null, aiGradeRaw:'',
@@ -1420,7 +1420,6 @@ async function setAppMode(mode){
     state.exerciseConfigSaved = false;
     state.exerciseConfig = [];
     state.skupiny = [];
-    try { if(typeof rosterSelectedEmails!=='undefined')rosterSelectedEmails.clear(); if(typeof rosterKnownEmails!=='undefined')rosterKnownEmails.clear(); } catch(_){}
     try { if (typeof rosterEntries !== 'undefined' && Array.isArray(rosterEntries)) rosterEntries.length = 0; } catch(_) {}
     applySimpleDefaults();
   }
