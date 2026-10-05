@@ -6,6 +6,10 @@ const instant = fs.readFileSync('src/js/14b-instant-test-runtime.js', 'utf8');
 const verifier = fs.readFileSync('src/js/13f-secure-teacher-verifier.js', 'utf8');
 const forms = fs.readFileSync('src/js/13ea-secure-verifier-forms.js', 'utf8');
 const ui = fs.readFileSync('src/js/13eb-secure-teacher-verifier-v2-ui.js', 'utf8');
+const preview = fs.readFileSync('src/features/preview-editor.js', 'utf8');
+const shell = fs.readFileSync('src/shell.html', 'utf8');
+const anchors = fs.readFileSync('src/js/13ee-secure-verifier-anchors.js', 'utf8');
+const suitability = fs.readFileSync('src/js/05c-exercise-suitability.js', 'utf8');
 
 let failed = 0;
 const pass = (m) => console.log('PASS ' + m);
@@ -32,6 +36,14 @@ need(ui, /\[['"]results['"],['"]Načtení výsledků['"]\]/, 'Verifier V2 moves 
 need(forms, /bulkVerifyPasted\([\s\S]*Nejdřív vlož celý záložní blok SECURE-ANSWERS-V1/, 'Pasted-backup button gives feedback when no payload is present');
 need(forms, /importFormsCsvFile\([\s\S]*CSV import dokončen/, 'Forms import confirms successful completion');
 need(verifier, /function downloadText\([\s\S]*Stažení bylo spuštěno:/, 'download actions give visible confirmation');
+need(preview, /__GHRAB_TEACHER_PREVIEW__=true/, 'Teacher preview injects an explicit preview-only runtime flag');
+need(secure, /function isTeacherPreviewRuntime\(\)[\s\S]*acquireAttemptTabLock\(\)[\s\S]*isTeacherPreviewRuntime\(\)\)return true/, 'Secure runtime bypasses cross-tab locking only in explicit teacher preview');
+need(secure, /function handleLeave\([\s\S]*isTeacherPreviewRuntime\(\)\)return/, 'Teacher preview cannot trigger the real leave-test lock');
+need(shell, /Kontrola celé sady cvičení[\s\S]*Vhodnost vybraných cvičení k podkladu/, 'Suitability panel clearly scopes itself to all selected exercises');
+need(shell, /Jak odpovídá student\?[\s\S]*vybírá odpověď z nabízených možností/, 'Reading setup explicitly explains the student answer format');
+need(suitability, /suitability-card[\s\S]*suitability-status[\s\S]*suitability-suggestion/, 'AI suitability result uses structured status cards');
+need(anchors, /Ověření importu z Google Forms[\s\S]*Dřívější technický název[\s\S]*Forms kotvy/, 'Verifier explains Forms anchors in teacher-facing language');
+
 
 if (failed) process.exit(1);
 console.log('PASS runtime UX regression contract');
