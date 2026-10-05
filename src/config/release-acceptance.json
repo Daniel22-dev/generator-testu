@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.89",
+  "appVersion": "7.1.90",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "WORKFLOW-DISTRIBUTION-2026-10-04",
+  "revision": "AUDIT-7.1.90-PRE-STUDENT-TEST-2026-10-05",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.89 is a source candidate, not deployed. Local component DOM and mailer tests do not certify the production build, permit/CSP chain, WebCrypto export, full grading, live Google delivery, Safari or physical iPad. Exact pinned npm installation was unavailable. Complete frozen E10 regression and exact-SHA CI remain required. Historical owner authorization is limited to controlled supervised red-team and is not technical certification for these changes.",
+    "note": "7.1.90 = 7.1.89 + opravy cíleného auditu: produktivní bodování úloh s mezerou, stabilní randomizace/verifier, navigace a typ cvičení ve výsledcích, iOS klávesnice/split a pokyn Nerušit. Automatizované kontroly a emulace nenahrazují fyzické testy iPhone/iPad/Android; přesné SHA CI a nasazení se ověřují samostatně.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Source candidate 7.1.89 requires full exact-lockfile CI and live integration acceptance before deployment. Existing owner-approved scope is controlled student red-team only. Companion Apps Script must be separately installed; no live spreadsheet or mail was changed.",
+  "note": "Source candidate 7.1.90 is limited to the controlled supervised student red-team scope. Physical-device gates remain required; live production deployment is not certified by this source update.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
