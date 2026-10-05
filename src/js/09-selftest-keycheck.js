@@ -511,9 +511,12 @@ const SecretScanner = (function(){
   const MASTERKEY_NEEDLES = ['masterKey','MASTER_KEY','master_key','rootKey','ROOT_KEY','globalSecret','GLOBAL_SECRET','generatorSecret','GENERATOR_SECRET','teacherPassword','teacherPass'];
   const SECRET_REGEXES = [
     {rule:'pem-private-key', re:/-----BEGIN [A-Z ]*PRIVATE KEY-----/, msg:'PEM privátní klíč'},
-    {rule:'github-token', re:/gh[pousr]_[A-Za-z0-9_]{30,}/, msg:'GitHub token'},
-    {rule:'github-pat', re:/github_pat_[A-Za-z0-9_]{20,}/, msg:'GitHub personal access token'},
-    {rule:'openai-key', re:/sk-[A-Za-z0-9_-]{20,}/, msg:'API klíč (sk-…)'},
+    // Tokenové signatury musí začínat na hranici hodnoty. Šifrovaný AES-GCM payload
+    // je base64url a může náhodně obsahovat řetězce jako "sk-" nebo "ghp_";
+    // bez hranice by SecretScanner občas zablokoval zcela validní studentský export.
+    {rule:'github-token', re:/(?:^|[^A-Za-z0-9_])gh[pousr]_[A-Za-z0-9_]{30,}/, msg:'GitHub token'},
+    {rule:'github-pat', re:/(?:^|[^A-Za-z0-9_])github_pat_[A-Za-z0-9_]{20,}/, msg:'GitHub personal access token'},
+    {rule:'openai-key', re:/(?:^|[^A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}/, msg:'API klíč (sk-…)'},
     {rule:'inline-credential', re:/(apiKey|api_key|token|secret|password)\s*[:=]\s*["'](?=[^"']*\d)[^"'\s]{12,}["']/i, msg:'inline přihlašovací údaj'}
   ];
   // E5: tyto hodnoty nesmí být v žádném distribuovaném HTML jako raw credential.
@@ -617,6 +620,7 @@ const SecretScanner = (function(){
     // Testovací hodnoty se skládají až za běhu, aby veřejný repozitář neobsahoval řetězce podobné skutečným tajným klíčům.
     const fakeInlineCredential = ['not','a','real','key','1234567890'].join('-');
     const fakeGithubToken = ['gh','p_','AbCdEfGhIjKlMnOpQrStUvWxYz012345'].join('');
+    const fakeOpenAiToken = ['s','k-','AbCdEfGhIjKlMnOpQrStUvWxYz012345'].join('');
     const cases = [
       // Povinné
       {n:'1: student smí obsahovat teacher_verifier.html (false-positive guard)',target:'student',fn:'student_test.html',c:'<div>Odpovědi jsou v teacher_verifier.html</div>',expect:true},
@@ -640,6 +644,9 @@ const SecretScanner = (function(){
       {n:'R12: raw Recovery Code ve studentském HTML blokuje',target:'student',fn:'student_test.html',c:'const recoveryCode="REC-AB12-CD34";',expect:false},
       {n:'R13: lokální credential placeholder ve studentském HTML blokuje',target:'student',fn:'student_test.html',c:'const x="__CLASSROOM_RECOVERY_CODE_DOPLN_LOKALNE__";',expect:false},
       {n:'R14: odvozené hash fieldy jsou povolené',target:'student',fn:'student_test.html',c:'const cfg={ucitelPinHash:"abc",recoveryCodeHash:"def"};',expect:true},
+      {n:'R15: samostatný OpenAI-like token je blokován',target:'student',fn:'student_test.html',c:'const token="'+fakeOpenAiToken+'";',expect:false},
+      {n:'R16: tokenový vzor uvnitř base64url ciphertextu není falešný secret',target:'student',fn:'student_test.html',c:'const ENCRYPTED_CONTENT={"v":1,"data":"AAA'+fakeOpenAiToken+'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"};',expect:true},
+      {n:'R17: GitHub tokenový vzor uvnitř base64url ciphertextu není falešný secret',target:'student',fn:'student_test.html',c:'const ENCRYPTED_CONTENT={"v":1,"data":"AAA'+fakeGithubToken+'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"};',expect:true},
     ];
     var pass=0, fail=0;
     var results = cases.map(function(tc){
