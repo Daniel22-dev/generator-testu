@@ -89,6 +89,7 @@ export const projectGlobals = {
   "RELEASE_CS": 'writable',
   "RELEASE_LABEL": 'writable',
   "SAVE_KEY": 'writable',
+  "SECURE_QUESTION_ORDER_JS": 'writable',
   "SECURE_STUDENT_GUARD_JS": 'writable',
   "SECURE_VERIFIER_ANCHORS_JS": 'writable',
   "SECURE_VERIFIER_FORMS_JS": 'writable',

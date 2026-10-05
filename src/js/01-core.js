@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.89',
+  version: '7.1.90',
   date:    '2026-10-04',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'AUDIT PŘED TESTOVÁNÍM (7.1.90): úlohy s mezerou uznají doplnění i celou větu; pořadí otázek stabilní po reloadu a verifier ukáže číslo u studenta; error-tagging nemíchá slova; typ cvičení a výběr studenta ve výsledcích; iOS klávesnice bez falešného zámku/splitu; pokyn Nerušit. Mobily emulace; fyzicky 6. a 9. 10.',
     'WORKFLOW (7.1.89): CEFR a podklad před cvičeními; Reading s vlastním zdrojem a kontrolou změn; viditelné AI potvrzení; poradce vhodnosti; souvislé číslování po zamíchání; rozesílání jen zaškrtnutým v Sheets. Samostatná instalace rozesílače a úplné CI jsou nutné.',
     'WORKFLOW AUDIT (7.1.88): kanonická konfigurace cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní/odložení účastníci. Přebalení kódů bez AI, povinná obnova kontrol a soukromý roster.',
     'RED-TEAM E10 CI FIX (7.1.87): smoke gate respektuje oddělený private verifier; klikací sady používají jeho startovní kód. Sjednocena dokumentace a release metadata. E7/Forms/E6 čekají. NOT READY.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E7 (7.1.83): 40 ručních mobilních scénářů, offline checklist a negativní kontroly záznamníku. iPhone/iPad/Android ANALYZED / NOT TESTED. F7, E6 residual/rotace a E8–E10 čekají; NOT READY.',
     'RED-TEAM E6 (7.1.82): student preflight, private verifier pairing, public SHA manifest a scan Git historie odmítají answer/teacher deriváty. Tehdejší živý public build/historie blokovaly release. NOT READY.',
     'RED-TEAM E5 / RUNTIME (7.1.81): strict reload/history/freeze/fullscreen zamknou test a zachovají audit. Paste/drop a běžné změny za zámkem blokovány. Split přežije reload; odemčení kontroluje nový odchod. Native a negativní testy; mobily NOT TESTED, CLIENT-CONTROLLED.',
-    'RED-TEAM E4 / STORAGE (7.1.80): restart zachovává pokus, deadline a ciphertext outbox. Web Locks omezují souběh; poškozený stav má integrity lock. Soukromá replay evidence přežije restart. Native Chromium a negativní kontroly. Úplné smazání nebo jiný profil vyžaduje server; CLIENT-CONTROLLED.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.

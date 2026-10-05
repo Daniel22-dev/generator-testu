@@ -1,14 +1,14 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.89",
+  "version": "7.1.90",
   "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
   "blockers": [],
   "f7": "IMPLEMENTED; current-version gates required",
   "remotePath": "Exact candidate SHA CI, protected main PR merge and deploy only main remain required. Owner approval permits the controlled experiment; technical regressions must pass for the new SHA.",
   "scope": "CONTROLLED_STUDENT_RED_TEAM_ONLY",
   "ownerDecision": {
-    "recordedOn": "2026-10-04",
-    "source": "Explicit owner instruction in the current session",
+    "recordedOn": "2026-10-05",
+    "source": "Explicit owner instruction to review and implement the audited 7.1.90 changes; scope remains controlled supervised student red-team only.",
     "authorizeGithubPublication": true,
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",

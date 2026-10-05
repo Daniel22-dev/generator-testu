@@ -37,6 +37,15 @@ function buildSecureStudentHtml(publicCfg, encryptedContent) {
     '</div>'+
     '<script>\n\'use strict\';\nconst CFG='+safeJsonForScript(publicCfg)+';\nconst STUDENT_VARIANTS={};\nconst ENCRYPTED_CONTENT='+safeJsonForScript(encryptedContent)+';\n'+[contentBytes,contentKey,contentBinding,decryptStudentContent].map(f=>f.toString()).join('\n')+'\n'+isolatedSecureStudentScript()+'\n<\/script></body></html>';
 }
+// Deterministické pořadí otázek při randomizaci — stejný kód běží ve studentském testu i ve verifieru
+// (verifier z attemptId/startedAt/groupKey dopočítá číslo, které student viděl).
+const SECURE_QUESTION_ORDER_JS=String.raw`
+function seedHash(str){let h=2166136261;str=String(str||'');for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function seededRandom(seed){let x=seed>>>0;return function(){x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function questionOrderBase(testId,attemptId,groupKey,startedAt){return seedHash(['GIT-QORDER-V2',testId,attemptId,groupKey,startedAt].join('|'));}
+function questionOrderSeed(base,ei){return base+ei*101;}
+function questionOrderFor(n,seed){const order=[];for(let k=0;k<n;k++)order.push(k);if(n<2)return order;const rnd=seededRandom(seed);for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const x=order[i];order[i]=order[j];order[j]=x;}return order;}
+`;
 function secureStudentScript(){return String.raw`
 let EXS=[],ACTIVE_KEY='__default',RESP={},STARTED_AT='',SUBMITTED_AT='',ANSWER_TXT='',SEC_EVENTS=[],CURRENT_DEVICE='auto',TIMER_ID=null,TIMER_DEADLINE=0,LOCKED=false,LOCK_REASON='',UNLOCK_BUSY=false,SUBMITTED=false,JOKER_CHOICE=null,JOKER_USED=false,JOKER_SELECTED_AT='',ATTEMPT_ID='',ACTIVE_IDENTITY_HASH='',ANSWER_CHANGE_STATS={},LAST_RESP_SERIAL={},LAST_CHANGE_TS={};
 let A11Y=null,CONTENT_READY=false;
@@ -78,23 +87,24 @@ function updateEnvWarning(){var el=$('envWarning');if(!el)return;if(isBrokenEnv(
 function deviceLabel(d){return d==='apple'?t('apple','iPhone / iPad'):d==='android'?t('android','Android'):d==='desktop'?t('desktop','PC / Mac'):t('auto','I don\'t know / automatic');}
 function pickDevice(device){CURRENT_DEVICE=device||'auto';renderDeviceInstructions();checkDevice(false);updateEnvWarning();}
 function tipsHtml(titleKey,tipsKey,fallbackTitle,formsKeep){let tips=arr(tipsKey);if(safeFormsSubmissionUrl()){tips=tips.slice(0,Math.max(0,Number(formsKeep)||0));tips.push(t('formsDeviceSubmitTip','After submitting, copy the whole submission code into the school Google Form.'));tips.push(t('formsDeviceFallbackTip','Use answers.txt only as an emergency backup.'));}return '<b>'+esc(t(titleKey,fallbackTitle))+'</b><ul>'+tips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';}
-function renderDeviceInstructions(){const selected=CURRENT_DEVICE==='auto'?detectDevice():CURRENT_DEVICE;document.querySelectorAll('.device-btn').forEach(b=>b.classList.toggle('selected',b.dataset.device===CURRENT_DEVICE));var tag=$('deviceDetectedTag');if(tag){var det=detectDevice();tag.textContent=CURRENT_DEVICE==='auto'?(t('deviceAutoDetected')+': '+deviceLabel(det)):(t('deviceManuallySelected')+': '+deviceLabel(CURRENT_DEVICE));}const box=$('deviceInstructions');if(!box)return;let html='';if(selected==='apple')html=tipsHtml('appleTitle','appleTips','iPhone/iPad',3);else if(selected==='android')html=tipsHtml('androidTitle','androidTips','Android',2);else if(selected==='desktop')html=tipsHtml('desktopTitle','desktopTips','PC/Mac',1);else html=tipsHtml('autoTitle','autoTips','General',1);box.innerHTML=html;}
+function renderDeviceInstructions(){const selected=CURRENT_DEVICE==='auto'?detectDevice():CURRENT_DEVICE;document.querySelectorAll('.device-btn').forEach(b=>b.classList.toggle('selected',b.dataset.device===CURRENT_DEVICE));var tag=$('deviceDetectedTag');if(tag){var det=detectDevice();tag.textContent=CURRENT_DEVICE==='auto'?(t('deviceAutoDetected')+': '+deviceLabel(det)):(t('deviceManuallySelected')+': '+deviceLabel(CURRENT_DEVICE));}const box=$('deviceInstructions');if(!box)return;let html='';if(selected==='apple')html=tipsHtml('appleTitle','appleTips','iPhone/iPad',4);else if(selected==='android')html=tipsHtml('androidTitle','androidTips','Android',3);else if(selected==='desktop')html=tipsHtml('desktopTitle','desktopTips','PC/Mac',1);else html=tipsHtml('autoTitle','autoTips','General',1);box.innerHTML=html;}
 window.addEventListener('DOMContentLoaded',()=>{CURRENT_DEVICE=detectDevice();renderDeviceInstructions();checkDevice(false);updateEnvWarning();});
 function deviceLine(ok,label,extra){return '<div>'+(ok?'✓':'✕')+' '+esc(label)+(extra?' — '+esc(extra):'')+'</div>';}
 function checkDevice(manual){const selected=CURRENT_DEVICE==='auto'?detectDevice():CURRENT_DEVICE;const info=envInfo();const hasCrypto=!!(CFG.publicKey&&window.crypto&&crypto.subtle);const hasBlob=typeof Blob!=='undefined'&&typeof URL!=='undefined'&&typeof URL.createObjectURL==='function';const hasText=typeof TextEncoder!=='undefined'&&typeof TextDecoder!=='undefined';let envMsg=t('ok','OK');if(info.localFile)envMsg='lokální HTML soubor';else if(info.contentUri)envMsg='náhled souboru / content://';else if(info.webview)envMsg='náhled aplikace / WebView';else if(info.noCrypto)envMsg=t('unavailable','unavailable');else if(info.noBlob)envMsg=t('unsupported','unsupported');const usable=hasCrypto&&hasBlob&&hasText&&!info.broken;let html='';html+=deviceLine(true,t('deviceSelected','Device'),deviceLabel(selected));html+=deviceLine(hasText,t('textEncoding','Text encoding'),hasText?t('ok','OK'):t('unsupported','unsupported'));html+=deviceLine(hasBlob,t('txtCreation','TXT file creation'),hasBlob?t('ok','OK'):t('unsupported','unsupported'));html+=deviceLine(hasCrypto,t('crypto','WebCrypto'),hasCrypto?t('ok','OK'):t('unavailable','unavailable'));html+=deviceLine(!info.broken,t('env','Environment'),info.broken?envMsg:t('ok','OK'));const box=$('deviceStatus');if(box)box.innerHTML=html+(usable?'<div class="ok">'+esc(t('usable','Device looks usable.'))+'</div>':(hasCrypto&&hasBlob&&hasText?'<div class="danger">'+esc(t('risky','This environment may be unreliable.'))+'</div>':'<div class="danger">'+esc(t('unusable','This environment is not suitable.'))+'</div>'));updateEnvWarning();return usable;}
 function testDownload(){try{const blob=new Blob([t('downloadTestText','TEST DOWNLOAD OK')],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='test_download_'+CFG.testId+'.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);const box=$('deviceStatus');if(box)box.innerHTML+='<div class="ok">'+esc(t('downloadStarted','Test download was triggered.'))+'</div>';return true;}catch(e){const box=$('deviceStatus');if(box)box.innerHTML+='<div class="danger">'+esc(t('downloadFailed','Test download failed'))+': '+esc(e.message||e)+'</div>';return false;}}
 
 
-function seedHash(str){let h=2166136261;str=String(str||'');for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-function seededRandom(seed){let x=seed>>>0;return function(){x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+`+SECURE_QUESTION_ORDER_JS+String.raw`
 function shuffleElementChildren(parent, selector, seed){if(!parent)return;const nodes=[...parent.querySelectorAll(':scope > '+selector)];if(nodes.length<2)return;nodes.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});nodes.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=nodes.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[nodes[i],nodes[j]]=[nodes[j],nodes[i]];}nodes.forEach(n=>parent.appendChild(n));}
 function shuffleOptionButtons(box, seed){if(!box)return;const nodes=[...box.children];if(nodes.length<2)return;nodes.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});nodes.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=nodes.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[nodes[i],nodes[j]]=[nodes[j],nodes[i]];}nodes.forEach((n,idx)=>{const b=n.querySelector('b');if(b)b.textContent=String.fromCharCode(65+idx)+'.';box.appendChild(n);});}
 function shuffleSelectOptions(sel, seed){if(!sel)return;const first=sel.querySelector('option[value=""]');const opts=[...sel.querySelectorAll('option')].filter(o=>o!==first);if(opts.length<2)return;opts.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});opts.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=opts.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}if(first)sel.appendChild(first);opts.forEach(o=>sel.appendChild(o));}
 function applyRuntimeRandomization(){
   if(!CFG.randomizace)return;
-  const base=seedHash([CFG.testId,$('studentName')&&$('studentName').value,ACTIVE_KEY,STARTED_AT].join('|'));
+  // Seed z ID pokusu, varianty a času startu: po obnovení stránky stejné pořadí (nezávisle na zápisu jména)
+  // a verifier ho deterministicky dopočítá (questionOrderFor = tentýž Fisher–Yates nad původním pořadím).
+  const base=questionOrderBase(CFG.testId,currentAttemptId(),ACTIVE_KEY,STARTED_AT);
   document.querySelectorAll('.ex-panel .card, #exerciseArea > .card').forEach((card,ei)=>{
-    shuffleElementChildren(card,'.q',base+ei*101);
+    shuffleElementChildren(card,'.q',questionOrderSeed(base,ei));
     card.querySelectorAll(':scope > .q').forEach((node,index)=>{
       const label=node.querySelector('.qhead > b');
       if(label)label.textContent=t('question','Question')+' '+(index+1);
@@ -105,7 +115,8 @@ function applyRuntimeRandomization(){
     // vyskočila pod nadpis. Po zamíchání proto navrow vrátíme na konec, aby zůstal dole.
     const nav=card.querySelector(':scope > .navrow'); if(nav) card.appendChild(nav);
   });
-  document.querySelectorAll('.opts').forEach((box,i)=>shuffleOptionButtons(box,base+i*307));
+  // Tokeny věty u error-tagging se NEmíchají: pořadí slov je součástí zadání (duplicitní slova by nešla rozlišit).
+  document.querySelectorAll('.opts:not(.et-list)').forEach((box,i)=>shuffleOptionButtons(box,base+i*307));
   document.querySelectorAll('select').forEach((sel,i)=>shuffleSelectOptions(sel,base+i*401));
 }
 function storageKey(kind){return 'testgen_'+kind+'_'+String(CFG.testId||'test')+'_'+String(CFG.manifestHash||'manifest');}
