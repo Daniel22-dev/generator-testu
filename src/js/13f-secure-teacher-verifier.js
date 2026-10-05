@@ -86,8 +86,8 @@ function scoreItemSecure(ex,it,val,pts){var t=ex.type;
   if(t==='error correction')return pts*correctionScore(val,it,t);
   if(t==='word order')return pts*textScore(val,it.correct_sentence||it.answer,it.alt_answers,t);
   if(t==='translation')return pts*textScore(val,it.answer||it.translation,it.alt_answers,t);
-  if(t==='sentence transformation')return pts*textScore(val,it.answer,it.alt_answers,t);
-  if(t==='word formation')return pts*textScore(val,it.answer,it.alt_answers,t);
+  if(t==='sentence transformation')return pts*gapTextScore(val,productiveText(it),[it.answer].concat(it.alt_answers||[]),[it.keyword],t);
+  if(t==='word formation')return pts*gapTextScore(val,productiveText(it),[it.answer].concat(it.alt_answers||[]),[it.base_word],t);
   if(t==='categorization')return norm(val)===norm(it.correct_category||it.category||it.answer)?pts:0;
   if(t==='cloze text'){var keys=Array.isArray(it.answers)?it.answers:[it.answer];var vals=Array.isArray(val)?val:(val!=null?[val]:[]);return scoreBlanks(keys,vals,it.alt_answers,pts,t,false);}
   if(t==='multi-select')return multiSelectScore(val,it.correct,pts);
