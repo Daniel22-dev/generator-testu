@@ -81,10 +81,10 @@ function renderReadingContext(){
   $('readingSourceAction').value=state.readingSourceAction||'generate';
   $('readingOwnSourceWrap').classList.toggle('hidden',!readingSourceIsOwn());
   const hint=state.readingSourceAction==='verbatim'
-    ? 'P\u016fvodn\u00ed text z\u016fstane beze zm\u011bny. CEFR ur\u010duje obt\u00ed\u017enost ot\u00e1zek, nikoli automatick\u00e9 p\u0159eps\u00e1n\u00ed textu. Pot\u0159ebn\u00fd je pln\u00fd \u010diteln\u00fd text (ne pouh\u00fd odkaz).'
+    ? 'AI text nep\u0159episuje. Pou\u017eije ho p\u0159esn\u011b tak, jak je, a vytvo\u0159\u00ed k n\u011bmu ot\u00e1zky. CEFR ovlivn\u00ed jen obt\u00ed\u017enost ot\u00e1zek.'
     : state.readingSourceAction==='adapt'
-    ? 'AI uprav\u00ed jazyk p\u016fvodn\u00edho textu na zvolenou CEFR; n\u00e1vrh p\u0159ed pou\u017eit\u00edm schv\u00e1l\u00ed\u0161.'
-    : 'AI vytvo\u0159\u00ed nov\u00fd text. Podklad vyu\u017eije podle zvolen\u00e9ho re\u017eimu (nap\u0159. jeho slovn\u00ed z\u00e1sobu).';
+    ? 'AI zachov\u00e1 obsah podkladu, ale uprav\u00ed slovn\u00ed z\u00e1sobu a v\u011btnou stavbu na zvolenou \u00farove\u0148 CEFR. V\u00fdsledek p\u0159ed pou\u017eit\u00edm uvid\u00ed\u0161.'
+    : 'AI vytvo\u0159\u00ed nov\u00fd souvisl\u00fd text podle podkladu. M\u016f\u017ee vyu\u017e\u00edt jeho slovn\u00ed z\u00e1sobu, fakta nebo t\u00e9ma podle nastaven\u00ed cel\u00e9ho testu.';
   $('readingSourceHint').textContent=hint;
   const notice=$('readingReviewNotice');notice.replaceChildren();notice.classList.toggle('hidden',!readingNeedsReview());
   if(readingNeedsReview()){
@@ -94,7 +94,7 @@ function renderReadingContext(){
     }
   }
   const dialog=$('readingSettingsDialog');
-  if(dialog)dialog.querySelector('.comp-context').textContent='CEFR: '+(compCefrForPrompt()||'nezvoleno')+' \u00b7 '+(readingSourceIsOwn()?'Vlastn\u00ed podklad Readingu':'Spole\u010dn\u00fd podklad testu')+' \u00b7 '+hint;
+  if(dialog)dialog.querySelector('.comp-context').textContent='CEFR: '+(compCefrForPrompt()||'nezvoleno')+' \u00b7 '+(readingSourceIsOwn()?'Samostatn\u00fd podklad Readingu':'Podklad z Konkr\u00e9tn\u00edho zad\u00e1n\u00ed')+' \u00b7 '+hint;
 }
 function refreshWorkflowSummary(){
   const box=$('exerciseWorkflowTotals');if(!box)return;
