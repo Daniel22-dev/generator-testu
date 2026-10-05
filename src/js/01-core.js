@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.93',
+  version: '7.1.94',
   date:    '2026-10-05',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'UX A WORKFLOW (7.1.94): zpřehledněné Reading comprehension, prémiovější AI posudek vhodnosti cvičení, opravený učitelský náhled bez kolize se studentským zámkem a srozumitelné ověření Google Forms přesunuté mimo běžné výsledky. CI migrace a P5 performance budgety byly opraveny bez oslabení bezpečnostních gateů.',
     'PŘEHLED PRŮBĚHU (7.1.93): výsledková historie s úplným dostupným záznamem, soukromé termíny podle individuálního plánu a čitelné časové pásmo. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
     'HISTORIE POKUSU (7.1.92): uchování kritických událostí a součtů při obnově; soukromé ověření konzistence a zpětná kompatibilita. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
     'SOUKROMÉ OVĚŘENÍ (7.1.91): samostatné Recovery údaje exportů, časové kotvy a přehled bezpečnostních událostí. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'RED-TEAM E10 CI FIX (7.1.87): smoke gate respektuje oddělený private verifier; klikací sady používají jeho startovní kód. Sjednocena dokumentace a release metadata. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E10 (7.1.86): zadání šifrované AES-GCM/PBKDF2; startovní kód 50 bitů jen učiteli. Fail-closed start, reload a offline testy; readiness brání merge/deploy. E7/Forms/E6 čekají. NOT READY.',
     'RED-TEAM E9 (7.1.85): společný CI řetězec, záporné kontroly exportu/zapojení/evidence a nativní obnova pokusu. GARP před P5 zachová reporty. E7 fyzicky netestováno; F7 chybí. NOT READY.',
-    'RED-TEAM E8 (7.1.84): 108 forgery scénářů, negativní kontroly, skutečný CSV import a dlouhá historie po reloadu. Verifier odmítá rozporné start/joker/split události; klientské skóre přepočítá. Konzistentní forgery zůstává CLIENT-CONTROLLED / REVIEW_REQUIRED. NOT READY.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
