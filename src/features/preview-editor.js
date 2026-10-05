@@ -10,7 +10,7 @@ function teacherPreviewHtml(html,code){
   let out=String(html||'');
   // Náhled je učitelská simulace, ne ostrý studentský pokus. Příznak se vloží
   // před runtime skripty, aby preview nesdílelo zámek karty ani trvalý stav pokusu.
-  const marker='<script>window.__GHRAB_TEACHER_PREVIEW__=true;<\\/script>';
+  const marker='<script>window.__GHRAB_TEACHER_PREVIEW__=true;<\/script>';
   out=/<head\b[^>]*>/i.test(out)
     ? out.replace(/<head\b[^>]*>/i,tag=>tag+marker)
     : marker+out;
