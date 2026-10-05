@@ -38,7 +38,7 @@ need(forms, /importFormsCsvFile\([\s\S]*CSV import dokončen/, 'Forms import con
 need(verifier, /function downloadText\([\s\S]*Stažení bylo spuštěno:/, 'download actions give visible confirmation');
 need(preview, /__GHRAB_TEACHER_PREVIEW__=true/, 'Teacher preview injects an explicit preview-only runtime flag');
 need(secure, /function isTeacherPreviewRuntime\(\)[\s\S]*acquireAttemptTabLock\(\)[\s\S]*isTeacherPreviewRuntime\(\)\)return true/, 'Secure runtime bypasses cross-tab locking only in explicit teacher preview');
-need(secure, /function handleLeave\([\s\S]*isTeacherPreviewRuntime\(\)\)return/, 'Teacher preview cannot trigger the real leave-test lock');
+need(secure, /function handleLeave\([\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return/, 'Teacher preview cannot trigger the real leave-test lock');
 need(shell, /Kontrola celé sady cvičení[\s\S]*Vhodnost vybraných cvičení k podkladu/, 'Suitability panel clearly scopes itself to all selected exercises');
 need(shell, /Jak odpovídá student\?[\s\S]*vybírá odpověď z nabízených možností/, 'Reading setup explicitly explains the student answer format');
 need(suitability, /suitability-card[\s\S]*suitability-status[\s\S]*suitability-suggestion/, 'AI suitability result uses structured status cards');
