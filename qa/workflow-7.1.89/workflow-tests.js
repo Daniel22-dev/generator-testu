@@ -76,10 +76,10 @@ async function runWorkflowComponentTests(){
   await test('Adding student preserves previously issued codes',()=>{
     setVal('rosterEmails','a@example.invalid\nb@example.invalid');rosterRefreshParticipants();rosterGenerate();must(rosterEntries.length===2);const before=rosterEntries.map(x=>x.code);setVal('rosterEmails','a@example.invalid\nb@example.invalid\nc@example.invalid');rosterRefreshParticipants();rosterGenerate();must(rosterEntries.length===3);must(equal(before,rosterEntries.slice(0,2).map(x=>x.code)));
   });
-  await test('Unselecting participant removes them from CSV, preserving issued-code registry',()=>{
-    state.participantMode='selected';rosterSelectedEmails=new Set(['a@example.invalid','b@example.invalid','c@example.invalid']);const c=rosterEntries[1].code;rosterToggleParticipant(1,false);let csv='';downloadBlobFile=value=>csv=value;rosterDownloadCsv();must(!csv.includes('b@example.invalid'));must(csv.includes('a@example.invalid'));must(csv.includes('odeslat'));must(csv.includes('FALSE'));rosterToggleParticipant(1,true);must(rosterEntries[1].code===c);
+  await test('CSV always contains entire roster and defaults every recipient OFF',()=>{
+    rosterRefreshParticipants();let csv='';downloadBlobFile=value=>csv=value;rosterDownloadCsv();const lines=csv.split('\n');
+    must(lines.length===4);must(csv.includes('a@example.invalid'));must(csv.includes('b@example.invalid'));must(csv.includes('c@example.invalid'));must(lines.slice(1).every(l=>l.endsWith(',FALSE')));
   });
-  await test('CSV for entire group defaults every recipient OFF',()=>{state.participantMode='all';rosterRefreshParticipants();let csv='';downloadBlobFile=value=>csv=value;rosterDownloadCsv();const lines=csv.split('\n');must(lines.length===4);must(lines.slice(1).every(l=>l.endsWith(',FALSE')));});
   await test('Private verifier is explained instead of adding admin secret to secure student',()=>{state.resultMode='secureOffline';updateSimpleSecretsHelper();must(!$('secureTeacherAccessInfo').classList.contains('hidden'));must($('teacherAccessCodeField').classList.contains('hidden'));});
   return {scope:'Actual source modules, Chromium about:blank, synthetic signed access, in-memory storage and mocked AI. No production transport/build/mobile certification.',total:results.length,passed:results.filter(r=>r.status==='PASS').length,results};
 }
