@@ -1,3 +1,5 @@
+> **7.1.94 – UX Readingu, AI posudek, náhled a Google Forms.** Opravený učitelský náhled, přehlednější Reading a AI posudek, přesunuté ověření Google Forms a sjednocené E2E/security workflow. Release prošel standardními P5/performance gate opravami bez zvýšení limitů. Viz [RELEASE-NOTES-7.1.94.md](RELEASE-NOTES-7.1.94.md).
+
 > **7.1.93 – uchování výsledkové historie a soukromé časové plány.** Řízené studentské testování; další nezávislou revizi vlastník výslovně vynechal, fyzické zkoušky dosud neproběhly. Nasazení přes chráněnou certifikaci `candidate` a `main`. Viz [RELEASE-NOTES-7.1.93.md](RELEASE-NOTES-7.1.93.md).
 
 > **7.1.90 – opravy cíleného auditu před studentským testováním (4.–5. 10. 2026).** Navazuje na 7.1.89. Úlohy s mezerou uznají doplnění i celou větu; po randomizaci verifier ukáže číslo, které viděl student; error-tagging nemíchá slova věty; výsledky ukazují typ cvičení a mají výběr studenta; iPhone/iPad klávesnice nevyvolá falešný zámek ani split. Mobilní chování je zatím automatizovaně ověřeno emulací; fyzické device gates zůstávají. Viz [RELEASE-NOTES-7.1.90.md](RELEASE-NOTES-7.1.90.md).

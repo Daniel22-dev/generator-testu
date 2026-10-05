@@ -1,6 +1,6 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.93",
+  "version": "7.1.94",
   "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
   "blockers": [],
   "f7": "IMPLEMENTED; current-version gates required",
@@ -32,7 +32,7 @@
     "independentReview": {
       "status": "FURTHER_REVIEW_WAIVED_BY_OWNER",
       "reviewedVersion": "7.1.92",
-      "currentVersion": "7.1.93",
+      "currentVersion": "7.1.94",
       "currentVersionIndependentlyReviewed": false
     }
   },
@@ -40,7 +40,7 @@
     "Publication is authorized for the supervised student red-team experiment; physical mobile compatibility is not certified.",
     "E6 remains deferred and open; a clean current branch does not prove historical cache removal.",
     "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication.",
-    "Physical phones and live Forms for this new export were not independently exercised. Further independent review of 7.1.93 was explicitly waived by owner; this is not an independent PASS.",
+    "Physical phones and live Forms for this new export were not independently exercised. Further independent review of 7.1.94 was explicitly waived by owner; this is not an independent PASS.",
     "Exact candidate and protected-main CI must complete before the existing promotion workflow may deploy."
   ]
 }
