@@ -1,3 +1,14 @@
+## 7.1.90 – 2026-10-05 – cílený audit před studentským testováním
+
+- error correction z 7.1.89: uznává celou větu i přesný změněný úsek; nový regresní kontrakt pokrývá kladné i záporné případy;
+- word formation a sentence/key word transformation: má-li zadání právě jednu mezeru `___`, uzná se doplnění i celá věta; bez mezery zůstává nutná přesná odpověď;
+- randomizace: seed z ID pokusu, varianty a času startu; verifier dopočítá číslo otázky u studenta; slova věty u error-tagging se nemíchají; instant feedback používá pořadí studenta;
+- výsledky: typ cvičení ve feedbacku, archivu, souhrnu a položkové analýze; navigace „Vyberte studenta ▼“ ve verifieru a exportech;
+- iOS/iPadOS: výjimka pro zavření softwarové klávesnice i pro iPhone, ochrana proti falešnému split signálu a měkký záznam delší ztráty fokusu;
+- pokyn „Nerušit / Soustředění“ pro iPhone/iPad a Android ve čtyřech jazycích;
+- CI: `check:productive-contract` a `check:randomization-numbering`; GARP trust anchor, AI fingerprint, SBOM a release metadata aktualizovány pro 7.1.90;
+- fyzické testy iPhone/iPad/Android zůstávají manuální release gate pro řízenou studentskou zkoušku.
+
 ## 7.1.88 – 2026-10-04
 
 Opravy výběru a zachování detailů cvičení, Reading/Listening dialogy, přesné opravné fragmenty, vybraní nebo odložení účastníci a přebalení kódů bez AI. Přidány funkční a nativní browser regresní sady do P5. Podrobnosti: [RELEASE-NOTES-7.1.88.md](RELEASE-NOTES-7.1.88.md).
