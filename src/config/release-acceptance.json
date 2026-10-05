@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.93",
+  "appVersion": "7.1.94",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "AUDIT-7.1.93-PRE-STUDENT-TEST-2026-10-05",
+  "revision": "AUDIT-7.1.94-PRE-STUDENT-TEST-2026-10-05",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.93 navazuje na 7.1.91 (Recovery exporty, soukromé časové kotvy a přehled historie) a 7.1.92 (kritická historie a monotónní čítače). Doplňuje uchování běžných výsledkových událostí, označení neúplného formátu a pražské zobrazení termínu s individuálním prodloužením. Lokální regrese, nezávislá revize, fyzická akceptace, přesné GitHub CI a nasazení se dokládají odděleně.",
+    "note": "7.1.94 navazuje na 7.1.91 (Recovery exporty, soukromé časové kotvy a přehled historie) a 7.1.92 (kritická historie a monotónní čítače). Doplňuje uchování běžných výsledkových událostí, označení neúplného formátu a pražské zobrazení termínu s individuálním prodloužením. Lokální regrese, nezávislá revize, fyzická akceptace, přesné GitHub CI a nasazení se dokládají odděleně.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Source candidate 7.1.93 is limited to the controlled supervised student red-team scope. Physical-device gates remain required; live production deployment is not certified by this source update.",
+  "note": "Source candidate 7.1.94 is limited to the controlled supervised student red-team scope. Physical-device gates remain required; live production deployment is not certified by this source update.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
