@@ -4920,7 +4920,7 @@ diff --git a/.github/workflows/stage-b-full-validation.yml b/.github/workflows/s
 diff --git a/scripts/ci/preflight.mjs b/scripts/ci/preflight.mjs
 --- a/scripts/ci/preflight.mjs
 +++ b/scripts/ci/preflight.mjs
-@@ -12,7 +12,7 @@
+@@ -12,6 +12,6 @@
  import { REPORT_FILES } from './release-evidence.mjs';
  
  const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
