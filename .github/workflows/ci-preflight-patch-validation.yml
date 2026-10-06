@@ -1,0 +1,131 @@
+name: Hosted CI Preflight for P0-P3 patch
+
+on:
+  push:
+    branches:
+      - ci/preflight-p0-p3-20261006
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generator-hosted-preflight-p0-p3
+  cancel-in-progress: true
+
+jobs:
+  validate-and-materialize:
+    name: hosted-preflight-p0-p3
+    if: github.repository == 'Daniel22-dev/generator-testu'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      BASE_SHA: 7516768223602cec697f4fb173382c2b6d17aab4
+      PATCH_FILE: ci-validation/P0_P1_P2_P3_CUMULATIVE.patch
+      READY_BRANCH: ci/p0-p3-ready-20261006
+    steps:
+      - name: Checkout validation controller
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install pinned actionlint
+        shell: bash
+        env:
+          ACTIONLINT_VERSION: '1.7.7'
+          ACTIONLINT_SHA256: '023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757'
+        run: |
+          set -euo pipefail
+          curl -fsSLo "${RUNNER_TEMP}/actionlint.tar.gz"             "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  ${RUNNER_TEMP}/actionlint.tar.gz" | sha256sum -c -
+          mkdir -p "${RUNNER_TEMP}/actionlint-bin"
+          tar -xzf "${RUNNER_TEMP}/actionlint.tar.gz" -C "${RUNNER_TEMP}/actionlint-bin" actionlint
+          echo "${RUNNER_TEMP}/actionlint-bin" >> "$GITHUB_PATH"
+          "${RUNNER_TEMP}/actionlint-bin/actionlint" -version
+
+      - name: Validate this controller workflow
+        shell: bash
+        run: actionlint .github/workflows/ci-preflight-patch-validation.yml
+
+      - name: Materialize exact proposed source from clean baseline
+        id: materialize
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          if [ "$remote_candidate" != "$BASE_SHA" ]; then
+            echo "::error::candidate moved from expected baseline $BASE_SHA to $remote_candidate; stale patch will not be tested or committed."
+            exit 1
+          fi
+          cp "$PATCH_FILE" "${RUNNER_TEMP}/p0-p3.patch"
+          git reset --hard "$BASE_SHA"
+          git clean -fdx
+          git apply --check "${RUNNER_TEMP}/p0-p3.patch"
+          git apply --whitespace=error-all "${RUNNER_TEMP}/p0-p3.patch"
+          git diff --check
+          git diff --binary "$BASE_SHA" > "${RUNNER_TEMP}/materialized.diff"
+          diff_sha="$(sha256sum "${RUNNER_TEMP}/materialized.diff" | awk '{print $1}')"
+          echo "diff_sha=$diff_sha" >> "$GITHUB_OUTPUT"
+          test -n "$(git status --porcelain)"
+
+      - name: Run complete project preflight on exact materialized source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run ci:preflight
+
+      - name: Recreate exact tested source after generated-test cleanup
+        shell: bash
+        env:
+          EXPECTED_DIFF_SHA: ${{ steps.materialize.outputs.diff_sha }}
+        run: |
+          set -euo pipefail
+          remote_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
+          if [ "$remote_candidate" != "$BASE_SHA" ]; then
+            echo "::error::candidate advanced during preflight; refusing to materialize a stale commit."
+            exit 1
+          fi
+          git reset --hard "$BASE_SHA"
+          git clean -fdx
+          git apply --check "${RUNNER_TEMP}/p0-p3.patch"
+          git apply --whitespace=error-all "${RUNNER_TEMP}/p0-p3.patch"
+          git diff --check
+          git diff --binary "$BASE_SHA" > "${RUNNER_TEMP}/recreated.diff"
+          actual="$(sha256sum "${RUNNER_TEMP}/recreated.diff" | awk '{print $1}')"
+          test "$actual" = "$EXPECTED_DIFF_SHA"
+
+      - name: Commit exact preflighted source to isolated ready branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'ci: harden and optimize GIT pipeline P0-P3'
+          ready_sha="$(git rev-parse HEAD)"
+          existing="$(git ls-remote origin "refs/heads/$READY_BRANCH" | awk '{print $1}')"
+          if [ -n "$existing" ] && [ "$existing" != "$ready_sha" ]; then
+            echo "::error::$READY_BRANCH already points to different commit $existing."
+            exit 1
+          fi
+          if [ -z "$existing" ]; then
+            git push origin "HEAD:refs/heads/$READY_BRANCH"
+          fi
+          echo "Preflighted source commit: $ready_sha"
+
+      - name: Upload preflight evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-hosted-preflight-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/git-ci-preflight-*
+          if-no-files-found: warn
+          retention-days: 14
