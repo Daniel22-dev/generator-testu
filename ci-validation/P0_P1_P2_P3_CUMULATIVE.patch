@@ -4996,44 +4996,20 @@ diff --git a/scripts/check-d8-final-audit.mjs b/scripts/check-d8-final-audit.mjs
    has(files.d7Runner,'cleanupSensitiveRuntimeArtifacts','qa-fixtures',"entry !== 'summary.json'") &&
    has(files.p5,'qa-results/d7-regressions.json','qa-results/d8-final-audit.json','qa-results/stage3-pdf-runtime/summary.json','qa-results/stage3-pdf-quality/summary.json','qa-results/verifier-ui-runtime/summary.json'));
 
-diff --git a/scripts/check-redteam-ci-e9.mjs b/scripts/check-redteam-ci-e9.mjs
---- a/scripts/check-redteam-ci-e9.mjs
-+++ b/scripts/check-redteam-ci-e9.mjs
-@@ -3 +3 @@
--export function validateRegressionCi({pkg,p5,deploy,runner}){
-+export function validateRegressionCi({pkg,p5,deploy,runner,installAction,setupTools}){
-@@ -16,7 +16,12 @@
-   assert.match(p5,/branches: \[pre-server-forms-workflow, candidate, main\]/);
-   assert.equal((p5.match(/^\s+run: npm run qa:redteam:ci$/gm)||[]).length,1,'P5 must run canonical chain once');
-   assert.doesNotMatch(p5,/^\s*(?:continue-on-error:|run:.*(?:\|\|\s*true|qa:p5:ci|qa:garp27:foundation))/m,'No optional/bypassed or extra destructive gate after E9');
--  assert.match(p5,/run: npm ci --ignore-scripts --no-audit --no-fund --registry=https:\/\/registry\.npmjs\.org/);
--  assert.match(p5,/npx playwright install --with-deps chromium/);
-+  assert.match(p5,/uses: \.\/\.github\/actions\/install-ci-tools/,'P5 must use audited local locked-tools action');
-+  assert.match(p5,/expected-sha: \$\{\{ github\.sha \}\}/,'P5 setup must bind to exact SHA');
-+  assert.match(p5,/browser-env: CHROMIUM_PATH/,'P5 setup must export pinned Chromium path');
-+  assert.match(installAction,/run: node scripts\/ci\/setup-tools\.mjs/,'Local action must invoke canonical setup-tools');
-+  assert.ok(setupTools.includes("export const INSTALL_COMMAND = Object.freeze(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund', '--registry=https://registry.npmjs.org']);"),'Canonical setup must use locked npm ci');
-+  assert.ok(setupTools.includes("export const BROWSER_ARGUMENTS = Object.freeze(['install', '--with-deps', 'chromium']);"),'Canonical setup must use pinned Chromium install arguments');
-+  assert.ok(setupTools.includes('run([process.execPath, report.tools.cli, ...BROWSER_ARGUMENTS]'),'Browser install must execute the locally installed Playwright CLI');
-   assert.match(p5,/name: p5-r2-\$\{\{ github\.sha \}\}/);
-   assert.match(p5,/if-no-files-found: error/);
-@@ -28 +33 @@
--  const input={pkg:JSON.parse(fs.readFileSync('package.json')),p5:fs.readFileSync('.github/workflows/p5-release-gate.yml','utf8'),deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),runner:fs.readFileSync('scripts/run-redteam-ci-e10.mjs','utf8')};
-+  const input={pkg:JSON.parse(fs.readFileSync('package.json')),p5:fs.readFileSync('.github/workflows/p5-release-gate.yml','utf8'),deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),runner:fs.readFileSync('scripts/run-redteam-ci-e10.mjs','utf8'),installAction:fs.readFileSync('.github/actions/install-ci-tools/action.yml','utf8'),setupTools:fs.readFileSync('scripts/ci/setup-tools.mjs','utf8')};
-@@ -41 +46 @@
--    ['unlocked-install',x=>x.p5=x.p5.replace('run: npm ci','run: npm install')],
-+    ['unlocked-install',x=>x.setupTools=x.setupTools.replace("'npm', 'ci'","'npm', 'install'")],
 diff --git a/scripts/qa-p5-release.mjs b/scripts/qa-p5-release.mjs
 --- a/scripts/qa-p5-release.mjs
 +++ b/scripts/qa-p5-release.mjs
-@@ -29 +29,9 @@
+@@ -6 +6,2 @@
+ import {validateRegressionCi} from './check-redteam-ci-e9.mjs';
++import {readSetupSources,validateSetupSources} from './ci/p2-workflow-contract.mjs';
+@@ -29 +30,9 @@
 -const wf=path.join(root,'.github','workflows','p5-release-gate.yml');check('ci.p5-workflow',exists(wf));if(exists(wf)){const t=await fsp.readFile(wf,'utf8');check('ci.clean-install',/npm ci/.test(t));check('ci.browser-install',/playwright install --with-deps chromium/.test(t));let gate=/npm run qa:p5:ci/.test(t);if(consumer.appId==='generator'){try{validateRegressionCi({pkg,p5:t,deploy:await fsp.readFile('.github/workflows/deploy.yml','utf8'),runner:await fsp.readFile('scripts/run-redteam-ci-e10.mjs','utf8')});gate=true;}catch(_){gate=false;}}check('ci.p5-gate',gate)}
 +const wf=path.join(root,'.github','workflows','p5-release-gate.yml');check('ci.p5-workflow',exists(wf));if(exists(wf)){
-+  const t=await fsp.readFile(wf,'utf8'),installAction=await fsp.readFile('.github/actions/install-ci-tools/action.yml','utf8'),setupTools=await fsp.readFile('scripts/ci/setup-tools.mjs','utf8');
-+  const usesLockedTools=/uses: \.\/\.github\/actions\/install-ci-tools/.test(t)&&/expected-sha: \$\{\{ github\.sha \}\}/.test(t)&&/browser-env: CHROMIUM_PATH/.test(t);
-+  check('ci.clean-install',usesLockedTools&&setupTools.includes("export const INSTALL_COMMAND = Object.freeze(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund', '--registry=https://registry.npmjs.org']);"));
-+  check('ci.browser-install',usesLockedTools&&installAction.includes('run: node scripts/ci/setup-tools.mjs')&&setupTools.includes("export const BROWSER_ARGUMENTS = Object.freeze(['install', '--with-deps', 'chromium']);")&&setupTools.includes('run([process.execPath, report.tools.cli, ...BROWSER_ARGUMENTS]'));
-+  let gate=/npm run qa:redteam:ci/.test(t);
-+  if(consumer.appId==='generator'){try{validateRegressionCi({pkg,p5:t,deploy:await fsp.readFile('.github/workflows/deploy.yml','utf8'),runner:await fsp.readFile('scripts/run-redteam-ci-e10.mjs','utf8'),installAction,setupTools});gate=true;}catch(_){gate=false;}}
++  const t=await fsp.readFile(wf,'utf8'),setup=readSetupSources(root);
++  let setupOk=true;try{validateSetupSources(setup);}catch(_){setupOk=false;}
++  const usesLockedTools=t.includes('uses: ./.github/actions/setup-ci-node')&&t.includes('uses: ./.github/actions/install-ci-tools')&&t.includes('expected-sha: ${{ github.sha }}')&&t.includes('browser-env: CHROMIUM_PATH');
++  check('ci.clean-install',setupOk&&usesLockedTools);
++  check('ci.browser-install',setupOk&&usesLockedTools);
++  let gate=/npm run qa:redteam:ci/.test(t);if(consumer.appId==='generator'){try{validateRegressionCi({pkg,p5:t,deploy:await fsp.readFile('.github/workflows/deploy.yml','utf8'),runner:await fsp.readFile('scripts/run-redteam-ci-e10.mjs','utf8'),setup});gate=true;}catch(_){gate=false;}}
 +  check('ci.p5-gate',gate);
 +}
