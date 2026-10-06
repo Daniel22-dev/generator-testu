@@ -33,3 +33,11 @@ jobs:
             conditions,
             required_status_checks: ([.rules[] | select(.type=="required_status_checks")][0].parameters // null)
           }' <<<"$data"
+          echo "--- effective main rules ---"
+          effective="$(gh api --paginate repos/$GITHUB_REPOSITORY/rules/branches/main | jq -s 'add')"
+          jq '{
+            count: length,
+            ruleset_ids: ([.[].ruleset_id] | unique),
+            rule_types: ([.[].type] | unique),
+            required_status_checks: [ .[] | select(.type=="required_status_checks") | .parameters ]
+          }' <<<"$effective"
