@@ -4772,3 +4772,47 @@ diff --git a/package-lock.json b/package-lock.json
          "node": ">=0.10.0"
        }
      },
+
+diff --git a/security/sbom/generator-testu-7.1.96.cdx.json b/security/sbom/generator-testu-7.1.96.cdx.json
+--- a/security/sbom/generator-testu-7.1.96.cdx.json
++++ b/security/sbom/generator-testu-7.1.96.cdx.json
+@@ -2423,9 +2423,9 @@
+     {
+       "type": "library",
+       "name": "source-map-js",
+-      "version": "1.2.1",
+-      "purl": "pkg:npm/source-map-js@1.2.1",
+-      "bom-ref": "pkg:npm/source-map-js@1.2.1?path=node_modules%2Fsource-map-js",
++      "version": "1.2.2",
++      "purl": "pkg:npm/source-map-js@1.2.2",
++      "bom-ref": "pkg:npm/source-map-js@1.2.2?path=node_modules%2Fsource-map-js",
+       "properties": [
+         {
+           "name": "ghrab:lockfilePath",
+@@ -2435,7 +2435,7 @@
+       "hashes": [
+         {
+           "alg": "SHA-512",
+-          "content": "51758c2a12cec1529bef6f0852d40f5f17d853ebac7726ed52b2bff2e184f0240cbeb84ea70bf30c1c23d108522fb31073bbc8b084811bc550f3e203431a5f40"
++          "content": "2868fff18e37c77e5a6550edb7e27898ad61a0b18750b3187d290e0c93508cd0c2de85b53ea3e8c4cc28d292d4b1633f5041b338dfcdc5e1f2c047cd5cd3f757"
+         }
+       ],
+       "licenses": [
+@@ -3085,7 +3085,7 @@
+       "ref": "pkg:npm/css-tree@3.2.1?path=node_modules%2Fcss-tree",
+       "dependsOn": [
+         "pkg:npm/mdn-data@2.27.1?path=node_modules%2Fmdn-data",
+-        "pkg:npm/source-map-js@1.2.1?path=node_modules%2Fsource-map-js"
++        "pkg:npm/source-map-js@1.2.2?path=node_modules%2Fsource-map-js"
+       ]
+     },
+     {
+@@ -3435,7 +3435,7 @@
+       "dependsOn": []
+     },
+     {
+-      "ref": "pkg:npm/source-map-js@1.2.1?path=node_modules%2Fsource-map-js",
++      "ref": "pkg:npm/source-map-js@1.2.2?path=node_modules%2Fsource-map-js",
+       "dependsOn": []
+     },
+     {
