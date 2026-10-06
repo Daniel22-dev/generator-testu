@@ -24,7 +24,7 @@ ok(String(pkg.scripts?.test||'').includes('npm run check:r3-security-behavior'),
 const walk=(dir)=>fs.readdirSync(new URL('../'+dir,import.meta.url),{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(dir+'/'+e.name):[/\.(?:mjs|js|py)$/.test(e.name)?dir+'/'+e.name:null].filter(Boolean));
 const verifierTestFiles=['scripts','tools','audit/tests'].flatMap(walk);
 const staleFormsPolicy=verifierTestFiles.filter(p=>/oneResponseConfirmed\s*:\s*true/.test(read(p)));
-const staleFormsUi=verifierTestFiles.filter(p=>/formsOneResponseConfirmed[^\n]{0,180}\.check\s*\(/.test(read(p)));
+const staleFormsUi=verifierTestFiles.filter(p=>{const src=read(p);return /locator\(\s*['"]#formsOneResponseConfirmed['"]\s*\)\s*\.check\s*\(/.test(src)||/\[[^\]\n]*['"]formsOneResponseConfirmed['"][^\]\n]*\][^\n]{0,240}\.check\s*\(/.test(src);});
 ok(staleFormsPolicy.length===0,'Forms verifier fixtures no longer require oneResponseConfirmed=true'+(staleFormsPolicy.length?' -> '+staleFormsPolicy.join(', '):''));
 ok(staleFormsUi.length===0,'Forms verifier browser fixtures no longer check the removed one-response checkbox'+(staleFormsUi.length?' -> '+staleFormsUi.join(', '):''));
 
