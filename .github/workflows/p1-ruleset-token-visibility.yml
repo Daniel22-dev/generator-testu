@@ -1,0 +1,35 @@
+name: P1 ruleset token visibility diagnostic
+
+on:
+  push:
+    branches:
+      - ci/ruleset-token-diag-20261006
+
+permissions:
+  contents: read
+
+jobs:
+  token-visibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect non-secret ruleset visibility
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          data="$(gh api repos/$GITHUB_REPOSITORY/rulesets/23603155)"
+          jq '{
+            id,
+            enforcement,
+            target,
+            source_type,
+            source,
+            updated_at,
+            has_bypass_actors: has("bypass_actors"),
+            bypass_actors: (.bypass_actors // null),
+            current_user_can_bypass: (.current_user_can_bypass // null),
+            conditions,
+            required_status_checks: ([.rules[] | select(.type=="required_status_checks")][0].parameters // null)
+          }' <<<"$data"
