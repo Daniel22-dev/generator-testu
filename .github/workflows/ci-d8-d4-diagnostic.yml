@@ -29,6 +29,12 @@ jobs:
           git clean -fdx
           git apply --check "${RUNNER_TEMP}/p.patch"
           git apply "${RUNNER_TEMP}/p.patch"
+      - name: Show materialized Safe Promotion topology
+        shell: bash
+        run: |
+          echo "--- safe-promotion topology ---"
+          grep -nE 'candidate-gate|pr-certification|release-admission|promote|p5-release-gate|journey-e2e|CERTIFIED_SHA|check-runs|Recheck candidate' .github/workflows/safe-promotion.yml || true
+          echo "--- end topology ---"
       - name: Evaluate D8 D.4 subconditions
         shell: bash
         run: |
