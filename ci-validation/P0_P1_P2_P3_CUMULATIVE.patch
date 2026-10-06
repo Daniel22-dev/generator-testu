@@ -4816,3 +4816,105 @@ diff --git a/security/sbom/generator-testu-7.1.96.cdx.json b/security/sbom/gener
        "dependsOn": []
      },
      {
+
+
+diff --git a/scripts/garp27/mutation-tests.mjs b/scripts/garp27/mutation-tests.mjs
+@@ -6,7 +6,7 @@
+ import { evaluateArchitecture } from './architecture-integrity.mjs';
+ 
+ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+-const COPY = ['src','public','scripts','security/garp27','vendor/garp-2.7-consolidated-r2','dist','package.json','package-lock.json','.github/workflows'];
++const COPY = ['src','public','scripts','security/garp27','vendor/garp-2.7-consolidated-r2','tools/ci-standard','dist','package.json','package-lock.json','.github/workflows'];
+ function fixture() {
+   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-garp27-'));
+   for (const rel of COPY) {
+
+diff --git a/security/garp27/trust-anchor.json b/security/garp27/trust-anchor.json
+@@ -19,7 +19,7 @@
+   "note": "GIT 7.1.96: owner requested Forms verifier time/checkbox correction with comprehensive pre-commit preflight; student secure runtime and scoring are unchanged; protected exact-SHA CI remains required.",
+   "adapterToolSha256s": {
+     "scripts/garp27/architecture-integrity.mjs": "6fcf2f7a4140d31344296c2a24bb46558e21100df44128475a7239bac640540d",
+-    "scripts/garp27/mutation-tests.mjs": "2565d9ec1224cc5c7914812117eaea686d1fc9b6b405d792c1429889f27684f1",
++    "scripts/garp27/mutation-tests.mjs": "39810b91bde7db1c59f19c16c35b771e8b7df583566d8f4cd82ba4bd84824c75",
+     "scripts/garp27/contract-gate.mjs": "1e67d0823e2a6864fd172a68889307eb96a274d97deeb230e50535635de39c59",
+     "scripts/garp27/policy-admission-mutations.mjs": "860e0f4b2d6f7323744aa9858c65a5ad1f20ed522c49b851fbe8b6cf8a9fd173",
+     "scripts/garp27/auto-patch-contract.mjs": "a4da84c88114d779e5fbcdcf82ad7b237e1b2e09d820824926685fbbbe42f926",
+
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+@@ -88,7 +88,7 @@
+       - name: Enforce E9 complete regression admission
+         run: npm run qa:redteam:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+ 
+       - name: Upload QA evidence
+         if: always()
+
+diff --git a/.github/workflows/p3-quality.yml b/.github/workflows/p3-quality.yml
+@@ -29,4 +29,4 @@
+       - name: Run current P5 R2 gate
+         run: npm run qa:p5:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+
+diff --git a/.github/workflows/p4-release.yml b/.github/workflows/p4-release.yml
+@@ -29,4 +29,4 @@
+       - name: Run current P5 R2 gate
+         run: npm run qa:p5:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+
+diff --git a/.github/workflows/p5-release-gate.yml b/.github/workflows/p5-release-gate.yml
+@@ -46,7 +46,7 @@
+       - name: Run E9 regression, foundation and final P5 admission
+         run: npm run qa:redteam:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+       - name: Upload audit evidence
+         if: always()
+         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+
+diff --git a/.github/workflows/safe-promotion.yml b/.github/workflows/safe-promotion.yml
+@@ -142,7 +142,7 @@
+       - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
+         run: npm run qa:redteam:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+ 
+       - name: Upload candidate QA evidence
+         if: always()
+@@ -254,7 +254,7 @@
+       - name: Enforce PR P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
+         run: npm run qa:redteam:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+ 
+       - name: Upload PR certification evidence
+         if: always()
+
+diff --git a/.github/workflows/stage-b-full-validation.yml b/.github/workflows/stage-b-full-validation.yml
+@@ -63,7 +63,7 @@
+       - name: P5 R2 plus GARP
+         run: npm run qa:p5:ci
+         env:
+-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
++          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+       - name: Teacher/student/verifier and Forms journeys
+         shell: bash
+         env:
+
+diff --git a/scripts/ci/preflight.mjs b/scripts/ci/preflight.mjs
+@@ -12,7 +12,7 @@
+ import { REPORT_FILES } from './release-evidence.mjs';
+ 
+ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+-const TRUST_PIN = '9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b';
++const TRUST_PIN = '2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1';
+ const ACTIONLINT_VERSION = '1.7.7';
+ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
