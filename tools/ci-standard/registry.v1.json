@@ -1,0 +1,63 @@
+{
+  "schema": "ghrab-ci-registry-v1",
+  "standardVersion": "1.0.0",
+  "purpose": "DIAGNOSTIC_ONLY_NOT_RELEASE_ADMISSION",
+  "repositories": [
+    {
+      "repository": "Daniel22-dev/generator-testu",
+      "repositoryId": "1262251614",
+      "appId": "generator-testu",
+      "state": "STAGED",
+      "consumer": "tools/ci-standard/consumers/generator-testu.json"
+    },
+    {
+      "repository": "Daniel22-dev/Ludus",
+      "repositoryId": "1274991736",
+      "appId": "ludus",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    },
+    {
+      "repository": "Daniel22-dev/SORTIO",
+      "repositoryId": "1309747090",
+      "appId": "sortio",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    },
+    {
+      "repository": "Daniel22-dev/lesson-hub",
+      "repositoryId": "1320210346",
+      "appId": "lesson-hub",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    },
+    {
+      "repository": "Daniel22-dev/diferenciator",
+      "repositoryId": "1312495918",
+      "appId": "diferenciator",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    },
+    {
+      "repository": "Daniel22-dev/korespondencni-asistent",
+      "repositoryId": "1312499266",
+      "appId": "korespondencni-asistent",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    },
+    {
+      "repository": "Daniel22-dev/Hodnotitel-maturitnich-slohu",
+      "repositoryId": "1297456625",
+      "appId": "hodnotitel-maturitnich-slohu",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    },
+    {
+      "repository": "Daniel22-dev/AI-Studio-GHRAB",
+      "repositoryId": "1296508970",
+      "appId": "ai-studio",
+      "state": "NOT_PROFILED",
+      "consumer": null
+    }
+  ]
+}

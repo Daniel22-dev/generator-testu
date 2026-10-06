@@ -63,7 +63,7 @@ jobs:
       - name: P5 R2 plus GARP
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
       - name: Teacher/student/verifier and Forms journeys
         shell: bash
         env:

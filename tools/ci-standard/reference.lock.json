@@ -1,0 +1,33 @@
+{
+  "schema": "ghrab-ci-reference-lock-v1",
+  "standardVersion": "1.0.0",
+  "purpose": "DIAGNOSTIC_ONLY_NOT_RELEASE_ADMISSION",
+  "files": [
+    {
+      "path": "tools/ci-standard/collect.mjs",
+      "sha256": "f6955c43c4a2516ee84123e6cafe61830992eeb82e8f6aa0743185415bc1b102",
+      "size": 9018
+    },
+    {
+      "path": "tools/ci-standard/compare.mjs",
+      "sha256": "ae1c3e35577b1c812f62c6c51a3313e8974c5810971c6c483674c82b48cd02c4",
+      "size": 2406
+    },
+    {
+      "path": "tools/ci-standard/contract.mjs",
+      "sha256": "786f49da2ef2010b2e3133c7c38d0acc768a0bdc0166fef7d7c27ff1d9720d72",
+      "size": 7461
+    },
+    {
+      "path": "tools/ci-standard/safe-io.mjs",
+      "sha256": "a0697c7ef193fbc94cbfcaf27690ff45fd8504534f12239923d685bf700f4baf",
+      "size": 3575
+    },
+    {
+      "path": "tools/ci-standard/standard.v1.json",
+      "sha256": "dbee44b002caffed89032bb913139b936bc7b908f6e52f6bfca2be3120156bd4",
+      "size": 961
+    }
+  ],
+  "bundleSha256": "a15bfce4871c32bb75a46c3fb369429ff99ae67aa555259a8387b2c0b2649fbe"
+}

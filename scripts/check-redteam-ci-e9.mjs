@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-export function validateRegressionCi({pkg,p5,deploy,runner}){
+import { readSetupSources, validateSetupSources } from './ci/p2-workflow-contract.mjs';
+export function validateRegressionCi({pkg,p5,deploy,runner,setup}){
   const scripts=pkg.scripts;
   assert.equal(scripts['qa:redteam:ci'],'node scripts/run-redteam-ci-e10.mjs','Canonical E9 runner required');
   for(const gate of ['isolation','trust','verifier','storage','runtime','publication','mobile','forgery']){
@@ -16,8 +17,10 @@ export function validateRegressionCi({pkg,p5,deploy,runner}){
   assert.match(p5,/branches: \[pre-server-forms-workflow, candidate, main\]/);
   assert.equal((p5.match(/^\s+run: npm run qa:redteam:ci$/gm)||[]).length,1,'P5 must run canonical chain once');
   assert.doesNotMatch(p5,/^\s*(?:continue-on-error:|run:.*(?:\|\|\s*true|qa:p5:ci|qa:garp27:foundation))/m,'No optional/bypassed or extra destructive gate after E9');
-  assert.match(p5,/run: npm ci --ignore-scripts --no-audit --no-fund --registry=https:\/\/registry\.npmjs\.org/);
-  assert.match(p5,/npx playwright install --with-deps chromium/);
+  validateSetupSources(setup);
+  assert.ok(p5.includes('uses: ./.github/actions/setup-ci-node'));
+  assert.ok(p5.includes('uses: ./.github/actions/install-ci-tools'));
+  assert.ok(p5.includes('expected-sha: ${{ github.sha }}'));
   assert.match(p5,/name: p5-r2-\$\{\{ github\.sha \}\}/);
   assert.match(p5,/if-no-files-found: error/);
   for(const path of ['qa-results/redteam-e*.json','qa-results/redteam-e9-*.json','qa-results/redteam-e9-negative/*.log','qa-results/redteam-e10-ci/*.log','audit/evidence/garp27-current/','dist/qa-p5-*.json'])for(const workflow of [p5,deploy])assert.ok(workflow.includes('            '+path),path+' must be retained');
@@ -25,7 +28,7 @@ export function validateRegressionCi({pkg,p5,deploy,runner}){
   assert.doesNotMatch(deploy,/^\s+run: npm run (?:qa:p5:ci|qa:garp27:foundation)$/m,'No second rebuild after certified chain');
 }
 if(process.argv[1]?.endsWith('check-redteam-ci-e9.mjs')){
-  const input={pkg:JSON.parse(fs.readFileSync('package.json')),p5:fs.readFileSync('.github/workflows/p5-release-gate.yml','utf8'),deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),runner:fs.readFileSync('scripts/run-redteam-ci-e10.mjs','utf8')};
+  const input={pkg:JSON.parse(fs.readFileSync('package.json')),p5:fs.readFileSync('.github/workflows/p5-release-gate.yml','utf8'),deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),runner:fs.readFileSync('scripts/run-redteam-ci-e10.mjs','utf8'),setup:readSetupSources()};
   validateRegressionCi(input);
   const mutations=[
     ['drop-VM',x=>x.pkg.scripts.test=x.pkg.scripts.test.replace(' && npm run check:redteam-verifier','')],
@@ -38,7 +41,7 @@ if(process.argv[1]?.endsWith('check-redteam-ci-e9.mjs')){
     ['unsafe-log-path',x=>x.runner=x.runner.replace("parts.join('-').replace(/[^a-zA-Z0-9._-]/g,'-')","parts.join('-')")],
     ['swallow-failure',x=>x.p5=x.p5.replace('run: npm run qa:redteam:ci','run: npm run qa:redteam:ci || true')],
     ['optional-gate',x=>x.p5=x.p5.replace('run: npm run qa:redteam:ci','continue-on-error: true\n        run: npm run qa:redteam:ci')],
-    ['unlocked-install',x=>x.p5=x.p5.replace('run: npm ci','run: npm install')],
+    ['unlocked-install',x=>x.setup.toolsRunner=x.setup.toolsRunner.replace("['npm', 'ci'","['npm', 'install'")],
     ['unbound-artifact',x=>x.p5=x.p5.replace('p5-r2-${{ github.sha }}','p5-r2-latest')],
     ['missing-evidence',x=>x.p5=x.p5.replace('            audit/evidence/garp27-current/','')],
     ['deploy-bypass',x=>x.deploy=x.deploy.replace('run: npm run qa:redteam:ci','run: npm run qa:p5:ci')],

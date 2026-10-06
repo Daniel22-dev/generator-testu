@@ -22,18 +22,27 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org
-      - name: Install locked dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
-      - name: Install pinned Playwright Chromium
-        shell: bash
-        run: |
-          npx playwright install --with-deps chromium
-          node -e "console.log('CHROMIUM_EXECUTABLE=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Configure shared CI Node setup
+        uses: ./.github/actions/setup-ci-node
+      - name: Install independently verified CI tools
+        id: ci_tools
+        timeout-minutes: 12
+        uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: ${{ github.sha }}
+          browser-env: CHROMIUM_EXECUTABLE
+
+      - name: Preserve per-job toolchain provenance
+        if: always() && (steps.ci_tools.outcome == 'success' || steps.ci_tools.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-toolchain-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          path: ${{ runner.temp }}/generator-ci-tools/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}/toolchain.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Install pinned Python audit tools
         shell: bash
         run: |

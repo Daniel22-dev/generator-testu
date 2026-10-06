@@ -1,0 +1,19 @@
+name: GIT independent locked tools
+description: Clean locked install and local Playwright CLI with run-bound diagnostic evidence. No result or build reuse.
+inputs:
+  expected-sha:
+    description: Exact checked-out commit certified by this job.
+    required: true
+  browser-env:
+    description: Existing browser variable consumed by this job, CHROMIUM_PATH or CHROMIUM_EXECUTABLE.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install and verify independent CI tools
+      shell: bash
+      env:
+        CI_TOOL_EXPECTED_SHA: ${{ inputs.expected-sha }}
+        CI_TOOL_BROWSER_ENV: ${{ inputs.browser-env }}
+        NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      run: node scripts/ci/setup-tools.mjs

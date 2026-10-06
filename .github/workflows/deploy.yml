@@ -25,38 +25,70 @@ jobs:
       assurance_mode: ${{ steps.release_identity.outputs.assurance_mode }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Configure shared CI Node setup
+        uses: ./.github/actions/setup-ci-node
       - name: Require classroom release readiness on main
         if: github.ref == 'refs/heads/main'
         run: node scripts/check-redteam-release-e10.mjs --require-ready
-      - name: Install dependencies
-        timeout-minutes: 5
-        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
-        env:
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      - name: Install independently verified CI tools
+        id: ci_tools
+        timeout-minutes: 12
+        uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: ${{ github.sha }}
+          browser-env: CHROMIUM_PATH
 
-      - name: Install pinned Playwright Chromium
-        shell: bash
-        run: |
-          npx playwright install --with-deps chromium
-          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Preserve per-job toolchain provenance
+        if: always() && (steps.ci_tools.outcome == 'success' || steps.ci_tools.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-toolchain-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          path: ${{ runner.temp }}/generator-ci-tools/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}/toolchain.json
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Run unified error reporter regression
         run: npm run test:reporter
+      - name: Record structured QA start
+        id: release_start
+        shell: bash
+        run: echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
       - name: Run GHRAB QA release gate
+        id: release_qa
         run: npm run qa:release
         env:
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      - name: Validate current structured QA evidence
+        id: release_evidence
+        if: always() && (steps.release_qa.outcome == 'success' || steps.release_qa.outcome == 'failure')
+        env:
+          CI_RELEASE_STARTED_AT: ${{ steps.release_start.outputs.started_at }}
+          CI_RELEASE_OUTCOME: ${{ steps.release_qa.outcome }}
+        run: node scripts/ci/release-evidence.mjs
+
+      - name: Preserve structured QA before destructive red-team cleanup
+        if: always() && steps.release_evidence.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-main-release-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: |
+            qa-results/qa-report.json
+            qa-results/qa-report.html
+            qa-results/release-verdict.txt
+            qa-results/qa-test-matrix.csv
+            qa-results/qa-release-evidence.json
+
       - name: Verify GHRAB Platform P3 conformance
         run: npm run qa:platform
 
       - name: Enforce E9 complete regression admission
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
 
       - name: Upload QA evidence
         if: always()

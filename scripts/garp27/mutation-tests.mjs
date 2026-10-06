@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { evaluateArchitecture } from './architecture-integrity.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const COPY = ['src','public','scripts','security/garp27','vendor/garp-2.7-consolidated-r2','dist','package.json','package-lock.json','.github/workflows'];
+const COPY = ['src','public','scripts','security/garp27','vendor/garp-2.7-consolidated-r2','tools/ci-standard','dist','package.json','package-lock.json','.github/workflows'];
 function fixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-garp27-'));
   for (const rel of COPY) {

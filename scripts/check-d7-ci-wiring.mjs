@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import { validateP1Workflow } from './ci/p1-workflow-contract.mjs';
+import { INDEPENDENT_GATES } from './ci/release-admission.mjs';
 
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const journey = fs.readFileSync('.github/workflows/journey-e2e.yml', 'utf8');
@@ -27,8 +29,9 @@ for (const script of [
 need(/rm -rf audit\/evidence[\s\S]*mkdir -p audit\/evidence/.test(journey), 'Journey workflow cleans stale evidence before the run');
 need(journey.includes('--suite config_extra_suite'), 'Journey workflow includes config_extra_suite for count/differentiation coverage');
 need(journey.includes('journey-e2e-evidence-${{ github.sha }}'), 'Journey artifact is bound to the exact SHA');
-need(/p5_green=.*p5-release-gate/.test(safePromotion) && /journey_green=.*journey-e2e/.test(safePromotion), 'Safe Promotion waits for independent P5 and Journey checks');
-need(/if \[ "\$p5_green" -gt 0 \] && \[ "\$journey_green" -gt 0 \]/.test(safePromotion), 'Safe Promotion requires both independent checks to be green');
+validateP1Workflow(safePromotion);
+need(INDEPENDENT_GATES.some(x => x.job === 'p5-release-gate'), 'P1 admission retains independent P5');
+need(INDEPENDENT_GATES.some(x => x.job === 'journey-e2e'), 'P1 admission also requires independent Journey');
 need(p5.includes('qa-results/d7-regressions.json') && p5.includes('qa-results/verifier-ui-runtime/summary.json'), 'P5 artifact retains non-sensitive D7 evidence summaries');
 
 if (failed) process.exit(1);

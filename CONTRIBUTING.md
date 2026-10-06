@@ -102,3 +102,25 @@ Bez jasného rozhodnutí nedělat:
 - odstranění offline verifieru,
 - spojení rozdělených modulů `13a…13g` / `14a…14d` zpět do monolitu,
 - velké dělení modulů bez průběžných testů.
+
+## CI/CD preflight před commitem
+
+Při úpravách release workflow spusť celý předcommitový průchod:
+
+```bash
+npm run ci:preflight
+```
+
+Vyžaduje Linux/WSL, Git, Bash, Node 22, Python s venv a actionlint 1.7.7.
+Při FAIL, BLOCKED nebo NOT_RUN se změny necommitují. Samostatný
+`npm run check:ci-orchestration` ověřuje nové CI kontroly, nenahrazuje však
+úplný preflight ani následné nezávislé certifikace na GitHubu.
+Postup a limity jsou v `docs/ci-cd/P0-IMPLEMENTATION.md`.
+
+### P1: paralelní certifikace a aktivace
+
+Při změnách P1 dodržet `docs/ci-cd/P1-IMPLEMENTATION.md`.
+`npm run ci:preflight` zahrnuje úplnou lokální sadu P0/P1 i živou kontrolu
+pravidel větve main. Dílčí PASS není povolení ke commitu, merge ani deployi.
+Neoslabovat nativní ochrany, aby se workflow spustilo. Mezi pět povinných
+kontrol patří read-only `release-admission`, nikoli `promote-certified-pr`.

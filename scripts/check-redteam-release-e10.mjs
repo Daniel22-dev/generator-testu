@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { validateP1Workflow } from './ci/p1-workflow-contract.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 export function requireReady(state,version){
@@ -24,6 +25,7 @@ export function releaseDecision(state,version){
   catch(error){if(error instanceof assert.AssertionError)return {releaseReadiness:state.status,releaseBlocked:true};throw error;}
 }
 function wiring({pkg,deploy,promotion}){
+  validateP1Workflow(promotion);
   for(const chain of ['test','qa:p5','qa:p5:ci'])for(const gate of ['content','e10'])assert.ok(pkg.scripts[chain].split(' && ').includes('npm run check:redteam-'+gate),chain+' requires '+gate);
   for(const chain of ['qa:p5','qa:p5:ci'])assert.ok(pkg.scripts[chain].split(' && ').includes('npm run check:redteam-content-browser'));
   assert.match(deploy,/branches: \[main\]/);assert.match(deploy,/deploy:\s*\n\s*if: github.ref == 'refs\/heads\/main'/);

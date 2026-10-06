@@ -1,0 +1,12 @@
+name: GIT locked CI Node setup
+description: Shared implementation only; each certification keeps its own runner and clean npm install.
+runs:
+  using: composite
+  steps:
+    - name: Configure Node and npm download cache
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, existing approved pin
+      with:
+        node-version: '22'
+        cache: npm
+        cache-dependency-path: package-lock.json
+        registry-url: https://registry.npmjs.org
