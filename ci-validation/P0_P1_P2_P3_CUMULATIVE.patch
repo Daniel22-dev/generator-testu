@@ -4963,7 +4963,7 @@ diff --git a/scripts/check-d8-final-audit.mjs b/scripts/check-d8-final-audit.mjs
    p5: read('.github/workflows/p5-release-gate.yml'),
 +  releaseAdmission: read('scripts/ci/release-admission.mjs'),
  };
-@@ -97,9 +98,24 @@
+@@ -97,9 +98,28 @@
  check('D','3','Journey clears stale evidence, covers config/state flows and binds artifact to exact SHA',
    /rm -rf audit\/evidence[\s\S]*mkdir -p audit\/evidence/.test(files.journey) &&
    has(files.journey,'--suite state_transition_suite','--suite config_extra_suite','journey-e2e-evidence-${{ github.sha }}'));
