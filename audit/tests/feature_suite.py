@@ -18,16 +18,24 @@ try:
  p.evaluate=safe_evaluate
  p.add_script_tag(content=(TESTS/'fixtures.js').read_text())
  def preview():
-  build();p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")')
-  assert 'hotovo' in p.locator('#resultTab1 .result-step-status').text_content().lower()
-  for key in ['pvW360','pvW768','pvWfull']:p.locator('#'+key).click();assert p.locator('#'+key).get_attribute('class').find('active')>=0
-  p.keyboard.press('Escape');assert not p.locator('#previewModal').is_visible();return '3 widths and Escape'
+  build();seen=[]
+  for attempt in range(3):
+   p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for()
+   instance=p.locator('#previewFrame').get_attribute('data-preview-instance');assert instance and instance not in seen,('preview must use a fresh iframe browsing context',seen,instance);seen.append(instance)
+   assert 'hotovo' in p.locator('#resultTab1 .result-step-status').text_content().lower()
+   if attempt==0:
+    for key in ['pvW360','pvW768','pvWfull']:p.locator('#'+key).click();assert p.locator('#'+key).get_attribute('class').find('active')>=0
+    p.keyboard.press('Escape')
+   else:p.evaluate('closeTestPreview()')
+   assert not p.locator('#previewModal').is_visible() and p.locator('#previewFrame').count()==0,'closed preview must destroy iframe context'
+  return 'fresh iframe x3, 3 widths and Escape'
  record('lazy-preview',preview)
  def preview_code():
   for mode in ['secureOffline','instant']:
    p.evaluate("""async mode=>{auditConfigure(['multiple choice'],mode,'en');state.identityMode='oneTimeCode';rosterEntries.length=0;rosterEntries.push({name:'QA Student',code:'QA-CODE-7'});const data=auditFixtures(state,'en');lastGenData=data;const built=await assembleTestHtml(state,data);generatedPackage=mode==='secureOffline'?built:null;generatedTestHtml=generatedPackage?'':String(built);generatedIntegrity=null;lastSelfTest=null;exportChecklist={};resetKeyCheckState();setGenUI('done');renderExportChecklist(true);goTo(4)}""",mode)
    artifact=p.evaluate('generatedPackage?generatedPackage.studentHtml:generatedTestHtml');assert 'QA-CODE-7' not in artifact
-   p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';p.evaluate('closeTestPreview()')
+   p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';assert f.locator('#studentName').get_attribute('type')=='password';first=p.locator('#previewFrame').get_attribute('data-preview-instance');p.evaluate('closeTestPreview()');assert p.locator('#previewFrame').count()==0
+   p.locator('#btnPreview').click();p.wait_for_function('!$("previewModal").classList.contains("hidden")');f=p.frame_locator('#previewFrame');f.locator('#studentName').wait_for();assert f.locator('#studentName').input_value()=='QA-CODE-7';second=p.locator('#previewFrame').get_attribute('data-preview-instance');assert first!=second,'second preview must be a new iframe';p.evaluate('closeTestPreview()')
   return 'one-time code works in secure + instant teacher preview and never enters student artefact'
  record('preview-one-time-code',preview_code)
  def edit_counts():

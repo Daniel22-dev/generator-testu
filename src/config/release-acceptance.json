@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.94",
+  "appVersion": "7.1.95",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "AUDIT-7.1.94-PRE-STUDENT-TEST-2026-10-05",
+  "revision": "AUDIT-7.1.95-PRE-STUDENT-TEST-2026-10-06",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.94 navazuje na 7.1.93 a přináší UX/workflow úpravy Reading comprehension, AI posudku vhodnosti cvičení, učitelského náhledu a ověření Google Forms. Opravy CI sjednotily E2E/E3/E8 workflow a zachovaly P5 performance a bezpečnostní limity bez jejich zvýšení. Fyzická akceptace na školních zařízeních zůstává samostatným krokem.",
+    "note": "7.1.95 navazuje na 7.1.94 a opravuje kritický lifecycle učitelského náhledu: každé otevření dostává nový iframe, zavření browsing context zničí a browser regrese pokrývá opakované otevření stejného instant i secure artefaktu včetně reopen po spuštění a odevzdání preview. Studentský runtime a jeho bezpečnostní semantika se tímto hotfixem nemění.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Source candidate 7.1.94 je určen pro řízené školní testování; chráněné CI, P5 a Pages nasazení musí proběhnout nad přesným SHA této verze.",
+  "note": "Source candidate 7.1.95 je opravný release náhledu pro řízené školní testování; chráněné CI, P5, journey-e2e a Pages nasazení musí proběhnout nad přesným SHA této verze.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

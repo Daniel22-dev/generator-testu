@@ -37,6 +37,10 @@ need(forms, /bulkVerifyPasted\([\s\S]*Nejdřív vlož celý záložní blok SECU
 need(forms, /importFormsCsvFile\([\s\S]*CSV import dokončen/, 'Forms import confirms successful completion');
 need(verifier, /function downloadText\([\s\S]*Stažení bylo spuštěno:/, 'download actions give visible confirmation');
 need(preview, /__GHRAB_TEACHER_PREVIEW__=true/, 'Teacher preview injects an explicit preview-only runtime flag');
+need(preview, /function createPreviewFrame\([\s\S]*createElement\(['"]iframe['"]\)[\s\S]*previewInstance/, 'Teacher preview creates a fresh iframe browsing context for every open');
+need(preview, /function destroyPreviewFrame\([\s\S]*parentNode\.removeChild/, 'Teacher preview destroys the iframe browsing context on close');
+!/srcdoc\s*=\s*['"]['"]/.test(preview) ? pass('Teacher preview teardown never navigates a reused iframe to blank srcdoc') : fail('Teacher preview must destroy, not blank and reuse, its iframe');
+!/id=["']previewFrame["']/.test(shell) ? pass('Preview shell does not ship a reusable iframe browsing context') : fail('Preview shell must create iframe only on demand');
 need(secure, /function acquireAttemptTabLock\(\)[\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return true/, 'Secure runtime bypasses cross-tab locking only in explicit teacher preview');
 need(secure, /function handleLeave\([\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return/, 'Teacher preview cannot trigger the real leave-test lock');
 need(shell, /Kontrola celé sady cvičení[\s\S]*Vhodnost vybraných cvičení k podkladu/, 'Suitability panel clearly scopes itself to all selected exercises');
