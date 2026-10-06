@@ -24,7 +24,7 @@ try {
     return 'SECURE-ANSWERS-V1\n'+JSON.stringify({testId:CFG.testId,manifestHash:CFG.manifestHash,payload:await encryptPayloadForTeacher(payload)});
   },pkg.studentHtmlSha256);
   await verifier.goto('http://127.0.0.1:18778/verifier.html');
-  await verifier.evaluate(()=>{if(window.setFormsAnchorPolicy)setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true});});
+  await verifier.evaluate(()=>{if(window.setFormsAnchorPolicy)setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});});
   const quote=s=>'"'+s.replaceAll('"','""')+'"';
   const csv='Timestamp,Email Address,Result\n'+['2026-10-03T12:16:00Z','synthetic-a@example.invalid',txt].map(quote).join(',');
   const outcome=await verifier.evaluate(async text=>{

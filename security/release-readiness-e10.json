@@ -1,14 +1,14 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.95",
+  "version": "7.1.96",
   "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
   "blockers": [],
   "f7": "IMPLEMENTED; current-version gates required",
-  "remotePath": "Owner explicitly requested the preview hotfix, comprehensive pre-commit impact review, GitHub publication and existing exact-SHA certification on 2026-10-06. Deploy only main after candidate gates pass.",
+  "remotePath": "Owner explicitly requested the Forms verifier maintenance release with comprehensive pre-commit impact review and existing exact-SHA certification. Deploy only main after candidate gates pass.",
   "scope": "CONTROLLED_STUDENT_RED_TEAM_ONLY",
   "ownerDecision": {
     "recordedOn": "2026-10-06",
-    "source": "Explicit owner instruction on 2026-10-06: repair the critical teacher preview, perform comprehensive preflight/impact review, publish through the existing protected GitHub release chain.",
+    "source": "Explicit owner instruction on 2026-10-06: repair Forms verifier publication-time and universal Google Forms policy UX, run comprehensive pre-commit preflight, and publish through the protected release chain.",
     "authorizeGithubPublication": true,
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",
@@ -32,7 +32,7 @@
     "independentReview": {
       "status": "FURTHER_REVIEW_WAIVED_BY_OWNER",
       "reviewedVersion": "7.1.92",
-      "currentVersion": "7.1.95",
+      "currentVersion": "7.1.96",
       "currentVersionIndependentlyReviewed": false
     }
   },
@@ -40,7 +40,7 @@
     "Publication is authorized for the supervised student red-team experiment; physical mobile compatibility is not certified.",
     "E6 remains deferred and open; a clean current branch does not prove historical cache removal.",
     "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication.",
-    "Physical phones and live Forms for this new export were not independently exercised. Further independent review of 7.1.95 was explicitly waived by owner; this is not an independent PASS.",
+    "Physical phones and live Forms for this new export were not independently exercised. Further independent review of 7.1.96 was explicitly waived by owner; this is not an independent PASS.",
     "Exact candidate and protected-main CI must complete before the existing promotion workflow may deploy."
   ]
 }

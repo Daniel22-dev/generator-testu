@@ -1,3 +1,12 @@
+## 7.1.96 – 2026-10-06 – Teacher Verifier / Google Forms UX
+
+- datum zveřejnění je předvyplněné na dnešek a učitel zadává běžný čas typu `13:20`; interní timestamp se počítá v `Europe/Prague` s fail-closed CET/CEST validací;
+- konec příjmu používá stejný model Datum + Čas;
+- odstraněn chybný požadavek „Jedna odpověď na účet“; `Limit to 1 response = OFF` je podporovaný;
+- třetí povinné potvrzení nyní ověřuje pouze, že CSV je původní nezměněný export z Google Forms;
+- identity/domain/roster, CSV parsing, replay/duplicate detekce, studentský secure runtime a scoring zůstávají zachované;
+- aktualizovány E3/browser journey testy, PWA verze/cache a release assurance/GARP evidence.
+
 ## 7.1.95 – 2026-10-06 – kritická oprava učitelského náhledu
 
 - náhled při každém otevření vytváří nový sandboxovaný iframe a při zavření jej odstraní, místo aby recykloval browsing context přes prázdný srcdoc;

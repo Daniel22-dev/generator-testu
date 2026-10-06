@@ -17,9 +17,11 @@ Metadata slouží jen k orientaci. Autoritou výsledku je stále kryptograficky 
 5. Test ID, název a skupina se do Formu předvyplní automaticky, pokud je jednorázová konfigurace aktivní.
 
 ## C. Po testu
-1. Z univerzálního Formu stáhni celé CSV. **Nefiltruj ho.**
+1. Z univerzálního Formu stáhni celé CSV. **Nefiltruj ho ani neupravuj.**
 2. Otevři `teacher_verifier.html` konkrétního testu.
-3. Nahraj celé CSV.
+3. V **Ověření Google Forms** nastav školní doménu, datum a běžný český čas zveřejnění (např. `13:20`). Datum je předvyplněné dnešním datem a časové pásmo je vždy `Europe/Prague`.
+4. Potvrď: **Sbírá ověřený e-mail**, **Je omezen na školní doménu** a **CSV je původní nezměněný export z Google Forms**. `Limit to 1 response` zůstává **OFF**.
+5. Nahraj celé CSV.
 4. Verifier rozliší výsledky tohoto testu, jiné testy, poškozené záznamy, metadata mismatch a duplicity.
 5. Identická duplicita se nezapočítá dvakrát. U dvou různých validních pokusů stejného studenta vyber explicitně, který použít.
 6. Stáhni **Export výsledků tohoto testu** a **Export odevzdání tohoto testu**.

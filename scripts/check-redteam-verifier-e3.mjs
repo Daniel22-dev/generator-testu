@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {w,gdom,configure,build,genDom} from './redteam-harness-utils.mjs';
 const selected=process.env.GIT_REDTEAM_E3_CASE||'all',checks=[],children=[];
-const policy={schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true};
+const policy={schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true,oneResponseConfirmed:false};
 const source={source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:'2026-10-03T12:16:00Z'};
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode'});
@@ -16,6 +16,17 @@ try{
   async function submit(patch={},sm=source){return v.verifyText('e3-synthetic.txt',await text({...base,...patch}),sm);}
   async function reject(patch,sm=source,code){reset();const result=await submit(patch,sm);assert.equal(result.classification,'invalid-current');assert.equal(result.row?.status,'CHYBA');assert.equal(result.row?.total,0,'rejection must precede scoring');assert.equal(v.effectiveResults().length,0);if(code)assert.equal(result.code,code);return result;}
   async function group(id,fn){if(selected!=='all'&&selected!==id)return;reset();await fn();checks.push(id);console.log('PASS E3',id);}
+  await group('forms-policy',async()=>{
+    assert.equal(v.e3PragueLocalIso('2026-10-06','13:20'),'2026-10-06T13:20:00+02:00');
+    assert.equal(v.e3PragueLocalIso('2026-01-15','13:20'),'2026-01-15T13:20:00+01:00');
+    assert.equal(v.e3PragueLocalIso('2026-07-15','13:20'),'2026-07-15T13:20:00+02:00');
+    assert.equal(v.e3PragueLocalIso('2026-10-06','25:80'),'');
+    assert.throws(()=>v.setFormsAnchorPolicy({...policy,publishedAt:undefined,publishedDate:'2026-10-06',publishedTime:''}));
+    assert.throws(()=>v.setFormsAnchorPolicy({...policy,csvOriginalConfirmed:false}));
+    const uiPolicy=v.setFormsAnchorPolicy({...policy,publishedAt:undefined,publishedDate:'2026-10-06',publishedTime:'13:20'});
+    assert.equal(uiPolicy.publishedAt,'2026-10-06T13:20:00+02:00');assert.equal(uiPolicy.csvOriginalConfirmed,true);assert.equal(Object.prototype.hasOwnProperty.call(uiPolicy,'oneResponseConfirmed'),false);
+    const limitOff=v.setFormsAnchorPolicy({...policy,oneResponseConfirmed:false});assert.equal(limitOff.schoolDomain,'example.invalid');
+  });
   await group('schema',async()=>{
     for(const patch of [{v:2},{attemptId:''},{resp:[]},{resp:{'99_0':1}},{resp:{'0_0':'1'}},{resp:{'0_0':99}},{resp:{'0_0':-1}},{resp:{'0_0':{answer:1}}},{securityEvents:[]},{securityEvents:null},{securityEvents:[{type:'attempt-start'}]},{securityEvents:[{t:base.startedAt,type:'attempt-start',bad:{nested:true}}]},{serverVerified:true},{trustAssessment:{runtimeAuthenticity:'PREVENTED'}},{totalAnswerChanges:1},{answerChangeStats:{'0_0':-1}},{jokerUsed:true,jokerSelectedAt:base.submittedAt},{pct:Infinity}])await reject(patch);
     reset();const missing={...base};delete missing.securityEvents;const result=await v.verifyText('missing.txt',await text(missing),source);assert.equal(result.row?.status,'CHYBA');

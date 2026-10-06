@@ -1,3 +1,5 @@
+> **7.1.96 – Teacher Verifier / Google Forms UX.** Čas zveřejnění se zadává jako české datum + čas v Europe/Prague; verifier automaticky řeší CET/CEST. Univerzální Form s `Limit to 1 response = OFF` je podporovaný; povinně se potvrzuje původní nezměněný CSV export. Studentský runtime a scoring se nemění. Viz [RELEASE-NOTES-7.1.96.md](RELEASE-NOTES-7.1.96.md).
+
 > **7.1.95 – kritická oprava opakovaného náhledu.** Každé otevření učitelského náhledu dostává nový iframe; zavření starý browsing context zničí. Přidány regresní scénáře pro opakované otevření instant i secure testu a PWA cache bump. Viz [RELEASE-NOTES-7.1.95.md](RELEASE-NOTES-7.1.95.md).
 
 > **7.1.94 – UX Readingu, AI posudek, náhled a Google Forms.** Opravený učitelský náhled, přehlednější Reading a AI posudek, přesunuté ověření Google Forms a sjednocené E2E/security workflow. Release prošel standardními P5/performance gate opravami bez zvýšení limitů. Viz [RELEASE-NOTES-7.1.94.md](RELEASE-NOTES-7.1.94.md).

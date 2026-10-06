@@ -1,7 +1,7 @@
 // Synthetic fixtures only; private generated HTML/JWK remain in memory.
 import {webcrypto,createHash} from 'node:crypto';
 import {w,configure,build,genDom,GEN} from './redteam-harness-utils.mjs';
-export const policy={schoolDomain:'example.invalid',publishedAt:'2026-10-04T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true};
+export const policy={schoolDomain:'example.invalid',publishedAt:'2026-10-04T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true};
 export const source={source:'google-forms-csv',fullYearCsv:false,formIdentity:'synthetic-a@example.invalid',formTimestamp:'2026-10-04T12:36:00Z'};
 export const clone=x=>structuredClone(x);
 export const b64=x=>Buffer.from(x).toString('base64url');

@@ -19,7 +19,7 @@ try {
     return await v.verifyText('synthetic-e2.txt',txt,{source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:'2026-10-03T12:16:00Z'});
   }
   await new Promise(r=>setTimeout(r,0));
-  if(v.setFormsAnchorPolicy)v.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true});
+  if(v.setFormsAnchorPolicy)v.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
   const sample=await forge();
   await check('trust',async()=>{
     assert.equal(sample.classification,'current');assert.equal(sample.row.pct,100);

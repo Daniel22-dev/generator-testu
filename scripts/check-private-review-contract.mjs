@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const c=vm.createContext({console,Intl,TextEncoder,CONFIG:{cas:40,identityMode:'oneTimeCode',roster:[{code:'ABC234',email:'synthetic@example.invalid'}],diffGroups:[]},$:()=>null,afterResultsChanged(){},renderFormsImportSummary(){},RESULTS:[],ATTEMPT_DECISIONS:new Map(),LAST_FORMS_IMPORT:null});
 for(const [f,symbol] of [['13ed-secure-verifier-validation.js','SECURE_VERIFIER_VALIDATION_JS'],['13ee-secure-verifier-anchors.js','SECURE_VERIFIER_ANCHORS_JS'],['13eg-secure-verifier-history.js','SECURE_VERIFIER_HISTORY_JS']]){vm.runInContext(fs.readFileSync('src/js/'+f,'utf8'),c);vm.runInContext(vm.runInContext(symbol,c),c);}
 const p={code:'ABC234',groupKey:'__default',startedAt:'2026-10-05T10:00:00Z',submittedAt:'2026-10-05T10:35:00Z',securityEvents:[{t:'2026-10-05T10:00:00Z',type:'attempt-start'}]};
-const policy={schoolDomain:'example.invalid',publishedAt:p.startedAt,csvTimezone:'Europe/Prague',emailHeader:'Email',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true};
+const policy={schoolDomain:'example.invalid',publishedAt:p.startedAt,csvTimezone:'Europe/Prague',emailHeader:'Email',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true};
 c.setFormsAnchorPolicy(policy);
 const source={submissionSource:'google-forms-csv',formIdentity:'synthetic@example.invalid',formTimestamp:'2026-10-05T10:42:00Z'};
 assert.equal(c.evaluateFormsAnchors(p,source).plannedMinutes,40);
