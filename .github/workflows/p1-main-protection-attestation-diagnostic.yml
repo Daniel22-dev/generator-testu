@@ -1,0 +1,46 @@
+name: P1 main protection attestation diagnostic
+
+on:
+  push:
+    branches:
+      - ci/main-protection-attestation-diag-20261006
+
+permissions:
+  contents: read
+
+jobs:
+  main-protection-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Materialize cumulative source plus attestation fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp ci-validation/P0_P1_P2_P3_CUMULATIVE.patch "${RUNNER_TEMP}/cumulative.patch"
+          cp ci-validation/P1_ATTESTATION_INCREMENTAL.patch "${RUNNER_TEMP}/attestation.patch"
+          git reset --hard 7516768223602cec697f4fb173382c2b6d17aab4
+          git clean -fdx
+          git apply --check "${RUNNER_TEMP}/cumulative.patch"
+          git apply --whitespace=error-all "${RUNNER_TEMP}/cumulative.patch"
+          git apply --check "${RUNNER_TEMP}/attestation.patch"
+          git apply --whitespace=error-all "${RUNNER_TEMP}/attestation.patch"
+          git diff --check
+
+      - name: Run P1 unit tests
+        run: node --test scripts/ci/p1.test.mjs
+
+      - name: Verify live main protection with standard GITHUB_TOKEN
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/main-protection.mjs --live
