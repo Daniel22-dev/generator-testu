@@ -19,7 +19,7 @@
   "note": "GIT 7.1.96: owner requested Forms verifier time/checkbox correction with comprehensive pre-commit preflight; student secure runtime and scoring are unchanged; protected exact-SHA CI remains required.",
   "adapterToolSha256s": {
     "scripts/garp27/architecture-integrity.mjs": "6fcf2f7a4140d31344296c2a24bb46558e21100df44128475a7239bac640540d",
-    "scripts/garp27/mutation-tests.mjs": "2565d9ec1224cc5c7914812117eaea686d1fc9b6b405d792c1429889f27684f1",
+    "scripts/garp27/mutation-tests.mjs": "39810b91bde7db1c59f19c16c35b771e8b7df583566d8f4cd82ba4bd84824c75",
     "scripts/garp27/contract-gate.mjs": "1e67d0823e2a6864fd172a68889307eb96a274d97deeb230e50535635de39c59",
     "scripts/garp27/policy-admission-mutations.mjs": "860e0f4b2d6f7323744aa9858c65a5ad1f20ed522c49b851fbe8b6cf8a9fd173",
     "scripts/garp27/auto-patch-contract.mjs": "a4da84c88114d779e5fbcdcf82ad7b237e1b2e09d820824926685fbbbe42f926",

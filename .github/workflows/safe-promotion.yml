@@ -8,128 +8,49 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: generator-safe-promotion
-  cancel-in-progress: true
-
 jobs:
-  candidate-gate:
-    name: candidate-gate
-    # Needs actions:write to cancel superseded runs and pull-requests:write to create/reuse the promotion PR; repository contents remain read-only.
-    permissions:
-      contents: read
-      actions: write
-      pull-requests: write
+  prepare:
+    name: prepare-promotion
     if: github.ref == 'refs/heads/candidate'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: generator-prepare-validation-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
-      certified_sha: ${{ steps.certified.outputs.sha }}
-      fresh: ${{ steps.freshness.outputs.fresh }}
-      has_changes: ${{ steps.diff.outputs.has_changes }}
+      certified_sha: ${{ steps.source.outputs.sha }}
+      main_sha: ${{ steps.source.outputs.main_sha }}
       pr_number: ${{ steps.pr.outputs.number }}
+      eligible: ${{ steps.ready.outputs.eligible }}
     steps:
-      - name: Cancel superseded candidate runs
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          for workflow in p5-release-gate.yml safe-promotion.yml; do
-            runs="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/runs?branch=candidate&per_page=100")"
-            while read -r run_id; do
-              [ -z "$run_id" ] && continue
-              [ "$run_id" = "$GITHUB_RUN_ID" ] && continue
-              gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" >/dev/null || true
-            done < <(jq -r --arg sha "$GITHUB_SHA" '.workflow_runs[] | select(.status != "completed" and .head_sha != $sha) | .id' <<<"$runs")
-          done
-
-      - name: Record exact candidate SHA
-        id: certified
-        shell: bash
-        run: echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout exact candidate SHA
+      - name: Checkout exact source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org
 
-      - name: Install dependencies
-        timeout-minutes: 5
-        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Require native main protection before early PR creation
         env:
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/main-protection.mjs --live
 
-      - name: Install pinned Playwright Chromium
-        shell: bash
-        run: |
-          npx playwright install --with-deps chromium
-          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
-
-      - name: Run unified error reporter regression
-        run: npm run test:reporter
-
-      - name: Run GHRAB QA release gate
-        run: npm run qa:release
+      - name: Pin fresh candidate and main before preparing PR
+        id: source
         env:
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
-
-      - name: Verify GHRAB Platform P3 conformance
-        run: npm run qa:platform
-
-      - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
-        run: npm run qa:redteam:ci
-        env:
-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
-
-      - name: Upload candidate QA evidence
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: generator-candidate-qa-${{ github.sha }}
-          path: qa-results
-
-      - name: Check candidate is still the certified SHA
-        id: freshness
-        shell: bash
-        env:
+          GH_TOKEN: ${{ github.token }}
           CERTIFIED_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin candidate
-          current_candidate="$(git rev-parse origin/candidate)"
-          if [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::notice::Candidate advanced during certification ($CERTIFIED_SHA -> $current_candidate). This run is superseded and will not promote anything."
-            echo "fresh=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "fresh=true" >> "$GITHUB_OUTPUT"
-          fi
+        run: node scripts/ci/promotion-freshness.mjs --prepare
 
-      - name: Check whether candidate differs from main
-        if: steps.freshness.outputs.fresh == 'true'
-        id: diff
-        shell: bash
-        env:
-          CERTIFIED_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin main
-          if git diff --quiet origin/main "$CERTIFIED_SHA" --; then
-            echo "::notice::Candidate $CERTIFIED_SHA has no content diff against main; promotion is already satisfied."
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Create or reuse candidate pull request
-        if: steps.freshness.outputs.fresh == 'true' && steps.diff.outputs.has_changes == 'true'
+      - name: Create or reuse protected candidate pull request
         id: pr
         shell: bash
         env:
@@ -138,217 +59,375 @@ jobs:
         run: |
           set -euo pipefail
           current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
-          if [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::error::Candidate changed before PR creation ($CERTIFIED_SHA -> $current_candidate)."
-            exit 1
-          fi
-          pr_number="$(gh pr list --repo "$GITHUB_REPOSITORY" --head candidate --base main --state open --json number --jq '.[0].number // empty')"
+          test "$current_candidate" = "$CERTIFIED_SHA"
+          prs="$(gh pr list --repo "$GITHUB_REPOSITORY" --head candidate --base main --state open --json number)"
+          count="$(jq 'length' <<<"$prs")"
+          test "$count" -le 1
+          pr_number="$(jq -r '.[0].number // empty' <<<"$prs")"
           if [ -z "$pr_number" ]; then
-            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'Automated Safe Promotion. Only the exact candidate SHA certified by GARP 2.7, legacy GARP 2.5.1/N5, QA, P3 and P5 R2 may be promoted. A second independent PR-certification job must also pass before merge.')"
+            pr_url="$(gh pr create --repo "$GITHUB_REPOSITORY" --head candidate --base main --title 'Promote verified Generator candidate' --body 'P1: two independent full certifications run on separate runners for the same exact SHA. Native release-admission, candidate, PR, P5 and Journey checks are required before merge. Creation of this PR is not approval for merge.')"
             pr_number="${pr_url##*/}"
           fi
-          pr_head="$(gh pr view "$pr_number" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
-          if [ "$pr_head" != "$CERTIFIED_SHA" ]; then
-            echo "::error::Open promotion PR #$pr_number does not point to certified SHA $CERTIFIED_SHA (head=$pr_head)."
-            exit 1
-          fi
+          [[ "$pr_number" =~ ^[1-9][0-9]*$ ]]
           echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+
+      - name: Bind protected PR to prepared candidate and main
+        id: ready
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ github.sha }}
+          PREPARED_MAIN_SHA: ${{ steps.source.outputs.main_sha }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
+
+  candidate-gate:
+    name: candidate-gate
+    needs: prepare
+    if: needs.prepare.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: generator-candidate-validation-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      certified_sha: ${{ needs.prepare.outputs.certified_sha }}
+      eligible: ${{ steps.freshness.outputs.eligible }}
+    steps:
+      - name: Checkout exact candidate SHA
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.prepare.outputs.certified_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure shared CI Node setup
+        uses: ./.github/actions/setup-ci-node
+
+      - name: Verify exact PR candidate and prepared main
+        id: initial_freshness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
+
+      - name: Install independently verified CI tools
+        id: ci_tools
+        timeout-minutes: 12
+        uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: ${{ needs.prepare.outputs.certified_sha }}
+          browser-env: CHROMIUM_PATH
+
+      - name: Preserve per-job toolchain provenance
+        if: always() && (steps.ci_tools.outcome == 'success' || steps.ci_tools.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-toolchain-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          path: ${{ runner.temp }}/generator-ci-tools/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}/toolchain.json
+          retention-days: 14
+          if-no-files-found: error
+
+
+      - name: Run unified error reporter regression
+        run: npm run test:reporter
+
+      - name: Record structured QA start
+        id: release_start
+        shell: bash
+        run: echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+      - name: Run GHRAB QA release gate
+        id: release_qa
+        run: npm run qa:release
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+
+      - name: Validate current structured QA evidence
+        id: release_evidence
+        if: always() && (steps.release_qa.outcome == 'success' || steps.release_qa.outcome == 'failure')
+        env:
+          CI_RELEASE_STARTED_AT: ${{ steps.release_start.outputs.started_at }}
+          CI_RELEASE_OUTCOME: ${{ steps.release_qa.outcome }}
+        run: node scripts/ci/release-evidence.mjs
+
+      - name: Preserve structured QA before destructive red-team cleanup
+        if: always() && steps.release_evidence.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-candidate-release-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: |
+            qa-results/qa-report.json
+            qa-results/qa-report.html
+            qa-results/release-verdict.txt
+            qa-results/qa-test-matrix.csv
+            qa-results/qa-release-evidence.json
+
+      - name: Verify GHRAB Platform P3 conformance
+        run: npm run qa:platform
+
+      - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
+        run: npm run qa:redteam:ci
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+
+      - name: Upload candidate QA evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-candidate-qa-${{ github.sha }}
+          path: qa-results
+
+      - name: Verify exact PR candidate and prepared main
+        id: freshness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
 
   pr-certification:
     name: pr-certification
+    concurrency:
+      group: generator-pr-validation-${{ github.ref }}
+      cancel-in-progress: true
+    timeout-minutes: 60
     # Certification only reads the exact PR/SHA and repository contents; it does not mutate either.
     permissions:
       contents: read
       pull-requests: read
-    needs: candidate-gate
-    if: needs.candidate-gate.outputs.fresh == 'true' && needs.candidate-gate.outputs.has_changes == 'true'
+    needs: prepare
+    if: needs.prepare.outputs.eligible == 'true'
     runs-on: ubuntu-latest
     outputs:
+      certified_sha: ${{ needs.prepare.outputs.certified_sha }}
       eligible: ${{ steps.final_freshness.outputs.eligible }}
     steps:
       - name: Checkout exact certified PR head
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ needs.candidate-gate.outputs.certified_sha }}
+          ref: ${{ needs.prepare.outputs.certified_sha }}
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Verify PR and candidate still point to certified SHA
+      - name: Configure shared CI Node setup
+        uses: ./.github/actions/setup-ci-node
+
+      - name: Verify exact PR candidate and prepared main
         id: pr_freshness
-        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
-          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
-        run: |
-          set -euo pipefail
-          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
-          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
-          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::notice::PR/candidate advanced before PR certification. This run is superseded and will be a no-op."
-            echo "current=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "current=true" >> "$GITHUB_OUTPUT"
-          fi
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
 
-      - name: Set up Node.js
-        if: steps.pr_freshness.outputs.current == 'true'
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - name: Install independently verified CI tools
+        id: ci_tools
+        timeout-minutes: 12
+        uses: ./.github/actions/install-ci-tools
         with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org
+          expected-sha: ${{ needs.prepare.outputs.certified_sha }}
+          browser-env: CHROMIUM_PATH
 
-      - name: Install dependencies
-        if: steps.pr_freshness.outputs.current == 'true'
-        timeout-minutes: 5
-        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
-        env:
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      - name: Preserve per-job toolchain provenance
+        if: always() && (steps.ci_tools.outcome == 'success' || steps.ci_tools.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-toolchain-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          path: ${{ runner.temp }}/generator-ci-tools/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}/toolchain.json
+          retention-days: 14
+          if-no-files-found: error
 
-      - name: Install pinned Playwright Chromium
-        if: steps.pr_freshness.outputs.current == 'true'
-        shell: bash
-        run: |
-          npx playwright install --with-deps chromium
-          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
 
       - name: Run PR unified error reporter regression
-        if: steps.pr_freshness.outputs.current == 'true'
         run: npm run test:reporter
 
+      - name: Record structured QA start
+        id: release_start
+        shell: bash
+        run: echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
       - name: Run PR GHRAB QA release gate
-        if: steps.pr_freshness.outputs.current == 'true'
+        id: release_qa
         run: npm run qa:release
         env:
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org
 
+      - name: Validate current structured QA evidence
+        id: release_evidence
+        if: always() && (steps.release_qa.outcome == 'success' || steps.release_qa.outcome == 'failure')
+        env:
+          CI_RELEASE_STARTED_AT: ${{ steps.release_start.outputs.started_at }}
+          CI_RELEASE_OUTCOME: ${{ steps.release_qa.outcome }}
+        run: node scripts/ci/release-evidence.mjs
+
+      - name: Preserve structured QA before destructive red-team cleanup
+        if: always() && steps.release_evidence.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-pr-release-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: |
+            qa-results/qa-report.json
+            qa-results/qa-report.html
+            qa-results/release-verdict.txt
+            qa-results/qa-test-matrix.csv
+            qa-results/qa-release-evidence.json
+
       - name: Verify PR GHRAB Platform P3 conformance
-        if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:platform
 
       - name: Enforce PR P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
-        if: steps.pr_freshness.outputs.current == 'true'
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
 
       - name: Upload PR certification evidence
-        if: always() && steps.pr_freshness.outputs.current == 'true'
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: generator-pr-certification-${{ needs.candidate-gate.outputs.certified_sha }}
+          name: generator-pr-certification-${{ needs.prepare.outputs.certified_sha }}
           path: qa-results
 
-      - name: Recheck exact PR head after certification
-        if: steps.pr_freshness.outputs.current == 'true'
+      - name: Verify exact PR candidate and prepared main
         id: final_freshness
-        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
-          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
-        run: |
-          set -euo pipefail
-          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
-          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
-          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::notice::Candidate advanced during PR certification. Certified SHA will not be merged."
-            echo "eligible=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "eligible=true" >> "$GITHUB_OUTPUT"
-          fi
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
+
+  admission:
+    name: release-admission
+    # Always executes even when a dependency failed or was skipped.
+    if: always()
+    needs: [prepare, candidate-gate, pr-certification]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    concurrency:
+      group: generator-admission-validation-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+      checks: read
+    outputs:
+      eligible: ${{ steps.admitted.outputs.eligible }}
+      certified_sha: ${{ steps.admitted.outputs.sha }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Reject failed skipped cancelled or foreign certification results
+        env:
+          CERTIFIED_SHA: ${{ github.sha }}
+          CI_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: node scripts/ci/release-admission.mjs --prerequisites
+
+      - name: Recheck native protection before admission
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/main-protection.mjs --live
+
+      - name: Require independent P5 and Journey E2E for exact certified SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+        run: node scripts/ci/release-admission.mjs --independent
+
+      - name: Require classroom release readiness
+        run: node scripts/check-redteam-release-e10.mjs --require-ready
+
+      - name: Admit only the still-current PR candidate and main
+        id: admitted
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
+
+      - name: Upload premerge admission evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-premerge-admission-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: qa-results/*-p1.json
 
   promote:
     name: promote-certified-pr
+    concurrency:
+      group: generator-promotion-transaction
+      cancel-in-progress: false
     # Final promotion must read Actions status, merge the certified PR, and synchronize candidate to the resulting main SHA.
     permissions:
       contents: write
       pull-requests: write
       actions: write
-    needs: [candidate-gate, pr-certification]
-    if: needs.candidate-gate.outputs.fresh == 'true' && needs.pr-certification.outputs.eligible == 'true'
+      checks: read
+    needs: [prepare, candidate-gate, pr-certification, admission]
+    if: needs.admission.result == 'success' && needs.admission.outputs.eligible == 'true' && needs.admission.outputs.certified_sha == github.sha
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - name: Checkout exact certified SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ needs.candidate-gate.outputs.certified_sha }}
+          ref: ${{ needs.prepare.outputs.certified_sha }}
           fetch-depth: 0
 
-      - name: Final fail-closed freshness gate
-        id: premerge
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
-          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
-        run: |
-          set -euo pipefail
-          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
-          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
-          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::notice::Certified SHA is no longer the PR/candidate HEAD. Promotion is superseded and will be a no-op."
-            echo "eligible=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "eligible=true" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
 
-      - name: Require independent P5 and Journey E2E for exact certified SHA
-        if: steps.premerge.outputs.eligible == 'true'
-        shell: bash
+      - name: Recheck native protection inside the promotion lock
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
-        run: |
-          set -euo pipefail
-          for attempt in $(seq 1 120); do
-            checks="$(gh api -H 'Accept: application/vnd.github+json' "repos/$GITHUB_REPOSITORY/commits/$CERTIFIED_SHA/check-runs?per_page=100")"
-            p5_green="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and .conclusion == "success")] | length' <<<"$checks")"
-            journey_green="$(jq '[.check_runs[] | select(.name == "journey-e2e" and .conclusion == "success")] | length' <<<"$checks")"
-            p5_red="$(jq '[.check_runs[] | select(.name == "p5-release-gate" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure"))] | length' <<<"$checks")"
-            journey_red="$(jq '[.check_runs[] | select(.name == "journey-e2e" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required" or .conclusion == "startup_failure"))] | length' <<<"$checks")"
-            if [ "$p5_red" -gt 0 ] || [ "$journey_red" -gt 0 ]; then
-              echo "::error::Required independent release check is RED for exact SHA $CERTIFIED_SHA (p5_red=$p5_red journey_red=$journey_red)."
-              exit 1
-            fi
-            if [ "$p5_green" -gt 0 ] && [ "$journey_green" -gt 0 ]; then
-              echo "Independent p5-release-gate and journey-e2e are GREEN for exact SHA $CERTIFIED_SHA."
-              exit 0
-            fi
-            echo "Waiting for independent release checks on exact SHA $CERTIFIED_SHA (attempt $attempt/120; p5_green=$p5_green journey_green=$journey_green)."
-            sleep 15
-          done
-          echo "::error::Required independent P5/Journey checks did not both reach GREEN for exact SHA $CERTIFIED_SHA within the bounded wait."
-          exit 1
+        run: node scripts/ci/main-protection.mjs --live
 
-      - name: Recheck candidate and PR after required release checks
-        if: steps.premerge.outputs.eligible == 'true'
-        shell: bash
+      - name: Recheck independent gates inside the promotion lock
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
-          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
-        run: |
-          set -euo pipefail
-          pr_head="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq '.headRefOid')"
-          current_candidate="$(git ls-remote origin refs/heads/candidate | awk '{print $1}')"
-          if [ "$pr_head" != "$CERTIFIED_SHA" ] || [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::error::Candidate or promotion PR moved while waiting for required release checks; refusing merge."
-            exit 1
-          fi
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+        run: node scripts/ci/release-admission.mjs --independent
 
       - name: Require classroom release readiness
-        if: steps.premerge.outputs.eligible == 'true'
         run: node scripts/check-redteam-release-e10.mjs --require-ready
+
+      - name: Final fail-closed freshness gate immediately before merge
+        id: premerge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/promotion-freshness.mjs --pr
 
       - name: Merge certified pull request into main
         if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
-          PR_NUMBER: ${{ needs.candidate-gate.outputs.pr_number }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
         run: |
           set -euo pipefail
           gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --merge --match-head-commit "$CERTIFIED_SHA"
@@ -358,7 +437,7 @@ jobs:
         id: merged
         shell: bash
         env:
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
         run: |
           set -euo pipefail
           git fetch --no-tags origin main
@@ -387,6 +466,7 @@ jobs:
             if [ -n "$deploy_run" ]; then
               break
             fi
+            echo "Waiting for automatic deploy run for $MAIN_HEAD (attempt $attempt/6)."
             sleep 5
           done
 
@@ -398,6 +478,7 @@ jobs:
               if [ -n "$deploy_run" ]; then
                 break
               fi
+              echo "Waiting for dispatched deploy run for $MAIN_HEAD (attempt $attempt/60)."
               sleep 5
             done
           fi
@@ -414,20 +495,6 @@ jobs:
         if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          CERTIFIED_SHA: ${{ needs.candidate-gate.outputs.certified_sha }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
           MAIN_HEAD: ${{ steps.merged.outputs.main_head }}
-        run: |
-          set -euo pipefail
-          current_candidate="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/candidate" --jq '.object.sha')"
-          if [ "$current_candidate" != "$CERTIFIED_SHA" ]; then
-            echo "::notice::Candidate advanced to $current_candidate after merge; refusing to overwrite newer candidate work."
-            exit 0
-          fi
-          gh api -X PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/candidate" -f sha="$MAIN_HEAD" -F force=true >/dev/null
-          synced_candidate="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/candidate" --jq '.object.sha')"
-          if [ "$synced_candidate" != "$MAIN_HEAD" ]; then
-            echo "::error::Candidate synchronisation failed ($synced_candidate != $MAIN_HEAD)."
-            exit 1
-          fi
-          echo "Candidate synchronised to promoted main $MAIN_HEAD."
+        run: bash scripts/ci/sync-candidate.sh

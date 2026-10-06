@@ -1,0 +1,22 @@
+{
+  "schema": "git-main-ruleset-admin-attestation-v1",
+  "repository": "Daniel22-dev/generator-testu",
+  "rulesetId": 23603155,
+  "rulesetUpdatedAt": "2026-10-06T18:33:10.701Z",
+  "bypassActors": [],
+  "currentUserCanBypass": "never",
+  "strictRequiredStatusChecks": true,
+  "doNotEnforceOnCreate": false,
+  "requiredChecks": [
+    { "context": "candidate-gate", "integrationId": 15368 },
+    { "context": "pr-certification", "integrationId": 15368 },
+    { "context": "p5-release-gate", "integrationId": 15368 },
+    { "context": "journey-e2e", "integrationId": 15368 },
+    { "context": "release-admission", "integrationId": 15368 }
+  ],
+  "scope": {
+    "include": ["refs/heads/main"],
+    "exclude": []
+  },
+  "attestationBasis": "Out-of-band administrator-readable ruleset inspection confirmed bypass_actors=[] for this exact ruleset updated_at."
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "ghrab-ci-consumer-v1",
+  "standardVersion": "1.0.0",
+  "purpose": "DIAGNOSTIC_ONLY_NOT_RELEASE_ADMISSION",
+  "repository": "Daniel22-dev/generator-testu",
+  "repositoryId": "1262251614",
+  "appId": "generator-testu",
+  "profile": "git-independent-v1",
+  "state": "STAGED",
+  "toolchain": {
+    "nodeMajor": 22,
+    "npmLockfile": "package-lock.json",
+    "playwright": "1.61.1",
+    "axe": "4.12.1",
+    "pythonRequirements": "audit/requirements-audit.txt"
+  },
+  "trustInputs": [
+    {
+      "environment": "GARP27_EXTERNAL_TRUST_SHA256",
+      "source": "repository-reviewed-pin",
+      "sha256": "2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1"
+    }
+  ],
+  "gates": [
+    {
+      "role": "candidate",
+      "workflow": ".github/workflows/safe-promotion.yml",
+      "job": "candidate-gate",
+      "checkName": "candidate-gate",
+      "identity": "candidate-source",
+      "independentGroup": "candidate"
+    },
+    {
+      "role": "pr",
+      "workflow": ".github/workflows/safe-promotion.yml",
+      "job": "pr-certification",
+      "checkName": "pr-certification",
+      "identity": "candidate-source",
+      "independentGroup": "pr"
+    },
+    {
+      "role": "p5",
+      "workflow": ".github/workflows/p5-release-gate.yml",
+      "job": "p5-release-gate",
+      "checkName": "p5-release-gate",
+      "identity": "candidate-source",
+      "independentGroup": "p5"
+    },
+    {
+      "role": "journey",
+      "workflow": ".github/workflows/journey-e2e.yml",
+      "job": "journey-e2e",
+      "checkName": "journey-e2e",
+      "identity": "candidate-source",
+      "independentGroup": "journey"
+    },
+    {
+      "role": "admission",
+      "workflow": ".github/workflows/safe-promotion.yml",
+      "job": "admission",
+      "checkName": "release-admission",
+      "identity": "candidate-source",
+      "independentGroup": null
+    },
+    {
+      "role": "main",
+      "workflow": ".github/workflows/deploy.yml",
+      "job": "qa-build",
+      "checkName": "qa-build",
+      "identity": "merged-main-source",
+      "independentGroup": "main"
+    }
+  ],
+  "evidence": {
+    "identityFields": [
+      "repositoryId",
+      "repository",
+      "sourceCommit",
+      "runId",
+      "runAttempt",
+      "job",
+      "workflowIdentity",
+      "artifactDigest"
+    ],
+    "cleanupPolicy": "preserve-before-cleanup",
+    "authority": "never-from-standard-report"
+  },
+  "invariants": [
+    "exact-source-identity",
+    "independent-certifications",
+    "fail-closed-admission",
+    "branch-and-pr-freshness",
+    "retain-mandatory-gates",
+    "preserve-evidence-before-cleanup",
+    "pinned-dependencies",
+    "least-privilege",
+    "atomic-candidate-update",
+    "protected-production-deploy",
+    "verify-live-release-identity",
+    "repository-specific-trust"
+  ],
+  "sharing": {
+    "implementation": true,
+    "buildArtifact": false,
+    "certificationResult": false
+  }
+}

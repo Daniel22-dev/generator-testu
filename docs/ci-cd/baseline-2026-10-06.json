@@ -1,0 +1,210 @@
+{
+  "schema": "git-cicd-audit-metrics-v1",
+  "repository": "Daniel22-dev/generator-testu",
+  "date": "2026-10-06",
+  "timezone": "UTC",
+  "collection_note": "Selected timestamp fields manually normalized from read-only GitHub connector responses; durations calculated, not estimated. Not the full raw API responses.",
+  "reference_cycle": {
+    "version": "7.1.96",
+    "candidate_sha": "cb808030d1288be805a4331f9ccfc2751de2aeda",
+    "main_sha": "7516768223602cec697f4fb173382c2b6d17aab4",
+    "candidate_and_merge_tree": "72d31d1f0c28701f280816f17309ffa0562048e5",
+    "pr": 87,
+    "workflow_created_at": "2026-10-06T08:33:11Z",
+    "merge_at": "2026-10-06T08:57:49Z",
+    "live_identity_verified_at": "2026-10-06T09:11:34Z",
+    "safe_workflow_updated_at": "2026-10-06T09:11:47Z",
+    "time_to_merge_seconds": 1478,
+    "time_to_verified_live_seconds": 2303,
+    "safe_workflow_wall_seconds": 2316,
+    "sum_job_execution_seconds": 3649,
+    "initial_workflow_to_candidate_job_created_seconds": 85,
+    "initial_workflow_to_candidate_job_started_seconds": 88,
+    "jobs": [
+      {
+        "run_id": 37436869060,
+        "job_id": 112181250017,
+        "name": "candidate-gate",
+        "created_at": "2026-10-06T08:34:36Z",
+        "started_at": "2026-10-06T08:34:39Z",
+        "completed_at": "2026-10-06T08:46:25Z",
+        "execution_seconds": 706,
+        "created_to_started_seconds": 3,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37436869060/jobs?per_page=10"
+      },
+      {
+        "run_id": 37436869060,
+        "job_id": 112185668762,
+        "name": "pr-certification",
+        "created_at": "2026-10-06T08:46:25Z",
+        "started_at": "2026-10-06T08:46:28Z",
+        "completed_at": "2026-10-06T08:57:37Z",
+        "execution_seconds": 669,
+        "created_to_started_seconds": 3,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37436869060/jobs?per_page=10"
+      },
+      {
+        "run_id": 37436869060,
+        "job_id": 112189914456,
+        "name": "promote-certified-pr",
+        "created_at": "2026-10-06T08:57:38Z",
+        "started_at": "2026-10-06T08:57:40Z",
+        "completed_at": "2026-10-06T09:11:46Z",
+        "execution_seconds": 846,
+        "created_to_started_seconds": 2,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37436869060/jobs?per_page=10"
+      },
+      {
+        "run_id": 37436869193,
+        "job_id": 112180722396,
+        "name": "p5-release-gate",
+        "created_at": "2026-10-06T08:33:12Z",
+        "started_at": "2026-10-06T08:33:15Z",
+        "completed_at": "2026-10-06T08:39:02Z",
+        "execution_seconds": 347,
+        "created_to_started_seconds": 3,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37436869193/jobs?per_page=10"
+      },
+      {
+        "run_id": 37436868995,
+        "job_id": 112180721930,
+        "name": "journey-e2e",
+        "created_at": "2026-10-06T08:33:12Z",
+        "started_at": "2026-10-06T08:33:13Z",
+        "completed_at": "2026-10-06T08:38:52Z",
+        "execution_seconds": 339,
+        "created_to_started_seconds": 1,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37436868995/jobs?per_page=10"
+      },
+      {
+        "run_id": 37439737588,
+        "job_id": 112190257842,
+        "name": "qa-build",
+        "created_at": "2026-10-06T08:58:31Z",
+        "started_at": "2026-10-06T08:59:09Z",
+        "completed_at": "2026-10-06T09:11:16Z",
+        "execution_seconds": 727,
+        "created_to_started_seconds": 38,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37439737588/jobs?per_page=10"
+      },
+      {
+        "run_id": 37439737588,
+        "job_id": 112195197699,
+        "name": "deploy",
+        "created_at": "2026-10-06T09:11:17Z",
+        "started_at": "2026-10-06T09:11:20Z",
+        "completed_at": "2026-10-06T09:11:30Z",
+        "execution_seconds": 10,
+        "created_to_started_seconds": 3,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37439737588/jobs?per_page=10"
+      },
+      {
+        "run_id": 37439737588,
+        "job_id": 112195285458,
+        "name": "notify-ai-studio",
+        "created_at": "2026-10-06T09:11:30Z",
+        "started_at": "2026-10-06T09:11:33Z",
+        "completed_at": "2026-10-06T09:11:38Z",
+        "execution_seconds": 5,
+        "created_to_started_seconds": 3,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37439737588/jobs?per_page=10"
+      }
+    ],
+    "selected_step_seconds": {
+      "candidate-gate": {
+        "npm_ci": 3,
+        "chromium_install": 24,
+        "reporter_including_prebuild": 20,
+        "qa_release": 286,
+        "platform": 1,
+        "redteam": 357
+      },
+      "pr-certification": {
+        "npm_ci": 1,
+        "chromium_install": 32,
+        "reporter_including_prebuild": 18,
+        "qa_release": 274,
+        "platform": 0,
+        "redteam": 332
+      },
+      "qa-build": {
+        "npm_ci": 2,
+        "chromium_install": 22,
+        "reporter_including_prebuild": 20,
+        "qa_release": 297,
+        "platform": 0,
+        "redteam": 378
+      },
+      "p5-release-gate": {
+        "npm_ci": 2,
+        "chromium_install": 29,
+        "redteam": 308
+      },
+      "journey-e2e": {
+        "npm_ci": 2,
+        "chromium_install": 21,
+        "python_setup": 4,
+        "build": 4,
+        "suites": 301
+      },
+      "promote-certified-pr": {
+        "wait_for_independent_checks_rounded_seconds": 0,
+        "ensure_deployment_including_dispatch_and_watch": 830
+      }
+    }
+  },
+  "comparison_cycle": {
+    "version": "7.1.95",
+    "candidate_sha": "45770292c837c43a64715f88e19d87b3e971797a",
+    "main_sha": "96634352da165baf941515edd7c8d1708f1babf8",
+    "safe_run_id": 37417337369,
+    "deploy_run_id": 37418932119,
+    "workflow_created_at": "2026-10-06T05:11:53Z",
+    "merge_at": "2026-10-06T05:30:28Z",
+    "safe_workflow_updated_at": "2026-10-06T05:41:05Z",
+    "time_to_merge_seconds": 1115,
+    "safe_workflow_wall_seconds": 1752,
+    "jobs": [
+      {
+        "run_id": 37417337369,
+        "job_id": 112118753670,
+        "name": "candidate-gate",
+        "created_at": "2026-10-06T05:11:54Z",
+        "started_at": "2026-10-06T05:11:56Z",
+        "completed_at": "2026-10-06T05:21:03Z",
+        "execution_seconds": 547,
+        "created_to_started_seconds": 2,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37417337369/jobs?per_page=10"
+      },
+      {
+        "run_id": 37417337369,
+        "job_id": 112121095404,
+        "name": "pr-certification",
+        "created_at": "2026-10-06T05:21:03Z",
+        "started_at": "2026-10-06T05:21:05Z",
+        "completed_at": "2026-10-06T05:30:17Z",
+        "execution_seconds": 552,
+        "created_to_started_seconds": 2,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37417337369/jobs?per_page=10"
+      },
+      {
+        "run_id": 37417337369,
+        "job_id": 112123477866,
+        "name": "promote-certified-pr",
+        "created_at": "2026-10-06T05:30:17Z",
+        "started_at": "2026-10-06T05:30:19Z",
+        "completed_at": "2026-10-06T05:41:04Z",
+        "execution_seconds": 645,
+        "created_to_started_seconds": 2,
+        "source_url": "https://api.github.com/repos/Daniel22-dev/generator-testu/actions/runs/37417337369/jobs?per_page=10"
+      }
+    ],
+    "watch_deploy_step_seconds": 631
+  },
+  "limitations": [
+    "Two different source revisions, not an A/B performance experiment.",
+    "Only current reference cycle has all four workflow job groups measured in this normalized dataset.",
+    "Sum of job elapsed time is runner occupancy, not CPU utilization or billed cost.",
+    "Queue column measures job.created_at to job.started_at; initial orchestration delay is recorded separately."
+  ]
+}

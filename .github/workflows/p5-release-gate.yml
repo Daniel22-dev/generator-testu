@@ -18,26 +18,35 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
-          cache: npm
-          registry-url: https://registry.npmjs.org
-      - name: Install locked dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Configure shared CI Node setup
+        uses: ./.github/actions/setup-ci-node
+      - name: Install independently verified CI tools
+        id: ci_tools
+        timeout-minutes: 12
+        uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: ${{ github.sha }}
+          browser-env: CHROMIUM_PATH
+
+      - name: Preserve per-job toolchain provenance
+        if: always() && (steps.ci_tools.outcome == 'success' || steps.ci_tools.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-toolchain-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          path: ${{ runner.temp }}/generator-ci-tools/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}/toolchain.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Verify pinned audit tools
         run: |
           node -e "const p=require('./node_modules/axe-core/package.json'); if(p.version!=='4.12.1') process.exit(1)"
           node -e "const p=require('./node_modules/playwright/package.json'); if(p.version!=='1.61.1') process.exit(1)"
-      - name: Install pinned Playwright Chromium
-        shell: bash
-        run: |
-          npx playwright install --with-deps chromium
-          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
       - name: Run E9 regression, foundation and final P5 admission
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
       - name: Upload audit evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

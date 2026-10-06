@@ -23,6 +23,7 @@ const files = {
   journey: read('.github/workflows/journey-e2e.yml'),
   safePromotion: read('.github/workflows/safe-promotion.yml'),
   p5: read('.github/workflows/p5-release-gate.yml'),
+  releaseAdmission: read('scripts/ci/release-admission.mjs'),
 };
 
 const results = [];
@@ -97,9 +98,28 @@ check('D','2','D7 runner covers analytics, IA/security, joker browser workflow, 
 check('D','3','Journey clears stale evidence, covers config/state flows and binds artifact to exact SHA',
   /rm -rf audit\/evidence[\s\S]*mkdir -p audit\/evidence/.test(files.journey) &&
   has(files.journey,'--suite state_transition_suite','--suite config_extra_suite','journey-e2e-evidence-${{ github.sha }}'));
-check('D','4','Safe Promotion requires green P5 and Journey checks on certified SHA',
-  /p5_green=.*p5-release-gate/.test(files.safePromotion) && /journey_green=.*journey-e2e/.test(files.safePromotion) &&
-  /if \[ "\$p5_green" -gt 0 \] && \[ "\$journey_green" -gt 0 \]/.test(files.safePromotion));
+check('D','4','Safe Promotion requires independent certification and read-only admission for the exact certified SHA',
+  has(files.safePromotion,
+    'name: release-admission',
+    'needs: [prepare, candidate-gate, pr-certification]',
+    'run: node scripts/ci/release-admission.mjs --prerequisites',
+    'needs: [prepare, candidate-gate, pr-certification, admission]',
+    'gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --merge --match-head-commit "$CERTIFIED_SHA"') &&
+  (files.safePromotion.match(/release-admission\.mjs --independent/g) || []).length >= 2 &&
+  has(files.releaseAdmission,
+    "{ file: 'p5-release-gate.yml', job: 'p5-release-gate' }",
+    "{ file: 'journey-e2e.yml', job: 'journey-e2e' }",
+    "assert.equal(needs?.[id]?.result, 'success'",
+    "assert.equal(needs[id].outputs?.eligible, 'true'",
+    "assert.equal(needs[id].outputs?.certified_sha, sha",
+    "run.head_sha === sha",
+    "assert.equal(run.path, '.github/workflows/' + gate.file",
+    "assert.equal(run.repository?.full_name, repo",
+    "assert.equal(run.head_repository?.full_name, repo",
+    "assert.equal(check.app?.id, ACTIONS_APP_ID",
+    "assert.equal(check.status, 'completed')",
+    "assert.equal(check.conclusion, 'success')",
+    "Independent P5/Journey did not both succeed within the bounded wait"));
 check('D','5','D7 removes sensitive browser fixtures/PDFs and retains only safe summaries',
   has(files.d7Runner,'cleanupSensitiveRuntimeArtifacts','qa-fixtures',"entry !== 'summary.json'") &&
   has(files.p5,'qa-results/d7-regressions.json','qa-results/d8-final-audit.json','qa-results/stage3-pdf-runtime/summary.json','qa-results/stage3-pdf-quality/summary.json','qa-results/verifier-ui-runtime/summary.json'));

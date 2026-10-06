@@ -1,0 +1,34 @@
+{
+  "schema": "ghrab-ci-standard-v1",
+  "version": "1.0.0",
+  "purpose": "DIAGNOSTIC_ONLY_NOT_RELEASE_ADMISSION",
+  "status": "STAGED_NOT_ACTIVATED",
+  "invariants": [
+    "exact-source-identity",
+    "independent-certifications",
+    "fail-closed-admission",
+    "branch-and-pr-freshness",
+    "retain-mandatory-gates",
+    "preserve-evidence-before-cleanup",
+    "pinned-dependencies",
+    "least-privilege",
+    "atomic-candidate-update",
+    "protected-production-deploy",
+    "verify-live-release-identity",
+    "repository-specific-trust"
+  ],
+  "sharing": {
+    "implementation": "reviewed-vendored-bundle",
+    "buildArtifact": false,
+    "certificationResult": false,
+    "globalTrustPin": false
+  },
+  "activation": [
+    "complete-local-preflight",
+    "native-policy-with-runtime-identity",
+    "independent-hosted-certifications",
+    "race-and-superseded-rehearsal",
+    "verified-deploy-and-rollback",
+    "explicit-per-repository-rollout"
+  ]
+}
