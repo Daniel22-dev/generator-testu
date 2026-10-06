@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - ci/preflight-p0-p3-20261006
+  pull_request:
+    branches:
+      - ci/preflight-p0-p3-20261006
   workflow_dispatch:
 
 permissions:
