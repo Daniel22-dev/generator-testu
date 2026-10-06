@@ -144,11 +144,14 @@ try:
   j.new_test('Běžný test')
   score=j.ev("()=>document.querySelector('#didacticPanel .quality-score').innerText")
   assert score.endswith('30 b'),('didactic points must match the test (F-03)',score)
-  j.p.click('#btnPreview');j.p.wait_for_timeout(700);fr=[f for f in j.p.frames if f!=j.p.main_frame][0]
+  j.p.click('#btnPreview');j.p.wait_for_timeout(700);fr=[f for f in j.p.frames if f!=j.p.main_frame][0];first_preview=j.p.locator('#previewFrame').get_attribute('data-preview-instance')
   fr.fill('#studentName','Jana Nováková');fr.get_by_role('button',name=re.compile('Start')).first.click()
   answer_instant(fr,lambda k:k%2==0);res=submit_instant(fr)
   assert '16/30' in res and '53%' in res,('preview must score like the student test',res[:300])
-  j.p.get_by_role('button',name='Zavřít náhled').click()  # Escape uvnitř sandboxovaného iframe náhled nezavře (MINOR, viz report)
+  j.p.get_by_role('button',name='Zavřít náhled').click();assert j.p.locator('#previewFrame').count()==0,'closing preview must destroy its iframe'
+  j.p.click('#btnPreview');j.p.wait_for_timeout(700);fresh=j.p.frame_locator('#previewFrame');fresh.locator('#studentName').wait_for();second_preview=j.p.locator('#previewFrame').get_attribute('data-preview-instance')
+  assert second_preview!=first_preview,'reopened preview must use a fresh browsing context';assert fresh.locator('#introScreen').is_visible(),'reopened preview must start clean';assert fresh.locator('#studentName').input_value()==''
+  j.p.get_by_role('button',name='Zavřít náhled').click()
   d=j.download('#btnDownloadMain');assert not j.text('#lockUnlockHint'),'no unlock hint for a test without lock'
   sp=h.new_page(d['text']);sp.wait_for_timeout(600)
   label=sp.evaluate("[document.querySelector('label[for=studentName]').innerText,document.getElementById('studentName').placeholder]")

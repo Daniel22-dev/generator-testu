@@ -1,3 +1,5 @@
+> **7.1.95 – kritická oprava opakovaného náhledu.** Každé otevření učitelského náhledu dostává nový iframe; zavření starý browsing context zničí. Přidány regresní scénáře pro opakované otevření instant i secure testu a PWA cache bump. Viz [RELEASE-NOTES-7.1.95.md](RELEASE-NOTES-7.1.95.md).
+
 > **7.1.94 – UX Readingu, AI posudek, náhled a Google Forms.** Opravený učitelský náhled, přehlednější Reading a AI posudek, přesunuté ověření Google Forms a sjednocené E2E/security workflow. Release prošel standardními P5/performance gate opravami bez zvýšení limitů. Viz [RELEASE-NOTES-7.1.94.md](RELEASE-NOTES-7.1.94.md).
 
 > **7.1.93 – uchování výsledkové historie a soukromé časové plány.** Řízené studentské testování; další nezávislou revizi vlastník výslovně vynechal, fyzické zkoušky dosud neproběhly. Nasazení přes chráněnou certifikaci `candidate` a `main`. Viz [RELEASE-NOTES-7.1.93.md](RELEASE-NOTES-7.1.93.md).

@@ -1,4 +1,17 @@
-## 7.1.90 – 2026-10-05 – cílený audit před studentským testováním
+## 7.1.95 – 2026-10-06 – kritická oprava učitelského náhledu
+
+- náhled při každém otevření vytváří nový sandboxovaný iframe a při zavření jej odstraní, místo aby recykloval browsing context přes prázdný srcdoc;
+- browser regrese kryje trojí open/close stejného artefaktu, instant reopen po spuštění a odevzdání a one-time-code preview v secure i instant režimu;
+- studentské runtimy a exportní bezpečnostní model zůstávají beze změny;
+- release byl posunut na 7.1.95, aby PWA cache nemohla držet starý preview modul;
+- synchronizovány AI assurance fingerprint, SBOM, GARP 2.7 binding/trust pins a release metadata; opraven zdrojový platform cache_name a počet registrovaných AI operací v GARP policy.
+
+## 7.1.94 – 2026-10-05 – Reading, AI posudek, náhled a Google Forms
+
+- zpřehlednění Reading comprehension a AI posudku vhodnosti cvičení;
+- učitelský náhled oddělen od studentského tab-locku a persistence pokusu;
+- ověření Google Forms přesunuto do bezpečnostního workflow;
+- sjednoceny E2E/E3/E8 harnessy a zachovány P5 performance limity.
 
 ## 7.1.93 — 2026-10-05 (candidate)
 
@@ -14,6 +27,8 @@ Nezávislá kontrola a fyzické zkoušky dosud čekají.
 
 Recovery údaje pro samostatné exporty, soukromé časové kotvy a viditelnost historie při ověření. Studentský runtime zůstává zachován.
 Nezávislá kontrola a fyzické zkoušky dosud čekají.
+
+## 7.1.90 – 2026-10-05 – cílený audit před studentským testováním
 
 - error correction z 7.1.89: uznává celou větu i přesný změněný úsek; nový regresní kontrakt pokrývá kladné i záporné případy;
 - word formation a sentence/key word transformation: má-li zadání právě jednu mezeru `___`, uzná se doplnění i celá věta; bez mezery zůstává nutná přesná odpověď;

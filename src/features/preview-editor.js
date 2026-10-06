@@ -31,6 +31,26 @@ function getPreviewHtml(){
 }
 function previewEscHandler(e){ if (e && e.key === 'Escape') closeTestPreview(); }
 function previewBackdrop(e){ if (e && e.target && e.target.id === 'previewModal') closeTestPreview(); }
+let previewFrameSeq=0;
+function createPreviewFrame(){
+  const stage=$('previewStage');
+  if(!stage)return null;
+  const old=$('previewFrame');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  while(stage.firstChild)stage.removeChild(stage.firstChild);
+  const frame=document.createElement('iframe');
+  frame.id='previewFrame';
+  frame.className='preview-frame';
+  frame.title='Náhled testu';
+  frame.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads');
+  frame.dataset.previewInstance=String(++previewFrameSeq);
+  stage.appendChild(frame);
+  return frame;
+}
+function destroyPreviewFrame(){
+  const frame=$('previewFrame');
+  if(frame&&frame.parentNode)frame.parentNode.removeChild(frame);
+}
 function setPreviewWidth(w){
   const frame = $('previewFrame');
   const map = { '360':'pvW360', '768':'pvW768', '0':'pvWfull' };
@@ -41,11 +61,13 @@ function setPreviewWidth(w){
 }
 function openTestPreview(){
   const pv = getPreviewHtml();
-  const modal = $('previewModal'), frame = $('previewFrame'), note = $('previewNote');
+  const modal = $('previewModal'), note = $('previewNote');
   if (!pv || !pv.html) { uiAlert('Nejdřív vygeneruj test, pak ho můžeš zobrazit v náhledu.'); return; }
   if(note)note.textContent=state.identityMode==='oneTimeCode'&&pv.previewCode?'Učitelský náhled: platný kód je předvyplněn pouze zde; studentský soubor se nemění.':pv.secure?'Studentský test bez správných odpovědí. Správnost klíče zkontroluješ v učitelském verifieru.':'Hotový interaktivní test tak, jak ho uvidí studenti.';
+  const frame=createPreviewFrame();
+  if(!frame){ uiAlert('Náhled se nepodařilo připravit. Zavři dialog a zkus to znovu.'); return; }
   setPreviewWidth(360);
-  if (frame) frame.srcdoc = pv.html;
+  frame.srcdoc = pv.html;
   exportChecklist.preview = true;
   renderExportChecklist();
   if(typeof updateSecureDownloadGate==='function')updateSecureDownloadGate();
@@ -53,8 +75,8 @@ function openTestPreview(){
   document.addEventListener('keydown', previewEscHandler);
 }
 function closeTestPreview(){
-  const modal = $('previewModal'), frame = $('previewFrame');
-  if (frame) frame.srcdoc = '';
+  const modal = $('previewModal');
+  destroyPreviewFrame();
   if (modal) modal.classList.add('hidden');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', previewEscHandler);
