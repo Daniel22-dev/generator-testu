@@ -5074,3 +5074,227 @@ diff --git a/scripts/qa-p5-release.mjs b/scripts/qa-p5-release.mjs
 +if(consumer.appId==='lesson-hub'){const security=await fsp.readFile(path.join(root,'server','lib','security.mjs'),'utf8');const serverApp=await fsp.readFile(path.join(root,'server','app.mjs'),'utf8');check('lesson-hub.async-scrypt-export',/export async function hashPasswordAsync/.test(security)&&/export async function verifyPasswordAsync/.test(security));check('lesson-hub.async-scrypt-request-path',/await verifyPasswordAsync/.test(serverApp)&&/await hashPasswordAsync/.test(serverApp));}
 +if(consumer.appId==='ludus'){const registry=await readJson(path.join(root,'media','registry.json'));check('ludus.public-default-unofficial',registry.policy?.defaultBuildProfile==='unofficial',registry.policy?.defaultBuildProfile||'missing');check('ludus.private-official-command',Boolean(pkg.scripts?.['build:official-private']),pkg.scripts?.['build:official-private']||'missing');const forbiddenMedia=['media/hogwarts/official/intro.mp4','media/hogwarts/official/soundtrack.mp3'];for(const rel of forbiddenMedia)check(`ludus.public-dist-excludes.${path.basename(rel)}`,!exists(path.join(dist,rel)),rel)}
 +const failed=checks.filter(c=>!c.ok);const report={schema:'ghrab-p5-release-certification-v2',appId:consumer.appId,appVersion:pkg.version,generatedAt:new Date().toISOString(),axeRequired:requireAxe,checks,summary:{total:checks.length,passed:checks.length-failed.length,failed:failed.length},status:failed.length?'failed':'passed'};await fsp.writeFile(path.join(dist,'qa-p5-release-report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({appId:report.appId,appVersion:report.appVersion,axeRequired:requireAxe,summary:report.summary,status:report.status,failed:failed.map(x=>x.id)},null,2));if(failed.length)process.exitCode=1;
+diff --git a/scripts/ci/main-protection.mjs b/scripts/ci/main-protection.mjs
+--- a/scripts/ci/main-protection.mjs
++++ b/scripts/ci/main-protection.mjs
+@@ -1,16 +1,23 @@
+ // P1 activation guard: read live effective rules BEFORE opening a PR and before merge.
+-// This never writes rulesets. Unknown/hidden bypass metadata is a blocking condition.
++// This never writes rulesets. Hidden bypass metadata is accepted only for the exact
++// administrator-attested ruleset revision; any later ruleset change fails closed.
+ import assert from 'node:assert/strict';
+ import fs from 'node:fs';
+ import path from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { createHash } from 'node:crypto';
+ import { githubRead, readCollection, repositoryName } from './github-read.mjs';
++
++const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+ export const RULESET_ID = 23603155;
+ export const ACTIONS_APP_ID = 15368;
++export const ATTESTATION_RELATIVE_PATH = 'security/ci/main-ruleset-attestation.json';
++export const ATTESTATION_SHA256 = 'b33b154dbe36a4bfa0a04f642898f40e594f86ec37d5785fd6fe00d9032f9e6f';
++export const ATTESTED_RULESET_UPDATED_AT = '2026-10-06T18:33:10.701Z';
+ export const REQUIRED_CHECKS = Object.freeze([
+   'candidate-gate', 'pr-certification', 'p5-release-gate', 'journey-e2e', 'release-admission',
+ ]);
++
+ function checkRules(rules) {
+   assert.ok(Array.isArray(rules), 'Missing rules');
+   for (const type of ['deletion', 'non_fast_forward', 'pull_request']) {
+@@ -25,14 +32,48 @@
+   }
+   assert.ok(!rules.some(rule => rule.type === 'merge_queue'), 'Merge queue requires a separate tested design');
+ }
+-export function verifyMainProtection({ ruleset, effectiveRules, repo }) {
++
++export function readAdminAttestation() {
++  const file = path.join(ROOT, ATTESTATION_RELATIVE_PATH);
++  const bytes = fs.readFileSync(file);
++  assert.equal(createHash('sha256').update(bytes).digest('hex'), ATTESTATION_SHA256,
++    'Governance attestation digest mismatch');
++  return JSON.parse(bytes.toString('utf8'));
++}
++
++function verifyAdminAttestation(attestation, ruleset, repo) {
++  assert.ok(attestation && typeof attestation === 'object', 'Hidden bypass metadata requires reviewed administrator attestation');
++  assert.equal(attestation.schema, 'git-main-ruleset-admin-attestation-v1');
++  assert.equal(attestation.repository, repo);
++  assert.equal(attestation.rulesetId, RULESET_ID);
++  assert.equal(attestation.rulesetUpdatedAt, ATTESTED_RULESET_UPDATED_AT);
++  assert.equal(ruleset.updated_at, attestation.rulesetUpdatedAt,
++    'Ruleset changed since administrator attestation; re-attestation required');
++  assert.deepEqual(attestation.bypassActors, [], 'Administrator attestation must prove an empty bypass list');
++  assert.equal(attestation.currentUserCanBypass, 'never');
++  assert.equal(attestation.strictRequiredStatusChecks, true);
++  assert.equal(attestation.doNotEnforceOnCreate, false);
++  assert.deepEqual(attestation.scope, { include: ['refs/heads/main'], exclude: [] });
++  const expected = REQUIRED_CHECKS.map(context => ({ context, integrationId: ACTIONS_APP_ID }));
++  assert.deepEqual(attestation.requiredChecks, expected, 'Administrator attestation required-check set differs');
++}
++
++export function verifyMainProtection({ ruleset, effectiveRules, repo, attestation }) {
+   repositoryName(repo);
+   assert.equal(ruleset.id, RULESET_ID, 'Unexpected protected ruleset identity');
+   assert.equal(ruleset.source_type, 'Repository');
+   assert.equal(ruleset.source, repo);
+   assert.equal(ruleset.target, 'branch');
+   assert.equal(ruleset.enforcement, 'active');
+-  assert.deepEqual(ruleset.bypass_actors, [], 'Bypass list must be visible and empty');
++  assert.equal(ruleset.current_user_can_bypass, 'never', 'Workflow identity must not be able to bypass main protection');
++  let bypassEvidence;
++  if (Object.hasOwn(ruleset, 'bypass_actors')) {
++    assert.deepEqual(ruleset.bypass_actors, [], 'Bypass list must be empty');
++    bypassEvidence = 'live-visible-empty';
++  } else {
++    verifyAdminAttestation(attestation, ruleset, repo);
++    bypassEvidence = 'admin-attested-exact-revision';
++  }
+   assert.ok(ruleset.conditions?.ref_name?.include?.includes('refs/heads/main'), 'Explicit main scope required');
+   assert.deepEqual(ruleset.conditions.ref_name.exclude, [], 'Main protection must not have exclusions');
+   checkRules(ruleset.rules);
+@@ -41,17 +82,21 @@
+     rule.ruleset_source_type === 'Repository' && rule.ruleset_source === repo);
+   checkRules(applied);
+   assert.ok(!effectiveRules.some(rule => rule.type === 'merge_queue'), 'Active merge queue is unsupported');
+-  return { schema: 'git-main-protection-p1-v1', status: 'PASS', repository: repo,
+-    rulesetId: RULESET_ID, requiredChecks: REQUIRED_CHECKS, checkedAt: new Date().toISOString(),
+-    evidenceSha256: createHash('sha256').update(JSON.stringify({ ruleset, effectiveRules })).digest('hex'),
+-    scope: 'Live ruleset and effective branch-rule snapshot; not protection against a later administrator change' };
++  return { schema: 'git-main-protection-p1-v2', status: 'PASS', repository: repo,
++    rulesetId: RULESET_ID, rulesetUpdatedAt: ruleset.updated_at, bypassEvidence,
++    requiredChecks: REQUIRED_CHECKS, checkedAt: new Date().toISOString(),
++    evidenceSha256: createHash('sha256').update(JSON.stringify({ ruleset, effectiveRules, bypassEvidence })).digest('hex'),
++    scope: 'Live ruleset/effective rules plus exact-revision administrator attestation when GitHub hides bypass_actors; any later ruleset change fails closed' };
+ }
++
+ export function readLiveProtection(repo, read = githubRead) {
+   repositoryName(repo);
+   const ruleset = read(`repos/${repo}/rulesets/${RULESET_ID}`);
+   const effectiveRules = readCollection(`repos/${repo}/rules/branches/main`, null, read);
+-  return verifyMainProtection({ ruleset, effectiveRules, repo });
++  const attestation = Object.hasOwn(ruleset, 'bypass_actors') ? undefined : readAdminAttestation();
++  return verifyMainProtection({ ruleset, effectiveRules, repo, attestation });
+ }
++
+ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+   try {
+     assert.deepEqual(process.argv.slice(2), ['--live'], 'Only live API validation is allowed');
+diff --git a/scripts/ci/p1.test.mjs b/scripts/ci/p1.test.mjs
+--- a/scripts/ci/p1.test.mjs
++++ b/scripts/ci/p1.test.mjs
+@@ -6,7 +6,7 @@
+ import { execFileSync, spawnSync } from 'node:child_process';
+ import { fileURLToPath } from 'node:url';
+ import { githubRead, readCollection } from './github-read.mjs';
+-import { verifyMainProtection, readLiveProtection, REQUIRED_CHECKS, RULESET_ID, ACTIONS_APP_ID } from './main-protection.mjs';
++import { verifyMainProtection, readLiveProtection, readAdminAttestation, REQUIRED_CHECKS, RULESET_ID, ACTIONS_APP_ID, ATTESTED_RULESET_UPDATED_AT } from './main-protection.mjs';
+ import { validateFreshness, checkLiveFreshness } from './promotion-freshness.mjs';
+ import { requirePrerequisites, selectIndependentRuns, verifyIndependentJob, waitForIndependent, INDEPENDENT_GATES } from './release-admission.mjs';
+ import { validateP1Workflow, jobBlock } from './p1-workflow-contract.mjs';
+@@ -17,12 +17,29 @@
+     { type: 'required_status_checks', parameters: { do_not_enforce_on_create: false, strict_required_status_checks_policy: true,
+       required_status_checks: REQUIRED_CHECKS.map(context => ({ context, integration_id: ACTIONS_APP_ID })) } }];
+   return { repo, ruleset: { id: RULESET_ID, source_type: 'Repository', source: repo, target: 'branch', enforcement: 'active',
+-    conditions: { ref_name: { include: ['refs/heads/main'], exclude: [] } }, bypass_actors: [], rules },
++    conditions: { ref_name: { include: ['refs/heads/main'], exclude: [] } }, updated_at: ATTESTED_RULESET_UPDATED_AT, current_user_can_bypass: 'never', bypass_actors: [], rules },
+   effectiveRules: rules.map(rule => ({ ...structuredClone(rule), ruleset_id: RULESET_ID, ruleset_source_type: 'Repository', ruleset_source: repo })) };
+ }
+ test('P1: all five native checks, PR and branch protection are mandatory', () => {
+   const result = verifyMainProtection(protection()); assert.equal(result.status, 'PASS'); assert.equal(result.requiredChecks.length, 5);
+ });
++test('P1 hidden bypass metadata is accepted only for the exact administrator-attested ruleset revision', () => {
++  const x = protection(); delete x.ruleset.bypass_actors;
++  const result = verifyMainProtection({ ...x, attestation: readAdminAttestation() });
++  assert.equal(result.status, 'PASS'); assert.equal(result.bypassEvidence, 'admin-attested-exact-revision');
++});
++test('P1 hidden bypass metadata fails closed without attestation or after any ruleset revision change', () => {
++  const x = protection(); delete x.ruleset.bypass_actors;
++  assert.throws(() => verifyMainProtection(x), /attestation/);
++  const attestation = readAdminAttestation();
++  x.ruleset.updated_at = '2026-10-06T18:33:10.702Z';
++  assert.throws(() => verifyMainProtection({ ...x, attestation }), /changed since administrator attestation/);
++});
++test('P1 hidden bypass metadata rejects a non-empty or otherwise forged administrator attestation', () => {
++  const x = protection(); delete x.ruleset.bypass_actors;
++  const attestation = structuredClone(readAdminAttestation()); attestation.bypassActors = [{ actor_type: 'Integration' }];
++  assert.throws(() => verifyMainProtection({ ...x, attestation }), /empty bypass list/);
++});
+ for (const [id, mutate] of [
+   ['loose main checks', x => { x.ruleset.rules[3].parameters.strict_required_status_checks_policy = false; }],
+   ['disabled', x => { x.ruleset.enforcement = 'disabled'; }],
+@@ -31,7 +48,7 @@
+   ['wrong ruleset ID', x => { x.ruleset.id++; }],
+   ['wrong target', x => { x.ruleset.target = 'tag'; }],
+   ['bypass allowed', x => { x.ruleset.bypass_actors = [{ actor_type: 'Integration', actor_id: ACTIONS_APP_ID, bypass_mode: 'always' }]; }],
+-  ['bypass hidden', x => { delete x.ruleset.bypass_actors; }],
++  ['workflow token can bypass', x => { x.ruleset.current_user_can_bypass = 'always'; }],
+   ['main excluded', x => { x.ruleset.conditions.ref_name.exclude = ['refs/heads/main']; }],
+   ['scope ambiguous', x => { x.ruleset.conditions.ref_name.include = ['refs/heads/*']; }],
+   ['ineffective rules', x => { x.effectiveRules = []; }],
+diff --git a/security/ci/main-ruleset-attestation.json b/security/ci/main-ruleset-attestation.json
+new file mode 100644
+--- /dev/null
++++ b/security/ci/main-ruleset-attestation.json
+@@ -0,0 +1,22 @@
++{
++  "schema": "git-main-ruleset-admin-attestation-v1",
++  "repository": "Daniel22-dev/generator-testu",
++  "rulesetId": 23603155,
++  "rulesetUpdatedAt": "2026-10-06T18:33:10.701Z",
++  "bypassActors": [],
++  "currentUserCanBypass": "never",
++  "strictRequiredStatusChecks": true,
++  "doNotEnforceOnCreate": false,
++  "requiredChecks": [
++    { "context": "candidate-gate", "integrationId": 15368 },
++    { "context": "pr-certification", "integrationId": 15368 },
++    { "context": "p5-release-gate", "integrationId": 15368 },
++    { "context": "journey-e2e", "integrationId": 15368 },
++    { "context": "release-admission", "integrationId": 15368 }
++  ],
++  "scope": {
++    "include": ["refs/heads/main"],
++    "exclude": []
++  },
++  "attestationBasis": "Out-of-band administrator-readable ruleset inspection confirmed bypass_actors=[] for this exact ruleset updated_at."
++}
+diff --git a/docs/ci-cd/P1-IMPLEMENTATION.md b/docs/ci-cd/P1-IMPLEMENTATION.md
+--- a/docs/ci-cd/P1-IMPLEMENTATION.md
++++ b/docs/ci-cd/P1-IMPLEMENTATION.md
+@@ -39,19 +39,24 @@
+ deletion and non-fast-forward updates. Do not remove other existing rules.
+ Merge queues need a separate design and are not supported by this P1 change.
+ 
+-The last inspected live ruleset required only P5 and had strict checks disabled.
+-It therefore DOES NOT satisfy P1. No rule settings were changed by this work.
+-A JSON file containing PASS, or an arbitrary environment flag, cannot substitute
+-for the live reads. There is no fallback to looser protection on a 403 or timeout.
++The live main ruleset was strengthened on 2026-10-06: all five required checks
++are bound to GitHub Actions app 15368, strict up-to-date checks are enabled, the
++main-only scope has no exclusions, and the administrator-visible bypass list is
++empty. A JSON file containing PASS, or an arbitrary environment flag, cannot
++substitute for the live reads. There is no fallback to looser protection on a 403
++or timeout.
+ 
+-IMPORTANT API LIMIT: GitHub documents that bypass_actors may be hidden from
+-callers without ruleset write access. An absent field is UNKNOWN, not an empty
+-list. Verify visibility using the ACTUAL workflow token in a controlled rehearsal.
+-If hidden, this design deliberately blocks activation. Do not fix that by adding
+-an administrator credential to code supplied from candidate, or by changing the
+-assertion to accept missing metadata. A separate reviewed trusted governance
+-attestation design would then be required. Hosted validation of this prerequisite
+-has NOT been completed here.
++IMPORTANT API LIMIT: GitHub hides bypass_actors from the normal GITHUB_TOKEN
++because that token lacks ruleset-write permission. A controlled hosted rehearsal
++confirmed that the same token still sees ruleset identity, updated_at,
++current_user_can_bypass=never, the five GitHub Actions checks, strict policy and
++the effective main rules. The administrator-visible revision was separately
++verified with bypass_actors=[]. That exact revision is recorded in
++security/ci/main-ruleset-attestation.json and hash-pinned by main-protection.mjs.
++Hidden bypass metadata is accepted only while live ruleset.updated_at exactly
++matches that reviewed attestation. Any later ruleset change fails closed until a
++new administrator-visible attestation is reviewed. No administrator credential or
++secret is exposed to candidate-controlled workflow code.
+ 
+ ## Admission is explicit and read-only
