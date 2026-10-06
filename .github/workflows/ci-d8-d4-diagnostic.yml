@@ -1,0 +1,52 @@
+name: D8 D4 targeted diagnostic
+
+on:
+  push:
+    branches:
+      - ci/d8-diag-20261006
+
+permissions:
+  contents: read
+
+jobs:
+  d8-d4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE_SHA: 7516768223602cec697f4fb173382c2b6d17aab4
+      PATCH_FILE: ci-validation/P0_P1_P2_P3_CUMULATIVE.patch
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Materialize exact patched source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$PATCH_FILE" "${RUNNER_TEMP}/p.patch"
+          git reset --hard "$BASE_SHA"
+          git clean -fdx
+          git apply --check "${RUNNER_TEMP}/p.patch"
+          git apply "${RUNNER_TEMP}/p.patch"
+      - name: Evaluate D8 D.4 subconditions
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const s=fs.readFileSync('.github/workflows/safe-promotion.yml','utf8');
+          const checks={
+            dualCertification:/needs:\s*\[candidate-gate, pr-certification\]/.test(s),
+            exactCertifiedSha:/CERTIFIED_SHA:\s*\$\{\{ needs\.candidate-gate\.outputs\.certified_sha \}\}/.test(s),
+            exactCheckRuns:/commits\/\$CERTIFIED_SHA\/check-runs\?per_page=100/.test(s),
+            p5Green:/p5_green=.*p5-release-gate/.test(s),
+            journeyGreen:/journey_green=.*journey-e2e/.test(s),
+            p5Red:/p5_red=.*p5-release-gate/.test(s),
+            journeyRed:/journey_red=.*journey-e2e/.test(s),
+            failClosedRed:/if \[ "\$p5_red" -gt 0 \] \|\| \[ "\$journey_red" -gt 0 \]/.test(s),
+            bothGreen:/if \[ "\$p5_green" -gt 0 \] && \[ "\$journey_green" -gt 0 \]/.test(s),
+            finalFreshness:s.includes('Recheck candidate and PR after required release checks') && s.includes('refusing merge.')
+          };
+          console.log(JSON.stringify(checks,null,2));
+          if(Object.values(checks).some(v=>!v)) process.exit(1);
+          NODE
