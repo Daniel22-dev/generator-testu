@@ -1,4 +1,4 @@
-name: D8 D4 targeted diagnostic
+name: Targeted redteam validation
 
 on:
   push:
@@ -9,17 +9,23 @@ permissions:
   contents: read
 
 jobs:
-  d8-d4:
+  redteam:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     env:
       BASE_SHA: 7516768223602cec697f4fb173382c2b6d17aab4
       PATCH_FILE: ci-validation/P0_P1_P2_P3_CUMULATIVE.patch
+      GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
       - name: Materialize exact patched source
         shell: bash
         run: |
@@ -28,7 +34,17 @@ jobs:
           git reset --hard "$BASE_SHA"
           git clean -fdx
           git apply --check "${RUNNER_TEMP}/p.patch"
-          git apply "${RUNNER_TEMP}/p.patch"
-      - name: Run complete D8 audit only
+          git apply --whitespace=error-all "${RUNNER_TEMP}/p.patch"
+          git diff --check
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Install pinned Chromium
         shell: bash
-        run: node scripts/check-d8-final-audit.mjs
+        run: |
+          set -euo pipefail
+          ./node_modules/.bin/playwright install --with-deps chromium
+          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Run complete redteam chain only
+        env:
+          CI: 'true'
+        run: npm run qa:redteam:ci
