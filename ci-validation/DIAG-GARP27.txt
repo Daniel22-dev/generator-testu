@@ -1,0 +1,1 @@
+Trigger isolated GARP27 mutation diagnostic after patch-header repair.
