@@ -21,5 +21,12 @@ ok(behavior.includes('pack.teacherHtml') && behavior.includes('acorn.parse'),'R3
 ok(pkg.scripts?.['check:r3-security-behavior']==='node scripts/check-security-behavior-r3.mjs','R3 behavioral gate has an npm script');
 ok(String(pkg.scripts?.test||'').includes('npm run check:r3-security-behavior'),'npm test requires the R3 behavioral gate after build');
 
+const walk=(dir)=>fs.readdirSync(new URL('../'+dir,import.meta.url),{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(dir+'/'+e.name):[/\.(?:mjs|js|py)$/.test(e.name)?dir+'/'+e.name:null].filter(Boolean));
+const verifierTestFiles=['scripts','tools','audit/tests'].flatMap(walk);
+const staleFormsPolicy=verifierTestFiles.filter(p=>/oneResponseConfirmed\s*:\s*true/.test(read(p)));
+const staleFormsUi=verifierTestFiles.filter(p=>/formsOneResponseConfirmed[^\n]{0,180}\.check\s*\(/.test(read(p)));
+ok(staleFormsPolicy.length===0,'Forms verifier fixtures no longer require oneResponseConfirmed=true'+(staleFormsPolicy.length?' -> '+staleFormsPolicy.join(', '):''));
+ok(staleFormsUi.length===0,'Forms verifier browser fixtures no longer check the removed one-response checkbox'+(staleFormsUi.length?' -> '+staleFormsUi.join(', '):''));
+
 if(process.exitCode)process.exit(process.exitCode);
 console.log('PASS R3 test infrastructure gate');

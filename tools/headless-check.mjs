@@ -286,7 +286,7 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
   try{
     const tw=teacherDom.window;
     if(!tw.document.getElementById('formsCsvFile')) throw new Error('chybí CSV import ovladač');
-    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'E-mailová adresa',timestampHeader:'Časové razítko',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true});
+    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'E-mailová adresa',timestampHeader:'Časové razítko',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
     const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
     const currentPack=JSON.parse(stage3Fixture.answerTxt.replace(/^SECURE-ANSWERS-V1\s*/,''));
     const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({...currentPack,payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
@@ -304,7 +304,7 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
     if(results.length!==4||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student@example.invalid'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
     if(!results[1].exactDuplicate) throw new Error('identická duplicita nebyla označena');
     if(results.slice(2).some(r=>r.status!=='CHYBA')) throw new Error('odmítnuté řádky musí zůstat v diagnostice');
-    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true});
+    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
     const semi='Timestamp;Email Address;Result\n'+[q('x'),q('student-two'),q(stage3Fixture.answerTxt)].join(';')+'\n';
     const p2=tw.parseFormsCsvText(semi);
     if(p2.delimiter!==';'||p2.identityIndex!==1) throw new Error('středníkový CSV export');

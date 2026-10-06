@@ -17,7 +17,7 @@ async function page(c){const p=await c.newPage();await p.goto(origin+'/student.h
 async function start(p,code='A7B9C2'){await p.locator('#studentName').fill(code);await enterStartCode(p,pkg);await p.evaluate(()=>startTest());}
 const state=p=>p.evaluate(async()=>{await flushPendingAttemptWrites();return {attemptId:ATTEMPT_ID,deadline:TIMER_DEADLINE,resp:RESP,locked:LOCKED,integrity:PERSIST_INTEGRITY_BLOCK,submitted:SUBMITTED,events:SEC_EVENTS.map(e=>e.type),active:isTestActive(),done:!$('done').classList.contains('hidden')};});
 async function group(id,fn){if(selected!=='all'&&selected!==id)return;await fn();checks.push(id);console.log('PASS E4',id);}
-const policy={schoolDomain:'example.invalid',publishedAt,csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,oneResponseConfirmed:true};
+const policy={schoolDomain:'example.invalid',publishedAt,csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true};
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode'});
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'},{code:'D4E6F8',label:'Synthetic B',email:'synthetic-b@example.invalid'}];");pkg=await build();
