@@ -12,13 +12,15 @@ try{
   browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});const student=await browser.newPage(),verifier=await browser.newPage();
   for(const page of [student,verifier])page.on('pageerror',e=>errors.push(e.message));
   const origin='http://127.0.0.1:18784',publishedAt=new Date(Date.now()-60000).toISOString();
+  const localParts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(publishedAt)).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+  const publishedDate=localParts.year+'-'+localParts.month+'-'+localParts.day,publishedTime=localParts.hour+':'+localParts.minute;
   await student.route(origin+'/student.html',r=>r.fulfill({status:200,contentType:'text/html',body:f.pkg.studentHtml}));await verifier.route(origin+'/verifier.html',r=>r.fulfill({status:200,contentType:'text/html',body:f.pkg.teacherHtml}));
   await student.goto(origin+'/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,f.pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});
   const nativeTxt=await student.locator('#answerBackup').inputValue(),nativePayload=await student.evaluate(()=>secureAnswers());
   await verifier.goto(origin+'/verifier.html');await verifier.evaluate(()=>showVerifierPanel('results'));
   const formsTrigger=verifier.locator('#formsVerifySummaryBtn');if(await formsTrigger.count())await formsTrigger.click();else await verifier.evaluate(()=>showVerifierPanel('security'));
-  await verifier.locator('#formsSchoolDomain').waitFor({state:'visible'});await verifier.locator('#formsSchoolDomain').fill('example.invalid');await verifier.locator('#formsPublishedAt').fill(publishedAt);
+  await verifier.locator('#formsSchoolDomain').waitFor({state:'visible'});await verifier.locator('#formsSchoolDomain').fill('example.invalid');await verifier.locator('#formsPublishedDate').fill(publishedDate);await verifier.locator('#formsPublishedTime').fill(publishedTime);
   const formsAdvanced=verifier.locator('.forms-verify-advanced');if(await formsAdvanced.count()&&!(await verifier.locator('#formsEmailHeader').isVisible()))await formsAdvanced.evaluate(el=>{el.open=true});
   await verifier.locator('#formsEmailHeader').fill('Email Address');await verifier.locator('#formsTimestampHeader').fill('Timestamp');
   for(const id of ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsCsvOriginalConfirmed'])await verifier.locator('#'+id).check();await verifier.getByRole('button',{name:'Uložit nastavení ověření',exact:true}).click();await verifier.waitForFunction(()=>!!FORMS_ANCHOR_POLICY);await verifier.evaluate(()=>showVerifierPanel('results'));

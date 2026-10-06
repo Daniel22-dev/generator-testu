@@ -27,6 +27,8 @@ const staleFormsPolicy=verifierTestFiles.filter(p=>/oneResponseConfirmed\s*:\s*t
 const staleFormsUi=verifierTestFiles.filter(p=>{const src=read(p);return /locator\(\s*['"]#formsOneResponseConfirmed['"]\s*\)\s*\.check\s*\(/.test(src)||/\[[^\]\n]*['"]formsOneResponseConfirmed['"][^\]\n]*\][^\n]{0,240}\.check\s*\(/.test(src);});
 ok(staleFormsPolicy.length===0,'Forms verifier fixtures no longer require oneResponseConfirmed=true'+(staleFormsPolicy.length?' -> '+staleFormsPolicy.join(', '):''));
 ok(staleFormsUi.length===0,'Forms verifier browser fixtures no longer check the removed one-response checkbox'+(staleFormsUi.length?' -> '+staleFormsUi.join(', '):''));
+const staleFormsTimestampUi=verifierTestFiles.filter(p=>p!=='scripts/check-test-infrastructure-r3.mjs'&&/#formsPublishedAt\b|#formsReceptionEndsAt\b/.test(read(p)));
+ok(staleFormsTimestampUi.length===0,'Forms verifier fixtures no longer reference removed ISO timestamp inputs'+(staleFormsTimestampUi.length?' -> '+staleFormsTimestampUi.join(', '):''));
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('PASS R3 test infrastructure gate');
