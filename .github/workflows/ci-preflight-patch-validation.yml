@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: generator-hosted-preflight-p0-p3
+  group: generator-hosted-preflight-p0-p3-final
   cancel-in-progress: true
 
 jobs:
