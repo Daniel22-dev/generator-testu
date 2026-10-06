@@ -1,5 +1,7 @@
 from harness import Harness,TESTS
 import json,time,traceback
+from datetime import datetime
+from zoneinfo import ZoneInfo
 OUT=TESTS.parent/'evidence'
 def click_attr(p,attr,val):p.locator('['+attr+'='+json.dumps(val)+']').click()
 def private_start_code(h,teacher_html):
@@ -21,11 +23,13 @@ def configure_forms_anchors(p,published_at,email_header='Email Address',timestam
   if trigger.count():trigger.click()
   else:p.locator('[data-v2-panel="security"]').click()
  domain.wait_for(state='visible')
- domain.fill('example.invalid');p.locator('#formsPublishedAt').fill(published_at)
+ dt=datetime.fromisoformat(published_at.replace('Z','+00:00')).astimezone(ZoneInfo('Europe/Prague'))
+ domain.fill('example.invalid');p.locator('#formsPublishedDate').fill(dt.strftime('%Y-%m-%d'));p.locator('#formsPublishedTime').fill(dt.strftime('%H:%M'))
  advanced=p.locator('.forms-verify-advanced')
  if advanced.count() and not p.locator('#formsEmailHeader').is_visible():advanced.evaluate('el=>{el.open=true}')
  p.locator('#formsEmailHeader').fill(email_header);p.locator('#formsTimestampHeader').fill(timestamp_header)
- for field in ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsOneResponseConfirmed']:p.locator('#'+field).check()
+ assert p.locator('#formsOneResponseConfirmed').count()==0
+ for field in ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsCsvOriginalConfirmed']:p.locator('#'+field).check()
  p.get_by_role('button',name='Uložit nastavení ověření',exact=True).click()
  assert p.evaluate('!!FORMS_ANCHOR_POLICY'),p.locator('#formsAnchorStatus').inner_text()
  if p.locator('[data-v2-panel="results"]').count():p.locator('[data-v2-panel="results"]').click()
