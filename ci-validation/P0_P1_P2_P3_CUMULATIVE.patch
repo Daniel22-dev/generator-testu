@@ -5262,7 +5262,7 @@ new file mode 100644
 diff --git a/docs/ci-cd/P1-IMPLEMENTATION.md b/docs/ci-cd/P1-IMPLEMENTATION.md
 --- a/docs/ci-cd/P1-IMPLEMENTATION.md
 +++ b/docs/ci-cd/P1-IMPLEMENTATION.md
-@@ -39,19 +39,24 @@
+@@ -39,18 +39,23 @@
  deletion and non-fast-forward updates. Do not remove other existing rules.
  Merge queues need a separate design and are not supported by this P1 change.
  
