@@ -4953,3 +4953,25 @@ diff --git a/tools/ci-standard/consumers/generator-testu.json b/tools/ci-standar
      }
    ],
    "gates": [
+
+diff --git a/scripts/check-d8-final-audit.mjs b/scripts/check-d8-final-audit.mjs
+--- a/scripts/check-d8-final-audit.mjs
++++ b/scripts/check-d8-final-audit.mjs
+@@ -97,9 +97,15 @@
+ check('D','3','Journey clears stale evidence, covers config/state flows and binds artifact to exact SHA',
+   /rm -rf audit\/evidence[\s\S]*mkdir -p audit\/evidence/.test(files.journey) &&
+   has(files.journey,'--suite state_transition_suite','--suite config_extra_suite','journey-e2e-evidence-${{ github.sha }}'));
+-check('D','4','Safe Promotion requires green P5 and Journey checks on certified SHA',
++check('D','4','Safe Promotion requires independent candidate/PR certification and fail-closed P5/Journey checks on exact certified SHA',
++  /needs:\s*\[candidate-gate, pr-certification\]/.test(files.safePromotion) &&
++  /CERTIFIED_SHA:\s*\$\{\{ needs\.candidate-gate\.outputs\.certified_sha \}\}/.test(files.safePromotion) &&
++  /commits\/\$CERTIFIED_SHA\/check-runs\?per_page=100/.test(files.safePromotion) &&
+   /p5_green=.*p5-release-gate/.test(files.safePromotion) && /journey_green=.*journey-e2e/.test(files.safePromotion) &&
+-  /if \[ "\$p5_green" -gt 0 \] && \[ "\$journey_green" -gt 0 \]/.test(files.safePromotion));
++  /p5_red=.*p5-release-gate/.test(files.safePromotion) && /journey_red=.*journey-e2e/.test(files.safePromotion) &&
++  /if \[ "\$p5_red" -gt 0 \] \|\| \[ "\$journey_red" -gt 0 \]/.test(files.safePromotion) &&
++  /if \[ "\$p5_green" -gt 0 \] && \[ "\$journey_green" -gt 0 \]/.test(files.safePromotion) &&
++  has(files.safePromotion,'Recheck candidate and PR after required release checks','refusing merge.'));
+ check('D','5','D7 removes sensitive browser fixtures/PDFs and retains only safe summaries',
+   has(files.d7Runner,'cleanupSensitiveRuntimeArtifacts','qa-fixtures',"entry !== 'summary.json'") &&
+   has(files.p5,'qa-results/d7-regressions.json','qa-results/d8-final-audit.json','qa-results/stage3-pdf-runtime/summary.json','qa-results/stage3-pdf-quality/summary.json','qa-results/verifier-ui-runtime/summary.json'));
