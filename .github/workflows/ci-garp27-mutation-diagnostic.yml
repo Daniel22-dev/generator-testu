@@ -1,0 +1,55 @@
+name: GARP27 mutation diagnostic
+
+on:
+  pull_request:
+    branches:
+      - ci/preflight-p0-p3-20261006
+    paths:
+      - ci-validation/DIAG-GARP27.txt
+
+permissions:
+  contents: read
+
+jobs:
+  mutation-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_SHA: 7516768223602cec697f4fb173382c2b6d17aab4
+      PATCH_FILE: ci-validation/P0_P1_P2_P3_CUMULATIVE.patch
+      GARP27_EXTERNAL_TRUST_SHA256: 9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b
+    steps:
+      - name: Checkout controller base
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Materialize exact proposed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$PATCH_FILE" "${RUNNER_TEMP}/p0-p3.patch"
+          git reset --hard "$BASE_SHA"
+          git clean -fdx
+          git apply --check "${RUNNER_TEMP}/p0-p3.patch"
+          git apply --whitespace=error-all "${RUNNER_TEMP}/p0-p3.patch"
+          git diff --check
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+
+      - name: Build exact source
+        run: npm run build
+
+      - name: Run exact GARP27 mutation suite
+        env:
+          CI: 'true'
+        run: node scripts/garp27/mutation-tests.mjs
