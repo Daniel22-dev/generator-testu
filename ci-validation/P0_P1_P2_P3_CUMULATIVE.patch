@@ -4928,3 +4928,28 @@ diff --git a/scripts/ci/preflight.mjs b/scripts/ci/preflight.mjs
 +const TRUST_PIN = '2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1';
  const ACTIONLINT_VERSION = '1.7.7';
  const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+
+diff --git a/tools/ci-standard/check.mjs b/tools/ci-standard/check.mjs
+--- a/tools/ci-standard/check.mjs
++++ b/tools/ci-standard/check.mjs
+@@ -27,7 +27,7 @@
+   assert.equal(profile.toolchain.pythonRequirements, 'audit/requirements-audit.txt');
+   assert.equal(profile.trustInputs.length, 1); const trust = profile.trustInputs[0];
+   assert.equal(trust.environment, 'GARP27_EXTERNAL_TRUST_SHA256');
+-  assert.equal(trust.sha256, '9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b');
++  assert.equal(trust.sha256, '2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1');
+   const pkg = readJson(root, 'package.json'), lock = readJson(root, profile.toolchain.npmLockfile);
+   assert.equal(pkg.name, 'generator-testu'); assert.equal(lock.version, pkg.version);
+   assert.equal(pkg.devDependencies.playwright, profile.toolchain.playwright); assert.equal(pkg.devDependencies['axe-core'], profile.toolchain.axe);
+diff --git a/tools/ci-standard/consumers/generator-testu.json b/tools/ci-standard/consumers/generator-testu.json
+--- a/tools/ci-standard/consumers/generator-testu.json
++++ b/tools/ci-standard/consumers/generator-testu.json
+@@ -18,7 +18,7 @@
+     {
+       "environment": "GARP27_EXTERNAL_TRUST_SHA256",
+       "source": "repository-reviewed-pin",
+-      "sha256": "9c8284e173198756592afe2d9e3654d616851ea196e6324a99aeee0d5833c05b"
++      "sha256": "2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1"
+     }
+   ],
+   "gates": [
