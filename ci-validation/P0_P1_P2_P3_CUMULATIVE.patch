@@ -4726,3 +4726,31 @@ new file mode 100644
 +    "explicit-per-repository-rollout"
 +  ]
 +}
+
+diff --git a/.github/workflows/safe-promotion.yml b/.github/workflows/safe-promotion.yml
+--- a/.github/workflows/safe-promotion.yml
++++ b/.github/workflows/safe-promotion.yml
+@@ -382,10 +382,11 @@
+           }
+ 
+           deploy_run=""
+           for attempt in $(seq 1 6); do
+             deploy_run="$(find_run)"
+             if [ -n "$deploy_run" ]; then
+               break
+             fi
++            echo "Waiting for automatic deploy run for $MAIN_HEAD (attempt $attempt/6)."
+             sleep 5
+           done
+@@ -393,10 +393,11 @@
+           if [ -z "$deploy_run" ]; then
+             echo "No automatic main deploy run detected; dispatching deploy.yml explicitly on main."
+             gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
+             for attempt in $(seq 1 60); do
+               deploy_run="$(find_run)"
+               if [ -n "$deploy_run" ]; then
+                 break
+               fi
++              echo "Waiting for dispatched deploy run for $MAIN_HEAD (attempt $attempt/60)."
+               sleep 5
+             done
