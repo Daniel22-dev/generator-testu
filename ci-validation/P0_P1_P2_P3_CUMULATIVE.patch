@@ -997,7 +997,8 @@ new file mode 100644
 +
 +The complete command runs 27 phases including locked setup, actionlint, npm test, headless, full npm audit (including dev dependencies, as CONTRIBUTING requires), reporter, QA release, platform, the canonical red-team/foundation/P5 chain, all seven Journey suites and release readiness. It stops at the first failure, marks subsequent phases NOT_RUN and requires the working-source snapshot to remain unchanged. It never commits, pushes, merges or deploys. Evidence lives in a printed temporary directory outside destructively cleaned QA directories.
 +
-+This command cleans audit/evidence before Journey, just as journey-e2e.yml does. Review generated evidence separately; do not stage it blindly. A local PASS still does not replace the independent exact-SHA GitHub certification jobs after committing. A changed source after preflight requires rerunning it.+
++This command cleans audit/evidence before Journey, just as journey-e2e.yml does. Review generated evidence separately; do not stage it blindly. A local PASS still does not replace the independent exact-SHA GitHub certification jobs after committing. A changed source after preflight requires rerunning it.
++
 +## Actual verification in this environment
 +
 +- New tests: 55/55 PASS, including real local bare-Git race fixtures and a deliberately unsafe force negative control.
@@ -1996,7 +1997,8 @@ new file mode 100644
 +++ b/scripts/ci/orchestration.test.mjs
 @@ -0,0 +1,267 @@
 +import { validateP1Workflow } from './p1-workflow-contract.mjs';
-+import test from 'node:test';+import assert from 'node:assert/strict';
++import test from 'node:test';
++import assert from 'node:assert/strict';
 +import fs from 'node:fs';
 +import os from 'node:os';
 +import path from 'node:path';
@@ -2995,7 +2997,8 @@ new file mode 100644
 +for (const p of ['../x', '/tmp/x', './x', 'a//x', 'a/../x', 'a\\x', 'a?x', 'a\nx']) test('unsafe path rejected: ' + JSON.stringify(p), () => assert.throws(() => relative(p)));
 +test('repository dot segments rejected', () => { for (const r of ['../app', 'test/..', '-x/../../b']) assert.throws(() => repoName(r)); });
 +test('symlink leaf + ancestor and oversize local files rejected', t => {
-+  const d = temporary(t); fs.writeFileSync(path.join(d, 'file'), 'xx'); fs.symlinkSync('file', path.join(d, 'link'));+  fs.mkdirSync(path.join(d, 'dir')); fs.writeFileSync(path.join(d, 'dir/f'), 'x'); fs.symlinkSync('dir', path.join(d, 'linked-dir'));
++  const d = temporary(t); fs.writeFileSync(path.join(d, 'file'), 'xx'); fs.symlinkSync('file', path.join(d, 'link'));
++  fs.mkdirSync(path.join(d, 'dir')); fs.writeFileSync(path.join(d, 'dir/f'), 'x'); fs.symlinkSync('dir', path.join(d, 'linked-dir'));
 +  assert.throws(() => regularRead(d, 'link')); assert.throws(() => regularRead(d, 'linked-dir/f')); assert.throws(() => regularRead(d, 'file', 1));
 +});
 +test('reference lock rejects mutation and cannot reduce its own coverage', t => {
@@ -3994,7 +3997,8 @@ new file mode 100644
 +
 +## Inventory scope and limits
 +
-+Coverage is explicitly `ci-definitions-packages-and-scoped-helpers-only`:+package.json, package-lock.json, audit/requirements-audit.txt, direct workflow
++Coverage is explicitly `ci-definitions-packages-and-scoped-helpers-only`:
++package.json, package-lock.json, audit/requirements-audit.txt, direct workflow
 +YAML files, local composite action metadata, and .mjs/.js/.sh/.json files under
 +scripts/ci and tools/ci-standard. Raw file contents are not emitted in the report.
 +The report records path, size, Git blob SHA and SHA-256. Branch identity is checked
