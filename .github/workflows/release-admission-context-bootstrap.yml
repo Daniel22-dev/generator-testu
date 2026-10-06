@@ -1,0 +1,20 @@
+name: Release admission context bootstrap
+
+on:
+  push:
+    branches:
+      - ci/release-admission-bootstrap-20261006
+
+permissions:
+  contents: read
+
+jobs:
+  release-admission:
+    name: release-admission
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Register GitHub Actions check context
+        run: |
+          echo "Bootstrap only: registers the release-admission check context from GitHub Actions."
+          echo "No candidate/main mutation, merge, deployment, or ruleset change is performed."
