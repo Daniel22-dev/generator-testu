@@ -29,30 +29,6 @@ jobs:
           git clean -fdx
           git apply --check "${RUNNER_TEMP}/p.patch"
           git apply "${RUNNER_TEMP}/p.patch"
-      - name: Show materialized Safe Promotion topology
+      - name: Run complete D8 audit only
         shell: bash
-        run: |
-          echo "--- safe-promotion topology ---"
-          grep -nE 'candidate-gate|pr-certification|release-admission|promote|p5-release-gate|journey-e2e|CERTIFIED_SHA|check-runs|Recheck candidate' .github/workflows/safe-promotion.yml || true
-          echo "--- end topology ---"
-      - name: Evaluate D8 D.4 subconditions
-        shell: bash
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const s=fs.readFileSync('.github/workflows/safe-promotion.yml','utf8');
-          const checks={
-            dualCertification:/needs:\s*\[candidate-gate, pr-certification\]/.test(s),
-            exactCertifiedSha:/CERTIFIED_SHA:\s*\$\{\{ needs\.candidate-gate\.outputs\.certified_sha \}\}/.test(s),
-            exactCheckRuns:/commits\/\$CERTIFIED_SHA\/check-runs\?per_page=100/.test(s),
-            p5Green:/p5_green=.*p5-release-gate/.test(s),
-            journeyGreen:/journey_green=.*journey-e2e/.test(s),
-            p5Red:/p5_red=.*p5-release-gate/.test(s),
-            journeyRed:/journey_red=.*journey-e2e/.test(s),
-            failClosedRed:/if \[ "\$p5_red" -gt 0 \] \|\| \[ "\$journey_red" -gt 0 \]/.test(s),
-            bothGreen:/if \[ "\$p5_green" -gt 0 \] && \[ "\$journey_green" -gt 0 \]/.test(s),
-            finalFreshness:s.includes('Recheck candidate and PR after required release checks') && s.includes('refusing merge.')
-          };
-          console.log(JSON.stringify(checks,null,2));
-          if(Object.values(checks).some(v=>!v)) process.exit(1);
-          NODE
+        run: node scripts/check-d8-final-audit.mjs
