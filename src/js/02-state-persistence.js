@@ -267,6 +267,7 @@ function normalizeGoogleFormsResponderUrl(raw){
   try { u = new URL(text); }
   catch(_) { throw new TypeError('Odkaz na Google Form není platná URL.'); }
   if (u.protocol !== 'https:') throw new TypeError('Google Form musí používat zabezpečený odkaz https://.');
+  if(u.username||u.password||u.port)throw new TypeError('Odkaz Google Forms nesmi obsahovat prihlasovaci udaje ani nestandardni port.');
   const host = String(u.hostname || '').toLowerCase();
   if (host === 'forms.gle') {
     if (!u.pathname || u.pathname === '/') throw new TypeError('Zkrácený odkaz forms.gle není úplný.');
@@ -290,11 +291,12 @@ function configuredGoogleFormsUrl(){
   catch(_) { return ''; }
 }
 const GOOGLE_FORMS_METADATA_PLACEHOLDERS = Object.freeze({
-  testId:'GIT_TEST_ID',
-  testName:'GIT_TEST_NAME',
-  group:'GIT_GROUP',
+  testId:'TESTID',
+  testName:'NAZEV',
+  group:'TRIDA',
   generatorVersion:'GIT_GENERATOR_VERSION',
-  generatedAt:'GIT_GENERATED_AT'
+  generatedAt:'GIT_GENERATED_AT',
+  submission:'KOD'
 });
 function validGoogleFormsEntryId(value){ return /^\d{1,20}$/.test(String(value||'')); }
 function storedGoogleFormsMetadataValue(){
@@ -317,6 +319,7 @@ function normalizeStoredGoogleFormsMetadata(value){
   for (const required of ['testId','testName','group']) {
     if (!cleanEntries[required]) throw new TypeError('Chybí povinné metadata pole '+required+'.');
   }
+  if(new Set(Object.values(cleanEntries)).size!==Object.keys(cleanEntries).length)throw new TypeError('Kazde mapovane pole musi mit vlastni entry ID.');
   return {v:1,responderUrl,entries:cleanEntries};
 }
 function configuredGoogleFormsMetadata(){
@@ -330,15 +333,18 @@ function parseGoogleFormsPrefilledMetadataUrl(raw){
   const text=String(raw||'').trim();
   if(!text) throw new TypeError('Vlož předvyplněný odkaz z Google Forms.');
   let u; try{u=new URL(text);}catch(_){throw new TypeError('Předvyplněný Google Forms odkaz není platná URL.');}
-  if(u.protocol!=='https:'||String(u.hostname||'').toLowerCase()!=='docs.google.com') throw new TypeError('Pro načtení metadata polí použij plný předvyplněný odkaz z docs.google.com/forms.');
+  if(u.protocol!=='https:'||u.username||u.password||u.port||String(u.hostname||'').toLowerCase()!=='docs.google.com') throw new TypeError('Pro načtení metadata polí použij plný předvyplněný odkaz z docs.google.com/forms.');
   if(!/^\/forms\/(?:u\/\d+\/)?d(?:\/e)?\/[^/]+\/viewform\/?$/i.test(u.pathname||'')) throw new TypeError('Použij předvyplněný responder odkaz Google Forms končící /viewform.');
-  const found={};
+  const found={},seenParams=new Set();
+  const aliases={testId:['TESTID','GIT_TEST_ID'],testName:['NAZEV','GIT_TEST_NAME'],group:['TRIDA','GIT_GROUP'],submission:['KOD','GIT_SUBMISSION_CODE']};
   for(const [param,value] of u.searchParams.entries()){
     const m=/^entry\.(\d{1,20})$/.exec(param);
     if(!m) continue;
+    if(seenParams.has(param))throw new TypeError('Duplicitni entry parametr v predvyplnenem odkazu.');
+    seenParams.add(param);
     const clean=String(value||'').trim();
     for(const [key,placeholder] of Object.entries(GOOGLE_FORMS_METADATA_PLACEHOLDERS)){
-      if(clean===placeholder){
+      if(clean===placeholder||(aliases[key]||[]).includes(clean)){
         if(found[key]&&found[key]!==m[1]) throw new TypeError('Placeholder '+placeholder+' je v odkazu vícekrát.');
         found[key]=m[1];
       }
@@ -347,7 +353,7 @@ function parseGoogleFormsPrefilledMetadataUrl(raw){
   for(const required of ['testId','testName','group']){
     if(!found[required]) throw new TypeError('V předvyplněném odkazu chybí placeholder '+GOOGLE_FORMS_METADATA_PLACEHOLDERS[required]+'.');
   }
-  const base=new URL(u.toString());
+  const base=new URL(u.origin+u.pathname);
   [...base.searchParams.keys()].forEach(k=>{ if(/^entry\.\d+$/.test(k)) base.searchParams.delete(k); });
   base.searchParams.delete('usp');
   return normalizeStoredGoogleFormsMetadata({v:1,responderUrl:base.toString(),entries:found});
@@ -358,6 +364,7 @@ function syncGeneratorSettingsFormsInput(){
   const metaInput = $('generatorSettingsPrefilledInput');
   if (metaInput) metaInput.value = '';
   updateGeneratorSettingsMetadataStatus();
+  if(typeof syncFormsTeacherProfileFields==='function')syncFormsTeacherProfileFields();
 }
 function updateGeneratorSettingsFormsStatus(){
   const status = $('generatorSettingsFormsStatus');
@@ -379,17 +386,11 @@ function updateGeneratorSettingsFormsStatus(){
   }
 }
 function updateGeneratorSettingsMetadataStatus(){
-  const status=$('generatorSettingsMetadataStatus');
-  if(!status) return;
-  const cfg=configuredGoogleFormsMetadata();
-  if(cfg){
-    const optional=['generatorVersion','generatedAt'].filter(k=>cfg.entries[k]).length;
-    status.textContent='🟢 Automatická metadata jsou nastavena: Test ID, název testu, skupina'+(optional?' + '+optional+' volitelné pole/pole.':'.');
-    status.className='secure-mode-box';
-    return;
-  }
-  status.textContent='⚪ Automatická metadata nejsou nastavena. Secure test použije současný Forms workflow bez metadata.';
-  status.className='secure-mode-box';
+  const status=$('generatorSettingsMetadataStatus');if(!status)return;
+  const cfg=configuredGoogleFormsMetadata(),profile=typeof configuredGoogleFormsAnchorProfile==='function'?configuredGoogleFormsAnchorProfile():null;
+  const ready=!!(cfg&&cfg.entries.submission&&profile);
+  status.textContent=ready?'Nastaveno: metadata, značky hodiny a školní účty učitelů. Nový verifier nepotřebuje další vyplňování.':'Export přes Forms je blokován, dokud nejsou uloženy hodnoty TESTID / NAZEV / TRIDA / KOD a potvrzený e-mail učitele.';
+  status.className='secure-mode-box'+(ready?'':' warn');
 }
 async function saveGoogleFormsUrlLocal(){
   const input = $('generatorSettingsFormsInput');
@@ -402,7 +403,7 @@ async function saveGoogleFormsUrlLocal(){
     if(!generatorPersistenceAllowed()) return;
     const oldMeta=configuredGoogleFormsMetadata();
     localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY, clean);
-    if(oldMeta&&oldMeta.responderUrl!==clean) localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);
+    if(oldMeta&&!sameGoogleForm(oldMeta.responderUrl,clean)) localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);
     if (input) input.value = clean;
     updateGeneratorSettingsFormsStatus();
     updateGeneratorSettingsMetadataStatus();
@@ -413,10 +414,12 @@ async function saveGoogleFormsUrlLocal(){
 async function saveGoogleFormsMetadataFromPrefilledUrl(){
   const input=$('generatorSettingsPrefilledInput');
   let cfg;
-  try{cfg=parseGoogleFormsPrefilledMetadataUrl(input?input.value:'');}
+  let profile;
+  try{cfg=parseGoogleFormsPrefilledMetadataUrl(input?input.value:'');profile=formsProfileFromSettingsUi();}
   catch(e){await uiAlert(String(e&&e.message?e.message:e),'Metadata Google Forms');updateGeneratorSettingsMetadataStatus();return;}
   try{
     if(!generatorPersistenceAllowed()) return;
+    localStorage.setItem(GOOGLE_FORMS_ANCHOR_PROFILE_KEY,JSON.stringify(profile));
     localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(cfg));
     localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,cfg.responderUrl);
     const urlInput=$('generatorSettingsFormsInput'); if(urlInput) urlInput.value=cfg.responderUrl;
@@ -431,7 +434,7 @@ async function forgetGoogleFormsMetadataLocal(){
   try{
     localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);
     updateGeneratorSettingsMetadataStatus();
-    uiToast('Automatická metadata Google Forms byla vypnuta. Základní Forms workflow zůstává aktivní.','ok',4200);
+    uiToast('Mapování bylo odstraněno. Export přes Forms je nyní blokován až do nového nastavení.','ok',4200);
   }catch(_){await uiAlert('Nastavení metadata polí se nepodařilo změnit.');}
 }
 async function forgetGoogleFormsUrlLocal(){
