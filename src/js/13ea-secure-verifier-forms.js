@@ -70,7 +70,94 @@ function parseFormsCsvText(text){
 }
 function formsPushRowError(rowNo,message,meta){RESULTS.push(Object.assign({file:'forms_radek_'+rowNo+'.txt',status:'CHYBA',error:String(message||'Neplatný řádek CSV.'),validationCodes:['csv.row'],student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:''},verifierSourceMeta(meta)));}
 function setFormsProgress(done,total){const box=$('formsImportProgress');if(box)box.textContent=total?'Zpracování CSV: '+done+' / '+total+' ('+Math.round(done/Math.max(1,total)*100)+' %)':'';}
-function renderFormsImportSummary(summary){const box=$('formsImportSummary');if(!box)return;if(!summary){box.className='muted';box.textContent='Zatím nebyl importován žádný CSV export z formuláře.';return;}const n=k=>Number(summary[k]||0),dup=summary.duplicates||{},problems=n('invalid')+n('missing')+n('ambiguous')+n('metadataMismatch');box.className='warn';box.textContent='CSV '+(summary.fileName||'')+': načteno '+n('rows')+', opravené výsledky tohoto testu (původ neprokázán) '+n('ok')+' (včetně následně vyloučených replayů), aktuálně návrhů k posouzení '+n('eligibleProposals')+', replay odmítnutí '+n('replayRejected')+', jiné testy '+n('otherTests')+', neplatné/poškozené '+n('invalid')+', bez payloadu '+n('missing')+', nejednoznačné '+n('ambiguous')+', metadata mismatch '+n('metadataMismatch')+'. Duplicity: '+Number(dup.exact||0)+' identických, '+Number(dup.conflicts||0)+' studentů s více různými pokusy. Oddělovač: '+(summary.delimiterLabel||'?')+'.';}
+let FORMS_CSV_BATCHES=[],FORMS_IMPORT_CHAIN=Promise.resolve(),FORMS_BATCH_SEQUENCE=0;
+function formsMetaFor(parsed,row,rowNo,batch){return {source:'google-forms-csv',fullYearCsv:true,formIdentity:row[parsed.identityIndex].trim(),formTimestamp:row[parsed.timestampIndex].trim(),formRow:rowNo,formFile:batch.fileName,formBatchId:batch.id,formTestId:parsed.testIdIndex>=0?row[parsed.testIdIndex].trim():'',formTestName:parsed.testNameIndex>=0?row[parsed.testNameIndex].trim():'',formGroup:parsed.groupIndex>=0?row[parsed.groupIndex].trim():''};}
+function formsMarkerCells(row){return row.map(v=>String(v||'').trim()).filter(v=>/^GIT-LESSON-(?:START|END)-V1(?:\s|$)/.test(v));}
+function collectFormsLessonWindows(batches){
+  const markers=[],seen=new Set();FORMS_LESSON_NOTICES=[];
+  for(const batch of batches){const p=batch.parsed;for(let i=0;i<p.data.length;i++){
+    const row=p.data[i],cells=formsMarkerCells(row);if(!cells.length)continue;
+    const label=batch.fileName+', \u0159\u00e1dek '+(i+2);
+    try{
+      e3Require(cells.length===1&&!row.some(v=>String(v).trim().startsWith('SECURE-ANSWERS-V1')),'lesson.mixed','Zna\u010dka je sm\u00edchan\u00e1 s odevzd\u00e1n\u00edm.');
+      const match=cells[0].match(/^GIT-LESSON-(START|END)-V1\s+([\s\S]+)$/);e3Require(match&&match[2].length<=2000,'lesson.shape','Neplatn\u00fd tvar zna\u010dky hodiny.');
+      const data=e3Json(match[2]);e3Require(e3Object(data)&&Object.keys(data).every(k=>['testId','manifestHash','group'].includes(k))&&e3String(data.testId,180)&&e3String(data.manifestHash,180),'lesson.shape','Neplatn\u00e1 zna\u010dka hodiny.');
+      if(data.testId!==CONFIG.testId)continue;
+      e3Require(data.manifestHash===CONFIG.manifestHash,'lesson.manifest','Zna\u010dka m\u00e1 jin\u00fd manifest.');
+      const email=e3Email(row[p.identityIndex]),policy=FORMS_ANCHOR_POLICY;
+      e3Require(policy&&email&&policy.teacherEmails.includes(email),'lesson.teacher','Podvr\u017een\u00e1 nebo nepovolen\u00e1 zna\u010dka hodiny od '+String(row[p.identityIndex]).slice(0,254)+' - ignorov\u00e1na.');
+      const time=e3FormsTime(row[p.timestampIndex]),id=match[1]+'|'+time.lower+'|'+email+'|'+data.testId;
+      if(seen.has(id))continue;seen.add(id);markers.push({kind:match[1],ms:time.lower,teacherEmail:email,group:String(data.group||'').slice(0,180)});
+    }catch(error){FORMS_LESSON_NOTICES.push(label+': '+String(error.message||error));}
+  }}
+  markers.sort((a,b)=>a.ms-b.ms||(a.kind===b.kind?0:(a.kind==='START'?-1:1)));
+  const windows=[];
+  for(const m of markers){if(m.kind==='START'){
+      if(windows.some(w=>w.startMs===m.ms)){FORMS_LESSON_NOTICES.push('Duplicitn\u00ed za\u010d\u00e1tek ve stejn\u00e9m okam\u017eiku byl slou\u010den.');continue;}
+      windows.push({startMs:m.ms,endMs:null,teacherEmail:m.teacherEmail,source:'lesson-csv',group:m.group});
+    }else{const w=[...windows].reverse().find(x=>x.startMs<=m.ms);if(w&&w.endMs===null)w.endMs=m.ms;else if(!w)FORMS_LESSON_NOTICES.push('Zna\u010dka konce bez p\u0159edchoz\u00edho za\u010d\u00e1tku - ignorov\u00e1na.');}}
+  FORMS_LESSON_WINDOWS=windows;return windows;
+}
+function formsSummaryRefresh(summary){
+  if(!summary)return summary;
+  const rows=RESULTS.filter(r=>r.formBatchId===summary.batchId),bad=r=>r.status==='CHYBA'||r.exactDuplicate||r.hardReplayConflict;
+  summary.ok=rows.filter(r=>r.status==='OK'&&!bad(r)).length;
+  summary.pending=rows.filter(r=>r.status==='IDENTITY_REVIEW'&&!bad(r)).length;
+  summary.invalid=rows.filter(bad).length;summary.current=rows.length;
+  summary.metadataMismatch=rows.filter(r=>r.status==='OK'&&!bad(r)&&r.metadataMismatch?.length).length;
+  summary.eligibleProposals=effectiveResults().length;summary.replayRejected=rows.filter(r=>r.exactDuplicate||r.hardReplayConflict).length;
+  summary.duplicates={exact:rows.filter(r=>r.exactDuplicate).length,conflicts:rows.filter(r=>r.hardReplayConflict).length};return summary;
+}
+function renderFormsImportSummary(summary){
+  const box=$('formsImportSummary');if(!box)return;
+  if(!summary){box.className='muted';box.textContent='Zat\u00edm nebyl importov\u00e1n CSV export z formul\u00e1\u0159e.';return;}
+  box.className='forms-summary-card';
+  if(summary.waitingForWindow){box.innerHTML='<h3>CSV na\u010dteno - dopl\u0148 \u010das hodiny</h3><p>CSV neobsahuje platnou zna\u010dku za\u010d\u00e1tku od u\u010ditele. Zadej skute\u010dn\u00e9 datum a \u010das podle rozvrhu; data z\u016fst\u00e1vaj\u00ed na\u010dten\u00e1.</p><button onclick="openFormsVerificationSettings()">Zadat \u010das hodiny</button>';return;}
+  formsSummaryRefresh(summary);
+  const counts=[summary.ok?'<span class="forms-good">'+summary.ok+' v po\u0159\u00e1dku</span>':'',summary.pending?'<span class="forms-review">'+summary.pending+' k ru\u010dn\u00edmu potvrzen\u00ed</span>':'',summary.invalid?'<span class="forms-bad">'+summary.invalid+' chyb/odm\u00edtnut\u00ed</span>':''].filter(Boolean).join(' \u00b7 ');
+  let html='<h3>Tento test: '+Number(summary.current||0)+' odevzd\u00e1n\u00ed</h3><div class="forms-counts">'+(counts||'\u017d\u00e1dn\u00e9 odevzd\u00e1n\u00ed tohoto testu.')+'</div>';
+  if(summary.metadataMismatch)html+='<p class="forms-warning">'+summary.metadataMismatch+' platn\u00fdch v\u00fdsledk\u016f m\u00e1 upozorn\u011bn\u00ed na popisn\u00e1 metadata. Odpov\u011bdi a body t\u00edm nejsou zm\u011bn\u011bny.</p>';
+  if(summary.otherTests)html+='<p class="muted">Jin\u00e9 testy v souboru: '+summary.otherTests+' (ignorov\u00e1no).</p>';
+  if(summary.otherTestsUnverified)html+='<p class="muted">Z toho '+summary.otherTestsUnverified+' ob\u00e1lek pat\u0159\u00ed podle vn\u011bj\u0161\u00edho ID k jin\u00fdm test\u016fm. Tento verifier je nem\u016f\u017ee de\u0161ifrovat; nejde o kryptograficky ov\u011b\u0159en\u00e9 za\u0159azen\u00ed.</p>';
+  if(summary.markers)html+='<p class="muted">Zna\u010dky hodiny: '+summary.markers+' \u0159\u00e1dk\u016f (nejsou to odevzd\u00e1n\u00ed).</p>';
+  const grouped=new Map();for(const r of RESULTS.filter(r=>r.formBatchId===summary.batchId&&(r.status==='CHYBA'||r.exactDuplicate||r.hardReplayConflict))){const code=r.exactDuplicate||r.hardReplayConflict?'replay.duplicate':r.validationCodes?.[0]||'unknown';if(!grouped.has(code))grouped.set(code,{count:0,message:r.exactDuplicate||r.hardReplayConflict?'Opakovan\u00e9 odevzd\u00e1n\u00ed je vy\u0159azeno. Zkontroluj p\u016fvodn\u00ed \u0159\u00e1dek CSV.':r.error});grouped.get(code).count++;}
+  for(const [code,g] of grouped)html+='<details class="forms-bad"><summary>'+g.count+'\u00d7 '+esc(g.message)+'</summary><code>'+esc(code)+'</code></details>';
+  const received=new Set(RESULTS.filter(r=>r.status==='OK'||r.status==='IDENTITY_REVIEW').map(r=>String(r.code||r.student||'').toUpperCase()));
+  const missing=(CONFIG.roster||[]).filter(r=>!received.has(String(r.code||'').toUpperCase()));
+  summary.missingStudents=missing.map(r=>String(r.name||r.label||r.email||r.code));
+  if(missing.length)html+='<p><b>Neodevzdali:</b> '+summary.missingStudents.map(esc).join(', ')+'.</p>';
+  if(FORMS_LESSON_NOTICES.length)html+='<details class="forms-warning" open><summary>Upozorn\u011bn\u00ed ke zna\u010dk\u00e1m hodiny</summary>'+FORMS_LESSON_NOTICES.map(esc).join('<br>')+'</details>';
+  html+='<p class="muted small">Kontrola duplicit uvnit\u0159 CSV funguje i na nov\u00e9m PC. Evidence opakovan\u00e9ho pou\u017eit\u00ed nap\u0159\u00ed\u010d importy plat\u00ed pouze v tomto prohl\u00ed\u017ee\u010di. P\u0159epo\u010det ani Forms kotvy neprokazuj\u00ed, \u017ee student pou\u017eil p\u016fvodn\u00ed test (p\u016fvod neprok\u00e1z\u00e1n).</p>';
+  box.innerHTML=html;
+}
+function queueFormsReevaluation(){const pending=FORMS_IMPORT_CHAIN.then(reevaluateFormsBatches,reevaluateFormsBatches);FORMS_IMPORT_CHAIN=pending.catch(()=>{});return pending;}
+async function reevaluateFormsBatches(){
+  // Parse before replacing results: a wrong header setting must not erase data.
+  const batches=FORMS_CSV_BATCHES.map(b=>Object.assign({},b,{parsed:parseFormsCsvText(b.text)}));
+  collectFormsLessonWindows(batches);refreshFormsVerificationSummary();
+  if(!FORMS_ANCHOR_POLICY||!FORMS_LESSON_WINDOWS.length&&!FORMS_ANCHOR_POLICY.publishedAt){
+    LAST_FORMS_IMPORT={fileName:batches.at(-1)?.fileName||'',batchId:batches.at(-1)?.id,waitingForWindow:true,rows:batches.at(-1)?.parsed.data.filter(csvRowNonEmpty).length||0};
+    RESULTS=RESULTS.filter(r=>r.submissionSource!=='google-forms-csv');rebuildDuplicateState();afterResultsChanged();renderFormsImportSummary(LAST_FORMS_IMPORT);if($('formsManualWindowNote'))$('formsManualWindowNote').hidden=false;openFormsVerificationSettings();return LAST_FORMS_IMPORT;
+  }
+  if($('formsManualWindowNote'))$('formsManualWindowNote').hidden=true;RESULTS=RESULTS.filter(r=>r.submissionSource!=='google-forms-csv');ATTEMPT_DECISIONS.clear();
+  let last=null;
+  for(const batch of batches){
+    const parsed=batch.parsed,summary={fileName:batch.fileName,batchId:batch.id,rows:0,current:0,ok:0,pending:0,otherTests:0,otherTestsUnverified:0,invalid:0,missing:0,ambiguous:0,metadataMismatch:0,markers:0,delimiterLabel:parsed.delimiterLabel,waitingForWindow:false};
+    const nonempty=parsed.data.filter(csvRowNonEmpty);let processed=0;setFormsProgress(0,nonempty.length);
+    for(let i=0;i<parsed.data.length;i++){
+      const row=parsed.data[i];if(!csvRowNonEmpty(row))continue;summary.rows++;const rowNo=i+2,meta=formsMetaFor(parsed,row,rowNo,batch);
+      const payloads=row.map(v=>String(v||'').trim()).filter(v=>v.startsWith('SECURE-ANSWERS-V1')),markers=formsMarkerCells(row);
+      if(markers.length&&!payloads.length){summary.markers++;}
+      else if(markers.length&&payloads.length){summary.ambiguous++;formsPushRowError(rowNo,'Zna\u010dka hodiny a odevzd\u00e1n\u00ed jsou ve stejn\u00e9m \u0159\u00e1dku. Zkontroluj p\u016fvodn\u00ed odpov\u011b\u010f ve Forms.',meta);}
+      else if(!payloads.length){summary.missing++;formsPushRowError(rowNo,'Chyb\u00ed odevzd\u00e1vac\u00ed k\u00f3d SECURE-ANSWERS-V1. Zkontroluj odpov\u011b\u010f ve Forms.',meta);}
+      else if(payloads.length>1){summary.ambiguous++;formsPushRowError(rowNo,'V\u00edce odevzd\u00e1vac\u00edch k\u00f3d\u016f v jednom \u0159\u00e1dku. Ov\u011b\u0159 p\u016fvodn\u00ed odpov\u011b\u010f ve Forms.',meta);}
+      else{const outcome=await verifyText('forms_radek_'+rowNo+'.txt',payloads[0],meta);if(outcome.classification==='other-test'){summary.otherTests++;if(outcome.unverifiedOtherTest)summary.otherTestsUnverified++;}}
+      if(++processed%20===0){setFormsProgress(processed,nonempty.length);await new Promise(r=>setTimeout(r,0));}
+    }
+    rebuildDuplicateState();formsSummaryRefresh(summary);last=summary;setFormsProgress(nonempty.length,nonempty.length);
+  }
+  LAST_FORMS_IMPORT=last;afterResultsChanged();renderFormsImportSummary(last);return last;
+}
 async function importFormsCsvText(text,fileName){
   parseFormsCsvText(text);
   e3Require(FORMS_CSV_BATCHES.length<20&&FORMS_CSV_BATCHES.reduce((n,b)=>n+b.text.length,0)+text.length<=FORMS_CSV_MAX_BYTES,'csv.batch-limit','Na\u010dten\u00e1 CSV p\u0159ekra\u010duj\u00ed limit. Ulo\u017e v\u00fdsledky a za\u010dni novou sadu.');
