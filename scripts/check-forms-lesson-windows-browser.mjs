@@ -21,7 +21,16 @@ try{
   await student.route('http://127.0.0.1:18781/s.html',r=>r.fulfill({status:200,contentType:'text/html',body:S}));await student.goto('http://127.0.0.1:18781/s.html');
   for(const bad of [pkg.testId,'A1','A7B9C2X']){await student.locator('#studentName').fill(bad);await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);assert.equal(await student.locator('#test').isVisible(),false,'accepted '+bad);await student.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));}
   ok('test ID / short / long codes rejected');
+  await student.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
   await student.locator('#studentName').fill('a7b9c2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});ok('lower-case valid code accepted');
+  assert.equal(await student.locator('#done').isVisible(),false,'fresh start jumped directly to submitted/Forms screen');
+  await student.waitForTimeout(80);assert.ok((await student.evaluate(()=>window.scrollY))<20,'fresh start did not reset scroll to the beginning of the test');
+  const submitButton=student.locator('#secureSubmitCard button');assert.equal(await submitButton.isDisabled(),true,'submit must be briefly disarmed after the start transition');
+  await submitButton.click({force:true});await student.waitForTimeout(100);assert.equal(await student.locator('#done').isVisible(),false,'start-transition click-through submitted the test');
+  await student.waitForTimeout(1300);assert.equal(await submitButton.isDisabled(),false,'submit did not re-arm after the start transition');
+  await submitButton.click();await student.locator('.s-modal-bd').waitFor({state:'visible'});assert.equal(await student.locator('#done').isVisible(),false,'manual submit bypassed explicit confirmation');
+  await student.locator('[data-confirm-cancel]').click();assert.equal(await student.locator('#test').isVisible(),true,'cancelling submit confirmation left the active test');
+  ok('fresh start cannot jump to Forms; scroll reset, click-through guard and explicit submit confirmation enforced');
   const reading=await student.evaluate(()=>[...document.querySelectorAll('.reading-passage')].map(e=>{const c=getComputedStyle(e);return {lang:e.getAttribute('lang'),align:c.textAlign,last:c.textAlignLast,hyph:c.hyphens,overflow:e.scrollWidth>e.clientWidth+1};}));
   assert.ok(reading.length&&reading.every(r=>r.lang==='en'&&r.align==='justify'&&r.last==='left'&&r.hyph==='auto'&&!r.overflow),JSON.stringify(reading));ok('reading passage justified, hyphenated, lang=en at 390 px');
   const startedAtMs=Date.now();
