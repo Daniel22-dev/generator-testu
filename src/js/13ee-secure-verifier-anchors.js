@@ -4,9 +4,78 @@ function verifierAnchorSettingsHtml(){return '<section class="card forms-verify-
 const SECURE_VERIFIER_ANCHORS_JS=String.raw`
 let FORMS_ANCHOR_POLICY=null;const FORMS_LOCAL_TIMEZONE='Europe/Prague',FORMS_DTF=new Intl.DateTimeFormat('en-GB',{timeZone:FORMS_LOCAL_TIMEZONE,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});function e3ZoneParts(ms){const p={};for(const v of FORMS_DTF.formatToParts(new Date(ms)))if(v.type!=='literal')p[v.type]=+v.value;return p;}
 function e3TodayInZone(){const p=e3ZoneParts(Date.now()),z=n=>String(n).padStart(2,'0');return p.year+'-'+z(p.month)+'-'+z(p.day);}
-function e3PragueLocalIso(d,t){const a=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})$/),b=String(t||'').match(/^(\d{2}):(\d{2})$/);if(!a||!b||+b[1]>23||+b[2]>59)return '';const ms=e3WallTimestamp(+a[3]+'.'+ +a[2]+'.'+ +a[1]+' '+ +b[1]+':'+b[2]+':00',FORMS_LOCAL_TIMEZONE);if(!Number.isFinite(ms))return '';const p=e3ZoneParts(ms),o=Math.round((Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second)-ms)/60000),z=n=>String(n).padStart(2,'0'),x=Math.abs(o);return d+'T'+t+':00'+(o>=0?'+':'-')+z(Math.floor(x/60))+':'+z(x%60);}
-function e3PolicyTimestamp(i,k){const p=k==='publication',a=String(i?.[p?'publishedAt':'receptionEndsAt']||'').trim();if(a){e3Require(Number.isFinite(e3Iso(a)),p?'anchors.config-publication':'anchors.config-deadline','Neplatný čas.');return a;}const d=String(i?.[p?'publishedDate':'receptionEndsDate']||''),t=String(i?.[p?'publishedTime':'receptionEndsTime']||'');if(!p&&!d&&!t)return '';e3Require(d&&t,p?'anchors.config-publication':'anchors.config-deadline','Vyplň datum i čas.');const x=e3PragueLocalIso(d,t);e3Require(x,p?'anchors.config-publication':'anchors.config-deadline','Neplatný čas Europe/Prague.');return x;}
-function ensureFormsAnchorDefaults(){if(typeof document==='undefined')return;const d=$('formsPublishedDate'),z=$('formsCsvTimezone');if(d&&!d.value)d.value=e3TodayInZone();if(z)z.value=FORMS_LOCAL_TIMEZONE;}
+function e3CivilEpoch(y,mo,d,h,mi,s){
+  const g=Date.UTC(y,mo-1,d,h,mi,s),q=new Date(g);
+  if(y<2000||y>2200||mo<1||mo>12||d<1||h<0||h>23||mi<0||mi>59||s<0||s>59||q.getUTCFullYear()!==y||q.getUTCMonth()!==mo-1||q.getUTCDate()!==d)return NaN;
+  return g;
+}
+function e3WallCandidates(y,mo,d,h,mi,s,zone){
+  const g=e3CivilEpoch(y,mo,d,h,mi,s);if(!Number.isFinite(g))return [];
+  const offsets=new Set();for(const k of [-36,0,36]){const t=g+k*3600000,p=e3ZoneParts(t,zone);offsets.add(Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second)-t);}
+  const hits=[];for(const o of offsets){const t=g-o,p=e3ZoneParts(t,zone);if(p.year===y&&p.month===mo&&p.day===d&&p.hour===h&&p.minute===mi&&p.second===s)hits.push(t);}
+  return [...new Set(hits)];
+}
+function e3WallTimestamp(t,z){
+  const m=String(t||'').trim().match(/^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);if(!m)return NaN;
+  const[d,mo,y,h,mi,s]=m.slice(1).map(Number);try{const a=e3WallCandidates(y,mo,d,h,mi,s,z||FORMS_LOCAL_TIMEZONE);return a.length===1?a[0]:NaN;}catch(_){return NaN;}
+}
+function e3FormsTime(value){
+  const raw=String(value??'').trim().replace(/\u00a0/g,' '),bad=reason=>e3Error('anchors.timestamp-format','\u010cas Forms "'+raw.slice(0,120)+'": '+reason+' Pou\u017eij p\u016fvodn\u00ed CSV nebo jednozna\u010dn\u00fd ISO \u010das s posunem; bez uveden\u00e9 z\u00f3ny plat\u00ed '+(FORMS_ANCHOR_POLICY?.csvTimezone||FORMS_LOCAL_TIMEZONE)+'.');
+  if(!raw||raw.length>120)throw bad('pr\u00e1zdn\u00e1 nebo p\u0159\u00edli\u0161 dlouh\u00e1 hodnota.');
+  const iso=e3Iso(raw);if(Number.isFinite(iso)){const f=raw.match(/\.(\d{1,3})(?:Z|[+-])/);return {lower:iso,upper:iso+(f?10**(3-f[1].length):1000)-1};}
+  let text=raw,offset=null;
+  const zm=text.match(/\s+(Z|[A-Za-z]{2,10}|(?:GMT|UTC)[+-]\d{1,2}(?::\d{2})?|[+-]\d{2}:\d{2})$/i);
+  if(zm&&!/^(am|pm)$/i.test(zm[1])){
+    const zone=zm[1].toUpperCase(),fixed={Z:0,CET:60,CEST:120,EET:120,EEST:180,WET:0,WEST:60,UTC:0,GMT:0};
+    if(Object.prototype.hasOwnProperty.call(fixed,zone))offset=fixed[zone];
+    else{const n=zone.match(/^(?:(?:GMT|UTC))?([+-])(\d{1,2})(?::(\d{2}))?$/);if(!n||+n[2]>14||+(n[3]||0)>59||+n[2]===14&&+(n[3]||0)!==0)throw e3Error('anchors.timestamp-zone','Nezn\u00e1m\u00e1 nebo neplatn\u00e1 z\u00f3na "'+zone+'" v \u010dase Forms "'+raw+'". Pou\u017eij CET/CEST, EET/EEST, WET/WEST, UTC/GMT, GMT\u00b1H:MM nebo ISO s posunem.');offset=(+n[2]*60+(+(n[3]||0)))*(n[1]==='-'?-1:1);}
+    text=text.slice(0,zm.index).trim();
+  }
+  let meridian='',am=text.match(/\s+(am|pm)$/i);if(am){meridian=am[1].toLowerCase();text=text.slice(0,am.index).trim();}
+  let m,y,mo,d,h,mi,s,precision;
+  if((m=text.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?$/))){[y,mo,d,h,mi]=m.slice(1,6).map(Number);s=+(m[6]||0);precision=m[6]===undefined?60000:1000;}
+  else if((m=text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/))){[mo,d,y,h,mi]=m.slice(1,6).map(Number);s=+(m[6]||0);precision=m[6]===undefined?60000:1000;}
+  else if((m=text.match(/^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/))){[d,mo,y,h,mi]=m.slice(1,6).map(Number);s=+(m[6]||0);precision=m[6]===undefined?60000:1000;}
+  else throw bad('nepodporovan\u00fd form\u00e1t (YYYY/MM/DD, americk\u00e9 M/D/YYYY, \u010desk\u00e9 D. M. YYYY nebo ISO).');
+  if(meridian){if(h<1||h>12)throw bad('hodina s AM/PM mus\u00ed b\u00fdt 1\u201312.');h=h%12+(meridian==='pm'?12:0);}
+  const civil=e3CivilEpoch(y,mo,d,h,mi,s);if(!Number.isFinite(civil))throw bad('neexistuj\u00edc\u00ed datum nebo \u010das.');
+  let lower;
+  if(offset!==null)lower=civil-offset*60000;
+  else{
+    const hits=e3WallCandidates(y,mo,d,h,mi,s,FORMS_ANCHOR_POLICY?.csvTimezone||FORMS_LOCAL_TIMEZONE);
+    if(hits.length!==1)throw e3Error('anchors.timestamp-ambiguous','\u010cas Forms "'+raw+'" je '+(hits.length?'nejednozna\u010dn\u00fd p\u0159i p\u0159echodu na zimn\u00ed \u010das.':'neexistuj\u00edc\u00ed p\u0159i p\u0159echodu na letn\u00ed \u010das.')+' Uve\u010f explicitn\u00ed z\u00f3nu (CET/CEST) nebo ISO s posunem.');
+    lower=hits[0];
+  }
+  return {lower,upper:lower+precision-1};
+}
+function e3PragueLocalIso(d,t){const a=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})$/),b=String(t||'').match(/^(\d{2}):(\d{2})$/);if(!a||!b)return '';const ms=e3WallTimestamp(+a[3]+'.'+ +a[2]+'.'+ +a[1]+' '+ +b[1]+':'+b[2]+':00',FORMS_LOCAL_TIMEZONE);return Number.isFinite(ms)?new Date(ms).toISOString():'';}
+function e3PolicyTimestamp(i,k){
+  const first=k==='publication',raw=String(i?.[first?'publishedAt':'receptionEndsAt']||'').trim();
+  if(raw){e3Require(Number.isFinite(e3Iso(raw)),first?'anchors.config-publication':'anchors.config-deadline','Neplatn\u00fd ISO \u010das hodiny.');return raw;}
+  const d=String(i?.[first?'publishedDate':'receptionEndsDate']||''),t=String(i?.[first?'publishedTime':'receptionEndsTime']||'');
+  if(!t)return '';e3Require(d,'anchors.config-time','Vypl\u0148 datum i \u010das hodiny.');const x=e3PragueLocalIso(d,t);e3Require(x,'anchors.config-time','Neplatn\u00fd nebo nejednozna\u010dn\u00fd \u010das Europe/Prague.');return x;
+}
+function e3Email(v){const e=typeof v==='string'?v.trim().toLowerCase():'';return /^[a-z0-9.!#$%&'*+/=?^_{|}~-]+@[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/.test(e)&&e.length<=254?e:'';}
+function e3Header(v){return String(v||'').normalize('NFC').trim().toLowerCase().replace(/\s+/g,' ');}
+function normalizeVerifierFormsPolicy(input){
+  const i=input&&typeof input==='object'?input:{},d=String(i.schoolDomain||'').trim().toLowerCase();
+  e3Require(d.length<=253&&d.includes('.')&&d.split('.').every(x=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(x)),'anchors.config-domain','Neplatn\u00e1 dom\u00e9na \u0161koly.');
+  e3Require(i.verifiedEmailConfirmed===true&&i.domainRestrictedConfirmed===true&&i.csvOriginalConfirmed===true,'anchors.config-confirmation','Potvr\u010f ov\u011b\u0159en\u00fd e-mail, \u0161koln\u00ed dom\u00e9nu a p\u016fvodn\u00ed CSV.');
+  const emailHeader=String(i.emailHeader||'auto').trim(),timestampHeader=String(i.timestampHeader||'auto').trim();
+  e3Require(emailHeader.length<=120&&timestampHeader.length<=120&&(emailHeader==='auto'||timestampHeader==='auto'||e3Header(emailHeader)!==e3Header(timestampHeader)),'anchors.config-headers','Neplatn\u00e9 syst\u00e9mov\u00e9 sloupce CSV.');
+  const zone=String(i.csvTimezone||FORMS_LOCAL_TIMEZONE);try{e3ZoneParts(Date.now(),zone);}catch(_){throw e3Error('anchors.config-zone','Neplatn\u00e1 \u010dasov\u00e1 z\u00f3na CSV.');}
+  const m=i.toleranceMinutes===undefined?2:Number(i.toleranceMinutes);e3Require(i.toleranceMinutes!==''&&Number.isFinite(m)&&m>=0&&m<=1440,'anchors.config-tolerance','Neplatn\u00e1 tolerance (0\u20131440 minut).');
+  const teachers=Array.isArray(i.teacherEmails)?[...new Set(i.teacherEmails.map(e3Email))]:[];
+  e3Require(teachers.length<=12&&teachers.every(e=>e&&e.split('@')[1]===d),'anchors.config-teachers','E-maily u\u010ditel\u016f musej\u00ed b\u00fdt ze \u0161koln\u00ed dom\u00e9ny.');
+  const p=e3PolicyTimestamp(i,'publication'),r=e3PolicyTimestamp(i,'deadline');e3Require(!r||p&&e3Iso(r)>=e3Iso(p),'anchors.config-deadline','Konec p\u0159\u00edjmu je p\u0159ed za\u010d\u00e1tkem hodiny.');
+  return Object.freeze({schoolDomain:d,teacherEmails:Object.freeze(teachers),csvTimezone:zone,emailHeader,timestampHeader,toleranceMinutes:m,publishedAt:p,receptionEndsAt:r,windowSource:p?'manual':'lesson-csv',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true,lessonMarkersConfirmed:i.lessonMarkersConfirmed===true});
+}
+function ensureFormsAnchorDefaults(){
+  if(typeof document==='undefined')return;const p=FORMS_ANCHOR_POLICY,baked=!!CONFIG.formsAnchorPolicy;
+  for(const el of document.querySelectorAll('.forms-fixed-settings'))el.hidden=baked;
+  const d=$('formsPublishedDate');if(d&&!d.value)d.value=e3TodayInZone();
+  if(p){for(const [id,key] of [['formsSchoolDomain','schoolDomain'],['formsEmailHeader','emailHeader'],['formsTimestampHeader','timestampHeader'],['formsCsvTimezone','csvTimezone'],['formsToleranceMinutes','toleranceMinutes']])if($(id)&&!$(id).dataset.edited)$(id).value=p[key];for(const id of ['formsVerifiedEmailConfirmed','formsDomainRestrictedConfirmed','formsCsvOriginalConfirmed'])if(baked&&$(id))$(id).checked=true;}
+}
 function ensureFormsReceptionDate(){const d=$('formsReceptionEndsDate'),t=$('formsReceptionEndsTime');if(d&&t&&t.value&&!d.value)d.value=$('formsPublishedDate')?.value||e3TodayInZone();}
 function refreshFormsVerificationSummary(){
   if(typeof document==='undefined')return;ensureFormsAnchorDefaults();const p=FORMS_ANCHOR_POLICY,t=$('formsVerifySummaryText'),b=$('formsVerifySummaryBtn'),x=$('formsVerifySummary');
