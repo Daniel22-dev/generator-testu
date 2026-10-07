@@ -389,7 +389,7 @@ function updateGeneratorSettingsMetadataStatus(){
   const status=$('generatorSettingsMetadataStatus');if(!status)return;
   const cfg=configuredGoogleFormsMetadata(),profile=typeof configuredGoogleFormsAnchorProfile==='function'?configuredGoogleFormsAnchorProfile():null;
   const ready=!!(cfg&&cfg.entries.submission&&profile);
-  status.textContent=ready?'Nastaveno: metadata, značky hodiny a školní účty učitelů. Nový verifier nepotřebuje další vyplňování.':'Export přes Forms je blokován, dokud nejsou uloženy hodnoty TESTID / NAZEV / TRIDA / KOD a potvrzený e-mail učitele.';
+  status.textContent=ready?'Nastaveno: metadata, zna\\u010dky hodiny a \\u0161koln\\u00ed \\u00fa\\u010dty u\\u010ditel\\u016f. Nov\\u00fd verifier nepot\\u0159ebuje dal\\u0161\\u00ed vypl\\u0148ov\\u00e1n\\u00ed.':'Export p\\u0159es Forms je blokov\\u00e1n, dokud nejsou ulo\\u017eeny hodnoty TESTID / NAZEV / TRIDA / KOD a potvrzen\\u00fd e-mail u\\u010ditele.';
   status.className='secure-mode-box'+(ready?'':' warn');
 }
 async function saveGoogleFormsUrlLocal(){
