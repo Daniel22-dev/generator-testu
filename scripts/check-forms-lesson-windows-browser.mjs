@@ -17,6 +17,14 @@ try{
   setForms(true);const pkg=await w.assembleTestHtml(w.eval('state'),structuredClone(GEN)),S=pkg.studentHtml,T=pkg.teacherHtml;
   for(const secret of [TEACHER,A,'A7B9C2'])assert.ok(!S.includes(secret),'student HTML leaks '+secret);ok('student HTML has no teacher e-mail, roster e-mail or code');
   browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});const errors=[];
+  const expiredCtx=await browser.newContext({viewport:{width:390,height:844}}),expired=await expiredCtx.newPage();expired.on('pageerror',e=>errors.push(e.message));
+  await expired.route('http://127.0.0.1:18781/expired.html',r=>r.fulfill({status:200,contentType:'text/html',body:S}));await expired.goto('http://127.0.0.1:18781/expired.html');
+  await expired.locator('#studentName').fill('A7B9C2');await enterStartCode(expired,pkg);await expired.evaluate(()=>startTest());await expired.locator('#test').waitFor({state:'visible'});
+  await expired.evaluate(async()=>{STARTED_AT=new Date(Date.now()-21*60000).toISOString();TIMER_DEADLINE=Date.now()-1000;await persistActiveAttemptSeal();});
+  await expired.reload();await expired.locator('#studentName').fill('A7B9C2');await enterStartCode(expired,pkg);await expired.evaluate(()=>startTest());await expired.locator('#done').waitFor({state:'visible'});
+  const expiredNotice=await expired.locator('.s-modal-bd').innerText();assert.match(expiredNotice,/time.*expired|expired.*time|čas.*vypršel|vypršel.*čas|submitted automatically/i,'expired resumed attempt lacks clear automatic-submit explanation');
+  assert.equal(await expired.locator('#timer').textContent(),'00:00','expired resumed attempt did not preserve exhausted deadline');ok('expired resumed attempt auto-submits without resetting time and explains why');
+  await expiredCtx.close();
   const sctx=await browser.newContext({viewport:{width:390,height:844}}),student=await sctx.newPage();student.on('pageerror',e=>errors.push(e.message));
   await student.route('http://127.0.0.1:18781/s.html',r=>r.fulfill({status:200,contentType:'text/html',body:S}));await student.goto('http://127.0.0.1:18781/s.html');
   for(const bad of [pkg.testId,'A1','A7B9C2X']){await student.locator('#studentName').fill(bad);await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);assert.equal(await student.locator('#test').isVisible(),false,'accepted '+bad);await student.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));}
@@ -38,6 +46,11 @@ try{
   await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const txt=await student.locator('#answerBackup').inputValue();
   const formsUrl=new URL(await student.evaluate(()=>formsOpenUrl()));assert.equal(formsUrl.searchParams.get('entry.111'),pkg.testId);assert.ok(formsUrl.searchParams.get('entry.222'));assert.ok(formsUrl.searchParams.get('entry.333'));assert.equal(formsUrl.searchParams.get('entry.444'),null);ok('student Forms link prefilled with test ID, name, class only');
+  await student.reload();await student.locator('#studentName').fill('ZZZZZZ');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);
+  assert.equal(await student.locator('#done').isVisible(),false,'arbitrary 6-char identity saw completed submission screen');
+  assert.equal(await student.locator('#answerBackup').inputValue(),'','arbitrary 6-char identity received previous encrypted payload');
+  assert.match(await student.locator('.s-modal-bd').innerText(),/another student|jiného studenta/i);ok('shared profile: arbitrary different 6-char code cannot recover another submission');
+  await student.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));
   await student.reload();await student.locator('#studentName').fill('K4M8P2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);
   assert.equal(await student.locator('#done').isVisible(),false,'foreign identity saw completed submission screen');
   assert.equal(await student.locator('#test').isVisible(),false,'foreign identity started a new attempt over completed outbox');
