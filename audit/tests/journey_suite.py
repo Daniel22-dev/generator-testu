@@ -453,11 +453,12 @@ try:
   assert summary_b['otherTests']>=1,('verifier B must classify TEST-A rows as other tests',summary_b)
   vb.close()
 
-  # Real-browser long-run benchmark: actual verifier + WebCrypto + yielding UI.
+  # Real-browser long-run benchmark: each size starts in a fresh verifier origin/profile.
+  # This measures one full-year CSV import, not cumulative re-processing of every previous benchmark file.
   perf=[]
-  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va2,stu_a['publishedAt'])
-  try:
-   for size in (100,1000,3000,5000):
+  for size in (100,1000,3000,5000):
+   va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va2,stu_a['publishedAt'])
+   try:
     big=io.StringIO();w=csv.writer(big);w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
     current=0
     for i in range(size):
@@ -468,23 +469,19 @@ try:
     va2.evaluate("()=>{clearInterval(window.__formsHbTimer);window.__formsHb=0;window.__formsHbTimer=setInterval(()=>window.__formsHb++,25)}")
     t0=time.time();va2.set_input_files('#formsCsvFile',bf.name)
     va2.wait_for_function("(n)=>!!LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===n&&!LAST_FORMS_IMPORT.waitingForWindow",arg=size,timeout=180000)
-    elapsed=round(time.time()-t0,3);txt=va2.locator('#formsImportSummary').inner_text()
-    summary=va2.evaluate("()=>({...LAST_FORMS_IMPORT,duplicates:{...LAST_FORMS_IMPORT.duplicates}})")
+    elapsed=round(time.time()-t0,3);summary=va2.evaluate("()=>({...LAST_FORMS_IMPORT,duplicates:{...LAST_FORMS_IMPORT.duplicates}})")
     hb=va2.evaluate("()=>{clearInterval(window.__formsHbTimer);return window.__formsHb}")
     heap=va2.evaluate("()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null")
     assert summary['current']==current,(size,current,summary)
     assert summary['otherTests']==size-current,(size,summary)
-    # The benchmark intentionally repeats the same TEST-A payload. In 7.1.97 those repeats
-    # are explicitly rejected as duplicate/replay rows rather than counted as clean results.
-    # After the first batch, the first TEST-A row is itself a duplicate of the prior batch.
-    expected_ok=1 if not perf else 0
-    assert summary['ok']==expected_ok,(size,summary)
-    assert summary['replayRejected']==current-expected_ok,(size,current,summary)
-    assert summary['invalid']>=current-expected_ok,(size,summary)
+    # Repeated TEST-A payloads inside this single CSV are duplicate/replay rows.
+    assert summary['ok']==1,(size,summary)
+    assert summary['replayRejected']==current-1,(size,current,summary)
+    assert summary['invalid']>=current-1,(size,summary)
     assert hb>0,('large CSV import must yield to browser event loop',size,hb)
     perf.append({'rows':size,'seconds':elapsed,'heartbeat':hb,'heapMiB':heap})
-  finally:
-   va2.close()
+   finally:
+    va2.close()
   return {'testA':test_a,'testB':test_b,'unicodePrefill':True,'metadataMismatch':True,'sameCsvTwoVerifiers':True,'browserPerformance':perf}
  record('pre-server-forms-full-year-workflow',pre_server_forms_full_year_workflow)
 
