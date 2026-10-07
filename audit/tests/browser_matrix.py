@@ -15,6 +15,11 @@ def private_start_code(h,teacher_html):
 def enter_start_code(p,code):
  assert len(code)==10,'use the code belonging to this private package'
  p.locator('#startCode').fill(code)
+def submit_secure(p):
+ p.wait_for_timeout(1300)
+ p.locator('[onclick="requestSecureSubmit()"]:visible').click()
+ p.locator('[data-confirm-ok]:visible').click()
+ p.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")')
 def configure_forms_anchors(p,published_at,email_header='Email Address',timestamp_header='Timestamp'):
  # Synthetic owner attestation for these fixtures; this does not inspect a live Form.
  # 7.1.97 bakes fixed school/teacher settings into new verifiers. In that case the UI hides
