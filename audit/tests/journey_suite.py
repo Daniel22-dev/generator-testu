@@ -7,7 +7,7 @@ production. Each assertion checks what the teacher/student actually sees or can
 do next, not only internal state.
 """
 from harness import Harness,TESTS
-from browser_matrix import private_start_code,enter_start_code,configure_forms_anchors
+from browser_matrix import private_start_code,enter_start_code,configure_forms_anchors,submit_secure
 from datetime import datetime,timezone,timedelta
 import json,re,time,traceback
 
@@ -197,10 +197,7 @@ try:
   sp.fill('#unlockInp',recovery_code);sp.locator("[onclick='tryUnlock()']").first.click();sp.wait_for_timeout(1200)
   assert not sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'Recovery code must unlock the current student lock'
   answer_secure(sp)
-  sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(300)
-  y=sp.locator('.s-modal-bd button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
-  if y.count():y.first.click()
-  sp.wait_for_timeout(900);done=sp.evaluate('document.body.innerText');backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
+  submit_secure(sp);sp.wait_for_timeout(200);done=sp.evaluate('document.body.innerText');backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
   assert backup.startswith('SECURE-ANSWERS-V1'),backup[:40]
   assert 'Use only if Google Forms' not in done and 'Emergency backup' not in done and 'Download answers.txt' in done,('answers.txt is the only channel without Forms (F-13)',done[:400])
   vp=h.new_page(tea['text']);vp.wait_for_timeout(700)
@@ -336,10 +333,7 @@ try:
   msg=sp.evaluate("document.body.innerText");assert re.search(r'(personal code|kód studenta|código del estudiante|code)',msg,re.I) and '6' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with current 6-character personal-code guidance'
   sp.locator('button:visible',has_text=re.compile('^OK$')).first.click()
   sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
-  sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(300)
-  y=sp.locator('.s-modal-bd button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
-  if y.count():y.first.click()
-  sp.wait_for_timeout(900);backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
+  submit_secure(sp);sp.wait_for_timeout(200);backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
   vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.locator('#fallbackImportDetails summary').click();vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
   assert re.search(r'novak \(kód '+codes[0]+r'\)\t\S+\t30/30\t100 %\t1\t',t),('verifier resolves the code to the roster e-mail',t[:500])
@@ -385,10 +379,8 @@ try:
    sp=h.new_page(stu['text']);sp.wait_for_timeout(600);enter_start_code(sp,stu['startCode'])
    url=sp.evaluate('formsOpenUrl()')
    sp.fill('#studentName',stu['code']);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
-   sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(250)
-   y=sp.locator('.s-modal-bd button:visible',has_text=re.compile('^(Yes|Submit|Confirm)',re.I))
-   if y.count():y.first.click()
-   sp.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1") && !document.getElementById("done").classList.contains("hidden")',timeout=10000)
+   submit_secure(sp)
+   sp.wait_for_function('!document.getElementById("done").classList.contains("hidden")',timeout=10000)
    backup=sp.locator('#answerBackup').input_value();sp.close();return url,backup
 
   url_a,backup_a1=student_submission(stu_a,'Student Alpha')
