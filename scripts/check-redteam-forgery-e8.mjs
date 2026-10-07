@@ -8,11 +8,14 @@ const probe=process.env.GIT_REDTEAM_E8_MODE==='probe',rows=[],windows=[];
 function replaceOnce(html,needle,value){assert.ok(html.includes(needle),'negative-control seam absent: '+needle);return html.replace(needle,value);}
 function weakened(html,c,ctx){
   if(c.expect==='REJECTED'){
+    // 7.1.97 parser rejections are thrown directly; the weakened build bypasses the whole parser instead.
+    if(String(c.code).startsWith('anchors.timestamp-'))return replaceOnce(html,'function e3FormsTime(value){','function e3FormsTime(value){return {lower:0,upper:0};');
     if(c.code==='crypto.parse-decrypt')return replaceOnce(html,'async function decryptPayload(pack){','async function decryptPayload(pack){return '+JSON.stringify(ctx.p)+';');
     return replaceOnce(html,'function e3Require(ok,code,message){','function e3Require(ok,code,message){if(code==='+JSON.stringify(c.code)+')return;');
   }
+  if(c.expect==='METADATA_WARNING')return replaceOnce(html,'function metadataMismatchFor(sm){','function metadataMismatchFor(sm){return [];');
   if(c.expect==='REPLAY_REJECTED')return replaceOnce(html,'function rebuildDuplicateState(){','function rebuildDuplicateState(){return;');
-  if(c.expect==='RESCORED')return replaceOnce(html,'scored=scorePayload(payload);','scored=scorePayload(payload);scored.pct=payload.pct;scored.grade=payload.grade;');
+  if(c.expect==='RESCORED')return replaceOnce(html,'scored=scorePayload(checked);','scored=scorePayload(checked);scored.pct=payload.pct;scored.grade=payload.grade;');
   if(c.expect==='OTHER_TEST')return replaceOnce(html,"if(fullYear&&payload.testId!==CONFIG.testId)return {classification:'other-test',verifiedTestId:payload.testId};",'');
   if(c.expect==='JOKER_EXCLUDED')return replaceOnce(html,'jokerUsed:!!payload.jokerUsed,','jokerUsed:false,');
   if(c.expect==='DIAGNOSTIC_ONLY')return replaceOnce(html,'function evaluateFormsAnchors(p,source){',"function evaluateFormsAnchors(p,source){return {identity:'MATCHED_FORMS_ROSTER',timeWindow:'WITHIN_PUBLICATION_FORMS_WINDOW',diagnosticOnly:false,codes:[]};");
@@ -26,6 +29,10 @@ async function check(f,c,ctx){
     assert.equal(a.classification,'invalid-current',c.id);assert.equal(a.code,c.code,c.id);
     assert.equal(a.row.status,'CHYBA');assert.equal(a.row.total,0,'reject before private scoring');assert.equal(v.effectiveResults().length,0);
     assert.equal(v.resultTrust(a.row).scoreSource,'NOT_SCORED');assert.equal(v.classificationStatus(a.row),'REJECTED');
+  }else if(c.expect==='METADATA_WARNING'){
+    assert.equal(a.classification,'current',c.id);assert.equal(a.row.status,'OK');assert.equal(a.row.total,5);
+    assert.ok(Array.isArray(a.row.metadataMismatch)&&a.row.metadataMismatch.length===1,c.id+' warning missing');
+    assert.equal(v.classificationStatus(a.row),'REVIEW_REQUIRED');assert.equal(v.effectiveResults().length,1);
   }else if(c.expect==='OTHER_TEST'){
     assert.equal(a.classification,'other-test');assert.equal(v.eval('RESULTS.length'),0);assert.equal(v.effectiveResults().length,0);
   }else if(c.expect==='REPLAY_REJECTED'){
