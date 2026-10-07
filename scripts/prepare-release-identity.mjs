@@ -15,6 +15,7 @@ const sbomPath = path.join(dist, 'sbom.cdx.json');
 const provenancePath = path.join(dist, 'build-provenance.json');
 const evidencePath = path.join(dist, 'security-evidence-manifest.json');
 const integrityPath = path.join(dist, 'release-integrity.json');
+const p4AssurancePath = path.join(dist, 'p4-premerge-assurance.json');
 const APP_ID = 'generator';
 const RELEASE_CONTRACT = 'ghrab-release-integrity-v2';
 const ASSURANCE_MODE = 'TRANSITIONAL';
@@ -53,13 +54,60 @@ const pkg = JSON.parse(pkgBytes.toString('utf8'));
 const sourceCommit = String(process.env.GHRAB_SOURCE_COMMIT || process.env.GITHUB_SHA || '').trim().toLowerCase();
 const sourceRepository = String(process.env.GHRAB_SOURCE_REPOSITORY || process.env.GITHUB_REPOSITORY || '').trim();
 const buildId = String(process.env.GHRAB_BUILD_ID || [process.env.GITHUB_RUN_ID, process.env.GITHUB_RUN_ATTEMPT].filter(Boolean).join('-') || '').trim();
+const p4EvidenceRel = String(process.env.GHRAB_P4_CONSUMED_EVIDENCE || '').trim();
+let p4Evidence = null;
+let p4Assurance = null;
 assert(SHA40.test(sourceCommit), 'GHRAB_SOURCE_COMMIT/GITHUB_SHA must be an exact 40-character Git commit SHA.');
 assert(REPOSITORY.test(sourceRepository), 'GHRAB_SOURCE_REPOSITORY/GITHUB_REPOSITORY must be owner/repository.');
 assert(/^\d+\.\d+\.\d+$/.test(String(pkg.version || '')), `package.json version must be stable SemVer, got ${pkg.version || '?'}`);
 assert(buildId, 'GHRAB_BUILD_ID or GitHub run identity is required.');
 const sourcePackageSha256 = sha256(pkgBytes);
+if (p4EvidenceRel) {
+  assert(!path.isAbsolute(p4EvidenceRel) && !p4EvidenceRel.split(/[\\/]+/).includes('..'), 'P4 evidence path must be repository-relative');
+  const p4EvidencePath = path.resolve(root, p4EvidenceRel);
+  assert(p4EvidencePath.startsWith(root + path.sep), 'P4 evidence must stay inside repository root');
+  ensureFile(p4EvidencePath);
+  p4Evidence = readJson(p4EvidencePath);
+  assert(p4Evidence.schema === 'git-p4-consumed-promotion-evidence-v1' && p4Evidence.status === 'PASS', 'Invalid P4 consumed evidence contract');
+  assert(String(p4Evidence.repository || '').toLowerCase() === sourceRepository.toLowerCase(), 'P4 evidence repository drift');
+  assert(String(p4Evidence.mergedMain?.commit || '').toLowerCase() === sourceCommit, 'P4 evidence belongs to another merged main commit');
+  assert(SHA40.test(p4Evidence.certifiedSource?.commit || ''), 'P4 certified source SHA missing');
+  assert(SHA40.test(p4Evidence.certifiedSource?.tree || '') && SHA40.test(p4Evidence.mergedMain?.tree || ''), 'P4 tree identity missing');
+  assert(p4Evidence.certifiedSource.tree === p4Evidence.mergedMain.tree, 'P4 source/main tree equivalence is false');
+  assert(SHA256.test(p4Evidence.promotionCertificateSha256 || ''), 'P4 promotion certificate digest missing');
+  assert(/^sha256:[0-9a-f]{64}$/.test(p4Evidence.promotion?.artifactDigest || ''), 'P4 GitHub artifact digest missing');
+  assert(/^sha256:[0-9a-f]{64}$/.test(p4Evidence.reusedP5?.artifactDigest || ''), 'P4 reused P5 artifact digest missing');
+  assert(SHA256.test(p4Evidence.reusedP5?.extractedSha256 || ''), 'P4 reused P5 extracted digest missing');
+  assert(Array.isArray(p4Evidence.reusedP5?.requiredReports) && p4Evidence.reusedP5.requiredReports.length === 4, 'P4 reused P5 report digest set incomplete');
+  p4Assurance = {
+    schema: 'ghrab-p4-premerge-assurance-v1',
+    status: 'PASS',
+    repository: sourceRepository,
+    certifiedSourceCommit: p4Evidence.certifiedSource.commit,
+    certifiedSourceTree: p4Evidence.certifiedSource.tree,
+    mergedMainCommit: p4Evidence.mergedMain.commit,
+    mergedMainTree: p4Evidence.mergedMain.tree,
+    promotionRunId: p4Evidence.promotion.runId,
+    promotionRunAttempt: p4Evidence.promotion.runAttempt,
+    promotionArtifactDigest: p4Evidence.promotion.artifactDigest,
+    promotionCertificateSha256: p4Evidence.promotionCertificateSha256,
+    reusedP5ArtifactDigest: p4Evidence.reusedP5.artifactDigest,
+    reusedP5ExtractedSha256: p4Evidence.reusedP5.extractedSha256,
+    reusedP5RequiredReports: p4Evidence.reusedP5.requiredReports,
+    validatedAt: p4Evidence.validatedAt,
+    assurance: p4Evidence.assurance,
+    finalBuildPolicy: 'AUTHORITATIVE_BUILD_CREATED_FROM_MERGED_MAIN_AFTER_EXACT_TREE_EVIDENCE_VALIDATION',
+  };
+  fs.writeFileSync(p4AssurancePath, JSON.stringify(p4Assurance, null, 2) + '\n', 'utf8');
+}
 for (const reportName of ['qa-p5-release-report.json', 'qa-p5-acceptance-report.json', 'qa-p5-runtime-report.json', 'qa-p5-axe-runtime-report.json']) {
-  const report = readJson(path.join(dist, reportName));
+  const reportPath = path.join(dist, reportName);
+  if (p4Assurance) {
+    const expected = p4Assurance.reusedP5RequiredReports.find(x => x.path === reportName);
+    assert(expected && SHA256.test(expected.sha256), `${reportName}: P4 reused report digest missing`);
+    assert(sha256(fs.readFileSync(reportPath)) === expected.sha256, `${reportName}: P4 reused report digest drift`);
+  }
+  const report = readJson(reportPath);
   assert(report.appId === APP_ID, `${reportName} appId drift: ${report.appId || '?'} != ${APP_ID}`);
   assert(report.appVersion === pkg.version, `${reportName} version drift: ${report.appVersion || '?'} != ${pkg.version}`);
   assert(report.status === 'passed', `${reportName} is not passed.`);
@@ -74,6 +122,7 @@ manifest.releaseIdentity = {
   contract: RELEASE_CONTRACT,
   url: './release-integrity.json',
   assuranceMode: ASSURANCE_MODE,
+  ...(p4Assurance ? { premergeAssuranceUrl: './p4-premerge-assurance.json' } : {}),
 };
 fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
 
@@ -135,14 +184,31 @@ integrity.manifestSha256 = manifestSha256;
 integrity.assuranceMode = ASSURANCE_MODE;
 integrity.sourceRepository = sourceRepository;
 integrity.garpProfile = 'GARP-2.5.1-SHIELD-PREP';
-integrity.garpGate = 'qa:p5:ci';
+integrity.garpGate = p4Assurance ? 'p4-balanced-exact-tree-evidence-reuse' : 'qa:p5:ci';
+if (p4Assurance) {
+  integrity.premergeAssurance = {
+    schema: p4Assurance.schema,
+    url: 'p4-premerge-assurance.json',
+    sha256: sha256(fs.readFileSync(p4AssurancePath)),
+    certifiedSourceCommit: p4Assurance.certifiedSourceCommit,
+    certifiedSourceTree: p4Assurance.certifiedSourceTree,
+    mergedMainTree: p4Assurance.mergedMainTree,
+    promotionRunId: p4Assurance.promotionRunId,
+    promotionRunAttempt: p4Assurance.promotionRunAttempt,
+    promotionCertificateSha256: p4Assurance.promotionCertificateSha256,
+    reusedP5ArtifactDigest: p4Assurance.reusedP5ArtifactDigest,
+    reusedP5ExtractedSha256: p4Assurance.reusedP5ExtractedSha256,
+  };
+}
 integrity.workflowRunId = process.env.GITHUB_RUN_ID || null;
 integrity.workflowRunAttempt = process.env.GITHUB_RUN_ATTEMPT || null;
 integrity.signature = {
   ...integrity.signature,
   status: 'UNSIGNED_TRANSITIONAL',
 };
-integrity.assuranceNote = 'TRANSITIONAL: artifact files, manifest, SBOM, QA evidence manifest, provenance and source commit are SHA-256-bound and revalidated; no production signing key/attestation chain is claimed.';
+integrity.assuranceNote = p4Assurance
+  ? 'TRANSITIONAL P4 BALANCED: independent pre-merge certifications are reused only after exact Git-tree, workflow/run/job/check/artifact and trust-input validation; the final production build is created from the authoritative merged main commit. No production signing key/attestation chain is claimed.'
+  : 'TRANSITIONAL: artifact files, manifest, SBOM, QA evidence manifest, provenance and source commit are SHA-256-bound and revalidated; no production signing key/attestation chain is claimed.';
 fs.writeFileSync(integrityPath, JSON.stringify(integrity, null, 2) + '\n', 'utf8');
 
 // Verify the final deployment directory with the approved GARP verifier.
@@ -181,7 +247,14 @@ assert(evidence.schema === 'ghrab-security-evidence-manifest-v1', 'security evid
 assert(evidence.appId === APP_ID && evidence.version === pkg.version, 'security evidence app/version drift.');
 assert(String(evidence.sourceRevision || '').toLowerCase() === sourceCommit, 'security evidence source commit drift.');
 assert(evidence.sourcePackageSha256 === sourcePackageSha256, 'security evidence source package digest drift.');
-for (const requiredPath of ['studio-manifest.json', 'sbom.cdx.json', 'build-provenance.json', 'security-evidence-manifest.json', 'qa-p5-release-report.json', 'qa-p5-acceptance-report.json']) {
+if (p4Assurance) {
+  assert(finalIntegrity.garpGate === 'p4-balanced-exact-tree-evidence-reuse', 'P4 release must identify its actual assurance gate.');
+  assert(finalIntegrity.premergeAssurance?.sha256 === sha256(fs.readFileSync(p4AssurancePath)), 'P4 assurance digest drift.');
+  assert(finalIntegrity.premergeAssurance?.certifiedSourceTree === finalIntegrity.premergeAssurance?.mergedMainTree, 'P4 release lost exact-tree equivalence.');
+  assert(finalManifest.releaseIdentity?.premergeAssuranceUrl === './p4-premerge-assurance.json', 'P4 assurance URL missing from manifest.');
+}
+const requiredReleasePaths = ['studio-manifest.json', 'sbom.cdx.json', 'build-provenance.json', 'security-evidence-manifest.json', 'qa-p5-release-report.json', 'qa-p5-acceptance-report.json', ...(p4Assurance ? ['p4-premerge-assurance.json'] : [])];
+for (const requiredPath of requiredReleasePaths) {
   assert(finalIntegrity.files.some((file) => file.path === requiredPath), `release-integrity does not cover ${requiredPath}.`);
 }
 assert(!finalIntegrity.files.some((file) => file.path === 'release-integrity.json'), 'release-integrity must exclude its own self-referential file.');

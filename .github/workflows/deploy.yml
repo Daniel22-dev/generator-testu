@@ -1,12 +1,35 @@
 name: Certifikace a nasazení Generátoru testů
+run-name: P4 deploy ${{ inputs.merged_main_sha }} from promotion ${{ inputs.promotion_run_id }}.${{ inputs.promotion_run_attempt }}
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      promotion_run_id:
+        description: Exact Safe Promotion workflow run ID
+        required: true
+        type: string
+      promotion_run_attempt:
+        description: Exact Safe Promotion run attempt
+        required: true
+        type: string
+      promotion_artifact_name:
+        description: Exact P4 promotion-certificate artifact name
+        required: true
+        type: string
+      certified_sha:
+        description: Exact pre-merge certified candidate SHA
+        required: true
+        type: string
+      merged_main_sha:
+        description: Exact merged main SHA to deploy
+        required: true
+        type: string
 
 permissions:
   contents: read
+  actions: read
+  checks: read
+  pull-requests: read
   pages: write
   id-token: write
 
@@ -27,12 +50,33 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
+
       - name: Configure shared CI Node setup
         uses: ./.github/actions/setup-ci-node
+
       - name: Require classroom release readiness on main
         if: github.ref == 'refs/heads/main'
         run: node scripts/check-redteam-release-e10.mjs --require-ready
+
+      - name: Recheck native main protection for P4 deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/main-protection.mjs --live
+
+      - name: Validate P4 exact-tree promotion evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ inputs.certified_sha }}
+          MERGED_MAIN_SHA: ${{ inputs.merged_main_sha }}
+          PROMOTION_RUN_ID: ${{ inputs.promotion_run_id }}
+          PROMOTION_RUN_ATTEMPT: ${{ inputs.promotion_run_attempt }}
+          PROMOTION_ARTIFACT_NAME: ${{ inputs.promotion_artifact_name }}
+          P4_REUSE_DIR: ${{ runner.temp }}/git-p4-reused-evidence
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+        run: node scripts/ci/p4-promotion-evidence.mjs --consume
+
       - name: Install independently verified CI tools
         id: ci_tools
         timeout-minutes: 12
@@ -50,68 +94,29 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-      - name: Run unified error reporter regression
-        run: npm run test:reporter
-      - name: Record structured QA start
-        id: release_start
-        shell: bash
-        run: echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
-      - name: Run GHRAB QA release gate
-        id: release_qa
-        run: npm run qa:release
-        env:
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
-      - name: Validate current structured QA evidence
-        id: release_evidence
-        if: always() && (steps.release_qa.outcome == 'success' || steps.release_qa.outcome == 'failure')
-        env:
-          CI_RELEASE_STARTED_AT: ${{ steps.release_start.outputs.started_at }}
-          CI_RELEASE_OUTCOME: ${{ steps.release_qa.outcome }}
-        run: node scripts/ci/release-evidence.mjs
+      - name: Build authoritative merged-main artifact
+        run: npm run build
 
-      - name: Preserve structured QA before destructive red-team cleanup
-        if: always() && steps.release_evidence.outcome == 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: generator-main-release-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
-          if-no-files-found: error
-          path: |
-            qa-results/qa-report.json
-            qa-results/qa-report.html
-            qa-results/release-verdict.txt
-            qa-results/qa-test-matrix.csv
-            qa-results/qa-release-evidence.json
+      - name: Materialize verified pre-merge certification evidence
+        env:
+          P4_REUSE_DIR: ${{ runner.temp }}/git-p4-reused-evidence
+        run: node scripts/ci/p4-promotion-evidence.mjs --materialize
 
-      - name: Verify GHRAB Platform P3 conformance
+      - name: Verify GHRAB Platform P3 conformance on final main build
         run: npm run qa:platform
 
-      - name: Enforce E9 complete regression admission
-        run: npm run qa:redteam:ci
-        env:
-          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
-
-      - name: Upload QA evidence
+      - name: Upload P4 assurance evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ghrab-qa-generator-${{ github.sha }}
+          name: ghrab-p4-main-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           if-no-files-found: error
           path: |
-            qa-results/redteam-e*.json
-            qa-results/redteam-e9-*.json
-            qa-results/redteam-e10-ci/*.log
-            qa-results/redteam-e9-negative/*.log
-            audit/evidence/garp27-current/
+            qa-results/p4-promotion-certificate.json
+            qa-results/p4-consumed-promotion-evidence.json
+            qa-results/premerge-p5/
             dist/qa-p5-*.json
-            dist/quality-report.json
-            dist/qa-p3-browser-report.json
-            qa-results/d7-regressions.json
-            qa-results/d8-final-audit.json
-            qa-results/security-behavior-r3.json
-            qa-results/adversarial-harness-r5.json
-            qa-results/stage3-pdf-runtime/summary.json
-            qa-results/stage3-pdf-quality/summary.json
-            qa-results/verifier-ui-runtime/summary.json
+
       - name: Prepare release identity
         env:
           GHRAB_SOURCE_COMMIT: ${{ github.sha }}
@@ -119,8 +124,9 @@ jobs:
           GHRAB_BUILD_ID: ${{ github.run_id }}-${{ github.run_attempt }}
           GHRAB_WORKFLOW_REF: ${{ github.workflow_ref }}
           GHRAB_BUILDER_ID: github-actions-hosted
-          GHRAB_BUILD_ENTRYPOINT: npm run qa:redteam:ci
-          GHRAB_BUILD_PROFILE: github-pages-release
+          GHRAB_BUILD_ENTRYPOINT: npm run build
+          GHRAB_BUILD_PROFILE: github-pages-p4-balanced
+          GHRAB_P4_CONSUMED_EVIDENCE: qa-results/p4-consumed-promotion-evidence.json
         run: node scripts/prepare-release-identity.mjs
 
       - name: Export release identity
@@ -160,7 +166,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           path: dist
-
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: qa-build
@@ -171,6 +176,19 @@ jobs:
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Recheck exact main immediately before Pages deploy
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_MAIN_SHA: ${{ needs.qa-build.outputs.source_commit }}
+        run: |
+          set -euo pipefail
+          current_main="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          if [ "$current_main" != "$EXPECTED_MAIN_SHA" ]; then
+            echo "::error::Main moved before Pages deploy: expected $EXPECTED_MAIN_SHA, got $current_main."
+            exit 1
+          fi
+
       - id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
 

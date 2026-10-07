@@ -152,7 +152,7 @@
     "check:productive-contract": "node scripts/check-productive-answer-contract.mjs",
     "check:randomization-numbering": "node scripts/check-randomization-numbering.mjs",
     "check:full-roster-workflow": "node scripts/check-full-roster-workflow.mjs",
-    "check:ci-orchestration": "node --test scripts/ci/orchestration.test.mjs scripts/ci/preflight.test.mjs scripts/ci/p1.test.mjs scripts/ci/p2.test.mjs scripts/ci/p3.test.mjs && node tools/ci-standard/check.mjs",
+    "check:ci-orchestration": "node --test scripts/ci/orchestration.test.mjs scripts/ci/preflight.test.mjs scripts/ci/p1.test.mjs scripts/ci/p2.test.mjs scripts/ci/p3.test.mjs scripts/ci/p4.test.mjs && node tools/ci-standard/check.mjs",
     "ci:preflight": "node scripts/ci/preflight.mjs",
     "ci:check-main-protection": "node scripts/ci/main-protection.mjs --live",
     "check:ci-standard": "node tools/ci-standard/check.mjs",

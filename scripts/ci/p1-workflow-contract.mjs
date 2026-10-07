@@ -29,6 +29,10 @@ export function validateP1Workflow(text, mode = 'parallel') {
   assert.match(promote, /needs.admission.result == 'success' && needs.admission.outputs.eligible == 'true' && needs.admission.outputs.certified_sha == github.sha/);
   assert.ok(promote.indexOf('promotion-freshness.mjs --pr') < promote.indexOf('gh pr merge'));
   assert.match(promote, /--match-head-commit "\$CERTIFIED_SHA"/);
+  assert.match(promote, /run: node scripts\/ci\/p4-promotion-evidence\.mjs --produce/);
+  assert.match(promote, /name: generator-p4-promotion-\$\{\{ steps\.merged\.outputs\.main_head \}\}-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}/);
+  assert.match(promote, /gh workflow run deploy\.yml[\s\S]*-f promotion_run_id="\$GITHUB_RUN_ID"[\s\S]*-f promotion_run_attempt="\$GITHUB_RUN_ATTEMPT"[\s\S]*-f certified_sha="\$CERTIFIED_SHA"[\s\S]*-f merged_main_sha="\$MAIN_HEAD"/);
+  assert.ok(promote.indexOf('p4-promotion-evidence.mjs --produce') < promote.indexOf('gh workflow run deploy.yml'), 'P4 certificate must exist before deploy dispatch');
   assert.doesNotMatch(text, /^concurrency:/m);
   assert.match(promote, /group: generator-promotion-transaction\n      cancel-in-progress: false/);
   assert.doesNotMatch(text, /continue-on-error: true|\/cancel|force=true|--admin/);

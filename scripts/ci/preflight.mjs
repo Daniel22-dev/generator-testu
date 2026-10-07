@@ -90,7 +90,7 @@ export function buildPlan({ root, out, env }) {
     fs.writeFileSync(path.join(directory, 'files.json'), JSON.stringify(hashes, null, 2) + '\n');
   }
   return [
-    command('ci-orchestration-tests', [process.execPath, '--test', 'scripts/ci/orchestration.test.mjs', 'scripts/ci/preflight.test.mjs', 'scripts/ci/p1.test.mjs', 'scripts/ci/p2.test.mjs', 'scripts/ci/p3.test.mjs']),
+    command('ci-orchestration-tests', [process.execPath, '--test', 'scripts/ci/orchestration.test.mjs', 'scripts/ci/preflight.test.mjs', 'scripts/ci/p1.test.mjs', 'scripts/ci/p2.test.mjs', 'scripts/ci/p3.test.mjs', 'scripts/ci/p4.test.mjs']),
     command('whitespace-before', ['git', 'diff', '--check']),
     { id: 'node-major', action: () => assert.equal(process.versions.node.split('.')[0], '22', 'Workflow uses Node 22') },
     command('ci-setup-definition', [process.execPath, 'scripts/ci/p2-workflow-contract.mjs']),
