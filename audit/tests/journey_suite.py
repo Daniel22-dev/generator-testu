@@ -333,7 +333,7 @@ try:
   assert all(c not in stu['text'] for c in codes),'student file must not contain plain codes'
   sp=h.new_page(stu['text']);sp.wait_for_timeout(700)
   enter_start_code(sp,private_start_code(h,tea['text']));sp.fill('#studentName','!invalid!');sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_timeout(500)
-  msg=sp.evaluate("document.body.innerText");assert 'not valid' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with a message'
+  msg=sp.evaluate("document.body.innerText");assert re.search(r'(personal code|kód studenta|código del estudiante|code)',msg,re.I) and '6' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with current 6-character personal-code guidance'
   sp.locator('button:visible',has_text=re.compile('^OK$')).first.click()
   sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
   sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(300)
@@ -362,9 +362,9 @@ try:
   })""")
   assert bad['host'] and bad['missing'],('invalid Forms metadata config must fail closed',bad)
   assert p.evaluate("()=>{localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);return configuredGoogleFormsMetadata()===null}"),'missing metadata config must stay optional'
-  pre='https://docs.google.com/forms/d/e/FORM_A/viewform?usp=pp_url&entry.111=GIT_TEST_ID&entry.222=GIT_TEST_NAME&entry.333=GIT_GROUP&entry.444=GIT_GENERATOR_VERSION&entry.555=GIT_GENERATED_AT'
-  cfg=p.evaluate("""u=>{const c=parseGoogleFormsPrefilledMetadataUrl(u);localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);return c}""",pre)
-  assert cfg['entries']['testId']=='111' and cfg['entries']['testName']=='222' and cfg['entries']['group']=='333',cfg
+  pre='https://docs.google.com/forms/d/e/FORM_A/viewform?usp=pp_url&entry.111=GIT_TEST_ID&entry.222=GIT_TEST_NAME&entry.333=GIT_GROUP&entry.666=KOD'
+  cfg=p.evaluate("""u=>{const c=parseGoogleFormsPrefilledMetadataUrl(u);localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);const profile=normalizeGoogleFormsAnchorProfile({teacherEmails:['teacher@example.invalid'],verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true,lessonMarkersConfirmed:true,csvTimezone:'Europe/Prague',emailHeader:'auto',timestampHeader:'auto',toleranceMinutes:2});localStorage.setItem(GOOGLE_FORMS_ANCHOR_PROFILE_KEY,JSON.stringify(profile));return c}""",pre)
+  assert cfg['entries']['testId']=='111' and cfg['entries']['testName']=='222' and cfg['entries']['group']=='333' and cfg['entries']['submission']=='666',cfg
 
   def build_secure(jj,name,group,email):
    q=jj.p;q.fill('#geminiKeyInput','AIzaTEST-forms-000000000000000000');q.click('#btnUseKeySession')
@@ -402,7 +402,7 @@ try:
   # Generate TEST-B with another group but the same universal Form mapping.
   j2=Journey(h)
   try:
-   j2.ev("(c)=>{localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl)}",cfg)
+   j2.ev("(c)=>{localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);const profile=normalizeGoogleFormsAnchorProfile({teacherEmails:['teacher@example.invalid'],verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true,lessonMarkersConfirmed:true,csvTimezone:'Europe/Prague',emailHeader:'auto',timestampHeader:'auto',toleranceMinutes:2});localStorage.setItem(GOOGLE_FORMS_ANCHOR_PROFILE_KEY,JSON.stringify(profile))}",cfg)
    name_b='Vocabulary B';group_b='2.B'
    stu_b,tea_b=build_secure(j2,name_b,group_b,'beta@example.invalid')
   finally:
