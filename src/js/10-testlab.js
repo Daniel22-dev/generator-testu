@@ -23,13 +23,23 @@ function openTestLab(){
     .then(function(api){ return api.open(); })
     .catch(function(error){ try{ uiAlert('Test Lab se nepoda\u0159ilo na\u010d\u00edst: '+error.message,'Test Lab'); }catch(_){} });
 }
+function downloadTargetContext(){
+  let targetWindow=window,targetDocument=document;
+  try{
+    if(window.top&&window.top!==window&&window.top.location.origin===window.location.origin&&window.top.document&&window.top.document.body){
+      targetWindow=window.top;targetDocument=window.top.document;
+    }
+  }catch(_){}
+  return {targetWindow,targetDocument};
+}
 function downloadBlobFile(content, filename, mime='text/html;charset=utf-8') {
-  const blob = new Blob([content], { type: mime });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+  const target=downloadTargetContext();
+  const blob = new target.targetWindow.Blob([content], { type: mime });
+  const url  = target.targetWindow.URL.createObjectURL(blob);
+  const a    = target.targetDocument.createElement('a');
   a.href = url; a.download = filename; a.style.display = 'none';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  target.targetDocument.body.appendChild(a);
+  try{a.click();}finally{a.remove();target.targetWindow.setTimeout(() => target.targetWindow.URL.revokeObjectURL(url), 1500);}
 }
 function rosterEscHtml(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function rosterParseEmails(raw){

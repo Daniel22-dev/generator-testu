@@ -28,6 +28,16 @@ try{
   await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const txt=await student.locator('#answerBackup').inputValue();
   const formsUrl=new URL(await student.evaluate(()=>formsOpenUrl()));assert.equal(formsUrl.searchParams.get('entry.111'),pkg.testId);assert.ok(formsUrl.searchParams.get('entry.222'));assert.ok(formsUrl.searchParams.get('entry.333'));assert.equal(formsUrl.searchParams.get('entry.444'),null);ok('student Forms link prefilled with test ID, name, class only');
+  await student.reload();await student.locator('#studentName').fill('K4M8P2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);
+  assert.equal(await student.locator('#done').isVisible(),false,'foreign identity saw completed submission screen');
+  assert.equal(await student.locator('#test').isVisible(),false,'foreign identity started a new attempt over completed outbox');
+  const conflictText=await student.locator('.s-modal-bd').innerText();assert.match(conflictText,/another student|jiného studenta/i);
+  assert.equal(await student.locator('#answerBackup').inputValue(),'','foreign identity received previous encrypted payload');
+  ok('shared profile: completed outbox is not exposed to a different student code');
+  await student.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));
+  await student.reload();await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#done').waitFor({state:'visible'});
+  assert.equal(await student.locator('#answerBackup').inputValue(),txt,'same student could not recover its completed outbox');
+  ok('same student can recover its own encrypted outbox after reload');
   await sctx.close();
   const startMarker=new URL(T.match(/https:\/\/docs\.google\.com\/forms[^"']*/)[0].replace(/&amp;/g,'&')).searchParams.get('entry.444');assert.match(startMarker,/^GIT-LESSON-START-V1\n/);ok('verifier START link carries marker');
   const HDR=['Timestamp','Username','Total score','Secure výsledek z testu ','  Test ID  ','  Název testu  ','Skupina'];

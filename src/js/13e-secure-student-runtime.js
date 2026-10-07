@@ -173,7 +173,30 @@ function releaseAttemptTabLock(){if((typeof window!=='undefined'&&window.__GHRAB
 // recovers the same submission; it never creates a replacement attempt.
 async function saveSubmissionOutbox(){await saveSignedRecord('submissionOutbox',{v:2,attemptId:ATTEMPT_ID,identityHash:ACTIVE_IDENTITY_HASH,activeKey:ACTIVE_KEY,student:$('studentName').value.trim(),txt:ANSWER_TXT},++PERSIST_REV,true);}
 function showSubmissionAnswers(){SUBMITTED=true;clearTimeout(TIMER_ID);$('answerBackup').value=ANSWER_TXT;$('intro').classList.add('hidden');$('test').classList.add('hidden');$('lockScreen').classList.add('hidden');$('done').classList.remove('hidden');updateJokerUi();refreshSubmissionOptions();}
-async function restoreSubmissionOutbox(){var saved=await loadSignedRecord('submissionOutbox');if(saved.tamper){showActiveAttemptLocked();return true;}if(!saved.record)return false;var b=saved.record.body;if(b.v!==2||!b.attemptId||!b.identityHash||typeof b.student!=='string'||typeof b.txt!=='string'||b.txt.length>2097152||!b.txt.startsWith('SECURE-ANSWERS-V1\n')){PERSIST_INTEGRITY_BLOCK=true;showActiveAttemptLocked();return true;}var guard=await loadSignedRecord('attemptGuard'),g=guard.record&&guard.record.body;if(guard.tamper||(g&&(g.attemptId!==b.attemptId||g.identityHash!==b.identityHash||g.activeKey!==b.activeKey))){showActiveAttemptLocked();return true;}ATTEMPT_ID=b.attemptId;ACTIVE_IDENTITY_HASH=b.identityHash;ACTIVE_KEY=b.activeKey;ANSWER_TXT=b.txt;$('studentName').value=b.student;SUBMITTED=true;if(!(await setSubmittedLocked())){showActiveAttemptLocked();return true;}await clearActiveAttemptSeal(false);showSubmissionAnswers();return true;}
+function submissionOutboxMatchesIdentity(body,expectedStudent,expectedIdentityHash){
+  if(!body||!expectedIdentityHash||typeof body.student!=='string')return false;
+  return body.identityHash===expectedIdentityHash&&normRosterIdentity(body.student)===normRosterIdentity(expectedStudent);
+}
+function showSubmissionOutboxIdentityConflict(){
+  const cs=String(CFG.uiLang||'').toLowerCase()==='cs';
+  sModal(
+    cs?'V tomto profilu prohlížeče už je uložen dokončený pokus jiného studenta. Jeho odevzdání se nezobrazí. Použij jiné čisté zařízení/profil nebo kontaktuj učitele.':'This browser profile already contains a completed submission for another student. That submission will not be shown. Use another clean device/browser profile or contact your teacher.',
+    cs?'Dokončený pokus jiného studenta':'Completed attempt for another student'
+  );
+}
+async function restoreSubmissionOutbox(expectedStudent,expectedIdentityHash){
+  var saved=await loadSignedRecord('submissionOutbox');
+  if(saved.tamper){showActiveAttemptLocked();return true;}
+  if(!saved.record)return false;
+  var b=saved.record.body;
+  if(b.v!==2||!b.attemptId||!b.identityHash||typeof b.student!=='string'||typeof b.txt!=='string'||b.txt.length>2097152||!b.txt.startsWith('SECURE-ANSWERS-V1\n')){PERSIST_INTEGRITY_BLOCK=true;showActiveAttemptLocked();return true;}
+  if(!submissionOutboxMatchesIdentity(b,expectedStudent,expectedIdentityHash)){showSubmissionOutboxIdentityConflict();return true;}
+  var guard=await loadSignedRecord('attemptGuard'),g=guard.record&&guard.record.body;
+  if(guard.tamper||(g&&(g.attemptId!==b.attemptId||g.identityHash!==b.identityHash||g.activeKey!==b.activeKey))){showActiveAttemptLocked();return true;}
+  ATTEMPT_ID=b.attemptId;ACTIVE_IDENTITY_HASH=b.identityHash;ACTIVE_KEY=b.activeKey;ANSWER_TXT=b.txt;$('studentName').value=expectedStudent;SUBMITTED=true;
+  if(!(await setSubmittedLocked())){showActiveAttemptLocked();return true;}
+  await clearActiveAttemptSeal(false);showSubmissionAnswers();return true;
+}
 async function clearSubmittedLocked(){storageRemove('submitted');await idbDelete('attemptGuard');storageRemove('attemptGuard');PERSIST_INTEGRITY_BLOCK=false;return true;}
 function showSubmittedLocked(){
   var bd=document.createElement('div');
@@ -225,18 +248,18 @@ async function startTestAttempt(){
   const name=(CFG.identityMode==='oneTimeCode'?$('studentName').value.replace(/\s/g,'').toUpperCase():$('studentName').value.trim());
   $('studentName').value=name;
   if(!name){$('studentName').focus();return;}
-  if(await restoreSubmissionOutbox())return;
-  if(await submittedLocked()){showSubmittedLocked();return;}
   try{if(!(await identityAllowed(name))){sModal(identityCodeProblem(name)||t('invalidIdentityCode'),t('codeVerification'));$('studentName').focus();return;}}catch(err){sModal(String(err&&err.message?err.message:err),t('codeVerification'));return;}
-  var seal=await loadActiveAttemptSeal();
-  if(seal&&seal.__integrityFailure){showActiveAttemptLocked();return;}
   var identityHash='';
   try{identityHash=await activeAttemptIdentityHash(name);}catch(err){sModal(String(err&&err.message?err.message:err),t('codeVerification'));return;}
+  if(!(await unlockTestContent()))return;
+  if(await restoreSubmissionOutbox(name,identityHash))return;
+  if(await submittedLocked()){showSubmittedLocked();return;}
+  var seal=await loadActiveAttemptSeal();
+  if(seal&&seal.__integrityFailure){showActiveAttemptLocked();return;}
   if(seal&&seal.identityHash&&seal.identityHash!==identityHash){showActiveAttemptLocked();return;}
   if(!seal&&CFG.zolicek&&JOKER_CHOICE===null){sModal(t('jokerChoiceHint','Vyber před začátkem testu, zda píšeš test, nebo bereš žolíka.'),t('jokerChoiceTitle'));return;}
   if(!checkDevice(false))return;
   if(!seal&&CFG.zolicek&&JOKER_CHOICE===true){if(!(await confirmJokerCommit()))return;}
-  if(!(await unlockTestContent()))return;
   try{ACTIVE_KEY=await chooseVariant(name);}catch(err){sModal(String(err&&err.message?err.message:err),t('differentiatedTest'));return;}
   if((CFG.diffGroups||[]).length&&!ACTIVE_KEY){sModal(t('unassignedIdentity'),t('differentiatedTest'));$('studentName').focus();return;}
   if(seal&&seal.activeKey&&seal.activeKey!==ACTIVE_KEY){showActiveAttemptLocked();return;}

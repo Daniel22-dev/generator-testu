@@ -556,7 +556,7 @@
         </div>
         <div id="rosterResult" class="small-muted" style="margin-top:8px"></div>
         <div class="workflow-review"><strong>Google Sheets:</strong> odešlou se jen zaškrtnuté, dosud neodeslané řádky. <a href="./tools/GIT-ROZESILANI-KODU.gs" download>Apps Script</a> · <a href="./manual/rozesilani-kodu.html" target="_blank" rel="noopener">Návod</a></div>
-        <p class="small-muted">CSV obsahuje osobní údaje a kódy. Nesdílej jej se třídou ani neposílej do AI. Kódy zůstávají stejné během přípravy jednoho testu; pro nový test začni novou přípravu. Bez serveru nelze zaručit jednorázové použití napříč zařízeními.</p>
+        <p class="small-muted">CSV obsahuje osobní údaje a kódy. Nesdílej jej se třídou ani neposílej do AI. <strong>Roster a kódy zůstávají jen v paměti právě otevřené relace GIT</strong>; volba „Otevřít samostatně“ spustí novou relaci a rozpracovaný roster do ní nepřenese. Kódy zůstávají stejné během přípravy jednoho testu; pro nový test začni novou přípravu. Bez serveru nelze zaručit jednorázové použití napříč zařízeními.</p>
       </div>
 
       <div class="field" id="layoutField">
@@ -1016,7 +1016,7 @@
 </div>
 
 <div class="ui-modal-backdrop hidden" id="generatorSettingsModal" role="dialog" aria-modal="true" aria-labelledby="generatorSettingsTitle" onclick="generatorSettingsBackdropClick(event)">
-  <div class="ui-modal" style="max-width:720px">
+  <div class="ui-modal generator-settings-dialog">
     <div class="ui-modal-head">
       <div><b id="generatorSettingsTitle">⚙️ Nastavení Generátoru</b><div class="muted" style="font-size:12px">Nastavení tohoto zařízení</div></div>
       <button type="button" class="ui-modal-x" onclick="closeGeneratorSettings()" aria-label="Zavřít">✕</button>

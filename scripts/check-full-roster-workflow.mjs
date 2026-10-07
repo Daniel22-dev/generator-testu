@@ -14,4 +14,6 @@ ck(/function rosterChosenParticipants\(\)\{return rosterParseEmails\(val\('roste
 ck(!/participantMode/.test(lab+form+manual+ui+core),'produkční workflow nemá historický participantMode');
 ck(!/participantsDeferredOk|outputParticipantsPending/.test(form+gate+lab),'odstraněny deferred/pending větve');
 ck(/email,student,code,test_id,odeslat/.test(lab)&&/'FALSE'/.test(lab),'CSV pro Sheets obsahuje nezaškrtnuté odeslat');
+ck(/function downloadTargetContext\([\s\S]*window\.top\.location\.origin===window\.location\.origin/.test(lab),'CSV download podporuje same-origin embedded AI Studio');
+ck(/Roster a kódy zůstávají jen v paměti právě otevřené relace GIT/.test(shell),'UI vysvětluje nepřenášení citlivého rosteru do nové relace');
 if(fail)process.exit(1);console.log('PASS full-roster workflow contract');
