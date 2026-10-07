@@ -1,5 +1,5 @@
 from harness import Harness,TESTS
-from browser_matrix import answer,click_attr,private_start_code,enter_start_code
+from browser_matrix import answer,click_attr,private_start_code,enter_start_code,submit_secure
 import json,traceback,time
 h=Harness();rows=[]
 try:
