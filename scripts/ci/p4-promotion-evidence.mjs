@@ -17,7 +17,7 @@ export const ACTIONS_APP_ID = 15368;
 export const PROMOTION_WORKFLOW = '.github/workflows/safe-promotion.yml';
 export const PROMOTION_JOB = 'promote-certified-pr';
 export const MAX_CERT_AGE_MS = 30 * 60 * 1000;
-export const GARP27_TRUST_SHA256 = '2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1';
+export const GARP27_TRUST_SHA256 = '831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896';
 export const REQUIRED_P5_REPORTS = Object.freeze([
   'qa-p5-release-report.json',
   'qa-p5-acceptance-report.json',

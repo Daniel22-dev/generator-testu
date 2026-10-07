@@ -1,3 +1,5 @@
+> **7.1.97 – Google Forms workflow F1–F9 hardening.** Teacher Verifier nese pevné Forms nastavení, používá důvěryhodné START/END značky z původního CSV, podporuje ruční korekci časového okna a explicitní potvrzení chybné identity. Serverový Forms timestamp nesmí předcházet START značce; desetiminutová tolerance platí jen pro klientský čas zahájení. Performance budget byl pro nový workflow kontrolovaně navýšen. Skutečný školní Form a fyzický iPhone/Android zůstávají provozními acceptance testy. Viz [RELEASE-NOTES-7.1.97.md](RELEASE-NOTES-7.1.97.md).
+
 > **7.1.96 – Teacher Verifier / Google Forms UX.** Čas zveřejnění se zadává jako české datum + čas v Europe/Prague; verifier automaticky řeší CET/CEST. Univerzální Form s `Limit to 1 response = OFF` je podporovaný; povinně se potvrzuje původní nezměněný CSV export. Studentský runtime a scoring se nemění. Viz [RELEASE-NOTES-7.1.96.md](RELEASE-NOTES-7.1.96.md).
 
 > **7.1.95 – kritická oprava opakovaného náhledu.** Každé otevření učitelského náhledu dostává nový iframe; zavření starý browsing context zničí. Přidány regresní scénáře pro opakované otevření instant i secure testu a PWA cache bump. Viz [RELEASE-NOTES-7.1.95.md](RELEASE-NOTES-7.1.95.md).
@@ -44,7 +46,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.90 (opravy auditu před studentským testováním; rozsah řízené studentské red-team zkoušky)
+**Aktuální verze:** 7.1.97 (Google Forms workflow F1–F9; před produkčním označením vyžaduje exact-SHA CI a první ostrý Forms/device acceptance test)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

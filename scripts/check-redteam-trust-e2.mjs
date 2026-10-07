@@ -30,7 +30,15 @@ try {
     assert.equal(t.scoreSource,'TEACHER_ANSWER_KEY');assert.equal(v.classificationStatus(sample.row),'REVIEW_REQUIRED');
     // Matching expected hash, encryption and client-supplied trusted bits never authorize a grade.
     const bad=await forge({manifestHash:'wrong-manifest'});assert.equal(bad.classification,'invalid-current');
-    const unknown=await forge({code:'UNKNOWN',student:'UNKNOWN'});assert.equal(unknown.classification,'invalid-current');
+    // A malformed code is only proposed for manual confirmation (F6) and never authorizes a grade by itself.
+    // Separate verifier profile: the replay ledger of the main verifier must stay untouched.
+    const iso=genDom(pkg.teacherHtml,undefined,new Map());children.push(iso);await new Promise(r=>setTimeout(r,0));
+    iso.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
+    const malformedTxt='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,payload:await x.encryptPayloadForTeacher({...base,code:'UNKNOWN',student:'UNKNOWN'})});
+    const malformed=await iso.verifyText('synthetic-e2-malformed.txt',malformedTxt,{source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:'2026-10-03T12:16:00Z'});
+    assert.equal(malformed.classification,'identity-review');assert.equal(iso.classificationStatus(malformed.row),'IDENTITY_REVIEW_REQUIRED');assert.equal(iso.effectiveResults().length,0);
+    // A well-formed code that is not in the roster is never recoverable.
+    const unknown=await forge({code:'ZZZZZZ',student:'ZZZZZZ'});assert.equal(unknown.classification,'invalid-current');
     assert.equal(v.resultTrust(unknown.row).scoreSource,'NOT_SCORED');
     assert.equal(v.resultTrust(unknown.row).buildBinding,'NOT_VERIFIED');
   });

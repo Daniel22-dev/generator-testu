@@ -33,8 +33,9 @@ const formCtx=vm.createContext({});
 vm.runInContext(formsSrc+'\n;globalThis.__forms=SECURE_VERIFIER_FORMS_JS;',formCtx);
 const forms=formCtx.__forms;
 must(typeof forms==='string'&&forms.includes('async function payloadBindingError(payload)'), 'payload binding verifier helper missing');
-const bindingAt=forms.indexOf('bindingError=await payloadBindingError(payload)'),schemaAt=forms.indexOf('validateSecurePayload(payload)'),anchorAt=forms.indexOf('evaluateFormsAnchors(payload,sm)'),scoreAt=forms.indexOf('scored=scorePayload(payload)');
+const bindingAt=forms.indexOf('bindingError=await payloadBindingError(checked)'),schemaAt=forms.indexOf('validateSecurePayload(payload)'),anchorAt=forms.indexOf('evaluateFormsAnchors(checked,sm)'),scoreAt=forms.indexOf('scored=scorePayload(checked)');
 must(bindingAt>=0&&schemaAt>=0&&anchorAt>=0&&scoreAt>bindingAt&&scoreAt>schemaAt&&scoreAt>anchorAt, 'payload schema, identity binding and Forms anchors are not enforced before scoring');
+must(forms.includes('validateSecurePayload(candidate)')&&forms.includes("error.validationCode!=='schema.code'")&&forms.includes("'identity.recovery-hash'")&&forms.includes("'IDENTITY_REVIEW'")&&forms.includes('async function confirmFormsIdentity('), 'manual identity candidate must retain schema/hash checks and explicit teacher confirmation');
 
 const norm=(value)=>String(value??'').normalize('NFKD').toLowerCase().replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 const b64url=(buf)=>Buffer.from(buf).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');

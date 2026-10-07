@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.96",
+  "appVersion": "7.1.97",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "AUDIT-7.1.96-FORMS-VERIFIER-UX-2026-10-06",
+  "revision": "AUDIT-7.1.97-FORMS-VERIFIER-UX-2026-10-06",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.96 navazuje na 7.1.95 a upravuje pouze Teacher Verifier / Forms workflow: české datum+čas se bezpečně převádí do Europe/Prague, odstraňuje se chybný požadavek Limit to 1 response a zachovávají se fail-closed identity/domain/roster, CSV a replay kontroly. Studentský secure runtime ani scoring se nemění.",
+    "note": "7.1.97 navazuje na 7.1.95 a upravuje pouze Teacher Verifier / Forms workflow: české datum+čas se bezpečně převádí do Europe/Prague, odstraňuje se chybný požadavek Limit to 1 response a zachovávají se fail-closed identity/domain/roster, CSV a replay kontroly. Studentský secure runtime ani scoring se nemění.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Source candidate 7.1.96 je Forms verifier UX/security maintenance release; chráněné CI, P5, journey-e2e a Pages nasazení musí proběhnout nad přesným SHA této verze.",
+  "note": "Source candidate 7.1.97 je Forms verifier UX/security maintenance release; chráněné CI, P5, journey-e2e a Pages nasazení musí proběhnout nad přesným SHA této verze.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

@@ -83,6 +83,11 @@ function renderStartCode(){
   if(!generatedPackage||!generatedPackage.startCode)return;
   box=document.createElement('div');box.id='privateStartCode';box.className='note warn';
   box.textContent='Startovní kód: '+generatedPackage.startCode+' — ukaž až při zahájení. Není to odemykací kód třídy. Kód je také v soukromém verifieru. Studentský soubor zveřejni co nejpozději.';
+  if(generatedPackage.lessonStartUrl){
+    const links=document.createElement('div');links.className='row';
+    for(const [label,key] of [['Za\u010d\u00edt p\u0159\u00edjem te\u010f','lessonStartUrl'],['Ukon\u010dit p\u0159\u00edjem te\u010f','lessonEndUrl']]){const a=document.createElement('a');a.href=generatedPackage[key];a.textContent=label;a.target='_blank';a.rel='noopener noreferrer';a.className='btn';links.appendChild(a);}
+    box.appendChild(links);const label=document.createElement('label');label.textContent='Odkaz pro zah\u00e1jen\u00ed z telefonu (otev\u0159i a ode\u0161li pod u\u010ditelsk\u00fdm \u00fa\u010dtem):';const input=document.createElement('input');input.value=generatedPackage.lessonStartUrl;input.readOnly=true;input.style.width='100%';input.addEventListener('click',()=>input.select());label.appendChild(input);box.appendChild(label);
+  }
   $('qualityPanel').insertAdjacentElement('beforebegin',box);
 }
 // ── Didaktická kontrola po vygenerování (pravidlová, BOD 5–8 + 15) ─────────────

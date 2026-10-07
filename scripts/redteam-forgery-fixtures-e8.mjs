@@ -14,7 +14,7 @@ export async function publicEncrypt(publicKey,raw){
 }
 export async function packet(f,p,raw){return {testId:f.cfg.testId,manifestHash:f.cfg.manifestHash,payload:await publicEncrypt(f.cfg.publicKey,raw??JSON.stringify(p))};}
 export const text=pack=>'SECURE-ANSWERS-V1\n'+JSON.stringify(pack);
-export function reset(f){const v=f.v;v.localStorage.removeItem(v.verifierReplayStorageKey());v.eval('VERIFIER_REPLAY_HISTORY=[];VERIFIER_REPLAY_CHAIN=Promise.resolve();');v.setFormsAnchorPolicy(policy);}
+export function reset(f){const v=f.v;v.localStorage.removeItem(v.verifierReplayStorageKey());v.eval('VERIFIER_REPLAY_HISTORY=[];VERIFIER_REPLAY_CHAIN=Promise.resolve();');/* 7.1.97: a policy change re-evaluates instead of clearing */if(v.clearVerifierResults)v.clearVerifierResults();v.setFormsAnchorPolicy(policy);}
 export async function createFixtures(){
   const fixtures={};
   for(const kind of ['default','joker','variant']){
