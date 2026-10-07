@@ -348,7 +348,7 @@ try:
   f=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);f.write(buf.getvalue());f.close()
   vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vp,published,'E-mailová adresa','Časová značka');vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
-  assert 'novak@example.invalid' in t and re.search(r'Duplicity: [1-9]',t),('Forms CSV import + repeated code must be flagged',t[t.find('Načteno'):t.find('Načteno')+200])
+  assert 'novak@example.invalid' in t and ('Opakované odevzdání je vyřazeno' in t or 'replay.duplicate' in t),('Forms CSV import + repeated code must be flagged',t[:1200])
   return {'codes':len(codes)}
  record('advanced-one-time-code-to-verifier',advanced_one_time_code_to_verifier)
 

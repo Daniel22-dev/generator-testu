@@ -16,7 +16,14 @@ def enter_start_code(p,code):
  p.locator('#startCode').fill(code)
 def configure_forms_anchors(p,published_at,email_header='Email Address',timestamp_header='Timestamp'):
  # Synthetic owner attestation for these fixtures; this does not inspect a live Form.
- # The production UI keeps the detailed verification form in the Security panel.
+ # 7.1.97 bakes fixed school/teacher settings into new verifiers. In that case the UI hides
+ # those immutable fields and tests set only the manual lesson window through the public helper.
+ if p.evaluate('()=>!!CONFIG.formsAnchorPolicy'):
+  p.evaluate("""async x=>setFormsAnchorPolicy({publishedAt:x.publishedAt,emailHeader:x.emailHeader,timestampHeader:x.timestampHeader,csvTimezone:'Europe/Prague'})""",{'publishedAt':published_at,'emailHeader':email_header,'timestampHeader':timestamp_header})
+  assert p.evaluate('!!FORMS_ANCHOR_POLICY')
+  if p.locator('[data-v2-panel="results"]').count():p.locator('[data-v2-panel="results"]').click()
+  return
+ # Legacy verifier fixture without a baked policy: exercise the editable fallback UI.
  domain=p.locator('#formsSchoolDomain')
  if not domain.is_visible():
   trigger=p.locator('#formsVerifySummaryBtn')
