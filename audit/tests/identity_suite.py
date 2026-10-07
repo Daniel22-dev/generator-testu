@@ -27,7 +27,7 @@ try:
    for i,ex in enumerate(x['variants'][key or '__default']):answer(s,ex,i,mode,'fr')
    if mode=='instant':sc=s.evaluate('calcScore()')
    else:
-    click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt)
+    submit_secure(s);txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt)
     # Real verifier import validates IDs, manifests and encrypted payload; importing twice warns.
     v.locator('[data-v2-panel="results"]').click();v.locator('#fallbackImportDetails').evaluate('el=>{el.open=true}');v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('RESULTS.length===1');assert v.evaluate('RESULTS[0].status')=='DIAGNOSTIC_ONLY',v.evaluate('RESULTS[0]')
     dup=v.evaluate('async txt=>{await verifyText("second.txt",txt);return duplicateInfo()}',txt);assert len(dup['dupStudentKeys'])==len(dup['dupAttemptKeys'])==0,('diagnostic copies must stay outside classification',dup)
