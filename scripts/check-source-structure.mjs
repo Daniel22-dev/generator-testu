@@ -11,6 +11,7 @@ const requiredOrder = [
   '13c-secure-package.js',
   '13d-secure-student-shell.js',
   '13de-secure-student-guard.js',
+  '13dh-secure-student-submit.js',
   '13e-secure-student-runtime.js',
   '13eb-secure-teacher-verifier-v2-ui.js',
   '13ec-secure-verifier-trust.js',
