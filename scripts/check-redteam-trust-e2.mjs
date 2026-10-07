@@ -37,6 +37,7 @@ try {
     const malformedTxt='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,payload:await x.encryptPayloadForTeacher({...base,code:'UNKNOWN',student:'UNKNOWN'})});
     const malformed=await iso.verifyText('synthetic-e2-malformed.txt',malformedTxt,{source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:'2026-10-03T12:16:00Z'});
     assert.equal(malformed.classification,'identity-review');assert.equal(iso.classificationStatus(malformed.row),'IDENTITY_REVIEW_REQUIRED');assert.equal(iso.effectiveResults().length,0);
+    // A well-formed code that is not in the roster is never recoverable.
     const unknown=await forge({code:'ZZZZZZ',student:'ZZZZZZ'});assert.equal(unknown.classification,'invalid-current');
     assert.equal(v.resultTrust(unknown.row).scoreSource,'NOT_SCORED');
     assert.equal(v.resultTrust(unknown.row).buildBinding,'NOT_VERIFIED');
