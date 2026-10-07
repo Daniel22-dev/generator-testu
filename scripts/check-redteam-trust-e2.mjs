@@ -30,7 +30,8 @@ try {
     assert.equal(t.scoreSource,'TEACHER_ANSWER_KEY');assert.equal(v.classificationStatus(sample.row),'REVIEW_REQUIRED');
     // Matching expected hash, encryption and client-supplied trusted bits never authorize a grade.
     const bad=await forge({manifestHash:'wrong-manifest'});assert.equal(bad.classification,'invalid-current');
-    // A malformed code is proposed for manual confirmation and does not authorize a grade by itself.
+    // A malformed code is only proposed for manual confirmation (F6) and never authorizes a grade by itself.
+    // Separate verifier profile: the replay ledger of the main verifier must stay untouched.
     const iso=genDom(pkg.teacherHtml,undefined,new Map());children.push(iso);await new Promise(r=>setTimeout(r,0));
     iso.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-10-03T11:59:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
     const malformedTxt='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,payload:await x.encryptPayloadForTeacher({...base,code:'UNKNOWN',student:'UNKNOWN'})});
