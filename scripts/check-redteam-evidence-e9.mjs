@@ -19,7 +19,7 @@ function validate(records,version,startedAt){
     if(d.summary){for(const key of ['failed','blockers','browserExceptions','initFailures','overflows'])if(key in d.summary)assert.equal(d.summary[key],0,'Failure '+file+' '+key);}
   }
   const get=name=>records['qa-results/redteam-'+name+'.json'].data;
-  const e8=get('e8-forgery');assert.equal(e8.caseCount,108);assert.equal(e8.negativeControls,108);assert.equal(e8.cases.length,108);assert.equal(e8.rejections,89);assert.equal(e8.replaySequences,6);assert.equal(e8.controls,13);
+  const e8=get('e8-forgery');assert.equal(e8.caseCount,108);assert.equal(e8.negativeControls,108);assert.equal(e8.cases.length,108);assert.equal(e8.rejections,86);const metadataWarnings=e8.cases.filter(x=>['forms-metadata-id','forms-metadata-title','forms-metadata-group'].includes(x.id));assert.equal(metadataWarnings.length,3);assert.ok(metadataWarnings.every(x=>x.expect==='METADATA_WARNING'&&x.passed!==false),'F4 metadata mismatch controls must remain covered as review warnings');assert.equal(e8.replaySequences,6);assert.equal(e8.controls,16);
   assert.equal(get('e9-negative').controls.length,7);assert.ok(get('e9-negative').controls.every(x=>x.detected&&x.actualExit===1));
   assert.equal(get('e9-ci-contract').negativeControls.length,14);assert.ok(get('e9-ci-contract').negativeControls.every(x=>x.detected));
   const native=get('e9-restart-browser');assert.equal(native.checks.length,12);assert.ok(native.checks.every(x=>x.status==='PASS'&&x.originPreserved&&x.deadlinePreserved&&x.answerPreserved));assert.equal(native.negativeControls.length,2);assert.ok(native.negativeControls.every(x=>x.detected));

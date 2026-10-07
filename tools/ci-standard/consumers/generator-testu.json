@@ -18,7 +18,7 @@
     {
       "environment": "GARP27_EXTERNAL_TRUST_SHA256",
       "source": "repository-reviewed-pin",
-      "sha256": "2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1"
+      "sha256": "831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896"
     }
   ],
   "gates": [

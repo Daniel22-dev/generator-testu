@@ -31,15 +31,18 @@ anchor('forms-foreign-domain','anchors.email',c=>{c.source.formIdentity='synthet
 anchor('forms-email-missing','anchors.email',c=>{c.source.formIdentity='';});
 anchor('forms-email-number','anchors.source-shape',c=>{c.source.formIdentity=7;});
 anchor('forms-email-oversize','anchors.source-shape',c=>{c.source.formIdentity='synthetic-a@example.invalid'+' '.repeat(300)+'junk';});
-anchor('forms-time-missing','anchors.timestamp',c=>{c.source.formTimestamp='';});
-anchor('forms-time-invalid','anchors.timestamp',c=>{c.source.formTimestamp='not-a-time';});
+// 7.1.97: precise parser codes (format / ambiguous DST); still rejected before scoring.
+anchor('forms-time-missing','anchors.timestamp-format',c=>{c.source.formTimestamp='';});
+anchor('forms-time-invalid','anchors.timestamp-format',c=>{c.source.formTimestamp='not-a-time';});
 anchor('forms-before-publication','anchors.timestamp',c=>{c.source.formTimestamp='2026-10-04T11:58:00Z';});
 anchor('forms-policy-missing','anchors.missing-policy',c=>{c.missingPolicy=true;});
-anchor('forms-dst-ambiguous','anchors.timestamp',c=>{c.source.formTimestamp='25.10.2026 02:30:00';});
-anchor('forms-dst-nonexistent','anchors.timestamp',c=>{c.source.formTimestamp='29.3.2026 02:30:00';});
-anchor('forms-metadata-id','binding.forms-metadata',c=>{c.source.formTestId='OTHER';});
-anchor('forms-metadata-title','binding.forms-metadata',c=>{c.source.formTestName='OTHER';});
-anchor('forms-metadata-group','binding.forms-metadata',c=>{c.source.formGroup='OTHER';});
+anchor('forms-dst-ambiguous','anchors.timestamp-ambiguous',c=>{c.source.formTimestamp='25.10.2026 02:30:00';});
+anchor('forms-dst-nonexistent','anchors.timestamp-ambiguous',c=>{c.source.formTimestamp='29.3.2026 02:30:00';});
+// 7.1.97 (F4): typed Forms metadata is untrusted convenience; a mismatch is a visible warning, never a rejection or a grade change.
+function meta(id,mutate){cases.push({id,group:'anchors',fixture:'default',expect:'METADATA_WARNING',build:ctx=>{mutate(ctx);return ctx;}});}
+meta('forms-metadata-id',c=>{c.source.formTestId='OTHER';});
+meta('forms-metadata-title',c=>{c.source.formTestName='OTHER';});
+meta('forms-metadata-group',c=>{c.source.formGroup='OTHER';});
 p('end-before-start','time','time.order',x=>{x.submittedAt='2026-10-04T11:59:59Z';});
 p('invalid-calendar','time','time.order',x=>{x.startedAt='2026-02-30T12:00:00Z';});
 p('no-timezone','time','time.order',x=>{x.startedAt='2026-10-04 12:00:00';});

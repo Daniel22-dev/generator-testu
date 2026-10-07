@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.96">
+<html lang="cs" data-ghrab-access="checking" data-ghrab-app-id="generator" data-ghrab-app-version="7.1.97">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://generativelanguage.googleapis.com; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; manifest-src 'self'">
-<script src="./frame-guard.js?v=7.1.96"></script>
+<script src="./frame-guard.js?v=7.1.97"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generátor testů</title>
 <meta name="theme-color" content="#f59e0b">
@@ -1031,23 +1031,24 @@
           <button type="button" class="btn-mini" onclick="saveGoogleFormsUrlLocal()">💾 Používat Google Forms</button>
           <button type="button" class="btn-mini" onclick="forgetGoogleFormsUrlLocal()">↩ Používat jen answers.txt</button>
         </div>
+        <div class="field" style="margin-top:16px"><label for="generatorFormsTeacherEmails">Školní e-mail učitele (lze více adres)</label><input id="generatorFormsTeacherEmails" type="text" autocomplete="email" oninput="updateFormsTeacherDomain();document.getElementById('generatorFormsTeacherConfirmed').checked=false" placeholder="Tvůj školní e-mail"><div id="generatorFormsTeacherDomain" class="field-hint"></div><label for="generatorFormsTolerance">Tolerance odevzdání (minuty)</label><input id="generatorFormsTolerance" type="number" min="0" max="1440" step="0.1" value="2"><label class="field-hint" style="display:block;margin:10px 0"><input id="generatorFormsTeacherConfirmed" type="checkbox"> Potvrzuji doménu, sběr ověřených školních e-mailů, omezení na školu, povolené opakované odpovědi a značky GIT-LESSON v poli kódu. Budu importovat původní neupravené CSV.</label><button type="button" class="btn-mini" onclick="saveFormsTeacherProfile()">Uložit nastavení učitele</button></div>
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr)">
           <div class="field-label">🏷️ Automatická metadata z předvyplněného odkazu</div>
-          <div class="field-hint">Jednorázově vlož předvyplněný Google Forms odkaz, ve kterém mají pole hodnoty <code>GIT_TEST_ID</code>, <code>GIT_TEST_NAME</code> a <code>GIT_GROUP</code>. Volitelně můžeš přidat <code>GIT_GENERATOR_VERSION</code> a <code>GIT_GENERATED_AT</code>. Generátor z odkazu bezpečně odvodí entry ID; student metadata ručně nevypisuje.</div>
+          <div class="field-hint">Jednou ve Forms vyber Předvyplnit formulář: Test ID = <code>TESTID</code>, název = <code>NAZEV</code>, třída = <code>TRIDA</code> a odevzdávací kód = <code>KOD</code>. Vlož získaný odkaz sem. Čtvrté pole je nutné pro značku hodiny; studentům se kód nepředvyplňuje. Staré hodnoty GIT_TEST_ID / GIT_TEST_NAME / GIT_GROUP fungují také.</div>
           <div class="secure-mode-box" id="generatorSettingsMetadataStatus" role="status"></div>
           <input type="url" id="generatorSettingsPrefilledInput" style="margin-top:10px" placeholder="Předvyplněný odkaz z docs.google.com/forms/.../viewform?usp=pp_url&entry..." autocomplete="off">
           <div class="ex-action" style="margin-top:8px;gap:8px;flex-wrap:wrap">
             <button type="button" class="btn-mini" onclick="saveGoogleFormsMetadataFromPrefilledUrl()">✨ Nastavit metadata z odkazu</button>
             <button type="button" class="btn-mini" onclick="forgetGoogleFormsMetadataLocal()">Vypnout automatická metadata</button>
           </div>
-          <div class="small-muted" style="margin-top:8px"><strong>Bezpečnost:</strong> metadata ve Formu jsou pouze provozní orientace. Známka a identita testu se dál určují z kryptograficky ověřeného <code>SECURE-ANSWERS-V1</code> payloadu.</div>
+          <div class="small-muted" style="margin-top:8px"><strong>Bezpečnost:</strong> metadata ve Formu jsou pouze provozní orientace. Body se přepočítávají podle soukromého klíče odpovědí z dešifrovaného a validovaného <code>SECURE-ANSWERS-V1</code> payloadu.</div>
         </div>
         <details class="forms-howto" style="margin-top:14px">
           <summary><strong>Jak Google Forms nastavit a používat — krok za krokem</strong></summary>
           <ol class="forms-howto-list">
             <li>Ve školních Google Forms vytvoř formulář pro odevzdání bezpečných testů.</li>
             <li>Přidej <strong>povinnou otázku typu Odstavec</strong>, např. „Odevzdávací kód z testu“. Do ní student vloží celý blok začínající <code>SECURE-ANSWERS-V1</code>.</li>
-            <li>Volitelně zapni sběr <strong>ověřeného školního e-mailu</strong>. E-mail je další identifikační údaj; nenahrazuje samotný šifrovaný blok.</li>
+            <li>Zapni sběr <strong>ověřeného školního e-mailu</strong> a omez přístup na školní doménu. Omezení na jednu odpověď nech vypnuté. E-mail je další identifikační údaj; nenahrazuje samotný šifrovaný blok.</li>
             <li>Formulář publikuj a zkopíruj <strong>odkaz pro respondenty</strong> (ne adresu editoru). Vlož ho výše a klikni na „Používat Google Forms“.</li>
             <li>V nově vygenerovaném secure testu student po odevzdání zkopíruje celý odevzdávací blok, otevře formulář, vloží jej do otázky a formulář odešle.</li>
             <li>Po testu v Google Forms stáhni odpovědi jako <strong>CSV</strong> a soubor nahraj do <code>teacher_verifier.html</code> v části „Import z Google Forms (CSV)“.</li>

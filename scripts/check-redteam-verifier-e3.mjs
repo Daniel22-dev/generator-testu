@@ -11,21 +11,26 @@ try{
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'},{code:'D4E6F8',label:'Synthetic B',email:'synthetic-b@example.invalid'}];");
   const pkg=await build(),x=genDom(pkg.studentHtml),v=genDom(pkg.teacherHtml);children.push(x,v);await new Promise(r=>setTimeout(r,0));const cfg=x.eval('CFG');
   const base={v:1,testId:cfg.testId,manifestHash:cfg.manifestHash,studentHtmlSha256:pkg.studentHtmlSha256,attemptId:'E3-A',identityMode:'oneTimeCode',code:'A7B9C2',student:'A7B9C2',groupKey:'__default',startedAt:'2026-10-03T12:00:00Z',submittedAt:'2026-10-03T12:15:00Z',resp:{'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1},securityEvents:[{t:'2026-10-03T12:00:00Z',type:'attempt-start'}]};
-  function reset(p=policy){if(v.verifierReplayStorageKey){v.localStorage.removeItem(v.verifierReplayStorageKey());v.eval('VERIFIER_REPLAY_HISTORY=[];');}if(v.setFormsAnchorPolicy)v.setFormsAnchorPolicy(p);else v.eval('RESULTS=[];ATTEMPT_DECISIONS.clear();');}
+  function reset(p=policy){if(v.verifierReplayStorageKey){v.localStorage.removeItem(v.verifierReplayStorageKey());v.eval('VERIFIER_REPLAY_HISTORY=[];');}if(v.clearVerifierResults)v.clearVerifierResults();else v.eval('RESULTS=[];ATTEMPT_DECISIONS.clear();');/* since 7.1.97 a policy change re-evaluates instead of clearing */if(v.setFormsAnchorPolicy)v.setFormsAnchorPolicy(p);}
   async function text(payload=base){return 'SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,payload:await x.encryptPayloadForTeacher(payload)});}
   async function submit(patch={},sm=source){return v.verifyText('e3-synthetic.txt',await text({...base,...patch}),sm);}
   async function reject(patch,sm=source,code){reset();const result=await submit(patch,sm);assert.equal(result.classification,'invalid-current');assert.equal(result.row?.status,'CHYBA');assert.equal(result.row?.total,0,'rejection must precede scoring');assert.equal(v.effectiveResults().length,0);if(code)assert.equal(result.code,code);return result;}
   async function group(id,fn){if(selected!=='all'&&selected!==id)return;reset();await fn();checks.push(id);console.log('PASS E3',id);}
   await group('forms-policy',async()=>{
-    assert.equal(v.e3PragueLocalIso('2026-10-06','13:20'),'2026-10-06T13:20:00+02:00');
-    assert.equal(v.e3PragueLocalIso('2026-01-15','13:20'),'2026-01-15T13:20:00+01:00');
-    assert.equal(v.e3PragueLocalIso('2026-07-15','13:20'),'2026-07-15T13:20:00+02:00');
+    // Compare instants: the helper may emit UTC (Z) or an explicit Prague offset.
+    assert.equal(Date.parse(v.e3PragueLocalIso('2026-10-06','13:20')),Date.parse('2026-10-06T13:20:00+02:00'));
+    assert.equal(Date.parse(v.e3PragueLocalIso('2026-01-15','13:20')),Date.parse('2026-01-15T13:20:00+01:00'));
+    assert.equal(Date.parse(v.e3PragueLocalIso('2026-07-15','13:20')),Date.parse('2026-07-15T13:20:00+02:00'));
     assert.equal(v.e3PragueLocalIso('2026-10-06','25:80'),'');
-    assert.throws(()=>v.setFormsAnchorPolicy({...policy,publishedAt:undefined,publishedDate:'2026-10-06',publishedTime:''}));
-    assert.throws(()=>v.setFormsAnchorPolicy({...policy,csvOriginalConfirmed:false}));
-    const uiPolicy=v.setFormsAnchorPolicy({...policy,publishedAt:undefined,publishedDate:'2026-10-06',publishedTime:'13:20'});
-    assert.equal(uiPolicy.publishedAt,'2026-10-06T13:20:00+02:00');assert.equal(uiPolicy.csvOriginalConfirmed,true);assert.equal(Object.prototype.hasOwnProperty.call(uiPolicy,'oneResponseConfirmed'),false);
-    const limitOff=v.setFormsAnchorPolicy({...policy,oneResponseConfirmed:false});assert.equal(limitOff.schoolDomain,'example.invalid');
+    // The date field is prefilled with today; a date without a time is not a manual window (CSV lesson markers apply).
+    assert.equal(v.normalizeVerifierFormsPolicy({...policy,publishedAt:undefined,publishedDate:'2026-10-06',publishedTime:''}).publishedAt,'');
+    assert.throws(()=>v.normalizeVerifierFormsPolicy({...policy,publishedAt:undefined,publishedDate:'',publishedTime:'13:20'}));
+    // setFormsAnchorPolicy is async since 7.1.97 (it re-evaluates loaded CSV); validation is checked on the pure normalizer.
+    assert.throws(()=>v.normalizeVerifierFormsPolicy({...policy,csvOriginalConfirmed:false}));
+    await assert.rejects(()=>v.setFormsAnchorPolicy({...policy,csvOriginalConfirmed:false,publishedAt:undefined,publishedDate:'',publishedTime:'13:20'}));
+    const uiPolicy=await v.setFormsAnchorPolicy({...policy,publishedAt:undefined,publishedDate:'2026-10-06',publishedTime:'13:20'});
+    assert.equal(Date.parse(uiPolicy.publishedAt),Date.parse('2026-10-06T13:20:00+02:00'));assert.equal(uiPolicy.csvOriginalConfirmed,true);assert.equal(Object.prototype.hasOwnProperty.call(uiPolicy,'oneResponseConfirmed'),false);
+    const limitOff=await v.setFormsAnchorPolicy({...policy,oneResponseConfirmed:false});assert.equal(limitOff.schoolDomain,'example.invalid');
   });
   await group('schema',async()=>{
     for(const patch of [{v:2},{attemptId:''},{resp:[]},{resp:{'99_0':1}},{resp:{'0_0':'1'}},{resp:{'0_0':99}},{resp:{'0_0':-1}},{resp:{'0_0':{answer:1}}},{securityEvents:[]},{securityEvents:null},{securityEvents:[{type:'attempt-start'}]},{securityEvents:[{t:base.startedAt,type:'attempt-start',bad:{nested:true}}]},{serverVerified:true},{trustAssessment:{runtimeAuthenticity:'PREVENTED'}},{totalAnswerChanges:1},{answerChangeStats:{'0_0':-1}},{jokerUsed:true,jokerSelectedAt:base.submittedAt},{pct:Infinity}])await reject(patch);
@@ -67,7 +72,7 @@ try{
     reset();const good=await submit({}, {...source,formIdentity:'SYNTHETIC-A@EXAMPLE.INVALID'});assert.equal(good.classification,'current');assert.equal(v.resultTrust(good.row).externalIdentity,'MATCHED_FORMS_ROSTER');
     const originalRoster=v.eval('CONFIG.roster');for(const roster of [[{code:'A7B9C2'}],[{code:'A7B9C2',email:'synthetic-a@other.invalid'}],[{code:'A7B9C2',email:'synthetic-a@example.invalid'},{code:'D4E6F8',email:'synthetic-a@example.invalid'}],[{code:'A7B9C2',email:'synthetic-a@example.invalid'},{code:'A7B9C2',email:'synthetic-b@example.invalid'}]]){v.__badRoster=roster;v.eval('CONFIG.roster=window.__badRoster');await reject({},source,'anchors.roster');}v.__badRoster=originalRoster;v.eval('CONFIG.roster=window.__badRoster');
     good.row.trustAssessment={externalIdentity:'FORGED',classificationAuthorization:'AUTHORIZED'};assert.equal(v.resultTrust(good.row).externalIdentity,'MATCHED_FORMS_ROSTER');assert.equal(v.resultTrust(good.row).classificationAuthorization,'REVIEW_REQUIRED');
-    assert.throws(()=>v.setFormsAnchorPolicy({...policy,verifiedEmailConfirmed:false}));
+    assert.throws(()=>v.normalizeVerifierFormsPolicy({...policy,verifiedEmailConfirmed:false}));
   });
   await group('time',async()=>{
     for(const patch of [{startedAt:'2040-01-01T12:00:00Z',submittedAt:'2000-01-01T12:00:00Z'},{startedAt:'2026-10-03T11:58:59Z',securityEvents:[{type:'attempt-start',t:'2026-10-03T11:58:59Z'}]},{submittedAt:'2026-10-03T12:16:01Z'},{startedAt:'2026-02-30T12:00:00Z'},{startedAt:'2026-10-03 12:00:00'},{securityEvents:[{type:'attempt-start',t:'2026-10-03T12:15:01Z'}]}])await reject(patch);
@@ -85,7 +90,7 @@ try{
   await group('csv',async()=>{
     const txt=await text(),q=s=>'"'+s.replaceAll('"','""')+'"',row=(mail='synthetic-a@example.invalid',payload=txt,other='')=>['2026-10-03T12:16:00Z',mail,payload,other].map(q).join(',');
     const header='Timestamp,Email Address,Result,Other\n';const summary=await v.importFormsCsvText(header+row()+'\n'+row()+'\n'+row('synthetic-a@example.invalid',txt,txt)+'\n'+row('synthetic-a@example.invalid',''),'e3.csv');
-    assert.equal(summary.ok,2);assert.equal(summary.ambiguous,1);assert.equal(summary.missing,1);assert.equal(v.eval('RESULTS.length'),4);assert.equal(v.effectiveResults().length,1);assert.equal(summary.replayRejected,1);
+    /* since 7.1.97 'ok' excludes rejected exact duplicates; they count as rejections */assert.equal(summary.ok,1);assert.equal(summary.invalid,3);assert.equal(summary.ambiguous,1);assert.equal(summary.missing,1);assert.equal(v.eval('RESULTS.length'),4);assert.equal(v.effectiveResults().length,1);assert.equal(summary.replayRejected,1);
     await v.importFormsCsvText(header+row(),'e3-again.csv');assert.equal(v.effectiveResults().length,1);assert.equal(v.eval('RESULTS.length'),5,'imports append to the existing replay ledger');
     for(const malformed of ['Timestamp,Email Address,Email Address\na,b,c','Timestamp,Email Address,Result\na,b','Timestamp,Email Address,Result\na,b,c,d','Timestamp,Email Address,Result\n"a"x,b,c','Timestamp,Email Address,Result\na,b,"c'])assert.throws(()=>v.parseFormsCsvText(malformed));
     assert.throws(()=>v.parseFormsCsvText('Timestamp,Entered Email,Result\na,b,c'),'owner-selected email header must exist');

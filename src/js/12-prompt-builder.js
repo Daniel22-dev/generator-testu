@@ -271,7 +271,7 @@ function getLabels(lang) {
       total:'Celkem', points:'bodů', questions:'otázek', minutes:'min', rules:'Pravidla',
       ruleOwn:'Odpovídej samostatně, bez cizí pomoci.', ruleFinal:'Po odeslání nelze odpovědi měnit.',
       ruleMonitor:'Test nesmíš opustit ani přepínat do jiné aplikace/karty.', ruleStrict:'Opuštění okna uzamkne test.', ruleVerify:'Po dokončení pošli učiteli screenshot + .txt soubor.', ruleJoker:'Máš k dispozici jednoho žolíka.',
-      name:'Kód studenta (např. A1)', namePh:'Zadej svůj kód, např. A1', nameIdentity:'Jméno a příjmení', nameIdentityPh:'Zadej své jméno a příjmení', ptsShort:'b', fbCorrect:'Správně', fbWrong:'Chyba', fbExplain:'Vysvětlení', start:'Začít test', teacher:'Učitelský mód',
+      name:'Kód studenta (např. A1B2C3)', namePh:'Zadej svůj kód, např. A1B2C3', nameIdentity:'Jméno a příjmení', nameIdentityPh:'Zadej své jméno a příjmení', ptsShort:'b', fbCorrect:'Správně', fbWrong:'Chyba', fbExplain:'Vysvětlení', start:'Začít test', teacher:'Učitelský mód',
       exercise:'Cvičení', submitTest:'Odevzdat test', submitExercise:'Odevzdat cvičení', submittedExercise:'Cvičení odevzdáno', showResult:'Zobrazit výsledek',
       next:'Další', prev:'Předchozí', submit:'Odevzdat', true:'Pravda', false:'Nepravda', choose:'vyber', correctedSentence:'Opravená věta:',
       writeAnswer:'Napiš svou odpověď...', writeTranslation:'Napiš překlad...', writeSentence:'Napiš správnou větu...', wordBank:'Slova k seřazení:',
@@ -287,7 +287,7 @@ function getLabels(lang) {
       total:'Total', points:'points', questions:'questions', minutes:'min', rules:'Rules',
       ruleOwn:'Work independently, without outside help.', ruleFinal:'You cannot change answers after submitting.',
       ruleMonitor:'Do not leave the test or switch to another app/tab.', ruleStrict:'Leaving the window locks the test.', ruleVerify:'After finishing, send your teacher a screenshot + the .txt file.', ruleJoker:'You have one joker available.',
-      name:'Student code (e.g. A1)', namePh:'Enter your code, e.g. A1', nameIdentity:'Your full name', nameIdentityPh:'Enter your first and last name', ptsShort:'pts', fbCorrect:'Correct', fbWrong:'Incorrect', fbExplain:'Explanation', start:'Start test', teacher:'Teacher mode',
+      name:'Student code (e.g. A1B2C3)', namePh:'Enter your code, e.g. A1B2C3', nameIdentity:'Your full name', nameIdentityPh:'Enter your first and last name', ptsShort:'pts', fbCorrect:'Correct', fbWrong:'Incorrect', fbExplain:'Explanation', start:'Start test', teacher:'Teacher mode',
       exercise:'Exercise', submitTest:'Submit test', submitExercise:'Submit exercise', submittedExercise:'Exercise submitted', showResult:'Show result',
       next:'Next', prev:'Previous', submit:'Submit', true:'True', false:'False', choose:'choose', correctedSentence:'Corrected sentence:',
       writeAnswer:'Write your answer...', writeTranslation:'Write the translation...', writeSentence:'Write the correct sentence...', wordBank:'Word bank:',
@@ -303,7 +303,7 @@ function getLabels(lang) {
       total:'Total', points:'puntos', questions:'preguntas', minutes:'min', rules:'Reglas',
       ruleOwn:'Trabaja de forma independiente, sin ayuda externa.', ruleFinal:'Después de enviar no podrás cambiar las respuestas.',
       ruleMonitor:'No salgas del test ni cambies a otra aplicación/pestaña.', ruleStrict:'Salir de la ventana bloquea el test.', ruleVerify:'Al terminar, envía al profesor una captura + el archivo .txt.', ruleJoker:'Tienes un comodín disponible.',
-      name:'Código del estudiante (p. ej. A1)', namePh:'Escribe tu código, p. ej. A1', nameIdentity:'Nombre y apellido', nameIdentityPh:'Escribe tu nombre y apellido', ptsShort:'p.', fbCorrect:'Correcto', fbWrong:'Incorrecto', fbExplain:'Explicación', start:'Empezar test', teacher:'Modo profesor',
+      name:'Código del estudiante (p. ej. A1B2C3)', namePh:'Escribe tu código, p. ej. A1B2C3', nameIdentity:'Nombre y apellido', nameIdentityPh:'Escribe tu nombre y apellido', ptsShort:'p.', fbCorrect:'Correcto', fbWrong:'Incorrecto', fbExplain:'Explicación', start:'Empezar test', teacher:'Modo profesor',
       exercise:'Ejercicio', submitTest:'Enviar test', submitExercise:'Enviar ejercicio', submittedExercise:'Ejercicio enviado', showResult:'Ver resultado',
       next:'Siguiente', prev:'Anterior', submit:'Enviar', true:'Verdadero', false:'Falso', choose:'elige', correctedSentence:'Frase corregida:',
       writeAnswer:'Escribe tu respuesta...', writeTranslation:'Escribe la traducción...', writeSentence:'Escribe la frase correcta...', wordBank:'Palabras:',
@@ -319,7 +319,7 @@ function getLabels(lang) {
       total:'Gesamt', points:'Punkte', questions:'Fragen', minutes:'Min.', rules:'Regeln',
       ruleOwn:'Arbeite selbstständig, ohne fremde Hilfe.', ruleFinal:'Nach dem Absenden kannst du Antworten nicht mehr ändern.',
       ruleMonitor:'Verlasse den Test nicht und wechsle nicht zu einer anderen App oder einem anderen Tab.', ruleStrict:'Wenn du das Fenster verlässt, wird der Test gesperrt.', ruleVerify:'Sende nach dem Abschluss einen Screenshot + die .txt-Datei an die Lehrkraft.', ruleJoker:'Du hast einen Joker.',
-      name:'Code (z. B. A1)', namePh:'Code eingeben, z. B. A1', nameIdentity:'Vor- und Nachname', nameIdentityPh:'Gib deinen Vor- und Nachnamen ein', ptsShort:'P.', fbCorrect:'Richtig', fbWrong:'Falsch', fbExplain:'Erklärung', start:'Test starten', teacher:'Lehrermodus',
+      name:'Code (z. B. A1B2C3)', namePh:'Code eingeben, z. B. A1B2C3', nameIdentity:'Vor- und Nachname', nameIdentityPh:'Gib deinen Vor- und Nachnamen ein', ptsShort:'P.', fbCorrect:'Richtig', fbWrong:'Falsch', fbExplain:'Erklärung', start:'Test starten', teacher:'Lehrermodus',
       exercise:'Übung', submitTest:'Test abgeben', submitExercise:'Übung abgeben', submittedExercise:'Übung abgegeben', showResult:'Ergebnis anzeigen',
       next:'Weiter', prev:'Zurück', submit:'Abgeben', true:'Richtig', false:'Falsch', choose:'wählen', correctedSentence:'Korrigierter Satz:',
       writeAnswer:'Schreibe deine Antwort...', writeTranslation:'Schreibe die Übersetzung...', writeSentence:'Schreibe den richtigen Satz...', wordBank:'Wortbank:',
@@ -526,7 +526,7 @@ function pseudonymizeDifferentiationConditions(condition, students, groupIndex){
     if(row.raw.length>=3){
       out=out.replace(new RegExp(escRe,'gi'),row.marker);
     }else{
-      // Krátké kódy (např. A1) měníme jen jako samostatný token, abychom
+      // Krátké kódy (např. A1B2C3) měníme jen jako samostatný token, abychom
       // nepoškodili běžná slova obsahující jedno- či dvouznakový řetězec.
       out=out.replace(new RegExp('(^|[^A-Za-z0-9_])('+escRe+')(?=$|[^A-Za-z0-9_])','gi'),(m,prefix)=>prefix+row.marker);
     }

@@ -15,6 +15,12 @@ async function assembleTestHtml(st, genData) {
   sourceState.__formsSubmissionUrl=typeof st.__formsSubmissionUrl==='string'?st.__formsSubmissionUrl:(typeof configuredGoogleFormsUrl==='function'?configuredGoogleFormsUrl():'');
   const formsMetaCandidate=(st.__formsMetadata&&typeof st.__formsMetadata==='object')?st.__formsMetadata:(typeof configuredGoogleFormsMetadata==='function'?(configuredGoogleFormsMetadata()||null):null);
   sourceState.__formsMetadata=formsMetaCandidate?(typeof normalizeStoredGoogleFormsMetadata==='function'?normalizeStoredGoogleFormsMetadata(formsMetaCandidate):null):null;
+  sourceState.__formsAnchorProfile=null;
+  if(sourceState.resultMode==='secureOffline'&&sourceState.__formsSubmissionUrl){
+    if(typeof requireFormsExportConfiguration!=='function')throw new Error('Forms export configuration module is unavailable. Reload the generator.');
+    sourceState.__formsAnchorProfile=st.__formsAnchorProfile||(typeof configuredGoogleFormsAnchorProfile==='function'?configuredGoogleFormsAnchorProfile():null);
+    sourceState.__formsAnchorProfile=requireFormsExportConfiguration(sourceState);
+  }
   st=sourceState;
   const field=id=>sourceState.__outputFields[id]??trim(id);
   const outputCefr=CEFR_LEVELS.filter(l=>(st.uroven||[]).includes(l)).join(' / ');
@@ -32,6 +38,7 @@ async function assembleTestHtml(st, genData) {
   const jazyk=st.jazyk||'angličtina';
   const uiLang=getUiLang(st.instrJazyk,jazyk);
   const labels=getLabels(uiLang);
+  if(st.resultMode==='secureOffline'&&st.__formsSubmissionUrl)labels.ruleVerify=formsSubmissionRule(uiLang);
   const customScaleRaw=field('vlastniSkala');
   const summary=variantSummary(defaultExercises);
   const testId='T'+Date.now().toString(36).toUpperCase().slice(-6)+'-'+randomHex(4).toUpperCase();

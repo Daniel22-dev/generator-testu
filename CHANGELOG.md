@@ -1,3 +1,16 @@
+## 7.1.97 – 2026-10-07 – Google Forms workflow (F1–F9) + audit
+
+- verifier nese pevné nastavení z Generátoru (doména, e-maily učitele, sloupce CSV); na vyhodnocovacím PC se nic nevyplňuje;
+- značky hodiny START/END se odesílají přes školní formulář pod účtem učitele a putují v CSV; značky od jiných účtů se ignorují s upozorněním;
+- parser časů Google exportu (`2026/10/06 2:38:00 pm EEST`, US, český tvar, ISO; CET/CEST/EET/EEST/WET/WEST/UTC/GMT±H);
+- export se zastaví bez předvyplněného odkazu formuláře; studentský odkaz předvyplní ID testu, název a třídu;
+- student přijme jen 6znakový osobní kód a odmítne ID testu; chybná identita s ověřeným Forms účtem čeká na ruční potvrzení;
+- neshoda popisných metadat je jen upozornění; Test ID se porovnává bez mezer a pomlček;
+- START odeslaný až po zahájení testu se toleruje 10 minut (s poznámkou u výsledku); opakovaný START nezneplatní dřívější okno; ručně zadaný čas hodiny přepíše značky z CSV (pozdní START, předčasný END);
+- ukázka v Reading comprehension je zarovnaná do bloku s dělením slov a jazykem testu;
+- CI: obnoveno pořadí `npm test` (orchestrace první), sjednocen GARP 2.7 trust pin, aktualizována E3 kontrola textu o neprokázaném původu, nová browser regrese `check:forms-lesson-browser`;
+- skutečný Google formulář a fyzické iPhone/Android zkoušky čekají.
+
 ## 7.1.96 – 2026-10-06 – Teacher Verifier / Google Forms UX
 
 - datum zveřejnění je předvyplněné na dnešek a učitel zadává běžný čas typu `13:20`; interní timestamp se počítá v `Europe/Prague` s fail-closed CET/CEST validací;

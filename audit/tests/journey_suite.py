@@ -333,7 +333,7 @@ try:
   assert all(c not in stu['text'] for c in codes),'student file must not contain plain codes'
   sp=h.new_page(stu['text']);sp.wait_for_timeout(700)
   enter_start_code(sp,private_start_code(h,tea['text']));sp.fill('#studentName','!invalid!');sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_timeout(500)
-  msg=sp.evaluate("document.body.innerText");assert 'not valid' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with a message'
+  msg=sp.evaluate("document.body.innerText");assert re.search(r'(personal code|kód studenta|código del estudiante|code)',msg,re.I) and '6' in msg and not sp.evaluate("!!document.querySelector('.ex-panel:not(.hidden)')"),'invalid code must be rejected with current 6-character personal-code guidance'
   sp.locator('button:visible',has_text=re.compile('^OK$')).first.click()
   sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
   sp.locator('[onclick="submitSecureTest()"]').click();sp.wait_for_timeout(300)
@@ -348,7 +348,7 @@ try:
   f=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);f.write(buf.getvalue());f.close()
   vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vp,published,'E-mailová adresa','Časová značka');vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
   t=vp.evaluate('document.body.innerText');vp.close()
-  assert 'novak@example.invalid' in t and re.search(r'Duplicity: [1-9]',t),('Forms CSV import + repeated code must be flagged',t[t.find('Načteno'):t.find('Načteno')+200])
+  assert 'novak@example.invalid' in t and ('Opakované odevzdání je vyřazeno' in t or 'replay.duplicate' in t),('Forms CSV import + repeated code must be flagged',t[:1200])
   return {'codes':len(codes)}
  record('advanced-one-time-code-to-verifier',advanced_one_time_code_to_verifier)
 
@@ -362,9 +362,9 @@ try:
   })""")
   assert bad['host'] and bad['missing'],('invalid Forms metadata config must fail closed',bad)
   assert p.evaluate("()=>{localStorage.removeItem(GOOGLE_FORMS_METADATA_CONFIG_KEY);return configuredGoogleFormsMetadata()===null}"),'missing metadata config must stay optional'
-  pre='https://docs.google.com/forms/d/e/FORM_A/viewform?usp=pp_url&entry.111=GIT_TEST_ID&entry.222=GIT_TEST_NAME&entry.333=GIT_GROUP&entry.444=GIT_GENERATOR_VERSION&entry.555=GIT_GENERATED_AT'
-  cfg=p.evaluate("""u=>{const c=parseGoogleFormsPrefilledMetadataUrl(u);localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);return c}""",pre)
-  assert cfg['entries']['testId']=='111' and cfg['entries']['testName']=='222' and cfg['entries']['group']=='333',cfg
+  pre='https://docs.google.com/forms/d/e/FORM_A/viewform?usp=pp_url&entry.111=GIT_TEST_ID&entry.222=GIT_TEST_NAME&entry.333=GIT_GROUP&entry.666=KOD'
+  cfg=p.evaluate("""u=>{const c=parseGoogleFormsPrefilledMetadataUrl(u);localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);const profile=normalizeGoogleFormsAnchorProfile({teacherEmails:['teacher@example.invalid'],verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true,lessonMarkersConfirmed:true,csvTimezone:'Europe/Prague',emailHeader:'auto',timestampHeader:'auto',toleranceMinutes:2});localStorage.setItem(GOOGLE_FORMS_ANCHOR_PROFILE_KEY,JSON.stringify(profile));return c}""",pre)
+  assert cfg['entries']['testId']=='111' and cfg['entries']['testName']=='222' and cfg['entries']['group']=='333' and cfg['entries']['submission']=='666',cfg
 
   def build_secure(jj,name,group,email):
    q=jj.p;q.fill('#geminiKeyInput','AIzaTEST-forms-000000000000000000');q.click('#btnUseKeySession')
@@ -402,7 +402,7 @@ try:
   # Generate TEST-B with another group but the same universal Form mapping.
   j2=Journey(h)
   try:
-   j2.ev("(c)=>{localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl)}",cfg)
+   j2.ev("(c)=>{localStorage.setItem(GOOGLE_FORMS_METADATA_CONFIG_KEY,JSON.stringify(c));localStorage.setItem(GOOGLE_FORMS_SUBMISSION_URL_KEY,c.responderUrl);const profile=normalizeGoogleFormsAnchorProfile({teacherEmails:['teacher@example.invalid'],verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true,lessonMarkersConfirmed:true,csvTimezone:'Europe/Prague',emailHeader:'auto',timestampHeader:'auto',toleranceMinutes:2});localStorage.setItem(GOOGLE_FORMS_ANCHOR_PROFILE_KEY,JSON.stringify(profile))}",cfg)
    name_b='Vocabulary B';group_b='2.B'
    stu_b,tea_b=build_secure(j2,name_b,group_b,'beta@example.invalid')
   finally:
@@ -429,11 +429,16 @@ try:
   va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va,stu_a['publishedAt']);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
   ta=va.evaluate('document.body.innerText')
   assert 'alpha@example.invalid' in ta and 'beta@example.invalid' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
-  assert va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&r.validationCodes.includes('binding.forms-metadata'))"),'tampered Forms metadata must be rejected before scoring'
+  # 7.1.97 / F4: descriptive Forms metadata is advisory only. It must surface as a warning,
+  # never as the old binding.forms-metadata rejection. Security binding stays in the encrypted payload.
+  assert not va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&r.validationCodes.includes('binding.forms-metadata'))"),'metadata mismatch must not be a hard rejection'
+  assert va.evaluate("RESULTS.some(r=>Array.isArray(r.metadataMismatch)&&r.metadataMismatch.length)"),'tampered Forms metadata must remain visible as a warning'
   assert va.evaluate('RESULTS.some(r=>r.hardReplayConflict)'),('distinct attempts must retain replay rejection',ta[-1000:])
-  assert re.search(r'jiné testy\s+1',ta,re.I),('full CSV must classify TEST-B as another test',ta[:1000])
-  assert re.search(r'neplatné/poškozené\s+2',ta,re.I),('corrupt payload and altered metadata must both be invalid',ta[:1000])
-  assert re.search(r'Duplicity:\s*[1-9]',ta),('identical payload must be duplicate',ta[:1000])
+  summary_a=va.evaluate("()=>({...LAST_FORMS_IMPORT})")
+  assert summary_a['otherTests']==1,('full CSV must classify TEST-B as another test',summary_a)
+  assert summary_a['replayRejected']>=2,('duplicate/replay rows must stay rejected',summary_a)
+  assert va.evaluate("RESULTS.some(r=>r.exactDuplicate)"),('identical payload must be duplicate',summary_a)
+  assert va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&!r.exactDuplicate&&!r.hardReplayConflict)"),('corrupt payload must remain invalid',summary_a)
   va.evaluate("()=>{const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate);chooseAttemptByDigest(r.submissionDigest)}")
   va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await __readDownloadText(-1)")
   assert len(res_csv.splitlines())==1,('manual selection must not classify replay-rejected submissions',res_csv)
@@ -444,14 +449,16 @@ try:
   vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vb,stu_b['publishedAt']);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
   tb=vb.evaluate('document.body.innerText')
   assert 'beta@example.invalid' in tb and 'alpha@example.invalid' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
-  assert re.search(r'jiné testy\s+[1-9]',tb,re.I),('verifier B must classify TEST-A rows as other tests',tb[:1000])
+  summary_b=vb.evaluate("()=>({...LAST_FORMS_IMPORT})")
+  assert summary_b['otherTests']>=1,('verifier B must classify TEST-A rows as other tests',summary_b)
   vb.close()
 
-  # Real-browser long-run benchmark: actual verifier + WebCrypto + yielding UI.
+  # Real-browser long-run benchmark: each size starts in a fresh verifier origin/profile.
+  # This measures one full-year CSV import, not cumulative re-processing of every previous benchmark file.
   perf=[]
-  va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va2,stu_a['publishedAt'])
-  try:
-   for size in (100,1000,3000,5000):
+  for size in (100,1000,3000,5000):
+   va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va2,stu_a['publishedAt'])
+   try:
     big=io.StringIO();w=csv.writer(big);w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
     current=0
     for i in range(size):
@@ -461,17 +468,20 @@ try:
     bf=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);bf.write(big.getvalue());bf.close()
     va2.evaluate("()=>{clearInterval(window.__formsHbTimer);window.__formsHb=0;window.__formsHbTimer=setInterval(()=>window.__formsHb++,25)}")
     t0=time.time();va2.set_input_files('#formsCsvFile',bf.name)
-    va2.wait_for_function("(n)=>document.getElementById('formsImportSummary').innerText.includes('načteno '+n)",arg=size,timeout=180000)
-    elapsed=round(time.time()-t0,3);txt=va2.locator('#formsImportSummary').inner_text()
+    va2.wait_for_function("(n)=>!!LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===n&&!LAST_FORMS_IMPORT.waitingForWindow",arg=size,timeout=180000)
+    elapsed=round(time.time()-t0,3);summary=va2.evaluate("()=>({...LAST_FORMS_IMPORT,duplicates:{...LAST_FORMS_IMPORT.duplicates}})")
     hb=va2.evaluate("()=>{clearInterval(window.__formsHbTimer);return window.__formsHb}")
     heap=va2.evaluate("()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null")
-    assert re.search(r'opravené výsledky tohoto testu(?:\s+\([^)]*\))?\s+'+str(current)+r'\b',txt,re.I),(size,current,txt)
-    assert re.search(r'jiné testy\s+'+str(size-current)+r'\b',txt,re.I),(size,txt)
-    assert 'neplatné/poškozené 0' in txt,(size,txt)
+    assert summary['current']==current,(size,current,summary)
+    assert summary['otherTests']==size-current,(size,summary)
+    # Repeated TEST-A payloads inside this single CSV are duplicate/replay rows.
+    assert summary['ok']==1,(size,summary)
+    assert summary['replayRejected']==current-1,(size,current,summary)
+    assert summary['invalid']>=current-1,(size,summary)
     assert hb>0,('large CSV import must yield to browser event loop',size,hb)
     perf.append({'rows':size,'seconds':elapsed,'heartbeat':hb,'heapMiB':heap})
-  finally:
-   va2.close()
+   finally:
+    va2.close()
   return {'testA':test_a,'testB':test_b,'unicodePrefill':True,'metadataMismatch':True,'sameCsvTwoVerifiers':True,'browserPerformance':perf}
  record('pre-server-forms-full-year-workflow',pre_server_forms_full_year_workflow)
 
