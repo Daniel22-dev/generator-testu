@@ -13,6 +13,14 @@ function isolatedSecureStudentLabels(labels, lang){
   [clean.contentCodeLabel,clean.contentCodeHint,clean.contentCodeError]=start;
   clean.unlockPh=l[0];clean.retryHint=l[1];clean.activeAttemptHint=l[2];
   clean.badLogin=({cs:'Nesprávný odemykací kód.',en:'Incorrect classroom unlock code.',es:'Código de desbloqueo incorrecto.',de:'Falscher Entsperrcode.'})[lang]||'Incorrect classroom unlock code.';
+  const codeMessages={
+    cs:['Tohle je ID testu, ne tvůj kód. Tvůj kód má 6 znaků a přišel ti e-mailem.','Tohle je startovní kód nebo jeho část. Zadej svůj osobní kód z e-mailu.','Tvůj osobní kód musí mít přesně 6 písmen A–Z nebo číslic. Najdeš ho ve svém e-mailu.','ID testu – nevyplňuješ','Předvyplněné ID testu, název a třídu ve formuláři neměň.'],
+    en:['This is the test ID, not your personal code. Your code has 6 characters and was sent by email.','This is the start code or part of it. Enter your personal code from your email.','Your personal code must have exactly 6 letters A–Z or digits. Check your email.','Test ID – do not enter this','Do not change the prefilled test ID, title or class in the form.'],
+    es:['Este es el ID del test, no tu código personal. Tu código tiene 6 caracteres y lo recibiste por correo.','Este es el código de inicio o parte de él. Usa tu código personal del correo.','Tu código personal debe tener exactamente 6 letras A–Z o dígitos. Revisa tu correo.','ID del test – no lo introduzcas','No cambies el ID, el título ni el grupo ya rellenados.'],
+    de:['Das ist die Test-ID, nicht dein persönlicher Code. Dein Code hat 6 Zeichen und kam per E-Mail.','Das ist der Startcode oder ein Teil davon. Nutze deinen persönlichen Code aus der E-Mail.','Dein persönlicher Code muss genau 6 Buchstaben A–Z oder Ziffern haben.','Test-ID – nicht eingeben','Ändere die vorausgefüllte Test-ID, den Titel und die Klasse nicht.']
+  }[lang]||[];
+  [clean.codeLooksLikeTestId,clean.codeLooksLikeStart,clean.invalidIdentityCode,clean.testIdNotCode,clean.formsMetadataHint]=codeMessages.length?codeMessages:['Use your 6-character personal code.','Use your personal code, not the start code.','Your code must have 6 letters or digits.','Test ID - do not enter this','Do not change the prefilled metadata.'];
+  clean.codePlaceholder='A1B2C3';
   return clean;
 }
 function isolatedSecureStudentScript(){
@@ -23,7 +31,7 @@ function isolatedSecureStudentScript(){
   const replacements={
     showSubmittedLocked:"function showSubmittedLocked(){sModal(t('retryHint'),t('retryTitle'));}",
     showActiveAttemptLocked:"function showActiveAttemptLocked(){sModal(t('activeAttemptHint'),t('activeAttemptTitle'));}",
-    identityAllowed:"async function identityAllowed(value){if((CFG.identityMode||'name')!=='oneTimeCode')return true;return /^[A-Z0-9-]{4,40}$/.test(String(value||'').trim().toUpperCase());}",
+    identityAllowed:"async function identityAllowed(value){if((CFG.identityMode||'name')!=='oneTimeCode')return true;return !identityCodeProblem(value);}",
     chooseVariant:"async function chooseVariant(){var groups=CFG.diffGroups||[];if(!groups.length)return '__default';if(groups.length===1)return groups[0].key;var el=$('studentVariant');var key=String(el&&el.value||'');return groups.some(g=>g.key===key)?key:'';}",
     deriveSecretHash:"async function deriveSecretHash(_kind,secret,testId){if(!(window.crypto&&crypto.subtle&&window.TextEncoder))throw new Error(t('cryptoFail'));var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(String(secret||'').trim().toUpperCase()),{name:'PBKDF2'},false,['deriveBits']);var bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode('classroom-unlock|'+String(testId)),iterations:120000,hash:'SHA-256'},key,256);return 'pbkdf2-v1$'+b64UrlFromBufferLocal(bits);}",
     recoveryCodeMatches:"async function unlockCodeMatches(secret){if(!secret||!CFG.unlockCodeHash)return false;return await deriveSecretHash('classroom-unlock',secret,CFG.testId)===CFG.unlockCodeHash;}"
@@ -50,7 +58,7 @@ function assertSecureStudentIsolation(publicCfg,studentVariants,html){
       walk(child,forbidden);
     }
   }
-  walk(publicCfg,/^(?:startCode|ucitelPin|ucitelPinHash|ucitelJmeno|teacherSecret|teacherPinHash|recoveryCode|recoveryCodeHash|hasRecoveryUnlock|identityCodeHashes|studentHashes|diffRosterSalt|privateKey|roster)$/i);
+  walk(publicCfg,/^(?:startCode|ucitelPin|ucitelPinHash|ucitelJmeno|teacherSecret|teacherPinHash|recoveryCode|recoveryCodeHash|hasRecoveryUnlock|identityCodeHashes|studentHashes|diffRosterSalt|privateKey|roster|formsAnchorPolicy|teacherEmails)$/i);
   walk(studentVariants,/^(?:answer|answers|alt_answers|correct|correct_order|correct_category|correct_sentence|model_answer|right|transcript|explanation|error_token_index|error_type|correction)$/i);
   if(['d','p','q','dp','dq','qi','oth'].some(k=>Object.prototype.hasOwnProperty.call(publicCfg.publicKey||{},k)))throw new Error('Studentský export obsahuje privátní RSA materiál.');
   if(/(?:function\s+(?:teacherLogin|teacherSecretMatches|openTeacherModal|clearSubmittedLocked)\b|id="teacherModal"|ucitelPinHash|recoveryCodeHash|identityCodeHashes|studentHashes)/.test(html))throw new Error('Studentský export obsahuje zakázanou učitelskou nebo rosterovou funkci.');
