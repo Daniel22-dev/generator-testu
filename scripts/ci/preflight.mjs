@@ -12,7 +12,7 @@ import { sourceSnapshot } from '../redteam-source-snapshot-e9.mjs';
 import { REPORT_FILES } from './release-evidence.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const TRUST_PIN = '2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1';
+const TRUST_PIN = '831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896';
 const ACTIONLINT_VERSION = '1.7.7';
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
