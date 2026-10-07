@@ -221,10 +221,10 @@ function validateWorkflowContracts(safe, deploy, p5, runner) {
   assert.match(safe, /run: bash scripts\/ci\/sync-candidate\.sh/);
   assert.ok(safe.indexOf('gh run watch') < safe.indexOf('run: bash scripts/ci/sync-candidate.sh'));
   assert.equal((safe.match(/run: npm run qa:redteam:ci/g) || []).length, 2);
-  assert.equal((deploy.match(/run: npm run qa:redteam:ci/g) || []).length, 1);
+  assert.equal((deploy.match(/run: npm run qa:redteam:ci/g) || []).length, 0, 'Main must reuse exact-tree evidence instead of rerunning E9');
   assert.equal((p5.match(/run: npm run qa:redteam:ci/g) || []).length, 1);
   assert.match(deploy, /group: generator-testu-pages\n  cancel-in-progress: false/);
-  for (const part of [job(safe, 'candidate-gate'), job(safe, 'pr-certification'), job(deploy, 'qa-build')]) {
+  for (const part of [job(safe, 'candidate-gate'), job(safe, 'pr-certification')]) {
     const start = part.indexOf('id: release_start'), qa = part.indexOf('run: npm run qa:release');
     const validate = part.indexOf('run: node scripts/ci/release-evidence.mjs');
     const upload = part.indexOf('name: Preserve structured QA before destructive red-team cleanup');
@@ -237,6 +237,20 @@ function validateWorkflowContracts(safe, deploy, p5, runner) {
     assert.match(part.slice(upload, redteam), /\$\{\{ github.sha \}\}-\$\{\{ github.run_id \}\}-\$\{\{ github.run_attempt \}\}/);
     assert.doesNotMatch(part, /continue-on-error: true/);
   }
+  const main = job(deploy, 'qa-build');
+  assert.match(main, /run: node scripts\/ci\/main-protection\.mjs --live/);
+  assert.match(main, /run: node scripts\/ci\/p4-promotion-evidence\.mjs --consume/);
+  assert.match(main, /run: npm run build/);
+  assert.match(main, /run: node scripts\/ci\/p4-promotion-evidence\.mjs --materialize/);
+  assert.match(main, /GHRAB_P4_CONSUMED_EVIDENCE: qa-results\/p4-consumed-promotion-evidence\.json/);
+  assert.doesNotMatch(main, /run: npm run (?:test:reporter|qa:release|qa:redteam:ci)/);
+  assert.ok(main.indexOf('main-protection.mjs --live') < main.indexOf('p4-promotion-evidence.mjs --consume'), 'Live main protection must be rechecked before evidence reuse');
+  assert.ok(main.indexOf('p4-promotion-evidence.mjs --consume') < main.indexOf('uses: ./.github/actions/install-ci-tools'), 'Fail-closed evidence validation must precede expensive setup');
+  const deployJob = job(deploy, 'deploy');
+  assert.match(deployJob, /gh api \"repos\/\$GITHUB_REPOSITORY\/git\/ref\/heads\/main\" --jq '\.object\.sha'/);
+  assert.match(deployJob, /if \[ \"\$current_main\" != \"\$EXPECTED_MAIN_SHA\" \]; then/);
+  assert.ok(main.indexOf('run: npm run build') < main.indexOf('p4-promotion-evidence.mjs --materialize'), 'Final main build precedes reused evidence materialization');
+  assert.doesNotMatch(main, /continue-on-error: true/);
   assert.match(runner, /const steps=\['npm test','npm run qa:garp27:foundation','npm run qa:p5:ci','node scripts\/check-redteam-evidence-e10.mjs'\]/);
   assert.match(runner, /fs.rmSync\('qa-results',\{recursive:true,force:true\}\)/);
   assert.match(runner, /results.every\(x=>x.pass\)&&sourceUnchanged/);
@@ -246,7 +260,7 @@ const safe = read('.github/workflows/safe-promotion.yml');
 const deploy = read('.github/workflows/deploy.yml');
 const p5 = read('.github/workflows/p5-release-gate.yml');
 const runner = read('scripts/run-redteam-ci-e10.mjs');
-test('workflow: retain every existing certification, evidence ordering and readiness', () => {
+test('workflow: retain all pre-merge certifications and use fail-closed P4 evidence on main', () => {
   validateWorkflowContracts(safe, deploy, p5, runner);
   assert.match(safe, /run: node scripts\/check-redteam-release-e10.mjs --require-ready/);
   assert.match(deploy, /run: node scripts\/check-redteam-release-e10.mjs --require-ready/);
@@ -258,7 +272,9 @@ for (const [name, mutate] of [
   ['open PR without native guard', x => { x[0] = x[0].replace('run: node scripts/ci/main-protection.mjs --live', 'run: true'); }],
   ['missing report upload', x => { x[0] = x[0].replace('            qa-results/qa-report.json', ''); }],
   ['unbound run artifact', x => { x[0] = x[0].replaceAll('${{ github.run_id }}-${{ github.run_attempt }}', 'latest'); }],
-  ['skip evidence validator', x => { x[1] = x[1].replace('run: node scripts/ci/release-evidence.mjs', 'run: true'); }],
+  ['skip P4 main protection recheck', x => { x[1] = x[1].replace('run: node scripts/ci/main-protection.mjs --live', 'run: true'); }],
+  ['skip P4 main evidence validator', x => { x[1] = x[1].replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume', 'run: true'); }],
+  ['accept stale main before deploy', x => { x[1] = x[1].replace('if [ \"$current_main\" != \"$EXPECTED_MAIN_SHA\" ]; then', 'if false; then'); }],
   ['drop cleanup freshness', x => { x[3] = x[3].replace("fs.rmSync('qa-results',{recursive:true,force:true})", ''); }],
   ['drop source invariant', x => { x[3] = x[3].replace('&&sourceUnchanged', ''); }],
 ]) test(`workflow negative control: ${name}`, () => {

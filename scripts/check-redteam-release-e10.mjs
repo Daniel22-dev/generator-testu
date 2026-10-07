@@ -28,8 +28,8 @@ function wiring({pkg,deploy,promotion}){
   validateP1Workflow(promotion);
   for(const chain of ['test','qa:p5','qa:p5:ci'])for(const gate of ['content','e10'])assert.ok(pkg.scripts[chain].split(' && ').includes('npm run check:redteam-'+gate),chain+' requires '+gate);
   for(const chain of ['qa:p5','qa:p5:ci'])assert.ok(pkg.scripts[chain].split(' && ').includes('npm run check:redteam-content-browser'));
-  assert.match(deploy,/branches: \[main\]/);assert.match(deploy,/deploy:\s*\n\s*if: github.ref == 'refs\/heads\/main'/);
-  assert.match(deploy,/run: node scripts\/check-redteam-release-e10.mjs --require-ready/);
+  assert.doesNotMatch(deploy,/push:\s*\n\s*branches: \[main\]/);assert.match(deploy,/workflow_dispatch:/);assert.match(deploy,/deploy:\s*\n\s*if: github.ref == 'refs\/heads\/main'/);
+  assert.match(deploy,/run: node scripts\/check-redteam-release-e10.mjs --require-ready/);assert.match(deploy,/run: node scripts\/ci\/main-protection.mjs --live/);assert.match(deploy,/run: node scripts\/ci\/p4-promotion-evidence.mjs --consume/);assert.match(deploy,/if \[ \"\$current_main\" != \"\$EXPECTED_MAIN_SHA\" \]; then/);
   assert.match(promotion,/run: node scripts\/check-redteam-release-e10.mjs --require-ready/);
   assert.ok(promotion.indexOf('--require-ready')<promotion.indexOf('gh pr merge'),'Readiness precedes merge');
   assert.equal((promotion.match(/run: npm run qa:redteam:ci/g)||[]).length,2,'Both candidate certifications use complete regression chain');
@@ -39,7 +39,7 @@ if(process.argv[1]?.endsWith('check-redteam-release-e10.mjs')){
   if(process.argv.includes('--require-ready')){requireReady(state,pkg.version);console.log('PASS release readiness');}
   else{
     const input={pkg,deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),promotion:fs.readFileSync('.github/workflows/safe-promotion.yml','utf8')};wiring(input);
-    const mutations=[['drop-content',x=>x.pkg.scripts.test=x.pkg.scripts.test.replace('npm run check:redteam-content && ','')],['drop-native',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:redteam-content-browser','')],['drop-merge-readiness',x=>x.promotion=x.promotion.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['drop-deploy-readiness',x=>x.deploy=x.deploy.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['deploy-candidate',x=>x.deploy=x.deploy.replace("deploy:\n    if: github.ref == 'refs/heads/main'","deploy:\n    if: true")],['partial-promotion-gate',x=>x.promotion=x.promotion.replace('run: npm run qa:redteam:ci','run: npm run qa:p5:ci')]];
+    const mutations=[['drop-content',x=>x.pkg.scripts.test=x.pkg.scripts.test.replace('npm run check:redteam-content && ','')],['drop-native',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:redteam-content-browser','')],['drop-merge-readiness',x=>x.promotion=x.promotion.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['drop-deploy-readiness',x=>x.deploy=x.deploy.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['deploy-candidate',x=>x.deploy=x.deploy.replace("deploy:\n    if: github.ref == 'refs/heads/main'","deploy:\n    if: true")],['deploy-without-p4-evidence',x=>x.deploy=x.deploy.replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume','run: true')],['partial-promotion-gate',x=>x.promotion=x.promotion.replace('run: npm run qa:redteam:ci','run: npm run qa:p5:ci')]];
     for(const [id,mutate] of mutations){const broken=structuredClone(input);mutate(broken);assert.throws(()=>wiring(broken),{name:'AssertionError'},id);}
     const ready={...state,status:'READY WITH DOCUMENTED LIMITATIONS',blockers:[]};requireReady(ready,pkg.version);
     const negativeControls=mutations.map(([id])=>({id,detected:true}));

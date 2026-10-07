@@ -448,47 +448,66 @@ jobs:
           fi
           echo "main_head=$main_head" >> "$GITHUB_OUTPUT"
 
+      - name: Create P4 promotion certificate
+        if: steps.premerge.outputs.eligible == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          MERGED_MAIN_SHA: ${{ steps.merged.outputs.main_head }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+        run: node scripts/ci/p4-promotion-evidence.mjs --produce
+
+      - name: Upload P4 promotion certificate
+        if: steps.premerge.outputs.eligible == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: generator-p4-promotion-${{ steps.merged.outputs.main_head }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: qa-results/p4-promotion-certificate.json
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Ensure production deployment runs on merged main
         if: steps.premerge.outputs.eligible == 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
           MAIN_HEAD: ${{ steps.merged.outputs.main_head }}
+          PROMOTION_ARTIFACT_NAME: generator-p4-promotion-${{ steps.merged.outputs.main_head }}-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           set -euo pipefail
+          expected_title="P4 deploy $MAIN_HEAD from promotion $GITHUB_RUN_ID.$GITHUB_RUN_ATTEMPT"
           find_run() {
-            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/runs?branch=main&per_page=20" --jq ".workflow_runs[] | select(.head_sha == \"$MAIN_HEAD\") | select(.event == \"push\" or .event == \"workflow_dispatch\") | .id" | head -n 1
+            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/runs?branch=main&event=workflow_dispatch&per_page=20" \
+              --jq ".workflow_runs[] | select(.head_sha == \"$MAIN_HEAD\") | select(.display_title == \"$expected_title\") | .id" | head -n 1
           }
 
+          test "$(git rev-parse origin/main)" = "$MAIN_HEAD"
+          gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main \
+            -f promotion_run_id="$GITHUB_RUN_ID" \
+            -f promotion_run_attempt="$GITHUB_RUN_ATTEMPT" \
+            -f promotion_artifact_name="$PROMOTION_ARTIFACT_NAME" \
+            -f certified_sha="$CERTIFIED_SHA" \
+            -f merged_main_sha="$MAIN_HEAD"
+
           deploy_run=""
-          for attempt in $(seq 1 6); do
+          for attempt in $(seq 1 60); do
             deploy_run="$(find_run)"
             if [ -n "$deploy_run" ]; then
               break
             fi
-            echo "Waiting for automatic deploy run for $MAIN_HEAD (attempt $attempt/6)."
+            echo "Waiting for exact P4 deploy run for $MAIN_HEAD (attempt $attempt/60)."
             sleep 5
           done
 
           if [ -z "$deploy_run" ]; then
-            echo "No automatic main deploy run detected; dispatching deploy.yml explicitly on main."
-            gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
-            for attempt in $(seq 1 60); do
-              deploy_run="$(find_run)"
-              if [ -n "$deploy_run" ]; then
-                break
-              fi
-              echo "Waiting for dispatched deploy run for $MAIN_HEAD (attempt $attempt/60)."
-              sleep 5
-            done
-          fi
-
-          if [ -z "$deploy_run" ]; then
-            echo "::error::Production deployment run did not appear for main SHA $MAIN_HEAD."
+            echo "::error::Exact P4 production deployment run did not appear for main SHA $MAIN_HEAD."
             exit 1
           fi
 
-          echo "Waiting for production deployment run $deploy_run on main $MAIN_HEAD."
+          echo "Waiting for P4 production deployment run $deploy_run on main $MAIN_HEAD."
           gh run watch "$deploy_run" --repo "$GITHUB_REPOSITORY" --exit-status
 
       - name: Synchronise candidate to promoted main when still safe

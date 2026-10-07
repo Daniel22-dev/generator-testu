@@ -23,9 +23,15 @@ export function validateRegressionCi({pkg,p5,deploy,runner,setup}){
   assert.ok(p5.includes('expected-sha: ${{ github.sha }}'));
   assert.match(p5,/name: p5-r2-\$\{\{ github\.sha \}\}/);
   assert.match(p5,/if-no-files-found: error/);
-  for(const path of ['qa-results/redteam-e*.json','qa-results/redteam-e9-*.json','qa-results/redteam-e9-negative/*.log','qa-results/redteam-e10-ci/*.log','audit/evidence/garp27-current/','dist/qa-p5-*.json'])for(const workflow of [p5,deploy])assert.ok(workflow.includes('            '+path),path+' must be retained');
-  assert.match(deploy,/run: npm run qa:redteam:ci/,'Deployment must require the same E9 admission');
-  assert.doesNotMatch(deploy,/^\s+run: npm run (?:qa:p5:ci|qa:garp27:foundation)$/m,'No second rebuild after certified chain');
+  for(const path of ['qa-results/redteam-e*.json','qa-results/redteam-e9-*.json','qa-results/redteam-e9-negative/*.log','qa-results/redteam-e10-ci/*.log','audit/evidence/garp27-current/','dist/qa-p5-*.json'])assert.ok(p5.includes('            '+path),path+' must be retained by independent P5');
+  for(const path of ['qa-results/p4-promotion-certificate.json','qa-results/p4-consumed-promotion-evidence.json','qa-results/premerge-p5/','dist/qa-p5-*.json'])assert.ok(deploy.includes('            '+path),path+' must be retained by P4 deploy');
+  assert.match(deploy,/run: node scripts\/ci\/main-protection.mjs --live/,'Deployment must recheck live main protection');
+  assert.match(deploy,/run: node scripts\/ci\/p4-promotion-evidence.mjs --consume/,'Deployment must verify exact-tree P4 evidence');
+  assert.match(deploy,/gh api \"repos\/\$GITHUB_REPOSITORY\/git\/ref\/heads\/main\" --jq '\.object\.sha'/,'Deployment must reread exact main immediately before Pages deploy');
+  assert.match(deploy,/if \[ \"\$current_main\" != \"\$EXPECTED_MAIN_SHA\" \]; then/,'Deployment must reject stale main before Pages deploy');
+  assert.match(deploy,/run: npm run build/,'Deployment must build authoritative merged main');
+  assert.doesNotMatch(deploy,/run: npm run qa:redteam:ci/,'Main must not repeat the certified E9 chain');
+  assert.doesNotMatch(deploy,/^\s+run: npm run (?:qa:p5:ci|qa:garp27:foundation)$/m,'No second destructive certification after exact-tree evidence reuse');
 }
 if(process.argv[1]?.endsWith('check-redteam-ci-e9.mjs')){
   const input={pkg:JSON.parse(fs.readFileSync('package.json')),p5:fs.readFileSync('.github/workflows/p5-release-gate.yml','utf8'),deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),runner:fs.readFileSync('scripts/run-redteam-ci-e10.mjs','utf8'),setup:readSetupSources()};
@@ -44,7 +50,7 @@ if(process.argv[1]?.endsWith('check-redteam-ci-e9.mjs')){
     ['unlocked-install',x=>x.setup.toolsRunner=x.setup.toolsRunner.replace("['npm', 'ci'","['npm', 'install'")],
     ['unbound-artifact',x=>x.p5=x.p5.replace('p5-r2-${{ github.sha }}','p5-r2-latest')],
     ['missing-evidence',x=>x.p5=x.p5.replace('            audit/evidence/garp27-current/','')],
-    ['deploy-bypass',x=>x.deploy=x.deploy.replace('run: npm run qa:redteam:ci','run: npm run qa:p5:ci')],
+    ['deploy-bypass',x=>x.deploy=x.deploy.replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume','run: true')],
   ];
   for(const [id,mutate] of mutations){const broken=structuredClone(input);mutate(broken);assert.throws(()=>validateRegressionCi(broken),{name:'AssertionError'},id);}
   fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/redteam-e9-ci-contract.json',JSON.stringify({stage:'E9',version:input.pkg.version,status:'PASS',scope:'Static wiring contract with 14 intentional mutations; actual process evidence is separate',negativeControls:mutations.map(([id])=>({id,detected:true}))},null,2)+'\n');
