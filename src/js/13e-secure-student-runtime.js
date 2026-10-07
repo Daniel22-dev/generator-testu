@@ -32,7 +32,7 @@ function buildSecureStudentHtml(publicCfg, encryptedContent) {
     '<label for="startCode">'+H(S.contentCodeLabel)+'</label><input id="startCode" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-describedby="startCodeHint"><div id="startCodeHint" class="small muted">'+H(S.contentCodeHint)+'</div>'+
     '<label for="studentName">'+(publicCfg.identityMode==='oneTimeCode'?H(S.individualCode):H(S.studentName))+'</label><input id="studentName" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="'+(publicCfg.identityMode==='oneTimeCode'?H(S.codePlaceholder):'')+'"><div class="row" style="margin-top:12px"><button onclick="startTest()">'+H(S.start)+'</button></div>'+
     '</section>'+
-    '<section id="test" class="hidden"><div class="bar"><b>'+H(publicCfg.nazev)+'</b><span id="timer">--:--</span></div><div id="a11yNote" class="a11y-note hidden"></div><div id="jokerWatermark" class="joker-watermark hidden"></div><div class="wrap"><div id="exerciseArea"></div><div class="card" id="secureSubmitCard"><div id="submitError" class="danger hidden"></div><button onclick="submitSecureTest()">'+H(submitSecureText)+'</button></div></div></section>'+
+    '<section id="test" class="hidden"><div class="bar"><b>'+H(publicCfg.nazev)+'</b><span id="timer">--:--</span></div><div id="a11yNote" class="a11y-note hidden"></div><div id="jokerWatermark" class="joker-watermark hidden"></div><div class="wrap"><div id="exerciseArea"></div><div class="card" id="secureSubmitCard"><div id="submitError" class="danger hidden"></div><button onclick="requestSecureSubmit()">'+H(submitSecureText)+'</button></div></div></section>'+
     '<section id="done" class="card hidden"><h1>'+H(S.done)+'</h1><div class="ok">'+H(doneText)+'</div><div id="jokerDoneBox" class="joker-result hidden"></div>'+formsBox+'<details id="answersFallback" class="archive-note"'+fallbackOpen+'><summary><b>'+H(formsEnabled ? (S.fallbackTitle || S.download) : S.download)+'</b></summary><div class="small muted" style="margin:8px 0">'+H(formsEnabled ? (S.fallbackHint || '') : '')+'</div><div class="row"><button onclick="downloadAnswers()">'+H(S.download)+'</button><button class="secondary" onclick="shareAnswers()">'+H(S.share)+'</button><button class="ghost" onclick="copyAnswers()">'+H(S.copyBackup)+'</button></div><textarea id="answerBackup" class="backup" readonly></textarea></details></section>'+
     '<div id="lockScreen" class="lockscreen hidden"><div class="lockbox"><h1 id="lockIcon" onclick="lockTap()" style="cursor:pointer;user-select:none;-webkit-user-select:none">🔒</h1><p><b>'+H(S.locked)+'</b></p><p id="lockContactMsg">'+H(S.lockContact||'Kontaktuj učitele.')+'</p><div id="unlockReveal" class="hidden"><p>'+H(S.lockedStrict)+'</p><div class="danger" id="lockReasonBox"></div><input id="unlockInp" type="password" placeholder="'+H(S.unlockPh)+'" autocomplete="off"><div class="row"><button onclick="tryUnlock()">'+H(S.unlock)+'</button></div></div></div></div>'+
     '</div>'+
@@ -48,7 +48,7 @@ function questionOrderSeed(base,ei){return base+ei*101;}
 function questionOrderFor(n,seed){const order=[];for(let k=0;k<n;k++)order.push(k);if(n<2)return order;const rnd=seededRandom(seed);for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const x=order[i];order[i]=order[j];order[j]=x;}return order;}
 `;
 function secureStudentScript(){return String.raw`
-let EXS=[],ACTIVE_KEY='__default',RESP={},STARTED_AT='',SUBMITTED_AT='',ANSWER_TXT='',SEC_EVENTS=[],CURRENT_DEVICE='auto',TIMER_ID=null,TIMER_DEADLINE=0,LOCKED=false,LOCK_REASON='',UNLOCK_BUSY=false,SUBMITTED=false,JOKER_CHOICE=null,JOKER_USED=false,JOKER_SELECTED_AT='',ATTEMPT_ID='',ACTIVE_IDENTITY_HASH='',ANSWER_CHANGE_STATS={},LAST_RESP_SERIAL={},LAST_CHANGE_TS={};
+let EXS=[],ACTIVE_KEY='__default',RESP={},STARTED_AT='',SUBMITTED_AT='',ANSWER_TXT='',SEC_EVENTS=[],CURRENT_DEVICE='auto',TIMER_ID=null,TIMER_DEADLINE=0,LOCKED=false,LOCK_REASON='',UNLOCK_BUSY=false,SUBMITTED=false,JOKER_CHOICE=null,JOKER_USED=false,JOKER_SELECTED_AT='',ATTEMPT_ID='',ACTIVE_IDENTITY_HASH='',ANSWER_CHANGE_STATS={},LAST_RESP_SERIAL={},LAST_CHANGE_TS={},SUBMIT_UI_ARMED_AT=0,TEST_INTERACTION_ARMED_AT=0;
 let A11Y=null,CONTENT_READY=false;
 `+SECURE_CRITICAL_HISTORY_JS+String.raw`
 async function unlockTestContent(){if(CONTENT_READY)return true;const input=$('startCode');try{const variants=await decryptStudentContent(ENCRYPTED_CONTENT,input&&input.value,CFG);Object.assign(STUDENT_VARIANTS,variants);CONTENT_READY=true;return true;}catch(_){sModal(t('contentCodeError'),t('contentCodeLabel'));if(input)input.focus();return false;}finally{if(input)input.value='';}}
@@ -173,7 +173,30 @@ function releaseAttemptTabLock(){if((typeof window!=='undefined'&&window.__GHRAB
 // recovers the same submission; it never creates a replacement attempt.
 async function saveSubmissionOutbox(){await saveSignedRecord('submissionOutbox',{v:2,attemptId:ATTEMPT_ID,identityHash:ACTIVE_IDENTITY_HASH,activeKey:ACTIVE_KEY,student:$('studentName').value.trim(),txt:ANSWER_TXT},++PERSIST_REV,true);}
 function showSubmissionAnswers(){SUBMITTED=true;clearTimeout(TIMER_ID);$('answerBackup').value=ANSWER_TXT;$('intro').classList.add('hidden');$('test').classList.add('hidden');$('lockScreen').classList.add('hidden');$('done').classList.remove('hidden');updateJokerUi();refreshSubmissionOptions();}
-async function restoreSubmissionOutbox(){var saved=await loadSignedRecord('submissionOutbox');if(saved.tamper){showActiveAttemptLocked();return true;}if(!saved.record)return false;var b=saved.record.body;if(b.v!==2||!b.attemptId||!b.identityHash||typeof b.student!=='string'||typeof b.txt!=='string'||b.txt.length>2097152||!b.txt.startsWith('SECURE-ANSWERS-V1\n')){PERSIST_INTEGRITY_BLOCK=true;showActiveAttemptLocked();return true;}var guard=await loadSignedRecord('attemptGuard'),g=guard.record&&guard.record.body;if(guard.tamper||(g&&(g.attemptId!==b.attemptId||g.identityHash!==b.identityHash||g.activeKey!==b.activeKey))){showActiveAttemptLocked();return true;}ATTEMPT_ID=b.attemptId;ACTIVE_IDENTITY_HASH=b.identityHash;ACTIVE_KEY=b.activeKey;ANSWER_TXT=b.txt;$('studentName').value=b.student;SUBMITTED=true;if(!(await setSubmittedLocked())){showActiveAttemptLocked();return true;}await clearActiveAttemptSeal(false);showSubmissionAnswers();return true;}
+function submissionOutboxMatchesIdentity(body,expectedStudent,expectedIdentityHash){
+  if(!body||!expectedIdentityHash||typeof body.student!=='string')return false;
+  return body.identityHash===expectedIdentityHash&&normRosterIdentity(body.student)===normRosterIdentity(expectedStudent);
+}
+function showSubmissionOutboxIdentityConflict(){
+  const cs=String(CFG.uiLang||'').toLowerCase()==='cs';
+  sModal(
+    cs?'V tomto profilu prohlížeče už je uložen dokončený pokus jiného studenta. Jeho odevzdání se nezobrazí. Použij jiné čisté zařízení/profil nebo kontaktuj učitele.':'This browser profile already contains a completed submission for another student. That submission will not be shown. Use another clean device/browser profile or contact your teacher.',
+    cs?'Dokončený pokus jiného studenta':'Completed attempt for another student'
+  );
+}
+async function restoreSubmissionOutbox(expectedStudent,expectedIdentityHash){
+  var saved=await loadSignedRecord('submissionOutbox');
+  if(saved.tamper){showActiveAttemptLocked();return true;}
+  if(!saved.record)return false;
+  var b=saved.record.body;
+  if(b.v!==2||!b.attemptId||!b.identityHash||typeof b.student!=='string'||typeof b.txt!=='string'||b.txt.length>2097152||!b.txt.startsWith('SECURE-ANSWERS-V1\n')){PERSIST_INTEGRITY_BLOCK=true;showActiveAttemptLocked();return true;}
+  if(!submissionOutboxMatchesIdentity(b,expectedStudent,expectedIdentityHash)){showSubmissionOutboxIdentityConflict();return true;}
+  var guard=await loadSignedRecord('attemptGuard'),g=guard.record&&guard.record.body;
+  if(guard.tamper||(g&&(g.attemptId!==b.attemptId||g.identityHash!==b.identityHash||g.activeKey!==b.activeKey))){showActiveAttemptLocked();return true;}
+  ATTEMPT_ID=b.attemptId;ACTIVE_IDENTITY_HASH=b.identityHash;ACTIVE_KEY=b.activeKey;ANSWER_TXT=b.txt;$('studentName').value=expectedStudent;SUBMITTED=true;
+  if(!(await setSubmittedLocked())){showActiveAttemptLocked();return true;}
+  await clearActiveAttemptSeal(false);showSubmissionAnswers();return true;
+}
 async function clearSubmittedLocked(){storageRemove('submitted');await idbDelete('attemptGuard');storageRemove('attemptGuard');PERSIST_INTEGRITY_BLOCK=false;return true;}
 function showSubmittedLocked(){
   var bd=document.createElement('div');
@@ -225,18 +248,18 @@ async function startTestAttempt(){
   const name=(CFG.identityMode==='oneTimeCode'?$('studentName').value.replace(/\s/g,'').toUpperCase():$('studentName').value.trim());
   $('studentName').value=name;
   if(!name){$('studentName').focus();return;}
-  if(await restoreSubmissionOutbox())return;
-  if(await submittedLocked()){showSubmittedLocked();return;}
   try{if(!(await identityAllowed(name))){sModal(identityCodeProblem(name)||t('invalidIdentityCode'),t('codeVerification'));$('studentName').focus();return;}}catch(err){sModal(String(err&&err.message?err.message:err),t('codeVerification'));return;}
-  var seal=await loadActiveAttemptSeal();
-  if(seal&&seal.__integrityFailure){showActiveAttemptLocked();return;}
   var identityHash='';
   try{identityHash=await activeAttemptIdentityHash(name);}catch(err){sModal(String(err&&err.message?err.message:err),t('codeVerification'));return;}
+  if(!(await unlockTestContent()))return;
+  if(await restoreSubmissionOutbox(name,identityHash))return;
+  if(await submittedLocked()){showSubmittedLocked();return;}
+  var seal=await loadActiveAttemptSeal();
+  if(seal&&seal.__integrityFailure){showActiveAttemptLocked();return;}
   if(seal&&seal.identityHash&&seal.identityHash!==identityHash){showActiveAttemptLocked();return;}
   if(!seal&&CFG.zolicek&&JOKER_CHOICE===null){sModal(t('jokerChoiceHint','Vyber před začátkem testu, zda píšeš test, nebo bereš žolíka.'),t('jokerChoiceTitle'));return;}
   if(!checkDevice(false))return;
   if(!seal&&CFG.zolicek&&JOKER_CHOICE===true){if(!(await confirmJokerCommit()))return;}
-  if(!(await unlockTestContent()))return;
   try{ACTIVE_KEY=await chooseVariant(name);}catch(err){sModal(String(err&&err.message?err.message:err),t('differentiatedTest'));return;}
   if((CFG.diffGroups||[]).length&&!ACTIVE_KEY){sModal(t('unassignedIdentity'),t('differentiatedTest'));$('studentName').focus();return;}
   if(seal&&seal.activeKey&&seal.activeKey!==ACTIVE_KEY){showActiveAttemptLocked();return;}
@@ -265,13 +288,13 @@ async function startTestAttempt(){
   restoreRuntimeAudit(seal);if(seal&&CFG.lockOnLeave){var wasLocked=LOCKED;LOCKED=true;LOCK_REASON=LOCK_REASON||'attempt resumed after reload';if(!wasLocked)recordSec('locked',LOCK_REASON);}
   prepareSecureTimerDeadline();
   if(!(await persistActiveAttemptSeal())){ACTIVE_IDENTITY_HASH='';ATTEMPT_ID='';STARTED_AT='';TIMER_DEADLINE=0;SEC_EVENTS=[];LOCKED=false;LOCK_REASON='';if(!seal)JOKER_SELECTED_AT='';sModal(t('activeAttemptStorageError','Test nelze bezpečně zahájit, protože prohlížeč nepovolil místní uložení stavu pokusu. Povol úložiště webu nebo použij jiné zařízení.'),t('activeAttemptTitle','Rozpracovaný pokus je uzamčen'));return;}
-  renderTest();restoreResponseUi();applyRuntimeRandomization();$('intro').classList.add('hidden');$('test').classList.remove('hidden');updateJokerUi();startTimer();startSplitMonitor();
-  if(LOCKED){const r=$('lockReasonBox');if(r)r.textContent=t('lockReason','Důvod')+': '+(LOCK_REASON||t('lockedEvent','opuštění okna/aplikace'));$('lockScreen').classList.remove('hidden');applyGuardUi(true);}
+  renderTest();restoreResponseUi();applyRuntimeRandomization();$('intro').classList.add('hidden');$('test').classList.remove('hidden');updateJokerUi();resetTestScrollAfterStart();armSecureStartInteractionGuard();armSecureSubmitButton();startTimer();if(isTestActive())startSplitMonitor();
+  if(LOCKED&&isTestActive()){const r=$('lockReasonBox');if(r)r.textContent=t('lockReason','Důvod')+': '+(LOCK_REASON||t('lockedEvent','opuštění okna/aplikace'));$('lockScreen').classList.remove('hidden');applyGuardUi(true);}
   if(seal)handleReturn();if(document.wasDiscarded)recordSec('page-discarded','browser discarded/recreated page');
 }
 function secureTimerLimitSeconds(){const base=Math.max(1,Number(CFG.cas)||45)*60;return A11Y&&A11Y.timeMult>1?Math.round(base*A11Y.timeMult):base;}
 function prepareSecureTimerDeadline(){if(A11Y&&A11Y.noLimit){TIMER_DEADLINE=0;return;}if(Number(TIMER_DEADLINE)>0)return;var startMs=Date.parse(STARTED_AT)||Date.now();TIMER_DEADLINE=startMs+secureTimerLimitSeconds()*1000;}
-function refreshSecureTimer(){if(SUBMITTED)return false;const el=$('timer');if(A11Y&&A11Y.noLimit){if(el)el.textContent='∞';return true;}const remain=Math.max(0,Math.ceil((TIMER_DEADLINE-Date.now())/1000));if(el){const m=Math.floor(remain/60),sec=remain%60;el.textContent=String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}if(remain<=0){submitSecureTest();return false;}return true;}
+function refreshSecureTimer(){if(SUBMITTED)return false;const el=$('timer');if(A11Y&&A11Y.noLimit){if(el)el.textContent='∞';return true;}const remain=Math.max(0,Math.ceil((TIMER_DEADLINE-Date.now())/1000));if(el){const m=Math.floor(remain/60),sec=remain%60;el.textContent=String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}if(remain<=0){submitSecureTest('timer-expired');return false;}return true;}
 function startTimer(){prepareSecureTimerDeadline();persistActiveAttemptSeal();clearTimeout(TIMER_ID);const tick=()=>{if(!refreshSecureTimer())return;TIMER_ID=setTimeout(tick,1000);};tick();}
 function isTestActive(){return $('test')&&!$('test').classList.contains('hidden')&&!SUBMITTED;}
 function isTestRunning(){return isTestActive()&&!LOCKED;}
@@ -389,10 +412,19 @@ function formsPayloadLimit(){var n=Number(CFG.formsPayloadSafeChars)||24000;retu
 function formsSubmissionReady(){return !!safeFormsSubmissionUrl()&&!!ANSWER_TXT&&ANSWER_TXT.length<=formsPayloadLimit();}
 function setFormsSubmitStatus(message,kind){var el=$('formsSubmitStatus');if(!el)return;el.textContent=String(message||'');el.className=(kind==='ok'?'small forms-status-ok':'small muted');}
 function refreshSubmissionOptions(){var configured=!!safeFormsSubmissionUrl();var tooLong=configured&&!!ANSWER_TXT&&ANSWER_TXT.length>formsPayloadLimit();var box=$('formsSubmissionBox');if(box)box.classList.toggle('hidden',!configured||tooLong);var warn=$('formsPayloadWarning');if(warn){warn.textContent=tooLong?t('formsTooLong','This result is too long for reliable form submission. Use answers.txt.'):'';warn.classList.toggle('hidden',!tooLong);}var fallback=$('answersFallback');if(fallback&&(tooLong||!configured))fallback.open=true;return configured&&!tooLong;}
+function resetTestScrollAfterStart(){var go=function(){try{window.scrollTo({top:0,left:0,behavior:'auto'});}catch(_){try{window.scrollTo(0,0);}catch(__){}}};go();if(typeof requestAnimationFrame==='function')requestAnimationFrame(go);else setTimeout(go,0);}
+function armSecureStartInteractionGuard(){TEST_INTERACTION_ARMED_AT=Date.now()+900;}
+function blockStartTransitionInteraction(e){if(!isTestActive()||Date.now()>=TEST_INTERACTION_ARMED_AT)return;if(e&&typeof e.preventDefault==='function')e.preventDefault();if(e&&typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();else if(e&&typeof e.stopPropagation==='function')e.stopPropagation();}
+document.addEventListener('click',blockStartTransitionInteraction,true);
+function armSecureSubmitButton(){SUBMIT_UI_ARMED_AT=Date.now()+1200;var card=$('secureSubmitCard'),btn=card&&card.querySelector('button');if(!btn)return;btn.disabled=true;setTimeout(function(){if(!SUBMITTED&&isTestActive())btn.disabled=false;},1250);}
+function responseHasValue(v){if(v===false||v===0)return true;if(v==null)return false;if(typeof v==='string')return v.trim()!=='';if(Array.isArray(v))return v.some(responseHasValue);if(typeof v==='object')return Object.keys(v).some(function(k){return responseHasValue(v[k]);});return true;}
+function secureResponseProgress(){var ids=[];document.querySelectorAll('[data-qid]').forEach(function(el){var id=String(el.dataset.qid||'');if(id&&ids.indexOf(id)===-1)ids.push(id);});var answered=ids.filter(function(id){return responseHasValue(RESP[id]);}).length;return {answered:answered,total:ids.length,unanswered:Math.max(0,ids.length-answered)};}
+async function requestSecureSubmit(){if(!isTestActive()||SUBMITTED)return false;if(Date.now()<SUBMIT_UI_ARMED_AT)return false;var p=secureResponseProgress(),msg=p.unanswered>0?(String(p.unanswered)+' '+t('unansweredZero','questions will be marked as 0 points.')+' '+t('ruleFinal','You cannot change answers after submitting.')):t('ruleFinal','You cannot change answers after submitting.');var ok=await sConfirm(msg,t('submitTitle','Submit test?'),t('yesSubmit','Yes, submit'),t('back','Back'));if(!ok)return false;await submitSecureTest();return true;}
 async function copyTextSafe(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(String(text||''));return true;}}catch(_){}var ta=$('answerBackup');if(!ta)return false;ta.value=String(text||'');ta.focus();ta.select();try{return document.execCommand('copy')!==false;}catch(_){return false;}}
 async function copySubmissionPayload(){if(!ANSWER_TXT)return;var ok=await copyTextSafe(ANSWER_TXT);if(ok)setFormsSubmitStatus(t('formsCopied','Submission code copied.'),'ok');else setFormsSubmitStatus(t('copyBackup','Copy backup')+': '+t('unavailable','unavailable'),'');}
 function openSubmissionForm(){var url=formsOpenUrl();if(!url){setFormsSubmitStatus(t('unavailable','unavailable'),'');return;}var opened=null;try{opened=window.open(url,'_blank','noopener,noreferrer');}catch(_){}if(opened){try{opened.opener=null;}catch(_){}setFormsSubmitStatus(t('formsOpened','Form opened.'),'ok');return;}try{window.location.href=url;}catch(_){setFormsSubmitStatus(t('unavailable','unavailable'),'');}}
-async function submitSecureTest(){if($('test').classList.contains('hidden')||SUBMITTED)return;var outboxSaved=false;try{SUBMITTED=true;clearTimeout(TIMER_ID);const payload=await secureAnswers();const packed=await encryptPayloadForTeacher(payload);ANSWER_TXT='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:CFG.testId,creatorId:CFG.creatorId||'',generatorVersion:CFG.generatorVersion||'',buildStatus:CFG.releaseStatus||'',resultMode:'secureOffline',manifestHash:CFG.manifestHash,studentHtmlSha256:payload.studentHtmlSha256||'',createdAt:new Date().toISOString(),payload:packed},null,2);await flushPendingAttemptWrites();await saveSubmissionOutbox();outboxSaved=true;if(!(await setSubmittedLocked()))throw new Error('Could not persist submitted-attempt guard. Reload to recover the saved result.');await clearActiveAttemptSeal(false);showSubmissionAnswers();releaseAttemptTabLock();if(!refreshSubmissionOptions())downloadAnswers();}catch(e){const el=$('submitError');if(outboxSaved){showSubmissionAnswers();releaseAttemptTabLock();sModal(String(e&&e.message?e.message:e),t('retryTitle'));}else{SUBMITTED=false;ANSWER_TXT='';startSplitMonitor();TIMER_ID=setTimeout(startTimer,1000);if(el){el.textContent=String(e&&e.message?e.message:e);el.classList.remove('hidden');}else{console.error(e);}}}}
+function showTimerExpiredNotice(){var start='';try{if(STARTED_AT)start=new Date(STARTED_AT).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}catch(_){}var msg=t('timerExpiredBody','The time for this attempt has expired. The test was submitted automatically.');if(start)msg+=' '+t('timerExpiredStarted','Attempt started at')+' '+start+'.';sModal(msg,t('timerExpiredTitle','Time expired'));}
+async function submitSecureTest(reason){if($('test').classList.contains('hidden')||SUBMITTED)return;var outboxSaved=false;try{SUBMITTED=true;clearTimeout(TIMER_ID);const payload=await secureAnswers();const packed=await encryptPayloadForTeacher(payload);ANSWER_TXT='SECURE-ANSWERS-V1\n'+JSON.stringify({testId:CFG.testId,creatorId:CFG.creatorId||'',generatorVersion:CFG.generatorVersion||'',buildStatus:CFG.releaseStatus||'',resultMode:'secureOffline',manifestHash:CFG.manifestHash,studentHtmlSha256:payload.studentHtmlSha256||'',createdAt:new Date().toISOString(),payload:packed},null,2);await flushPendingAttemptWrites();await saveSubmissionOutbox();outboxSaved=true;if(!(await setSubmittedLocked()))throw new Error('Could not persist submitted-attempt guard. Reload to recover the saved result.');await clearActiveAttemptSeal(false);showSubmissionAnswers();releaseAttemptTabLock();if(reason==='timer-expired')showTimerExpiredNotice();if(!refreshSubmissionOptions())downloadAnswers();}catch(e){const el=$('submitError');if(outboxSaved){showSubmissionAnswers();releaseAttemptTabLock();sModal(String(e&&e.message?e.message:e),t('retryTitle'));}else{SUBMITTED=false;ANSWER_TXT='';startSplitMonitor();TIMER_ID=setTimeout(startTimer,1000);if(el){el.textContent=String(e&&e.message?e.message:e);el.classList.remove('hidden');}else{console.error(e);}}}}
 function downloadAnswers(){if(!ANSWER_TXT)return;const name=($('studentName').value.trim()||'student').replace(/[^a-z0-9_-]+/gi,'-');const att=(ATTEMPT_ID||'').replace(/[^a-z0-9_-]+/gi,'-');const blob=new Blob([ANSWER_TXT],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='answers_'+CFG.testId+'_'+name+(att?'_'+att:'')+'.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 async function shareAnswers(){if(!ANSWER_TXT)return;const name=($('studentName').value.trim()||'student').replace(/[^a-z0-9_-]+/gi,'-');const att=(ATTEMPT_ID||'').replace(/[^a-z0-9_-]+/gi,'-');try{if(navigator.share&&typeof File!=='undefined'){const file=new File([ANSWER_TXT],'answers_'+CFG.testId+'_'+name+(att?'_'+att:'')+'.txt',{type:'text/plain'});if(!navigator.canShare||navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'answers.txt'});return;}}}catch(e){}await copyAnswers();}
 async function copyAnswers(){if(!ANSWER_TXT)return;await copyTextSafe(ANSWER_TXT);}

@@ -10,6 +10,8 @@ const preview = fs.readFileSync('src/features/preview-editor.js', 'utf8');
 const shell = fs.readFileSync('src/shell.html', 'utf8');
 const anchors = fs.readFileSync('src/js/13ee-secure-verifier-anchors.js', 'utf8');
 const suitability = fs.readFileSync('src/js/05c-exercise-suitability.js', 'utf8');
+const lab = fs.readFileSync('src/js/10-testlab.js', 'utf8');
+const styles = fs.readFileSync('src/styles.css', 'utf8');
 
 let failed = 0;
 const pass = (m) => console.log('PASS ' + m);
@@ -43,6 +45,23 @@ need(preview, /function destroyPreviewFrame\([\s\S]*parentNode\.removeChild/, 'T
 !/id=["']previewFrame["']/.test(shell) ? pass('Preview shell does not ship a reusable iframe browsing context') : fail('Preview shell must create iframe only on demand');
 need(secure, /function acquireAttemptTabLock\(\)[\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return true/, 'Secure runtime bypasses cross-tab locking only in explicit teacher preview');
 need(secure, /function handleLeave\([\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return/, 'Teacher preview cannot trigger the real leave-test lock');
+need(secure, /function submissionOutboxMatchesIdentity\([\s\S]*body\.identityHash===expectedIdentityHash[\s\S]*normRosterIdentity\(body\.student\)===normRosterIdentity\(expectedStudent\)/, 'Completed submission outbox is cryptographically bound to the currently entered identity');
+need(secure, /function startTestAttempt\([\s\S]*identityAllowed\(name\)[\s\S]*activeAttemptIdentityHash\(name\)[\s\S]*unlockTestContent\(\)[\s\S]*restoreSubmissionOutbox\(name,identityHash\)[\s\S]*submittedLocked\(\)/, 'Start flow validates identity and start code before any completed outbox can be restored');
+need(secure, /function restoreSubmissionOutbox\(expectedStudent,expectedIdentityHash\)[\s\S]*submissionOutboxMatchesIdentity[\s\S]*showSubmissionOutboxIdentityConflict[\s\S]*ANSWER_TXT=b\.txt/, 'Foreign completed outbox is blocked before ciphertext is assigned to the UI');
+need(secure, /onclick=["']requestSecureSubmit\(\)["'][\s\S]*async function requestSecureSubmit\(\)[\s\S]*sConfirm\([\s\S]*await submitSecureTest\(\)/, 'Manual secure submission is routed through explicit confirmation');
+need(secure, /function armSecureStartInteractionGuard\(\)[\s\S]*TEST_INTERACTION_ARMED_AT[\s\S]*function blockStartTransitionInteraction\(e\)[\s\S]*stopImmediatePropagation/, 'Fresh-start interaction guard blocks click-through into test controls');
+need(secure, /function resetTestScrollAfterStart\(\)[\s\S]*scrollTo[\s\S]*armSecureStartInteractionGuard\(\)[\s\S]*armSecureSubmitButton\(\)/, 'Fresh-start transition resets scroll before interaction is armed');
+need(secure, /function refreshSecureTimer\(\)[\s\S]*submitSecureTest\(['"]timer-expired['"]\)[\s\S]*function showTimerExpiredNotice\(\)[\s\S]*submitted automatically/, 'Expired attempts preserve automatic submission and explain the reason');
+need(secure, /startTimer\(\);if\(isTestActive\(\)\)startSplitMonitor\(\)[\s\S]*if\(LOCKED&&isTestActive\(\)\)/, 'Expired resume cannot re-arm split monitoring or lock UI after auto-submit starts');
+need(secure, /function handlePageRestore\(event\)[\s\S]*restoreSubmissionOutbox\(\(\$\('studentName'\)[\s\S]*ACTIVE_IDENTITY_HASH\)/, 'BFCache/pageshow outbox recovery preserves the current identity binding');
+need(secure, /function storageGet\(kind\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return null/, 'Teacher preview cannot read persistent submitted/outbox state');
+need(secure, /async function submittedLocked\(\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return false/, 'Teacher preview never inherits a submitted lock');
+need(lab, /function downloadTargetContext\([\s\S]*window\.top\.location\.origin===window\.location\.origin[\s\S]*targetDocument=window\.top\.document/, 'Downloads are promoted to the same-origin AI Studio top-level context when embedded');
+need(shell, /Roster a kódy zůstávají jen v paměti právě otevřené relace GIT[\s\S]*Otevřít samostatně/, 'Roster UI explains that standalone opens a new in-memory preparation session');
+need(shell, /ui-modal generator-settings-dialog/, 'Generator settings uses the dedicated large responsive dialog');
+need(styles, /#generatorSettingsModal \.generator-settings-dialog \{ width:min\(1120px,calc\(100vw - 48px\)\)/, 'Generator settings expands on desktop without affecting other modals');
+need(anchors, /Řízení testovací hodiny[\s\S]*formsLessonState[\s\S]*Startovací kód pro studenty[\s\S]*forms-lesson-tech/, 'Verifier lesson controls group START/END, start code and collapsed technical URL');
+
 need(shell, /Kontrola celé sady cvičení[\s\S]*Vhodnost vybraných cvičení k podkladu/, 'Suitability panel clearly scopes itself to all selected exercises');
 need(shell, /Jak odpovídá student\?[\s\S]*vybírá odpověď z nabízených možností/, 'Reading setup explicitly explains the student answer format');
 need(suitability, /suitability-card[\s\S]*suitability-status[\s\S]*suitability-suggestion/, 'AI suitability result uses structured status cards');
