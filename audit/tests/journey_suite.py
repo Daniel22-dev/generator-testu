@@ -476,9 +476,11 @@ try:
     assert summary['otherTests']==size-current,(size,summary)
     # The benchmark intentionally repeats the same TEST-A payload. In 7.1.97 those repeats
     # are explicitly rejected as duplicate/replay rows rather than counted as clean results.
-    assert summary['ok']==1,(size,summary)
-    assert summary['replayRejected']==current-1,(size,current,summary)
-    assert summary['invalid']>=current-1,(size,summary)
+    # After the first batch, the first TEST-A row is itself a duplicate of the prior batch.
+    expected_ok=1 if not perf else 0
+    assert summary['ok']==expected_ok,(size,summary)
+    assert summary['replayRejected']==current-expected_ok,(size,current,summary)
+    assert summary['invalid']>=current-expected_ok,(size,summary)
     assert hb>0,('large CSV import must yield to browser event loop',size,hb)
     perf.append({'rows':size,'seconds':elapsed,'heartbeat':hb,'heapMiB':heap})
   finally:
