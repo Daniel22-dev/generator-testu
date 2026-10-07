@@ -83,6 +83,11 @@ function renderStartCode(){
   if(!generatedPackage||!generatedPackage.startCode)return;
   box=document.createElement('div');box.id='privateStartCode';box.className='note warn';
   box.textContent='Startovní kód: '+generatedPackage.startCode+' — ukaž až při zahájení. Není to odemykací kód třídy. Kód je také v soukromém verifieru. Studentský soubor zveřejni co nejpozději.';
+  if(generatedPackage.lessonStartUrl){
+    const links=document.createElement('div');links.className='row';
+    for(const [label,key] of [['Začít příjem teď','lessonStartUrl'],['Ukončit příjem teď','lessonEndUrl']]){const a=document.createElement('a');a.href=generatedPackage[key];a.textContent=label;a.target='_blank';a.rel='noopener noreferrer';a.className='btn';links.appendChild(a);}
+    box.appendChild(links);const label=document.createElement('label');label.textContent='Odkaz pro zahájení z telefonu (otevři a odešli pod učitelským účtem):';const input=document.createElement('input');input.value=generatedPackage.lessonStartUrl;input.readOnly=true;input.style.width='100%';input.addEventListener('click',()=>input.select());label.appendChild(input);box.appendChild(label);
+  }
   $('qualityPanel').insertAdjacentElement('beforebegin',box);
 }
 // ── Didaktická kontrola po vygenerování (pravidlová, BOD 5–8 + 15) ─────────────
