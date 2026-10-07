@@ -429,11 +429,16 @@ try:
   va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va,stu_a['publishedAt']);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
   ta=va.evaluate('document.body.innerText')
   assert 'alpha@example.invalid' in ta and 'beta@example.invalid' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
-  assert va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&r.validationCodes.includes('binding.forms-metadata'))"),'tampered Forms metadata must be rejected before scoring'
+  # 7.1.97 / F4: descriptive Forms metadata is advisory only. It must surface as a warning,
+  # never as the old binding.forms-metadata rejection. Security binding stays in the encrypted payload.
+  assert not va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&r.validationCodes.includes('binding.forms-metadata'))"),'metadata mismatch must not be a hard rejection'
+  assert va.evaluate("RESULTS.some(r=>Array.isArray(r.metadataMismatch)&&r.metadataMismatch.length)"),'tampered Forms metadata must remain visible as a warning'
   assert va.evaluate('RESULTS.some(r=>r.hardReplayConflict)'),('distinct attempts must retain replay rejection',ta[-1000:])
-  assert re.search(r'jiné testy\s+1',ta,re.I),('full CSV must classify TEST-B as another test',ta[:1000])
-  assert re.search(r'neplatné/poškozené\s+2',ta,re.I),('corrupt payload and altered metadata must both be invalid',ta[:1000])
-  assert re.search(r'Duplicity:\s*[1-9]',ta),('identical payload must be duplicate',ta[:1000])
+  summary_a=va.evaluate("()=>({...LAST_FORMS_IMPORT})")
+  assert summary_a['otherTests']==1,('full CSV must classify TEST-B as another test',summary_a)
+  assert summary_a['replayRejected']>=2,('duplicate/replay rows must stay rejected',summary_a)
+  assert va.evaluate("RESULTS.some(r=>r.exactDuplicate)"),('identical payload must be duplicate',summary_a)
+  assert va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&!r.exactDuplicate&&!r.hardReplayConflict)"),('corrupt payload must remain invalid',summary_a)
   va.evaluate("()=>{const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate);chooseAttemptByDigest(r.submissionDigest)}")
   va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await __readDownloadText(-1)")
   assert len(res_csv.splitlines())==1,('manual selection must not classify replay-rejected submissions',res_csv)
@@ -444,7 +449,8 @@ try:
   vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vb,stu_b['publishedAt']);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
   tb=vb.evaluate('document.body.innerText')
   assert 'beta@example.invalid' in tb and 'alpha@example.invalid' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
-  assert re.search(r'jiné testy\s+[1-9]',tb,re.I),('verifier B must classify TEST-A rows as other tests',tb[:1000])
+  summary_b=vb.evaluate("()=>({...LAST_FORMS_IMPORT})")
+  assert summary_b['otherTests']>=1,('verifier B must classify TEST-A rows as other tests',summary_b)
   vb.close()
 
   # Real-browser long-run benchmark: actual verifier + WebCrypto + yielding UI.
@@ -461,13 +467,18 @@ try:
     bf=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);bf.write(big.getvalue());bf.close()
     va2.evaluate("()=>{clearInterval(window.__formsHbTimer);window.__formsHb=0;window.__formsHbTimer=setInterval(()=>window.__formsHb++,25)}")
     t0=time.time();va2.set_input_files('#formsCsvFile',bf.name)
-    va2.wait_for_function("(n)=>document.getElementById('formsImportSummary').innerText.includes('načteno '+n)",arg=size,timeout=180000)
+    va2.wait_for_function("(n)=>!!LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===n&&!LAST_FORMS_IMPORT.waitingForWindow",arg=size,timeout=180000)
     elapsed=round(time.time()-t0,3);txt=va2.locator('#formsImportSummary').inner_text()
+    summary=va2.evaluate("()=>({...LAST_FORMS_IMPORT,duplicates:{...LAST_FORMS_IMPORT.duplicates}})")
     hb=va2.evaluate("()=>{clearInterval(window.__formsHbTimer);return window.__formsHb}")
     heap=va2.evaluate("()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null")
-    assert re.search(r'opravené výsledky tohoto testu(?:\s+\([^)]*\))?\s+'+str(current)+r'\b',txt,re.I),(size,current,txt)
-    assert re.search(r'jiné testy\s+'+str(size-current)+r'\b',txt,re.I),(size,txt)
-    assert 'neplatné/poškozené 0' in txt,(size,txt)
+    assert summary['current']==current,(size,current,summary)
+    assert summary['otherTests']==size-current,(size,summary)
+    # The benchmark intentionally repeats the same TEST-A payload. In 7.1.97 those repeats
+    # are explicitly rejected as duplicate/replay rows rather than counted as clean results.
+    assert summary['ok']==1,(size,summary)
+    assert summary['replayRejected']==current-1,(size,current,summary)
+    assert summary['invalid']>=current-1,(size,summary)
     assert hb>0,('large CSV import must yield to browser event loop',size,hb)
     perf.append({'rows':size,'seconds':elapsed,'heartbeat':hb,'heapMiB':heap})
   finally:
