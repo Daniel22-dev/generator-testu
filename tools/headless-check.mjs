@@ -286,7 +286,7 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
   try{
     const tw=teacherDom.window;
     if(!tw.document.getElementById('formsCsvFile')) throw new Error('chybí CSV import ovladač');
-    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'E-mailová adresa',timestampHeader:'Časové razítko',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
+    await tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'E-mailová adresa',timestampHeader:'Časové razítko',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
     const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
     const currentPack=JSON.parse(stage3Fixture.answerTxt.replace(/^SECURE-ANSWERS-V1\s*/,''));
     const bad='SECURE-ANSWERS-V1\n'+JSON.stringify({...currentPack,payload:{mode:'encrypted',key:'x',iv:'x',data:'x'}});
@@ -299,12 +299,12 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
     if(parsed.delimiter!==','||parsed.identityIndex!==1||parsed.timestampIndex!==0) throw new Error('detekce Google Forms CSV');
     const summary=await tw.importFormsCsvText(csv,'forms-export.csv');
     const results=tw.eval('RESULTS');
-    if(summary.rows!==4||summary.ok!==2||summary.missing!==1||summary.invalid!==1||summary.otherTests!==0||summary.ambiguous!==0) throw new Error('špatný import summary '+JSON.stringify(summary));
+    /* 7.1.97: ok excludes the rejected exact duplicate; invalid = duplicate + missing payload + bad payload */if(summary.rows!==4||summary.ok!==1||summary.missing!==1||summary.invalid!==3||summary.replayRejected!==1||summary.otherTests!==0||summary.ambiguous!==0) throw new Error('špatný import summary '+JSON.stringify(summary));
     if(summary.duplicates.exact!==1||summary.duplicates.conflicts!==0) throw new Error('duplicity nebyly zachyceny');
     if(results.length!==4||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student@example.invalid'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
     if(!results[1].exactDuplicate) throw new Error('identická duplicita nebyla označena');
     if(results.slice(2).some(r=>r.status!=='CHYBA')) throw new Error('odmítnuté řádky musí zůstat v diagnostice');
-    tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
+    /* 7.1.97: new CSV language = new session; settings changes re-evaluate loaded CSV instead of clearing it */tw.clearVerifierResults();await tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
     const semi='Timestamp;Email Address;Result\n'+[q('x'),q('student-two'),q(stage3Fixture.answerTxt)].join(';')+'\n';
     const p2=tw.parseFormsCsvText(semi);
     if(p2.delimiter!==';'||p2.identityIndex!==1) throw new Error('středníkový CSV export');
