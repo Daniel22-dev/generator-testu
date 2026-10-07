@@ -74,7 +74,7 @@ jobs:
           PROMOTION_RUN_ATTEMPT: ${{ inputs.promotion_run_attempt }}
           PROMOTION_ARTIFACT_NAME: ${{ inputs.promotion_artifact_name }}
           P4_REUSE_DIR: ${{ runner.temp }}/git-p4-reused-evidence
-          GARP27_EXTERNAL_TRUST_SHA256: 2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1
+          GARP27_EXTERNAL_TRUST_SHA256: 831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896
         run: node scripts/ci/p4-promotion-evidence.mjs --consume
 
       - name: Install independently verified CI tools
