@@ -288,8 +288,8 @@ async function startTestAttempt(){
   restoreRuntimeAudit(seal);if(seal&&CFG.lockOnLeave){var wasLocked=LOCKED;LOCKED=true;LOCK_REASON=LOCK_REASON||'attempt resumed after reload';if(!wasLocked)recordSec('locked',LOCK_REASON);}
   prepareSecureTimerDeadline();
   if(!(await persistActiveAttemptSeal())){ACTIVE_IDENTITY_HASH='';ATTEMPT_ID='';STARTED_AT='';TIMER_DEADLINE=0;SEC_EVENTS=[];LOCKED=false;LOCK_REASON='';if(!seal)JOKER_SELECTED_AT='';sModal(t('activeAttemptStorageError','Test nelze bezpečně zahájit, protože prohlížeč nepovolil místní uložení stavu pokusu. Povol úložiště webu nebo použij jiné zařízení.'),t('activeAttemptTitle','Rozpracovaný pokus je uzamčen'));return;}
-  renderTest();restoreResponseUi();applyRuntimeRandomization();$('intro').classList.add('hidden');$('test').classList.remove('hidden');updateJokerUi();resetTestScrollAfterStart();armSecureStartInteractionGuard();armSecureSubmitButton();startTimer();startSplitMonitor();
-  if(LOCKED){const r=$('lockReasonBox');if(r)r.textContent=t('lockReason','Důvod')+': '+(LOCK_REASON||t('lockedEvent','opuštění okna/aplikace'));$('lockScreen').classList.remove('hidden');applyGuardUi(true);}
+  renderTest();restoreResponseUi();applyRuntimeRandomization();$('intro').classList.add('hidden');$('test').classList.remove('hidden');updateJokerUi();resetTestScrollAfterStart();armSecureStartInteractionGuard();armSecureSubmitButton();startTimer();if(isTestActive())startSplitMonitor();
+  if(LOCKED&&isTestActive()){const r=$('lockReasonBox');if(r)r.textContent=t('lockReason','Důvod')+': '+(LOCK_REASON||t('lockedEvent','opuštění okna/aplikace'));$('lockScreen').classList.remove('hidden');applyGuardUi(true);}
   if(seal)handleReturn();if(document.wasDiscarded)recordSec('page-discarded','browser discarded/recreated page');
 }
 function secureTimerLimitSeconds(){const base=Math.max(1,Number(CFG.cas)||45)*60;return A11Y&&A11Y.timeMult>1?Math.round(base*A11Y.timeMult):base;}
