@@ -27,7 +27,7 @@ export function checkLocal(root = process.cwd()) {
   assert.equal(profile.toolchain.pythonRequirements, 'audit/requirements-audit.txt');
   assert.equal(profile.trustInputs.length, 1); const trust = profile.trustInputs[0];
   assert.equal(trust.environment, 'GARP27_EXTERNAL_TRUST_SHA256');
-  assert.equal(trust.sha256, '2444648deccb7b4693ac8ad7ce72d0adffddd30ba9eeea4d3628d014faacebc1');
+  assert.equal(trust.sha256, '831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896');
   const pkg = readJson(root, 'package.json'), lock = readJson(root, profile.toolchain.npmLockfile);
   assert.equal(pkg.name, 'generator-testu'); assert.equal(lock.version, pkg.version);
   assert.equal(pkg.devDependencies.playwright, profile.toolchain.playwright); assert.equal(pkg.devDependencies['axe-core'], profile.toolchain.axe);
