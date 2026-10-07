@@ -10,31 +10,66 @@ function b64UrlVerifier(buf){var bin='',bytes=new Uint8Array(buf);for(var i=0;i<
 async function verifierRosterHash(value){if(!(crypto&&crypto.subtle&&window.TextEncoder))throw new Error('Verifier nema WebCrypto pro kontrolu varianty.');var input='GIT-DIFF-ROSTER-V1|'+String(CONFIG.diffRosterSalt||'')+'|'+normBindingIdentity(value);var dig=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input));return b64UrlVerifier(dig);}
 function verifierRosterCodeExists(value){if((CONFIG.identityMode||'name')!=='oneTimeCode'||!(CONFIG.roster||[]).length)return true;var code=String(value||'').trim().toUpperCase();return (CONFIG.roster||[]).some(function(e){return e&&String(e.code||'').trim().toUpperCase()===code;});}
 async function payloadBindingError(payload){if(String(payload.identityMode||CONFIG.identityMode||'name')!==String(CONFIG.identityMode||'name'))return 'Payload ma jiny rezim identity nez tento test.';var claimed=String(payload.groupKey||'__default');if(!Object.prototype.hasOwnProperty.call(VARIANTS_FULL,claimed))return 'Payload uvadi neexistujici variantu: '+claimed+'.';var ident=(CONFIG.identityMode==='oneTimeCode')?String(payload.code||payload.student||''):String(payload.student||'');if(CONFIG.identityMode==='oneTimeCode'&&!verifierRosterCodeExists(ident))return 'Jednorazovy kod neni v rosteru tohoto testu.';var groups=CONFIG.diffGroups||[];if(!groups.length)return claimed==='__default'?'':'Payload uvadi variantu, ale tento test neni diferencovany.';if(!ident)return 'Payload nema identitu potrebnou pro overeni varianty.';var h=await verifierRosterHash(ident);var matches=groups.filter(function(g){return g&&Array.isArray(g.studentHashes)&&g.studentHashes.indexOf(h)!==-1;});if(matches.length!==1)return matches.length?'Identita je nejednoznacne prirazena k vice variantam.':'Identita neni prirazena k zadne variante tohoto testu.';if(String(matches[0].key)!==claimed)return 'Nesedi vazba student-varianta: ocekavano '+String(matches[0].key)+', payload uvadi '+claimed+'.';return '';}
+const PRIVATE_IDENTITY_REVIEWS=new WeakMap(),PRIVATE_CONFIRMED_IDENTITIES=new Map();
+function manualIdentityKey(digest,email,code){return digest+'|'+email+'|'+code;}
+function proposeManualIdentity(payload,sm,error){
+  // Only malformed codes are recoverable, never valid codes of other students.
+  if(error.validationCode!=='schema.code'||CONFIG.identityMode!=='oneTimeCode'||payload.identityMode!=='oneTimeCode'||sm.submissionSource!=='google-forms-csv')throw error;
+  // Not a recoverable shape (e.g. code and identity disagree): keep the original schema rejection.
+  if(!(e3String(payload.code,180)&&e3String(payload.student,180)&&payload.code.toUpperCase()===payload.student.toUpperCase()&&!/^[A-Z0-9]{6}$/i.test(payload.code)))throw error;
+  e3Require(CONFIG.studentHtmlSha256&&payload.studentHtmlSha256===CONFIG.studentHtmlSha256,'identity.recovery-hash','Ru\u010dn\u00ed p\u0159i\u0159azen\u00ed vy\u017eaduje shodn\u00fd hash studentsk\u00e9ho HTML.');
+  const email=e3Email(sm.formIdentity),policy=FORMS_ANCHOR_POLICY;
+  e3Require(policy&&email&&email.split('@')[1]===policy.schoolDomain,'anchors.identity-domain','Forms \u00fa\u010det nen\u00ed z nastaven\u00e9 \u0161koln\u00ed dom\u00e9ny.');
+  const roster=(CONFIG.roster||[]).filter(r=>e3Email(r.email)===email);
+  e3Require(roster.length===1,'identity.recovery-roster','Forms \u00fa\u010det nem\u00e1 pr\u00e1v\u011b jednu identitu v rosteru.');
+  const code=String(roster[0].code||'').toUpperCase(),candidate=Object.assign({},payload,{student:code,code});
+  validateSecurePayload(candidate);
+  return {candidate,proof:{originalCode:payload.code,assignedCode:code,email}};
+}
 async function verifyText(name,txt,meta){
   const sm=verifierSourceMeta(meta),fullYear=!!(meta&&meta.fullYearCsv);let pack=null,payload=null,digest='';
   try{
-    if(sm.submissionSource==='google-forms-csv')e3Require(meta&&typeof meta.formIdentity==='string'&&meta.formIdentity.trim().length<=254&&typeof meta.formTimestamp==='string'&&meta.formTimestamp.trim().length<=120,'anchors.source-shape','Systémová Forms identita nebo čas mají neplatný typ/velikost.');
-    pack=parseTxt(txt);validateSecureEnvelope(pack);digest=await sha256HexText(txt);
-    payload=await decryptPayload(pack);validateSecurePayload(payload);
+    if(sm.submissionSource==='google-forms-csv')e3Require(meta&&typeof meta.formIdentity==='string'&&meta.formIdentity.trim().length<=254&&typeof meta.formTimestamp==='string'&&meta.formTimestamp.trim().length<=120,'anchors.source-shape','Neplatn\u00fd typ nebo velikost Forms e-mailu/\u010dasu.');
+    pack=parseTxt(txt);validateSecureEnvelope(pack);digest=await sha256HexText(txt);payload=await decryptPayload(pack);
+    e3Require(e3Object(payload),'schema.shape','Payload nen\u00ed objekt.');e3SafeTree(payload);e3Require(e3String(payload.testId,180)&&payload.testId.trim(),'schema.testId','Payload has no valid test identifier.');
     if(fullYear&&payload.testId!==CONFIG.testId)return {classification:'other-test',verifiedTestId:payload.testId};
-    e3Require(payload.testId===CONFIG.testId&&pack.testId===CONFIG.testId,'binding.test','Výsledek patří k jinému testu.');
-    e3Require(payload.manifestHash===CONFIG.manifestHash&&pack.manifestHash===CONFIG.manifestHash,'binding.manifest','Payload nebo obal má jiný manifest testu.');
-    e3Require(!payload.studentHtmlSha256||!CONFIG.studentHtmlSha256||payload.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Payload uvádí jiný SHA-256 studentského HTML.');
-    e3Require(!pack.studentHtmlSha256||!CONFIG.studentHtmlSha256||pack.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Obal uvádí jiný SHA-256 studentského HTML.');
-    const bindingError=await payloadBindingError(payload);e3Require(!bindingError,'binding.identity-variant',bindingError);
-    const metadataMismatch=metadataMismatchFor(sm);e3Require(!metadataMismatch.length,'binding.forms-metadata',metadataMismatch.join('; '));
-    const anchors=evaluateFormsAnchors(payload,sm),semanticDigest=await semanticSubmissionDigest(payload);
-    const replay=anchors.diagnosticOnly?null:await observeVerifierReplay(payload,semanticDigest,digest),scored=scorePayload(payload);
-    const row=Object.assign({file:name,status:anchors.diagnosticOnly?'DIAGNOSTIC_ONLY':'OK',rawTxt:txt,submissionDigest:digest,semanticDigest,replayIdentityDigest:replay&&replay.identityDigest||'',replayKnown:!!(replay&&replay.known),expectedStudentHtmlSha256:CONFIG.studentHtmlSha256||'',answerStudentHtmlSha256:payload.studentHtmlSha256||'',metadataMismatch,envelopeMismatch:[],validationCodes:anchors.codes,error:anchors.diagnosticOnly?'Záloha bez Forms kotev — pouze diagnostika, mimo klasifikaci.':''},sm,scored);
-    const trust=submissionTrust(payload,sm,anchors);PRIVATE_SUBMISSION_TRUST.set(row,trust);row.trustAssessment=trust;row.anchorAssessment=anchors;
+    e3Require(payload.testId===CONFIG.testId&&pack.testId===CONFIG.testId,'binding.test','V\u00fdsledek pat\u0159\u00ed k jin\u00e9mu testu.');
+    e3Require(payload.manifestHash===CONFIG.manifestHash&&pack.manifestHash===CONFIG.manifestHash,'binding.manifest','Payload nebo obal m\u00e1 jin\u00fd manifest testu.');
+    let checked=payload,review=null;
+    try{validateSecurePayload(payload);}catch(error){const proposal=proposeManualIdentity(payload,sm,error);checked=proposal.candidate;review=proposal.proof;}
+    // Schema errors keep priority (as before 7.1.97); the build-hash binding then applies to every accepted payload.
+    e3Require(!payload.studentHtmlSha256||!CONFIG.studentHtmlSha256||payload.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Payload uv\u00e1d\u00ed jin\u00fd SHA-256 studentsk\u00e9ho HTML.');
+    e3Require(!pack.studentHtmlSha256||!CONFIG.studentHtmlSha256||pack.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Obal uv\u00e1d\u00ed jin\u00fd SHA-256 studentsk\u00e9ho HTML.');
+    const bindingError=await payloadBindingError(checked);e3Require(!bindingError,'binding.identity-variant',bindingError);
+    const metadataMismatch=metadataMismatchFor(sm),anchors=evaluateFormsAnchors(checked,sm),semanticDigest=await semanticSubmissionDigest(payload);
+    const replay=anchors.diagnosticOnly?null:await observeVerifierReplay(checked,semanticDigest,digest),scored=scorePayload(checked);
+    const confirmation=review&&PRIVATE_CONFIRMED_IDENTITIES.get(manualIdentityKey(semanticDigest,review.email,review.assignedCode));
+    const status=anchors.diagnosticOnly?'DIAGNOSTIC_ONLY':(review&&!confirmation?'IDENTITY_REVIEW':'OK');
+    const row=Object.assign({file:name,status,rawTxt:txt,submissionDigest:digest,semanticDigest,replayIdentityDigest:replay&&replay.identityDigest||'',replayKnown:!!(replay&&replay.known),expectedStudentHtmlSha256:CONFIG.studentHtmlSha256||'',answerStudentHtmlSha256:payload.studentHtmlSha256||'',metadataMismatch,anchorNotes:Array.isArray(anchors.notes)?anchors.notes.slice():[],envelopeMismatch:[],validationCodes:anchors.codes,error:anchors.diagnosticOnly?'Z\u00e1loha bez Forms kotev - pouze diagnostika.':'',manualIdentityAssigned:!!confirmation,identityConfirmationAt:confirmation||'',originalIdentityCode:review?review.originalCode:'',proposedIdentityCode:review?review.assignedCode:''},sm,scored);
+    if(review)PRIVATE_IDENTITY_REVIEWS.set(row,Object.freeze(Object.assign({},review,{semanticDigest})));
+    const assessed=review?Object.assign({},anchors,{identity:confirmation?'MANUALLY_CONFIRMED_FORMS_ROSTER':'AWAITING_TEACHER_CONFIRMATION'}):anchors;
+    const trust=submissionTrust(payload,sm,assessed);PRIVATE_SUBMISSION_TRUST.set(row,trust);row.trustAssessment=trust;row.anchorAssessment=assessed;
     RESULTS.push(row);rebuildDuplicateState();
-    return {classification:anchors.diagnosticOnly?'diagnostic-only':'current',row};
+    return {classification:anchors.diagnosticOnly?'diagnostic-only':(status==='IDENTITY_REVIEW'?'identity-review':'current'),row};
   }catch(error){
-    if(fullYear&&pack&&pack.testId!==CONFIG.testId&&!payload&&!error.validationCode)return {classification:'other-test',hintTestId:pack.testId};
+    if(fullYear&&pack&&pack.testId!==CONFIG.testId&&!payload&&!error.validationCode)return {classification:'other-test',hintTestId:pack.testId,unverifiedOtherTest:true};
     const code=error.validationCode||'crypto.parse-decrypt',message=String(error&&error.message?error.message:error);
     const row=Object.assign({file:name,status:'CHYBA',error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',earned:0,total:0,pct:0,grade:'?',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
     RESULTS.push(row);return {classification:'invalid-current',error:message,code,row};
   }
+}
+function formsIdentityReviewAction(r){return (r.status==='IDENTITY_REVIEW'&&!r.exactDuplicate&&!r.hardReplayConflict)?'<div class="forms-review-action">Forms '+esc(r.formIdentity)+' &rarr; '+esc(r.proposedIdentityCode)+'<br><button type="button" onclick="confirmFormsIdentity('+RESULTS.indexOf(r)+')">Potvrdit identitu</button></div>':'';}
+async function confirmFormsIdentity(index){
+  const row=RESULTS[Number(index)],proof=row&&PRIVATE_IDENTITY_REVIEWS.get(row);
+  if(!proof||row.status!=='IDENTITY_REVIEW')return false;
+  rebuildDuplicateState();if(row.exactDuplicate||row.hardReplayConflict){vToast('Duplicitu nebo replay nelze potvrdit.','err');return false;}
+  if(!await vConfirm('Potvrdit ru\u010dn\u00ed p\u0159i\u0159azen\u00ed: Forms \u00fa\u010det '+proof.email+' \u2192 k\u00f3d '+proof.assignedCode+'? P\u016fvodn\u00ed k\u00f3d: '+proof.originalCode+'. P\u016fvod v\u00fdsledku t\u00edm nen\u00ed prok\u00e1z\u00e1n.','Identita k ru\u010dn\u00edmu potvrzen\u00ed'))return false;
+  rebuildDuplicateState();if(!RESULTS.includes(row)||row.status!=='IDENTITY_REVIEW'||row.exactDuplicate||row.hardReplayConflict)return false;
+  const at=new Date().toISOString();PRIVATE_CONFIRMED_IDENTITIES.set(manualIdentityKey(proof.semanticDigest,proof.email,proof.assignedCode),at);
+  row.status='OK';row.manualIdentityAssigned=true;row.identityConfirmationAt=at;
+  row.anchorAssessment=Object.assign({},row.anchorAssessment,{identity:'MANUALLY_CONFIRMED_FORMS_ROSTER'});
+  const trust=Object.freeze(Object.assign({},PRIVATE_SUBMISSION_TRUST.get(row),{externalIdentity:'MANUALLY_CONFIRMED_FORMS_ROSTER'}));PRIVATE_SUBMISSION_TRUST.set(row,trust);row.trustAssessment=trust;
+  afterResultsChanged();renderFormsImportSummary(LAST_FORMS_IMPORT);return true;
 }
 async function bulkVerifyFiles(files){const arr=Array.from(files||[]);if(!arr.length){vToast('Nebyl vybrán žádný answers.txt soubor.','warn');return;}for(const f of arr){if(Number(f.size)>E3_MAX_TXT)await verifyText(f.name,'');else await verifyText(f.name,await f.text());}afterResultsChanged();vToast('Nouzový import dokončen. Zálohy bez Forms jsou pouze diagnostické a nezapočítávají se do klasifikace.','warn');}
 async function bulkVerifyPasted(){const txt=($('pasteBox').value||'').trim();if(!txt){vToast('Nejdřív vlož celý záložní blok SECURE-ANSWERS-V1.','warn');return;}await verifyText('vlozena_zaloha_'+(RESULTS.length+1)+'.txt',txt);$('pasteBox').value='';afterResultsChanged();vToast('Záloha načtena pro diagnostiku; stav a důvody jsou v tabulce.','warn');}
@@ -63,8 +98,12 @@ function parseFormsCsvText(text){
   e3Require(data.filter(csvRowNonEmpty).every(row=>row.length===headers.length),'csv.width','Počet polí řádku neodpovídá hlavičce CSV.');
   const normHeader=v=>e3Header(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(),hnorm=headers.map(normHeader);
   const policy=FORMS_ANCHOR_POLICY;
-  const identityIndex=policy?normalized.indexOf(e3Header(policy.emailHeader)):-1,timestampIndex=policy?normalized.indexOf(e3Header(policy.timestampHeader)):-1;
-  if(policy)e3Require(identityIndex>=0&&timestampIndex>=0,'csv.anchor-columns','CSV nemá zvolené systémové sloupce ověřeného e-mailu a času.');
+  function anchorColumn(setting,aliases){
+    if(setting&&setting!=='auto'){const idx=normalized.indexOf(e3Header(setting));e3Require(idx>=0,'csv.anchor-columns','CSV nem\u00e1 zvolen\u00fd syst\u00e9mov\u00fd sloupec: '+setting);return idx;}
+    const hits=normalized.map((h,i)=>aliases.includes(h)?i:-1).filter(i=>i>=0);
+    e3Require(hits.length===1,'csv.anchor-columns','CSV mus\u00ed obsahovat pr\u00e1v\u011b jeden syst\u00e9mov\u00fd sloupec '+aliases.join(' / ')+'. Exportuj p\u016fvodn\u00ed odpov\u011bdi z Forms.');return hits[0];
+  }
+  const identityIndex=anchorColumn(policy?.emailHeader,['username','e-mailov\u00e1 adresa','email address','e-mail address']),timestampIndex=anchorColumn(policy?.timestampHeader,['timestamp','\u010dasov\u00e1 zna\u010dka','\u010dasov\u00e9 raz\u00edtko']);
   const testIdIndex=hnorm.findIndex(h=>h==='test id'||h==='id testu'),testNameIndex=hnorm.findIndex(h=>h==='test name'||h==='nazev testu'),groupIndex=hnorm.findIndex(h=>['group','class','skupina','trida','trida skupina'].includes(h));
   return {headers,data,delimiter:best.delimiter,delimiterLabel:best.delimiterLabel,identityIndex,timestampIndex,testIdIndex,testNameIndex,groupIndex};
 }
