@@ -1,5 +1,5 @@
 from harness import Harness,TESTS
-from browser_matrix import answer,click_attr
+from browser_matrix import answer,click_attr,submit_secure
 import json,time,traceback,itertools
 h=Harness();rows=[];out=TESTS.parent/'evidence/runtime-suite.json'
 try:
@@ -20,7 +20,7 @@ try:
     if cfg['odevzdavani']=='B':click_attr(s,'onclick','doSubmit()')
     s.wait_for_function('submitted')
    else:
-    click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',s.locator('#answerBackup').input_value());assert sc['earned']==sc['total']==48,sc
+    submit_secure(s);v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',s.locator('#answerBackup').input_value());assert sc['earned']==sc['total']==48,sc
    assert s.evaluate('__errors')==[],s.evaluate('__errors');row.update(ok=True,score={'earned':sc['earned'],'total':sc['total']})
   except Exception as e:row.update(ok=False,error=str(e),trace=traceback.format_exc())
   finally:

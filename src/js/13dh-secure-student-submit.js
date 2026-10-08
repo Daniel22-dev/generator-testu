@@ -3,7 +3,7 @@
 const SECURE_STUDENT_SUBMIT_JS=String.raw`
 function resetTestScrollAfterStart(){var go=function(){try{window.scrollTo({top:0,left:0,behavior:'auto'});}catch(_){try{window.scrollTo(0,0);}catch(__){}}};go();if(typeof requestAnimationFrame==='function')requestAnimationFrame(go);else setTimeout(go,0);}
 function armSecureStartInteractionGuard(){TEST_INTERACTION_ARMED_AT=Date.now()+900;}
-function blockStartTransitionInteraction(e){if(!isTestActive()||Date.now()>=TEST_INTERACTION_ARMED_AT)return;if(e&&typeof e.preventDefault==='function')e.preventDefault();if(e&&typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();else if(e&&typeof e.stopPropagation==='function')e.stopPropagation();}
+function blockStartTransitionInteraction(e){if(!isTestActive()||Date.now()>=TEST_INTERACTION_ARMED_AT)return;var test=$('test');if(!test||!e||!test.contains(e.target))return;TEST_INTERACTION_ARMED_AT=0;if(typeof e.preventDefault==='function')e.preventDefault();if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();else if(typeof e.stopPropagation==='function')e.stopPropagation();}
 document.addEventListener('click',blockStartTransitionInteraction,true);
 function armSecureSubmitButton(){SUBMIT_UI_ARMED_AT=Date.now()+1200;var card=$('secureSubmitCard'),btn=card&&card.querySelector('button');if(!btn)return;btn.disabled=true;setTimeout(function(){if(!SUBMITTED&&isTestActive())btn.disabled=false;},1250);}
 function responseHasValue(v){if(v===false||v===0)return true;if(v==null)return false;if(typeof v==='string')return v.trim()!=='';if(Array.isArray(v))return v.some(responseHasValue);if(typeof v==='object')return Object.keys(v).some(function(k){return responseHasValue(v[k]);});return true;}
