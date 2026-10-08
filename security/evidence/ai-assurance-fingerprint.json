@@ -46,7 +46,7 @@
     {
       "path": "src/js/08-manual-editor.js",
       "size": 68013,
-      "sha256": "27451771459fefd54403a6da032ed93314bdca567ba331bf4b03aa201dc95c23"
+      "sha256": "27451771459f5eeeb78140eb140972ca5f6d96b94a5b8026f0aa3b6998bf1142"
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
