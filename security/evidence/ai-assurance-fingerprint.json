@@ -8,28 +8,124 @@
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
   "fingerprint": "53d97d8912d7f5254a065cea02e2894f2f3f6105e367817a5a726a9caf4e4fbc",
   "files": [
-    {"path":"src/js/01-core.js","size":166137,"sha256":"598d90c41156e0144a5f31390b2e4fab566f3288ada90a1d10c5edd150ae9292"},
-    {"path":"src/js/03-ui-render.js","size":55853,"sha256":"cc66e3f65c0b2bfb01230abc6dd3b94bb743fe16566a59b24230af724e6a260c"},
-    {"path":"src/js/05-form-fields.js","size":120750,"sha256":"7e4a85eaab8b7bbd9de85523274f219031b0a7dad1d5d7bcba5afc251e03a343"},
-    {"path":"src/js/05b-workflow-context.js","size":11346,"sha256":"4badbc2446a252cac3c8ad8b57cde6a22ed42753bb7b3a91ecb356e3fcf947fb"},
-    {"path":"src/js/05c-exercise-suitability.js","size":9398,"sha256":"7a2d1033ef7bc42632d2cdc840a8c2831987f9baf77a42c58b9e9dbc3912c152"},
-    {"path":"src/js/07-gemini.js","size":56845,"sha256":"7b2e1e07ca9eb70d6de4254c04cdf585cfd26df5a491ac362d3eb2b851f00eb0"},
-    {"path":"src/js/07z-ai-core-integration.js","size":14586,"sha256":"1022388a750767f07a1e7eae4674cb467d09bd7459e75eaa292abc3e2c50b787"},
-    {"path":"src/js/08-manual-editor.js","size":68013,"sha256":"27451771459fefd54403a6da032ed93314bdca567ba331bf4b03aa201dc95c23"},
-    {"path":"src/js/09-selftest-keycheck.js","size":57005,"sha256":"acb8bf5461f55556c5af26205a1630a81eeeb3b9d8bb89821f020dd6efac47df"},
-    {"path":"src/js/12-prompt-builder.js","size":62496,"sha256":"a5c8a170575fefd54403a6da032ed93314bdca567ba331bf4b03aa201dc95c23"},
-    {"path":"src/js/13a-secure-helpers.js","size":35859,"sha256":"a32104f2c3c3c7ba34e649fe1b15de5fee8cc154480401a1a5f1757e81719312"},
-    {"path":"src/js/50-cs-module.js","size":94798,"sha256":"c834e3e5bb7f949d380cd3498cc858b46e005a60da5abcf917aac843cb2a7ba0"},
-    {"path":"src/features/preview-editor.js","size":65960,"sha256":"b3831420a40c72825e24c270ee5b1e03188f3d9a914db98367172424f06c0cdd"},
-    {"path":"src/features/testlab.js","size":61549,"sha256":"ea21f3fae479c351355edcd11d2f9ab71e444a667766381afdd0b1101e7ec734"},
-    {"path":"public/ai-operations.json","size":6212,"sha256":"061daa937036b90180cb87a9f608e3ef4f8de569f1abfcc9a48183953da04393"},
-    {"path":"ghrab-ai-core.consumer.json","size":324,"sha256":"f67e63e6546ffd8bbd530787b15d2791832ceadb48dd91d2c1853ff5e36304e9"},
-    {"path":"vendor/ghrab-ai-core-1.0.0/ghrab-ai-core-manifest-1.0.0.json","size":392,"sha256":"fc006c3e500495965188c1d385f5ecfd9a7b8967fd86d792883c649fd21ce9b8"},
-    {"path":"security/garp23-ai-red-corpus.json","size":7112,"sha256":"3560e60fd78a9cc81cfef1d7d2c3ba52b270ac5f38d582cc0cded3aa31183a6d"}
+    {
+      "path": "src/js/01-core.js",
+      "size": 166137,
+      "sha256": "598d90c41156e0144a5f31390b2e4fab566f3288ada90a1d10c5edd150ae9292"
+    },
+    {
+      "path": "src/js/03-ui-render.js",
+      "size": 55853,
+      "sha256": "cc66e3f65c0b2bfb01230abc6dd3b94bb743fe16566a59b24230af724e6a260c"
+    },
+    {
+      "path": "src/js/05-form-fields.js",
+      "size": 120750,
+      "sha256": "7e4a85eaab8b7bbd9de85523274f219031b0a7dad1d5d7bcba5afc251e03a343"
+    },
+    {
+      "path": "src/js/05b-workflow-context.js",
+      "size": 11346,
+      "sha256": "4badbc2446a252cac3c8ad8b57cde6a22ed42753bb7b3a91ecb356e3fcf947fb"
+    },
+    {
+      "path": "src/js/05c-exercise-suitability.js",
+      "size": 9398,
+      "sha256": "7a2d1033ef7bc42632d2cdc840a8c2831987f9baf77a42c58b9e9dbc3912c152"
+    },
+    {
+      "path": "src/js/07-gemini.js",
+      "size": 56845,
+      "sha256": "7b2e1e07ca9eb70d6de4254c04cdf585cfd26df5a491ac362d3eb2b851f00eb0"
+    },
+    {
+      "path": "src/js/07z-ai-core-integration.js",
+      "size": 14586,
+      "sha256": "1022388a750767f07a1e7eae4674cb467d09bd7459e75eaa292abc3e2c50b787"
+    },
+    {
+      "path": "src/js/08-manual-editor.js",
+      "size": 68013,
+      "sha256": "27451771459fefd54403a6da032ed93314bdca567ba331bf4b03aa201dc95c23"
+    },
+    {
+      "path": "src/js/09-selftest-keycheck.js",
+      "size": 57005,
+      "sha256": "acb8bf5461f55556c5af26205a1630a81eeeb3b9d8bb89821f020dd6efac47df"
+    },
+    {
+      "path": "src/js/12-prompt-builder.js",
+      "size": 62496,
+      "sha256": "a5c8a170575fefd54403a6da032ed93314bdca567ba331bf4b03aa201dc95c23"
+    },
+    {
+      "path": "src/js/13a-secure-helpers.js",
+      "size": 35859,
+      "sha256": "a32104f2c3c3c7ba34e649fe1b15de5fee8cc154480401a1a5f1757e81719312"
+    },
+    {
+      "path": "src/js/50-cs-module.js",
+      "size": 94798,
+      "sha256": "c834e3e5bb7f949d380cd3498cc858b46e005a60da5abcf917aac843cb2a7ba0"
+    },
+    {
+      "path": "src/features/preview-editor.js",
+      "size": 65960,
+      "sha256": "b3831420a40c72825e24c270ee5b1e03188f3d9a914db98367172424f06c0cdd"
+    },
+    {
+      "path": "src/features/testlab.js",
+      "size": 61549,
+      "sha256": "ea21f3fae479c351355edcd11d2f9ab71e444a667766381afdd0b1101e7ec734"
+    },
+    {
+      "path": "public/ai-operations.json",
+      "size": 6212,
+      "sha256": "061daa937036b90180cb87a9f608e3ef4f8de569f1abfcc9a48183953da04393"
+    },
+    {
+      "path": "ghrab-ai-core.consumer.json",
+      "size": 324,
+      "sha256": "f67e63e6546ffd8bbd530787b15d2791832ceadb48dd91d2c1853ff5e36304e9"
+    },
+    {
+      "path": "vendor/ghrab-ai-core-1.0.0/ghrab-ai-core-manifest-1.0.0.json",
+      "size": 392,
+      "sha256": "fc006c3e500495965188c1d385f5ecfd9a7b8967fd86d792883c649fd21ce9b8"
+    },
+    {
+      "path": "security/garp23-ai-red-corpus.json",
+      "size": 7112,
+      "sha256": "3560e60fd78a9cc81cfef1d7d2c3ba52b270ac5f38d582cc0cded3aa31183a6d"
+    }
   ],
   "scopeDetection": {
-    "tokens": ["callGeminiJSON","buildContentPrompt","wrapUntrustedSource","wrapUntrustedField","wrapUntrustedMetadata","aiTrustedSystemInstruction","stripAiBoundaryTokens","aiSafeLabel","generativelanguage.googleapis.com","x-goog-api-key"],
-    "discoveredSourceFiles": ["src/features/preview-editor.js","src/features/testlab.js","src/js/01-core.js","src/js/03-ui-render.js","src/js/05-form-fields.js","src/js/05c-exercise-suitability.js","src/js/07-gemini.js","src/js/07z-ai-core-integration.js","src/js/08-manual-editor.js","src/js/09-selftest-keycheck.js","src/js/12-prompt-builder.js","src/js/50-cs-module.js"],
+    "tokens": [
+      "callGeminiJSON",
+      "buildContentPrompt",
+      "wrapUntrustedSource",
+      "wrapUntrustedField",
+      "wrapUntrustedMetadata",
+      "aiTrustedSystemInstruction",
+      "stripAiBoundaryTokens",
+      "aiSafeLabel",
+      "generativelanguage.googleapis.com",
+      "x-goog-api-key"
+    ],
+    "discoveredSourceFiles": [
+      "src/features/preview-editor.js",
+      "src/features/testlab.js",
+      "src/js/01-core.js",
+      "src/js/03-ui-render.js",
+      "src/js/05-form-fields.js",
+      "src/js/05c-exercise-suitability.js",
+      "src/js/07-gemini.js",
+      "src/js/07z-ai-core-integration.js",
+      "src/js/08-manual-editor.js",
+      "src/js/09-selftest-keycheck.js",
+      "src/js/12-prompt-builder.js",
+      "src/js/50-cs-module.js"
+    ],
     "untrackedSourceFiles": []
   },
   "invalidationRule": "Any change to a listed file invalidates inherited behavioral AIR evidence until reviewed/re-executed. The generator also fails if a .js/.mjs source under src/ or public/ uses an AI/prompt-boundary token or direct Gemini transport token and is not listed. Model/provider/system-instruction changes must never remain current by version label alone."
