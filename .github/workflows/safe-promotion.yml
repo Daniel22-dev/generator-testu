@@ -173,7 +173,7 @@ jobs:
       - name: Enforce P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896
+          GARP27_EXTERNAL_TRUST_SHA256: 7065476c9dad2979212e5ed45a1c141778303d5156a9a494812dc03008366f7a
 
       - name: Upload candidate QA evidence
         if: always()
@@ -285,7 +285,7 @@ jobs:
       - name: Enforce PR P5 R2 release gate including GARP 2.7 and legacy GARP 2.5.1/N5
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896
+          GARP27_EXTERNAL_TRUST_SHA256: 7065476c9dad2979212e5ed45a1c141778303d5156a9a494812dc03008366f7a
 
       - name: Upload PR certification evidence
         if: always()
@@ -456,7 +456,7 @@ jobs:
           PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
           MERGED_MAIN_SHA: ${{ steps.merged.outputs.main_head }}
           PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
-          GARP27_EXTERNAL_TRUST_SHA256: 831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896
+          GARP27_EXTERNAL_TRUST_SHA256: 7065476c9dad2979212e5ed45a1c141778303d5156a9a494812dc03008366f7a
         run: node scripts/ci/p4-promotion-evidence.mjs --produce
 
       - name: Upload P4 promotion certificate
