@@ -29,7 +29,6 @@ const RELEASE = Object.freeze({
     'SOUKROMÉ OVĚŘENÍ (7.1.91): samostatné Recovery údaje exportů, časové kotvy a přehled bezpečnostních událostí. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
     'AUDIT PŘED TESTOVÁNÍM (7.1.90): úlohy s mezerou uznají doplnění i celou větu; pořadí otázek stabilní po reloadu a verifier ukáže číslo u studenta; error-tagging nemíchá slova; typ cvičení a výběr studenta ve výsledcích; iOS klávesnice bez falešného zámku/splitu; pokyn Nerušit. Mobily emulace; fyzicky 6. a 9. 10.',
     'WORKFLOW (7.1.89): CEFR a podklad před cvičeními; Reading s vlastním zdrojem a kontrolou změn; viditelné AI potvrzení; poradce vhodnosti; souvislé číslování po zamíchání; rozesílání jen zaškrtnutým v Sheets. Samostatná instalace rozesílače a úplné CI jsou nutné.',
-    'WORKFLOW AUDIT (7.1.88): kanonická konfigurace cvičení, Reading/Listening dialogy, přesné opravné fragmenty a vybraní/odložení účastníci. Přebalení kódů bez AI, povinná obnova kontrol a soukromý roster.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
