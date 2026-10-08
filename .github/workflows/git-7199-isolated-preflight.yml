@@ -1,0 +1,55 @@
+name: GIT 7.1.99 isolated preflight
+on:
+  push:
+    branches:
+      - preflight/git-7.1.99-20261008
+permissions:
+  contents: read
+concurrency:
+  group: git-7199-isolated-preflight
+  cancel-in-progress: true
+jobs:
+  release-preflight:
+    name: Full release and GARP27 checks (no promotion)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact release commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 5b908065ed3f01844b77f616850064df5c324476
+          persist-credentials: false
+      - name: Setup Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked project dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run full npm test including browser workflow
+        run: npm test
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279
+      - name: Run independent headless runtime checks
+        run: npm run test:headless
+      - name: Run GARP 2.7 static gate
+        run: npm run qa:garp27:static
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279
+      - name: Re-verify pinned release evidence
+        run: |
+          npm run check:versions
+          npm run garp25:sbom:check
+          npm run garp25:ai-evidence:check
+      - name: Upload preflight diagnostic artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: git-7199-isolated-preflight-evidence
+          path: |
+            qa-results/
+            dist/qa-*.json
+          if-no-files-found: ignore
+          retention-days: 7
