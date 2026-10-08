@@ -1,14 +1,14 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.97",
+  "version": "7.1.98",
   "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
   "blockers": [],
   "f7": "IMPLEMENTED; current-version gates required",
-  "remotePath": "Owner asked on 2026-10-07 to audit the GPT 7.1.97 Forms workflow candidate and to fix the blocking findings before deployment. Deploy only main after candidate gates pass.",
+  "remotePath": "Owner asked on 2026-10-08 to complete the 7.1.98 classroom hotfix, keep main protected until exact candidate gates pass, and finish publication through the protected release chain.",
   "scope": "CONTROLLED_STUDENT_RED_TEAM_ONLY",
   "ownerDecision": {
-    "recordedOn": "2026-10-07",
-    "source": "Explicit owner instruction on 2026-10-07: audit 7.1.97 (Forms workflow F1-F9), fix blocking findings (CI chain, late/repeated START marker, manual override) and prepare it for publication through the protected release chain.",
+    "recordedOn": "2026-10-08",
+    "source": "Explicit owner instruction on 2026-10-08: complete the 7.1.98 classroom hotfix for the secureOffline / Google Forms workflow, validate it through the candidate release gates, and finish the protected release.",
     "authorizeGithubPublication": true,
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",
@@ -18,7 +18,7 @@
     "LIVE_FORMS": {
       "status": "OWNER_REPORTED_CHECKED",
       "independentlyVerified": false,
-      "note": "Owner checked the school Form settings for the 2026-10-06 lesson (owner confirmation, not an independent inspection). The 7.1.97 prefill, KOD field and START/END markers are verified only with synthetic Google-export CSV; the first real lesson must confirm them on the live form."
+      "note": "Owner previously checked the school Form settings. The 7.1.98 secureOffline/Forms hotfix is covered by synthetic Google-export/browser regressions; the next supervised lesson remains the live operational confirmation."
     },
     "E7_PHYSICAL": {
       "status": "SCHEDULED",
@@ -32,16 +32,16 @@
     "independentReview": {
       "status": "CLAUDE_AUDIT_AND_FIX",
       "reviewedVersion": "7.1.97",
-      "currentVersion": "7.1.97",
+      "currentVersion": "7.1.98",
       "currentVersionIndependentlyReviewed": false,
-      "note": "The same reviewer audited the GPT candidate and authored the follow-up fixes; no separate review of those fixes."
+      "note": "Claude independently analyzed the 7.1.97 incident mechanisms and recommended the relevant hardening. The final 7.1.98 implementation and follow-up CI fixes were not separately independently certified."
     }
   },
   "limitations": [
     "Publication is authorized for the supervised student red-team experiment; physical mobile compatibility is not certified.",
     "E6 remains deferred and open; a clean current branch does not prove historical cache removal.",
     "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication.",
-    "Physical phones and live Forms for this new export were not independently exercised. Further independent review of 7.1.97 was explicitly waived by owner; this is not an independent PASS.",
+    "Physical phones and live Forms for this new export were not independently exercised. The final 7.1.98 hotfix was not separately independently certified; this is not an independent PASS.",
     "Exact candidate and protected-main CI must complete before the existing promotion workflow may deploy.",
     "START marker tolerance is 10 minutes; a manually entered lesson time overrides CSV markers and is labelled as manual in results."
   ]
