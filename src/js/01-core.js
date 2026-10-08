@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.97',
-  date:    '2026-10-07',
+  version: '7.1.98',
+  date:    '2026-10-08',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'CLASSROOM HOTFIX (7.1.98): secure outbox je svázán s aktuální identitou a obnovuje se až po ověření; fresh start resetuje scroll a blokuje click-through pouze uvnitř testu; ruční odevzdání vyžaduje potvrzení, timeout zůstává automatický s vysvětlením; BFCache zachovává identity binding. Secure runtime je rozdělen do samostatného submit modulu a regresní/browser audity pokrývají fresh start, cizí outbox, expired resume a potvrzený submit.',
     'FORMS WORKFLOW (7.1.97): pevné nastavení ve verifieru, značky hodiny START/END, předvyplnění formuláře a povinná kontrola exportu. Parser časových zón, upozornění na metadata, ruční potvrzení chybné identity, 6znakový osobní kód a mobilní Reading. Audit: START se toleruje 10 min po zahájení, opakovaný START nezneplatní dřívější okno, ruční čas opraví pozdní START i předčasný END, Test ID bez pomlčky není neshoda; browser regrese check:forms-lesson-browser. Skutečný Google formulář a fyzické iPhone/Android zkoušky čekají.',
     'FORMS VERIFIER UX (7.1.96): nastavení času používá české Datum + Čas s pevnou zónou Europe/Prague a automatickým CET/CEST převodem; univerzální Google Form s Limit to 1 response = OFF je podporovaný, zatímco původní nezměněný CSV export zůstává povinně potvrzen. Identity/domain/roster a replay kontroly zůstávají zachované.',
     'HOTFIX NÁHLEDU (7.1.96): učitelský náhled při každém otevření vytváří nový iframe a při zavření jej zcela zahodí; opakované otevření stejného instant i secure testu je kryté browser regresí. Verze a PWA cache byly posunuty, aby se oprava nenačítala ze staré cache.',

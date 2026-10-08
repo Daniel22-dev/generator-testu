@@ -1,3 +1,11 @@
+## 7.1.98 – 2026-10-08 – classroom secure start/submission hotfix
+
+- identity-bound `submissionOutbox` recovery after validation; foreign outbox disclosure blocked;
+- fresh-start scroll/click-through protection scoped to test UI; manual submit requires confirmation;
+- expired resumed attempts preserve deadline and explain automatic submission;
+- BFCache identity binding and timeout monitor lifecycle hardened;
+- secure submit/Forms helpers split into `13dh-secure-student-submit.js` with browser/audit regressions.
+
 ## 7.1.97 – 2026-10-07 – Google Forms workflow (F1–F9) + audit
 
 - verifier nese pevné nastavení z Generátoru (doména, e-maily učitele, sloupce CSV); na vyhodnocovacím PC se nic nevyplňuje;
