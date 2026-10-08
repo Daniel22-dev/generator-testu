@@ -12,9 +12,11 @@ import { sourceSnapshot } from '../redteam-source-snapshot-e9.mjs';
 import { REPORT_FILES } from './release-evidence.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const TRUST_PIN = '831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896';
+const TRUST_PIN = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/ci-standard/consumers/generator-testu.json'), 'utf8')).trustInputs[0].sha256;
 const ACTIONLINT_VERSION = '1.7.7';
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+assert.match(TRUST_PIN, /^[a-f0-9]{64}$/i, 'Reviewed GARP trust pin must be a SHA-256 digest');
+assert.equal(TRUST_PIN, digest(fs.readFileSync(path.join(ROOT, 'security/garp27/trust-anchor.json'))), 'Reviewed GARP trust pin must match the local anchor');
 
 // Exported only to test failure handling without substituting any real gate.
 export function executePlan(plan, { out, cwd, env, execute = spawnSync, snapshot = sourceSnapshot }) {
