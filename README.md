@@ -1,3 +1,5 @@
+> **7.1.99 – otevření Google Forms + širší Teacher Verifier V2.** Nový Google Form se při povoleném popupu otevírá pouze v nové kartě; odevzdávací kód zůstane na kartě testu. Verifier V2 využívá šířku desktopu. V blokovaném popupu zůstává původní navigační fallback. Podrobnosti [RELEASE-NOTES-7.1.99.md](RELEASE-NOTES-7.1.99.md).
+
 > **7.1.98 – classroom hotfix.** Identity-bound outbox recovery, fresh-start click-through protection, confirmed manual submit, expired-resume explanation and BFCache hardening. Viz [RELEASE-NOTES-7.1.98.md](RELEASE-NOTES-7.1.98.md).
 
 > **7.1.97 – Google Forms workflow F1–F9 hardening.** Teacher Verifier nese pevné Forms nastavení, používá důvěryhodné START/END značky z původního CSV, podporuje ruční korekci časového okna a explicitní potvrzení chybné identity. Serverový Forms timestamp nesmí předcházet START značce; desetiminutová tolerance platí jen pro klientský čas zahájení. Performance budget byl pro nový workflow kontrolovaně navýšen. Skutečný školní Form a fyzický iPhone/Android zůstávají provozními acceptance testy. Viz [RELEASE-NOTES-7.1.97.md](RELEASE-NOTES-7.1.97.md).
@@ -48,7 +50,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.98 (classroom secure start/submission hotfix; exact-SHA release gates required)
+**Aktuální verze:** 7.1.99 (Forms tab + Teacher Verifier V2 width hotfix; exact-SHA release gates required)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

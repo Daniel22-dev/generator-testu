@@ -46,6 +46,12 @@ try{
   await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const txt=await student.locator('#answerBackup').inputValue();
   const formsUrl=new URL(await student.evaluate(()=>formsOpenUrl()));assert.equal(formsUrl.searchParams.get('entry.111'),pkg.testId);assert.ok(formsUrl.searchParams.get('entry.222'));assert.ok(formsUrl.searchParams.get('entry.333'));assert.equal(formsUrl.searchParams.get('entry.444'),null);ok('student Forms link prefilled with test ID, name, class only');
+  await sctx.route('https://docs.google.com/**',r=>r.fulfill({status:200,contentType:'text/html',body:'<p>synthetic form</p>'}));
+  const pagesBeforeForm=sctx.pages().length,studentUrlBeforeForm=student.url(),formPopup=sctx.waitForEvent('page');
+  await student.locator('#done button').filter({hasText:/Open form|Otevřít formulář/}).click();const formPage=await formPopup;await formPage.waitForLoadState();await student.waitForTimeout(400);
+  assert.equal(student.url(),studentUrlBeforeForm,'open-form navigated the test page away');assert.equal(await student.locator('#done').isVisible(),true,'submission screen disappeared after opening the form');
+  assert.equal(sctx.pages().length,pagesBeforeForm+1,'open-form must open exactly one new tab');assert.ok(formPage.url().startsWith('https://docs.google.com/forms/'));await formPage.close();
+  ok('open-form opens exactly one Forms tab and keeps the submission screen');
   await student.reload();await student.locator('#studentName').fill('ZZZZZZ');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);
   assert.equal(await student.locator('#done').isVisible(),false,'arbitrary 6-char identity saw completed submission screen');
   assert.equal(await student.locator('#answerBackup').inputValue(),'','arbitrary 6-char identity received previous encrypted payload');

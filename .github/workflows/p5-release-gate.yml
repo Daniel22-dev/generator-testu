@@ -46,7 +46,7 @@ jobs:
       - name: Run E9 regression, foundation and final P5 admission
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 7065476c9dad2979212e5ed45a1c141778303d5156a9a494812dc03008366f7a
+          GARP27_EXTERNAL_TRUST_SHA256: afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279
       - name: Upload audit evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

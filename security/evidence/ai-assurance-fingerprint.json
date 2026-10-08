@@ -1,17 +1,17 @@
 {
   "schema": "ghrab-ai-assurance-fingerprint-v1",
   "appId": "generator",
-  "appVersion": "7.1.98",
+  "appVersion": "7.1.99",
   "coreVersion": "1.0.0",
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "c6bd544371d37db01f1aea9fddfb99c2732970d2e5d4b1ffedd33ce1666d5087",
+  "fingerprint": "4df59d23beb8c522042a4dc00c86a98ee0b7314e55e91c07956eb1c3245eaf08",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 165909,
-      "sha256": "17308dfa5e751dca3fda4a0902649d73ad58d2d8f8c204a08b3450262914f12d"
+      "size": 165911,
+      "sha256": "8b350a8cb264ddaa8c1f9c07470ca2b03ab3cbb80b6d38f64d79bdb871cf431e"
     },
     {
       "path": "src/js/03-ui-render.js",
@@ -41,7 +41,7 @@
     {
       "path": "src/js/07z-ai-core-integration.js",
       "size": 14586,
-      "sha256": "1022388a750767f07a1e7eae4674cb467d09bd7459e75eaa292abc3e2c50b787"
+      "sha256": "7bdc3ed7f573ad587178068f6476495926ab362d67fa76396ead023b74e8d530"
     },
     {
       "path": "src/js/08-manual-editor.js",
@@ -81,7 +81,7 @@
     {
       "path": "public/ai-operations.json",
       "size": 6212,
-      "sha256": "061daa937036b90180cb87a9f608e3ef4f8de569f1abfcc9a48183953da04393"
+      "sha256": "d09aee35df09296c8e0d8b2e8e99f66e8797ea67307a28ed117f1037189b773e"
     },
     {
       "path": "ghrab-ai-core.consumer.json",

@@ -1,3 +1,11 @@
+## 7.1.99 – 2026-10-08 – Forms new tab and Teacher Verifier V2 width hotfix
+
+- Studentské tlačítko „Otevřít formulář“ při povoleném popupu otevře právě jednu kartu Google Forms a zachová stránku testu s odevzdávacím kódem; `window.opener` se vynuluje.
+- Při blokování popupu zůstává fallback přesměrováním aktuální karty – známé omezení, nikoliv nové chování.
+- Teacher Verifier V2 používá `.wrap[data-v2-ready]{max-width:min(1500px,98vw)}`; na menších monitorech může být vodorovný posun nadále nutný.
+- Přidány unit/browser regresní kontrakty; scoring, kryptografie, identita, roster a časové kotvy Forms zůstávají beze změny.
+- Verze/PWA cache, SBOM, AI evidence a GARP 2.7 trust chain aktualizovány; P5 R2, journeys a Safe Promotion vyžadují samostatnou exact-SHA certifikaci.
+
 ## 7.1.98 – 2026-10-08 – classroom secure start/submission hotfix
 
 - identity-bound `submissionOutbox` recovery after validation; foreign outbox disclosure blocked;

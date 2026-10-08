@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.98",
+  "appVersion": "7.1.99",
   "releaseStatus": "ready-for-controlled-student-redteam",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "AUDIT-7.1.98-CLASSROOM-HOTFIX-2026-10-08",
+  "revision": "AUDIT-7.1.99-FORMS-TAB-VERIFIER-WIDTH-2026-10-08",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": false,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": false,
     "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.98 hardens the secureOffline classroom start/submission lifecycle: identity-bound outbox recovery, fresh-start click-through protection, confirmed manual submit, expired-attempt explanation and BFCache identity preservation. Scoring semantics are unchanged; exact-SHA CI remains authoritative for release admission.",
+    "note": "7.1.99 modifies only the secure student Forms open-tab action and Teacher Verifier V2 CSS width plus regression tests; scoring, identity, cryptography and Forms-time anchors are unchanged. Full lockfile-based CI, exact-SHA release gates, physical devices and real school Forms remain pending until independently verified.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Source candidate 7.1.98 is the classroom secureOffline/Google Forms hotfix; protected exact-SHA P5, journey-e2e and Safe Promotion must pass before production promotion.",
+  "note": "7.1.99 local precommit candidate: Forms opens separately without redirecting the student page when popups are permitted; verifier V2 can use wide desktop viewport. Candidate commit requires complete local gates; P5 R2, journeys E2E and Safe Promotion must pass on the exact SHA before production promotion. Browser popup-blocked fallback is a documented limitation.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [
