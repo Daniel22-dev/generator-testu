@@ -21,6 +21,15 @@ const repo = 'synthetic/fixture';
 const promotionRunId = 1001, promotionAttempt = 2, p5RunId = 2001, journeyRunId = 3001;
 const prNumber = 77;
 
+test('P4 promotion trust pin matches the reviewed current GARP anchor', () => {
+  const expected = hash(fs.readFileSync(path.join(ROOT, 'security/garp27/trust-anchor.json')));
+  const consumer = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/ci-standard/consumers/generator-testu.json'), 'utf8'));
+  const pin = consumer.trustInputs.find(input => input.environment === 'GARP27_EXTERNAL_TRUST_SHA256')?.sha256;
+  assert.equal(pin, expected, 'CI consumer trust pin must match current GARP anchor');
+  assert.equal(GARP27_TRUST_SHA256, expected, 'P4 promotion must use current reviewed GARP pin');
+});
+
+
 function tempRoot(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'git-p4-test-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));

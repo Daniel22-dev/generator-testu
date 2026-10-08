@@ -17,7 +17,13 @@ export const ACTIONS_APP_ID = 15368;
 export const PROMOTION_WORKFLOW = '.github/workflows/safe-promotion.yml';
 export const PROMOTION_JOB = 'promote-certified-pr';
 export const MAX_CERT_AGE_MS = 30 * 60 * 1000;
-export const GARP27_TRUST_SHA256 = '831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896';
+// Independently reviewed GARP trust root: never pin a version-specific hash in source code.
+const reviewedTrust = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/ci-standard/consumers/generator-testu.json'), 'utf8'))
+  .trustInputs.find(input => input.environment === 'GARP27_EXTERNAL_TRUST_SHA256')?.sha256;
+const anchoredTrust = createHash('sha256').update(fs.readFileSync(path.join(ROOT, 'security/garp27/trust-anchor.json'))).digest('hex');
+assert.match(reviewedTrust || '', /^[a-f0-9]{64}$/, 'Missing reviewed GARP trust pin');
+assert.equal(reviewedTrust, anchoredTrust, 'P4 reviewed GARP trust pin does not match the current anchor');
+export const GARP27_TRUST_SHA256 = reviewedTrust;
 export const REQUIRED_P5_REPORTS = Object.freeze([
   'qa-p5-release-report.json',
   'qa-p5-acceptance-report.json',
