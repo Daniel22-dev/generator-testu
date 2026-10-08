@@ -6,7 +6,7 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "53d97d8912d7f5254a065cea02e2894f2f3f6105e367817a5a726a9caf4e4fbc",
+  "fingerprint": "3df7ca9a89fca3cc36b5d4f0a8ccb45734c8b22977c7f271c21c44b675553ab6",
   "files": [
     {
       "path": "src/js/01-core.js",
