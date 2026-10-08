@@ -995,6 +995,13 @@ body:not(.simple-mode) .simple-only { display: none !important; }
 .ui-modal-backdrop.hidden { display: none; }
 .ui-modal-box { width: min(440px, 100%); max-height: calc(100vh - 32px); margin: auto; display: flex; flex-direction: column; background: var(--bg2); border: 1px solid var(--bdr); border-radius: 14px; box-shadow: 0 24px 80px rgba(0,0,0,.55); overflow: hidden; }
 .ui-modal { width:min(660px,100%); max-height:calc(100vh - 32px); margin:auto; display:flex; flex-direction:column; background:var(--bg2); color:var(--t2); border:1px solid var(--bdr); border-radius:14px; box-shadow:0 24px 80px rgba(0,0,0,.55); overflow:hidden; }
+#generatorSettingsModal .generator-settings-dialog { width:min(1120px,calc(100vw - 48px)); max-width:none; height:min(900px,calc(100dvh - 48px)); max-height:calc(100dvh - 48px); }
+#generatorSettingsModal .generator-settings-dialog .ui-modal-body { padding:20px 22px; }
+@media(max-width:760px){
+  #generatorSettingsModal { padding:10px; }
+  #generatorSettingsModal .generator-settings-dialog { width:100%; height:auto; max-height:calc(100dvh - 20px); }
+  #generatorSettingsModal .generator-settings-dialog .ui-modal-body { padding:14px; }
+}
 .ui-modal .ui-modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:14px 16px; border-bottom:1px solid var(--bdr2); }
 .ui-modal .ui-modal-body { padding:16px; white-space:normal; }
 .ui-modal-x { flex:0 0 auto; width:36px; height:36px; border:1px solid var(--bdr); border-radius:8px; background:var(--bg3); color:var(--t2); cursor:pointer; font:700 16px/1 system-ui,sans-serif; }

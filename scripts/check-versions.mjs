@@ -45,6 +45,10 @@ const found = {
   'public/ghrab-platform.consumer.json appVersion': jsonVersion('public/ghrab-platform.consumer.json'),
   'qa/qa-manifest.json appVersion': jsonVersion('qa/qa-manifest.json'),
   'reporter-test.config.json version': jsonVersion('reporter-test.config.json'),
+  'GARP 2.7 trust-anchor version': jsonVersion('security/garp27/trust-anchor.json'),
+  'GARP 2.7 policy version': jsonVersion('security/garp27/garp-policy.json'),
+  'GARP 2.7 architecture version': jsonVersion('security/garp27/architecture-policy.json'),
+  'GARP 2.7 capability inventory version': jsonVersion('security/garp27/capability-inventory.json'),
   'public/manual/index.html version': read('public/manual/index.html').match(/data-ghrab-app-version="([^"]+)"/)?.[1] || null,
 };
 

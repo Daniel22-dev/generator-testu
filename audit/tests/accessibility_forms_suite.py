@@ -1,5 +1,5 @@
 from harness import Harness,TESTS
-from browser_matrix import click_attr,answer
+from browser_matrix import click_attr,answer,submit_secure
 import json,itertools,traceback
 h=Harness();rows=[]
 try:
@@ -15,7 +15,7 @@ try:
      got=s.evaluate('a=>{CFG.diffGroups[0].a11y=a;'+('applyA11yInstant' if mode=='instant' else 'applyA11y')+'("g1");return {a:A11Y,classes:document.body.className}}',{'time':t,'font':f,'dys':d});assert got['a']['timeMult']=={'125':1.25,'150':1.5,'200':2}.get(t,1) and got['a']['noLimit']==(t=='none');assert ('a11y-large' in got['classes'])==(f=='large') and ('a11y-xlarge' in got['classes'])==(f=='xlarge') and ('a11y-dys' in got['classes'])==d
     r['supportConfigurations']=30
     if mode=='secureOffline':
-     answer(s,x['variants']['g1'][0],0,mode,lang);click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('ANSWER_TXT.startsWith("SECURE-ANSWERS-V1")');assert s.locator('#formsSubmissionBox').is_visible()
+     answer(s,x['variants']['g1'][0],0,mode,lang);submit_secure(s);assert s.locator('#formsSubmissionBox').is_visible()
      s.evaluate('()=>{window.__copied="";copyTextSafe=async text=>{window.__copied=text;return true};window.__opened="";window.open=url=>{window.__opened=url;return {opener:null}};}');click_attr(s,'onclick','copySubmissionPayload()');s.wait_for_function('__copied===ANSWER_TXT');click_attr(s,'onclick','openSubmissionForm()');assert s.evaluate('__opened')==x['cfg']['formsSubmissionUrl']
      urls=['https://docs.google.com/forms/d/e/AUDIT/viewform','https://forms.gle/AUDIT','http://forms.gle/AUDIT','https://evil.example.invalid/forms/d/e/a/viewform','https://docs.google.com/forms/d/e/a/edit','javascript:alert(1)']
      for url,ok in zip(urls,[True,True,False,False,False,False]):assert s.evaluate('url=>{CFG.formsSubmissionUrl=url;return !!safeFormsSubmissionUrl()}',url)==ok

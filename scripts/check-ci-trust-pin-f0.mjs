@@ -19,6 +19,12 @@ if(!refs.length){
   console.error('FAIL F0 CI trust pin gate: no GARP27_EXTERNAL_TRUST_SHA256 references found');
   process.exit(1);
 }
+const consumer=JSON.parse(fs.readFileSync(path.join(ROOT,'tools/ci-standard/consumers/generator-testu.json'),'utf8'));
+const trust=consumer.trustInputs?.find(x=>x.environment==='GARP27_EXTERNAL_TRUST_SHA256');
+if(!trust || trust.sha256!==expected){
+  console.error('FAIL F0 CI trust pin gate: reviewed consumer profile does not match trust anchor');
+  process.exit(1);
+}
 const bad=refs.filter(x=>x.pin!==expected);
 if(bad.length){
   console.error(`FAIL F0 CI trust pin gate: expected ${expected}`);

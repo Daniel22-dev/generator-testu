@@ -29,4 +29,4 @@ jobs:
       - name: Run current P5 R2 gate
         run: npm run qa:p5:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: 831b87232ff4c3b9e517c25728153e97b3489d18f859bb235a7e3e9a06c9a896
+          GARP27_EXTERNAL_TRUST_SHA256: 7065476c9dad2979212e5ed45a1c141778303d5156a9a494812dc03008366f7a

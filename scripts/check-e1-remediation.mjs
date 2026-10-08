@@ -9,7 +9,7 @@ const pass=(m)=>console.log('PASS',m);
 const must=(v,m)=>{if(!v)fail(m)};
 const read=(p)=>fs.readFileSync(new URL('../'+p, import.meta.url),'utf8');
 
-const student=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const student=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13dh-secure-student-submit.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const verifier=read('src/js/13f-secure-teacher-verifier.js');
 const formsSrc=read('src/js/13ea-secure-verifier-forms.js');
 
@@ -21,8 +21,9 @@ must(student.includes("Number(local.rev)!==Number(dbrec.rev)"),'revision mismatc
 must(student.includes("state:'submitted'")&&student.includes("submittedLocked()"),'durable submitted guard is missing');
 must(student.includes('resp:RESP')&&student.includes('restoreResponseUi()'),'in-progress response persistence/restore is missing');
 must(student.includes('async function flushPendingAttemptWrites()'),'pending persistence flush is missing');
-const submitAt=student.indexOf('async function submitSecureTest()');
-const submitChunk=student.slice(submitAt,submitAt+2200);
+const submitAt=student.indexOf('async function submitSecureTest(');
+must(submitAt>=0,'submitSecureTest definition is missing');
+const submitChunk=student.slice(submitAt,submitAt+2600);
 must(submitChunk.indexOf('await flushPendingAttemptWrites()')>=0,'submit does not drain pending active-attempt writes');
 must(submitChunk.indexOf('await flushPendingAttemptWrites()')<submitChunk.indexOf('await setSubmittedLocked()'),'submitted guard can race with an older active-attempt write');
 must(submitChunk.includes('await clearActiveAttemptSeal(false)'),'submit does not preserve submitted guard while clearing active state');

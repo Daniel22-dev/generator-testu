@@ -8,12 +8,18 @@ def private_start_code(h,teacher_html):
  v=h.new_page(teacher_html)
  try:
   code=v.evaluate('CONFIG.startCode')
-  assert len(code)==10 and v.locator('.warn code').first.inner_text()==code,'private verifier must display its start code'
+  start_field=v.locator('#formsLessonStartCode')
+  assert len(code)==10 and start_field.count()==1 and start_field.input_value()==code,'private verifier must display its start code'
   return code
  finally:v.close()
 def enter_start_code(p,code):
  assert len(code)==10,'use the code belonging to this private package'
  p.locator('#startCode').fill(code)
+def submit_secure(p):
+ p.wait_for_timeout(1300)
+ p.locator('[onclick="requestSecureSubmit()"]:visible').click()
+ p.locator('[data-confirm-ok]:visible').click()
+ p.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")')
 def configure_forms_anchors(p,published_at,email_header='Email Address',timestamp_header='Timestamp'):
  # Synthetic owner attestation for these fixtures; this does not inspect a live Form.
  # 7.1.97 bakes fixed school/teacher settings into new verifiers. In that case the UI hides
@@ -41,6 +47,7 @@ def configure_forms_anchors(p,published_at,email_header='Email Address',timestam
  assert p.evaluate('!!FORMS_ANCHOR_POLICY'),p.locator('#formsAnchorStatus').inner_text()
  if p.locator('[data-v2-panel="results"]').count():p.locator('[data-v2-panel="results"]').click()
 def answer(p,ex,ei,mode,language):
+ if mode=='secureOffline':p.evaluate("()=>{if(typeof TEST_INTERACTION_ARMED_AT!=='undefined')TEST_INTERACTION_ARMED_AT=0}")
  t=ex['type']
  for qi,it in enumerate(ex['items']):
   q=f'{ei}_{qi}'
@@ -86,7 +93,7 @@ def run():
        sc=s.evaluate('calcScore()');assert sc['earned']==sc['total']==12*len(chunk),sc
        click_attr(s,'onclick','confirmSubmit()');click_attr(s,'onclick','doSubmit()');s.wait_for_function('!document.getElementById("resultScreen").classList.contains("hidden")')
       else:
-       click_attr(s,'onclick','submitSecureTest()');s.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt);assert sc['earned']==sc['total']==12*len(chunk),sc
+       s.evaluate('()=>{SUBMIT_UI_ARMED_AT=0;TEST_INTERACTION_ARMED_AT=0}');click_attr(s,'onclick','requestSecureSubmit()');s.locator('[data-confirm-ok]').click();s.wait_for_function('document.getElementById("answerBackup").value.startsWith("SECURE-ANSWERS-V1")');txt=s.locator('#answerBackup').input_value();v=h.new_page(x['teacher']);sc=v.evaluate('async txt=>scorePayload(await decryptPayload(parseTxt(txt)))',txt);assert sc['earned']==sc['total']==12*len(chunk),sc
        v.locator('[data-v2-panel="results"]').click();v.locator('#fallbackImportDetails').evaluate('el=>{el.open=true}');v.locator('#pasteBox').fill(txt);click_attr(v,'onclick','bulkVerifyPasted()');v.wait_for_function('document.getElementById("resultTable").textContent.includes("QA")')
       assert s.evaluate('__errors')==[],s.evaluate('__errors')
       st=p.evaluate('async()=>await runScoringSelfTest()');assert st['ok'] and not st['hasGaps'],st
