@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const form=fs.readFileSync(new URL('../src/js/05-form-fields.js',import.meta.url),'utf8');
-const core=fs.readFileSync(new URL('../src/js/01-core.js',import.meta.url),'utf8');
-const workflow=fs.readFileSync(new URL('../src/js/08a-output-workflow.js',import.meta.url),'utf8');
-const assembly=fs.readFileSync(new URL('../src/js/13g-assemble-test-html.js',import.meta.url),'utf8');
+const readNormalized=p=>fs.readFileSync(new URL(p,import.meta.url),'utf8').replace(/\r\n?/g,'\n');
+const form=readNormalized('../src/js/05-form-fields.js');
+const core=readNormalized('../src/js/01-core.js');
+const workflow=readNormalized('../src/js/08a-output-workflow.js');
+const assembly=readNormalized('../src/js/13g-assemble-test-html.js');
 
 function ok(c,m){if(!c){console.error('FAIL R2:',m);process.exitCode=1}else console.log('PASS R2:',m)}
 function sliceBetween(src,a,b){const i=src.indexOf(a),j=src.indexOf(b,i+a.length);if(i<0||j<0)throw new Error('marker missing: '+a+' -> '+b);return src.slice(i,j)}

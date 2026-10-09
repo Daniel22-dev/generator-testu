@@ -68,7 +68,7 @@ assert(count(secure,'recoveryCodeMatches(')===2, 'E3 secure: Recovery helper is 
 assert(/function lockTap\(\).*LOCK_TAPS>=5/s.test(secure), 'E3 secure: hidden 5x lock-tap reveal is preserved');
 
 // Static privilege-boundary proof: instant runtime.
-const instantUnlock = between(instant, 'async function tryUnlock()', '`;\n}');
+const instantUnlock = extractFunction(instant, 'tryUnlock');
 const instantLogin = between(instant, 'async function doTeacherLogin()', 'function logoutTeacher');
 assert(/recoveryCodeMatches\(v\)/.test(instantUnlock) && !/teacherSecretMatches|teacher-pin|ucitelPinHash/.test(instantUnlock), 'E3 instant: tryUnlock accepts only Classroom Recovery authorization');
 assert(/teacherSecretMatches\(p\)/.test(instantLogin) && !/recoveryCodeMatches|recovery-code|recoveryCodeHash/.test(instantLogin), 'E3 instant: teacher login accepts only Teacher/Admin authorization');
@@ -116,14 +116,17 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   els.teacherName.value='Teacher'; els.teacherPin.value=RECOVERY;
   await vm.runInContext('teacherLogin()',ctx);
   assert(els.teacherPanel.classList.contains('hidden'), 'E3 secure dynamic: Recovery Code does not open teacher panel');
+  assert(els.teacherPin.value==='', 'E3 secure dynamic: rejected Teacher/Admin input is cleared immediately');
   els.teacherPin.value=TEACHER;
   await vm.runInContext('teacherLogin()',ctx);
   assert(!els.teacherPanel.classList.contains('hidden'), 'E3 secure dynamic: Teacher/Admin secret opens teacher panel');
+  assert(els.teacherPin.value==='', 'E3 secure dynamic: accepted Teacher/Admin input is cleared immediately');
 
   const before=vm.runInContext(`JSON.stringify({ATTEMPT_ID,TIMER_DEADLINE,ACTIVE_IDENTITY_HASH,ACTIVE_KEY,JOKER_USED,JOKER_SELECTED_AT,JOKER_CHOICE,STARTED_AT,RESP})`,ctx);
   els.unlockInp.value=TEACHER;
   await vm.runInContext('tryUnlock()',ctx);
   assert(vm.runInContext('LOCKED',ctx)===true, 'E3 secure dynamic: Teacher/Admin secret cannot unlock through the Recovery path');
+  assert(els.unlockInp.value==='', 'E3 secure dynamic: rejected Recovery input is cleared immediately');
 
   vm.runInContext(`SEC_EVENTS=[{t:'2026-10-02T15:05:00.000Z',type:'locked',detail:'Student left window'}]; LOCKED=true; LOCK_REASON='Student left window';`,ctx);
   els.unlockInp.value=RECOVERY;
@@ -131,6 +134,7 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   const after=vm.runInContext(`JSON.stringify({ATTEMPT_ID,TIMER_DEADLINE,ACTIVE_IDENTITY_HASH,ACTIVE_KEY,JOKER_USED,JOKER_SELECTED_AT,JOKER_CHOICE,STARTED_AT,RESP})`,ctx);
   assert(before===after, 'E3 secure dynamic: Recovery unlock preserves attemptId, deadline, identity, variant, joker choice, start time and answers');
   assert(vm.runInContext('LOCKED',ctx)===false, 'E3 secure dynamic: valid Recovery Code unlocks the current attempt');
+  assert(els.unlockInp.value==='', 'E3 secure dynamic: accepted Recovery input is cleared immediately');
   assert(vm.runInContext(`SEC_EVENTS.length===2 && SEC_EVENTS[0].type==='locked' && SEC_EVENTS[1].type==='recovery-unlock'`,ctx), 'E3 secure dynamic: Recovery unlock appends to existing securityEvents instead of replacing them');
   assert(vm.runInContext(`__lastSeal && __lastSeal.attemptId==='ATT-E3-001' && __lastSeal.timerDeadline===1999999999999 && __lastSeal.identityHash==='IDENTITY-HASH-001' && __lastSeal.activeKey==='VARIANT-B' && __lastSeal.jokerUsed===true`,ctx), 'E3 secure dynamic: persisted active-attempt seal retains immutable attempt identity/variant/joker/deadline');
 
@@ -169,19 +173,23 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   els['t-name'].value='Teacher'; els['t-pin'].value=RECOVERY;
   await vm.runInContext('doTeacherLogin()',ctx);
   assert(vm.runInContext('teacherLogged',ctx)===false, 'E3 instant dynamic: Recovery Code does not open teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: rejected Teacher/Admin input is cleared immediately');
   els['t-pin'].value=TEACHER;
   await vm.runInContext('doTeacherLogin()',ctx);
   assert(vm.runInContext('teacherLogged',ctx)===true, 'E3 instant dynamic: Teacher/Admin secret opens teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: accepted Teacher/Admin input is cleared immediately');
 
   const before=vm.runInContext(`JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,group:CFG.activeGroupKey,variant:CFG.activeVariantKey})`,ctx);
   vm.runInContext('locked=true;',ctx); els.unlockInp.value=TEACHER;
   await vm.runInContext('tryUnlock()',ctx);
   assert(vm.runInContext('locked',ctx)===true, 'E3 instant dynamic: Teacher/Admin secret cannot unlock through Recovery path');
+  assert(els.unlockInp.value==='', 'E3 instant dynamic: rejected Recovery input is cleared immediately');
   vm.runInContext(`securityEvents=[{type:'lock',detail:'left',ts:'before'}]; locked=true;`,ctx); els.unlockInp.value=RECOVERY;
   await vm.runInContext('tryUnlock()',ctx);
   const after=vm.runInContext(`JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,group:CFG.activeGroupKey,variant:CFG.activeVariantKey})`,ctx);
   assert(before===after, 'E3 instant dynamic: Recovery unlock preserves attempt id, deadline, variant and joker state');
   assert(vm.runInContext(`!locked && securityEvents.length===2 && securityEvents[0].type==='lock' && securityEvents[1].type==='recovery-unlock'`,ctx), 'E3 instant dynamic: valid Recovery Code unlocks and appends an audit event');
+  assert(els.unlockInp.value==='', 'E3 instant dynamic: accepted Recovery input is cleared immediately');
 
   els.unlockReveal.classList.add('hidden'); vm.runInContext('LOCK_TAPS=0; lockTap(); lockTap(); lockTap(); lockTap();',ctx);
   assert(els.unlockReveal.classList.contains('hidden'), 'E3 instant dynamic: fewer than five lock taps do not reveal Recovery input');
