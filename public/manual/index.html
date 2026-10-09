@@ -42,7 +42,6 @@ section{scroll-margin-top:90px;margin-top:54px}.section-head{display:flex;align-
     <button class="iconbtn" id="searchBtn" title="Hledat v manuálu (Ctrl+K)">⌕</button>
     <button class="iconbtn" id="themeBtn" title="Světlý / tmavý režim">◐</button>
     <button class="iconbtn" id="fullscreenBtn" type="button" title="Zobrazit na celou obrazovku" aria-label="Zobrazit na celou obrazovku" aria-pressed="false"><svg class="fullscreen-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="iconbtn" onclick="window.print()" title="Vytisknout rychlou příručku">⎙</button>
   </div>
 </header>
 <div class="layout">
@@ -150,7 +149,7 @@ section{scroll-margin-top:90px;margin-top:54px}.section-head{display:flex;align-
   <div class="section-head"><div><div class="kicker">Před prvním ostrým použitím</div><h2>Kontrolní seznam</h2><p>Stav se ukládá pouze lokálně v tomto prohlížeči.</p></div><button class="chipbtn" id="resetProgress">Vynulovat průchod</button></div>
   <div class="checklist" id="checklist"><label class="check"><input type="checkbox"><span>Rozumím účelu aplikace a vybral(a) jsem správný pracovní scénář.</span></label><label class="check"><input type="checkbox"><span>Prošel/prošla jsem mapu prostředí a vím, kde se nachází hlavní pracovní kroky.</span></label><label class="check"><input type="checkbox"><span>Dokončil(a) jsem interaktivní prohlídku krok za krokem.</span></label><label class="check"><input type="checkbox"><span>Znám bezpečnostní pravidla a vím, které údaje nesmí odejít do AI.</span></label><label class="check"><input type="checkbox"><span>Vyzkoušel(a) jsem aplikaci na neostrém testovacím příkladu.</span></label><label class="check"><input type="checkbox"><span>Před prvním ostrým použitím provedu finální lidskou kontrolu výstupu.</span></label></div>
 </section>
-<div class="footer" data-ghrab-footer>Interaktivní manuál 1.0 · cílová aplikace Generátor testů v7.1.99 · integrováno do aplikace a AI Studia GHRAB<br>© 2026 Daniel Baláž · Gymnázium, Ostrava-Hrabůvka</div>
+<div class="footer" data-ghrab-footer>Interaktivní manuál 2.0 · cílová aplikace Generátor testů v7.1.99 · integrováno do aplikace a AI Studia GHRAB<br>© 2026 Daniel Baláž · Gymnázium, Ostrava-Hrabůvka</div>
 
 <section class="ghrab-central-error-guide" style="margin:20px 0;padding:18px;border:1px solid color-mix(in srgb,currentColor 22%,transparent);border-radius:14px;background:color-mix(in srgb,currentColor 5%,transparent)">
   <strong style="display:block;margin-bottom:7px">Potřebujete nahlásit technickou chybu?</strong>
@@ -247,4 +246,6 @@ if(localPreview){activatePage();}else{
 }
 </script>
 <noscript><style>html[data-ghrab-access="checking"] body{visibility:visible}</style><main style="max-width:42rem;margin:4rem auto;padding:1.5rem;font-family:system-ui">Interaktivní manuál vyžaduje JavaScript a platný přístup z AI Studia GHRAB.</main></noscript>
+<script type="module" src="./pdf-download.js"></script>
+<script type="module" src="./manual-navigation.js"></script>
 </body></html>
