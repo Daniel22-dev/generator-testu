@@ -39,10 +39,10 @@ function plainFn(src,name){
 
 ok(/LOCK_REASON='',UNLOCK_BUSY=false/.test(secure),'secure runtime declares unlock busy state');
 ok(/if\(!LOCKED\|\|UNLOCK_BUSY\)return;/.test(secure),'secure tryUnlock is a no-op unless locked and serializes concurrent unlocks');
-ok(/UNLOCK_BUSY=true;var guardEpoch=GUARD_EPOCH;try\{/.test(secure)&&/finally\{UNLOCK_BUSY=false;\}/.test(secure),'secure unlock busy flag is fail-safe via try/finally');
+ok(/UNLOCK_BUSY=true;var guardEpoch=GUARD_EPOCH;try\{/.test(secure)&&/finally\{if\(input\)input\.value='';UNLOCK_BUSY=false;\}/.test(secure),'secure unlock busy flag and DOM cleanup are fail-safe via try/finally');
 ok(/unlockBusy=false/.test(instant),'instant runtime declares unlock busy state');
 ok(/if\(!locked\|\|unlockBusy\)return;/.test(instant),'instant tryUnlock is a no-op unless locked and serializes concurrent unlocks');
-ok(/unlockBusy=true;try\{/.test(instant)&&/finally\{unlockBusy=false;\}/.test(instant),'instant unlock busy flag is fail-safe via try/finally');
+ok(/unlockBusy=true;try\{/.test(instant)&&/finally\{if\(input\)input\.value='';unlockBusy=false;\}/.test(instant),'instant unlock busy flag and DOM cleanup are fail-safe via try/finally');
 ok(/warningCount=securityCounts\(\)\.warnings/.test(instant),'instant warningCount tracks warning-class events only');
 
 const secureTry=fnBlock(secure,'tryUnlock');
@@ -84,7 +84,7 @@ ss=sctx.__state();
 ok(ss.SEC_EVENTS.length===beforeSecure&&ss.matchCalls===1,'secure unlock on an already unlocked attempt is a no-op');
 sctx.__setLocked(true);sctx.__setValue('REC-WRONG');await sctx.tryUnlock();ss=sctx.__state();
 ok(ss.LOCKED===true&&ss.inputValue==='','secure rejected recovery keeps the lock and clears the DOM input');
-sctx.__setMatcher(async()=>{throw new Error('synthetic authorization fault');});sctx.__setValue('REC-FAULT');try{await sctx.tryUnlock();}catch(_){}ss=sctx.__state();
+sctx.__setMatcher(async()=>{throw new Error('synthetic authorization fault');});sctx.__setValue('REC-FAULT');try{await sctx.tryUnlock();}catch{}ss=sctx.__state();
 ok(ss.LOCKED===true&&ss.inputValue==='','secure recovery exception keeps the lock and clears the DOM input');
 sctx.__setCritical(true);sctx.__setValue('REC-INTERRUPTED');await sctx.tryUnlock();ss=sctx.__state();
 ok(ss.LOCKED===true&&ss.inputValue==='','secure interrupted authorization clears the DOM input before returning');
@@ -122,7 +122,7 @@ is=ictx.__state();
 ok(is.securityEvents.length===beforeInstant&&is.matchCalls===1,'instant unlock on an already unlocked attempt is a no-op');
 ictx.__setLocked(true);ictx.__setValue('REC-WRONG');await ictx.tryUnlock();is=ictx.__state();
 ok(is.locked===true&&is.inputValue==='','instant rejected recovery keeps the lock and clears the DOM input');
-ictx.__setMatcher(async()=>{throw new Error('synthetic authorization fault');});ictx.__setValue('REC-FAULT');try{await ictx.tryUnlock();}catch(_){}is=ictx.__state();
+ictx.__setMatcher(async()=>{throw new Error('synthetic authorization fault');});ictx.__setValue('REC-FAULT');try{await ictx.tryUnlock();}catch{}is=ictx.__state();
 ok(is.locked===true&&is.inputValue==='','instant recovery exception keeps the lock and clears the DOM input');
 ictx.recordSecurityEvent('warning','manual warning');
 is=ictx.__state();

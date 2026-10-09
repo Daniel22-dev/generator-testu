@@ -73,12 +73,25 @@ function genDom(html,storage,idbState=new Map()){const dom=new JSDOM(html,{runSc
   if(storage)for(const [k,v] of Object.entries(storage))x.localStorage.setItem(k,v);
 }});const inp=dom.window.document.getElementById('startCode');if(inp)inp.value=startCodes.get(dom.window.eval('CFG.testId'))||'';return dom;}
 function dumpStorage(x){const out={};for(let i=0;i<x.localStorage.length;i++){const k=x.localStorage.key(i);out[k]=x.localStorage.getItem(k)}return out}
+function browserOwnedData(x){
+  const local=dumpStorage(x),session={};
+  for(let i=0;i<x.sessionStorage.length;i++){const k=x.sessionStorage.key(i);session[k]=x.sessionStorage.getItem(k)}
+  const idb=[];for(const [dbName,stores] of x.__qaIdbState||[]){for(const [storeName,entries] of stores){idb.push([dbName,storeName,[...entries.entries()]]);}}
+  return JSON.stringify({local,session,idb,url:x.location.href});
+}
+function mustHardenedPasswordInput(input,label){
+  must(input&&input.type==='password',label+' is not a password input');
+  must(input.getAttribute('autocomplete')==='off',label+' autocomplete policy missing');
+  must(input.getAttribute('autocorrect')==='off',label+' autocorrect policy missing');
+  must(input.getAttribute('autocapitalize')==='off',label+' autocapitalize policy missing');
+  must(input.getAttribute('spellcheck')==='false',label+' spellcheck policy missing');
+}
 
 await test('R2-direct-same-secret',async()=>{
   configure({},REC,REC);let threw=false;try{await build()}catch(e){threw=/Recovery|credential|stejn/i.test(String(e.message))}must(threw,'assembleTestHtml accepted Teacher == Recovery');return 'fail-closed';
 });
 await test('R2-direct-weak-teacher',async()=>{
-  configure({},'123456',REC);let threw=false;try{await build()}catch(e){threw=true}must(threw,'assembleTestHtml accepted weak Teacher/Admin secret');return 'fail-closed';
+  configure({},'123456',REC);let threw=false;try{await build()}catch{threw=true}must(threw,'assembleTestHtml accepted weak Teacher/Admin secret');return 'fail-closed';
 });
 await test('R2-drift-bypass',async()=>{
   configure();await build();w.eval('lastGenData='+JSON.stringify(GEN)+';generatedTestHtml="r3";');const before=w.eval('lastAssembled');
@@ -89,12 +102,13 @@ await test('R2-drift-bypass',async()=>{
 configure({testMode:'bezny',resultMode:'instant',screenGuard:true,feedbackMode:'brief'});
 const instant=await build();
 await test('R3-instant-privilege-boundary',async()=>{
-  const d=genDom(instant);const x=d.window;await sleep(120);x.document.getElementById('studentName').value='Student';await x.startTest();
-  x.openTeacherModal();x.document.getElementById('t-name').value=TEACHER_NAME;x.document.getElementById('t-pin').value=REC;await x.doTeacherLogin();must(x.document.getElementById('t-panel').classList.contains('hidden'),'Recovery opened instant teacher panel');
-  x.document.getElementById('t-pin').value=TEACH;await x.doTeacherLogin();must(!x.document.getElementById('t-panel').classList.contains('hidden'),'Teacher/Admin login failed');x.closeTeacherModal();
+  const d=genDom(instant);const x=d.window;await sleep(120);const unlock=x.document.getElementById('unlockInp'),teacherPin=x.document.getElementById('t-pin');mustHardenedPasswordInput(unlock,'instant Recovery');mustHardenedPasswordInput(teacherPin,'instant Teacher/Admin');must(/Recovery|Odemykací kód testu/i.test(unlock.placeholder)&&!/Teacher access|Učitelský přístup/i.test(unlock.placeholder),'instant lock label confuses Recovery with Teacher/Admin');x.document.getElementById('studentName').value='Student';await x.startTest();
+  x.openTeacherModal();x.document.getElementById('t-name').value=TEACHER_NAME;teacherPin.value=REC;await x.doTeacherLogin();must(x.document.getElementById('t-panel').classList.contains('hidden'),'Recovery opened instant teacher panel');must(teacherPin.value==='','rejected instant Teacher/Admin input remained in DOM');
+  teacherPin.value=TEACH;await x.doTeacherLogin();must(!x.document.getElementById('t-panel').classList.contains('hidden'),'Teacher/Admin login failed');must(teacherPin.value==='','accepted instant Teacher/Admin input remained in DOM');x.closeTeacherModal();
   x.dispatchEvent(new x.Event('pagehide'));await sleep(20);must(!x.document.getElementById('lockScreen').classList.contains('hidden'),'instant did not lock');
-  x.document.getElementById('unlockInp').value=TEACH;await x.tryUnlock();must(!x.document.getElementById('lockScreen').classList.contains('hidden'),'Teacher/Admin unlocked instant lock');
-  x.document.getElementById('unlockInp').value=REC;await x.tryUnlock();must(x.document.getElementById('lockScreen').classList.contains('hidden'),'Recovery did not unlock instant lock');d.window.close();return 'login/unlock separated';
+  const before=x.eval('JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,ANSWERS})');unlock.value=TEACH;await x.tryUnlock();must(!x.document.getElementById('lockScreen').classList.contains('hidden'),'Teacher/Admin unlocked instant lock');must(unlock.value==='','rejected instant Recovery input remained in DOM');must(!browserOwnedData(x).includes(TEACH),'rejected Teacher/Admin value leaked into instant app storage or URL');
+  x.eval('var __s1RecoveryMatcher=recoveryCodeMatches;recoveryCodeMatches=async function(){throw new Error("synthetic authorization fault");}');unlock.value='SYNTHETIC-FAULT';try{await x.tryUnlock()}catch{}must(unlock.value===''&&x.eval('locked')===true,'instant recovery exception retained input or changed lock');x.eval('recoveryCodeMatches=__s1RecoveryMatcher');
+  unlock.value=REC;await x.tryUnlock();must(x.document.getElementById('lockScreen').classList.contains('hidden'),'Recovery did not unlock instant lock');must(unlock.value==='','accepted instant Recovery input remained in DOM');must(before===x.eval('JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,ANSWERS})'),'instant recovery changed attempt, timer, joker or answers');must(!browserOwnedData(x).includes(REC),'raw Recovery Code leaked into instant app storage or URL');d.window.close();return 'labels/inputs hardened; login/unlock separated; state preserved';
 });
 
 configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,feedbackMode:'none'});
@@ -104,9 +118,11 @@ await test('R1-verifier-generated-script',async()=>{
   const d=genDom(pack.teacherHtml);await sleep(180);for(const fn of ['renderTable','downloadResultsCsv','parseFormsCsvText','bulkVerifyPasted','downloadDirectPdf'])must(typeof d.window[fn]==='function',fn+' missing');d.window.close();return scripts.length+' script(s) parsed';
 });
 await test('R3-secure-privilege-boundary',async()=>{
-  const d=genDom(pack.studentHtml);const x=d.window;await sleep(150);x.document.getElementById('studentName').value='Alice';await x.startTest();x.lockTest('r3-lock');await sleep(20);
+  const d=genDom(pack.studentHtml);const x=d.window;await sleep(150);const unlock=x.document.getElementById('unlockInp');mustHardenedPasswordInput(unlock,'secure Recovery');must(/Recovery|Odemykací kód testu/i.test(unlock.placeholder)&&!/Teacher access|Učitelský přístup/i.test(unlock.placeholder),'secure lock label confuses Recovery with Teacher/Admin');x.document.getElementById('studentName').value='Alice';await x.startTest();x.lockTest('r3-lock');await sleep(20);
   must(!x.document.getElementById('teacherModal')&&typeof x.teacherLogin==='undefined'&&typeof x.teacherSecretMatches==='undefined','teacher capability serialized in secure student');
-  x.document.getElementById('unlockInp').value=TEACH;await x.tryUnlock();must(x.eval('LOCKED')===true,'Teacher/Admin unlocked secure lock');x.document.getElementById('unlockInp').value=REC;await x.tryUnlock();must(x.eval('LOCKED')===false,'Recovery did not unlock secure lock');
+  const before=x.eval('JSON.stringify({ATTEMPT_ID,TIMER_DEADLINE,ACTIVE_IDENTITY_HASH,ACTIVE_KEY,JOKER_USED,JOKER_SELECTED_AT,JOKER_CHOICE,STARTED_AT,RESP})');unlock.value=TEACH;await x.tryUnlock();must(x.eval('LOCKED')===true,'Teacher/Admin unlocked secure lock');must(unlock.value==='','rejected secure Recovery input remained in DOM');must(!browserOwnedData(x).includes(TEACH),'rejected Teacher/Admin value leaked into secure app storage or URL');
+  x.eval('var __s1RecoveryMatcher=unlockCodeMatches;unlockCodeMatches=async function(){throw new Error("synthetic authorization fault");}');unlock.value='SYNTHETIC-FAULT';try{await x.tryUnlock()}catch{}must(unlock.value===''&&x.eval('LOCKED')===true,'secure recovery exception retained input or changed lock');x.eval('unlockCodeMatches=__s1RecoveryMatcher');
+  unlock.value=REC;await x.tryUnlock();must(x.eval('LOCKED')===false,'Recovery did not unlock secure lock');must(unlock.value==='','accepted secure Recovery input remained in DOM');must(before===x.eval('JSON.stringify({ATTEMPT_ID,TIMER_DEADLINE,ACTIVE_IDENTITY_HASH,ACTIVE_KEY,JOKER_USED,JOKER_SELECTED_AT,JOKER_CHOICE,STARTED_AT,RESP})'),'secure recovery changed attempt, timer, identity, variant, joker, start or answers');must(!browserOwnedData(x).includes(REC),'raw Recovery Code leaked into secure app storage or URL');
   const storage=dumpStorage(x);const activeKey=x.eval("storageKey('activeAttempt')");const y=genDom(pack.studentHtml,storage,d.window.__qaIdbState).window;await sleep(150);y.document.getElementById('studentName').value='Bob';await y.startTest();await sleep(30);must(y.document.querySelector('.s-modal-bd'),'foreign active attempt not blocked');must(!y.document.querySelector('.s-modal-bd input[type=password]'),'reset capability exported');must(y.localStorage.getItem(activeKey)!==null,'foreign state cleared');y.close();d.window.close();return 'teacher absent; classroom unlock preserves attempt; foreign identity blocked';
 });
 

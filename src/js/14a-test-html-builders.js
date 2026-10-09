@@ -347,7 +347,7 @@ function buildTeacherHtml(cfg, exercises) {
     '<div class="modal-box teacher-box"><div id="t-login">' +
     '<div class="modal-title">&#128274; ' + H(L.teacher) + '</div>' +
     '<input type="text" id="t-name" class="modal-inp" placeholder="' + H(L.teacher) + '" autocomplete="off">' +
-    '<input type="password" id="t-pin" class="modal-inp" placeholder="PIN" onkeydown="if(event.key===\'Enter\')doTeacherLogin()">' +
+    '<input type="password" id="t-pin" class="modal-inp" placeholder="' + H(L.teacherAccess || L.teacher) + '" aria-label="' + H(L.teacherAccess || L.teacher) + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key===\'Enter\')doTeacherLogin()">' +
     '<div id="t-err" class="t-err hidden"></div>' +
     '<button class="btn-modal-ok" onclick="doTeacherLogin()">' + H(L.login) + '</button>' +
     '<button class="btn-modal-cancel" onclick="closeTeacherModal()">' + H(L.close) + '</button>' +
@@ -372,7 +372,7 @@ function buildModalsHtml(cfg) {
       '<div class="lock-icon" id="lockIcon" onclick="lockTap()" style="cursor:pointer;user-select:none;-webkit-user-select:none">&#128274;</div><div class="lock-title">' + H(L.locked) + '</div>' +
       '<div class="lock-reason" id="lockContactMsg">' + H(L.lockContact || 'Kontaktuj učitele.') + '</div>' +
       '<div id="unlockReveal" class="hidden"><div id="lockReason" class="lock-reason"></div>' +
-      '<input type="password" id="unlockInp" class="lock-inp" placeholder="' + H(L.unlockPh) + '" onkeydown="if(event.key===\'Enter\')tryUnlock()">' +
+      '<input type="password" id="unlockInp" class="lock-inp" aria-label="' + H(L.unlockPh) + '" placeholder="' + H(L.unlockPh) + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key===\'Enter\')tryUnlock()">' +
       '<button class="btn-modal-ok" onclick="tryUnlock()">' + H(L.unlock) + '</button></div></div></div>' : '');
 }
 
