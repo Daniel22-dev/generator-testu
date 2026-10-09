@@ -37,8 +37,18 @@ function addManualNavigation() {
   for (const link of oldLinks) { link.hidden = true; link.style.display = "none"; }
   for (const control of document.querySelectorAll(
     'button[onclick*="window.print"],button[title*="Vytisknout"],#printBtn')) {
-    control.hidden = true;
-    control.style.display = "none";
+    if (isViewer) {
+      // Studio's embedded viewer owns the PDF export: do not duplicate the action.
+      control.hidden = true;
+      control.style.display = "none";
+    } else {
+      // Standalone GIT currently has no local pdf-download.js; do not silently
+      // remove its only printable/exportable output while content review is pending.
+      control.hidden = false;
+      control.style.display = "";
+      control.title = "Tisknout / uložit jako PDF";
+      control.setAttribute("aria-label", "Tisknout / uložit jako PDF");
+    }
   }
   if (isViewer) {
     document.documentElement.dataset.ghrabManualEmbedded = "viewer";
