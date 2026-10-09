@@ -58,7 +58,10 @@ test('app launch returns to application and Studio without legacy links', () => 
   assert.deepEqual(x.links.map(link => link.text), ['← Zpět do aplikace', 'AI Studio']);
   assert.equal(x.links[0].href, appHome);
   assert.equal(x.links[1].href, studioHome);
-  assert.ok(x.legacyApp.hidden && x.legacyStudio.hidden && x.print.hidden);
+  assert.ok(x.legacyApp.hidden && x.legacyStudio.hidden);
+  // GIT has no standalone local PDF module; printing remains available here.
+  assert.equal(x.print.hidden, false);
+  assert.equal(x.print.attributes["aria-label"], "Tisknout / uložit jako PDF");
 });
 test('catalog launch returns only to manuals and Studio', () => {
   const x = simulate('?from=studio');
