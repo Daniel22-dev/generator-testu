@@ -256,13 +256,19 @@ check(collectIssues(similarAcrossExercises, specsFiveStyles).some(issue => issue
 const shortLegitimate = structuredClone(validFiveStyles);
 shortLegitimate[0].items[0].question = 'Choose the correct answer.';
 shortLegitimate[3].items[0].question = 'Choose the correct answer.';
+shortLegitimate[3].items[0].options = ['W', 'X', 'Y', 'Z'];
 check(!collectIssues(shortLegitimate, specsFiveStyles).some(issue => /duplicate|similarity/.test(issue.code)), 'T02 short generic instructions do not trigger a false duplicate finding');
 for (const prompt of ['Vyber správnou odpověď.', 'Selecciona la respuesta correcta.', 'Wähle die richtige Antwort.']) {
   const genericControl = structuredClone(validFiveStyles);
   genericControl[0].items[0].question = prompt;
   genericControl[3].items[0].question = prompt;
+  genericControl[3].items[0].options = ['W', 'X', 'Y', 'Z'];
   check(!collectIssues(genericControl, specsFiveStyles).some(issue => /duplicate|similarity/.test(issue.code)), `S2-R1 multilingual generic instruction remains exempt: ${prompt}`);
 }
+const completeGenericDuplicate = structuredClone(validFiveStyles);
+completeGenericDuplicate[0].items[0].question = 'Choose the correct answer.';
+completeGenericDuplicate[3].items[0].question = 'Choose the correct answer.';
+check(collectIssues(completeGenericDuplicate, specsFiveStyles).some(issue => issue.code === 'literal-cross-exercise-duplicate' && issue.level === 'bad'), 'S2.1-R2 identical generic stem and answer content remain blocking');
 
 const legacyExercise = {type:'multiple choice', title:'Advanced Conditionals'};
 check(vm.runInContext('exerciseStyleLabel', context)(legacyExercise) === 'Multiple choice', 'legacy tests without style fall back to their canonical type without inventing pedagogy');

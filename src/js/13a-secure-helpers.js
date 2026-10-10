@@ -127,14 +127,24 @@ function fidelitySimilarity(a,b){const aa=Array.from(new Set(fidelityContentToke
 function fidelityStyleKey(value){const raw=valueText(value);return specialStyleKey(raw)||normalizeType(raw);}
 function collectPedagogicalFidelityIssues(exercises,specs){
   const issues=[],rows=[];
-  const genericInstructions=new Set([
-    'choose the correct answer','choose the correct option','select the correct answer','select the correct option','pick the correct answer','pick the correct option',
-    'answer the question','answer the questions','complete the sentence','complete the sentences','fill in the blank','fill in the blanks',
-    'translate the sentence','translate the sentences','match the items','match the columns','read the text','read the passage',
-    'vyber spravnou odpoved','vyber spravnou moznost','zvol spravnou odpoved','zvol spravnou moznost','odpovez na otazku','dopln vetu','preloz vetu',
-    'elige la respuesta correcta','elige la opcion correcta','selecciona la respuesta correcta','selecciona la opcion correcta','responde la pregunta','completa la oracion','traduce la oracion',
-    'wahle die richtige antwort','wahle die richtige option','beantworte die frage','vervollstandige den satz','ubersetze den satz'
-  ]);
+  const normalizedContent=function(value){
+    if(Array.isArray(value))return '['+value.map(normalizedContent).sort().join(',')+']';
+    if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(key=>fidelityNormalizedText(key)+':'+normalizedContent(value[key])).join(',')+'}';
+    return fidelityNormalizedText(String(value==null?'':value));
+  };
+  const itemContentFingerprint=function(item){
+    if(!item||typeof item!=='object')return '';
+    const parts=[];
+    if(Array.isArray(item.options)&&item.options.length){
+      parts.push('options:'+normalizedContent(item.options));
+      const correctIndex=Number(item.correct);
+      if(Number.isInteger(correctIndex)&&correctIndex>=0&&correctIndex<item.options.length)parts.push('correct-option:'+normalizedContent(item.options[correctIndex]));
+    }else if(Object.prototype.hasOwnProperty.call(item,'correct'))parts.push('correct:'+normalizedContent(item.correct));
+    ['answer','answers','correct_answer','correctAnswer','acceptable_answers','acceptableAnswers','expected','expected_answer','solution','translation','pairs','right'].forEach(function(key){
+      if(Object.prototype.hasOwnProperty.call(item,key)&&valueText(item[key]))parts.push(fidelityNormalizedText(key)+':'+normalizedContent(item[key]));
+    });
+    return parts.sort().join('|');
+  };
   if(!Array.isArray(exercises))return issues;
   exercises.forEach(function(ex,ei){
     ex=ex&&typeof ex==='object'?ex:{};
@@ -152,19 +162,19 @@ function collectPedagogicalFidelityIssues(exercises,specs){
         const stem=fidelityItemStem(item),hiddenItemContext=hasAnyText(item,['passage','source_text','text','source']);
         const normalizedStem=fidelityNormalizedText(stem);
         const contextReference=[
-          /\b(?:according to|based on|in|from)\s+(?:(?:the|this|that)\s+)?(?:text|passage|article|story|extract|reading)\b/,
+          /\b(?:according to|based on|in|from)\s+(?:(?:the|this|that)\s+)?(?:(?:following|preceding|above)\s+)?(?:text|passage|article|story|extract|reading)\b/,
           /\b(?:podle|v|ve|z|ze)\s+(?:(?:tohoto|toho|tamtoho)\s+)?(?:textu|pasaze|clanku|pribehu|ukazky)\b/,
-          /\b(?:segun|de acuerdo con|basado en|en|del)\s+(?:(?:el|este|ese|aquel)\s+)?(?:texto|pasaje|articulo|relato|extracto|lectura)\b/,
+          /\b(?:segun|de acuerdo con|basado en|en|del)\s+(?:(?:el|este|ese|aquel)\s+)?(?:(?:siguiente|anterior)\s+)?(?:texto|pasaje|articulo|relato|extracto|lectura)\b/,
           /\b(?:laut|gemass|gemaß|in|aus)\s+(?:(?:dem|diesem|jenem)\s+)?(?:text|abschnitt|artikel|auszug|lesetext)\b/
         ].some(pattern=>pattern.test(normalizedStem));
         if(hiddenExerciseContext||hiddenItemContext||contextReference)issues.push({level:'bad',code:'independent-mc-hidden-context',exercise:ei+1,item:qi+1,detail:`cvičení ${ei+1}, položka ${qi+1}: samostatné Multiple Choice odkazuje na text/passage, který jeho renderer studentovi nezobrazuje.`});
       });
     }
-    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem);if(normalized&&!genericInstructions.has(normalized))rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens});});
+    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem),contentFingerprint=itemContentFingerprint(item);if(normalized)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens,contentFingerprint});});
   });
   for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
     const a=rows[i],b=rows[j];if(a.exercise===b.exercise)continue;
-    if(a.normalized===b.normalized){issues.push({level:'bad',code:'literal-cross-exercise-duplicate',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} mají doslovně stejné zadání napříč cvičeními.`});continue;}
+    if(a.normalized===b.normalized){if(a.contentFingerprint===b.contentFingerprint)issues.push({level:'bad',code:'literal-cross-exercise-duplicate',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} mají shodné zadání i odpovědní obsah napříč cvičeními.`});continue;}
     const similarity=fidelitySimilarity(a.stem,b.stem);
     if(similarity>=0.82)issues.push({level:'warn',code:'high-cross-exercise-similarity',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,similarity,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} jsou vysoce podobné (${Math.round(similarity*100)} %); učitel má ověřit, že nejde o nechtěnou duplicitu.`});
   }

@@ -51,10 +51,10 @@ function replaceLine(source, marker, replacement, id) {
   return lines.join('\n');
 }
 
-function fixture(mcStem, readingStem) {
+function fixture(mcStem, readingStem, mcOptions=['A','B'], readingOptions=['A','B']) {
   return [
-    {type:'multiple choice',style:'multiple choice',items:[{question:mcStem,options:['A','B'],correct:0}]},
-    {type:'reading comprehension',style:'reading comprehension',passage:'A synthetic visible passage.',items:[{question:readingStem,options:['A','B'],correct:0}]}
+    {type:'multiple choice',style:'multiple choice',items:[{question:mcStem,options:mcOptions,correct:0}]},
+    {type:'reading comprehension',style:'reading comprehension',passage:'A synthetic visible passage.',items:[{question:readingStem,options:readingOptions,correct:0}]}
   ];
 }
 const specs = [{style:'multiple choice',type:'multiple choice'},{style:'reading comprehension',type:'reading comprehension'}];
@@ -66,8 +66,12 @@ const current = collectorFrom(original);
 assert(hasCode(current, fixture('Which device broke first?', 'Which device broke first?'), 'literal-cross-exercise-duplicate'), 'current S2-R1 policy blocks short substantive literal duplicate');
 assert(hasCode(current, fixture('According to this passage, which device broke first?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'current S2-R2 policy blocks English demonstrative reference');
 assert(hasCode(current, fixture('Según el texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'current S2-R3 policy blocks Spanish reference');
+assert(!hasCode(current, fixture('Choose the best answer.', 'Choose the best answer.', ['has','have'], ['red','blue']), 'literal-cross-exercise-duplicate'), 'current R2-FP policy allows repeated stem with different answer content');
+assert(hasCode(current, fixture('Choose the correct answer.', 'Choose the correct answer.', ['A true fact','A false fact'], ['A true fact','A false fact']), 'literal-cross-exercise-duplicate'), 'current R2-TP policy blocks complete duplicate including answer content');
+assert(hasCode(current, fixture('According to the following passage, which device broke first?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'current R2-FN policy blocks English following-passage reference');
+assert(hasCode(current, fixture('Según el siguiente texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'current R2-FN policy blocks Spanish following-text reference');
 
-const oldLengthCutoff = replaceOnce(original, 'if(normalized&&!genericInstructions.has(normalized))rows.push', 'if(normalized&&tokens.length>=5)rows.push', 'S2-R1');
+const oldLengthCutoff = replaceOnce(original, 'if(normalized)rows.push', 'if(normalized&&tokens.length>=5)rows.push', 'S2-R1');
 assert(!hasCode(collectorFrom(oldLengthCutoff), fixture('Which device broke first?', 'Which device broke first?'), 'literal-cross-exercise-duplicate'), 'mutation proof S2-R1: restoring the old token cutoff reopens the reported gap');
 
 const noDemonstratives = replaceOnce(original, '(?:the|this|that)', '(?:the)', 'S2-R2');
@@ -76,4 +80,16 @@ assert(!hasCode(collectorFrom(noDemonstratives), fixture('According to this pass
 const noSpanish = replaceLine(original, '(?:segun|de acuerdo con|basado en|en|del)', '          /(?!)/,', 'S2-R3');
 assert(!hasCode(collectorFrom(noSpanish), fixture('Según el texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof S2-R3: removing Spanish references reopens the reported gap');
 
-console.log('Sprint 02.1 remediation mutation gate passed.');
+const stemOnlyDuplicate = replaceOnce(original, 'if(a.contentFingerprint===b.contentFingerprint)', 'if(true)', 'R2-FP');
+assert(hasCode(collectorFrom(stemOnlyDuplicate), fixture('Choose the best answer.', 'Choose the best answer.', ['has','have'], ['red','blue']), 'literal-cross-exercise-duplicate'), 'mutation proof R2-FP: stem-only duplicate comparison recreates the false positive');
+
+const genericRowsSkipped = replaceOnce(original, 'if(normalized)rows.push', "if(normalized&&fidelityContentTokens(stem).length)rows.push", 'R2-TP');
+assert(!hasCode(collectorFrom(genericRowsSkipped), fixture('Choose the correct answer.', 'Choose the correct answer.', ['A true fact','A false fact'], ['A true fact','A false fact']), 'literal-cross-exercise-duplicate'), 'mutation proof R2-TP: skipping content-free generic stems misses a complete duplicate');
+
+const noFollowing = replaceOnce(original, '(?:following|preceding|above)', '(?:preceding|above)', 'R2-FN-EN');
+assert(!hasCode(collectorFrom(noFollowing), fixture('According to the following passage, which device broke first?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof R2-FN-EN: removing following-passage support reopens the hidden-context gap');
+
+const noSiguiente = replaceOnce(original, '(?:siguiente|anterior)', '(?:anterior)', 'R2-FN-ES');
+assert(!hasCode(collectorFrom(noSiguiente), fixture('Según el siguiente texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof R2-FN-ES: removing siguiente-texto support reopens the hidden-context gap');
+
+console.log('Sprint 02.1 R2 remediation mutation gate passed.');
