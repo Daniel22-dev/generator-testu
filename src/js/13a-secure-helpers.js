@@ -109,6 +109,59 @@ function valueText(v){return String(v == null ? '' : v).replace(/\u0000/g,'').tr
 function hasAnyText(obj, keys){return keys.some(k => valueText(obj && obj[k]).length > 0);}
 function hasNonEmptyArray(obj, key){return Array.isArray(obj && obj[key]) && obj[key].filter(x => valueText(x).length > 0).length > 0;}
 
+// style = učitelem zvolený pedagogický formát, type = kanonická bodovací/renderovací
+// větev a title = volitelný tematický podtitulek od AI. Tyto údaje se nesmějí
+// vzájemně nahrazovat. Starší export bez style bezpečně zobrazuje pouze type.
+function exercisePedagogicalStyle(ex){return valueText(ex&&ex.style)||valueText(ex&&ex.type);}
+function exerciseStyleLabel(ex){const raw=exercisePedagogicalStyle(ex);return raw?raw.charAt(0).toUpperCase()+raw.slice(1):'';}
+function exerciseThemeTitle(ex){const title=valueText(ex&&ex.title),style=exercisePedagogicalStyle(ex),type=valueText(ex&&ex.type);if(!title)return '';const key=title.toLowerCase();return key===style.toLowerCase()||key===type.toLowerCase()?'':title;}
+function exerciseDisplayName(ex){const style=exerciseStyleLabel(ex),title=exerciseThemeTitle(ex);return title?(style+' — '+title):style;}
+
+function fidelityNormalizedText(value){return valueText(value).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g,' ').replace(/\s+/g,' ').trim();}
+function fidelityContentTokens(value){
+  const stop=new Set(['the','a','an','and','or','to','of','in','on','for','with','is','are','was','were','what','which','who','when','where','why','how','choose','select','correct','answer','option','question','according','based','text','passage','article','story','extract','reading','vyber','zvol','spravnou','spravne','odpoved','otazka','podle','textu','pasaze','clanku','pribehu','ukazky']);
+  return fidelityNormalizedText(value).split(' ').filter(token=>token.length>=3&&!stop.has(token));
+}
+function fidelityItemStem(item){return valueText(item&&(item.question||item.prompt||item.statement||item.sentence||item.base_sentence||item.left||item.text||item.item));}
+function fidelitySimilarity(a,b){const aa=Array.from(new Set(fidelityContentTokens(a))),bb=Array.from(new Set(fidelityContentTokens(b)));if(aa.length<8||bb.length<8)return 0;const bs=new Set(bb),inter=aa.filter(x=>bs.has(x)).length,union=new Set(aa.concat(bb)).size;return inter>=7&&union?inter/union:0;}
+function fidelityStyleKey(value){const raw=valueText(value);return specialStyleKey(raw)||normalizeType(raw);}
+function collectPedagogicalFidelityIssues(exercises,specs){
+  const issues=[],rows=[];
+  if(!Array.isArray(exercises))return issues;
+  exercises.forEach(function(ex,ei){
+    ex=ex&&typeof ex==='object'?ex:{};
+    const spec=Array.isArray(specs)?specs[ei]:null,type=normalizeType(ex.type||''),items=Array.isArray(ex.items)?ex.items:[];
+    const actualStyle=valueText(ex.style),expectedStyle=valueText(spec&&spec.style);
+    if(actualStyle&&expectedStyle&&fidelityStyleKey(actualStyle)!==fidelityStyleKey(expectedStyle))issues.push({level:'bad',code:'style-mismatch',exercise:ei+1,detail:`cvičení ${ei+1}: pedagogický styl je "${actualStyle}", učitel zvolil "${expectedStyle}".`});
+    if(spec&&type!==spec.type)issues.push({level:'bad',code:'type-style-mismatch',exercise:ei+1,detail:`cvičení ${ei+1}: styl "${expectedStyle}" se musí bodovat jako "${spec.type}", nikoli "${type}".`});
+    if(type==='reading comprehension'){
+      if(!hasAnyText(ex,['passage','source_text','text','source']))issues.push({level:'bad',code:'reading-context-missing',exercise:ei+1,detail:`cvičení ${ei+1}: Reading Comprehension nemá jeden sdílený passage na úrovni cvičení.`});
+      items.forEach(function(item,qi){if(hasAnyText(item,['passage','source_text','text','source']))issues.push({level:'bad',code:'reading-context-repeated',exercise:ei+1,item:qi+1,detail:`cvičení ${ei+1}, položka ${qi+1}: Reading passage nesmí být skrytě opakován uvnitř položky.`});});
+    }
+    if(type==='multiple choice'){
+      const hiddenExerciseContext=hasAnyText(ex,['passage','source_text','text','source']);
+      items.forEach(function(item,qi){
+        const stem=fidelityItemStem(item),hiddenItemContext=hasAnyText(item,['passage','source_text','text','source']);
+        const contextReference=/\b(?:according to|based on|in|from)\s+(?:the\s+)?(?:text|passage|article|story|extract|reading)\b|\b(?:podle|v|z)\s+(?:textu|pasaze|clanku|pribehu|ukazky)\b/i.test(fidelityNormalizedText(stem));
+        if(hiddenExerciseContext||hiddenItemContext||contextReference)issues.push({level:'bad',code:'independent-mc-hidden-context',exercise:ei+1,item:qi+1,detail:`cvičení ${ei+1}, položka ${qi+1}: samostatné Multiple Choice odkazuje na text/passage, který jeho renderer studentovi nezobrazuje.`});
+      });
+    }
+    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem);if(normalized&&tokens.length>=5)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens});});
+  });
+  for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
+    const a=rows[i],b=rows[j];if(a.exercise===b.exercise)continue;
+    if(a.normalized===b.normalized){issues.push({level:'bad',code:'literal-cross-exercise-duplicate',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} mají doslovně stejné zadání napříč cvičeními.`});continue;}
+    const similarity=fidelitySimilarity(a.stem,b.stem);
+    if(similarity>=0.82)issues.push({level:'warn',code:'high-cross-exercise-similarity',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,similarity,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} jsou vysoce podobné (${Math.round(similarity*100)} %); učitel má ověřit, že nejde o nechtěnou duplicitu.`});
+  }
+  return issues;
+}
+function buildPedagogicalReview(variants){
+  const review={};
+  Object.keys(variants||{}).forEach(key=>{const exs=variants[key]||[],specs=exs.map(ex=>({style:ex.style||'',type:scoringTypeFor(ex.style||ex.type)}));review[key]=collectPedagogicalFidelityIssues(exs,specs).map(issue=>({level:issue.level,code:issue.code,detail:issue.detail}));});
+  return review;
+}
+
 // A single contract for the model, manual forms, editor and both scorers.
 // Canonicalization copies data: validation and failed edits must not mutate inputs.
 function canonicalizeExercise(ex, spec){
@@ -187,7 +240,6 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
       }
       if(['multiple choice','reading comprehension','listening comprehension'].includes(type)){
         if(!hasAnyText(it,['question','prompt']))errors.push(`${loc}: chybí question/prompt.`);
-        if(type==='reading comprehension'&&!hasAnyText(ex,['passage','source_text','text','source'])&&!hasAnyText(it,['passage','text','source']))errors.push(`${loc}: reading comprehension potřebuje sdílený text (passage) na úrovni cvičení, nebo u položky.`);
         if(type==='listening comprehension'&&!hasAnyText(it,['transcript','audio_prompt','audio_source_note','source_url','text','passage']))errors.push(`${loc}: listening comprehension potřebuje teacher-only transcript/audio script/source note podle přiloženého audio/video/URL/dokumentu.`);
         if(!Array.isArray(it.options)||it.options.filter(x=>valueText(x)).length<2)errors.push(`${loc}: chybí alespoň dvě možnosti.`);
         if(resolveCorrectIndex(it)<0)errors.push(`${loc}: chybí správná odpověď nebo je correct mimo rozsah options (0 = první možnost).`);
@@ -344,6 +396,7 @@ function validateExerciseSetStrict(st,exercises,whereLabel){
       }
     });
   }
+  collectPedagogicalFidelityIssues(exercises,specs).filter(issue=>issue.level==='bad').forEach(issue=>errors.push(`${whereLabel}: ${issue.detail}`));
   if(errors.length){
     const err=new Error('Gemini vrátil data mimo zadání, test negeneruji:\n- '+errors.join('\n- '));
     err.isExerciseValidation=true;            // rozlišení od jiných chyb (crypto, síť…)

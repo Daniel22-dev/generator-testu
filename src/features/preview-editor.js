@@ -150,9 +150,10 @@ function edTextarea(key,ei,ii,val,ph){ return '<textarea class="ed-ta" oninput="
 
 function edExerciseHtml(ex,ei){
   const type=normalizeType(ex.type||'');
+  const style=exerciseStyleLabel(ex);
   let h='<div class="ed-ex"><div class="ed-ex-head"><span class="ed-ex-num">'+(ei+1)+'</span>'+
-    '<input class="ed-title" value="'+H(ex.title||type)+'" oninput="edSetTitle('+ei+',this.value)" placeholder="Název cvičení">'+
-    '<span class="ed-type">'+H(type)+'</span></div>';
+    '<span class="ed-type"><strong>'+H(style)+'</strong><small>bodování: '+H(type)+'</small></span>'+
+    '<input class="ed-title" value="'+H(exerciseThemeTitle(ex))+'" oninput="edSetTitle('+ei+',this.value)" aria-label="Tematický podtitulek" placeholder="Tematický podtitulek (volitelný)"></div>';
   if(type==='reading comprehension'&&valueText(ex.passage||ex.source_text||ex.text||ex.source)){
     h+=edRow('Sd\u00edlen\u00fd text pro cel\u00e9 cvi\u010den\u00ed','<textarea class="ed-ta" onchange="edSetExercisePassage('+ei+',this.value)">'+H(ex.passage||ex.source_text||ex.text||ex.source)+'</textarea>');
   }

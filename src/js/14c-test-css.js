@@ -12,7 +12,7 @@ function getTestBaseCSS() {
 '.ex-ov{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}' +
 '.ex-ov-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}' +
 '.ex-num-badge{background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}' +
-'.ex-ov-name{flex:1;font-size:14px}.ex-ov-pts{font-size:13px;color:var(--muted)}' +
+'.ex-ov-name{flex:1;font-size:14px}.ex-style-label{display:block}.exercise-subtitle{display:block;margin-top:2px;color:var(--muted);font-size:.78em;font-weight:500;line-height:1.25}.ex-ov-pts{font-size:13px;color:var(--muted)}' +
 '.ex-ov-total{display:flex;justify-content:space-between;padding:10px 14px;background:var(--card2);font-size:13px;font-weight:600}' +
 '.cs-test-note{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.45);border-radius:12px;padding:10px 12px;margin:12px 0 14px;font-size:13px;line-height:1.55;color:var(--text)}.cs-test-note strong{color:var(--accent)}' +
 '.rules-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px}' +
@@ -46,7 +46,7 @@ function getTestBaseCSS() {
 '.tabs-nav::-webkit-scrollbar{display:none}' +
 '.tab-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--muted);font-size:12px;cursor:pointer;min-height:44px;min-width:58px;transition:all .15s}' +
 '.tab-btn.tab-active{border-color:var(--accent);color:var(--accent)}' +
-'.tab-name{font-size:10px;max-width:13ch;text-align:center;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.tab-done{color:var(--ok);font-size:10px}' +
+'.tab-name{font-size:10px;max-width:16ch;text-align:center;line-height:1.2;overflow:hidden}.tab-name .exercise-subtitle{font-size:9px}.tab-done{color:var(--ok);font-size:10px}' +
 /* Exercise area */
 '.ex-area{padding:12px;max-width:720px;margin:0 auto}' +
 '.ex-hdr{margin-bottom:16px;padding:12px 14px;background:var(--card);border-radius:12px;border:1px solid var(--border)}' +

@@ -83,6 +83,7 @@ function stripVariantsForStudent(variants) {
     out[key] = (variants[key] || []).map(ex => {
       const cleanEx = {
         title: ex.title || ex.type,
+        style: ex.style || '',
         type: ex.type,
         points_total: ex.points_total,
         points_each: ex.points_each,
@@ -192,7 +193,7 @@ async function assembleSecureOfflinePackage(st, cfg, variants) {
   const studentHtml = buildSecureStudentHtml(publicCfg, content.bundle);
   assertSecureStudentIsolation(publicCfg,studentVariants,studentHtml);
   const studentHtmlSha256 = await sha256HexText(studentHtml);
-  const teacherCfg = Object.assign({}, cfg, { formsAnchorPolicy:st.__formsAnchorProfile||null, startCode:content.code, privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256, schoolLogoDataUri:await secureSchoolLogoDataUri() });
+  const teacherCfg = Object.assign({}, cfg, { pedagogicalReview:buildPedagogicalReview(variants), formsAnchorPolicy:st.__formsAnchorProfile||null, startCode:content.code, privateKey:keyInfo.privateJwk, publicKey:keyInfo.publicJwk, roster:((((typeof st!=='undefined'&&st&&st.identityMode)||cfg.identityMode)==='oneTimeCode')?(Array.isArray(st.__roster)?st.__roster:rosterForVerifier()):[]), studentHtmlSha256, schoolLogoDataUri:await secureSchoolLogoDataUri() });
   const teacherHtml = buildSecureTeacherVerifierHtml(teacherCfg, variants);
   const teacherHtmlSha256 = await sha256HexText(teacherHtml);
   const pkg={

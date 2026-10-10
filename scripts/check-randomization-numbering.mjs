@@ -3,9 +3,10 @@
 // shodný algoritmus pořadí ve studentském testu a verifieru, slova u error-tagging se nemíchají.
 import fs from 'node:fs';
 import vm from 'node:vm';
-const secure = fs.readFileSync('src/js/13e-secure-student-runtime.js', 'utf8');
-const verifier = fs.readFileSync('src/js/13f-secure-teacher-verifier.js', 'utf8');
-const instant = fs.readFileSync('src/js/14b-instant-test-runtime.js', 'utf8');
+const readNormalized = file => fs.readFileSync(file, 'utf8').replace(/\r\n?/g, '\n');
+const secure = readNormalized('src/js/13e-secure-student-runtime.js');
+const verifier = readNormalized('src/js/13f-secure-teacher-verifier.js');
+const instant = readNormalized('src/js/14b-instant-test-runtime.js');
 let failed = 0; const pass = m => console.log('PASS ' + m); const fail = m => { failed++; console.error('FAIL ' + m); };
 const need = (c, m) => c ? pass(m) : fail(m);
 const m = secure.match(/const SECURE_QUESTION_ORDER_JS=String\.raw`\n([\s\S]*?)`;\n/);

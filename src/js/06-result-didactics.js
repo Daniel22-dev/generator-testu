@@ -64,6 +64,20 @@ function analyzeGeneratedTestQuality(st, data){
     if (variantCount >= st.skupiny.length) add('ok','Diferenciace má varianty',`Nalezeno ${variantCount} variant pro ${st.skupiny.length} skupin.`);
     else { add('warn','Zkontroluj diferenciaci',`Nalezeno ${variantCount} variant, skupin je ${st.skupiny.length}.`); score -= 1; }
   }
+  const fidelitySpecs = buildExerciseSpecs(st);
+  const fidelityIssues = [];
+  (sets.length ? sets : [{label:'základní varianta',exercises}]).forEach(set => {
+    collectPedagogicalFidelityIssues(set.exercises || [], fidelitySpecs).forEach(issue => fidelityIssues.push(Object.assign({variant:set.label}, issue)));
+  });
+  if (!fidelityIssues.length) {
+    add('ok','Pedagogické typy a kontexty jsou oddělené','Zvolený styl, bodovací typ a tematický podtitulek nejsou zaměněné; nebyla nalezena mezicvičební duplicita ani skrytý Reading kontext.');
+  } else {
+    fidelityIssues.forEach(issue => {
+      const level=issue.level==='bad'?'bad':'warn';
+      add(level,level==='bad'?'Neshoda pedagogického typu nebo kontextu':'Možná vysoká podobnost mezi cvičeními',`${issue.variant}: ${issue.detail}`);
+      score -= level==='bad'?2:0.75;
+    });
+  }
   score = Math.max(0, Math.min(10, Math.round(score * 10) / 10));
   return { score, checks, sets, itemCount, uniqueTypes };
 }
