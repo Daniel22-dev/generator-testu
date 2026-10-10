@@ -220,6 +220,35 @@ check(collectIssues(wrongStyle, specsFiveStyles).some(issue => issue.code === 's
 const hiddenMcContext = structuredClone(validFiveStyles);
 hiddenMcContext[0].items[0].question = 'According to the passage, which statement is correct?';
 check(collectIssues(hiddenMcContext, specsFiveStyles).some(issue => issue.code === 'independent-mc-hidden-context' && issue.level === 'bad'), 'T01 independent Multiple Choice cannot refer to a hidden Reading context');
+const shortLiteralDuplicate = structuredClone(validFiveStyles);
+shortLiteralDuplicate[0].items[0].question = 'Which device broke first?';
+shortLiteralDuplicate[3].items[0].question = 'Which device broke first?';
+check(collectIssues(shortLiteralDuplicate, specsFiveStyles).some(issue => issue.code === 'literal-cross-exercise-duplicate' && issue.level === 'bad'), 'S2-R1 short content-specific exact duplicates remain blocking');
+for (const prompt of [
+  'According to this passage, which device broke first?',
+  'Based on that article, which device broke first?',
+  'According to the text, which device broke first?',
+  'Podle tohoto textu, které zařízení selhalo jako první?',
+  'Segun el texto, que dispositivo fallo primero?',
+  'Según este pasaje, ¿qué dispositivo falló primero?',
+  'Laut diesem Text, welches Gerät fiel zuerst aus?',
+  'Gemäß diesem Text, welches Gerät fiel zuerst aus?'
+]) {
+  const explicitReference = structuredClone(validFiveStyles);
+  explicitReference[0].items[0].question = prompt;
+  check(collectIssues(explicitReference, specsFiveStyles).some(issue => issue.code === 'independent-mc-hidden-context' && issue.level === 'bad'), `S2-R2/R3 explicit hidden Reading reference is blocked: ${prompt}`);
+}
+for (const prompt of [
+  'Which word means passage?',
+  'Select the word text.',
+  'Selecciona la palabra texto.',
+  'In which tense is this sentence written?',
+  'Wähle die richtige Übersetzung des Wortes Text.'
+]) {
+  const selfContained = structuredClone(validFiveStyles);
+  selfContained[0].items[0].question = prompt;
+  check(!collectIssues(selfContained, specsFiveStyles).some(issue => issue.code === 'independent-mc-hidden-context'), `S2-R2/R3 self-contained prompt is not overblocked: ${prompt}`);
+}
 const similarAcrossExercises = structuredClone(validFiveStyles);
 similarAcrossExercises[0].items[0].question = 'Explain how coastal researchers carefully measured changing water temperatures during weekly environmental surveys.';
 similarAcrossExercises[3].items[0].question = 'Explain how coastal researchers carefully measured water temperatures changing during weekly environmental surveys.';
@@ -228,6 +257,12 @@ const shortLegitimate = structuredClone(validFiveStyles);
 shortLegitimate[0].items[0].question = 'Choose the correct answer.';
 shortLegitimate[3].items[0].question = 'Choose the correct answer.';
 check(!collectIssues(shortLegitimate, specsFiveStyles).some(issue => /duplicate|similarity/.test(issue.code)), 'T02 short generic instructions do not trigger a false duplicate finding');
+for (const prompt of ['Vyber správnou odpověď.', 'Selecciona la respuesta correcta.', 'Wähle die richtige Antwort.']) {
+  const genericControl = structuredClone(validFiveStyles);
+  genericControl[0].items[0].question = prompt;
+  genericControl[3].items[0].question = prompt;
+  check(!collectIssues(genericControl, specsFiveStyles).some(issue => /duplicate|similarity/.test(issue.code)), `S2-R1 multilingual generic instruction remains exempt: ${prompt}`);
+}
 
 const legacyExercise = {type:'multiple choice', title:'Advanced Conditionals'};
 check(vm.runInContext('exerciseStyleLabel', context)(legacyExercise) === 'Multiple choice', 'legacy tests without style fall back to their canonical type without inventing pedagogy');

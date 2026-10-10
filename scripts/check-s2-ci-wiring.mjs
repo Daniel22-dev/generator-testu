@@ -9,8 +9,8 @@ const read = relative => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 const splitSteps = command => String(command || '').split(' && ').map(step => step.trim()).filter(Boolean);
 
 function validateS2Wiring(pkg, p5Workflow) {
-  assert.equal(pkg.scripts?.['check:s2-pedagogical-fidelity'], 'node scripts/check-pedagogical-fidelity-s2.mjs',
-    'S2 source gate must point to the reviewed pedagogical-fidelity test');
+  assert.equal(pkg.scripts?.['check:s2-pedagogical-fidelity'], 'node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-remediation-mutations.mjs',
+    'S2 source gate must execute the reviewed fidelity and remediation mutation tests');
   assert.equal(pkg.scripts?.['check:s2-pedagogical-browser'], 'node scripts/check-pedagogical-fidelity-browser-s2.mjs',
     'S2 browser gate must point to the reviewed Chromium test');
   assert.equal(pkg.devDependencies?.playwright, '1.61.1', 'S2 browser evidence requires the reviewed Playwright pin');
@@ -46,6 +46,11 @@ const disconnectedSource = structuredClone(pkg);
 disconnectedSource.scripts.prebuild = disconnectedSource.scripts.prebuild.replace(' && npm run check:s2-pedagogical-fidelity', '');
 assert.throws(() => validateS2Wiring(disconnectedSource, workflow), /blocking S2 source gate/,
   'S2 contract must reject a disconnected source gate');
+
+const disconnectedRemediation = structuredClone(pkg);
+disconnectedRemediation.scripts['check:s2-pedagogical-fidelity'] = 'node scripts/check-pedagogical-fidelity-s2.mjs';
+assert.throws(() => validateS2Wiring(disconnectedRemediation, workflow), /remediation mutation tests/,
+  'S2 contract must reject a source gate that omits S2.1 mutation tests');
 
 const disconnectedBrowser = structuredClone(pkg);
 disconnectedBrowser.scripts['qa:p5:ci'] = disconnectedBrowser.scripts['qa:p5:ci'].replace(' && npm run check:s2-pedagogical-browser', '');

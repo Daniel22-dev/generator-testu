@@ -127,6 +127,14 @@ function fidelitySimilarity(a,b){const aa=Array.from(new Set(fidelityContentToke
 function fidelityStyleKey(value){const raw=valueText(value);return specialStyleKey(raw)||normalizeType(raw);}
 function collectPedagogicalFidelityIssues(exercises,specs){
   const issues=[],rows=[];
+  const genericInstructions=new Set([
+    'choose the correct answer','choose the correct option','select the correct answer','select the correct option','pick the correct answer','pick the correct option',
+    'answer the question','answer the questions','complete the sentence','complete the sentences','fill in the blank','fill in the blanks',
+    'translate the sentence','translate the sentences','match the items','match the columns','read the text','read the passage',
+    'vyber spravnou odpoved','vyber spravnou moznost','zvol spravnou odpoved','zvol spravnou moznost','odpovez na otazku','dopln vetu','preloz vetu',
+    'elige la respuesta correcta','elige la opcion correcta','selecciona la respuesta correcta','selecciona la opcion correcta','responde la pregunta','completa la oracion','traduce la oracion',
+    'wahle die richtige antwort','wahle die richtige option','beantworte die frage','vervollstandige den satz','ubersetze den satz'
+  ]);
   if(!Array.isArray(exercises))return issues;
   exercises.forEach(function(ex,ei){
     ex=ex&&typeof ex==='object'?ex:{};
@@ -142,11 +150,17 @@ function collectPedagogicalFidelityIssues(exercises,specs){
       const hiddenExerciseContext=hasAnyText(ex,['passage','source_text','text','source']);
       items.forEach(function(item,qi){
         const stem=fidelityItemStem(item),hiddenItemContext=hasAnyText(item,['passage','source_text','text','source']);
-        const contextReference=/\b(?:according to|based on|in|from)\s+(?:the\s+)?(?:text|passage|article|story|extract|reading)\b|\b(?:podle|v|z)\s+(?:textu|pasaze|clanku|pribehu|ukazky)\b/i.test(fidelityNormalizedText(stem));
+        const normalizedStem=fidelityNormalizedText(stem);
+        const contextReference=[
+          /\b(?:according to|based on|in|from)\s+(?:(?:the|this|that)\s+)?(?:text|passage|article|story|extract|reading)\b/,
+          /\b(?:podle|v|ve|z|ze)\s+(?:(?:tohoto|toho|tamtoho)\s+)?(?:textu|pasaze|clanku|pribehu|ukazky)\b/,
+          /\b(?:segun|de acuerdo con|basado en|en|del)\s+(?:(?:el|este|ese|aquel)\s+)?(?:texto|pasaje|articulo|relato|extracto|lectura)\b/,
+          /\b(?:laut|gemass|gemaß|in|aus)\s+(?:(?:dem|diesem|jenem)\s+)?(?:text|abschnitt|artikel|auszug|lesetext)\b/
+        ].some(pattern=>pattern.test(normalizedStem));
         if(hiddenExerciseContext||hiddenItemContext||contextReference)issues.push({level:'bad',code:'independent-mc-hidden-context',exercise:ei+1,item:qi+1,detail:`cvičení ${ei+1}, položka ${qi+1}: samostatné Multiple Choice odkazuje na text/passage, který jeho renderer studentovi nezobrazuje.`});
       });
     }
-    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem);if(normalized&&tokens.length>=5)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens});});
+    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem);if(normalized&&!genericInstructions.has(normalized))rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens});});
   });
   for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
     const a=rows[i],b=rows[j];if(a.exercise===b.exercise)continue;
