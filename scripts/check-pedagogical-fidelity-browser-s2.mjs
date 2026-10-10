@@ -70,7 +70,7 @@ async function assertRenderedContract(page, mode) {
   assert.equal(subtitles.length, 5, `${mode}: thematic subtitles missing`);
   assert.ok(subtitles.every(value => value.trim() === 'Advanced Conditionals'), `${mode}: title replaced a pedagogical label`);
   assert.equal(await page.locator('.reading-passage').count(), 1, `${mode}: Reading passage must be shown exactly once`);
-  assert.equal((await page.locator('body').innerText()).split(passage).length - 1, 1, `${mode}: Reading passage was duplicated in the rendered document`);
+  assert.equal(((await page.locator('body').textContent()) || '').split(passage).length - 1, 1, `${mode}: Reading passage was duplicated in the rendered document`);
   const counts = await page.locator('.ex-panel').evaluateAll(panels => panels.map(panel => panel.querySelectorAll('.question,.q').length));
   assert.deepEqual(counts, [4,3,2,5,4], `${mode}: configured question counts changed`);
   const mcText = await page.locator('.ex-panel').first().innerText();
