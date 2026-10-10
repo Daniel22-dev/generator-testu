@@ -162,7 +162,7 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   };
   vm.createContext(ctx);
   vm.runInContext(`
-    var teacherLogged=false, locked=true, unlockBusy=false, LOCK_TAPS=0, LOCK_TAP_TIMER=null;
+    var TEACHER_AUTH_EPOCH=0, teacherLogged=false, locked=true, unlockBusy=false, LOCK_TAPS=0, LOCK_TAP_TIMER=null;
     var attemptId='INSTANT-ATT-1', timerDeadline=1888888888888, jokerUsed=true, jokerSelectedAt='2026-10-02T15:00:05.000Z';
     var securityEvents=[{type:'lock',detail:'left',ts:'before'}], warningCount=1;
     function recordSecurityEvent(type,detail){securityEvents.push({type,detail,ts:'NOW'});warningCount=securityEvents.length;}
@@ -178,6 +178,51 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   await vm.runInContext('doTeacherLogin()',ctx);
   assert(vm.runInContext('teacherLogged',ctx)===true, 'E3 instant dynamic: Teacher/Admin secret opens teacher panel');
   assert(els['t-pin'].value==='', 'E3 instant dynamic: accepted Teacher/Admin input is cleared immediately');
+
+  // Regression: modal close/logout must invalidate both one pending login and
+  // multiple out-of-order authentication results.
+  vm.runInContext(extractFunction(instant,'logoutTeacher'),ctx);
+  vm.runInContext(extractFunction(instant,'closeTeacherModal'),ctx);
+  const originalTeacherMatcher=ctx.teacherSecretMatches;
+
+  vm.runInContext('logoutTeacher()',ctx);
+  let resolvePending;
+  ctx.teacherSecretMatches=()=>new Promise(resolve=>{resolvePending=resolve;});
+  els['t-pin'].value=TEACHER;
+  const pendingLogin=vm.runInContext('doTeacherLogin()',ctx);
+  vm.runInContext('closeTeacherModal()',ctx);
+  assert(vm.runInContext('teacherLogged',ctx)===false, 'E3 instant dynamic: close logs out before authorization returns');
+  resolvePending(true);
+  await pendingLogin;
+  assert(vm.runInContext('teacherLogged',ctx)===false && els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: late successful authorization cannot revive a closed teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: cancelled login leaves no credential in the DOM');
+
+  const concurrentResolvers=[];
+  ctx.teacherSecretMatches=()=>new Promise(resolve=>{concurrentResolvers.push(resolve);});
+  els['t-pin'].value=TEACHER;
+  const firstLogin=vm.runInContext('doTeacherLogin()',ctx);
+  els['t-pin'].value=TEACHER;
+  const secondLogin=vm.runInContext('doTeacherLogin()',ctx);
+  assert(concurrentResolvers.length===2, 'E3 instant dynamic: two asynchronous teacher checks are pending');
+  vm.runInContext('closeTeacherModal()',ctx);
+  concurrentResolvers[1](true);
+  await secondLogin;
+  concurrentResolvers[0](true);
+  await firstLogin;
+  assert(vm.runInContext('teacherLogged',ctx)===false && els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: out-of-order concurrent successes cannot revive a closed teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: concurrent cancelled logins leave no credential in the DOM');
+
+  ctx.teacherSecretMatches=originalTeacherMatcher;
+  els['t-pin'].value=TEACHER;
+  await vm.runInContext('doTeacherLogin()',ctx);
+  assert(vm.runInContext('teacherLogged',ctx)===true && !els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: a fresh legitimate login still succeeds after cancellations');
+  vm.runInContext('logoutTeacher()',ctx);
+  assert(vm.runInContext('teacherLogged',ctx)===false && els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: explicit logout removes privilege after a successful login');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: logout clears the Teacher/Admin credential field');
 
   const before=vm.runInContext(`JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,group:CFG.activeGroupKey,variant:CFG.activeVariantKey})`,ctx);
   vm.runInContext('locked=true;',ctx); els.unlockInp.value=TEACHER;

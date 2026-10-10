@@ -1,6 +1,7 @@
 // Sprint 01: real-Chromium regression gate for generated instant and secure student HTML.
 // All credentials and identities in this harness are synthetic.
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -11,9 +12,33 @@ const contexts = [];
 const pageErrors = [];
 const consoleLeaks = [];
 const checks = [];
+const scenarioOutcomes = [];
 let browser;
 
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
+
+function collectProvenance() {
+  const sourceHead = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().toLowerCase();
+  const trackedStatus = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { encoding: 'utf8' }).trim();
+  assert.match(sourceHead, /^[0-9a-f]{40}$/, 'S1 evidence requires an exact Git source HEAD');
+  assert.equal(trackedStatus, '', 'S1 evidence requires a clean tracked working tree');
+  const ciHead = String(process.env.GITHUB_SHA || '').trim().toLowerCase();
+  if (ciHead) assert.equal(ciHead, sourceHead, 'S1 source HEAD differs from GITHUB_SHA');
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const playwrightVersion = JSON.parse(fs.readFileSync('node_modules/playwright/package.json', 'utf8')).version;
+  assert.equal(playwrightVersion, packageJson.devDependencies.playwright, 'S1 installed Playwright differs from the repository pin');
+  return {
+    sourceHead,
+    ciHead: ciHead || null,
+    trackedTree: 'clean',
+    nodeVersion: process.version,
+    platform: process.platform,
+    architecture: process.arch,
+    playwrightVersion,
+    gateScriptSha256: sha256(fs.readFileSync(new URL(import.meta.url))),
+    packageLockSha256: sha256(fs.readFileSync('package-lock.json'))
+  };
+}
 
 async function makePage(html, path) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -123,6 +148,49 @@ async function instantCase() {
   await page.evaluate(() => closeTeacherModal());
 
   await page.evaluate(() => {
+    window.__s1OriginalTeacherMatcher = teacherSecretMatches;
+    window.__s1TeacherResolvers = [];
+    window.__s1TeacherPending = [];
+    teacherSecretMatches = () => new Promise(resolve => window.__s1TeacherResolvers.push(resolve));
+  });
+  await page.evaluate(() => openTeacherModal());
+  await page.locator('#t-name').fill('Daniel Teacher');
+  await page.locator('#t-pin').fill(TEACH);
+  await page.evaluate(() => { window.__s1TeacherPending.push(doTeacherLogin()); });
+  await page.locator('#t-pin').fill(TEACH);
+  await page.evaluate(() => { window.__s1TeacherPending.push(doTeacherLogin()); });
+  assert.equal(await page.evaluate(() => window.__s1TeacherResolvers.length), 2, 'two teacher authentications were not pending');
+  await page.evaluate(() => closeTeacherModal());
+  assert.equal(await page.evaluate(() => teacherLogged), false, 'teacher remained logged after closing a pending authentication');
+  assert.equal(await page.locator('#t-panel').evaluate(el => el.classList.contains('hidden')), true);
+  await page.evaluate(async () => {
+    window.__s1TeacherResolvers[1](true);
+    await window.__s1TeacherPending[1];
+    window.__s1TeacherResolvers[0](true);
+    await window.__s1TeacherPending[0];
+  });
+  assert.equal(await page.evaluate(() => teacherLogged), false, 'late concurrent teacher authorization revived privilege');
+  assert.equal(await page.locator('#t-panel').evaluate(el => el.classList.contains('hidden')), true, 'stale privileged panel became visible');
+  assert.equal(await page.locator('#t-pin').inputValue(), '');
+  await page.evaluate(() => openTeacherModal());
+  assert.equal(await page.locator('#t-panel').evaluate(el => el.classList.contains('hidden')), true, 'reopened modal exposed a stale privileged panel');
+  assert.equal(await page.locator('#t-login').evaluate(el => el.classList.contains('hidden')), false, 'reopened modal omitted the unauthenticated login panel');
+  await page.evaluate(() => {
+    teacherSecretMatches = window.__s1OriginalTeacherMatcher;
+    delete window.__s1OriginalTeacherMatcher;
+    delete window.__s1TeacherResolvers;
+    delete window.__s1TeacherPending;
+    closeTeacherModal();
+  });
+  scenarioOutcomes.push({
+    id: 'instant-teacher-auth-close-race',
+    status: 'PASS',
+    requests: 2,
+    completionOrder: 'second-then-first',
+    result: 'closed modal remained logged out; no stale privileged panel'
+  });
+
+  await page.evaluate(() => {
     selectChoice('0_0', 1);
     lockTest('synthetic browser recovery check');
   });
@@ -160,6 +228,11 @@ async function instantCase() {
   assert.equal(owned.includes(REC) || owned.includes(TEACH), false, 'raw synthetic credential reached instant browser-owned app data');
   assert.equal(html.includes(REC) || html.includes(TEACH), false, 'raw synthetic credential reached instant export');
   checks.push('instant: hardened inputs, privilege separation, cleanup, state continuity, app-data scan');
+  scenarioOutcomes.push({
+    id: 'instant-recovery-and-privilege-boundary',
+    status: 'PASS',
+    result: 'Recovery only unlocked recovery; Teacher/Admin remained separate; attempt state preserved'
+  });
   return { sha256: sha256(html), captureObserved: true };
 }
 
@@ -232,6 +305,11 @@ async function secureCase() {
   assert.equal(owned.includes(REC) || owned.includes(TEACH), false, 'raw synthetic credential reached secure browser-owned app data');
   assert.equal(pkg.studentHtml.includes(REC) || pkg.studentHtml.includes(TEACH), false, 'raw synthetic credential reached secure student export');
   checks.push('secure: hardened input, no teacher capability, privilege separation, cleanup, state continuity, app-data scan');
+  scenarioOutcomes.push({
+    id: 'secure-recovery-and-capability-isolation',
+    status: 'PASS',
+    result: 'secure student HTML had no teacher capability; Recovery preserved attempt state'
+  });
   return {
     studentSha256: sha256(pkg.studentHtml),
     verifierSha256: sha256(pkg.teacherHtml),
@@ -240,6 +318,8 @@ async function secureCase() {
 }
 
 try {
+  const startedAt = new Date().toISOString();
+  const provenance = collectProvenance();
   browser = await chromium.launch({
     headless: true,
     ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {})
@@ -251,8 +331,12 @@ try {
   const report = {
     sprint: '01-recovery-credential-hardening',
     status: 'PASS',
+    startedAt,
+    completedAt: new Date().toISOString(),
+    provenance,
     browser: await browser.version(),
     checks,
+    scenarioOutcomes,
     artifacts: { instant, secure },
     evidence: {
       credentials: 'synthetic only; report contains hashes, not raw values',

@@ -59,6 +59,7 @@ jobs:
             dist/quality-report.json
             qa-results/d7-regressions.json
             qa-results/d8-final-audit.json
+            qa-results/recovery-browser-s1.json
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json
