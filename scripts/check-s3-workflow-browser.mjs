@@ -226,7 +226,7 @@ async function sessionPreservationCase() {
     await pointPage.waitForFunction(()=>typeof onCustomBody==='function'&&typeof pickNum==='function'&&typeof goTo==='function');
     await pointPage.evaluate(()=>{
       Object.assign(state,{
-        body:20,pocet:5,odevzdavani:'B',gradeTyp:'standard',exerciseDetail:false,exerciseConfigSaved:false,
+        appMode:'advanced',workPreset:'advanced',body:20,pocet:5,odevzdavani:'B',gradeTyp:'standard',exerciseDetail:false,exerciseConfigSaved:false,
         exerciseConfig:Array.from({length:5},()=>({typ:'multiple choice',pocetOtazek:4,body:4})),
         typyCviceni:['multiple choice','gap fill','true/false','translation','error correction']
       });
