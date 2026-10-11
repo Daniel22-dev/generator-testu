@@ -7,6 +7,7 @@ Technický implementační a ověřovací report, 2026-10-11.
 - Požadovaný výchozí HEAD Sprintu 02.1 R2: `9e2f89fb8611827c8cf76a11dccd1c1935976357`.
 - Izolovaná větev: `codex/sprint-02.1-r2-fingerprint-remediation`.
 - Implementační checkpoint: `64ad6e39a10155bcbc7dd510755d7fcdd7786fc3`.
+- Packaging-only EOF normalizace testovacího skriptu: `235ab84bb1e85b88da8669ad1e397c3d6a23c0eb`; proti implementačnímu checkpointu odstraňuje jediný prázdný řádek a nemění běh kódu.
 - Merge-base s požadovaným základem: přesně `9e2f89fb8611827c8cf76a11dccd1c1935976357`.
 - Rozsah: pouze strukturální otisky studentovi viditelné úlohy a odpovědního klíče, F-01 až F-04, jejich regrese, mutace a povinné S2 source-gate wiring.
 - Beze změny zůstaly scorery, kryptografie, Google Forms payload, GARP trust data, Recovery/Teacher/Admin hranice, generátory studentských HTML i teacher verifier runtime.
@@ -60,7 +61,14 @@ Stejná viditelná úloha je vždy blokující `literal-cross-exercise-duplicate
 - `scripts/check-s2-ci-wiring.mjs`
 - `package.json`
 
-Tento report je jediný soubor samostatného následného dokumentačního commitu.
+Tento report je samostatný dokumentační soubor. Po whitespace-only commitu byl celý S2 source gate zopakován na `235ab84bb1e85b88da8669ad1e397c3d6a23c0eb` a všechny jeho části skončily exit `0`; ostatní výsledky níže jsou vázány na funkčně shodný implementační checkpoint `64ad6e39a10155bcbc7dd510755d7fcdd7786fc3`.
+
+## 5.1 Commity před finálním reportovým checkpointem
+
+- `64ad6e39a10155bcbc7dd510755d7fcdd7786fc3` — `fix(s2): separate visible task and grading fingerprints`.
+- `9f2a7969e25cd0131fc0cb97d6221364343408eb` — `docs: record final S2 fingerprint remediation`.
+- `235ab84bb1e85b88da8669ad1e397c3d6a23c0eb` — `chore(s2): normalize fingerprint test EOF`.
+- Finální reportový commit je uveden v historii větve a checksum manifestu, aby report nevytvářel kruhovou sebe-referenci.
 
 ## 6. Výsledky na SHA `64ad6e39a10155bcbc7dd510755d7fcdd7786fc3`
 
