@@ -143,6 +143,7 @@ function browserGeneratorHtml() {
     .replace(/<script[^>]+src="[^"]+"[^>]*><\/script>/g, '')
     .replace(/<link[^>]+(?:rel="stylesheet"|rel="manifest"|rel="icon"|rel="apple-touch-icon")[^>]*>/g, '')
     .replace(/<script type="module" data-ghrab-access-bootstrap>[\s\S]*?<\/script>/, '')
+    .replace(/type="application\/ghrab-protected"\s+data-ghrab-protected\s*/g, '')
     .replace('data-ghrab-access="checking"','data-ghrab-access="granted"')
     .replace('<body>','<body><script>window.__GHRAB_STUDIO_ACCESS__={appId:"generator",permit:{sub:"S3",displayName:"Synthetic",role:"admin",apps:["*"],iat:1,exp:4102444800,jti:"s3"}};<\/script>');
 }
@@ -153,7 +154,6 @@ async function sessionPreservationCase() {
   const generatorHtml = browserGeneratorHtml();
   await context.addInitScript(() => {
     window.__GHRAB_DEPLOYMENT_CONFIG__ = Object.freeze({schema:'ghrab-deployment-config-v1',version:1,environmentId:'s3',profile:'github-pages',authMode:'signed-permit',aiTransport:'direct-gemini',apiBaseUrl:'',features:Object.freeze({allowLocalProviderKeys:true,serverSessionReady:false,schoolGatewayReady:false,schoolServerConnected:false})});
-    window.scrollTo = (...args) => HTMLElement.prototype.scrollTo ? HTMLElement.prototype.scrollTo.apply(document.documentElement,args) : undefined;
   });
   await context.route(origin + '/**', route => {
     const url = new URL(route.request().url());
