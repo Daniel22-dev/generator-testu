@@ -110,7 +110,7 @@
     "check:r4-recovery-runtime": "node scripts/check-recovery-runtime-r4.mjs",
     "check:s1-recovery-browser": "node scripts/check-recovery-browser-s1.mjs",
     "check:s1-ci-wiring": "node scripts/check-s1-ci-wiring.mjs",
-    "check:s2-pedagogical-fidelity": "node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-remediation-mutations.mjs",
+    "check:s2-pedagogical-fidelity": "node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-visible-task-fingerprint.mjs && node scripts/check-s2-remediation-mutations.mjs",
     "check:s2-pedagogical-browser": "node scripts/check-pedagogical-fidelity-browser-s2.mjs",
     "check:s2-ci-wiring": "node scripts/check-s2-ci-wiring.mjs",
     "check:r5-adversarial": "node scripts/check-security-adversarial-r5.mjs",

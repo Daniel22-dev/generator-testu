@@ -71,6 +71,44 @@ assert(hasCode(current, fixture('Choose the correct answer.', 'Choose the correc
 assert(hasCode(current, fixture('According to the following passage, which device broke first?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'current R2-FN policy blocks English following-passage reference');
 assert(hasCode(current, fixture('Según el siguiente texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'current R2-FN policy blocks Spanish following-text reference');
 
+function sameTypeFixture(type, first, second) {
+  const exercises = [{type,style:type,items:[first]},{type,style:type,items:[second]}];
+  const typeSpecs = exercises.map(exercise => ({style:exercise.style,type:exercise.type}));
+  return { exercises, specs:typeSpecs };
+}
+function hasFixtureCode(collect, fixtureValue, code) {
+  return collect(fixtureValue.exercises, fixtureValue.specs).some(issue => issue.code === code);
+}
+const conflictingMc = sameTypeFixture('multiple choice',
+  {question:'Which word is the past form of go?',options:['went','goes'],correct:0},
+  {question:'Which word is the past form of go?',options:['went','goes'],correct:1});
+const distinctWordOrder = sameTypeFixture('word order',
+  {prompt:'Put the words in the correct order.',words:['She','likes','apples'],correct_sentence:'She likes apples.'},
+  {prompt:'Put the words in the correct order.',words:['He','plays','chess'],correct_sentence:'He plays chess.'});
+const distinctOrdering = sameTypeFixture('ordering',
+  {question:'Put the steps in the correct order.',items:['Wash hands','Prepare food'],correct_order:[0,1]},
+  {question:'Put the steps in the correct order.',items:['Get up','Go home'],correct_order:[1,0]});
+const distinctTable = sameTypeFixture('table-completion',
+  {question:'Complete the missing verb forms.',columns:['Base','Past'],rows:[['go',{answer:'went'}]]},
+  {question:'Complete the missing verb forms.',columns:['Base','Past'],rows:[['see',{answer:'saw'}]]});
+const conflictingWordOrder = sameTypeFixture('word order',
+  {prompt:'Put the words in the correct order.',words:['She','likes','apples'],correct_sentence:'She likes apples.'},
+  {prompt:'Put the words in the correct order.',words:['apples','She','likes'],correct_sentence:'Apples like she.'});
+const conflictingOrdering = sameTypeFixture('ordering',
+  {question:'Put the steps in the correct order.',items:['Wake up','Eat breakfast'],correct_order:[0,1]},
+  {question:'Put the steps in the correct order.',items:['Eat breakfast','Wake up'],correct_order:[0,1]});
+const conflictingTable = sameTypeFixture('table-completion',
+  {question:'Complete the missing verb forms.',columns:['Base','Past'],rows:[['go',{answer:'went'}]]},
+  {question:'Complete the missing verb forms.',columns:['Base','Past'],rows:[['go',{answer:'goed'}]]});
+assert(hasFixtureCode(current, conflictingMc, 'literal-cross-exercise-duplicate'), 'current F-01 policy detects identical visible MC tasks despite conflicting keys');
+assert(hasFixtureCode(current, conflictingMc, 'cross-exercise-answer-key-conflict'), 'current F-01 policy reports the contradictory MC key explicitly');
+assert(!hasFixtureCode(current, distinctWordOrder, 'literal-cross-exercise-duplicate'), 'current F-02 policy distinguishes visible word-order pools');
+assert(!hasFixtureCode(current, distinctOrdering, 'literal-cross-exercise-duplicate'), 'current F-03 policy distinguishes visible ordering pools');
+assert(!hasFixtureCode(current, distinctTable, 'literal-cross-exercise-duplicate'), 'current F-04 policy distinguishes visible table grids');
+assert(hasFixtureCode(current, conflictingWordOrder, 'cross-exercise-answer-key-conflict'), 'current F-02 policy keeps word-order keys separate from visible identity');
+assert(hasFixtureCode(current, conflictingOrdering, 'cross-exercise-answer-key-conflict'), 'current F-03 policy keeps ordering keys separate from visible identity');
+assert(hasFixtureCode(current, conflictingTable, 'cross-exercise-answer-key-conflict'), 'current F-04 policy keeps table answers separate from visible identity');
+
 const oldLengthCutoff = replaceOnce(original, 'if(normalized)rows.push', 'if(normalized&&tokens.length>=5)rows.push', 'S2-R1');
 assert(!hasCode(collectorFrom(oldLengthCutoff), fixture('Which device broke first?', 'Which device broke first?'), 'literal-cross-exercise-duplicate'), 'mutation proof S2-R1: restoring the old token cutoff reopens the reported gap');
 
@@ -80,7 +118,7 @@ assert(!hasCode(collectorFrom(noDemonstratives), fixture('According to this pass
 const noSpanish = replaceLine(original, '(?:segun|de acuerdo con|basado en|en|del)', '          /(?!)/,', 'S2-R3');
 assert(!hasCode(collectorFrom(noSpanish), fixture('Según el texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof S2-R3: removing Spanish references reopens the reported gap');
 
-const stemOnlyDuplicate = replaceOnce(original, 'if(a.contentFingerprint===b.contentFingerprint)', 'if(true)', 'R2-FP');
+const stemOnlyDuplicate = replaceOnce(original, 'if(a.visibleFingerprint===b.visibleFingerprint){', 'if(true){', 'R2-FP');
 assert(hasCode(collectorFrom(stemOnlyDuplicate), fixture('Choose the best answer.', 'Choose the best answer.', ['has','have'], ['red','blue']), 'literal-cross-exercise-duplicate'), 'mutation proof R2-FP: stem-only duplicate comparison recreates the false positive');
 
 const genericRowsSkipped = replaceOnce(original, 'if(normalized)rows.push', "if(normalized&&fidelityContentTokens(stem).length)rows.push", 'R2-TP');
@@ -91,5 +129,17 @@ assert(!hasCode(collectorFrom(noFollowing), fixture('According to the following 
 
 const noSiguiente = replaceOnce(original, '(?:siguiente|anterior)', '(?:anterior)', 'R2-FN-ES');
 assert(!hasCode(collectorFrom(noSiguiente), fixture('Según el siguiente texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof R2-FN-ES: removing siguiente-texto support reopens the hidden-context gap');
+
+const keyDependentIdentity = replaceOnce(original, 'if(a.visibleFingerprint===b.visibleFingerprint){', 'if(a.visibleFingerprint===b.visibleFingerprint&&a.keyFingerprint===b.keyFingerprint){', 'F-01');
+assert(!hasFixtureCode(collectorFrom(keyDependentIdentity), conflictingMc, 'literal-cross-exercise-duplicate'), 'mutation proof F-01: mixing the grading key into visible identity hides a conflicting duplicate');
+
+const noWordPool = replaceOnce(original, "if(type==='word order')addUnordered('words',item.words);", "if(type==='word order'){}", 'F-02');
+assert(hasFixtureCode(collectorFrom(noWordPool), distinctWordOrder, 'literal-cross-exercise-duplicate'), 'mutation proof F-02: omitting the visible word pool recreates the false duplicate');
+
+const noOrderingPool = replaceOnce(original, "else if(type==='ordering')addUnordered('items',item.items);", "else if(type==='ordering'){}", 'F-03');
+assert(hasFixtureCode(collectorFrom(noOrderingPool), distinctOrdering, 'literal-cross-exercise-duplicate'), 'mutation proof F-03: omitting the visible ordering items recreates the false duplicate');
+
+const noTableGrid = replaceOnce(original, "else if(type==='table-completion'){\n      addOrdered('columns',item.columns);", "else if(type==='table-completion'&&false){\n      addOrdered('columns',item.columns);", 'F-04');
+assert(hasFixtureCode(collectorFrom(noTableGrid), distinctTable, 'literal-cross-exercise-duplicate'), 'mutation proof F-04: omitting the visible table grid recreates the false duplicate');
 
 console.log('Sprint 02.1 R2 remediation mutation gate passed.');

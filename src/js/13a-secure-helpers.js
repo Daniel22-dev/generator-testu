@@ -127,22 +127,97 @@ function fidelitySimilarity(a,b){const aa=Array.from(new Set(fidelityContentToke
 function fidelityStyleKey(value){const raw=valueText(value);return specialStyleKey(raw)||normalizeType(raw);}
 function collectPedagogicalFidelityIssues(exercises,specs){
   const issues=[],rows=[];
-  const normalizedContent=function(value){
-    if(Array.isArray(value))return '['+value.map(normalizedContent).sort().join(',')+']';
-    if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(key=>fidelityNormalizedText(key)+':'+normalizedContent(value[key])).join(',')+'}';
+  const normalizedOrderedContent=function(value){
+    if(Array.isArray(value))return '['+value.map(normalizedOrderedContent).join(',')+']';
+    if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(key=>fidelityNormalizedText(key)+':'+normalizedOrderedContent(value[key])).join(',')+'}';
     return fidelityNormalizedText(String(value==null?'':value));
   };
-  const itemContentFingerprint=function(item){
+  const normalizedUnorderedContent=function(value){
+    return Array.isArray(value)?'['+value.map(normalizedOrderedContent).sort().join(',')+']':normalizedOrderedContent(value);
+  };
+  const resolvedOptionIndex=function(item){
+    if(!item||!Array.isArray(item.options))return -1;
+    if(typeof item.correct==='number')return Number.isInteger(item.correct)&&item.correct>=0&&item.correct<item.options.length?item.correct:-1;
+    const correct=valueText(item.correct);
+    if(/^[0-9]+$/.test(correct)){const index=Number(correct);return index<item.options.length?index:-1;}
+    const byText=item.options.map(valueText).findIndex(option=>option.toLowerCase()===correct.toLowerCase());
+    if(byText>=0)return byText;
+    if(correct.length===1){const letter=correct.toUpperCase().charCodeAt(0)-65;return letter>=0&&letter<item.options.length?letter:-1;}
+    return -1;
+  };
+  // Duplicate identity follows what the student can actually see (or select),
+  // never the hidden grading key. Array order is preserved only where it has
+  // semantic meaning; selectable pools are compared as multisets.
+  const studentVisibleTaskFingerprint=function(type,item){
     if(!item||typeof item!=='object')return '';
     const parts=[];
-    if(Array.isArray(item.options)&&item.options.length){
-      parts.push('options:'+normalizedContent(item.options));
-      const correctIndex=Number(item.correct);
-      if(Number.isInteger(correctIndex)&&correctIndex>=0&&correctIndex<item.options.length)parts.push('correct-option:'+normalizedContent(item.options[correctIndex]));
-    }else if(Object.prototype.hasOwnProperty.call(item,'correct'))parts.push('correct:'+normalizedContent(item.correct));
-    ['answer','answers','correct_answer','correctAnswer','acceptable_answers','acceptableAnswers','expected','expected_answer','solution','translation','pairs','right'].forEach(function(key){
-      if(Object.prototype.hasOwnProperty.call(item,key)&&valueText(item[key]))parts.push(fidelityNormalizedText(key)+':'+normalizedContent(item[key]));
-    });
+    const addOrdered=function(name,value){if(Array.isArray(value)?value.length:value&&typeof value==='object'?Object.keys(value).length:valueText(value))parts.push(name+':'+normalizedOrderedContent(value));};
+    const addUnordered=function(name,value){if(Array.isArray(value)&&value.length)parts.push(name+':'+normalizedUnorderedContent(value));};
+    addUnordered('options',item.options);
+    if(type==='word order')addUnordered('words',item.words);
+    else if(type==='ordering')addUnordered('items',item.items);
+    else if(type==='table-completion'){
+      addOrdered('columns',item.columns);
+      if(Array.isArray(item.rows)){
+        const visibleRows=item.rows.map(function(row){return Array.isArray(row)?row.map(function(cell){return cell&&typeof cell==='object'&&!Array.isArray(cell)?{blank:true}:cell;}):row;});
+        addOrdered('rows',visibleRows);
+      }
+    }else if(type==='transformation-chain'){
+      addOrdered('instructions',Array.isArray(item.transformations)?item.transformations.map(step=>step&&step.instruction):[]);
+    }else if(type==='error-tagging'){
+      addOrdered('tokens',item.tokens);
+      addUnordered('error-type-options',item.error_type_options);
+    }else if(type==='categorisation-board'){
+      addUnordered('categories',item.categories);
+      addUnordered('entries',Array.isArray(item.entries)?item.entries.map(entry=>entry&&entry.text):[]);
+    }else if(type==='highlight-evidence')addUnordered('sentences',item.sentences);
+    else if(type==='dialogue completion')addOrdered('dialogue',item.dialogue);
+    else if(type==='categorization')addUnordered('categories',item.categories);
+    else if(type==='sentence transformation')addOrdered('keyword',item.keyword);
+    else if(type==='word formation')addOrdered('base-word',item.base_word);
+    else if(type==='matching')addOrdered('right-pool-entry',item.right);
+    return parts.sort().join('|');
+  };
+  const gradingKeyFingerprint=function(type,item){
+    if(!item||typeof item!=='object')return '';
+    const parts=[];
+    const add=function(name,value,unordered){
+      const present=Array.isArray(value)?value.length:value&&typeof value==='object'?Object.keys(value).length:Object.prototype.hasOwnProperty.call({value},'value')&&value!==undefined&&value!==null&&valueText(value)!=='';
+      if(present)parts.push(name+':'+(unordered?normalizedUnorderedContent(value):normalizedOrderedContent(value)));
+    };
+    if(['multiple choice','reading comprehension','listening comprehension','dialogue completion'].includes(type)){
+      const index=resolvedOptionIndex(item);
+      if(index>=0)add('correct-option',item.options[index]);
+    }else if(type==='multi-select'){
+      const selected=(Array.isArray(item.correct)?item.correct:[]).map(index=>Array.isArray(item.options)?item.options[Number(index)]:undefined).filter(value=>value!==undefined);
+      add('correct-options',selected,true);
+    }else if(type==='highlight-evidence'){
+      const index=Number(item.correct);
+      if(Number.isInteger(index)&&Array.isArray(item.sentences)&&item.sentences[index]!=null)add('correct-sentence',item.sentences[index]);
+    }else if(type==='word order')add('correct-sentence',item.correct_sentence!=null?item.correct_sentence:item.answer);
+    else if(type==='ordering'){
+      const sequence=(Array.isArray(item.correct_order)?item.correct_order:[]).map(index=>Array.isArray(item.items)?item.items[Number(index)]:undefined).filter(value=>value!==undefined);
+      add('correct-order',sequence);
+    }else if(type==='table-completion'){
+      const answers=(Array.isArray(item.rows)?item.rows:[]).map(function(row){return Array.isArray(row)?row.map(function(cell){return cell&&typeof cell==='object'&&!Array.isArray(cell)?{answer:cell.answer,alt_answers:cell.alt_answers}:null;}):[];});
+      add('cell-answers',answers);
+    }else if(type==='transformation-chain'){
+      const answers=(Array.isArray(item.transformations)?item.transformations:[]).map(step=>step&&{answer:step.answer,alt_answers:step.alt_answers});
+      add('step-answers',answers);
+    }else if(type==='categorisation-board'){
+      const assignments=(Array.isArray(item.entries)?item.entries:[]).map(entry=>({text:entry&&entry.text,category:entry&&entry.category}));
+      add('assignments',assignments,true);
+    }else if(type==='error-tagging'){
+      const index=Number(item.error_token_index),token=Number.isInteger(index)&&Array.isArray(item.tokens)?item.tokens[index]:undefined;
+      add('error-token',token);add('error-type',item.error_type);add('correction',item.correction);
+    }else if(type==='categorization')add('correct-category',item.correct_category!=null?item.correct_category:(item.category!=null?item.category:item.answer));
+    else if(type==='true/false')add('correct',item.correct);
+    else if(type==='matching')add('right',item.right);
+    else {
+      ['answer','answers','correct_answer','correctAnswer','correct_sentence','acceptable_answers','acceptableAnswers','expected','expected_answer','solution','translation','model_answer','correction'].forEach(function(key){
+        if(Object.prototype.hasOwnProperty.call(item,key))add(fidelityNormalizedText(key),item[key],Array.isArray(item[key]));
+      });
+    }
     return parts.sort().join('|');
   };
   if(!Array.isArray(exercises))return issues;
@@ -170,11 +245,17 @@ function collectPedagogicalFidelityIssues(exercises,specs){
         if(hiddenExerciseContext||hiddenItemContext||contextReference)issues.push({level:'bad',code:'independent-mc-hidden-context',exercise:ei+1,item:qi+1,detail:`cvičení ${ei+1}, položka ${qi+1}: samostatné Multiple Choice odkazuje na text/passage, který jeho renderer studentovi nezobrazuje.`});
       });
     }
-    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem),contentFingerprint=itemContentFingerprint(item);if(normalized)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens,contentFingerprint});});
+    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem),visibleFingerprint=studentVisibleTaskFingerprint(type,item),keyFingerprint=gradingKeyFingerprint(type,item);if(normalized)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens,visibleFingerprint,keyFingerprint});});
   });
   for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
     const a=rows[i],b=rows[j];if(a.exercise===b.exercise)continue;
-    if(a.normalized===b.normalized){if(a.contentFingerprint===b.contentFingerprint)issues.push({level:'bad',code:'literal-cross-exercise-duplicate',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} mají shodné zadání i odpovědní obsah napříč cvičeními.`});continue;}
+    if(a.normalized===b.normalized){
+      if(a.visibleFingerprint===b.visibleFingerprint){
+        issues.push({level:'bad',code:'literal-cross-exercise-duplicate',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} představují stejnou studentovi zobrazenou úlohu napříč cvičeními.`});
+        if(a.keyFingerprint&&b.keyFingerprint&&a.keyFingerprint!==b.keyFingerprint)issues.push({level:'bad',code:'cross-exercise-answer-key-conflict',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: shodná studentovi zobrazená úloha má rozporný správný odpovědní klíč.`});
+      }
+      continue;
+    }
     const similarity=fidelitySimilarity(a.stem,b.stem);
     if(similarity>=0.82)issues.push({level:'warn',code:'high-cross-exercise-similarity',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,similarity,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} jsou vysoce podobné (${Math.round(similarity*100)} %); učitel má ověřit, že nejde o nechtěnou duplicitu.`});
   }
