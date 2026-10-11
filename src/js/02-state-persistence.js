@@ -37,6 +37,8 @@ function normalizeLoadedState(s) {
     s.pocet = Math.min(10, s.exerciseConfig.length);
     s.exerciseConfig = s.exerciseConfig.slice(0, s.pocet);
     s.typyCviceni = uniqueExerciseTypes(s.exerciseConfig.map(ex=>ex.typ));
+    syncComprehensionCountsFromConfig(s);
+    syncDetailedPointsTotal(s,false);
   } else {
     s.exerciseConfigSaved = false;
     const loadedTypes = uniqueExerciseTypes(s.typyCviceni || []).slice(0, 10);

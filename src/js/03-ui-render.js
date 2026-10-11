@@ -161,8 +161,8 @@ function applyVisualState() {
   const rb = $('readingBlock');
   if (rb) rb.classList.toggle('hidden', !usesReadingComprehension());
   document.querySelectorAll('#rcLenBtns .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === (state.rcLength || 'medium')));
-  const rcCount=$('readingQuestionCount');if(rcCount)rcCount.value=String(Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4)));
-  const liCount=$('listeningQuestionCount');if(liCount)liCount.value=String(Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4)));
+  syncComprehensionControl('reading comprehension',state);
+  syncComprehensionControl('listening comprehension',state);
   renderRcTopics();
   renderComprehensionSummaries();
 
@@ -363,10 +363,11 @@ function pickTheme(t) { state.tema=t; applyVisualState(); saveSnapshot(); }
 function pickRcLength(v){ state.rcLength = v; applyVisualState(); saveSnapshot(); }
 function setComprehensionQuestionCount(type,value){
   const canonical=normalizeType(type),n=Math.max(1,Math.min(30,parseInt(value,10)||4));
-  const key=canonical==='reading comprehension'?'readingQuestionCount':'listeningQuestionCount';
+  const key=comprehensionCountKey(canonical);
   state[key]=n;
-  if(hasConfiguredExercises(state)&&Array.isArray(state.exerciseConfig))state.exerciseConfig.forEach(ex=>{if(normalizeType(ex.typ||'')===canonical)ex.pocetOtazek=n});
-  const el=document.getElementById(key);if(el)el.value=String(n);
+  const indexes=configuredComprehensionIndexes(state,canonical);
+  if(indexes.length)state.exerciseConfig[indexes[0]].pocetOtazek=n;
+  syncComprehensionControl(canonical,state);
   if(typeof renderExerciseConfig==='function'&&state.exerciseDetail)renderExerciseConfig();
   validate();saveSnapshot();
 }
@@ -528,7 +529,7 @@ async function aiSuggestListeningQuestions(){
     const fp=await buildGeminiFilePartsForApi();assertComprehensionTask(task);
     fileParts=fp?.parts||[];urlPack=buildGeminiUrlPartsForApi(state);fileParts=fileParts.concat(urlPack.parts||[]);
     if(btn)btn.textContent='Generuji…';
-  const n = Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4));
+  const n = effectiveComprehensionQuestionCount('listening comprehension',state);
   const prompt =
     'Jsi pomocník učitele jazyků. Navrhni ' + n + ' otázek k poslechu s porozuměním pro školní test.\n' +
     'Jazyk otázek: ' + jazyk + '. Úroveň CEFR: ' + lvl + '.\n' +
@@ -598,7 +599,7 @@ async function aiSuggestReading(){
     return;
   }
   const words = rcLenWords();
-  const nQ = Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4));
+  const nQ = effectiveComprehensionQuestionCount('reading comprehension',state);
   const latka = trim('latka');
   const sourcePresent = readingSourcePresent();
   const sourceMode = normalizeSourceUseMode(state.sourceUseMode);

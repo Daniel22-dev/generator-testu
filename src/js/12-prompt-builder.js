@@ -40,8 +40,8 @@ function defaultItemCount(type, sourceState) {
   if (style === 'match word to definition' || style === 'heading matching') return 5;
   if (style === 'verb form' || style === 'preposition gap-fill' || style === 'word family' || style === 'short answer') return 6;
   type = normalizeType(type);
-  if (type === 'reading comprehension') return Math.max(1,Math.min(30,parseInt(st?.readingQuestionCount,10)||4));
-  if (type === 'listening comprehension') return Math.max(1,Math.min(30,parseInt(st?.listeningQuestionCount,10)||4));
+  if (type === 'reading comprehension') return typeof effectiveComprehensionQuestionCount==='function'?effectiveComprehensionQuestionCount(type,st):Math.max(1,Math.min(30,parseInt(st?.readingQuestionCount,10)||4));
+  if (type === 'listening comprehension') return typeof effectiveComprehensionQuestionCount==='function'?effectiveComprehensionQuestionCount(type,st):Math.max(1,Math.min(30,parseInt(st?.listeningQuestionCount,10)||4));
   if (type === 'cloze text') return 2;
   if (type === 'multi-select') return 4;
   if (type === 'ordering') return 3;
