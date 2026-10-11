@@ -9,8 +9,8 @@ const read = relative => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 const splitSteps = command => String(command || '').split(' && ').map(step => step.trim()).filter(Boolean);
 
 function validateS2Wiring(pkg, p5Workflow) {
-  assert.equal(pkg.scripts?.['check:s2-pedagogical-fidelity'], 'node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-visible-task-fingerprint.mjs && node scripts/check-s2-remediation-mutations.mjs',
-    'S2 source gate must execute the reviewed fidelity, R2 adversarial, visible-task fingerprint and remediation mutation tests');
+  assert.equal(pkg.scripts?.['check:s2-pedagogical-fidelity'], 'node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-visible-task-fingerprint.mjs && node scripts/check-s2-renderer-fidelity.mjs && node scripts/check-s2-remediation-mutations.mjs',
+    'S2 source gate must execute the reviewed fidelity, R2 adversarial, visible-task fingerprint, renderer-fidelity and remediation mutation tests');
   assert.equal(pkg.scripts?.['check:s2-pedagogical-browser'], 'node scripts/check-pedagogical-fidelity-browser-s2.mjs',
     'S2 browser gate must point to the reviewed Chromium test');
   assert.equal(pkg.devDependencies?.playwright, '1.61.1', 'S2 browser evidence requires the reviewed Playwright pin');
@@ -58,9 +58,14 @@ assert.throws(() => validateS2Wiring(disconnectedR2, workflow), /R2 adversarial/
   'S2 contract must reject a source gate that omits R2 adversarial scenarios');
 
 const disconnectedFingerprint = structuredClone(pkg);
-disconnectedFingerprint.scripts['check:s2-pedagogical-fidelity'] = 'node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-remediation-mutations.mjs';
+disconnectedFingerprint.scripts['check:s2-pedagogical-fidelity'] = 'node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-renderer-fidelity.mjs && node scripts/check-s2-remediation-mutations.mjs';
 assert.throws(() => validateS2Wiring(disconnectedFingerprint, workflow), /visible-task fingerprint/,
   'S2 contract must reject a source gate that omits final fingerprint scenarios');
+
+const disconnectedRendererFidelity = structuredClone(pkg);
+disconnectedRendererFidelity.scripts['check:s2-pedagogical-fidelity'] = 'node scripts/check-pedagogical-fidelity-s2.mjs && node scripts/check-s2-r2-adversarial.mjs && node scripts/check-s2-visible-task-fingerprint.mjs && node scripts/check-s2-remediation-mutations.mjs';
+assert.throws(() => validateS2Wiring(disconnectedRendererFidelity, workflow), /renderer-fidelity/,
+  'S2 contract must reject a source gate that omits the consolidated renderer-fidelity matrix');
 
 const disconnectedBrowser = structuredClone(pkg);
 disconnectedBrowser.scripts['qa:p5:ci'] = disconnectedBrowser.scripts['qa:p5:ci'].replace(' && npm run check:s2-pedagogical-browser', '');

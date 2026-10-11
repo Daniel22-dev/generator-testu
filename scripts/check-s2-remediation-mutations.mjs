@@ -118,7 +118,8 @@ assert(!hasCode(collectorFrom(noDemonstratives), fixture('According to this pass
 const noSpanish = replaceLine(original, '(?:segun|de acuerdo con|basado en|en|del)', '          /(?!)/,', 'S2-R3');
 assert(!hasCode(collectorFrom(noSpanish), fixture('Según el texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof S2-R3: removing Spanish references reopens the reported gap');
 
-const stemOnlyDuplicate = replaceOnce(original, 'if(a.visibleFingerprint===b.visibleFingerprint){', 'if(true){', 'R2-FP');
+const renderedIdentityCondition = 'if(a.visibleFingerprint===b.visibleFingerprint&&(!bothReading||a.readingContext===b.readingContext)){' ;
+const stemOnlyDuplicate = replaceOnce(original, renderedIdentityCondition, 'if(true){', 'R2-FP');
 assert(hasCode(collectorFrom(stemOnlyDuplicate), fixture('Choose the best answer.', 'Choose the best answer.', ['has','have'], ['red','blue']), 'literal-cross-exercise-duplicate'), 'mutation proof R2-FP: stem-only duplicate comparison recreates the false positive');
 
 const genericRowsSkipped = replaceOnce(original, 'if(normalized)rows.push', "if(normalized&&fidelityContentTokens(stem).length)rows.push", 'R2-TP');
@@ -130,10 +131,10 @@ assert(!hasCode(collectorFrom(noFollowing), fixture('According to the following 
 const noSiguiente = replaceOnce(original, '(?:siguiente|anterior)', '(?:anterior)', 'R2-FN-ES');
 assert(!hasCode(collectorFrom(noSiguiente), fixture('Según el siguiente texto, ¿qué dispositivo falló primero?', 'Where did it happen?'), 'independent-mc-hidden-context'), 'mutation proof R2-FN-ES: removing siguiente-texto support reopens the hidden-context gap');
 
-const keyDependentIdentity = replaceOnce(original, 'if(a.visibleFingerprint===b.visibleFingerprint){', 'if(a.visibleFingerprint===b.visibleFingerprint&&a.keyFingerprint===b.keyFingerprint){', 'F-01');
+const keyDependentIdentity = replaceOnce(original, renderedIdentityCondition, 'if(a.visibleFingerprint===b.visibleFingerprint&&(!bothReading||a.readingContext===b.readingContext)&&a.keyFingerprint===b.keyFingerprint){', 'F-01');
 assert(!hasFixtureCode(collectorFrom(keyDependentIdentity), conflictingMc, 'literal-cross-exercise-duplicate'), 'mutation proof F-01: mixing the grading key into visible identity hides a conflicting duplicate');
 
-const noWordPool = replaceOnce(original, "if(type==='word order')addUnordered('words',item.words);", "if(type==='word order'){}", 'F-02');
+const noWordPool = replaceOnce(original, "addUnordered('words',words);", "", 'F-02');
 assert(hasFixtureCode(collectorFrom(noWordPool), distinctWordOrder, 'literal-cross-exercise-duplicate'), 'mutation proof F-02: omitting the visible word pool recreates the false duplicate');
 
 const noOrderingPool = replaceOnce(original, "else if(type==='ordering')addUnordered('items',item.items);", "else if(type==='ordering'){}", 'F-03');
@@ -141,5 +142,45 @@ assert(hasFixtureCode(collectorFrom(noOrderingPool), distinctOrdering, 'literal-
 
 const noTableGrid = replaceOnce(original, "else if(type==='table-completion'){\n      addOrdered('columns',item.columns);", "else if(type==='table-completion'&&false){\n      addOrdered('columns',item.columns);", 'F-04');
 assert(hasFixtureCode(collectorFrom(noTableGrid), distinctTable, 'literal-cross-exercise-duplicate'), 'mutation proof F-04: omitting the visible table grid recreates the false duplicate');
+
+const fibPromptFirst = replaceOnce(original,
+  "if(type==='fill-in-the-blank'||type==='error correction'||type==='word formation')return valueText(item.sentence||item.prompt||item.question);",
+  "if(type==='fill-in-the-blank'||type==='error correction'||type==='word formation')return valueText(item.prompt||item.question||item.sentence);", 'RF-priority-FIB');
+const fibPriorityFixture = sameTypeFixture('fill-in-the-blank',
+  {prompt:'Complete the sentence.',sentence:'She ___ to school.',answer:'goes'},
+  {prompt:'Type a verb.',sentence:'She ___ to school.',answer:'goes'});
+assert(!hasFixtureCode(collectorFrom(fibPromptFirst), fibPriorityFixture, 'literal-cross-exercise-duplicate'), 'mutation proof RF priority: non-rendered FIB prompt metadata cannot split an identical rendered sentence');
+
+const tfQuestionFirst = replaceOnce(original,
+  "if(type==='true/false')return valueText(item.statement||item.question||item.prompt);",
+  "if(type==='true/false')return valueText(item.question||item.prompt||item.statement);", 'RF-priority-TF');
+const tfPriorityFixture = sameTypeFixture('true/false',
+  {question:'True or false?',statement:'The Earth orbits the Sun.',correct:true},
+  {question:'True or false?',statement:'Fish live in trees.',correct:false});
+assert(hasFixtureCode(collectorFrom(tfQuestionFirst), tfPriorityFixture, 'literal-cross-exercise-duplicate'), 'mutation proof RF priority: generic true/false question cannot override the rendered statement');
+
+const noReadingContext = replaceOnce(original, renderedIdentityCondition, 'if(a.visibleFingerprint===b.visibleFingerprint){', 'RF-reading-context');
+const readingContextFixture = {
+  exercises:[
+    {type:'reading comprehension',style:'reading comprehension',passage:'Birdwatching at sunrise.',items:[{question:'What did the writer see?',options:['a bird','a plane'],correct:0}]},
+    {type:'reading comprehension',style:'reading comprehension',passage:'Air show at the airport.',items:[{question:'What did the writer see?',options:['a bird','a plane'],correct:0}]}
+  ],
+  specs:[{style:'reading comprehension',type:'reading comprehension'},{style:'reading comprehension',type:'reading comprehension'}]
+};
+assert(hasFixtureCode(collectorFrom(noReadingContext), readingContextFixture, 'literal-cross-exercise-duplicate'), 'mutation proof RF Reading: omitting the displayed passage recreates the false duplicate');
+
+const noGapLayout = replaceOnce(original,
+  "if(renderedText)parts.push('gap-layout:'+renderedText.split('___').map(fidelityNormalizedText).join('<gap>'));",
+  "if(renderedText){}", 'RF-gap-layout');
+const gapLayoutFixture = sameTypeFixture('fill-in-the-blank',
+  {sentence:'She ___ likes apples.',answer:'really'},
+  {sentence:'She likes ___ apples.',answer:'green'});
+assert(hasFixtureCode(collectorFrom(noGapLayout), gapLayoutFixture, 'literal-cross-exercise-duplicate'), 'mutation proof RF gap layout: blank position remains part of the rendered task');
+
+const noMatchingPool = replaceOnce(original, "addUnordered('matching-pool',pool);", '', 'RF-matching-pool');
+const matchingPoolFixture = sameTypeFixture('matching',
+  {left:'alpha',right:'first'},
+  {left:'alpha',right:'second'});
+assert(hasFixtureCode(collectorFrom(noMatchingPool), matchingPoolFixture, 'literal-cross-exercise-duplicate'), 'mutation proof RF Matching: the displayed right-side pool distinguishes tasks');
 
 console.log('Sprint 02.1 R2 remediation mutation gate passed.');

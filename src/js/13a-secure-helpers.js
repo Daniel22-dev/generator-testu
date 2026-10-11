@@ -122,7 +122,25 @@ function fidelityContentTokens(value){
   const stop=new Set(['the','a','an','and','or','to','of','in','on','for','with','is','are','was','were','what','which','who','when','where','why','how','choose','select','correct','answer','option','question','according','based','text','passage','article','story','extract','reading','vyber','zvol','spravnou','spravne','odpoved','otazka','podle','textu','pasaze','clanku','pribehu','ukazky']);
   return fidelityNormalizedText(value).split(' ').filter(token=>token.length>=3&&!stop.has(token));
 }
-function fidelityItemStem(item){return valueText(item&&(item.question||item.prompt||item.statement||item.sentence||item.base_sentence||item.left||item.text||item.item));}
+// Resolve the primary student-visible text with the same per-type precedence as
+// the canonicalizer and the instant/secure renderers. Generic prompt metadata
+// must not override a more specific sentence, statement or text that is what
+// the exported test actually shows.
+function fidelityItemStem(item,type){
+  if(!item||typeof item!=='object')return '';
+  type=normalizeType(type||'');
+  if(type==='fill-in-the-blank'||type==='error correction'||type==='word formation')return valueText(item.sentence||item.prompt||item.question);
+  if(type==='true/false')return valueText(item.statement||item.question||item.prompt);
+  if(type==='cloze text')return valueText(item.text||item.passage);
+  if(type==='categorization')return valueText(item.text||item.item||item.prompt);
+  if(type==='matching')return valueText(item.left);
+  if(type==='transformation-chain')return valueText(item.base_sentence);
+  if(type==='error-tagging')return valueText(item.sentence||(Array.isArray(item.tokens)?item.tokens.join(' '):''));
+  if(type==='translation')return valueText(item.prompt||item.source||item.sentence||item.question);
+  if(type==='sentence transformation')return valueText(item.prompt||item.sentence||item.question);
+  if(type==='word order')return valueText(item.prompt||item.sentence||item.correct_sentence);
+  return valueText(item.question||item.prompt||item.statement||item.sentence||item.base_sentence||item.left||item.text||item.item);
+}
 function fidelitySimilarity(a,b){const aa=Array.from(new Set(fidelityContentTokens(a))),bb=Array.from(new Set(fidelityContentTokens(b)));if(aa.length<8||bb.length<8)return 0;const bs=new Set(bb),inter=aa.filter(x=>bs.has(x)).length,union=new Set(aa.concat(bb)).size;return inter>=7&&union?inter/union:0;}
 function fidelityStyleKey(value){const raw=valueText(value);return specialStyleKey(raw)||normalizeType(raw);}
 function collectPedagogicalFidelityIssues(exercises,specs){
@@ -148,14 +166,26 @@ function collectPedagogicalFidelityIssues(exercises,specs){
   // Duplicate identity follows what the student can actually see (or select),
   // never the hidden grading key. Array order is preserved only where it has
   // semantic meaning; selectable pools are compared as multisets.
-  const studentVisibleTaskFingerprint=function(type,item){
+  const studentVisibleTaskFingerprint=function(type,item,exercise){
     if(!item||typeof item!=='object')return '';
     const parts=[];
     const addOrdered=function(name,value){if(Array.isArray(value)?value.length:value&&typeof value==='object'?Object.keys(value).length:valueText(value))parts.push(name+':'+normalizedOrderedContent(value));};
     const addUnordered=function(name,value){if(Array.isArray(value)&&value.length)parts.push(name+':'+normalizedUnorderedContent(value));};
-    addUnordered('options',item.options);
-    if(type==='word order')addUnordered('words',item.words);
+    const choiceTypes=['multiple choice','reading comprehension','listening comprehension','dialogue completion','multi-select'];
+    if(choiceTypes.includes(type))addUnordered('options',item.options);
+    if(type==='fill-in-the-blank'||type==='cloze text'){
+      const renderedText=type==='cloze text'?valueText(item.text||item.passage):valueText(item.sentence||item.prompt||item.question);
+      if(renderedText)parts.push('gap-layout:'+renderedText.split('___').map(fidelityNormalizedText).join('<gap>'));
+    }
+    if(type==='word order'){
+      const words=Array.isArray(item.words)?item.words:valueText(item.prompt||item.sentence).split(/\s+/).filter(Boolean);
+      addUnordered('words',words);
+    }
     else if(type==='ordering')addUnordered('items',item.items);
+    else if(type==='matching'){
+      const pool=exercise&&Array.isArray(exercise.items)?exercise.items.map(entry=>entry&&entry.right).filter(entry=>valueText(entry)):[];
+      addUnordered('matching-pool',pool);
+    }
     else if(type==='table-completion'){
       addOrdered('columns',item.columns);
       if(Array.isArray(item.rows)){
@@ -165,18 +195,30 @@ function collectPedagogicalFidelityIssues(exercises,specs){
     }else if(type==='transformation-chain'){
       addOrdered('instructions',Array.isArray(item.transformations)?item.transformations.map(step=>step&&step.instruction):[]);
     }else if(type==='error-tagging'){
-      addOrdered('tokens',item.tokens);
+      const tokens=Array.isArray(item.tokens)?item.tokens:valueText(item.sentence).split(/\s+/).filter(Boolean);
+      addOrdered('tokens',tokens);
       addUnordered('error-type-options',item.error_type_options);
     }else if(type==='categorisation-board'){
       addUnordered('categories',item.categories);
       addUnordered('entries',Array.isArray(item.entries)?item.entries.map(entry=>entry&&entry.text):[]);
     }else if(type==='highlight-evidence')addUnordered('sentences',item.sentences);
-    else if(type==='dialogue completion')addOrdered('dialogue',item.dialogue);
+    else if(type==='dialogue completion')addOrdered('dialogue',item.dialogue||item.prompt||item.question);
     else if(type==='categorization')addUnordered('categories',item.categories);
     else if(type==='sentence transformation')addOrdered('keyword',item.keyword);
-    else if(type==='word formation')addOrdered('base-word',item.base_word);
-    else if(type==='matching')addOrdered('right-pool-entry',item.right);
+    else if(type==='word formation')addOrdered('base-word',item.base_word||item.base);
     return parts.sort().join('|');
+  };
+  const readingVisibleContext=function(exercise){
+    if(!exercise||typeof exercise!=='object')return '';
+    const direct=valueText(exercise.passage||exercise.source_text||exercise.text||exercise.source);
+    if(direct)return fidelityNormalizedText(direct);
+    const items=Array.isArray(exercise.items)?exercise.items:[];
+    let shared='';
+    for(let i=0;i<items.length;i++){
+      const candidate=valueText(items[i]&&(items[i].passage||items[i].text||items[i].source));
+      if(i===0)shared=candidate;else if(candidate!==shared)return '';
+    }
+    return fidelityNormalizedText(shared);
   };
   const gradingKeyFingerprint=function(type,item){
     if(!item||typeof item!=='object')return '';
@@ -208,7 +250,8 @@ function collectPedagogicalFidelityIssues(exercises,specs){
       const assignments=(Array.isArray(item.entries)?item.entries:[]).map(entry=>({text:entry&&entry.text,category:entry&&entry.category}));
       add('assignments',assignments,true);
     }else if(type==='error-tagging'){
-      const index=Number(item.error_token_index),token=Number.isInteger(index)&&Array.isArray(item.tokens)?item.tokens[index]:undefined;
+      const tokens=Array.isArray(item.tokens)?item.tokens:valueText(item.sentence).split(/\s+/).filter(Boolean);
+      const index=Number(item.error_token_index),token=Number.isInteger(index)?tokens[index]:undefined;
       add('error-token',token);add('error-type',item.error_type);add('correction',item.correction);
     }else if(type==='categorization')add('correct-category',item.correct_category!=null?item.correct_category:(item.category!=null?item.category:item.answer));
     else if(type==='true/false')add('correct',item.correct);
@@ -234,7 +277,7 @@ function collectPedagogicalFidelityIssues(exercises,specs){
     if(type==='multiple choice'){
       const hiddenExerciseContext=hasAnyText(ex,['passage','source_text','text','source']);
       items.forEach(function(item,qi){
-        const stem=fidelityItemStem(item),hiddenItemContext=hasAnyText(item,['passage','source_text','text','source']);
+        const stem=fidelityItemStem(item,type),hiddenItemContext=hasAnyText(item,['passage','source_text','text','source']);
         const normalizedStem=fidelityNormalizedText(stem);
         const contextReference=[
           /\b(?:according to|based on|in|from)\s+(?:(?:the|this|that)\s+)?(?:(?:following|preceding|above)\s+)?(?:text|passage|article|story|extract|reading)\b/,
@@ -245,12 +288,13 @@ function collectPedagogicalFidelityIssues(exercises,specs){
         if(hiddenExerciseContext||hiddenItemContext||contextReference)issues.push({level:'bad',code:'independent-mc-hidden-context',exercise:ei+1,item:qi+1,detail:`cvičení ${ei+1}, položka ${qi+1}: samostatné Multiple Choice odkazuje na text/passage, který jeho renderer studentovi nezobrazuje.`});
       });
     }
-    items.forEach(function(item,qi){const stem=fidelityItemStem(item),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem),visibleFingerprint=studentVisibleTaskFingerprint(type,item),keyFingerprint=gradingKeyFingerprint(type,item);if(normalized)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens,visibleFingerprint,keyFingerprint});});
+    items.forEach(function(item,qi){const stem=fidelityItemStem(item,type),normalized=fidelityNormalizedText(stem),tokens=fidelityContentTokens(stem),visibleFingerprint=studentVisibleTaskFingerprint(type,item,ex),keyFingerprint=gradingKeyFingerprint(type,item),readingContext=type==='reading comprehension'?readingVisibleContext(ex):'';if(normalized)rows.push({exercise:ei+1,item:qi+1,type,stem,normalized,tokens,visibleFingerprint,keyFingerprint,readingContext});});
   });
   for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
     const a=rows[i],b=rows[j];if(a.exercise===b.exercise)continue;
     if(a.normalized===b.normalized){
-      if(a.visibleFingerprint===b.visibleFingerprint){
+      const bothReading=a.type==='reading comprehension'&&b.type==='reading comprehension';
+      if(a.visibleFingerprint===b.visibleFingerprint&&(!bothReading||a.readingContext===b.readingContext)){
         issues.push({level:'bad',code:'literal-cross-exercise-duplicate',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: položky ${a.item}/${b.item} představují stejnou studentovi zobrazenou úlohu napříč cvičeními.`});
         if(a.keyFingerprint&&b.keyFingerprint&&a.keyFingerprint!==b.keyFingerprint)issues.push({level:'bad',code:'cross-exercise-answer-key-conflict',exercise:a.exercise,item:a.item,otherExercise:b.exercise,otherItem:b.item,detail:`cvičení ${a.exercise}/${b.exercise}: shodná studentovi zobrazená úloha má rozporný správný odpovědní klíč.`});
       }
