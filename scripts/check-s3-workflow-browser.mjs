@@ -219,6 +219,63 @@ async function sessionPreservationCase() {
   assert.equal(csv1.name, csv2.name);
   assert.equal(sha256(csv1.bytes), sha256(csv2.bytes));
 
+  async function pointInputWorkflowCase(){
+    const pointPage=await context.newPage();
+    pointPage.on('pageerror',error=>pageErrors.push(`point-input-workflow: ${error.message}`));
+    await pointPage.goto(origin+'/generator/');
+    await pointPage.waitForFunction(()=>typeof onCustomBody==='function'&&typeof pickNum==='function'&&typeof goTo==='function');
+    await pointPage.evaluate(()=>{
+      Object.assign(state,{
+        body:20,pocet:5,odevzdavani:'B',gradeTyp:'standard',exerciseDetail:false,exerciseConfigSaved:false,
+        exerciseConfig:Array.from({length:5},()=>({typ:'multiple choice',pocetOtazek:4,body:4})),
+        typyCviceni:['multiple choice','gap fill','true/false','translation','error correction']
+      });
+      document.querySelectorAll('[id^="step"]').forEach(step=>step.classList.add('hidden'));
+      document.getElementById('step2').classList.remove('hidden');
+      currentStep=2;maxStep=2;applyVisualState();validate();
+    });
+    const input=pointPage.locator('#bodyCustom'),next=pointPage.locator('#next2');
+    await input.fill('29.7');
+    const immediate=await pointPage.evaluate(()=>(
+      {body:state.body,points:state.exerciseConfig.map(ex=>ex.body),nextDisabled:document.getElementById('next2').disabled,
+        value:document.getElementById('bodyCustom').value,message:document.getElementById('bodyCustom').validationMessage,
+        ariaInvalid:document.getElementById('bodyCustom').getAttribute('aria-invalid')}
+    ));
+    await pointPage.locator('#randomBtns .tag-btn[data-val="ANO"]').click();
+    const afterUnrelated=await pointPage.evaluate(()=>(
+      {body:state.body,nextDisabled:document.getElementById('next2').disabled,currentStep,
+        value:document.getElementById('bodyCustom').value,message:document.getElementById('bodyCustom').validationMessage}
+    ));
+    let normalClickBlocked=false;
+    try{await next.click({timeout:750});}catch{normalClickBlocked=true;}
+    const directAdvance=await pointPage.evaluate(()=>({returned:goTo(3),currentStep}));
+    await pointPage.locator('#bodyBtns .tag-btn[data-val="30"]').click();
+    const afterPreset=await pointPage.evaluate(()=>(
+      {body:state.body,points:state.exerciseConfig.map(ex=>ex.body),nextDisabled:document.getElementById('next2').disabled,
+        value:document.getElementById('bodyCustom').value,message:document.getElementById('bodyCustom').validationMessage,
+        ariaInvalid:document.getElementById('bodyCustom').getAttribute('aria-invalid')}
+    ));
+    await next.click();
+    const advancedAfterCorrection=await pointPage.evaluate(()=>currentStep);
+    await pointPage.evaluate(()=>goTo(2));
+    await input.fill('29.7');await input.fill('29');
+    const afterTyped=await pointPage.evaluate(()=>(
+      {body:state.body,points:state.exerciseConfig.map(ex=>ex.body),nextDisabled:document.getElementById('next2').disabled,
+        value:document.getElementById('bodyCustom').value,message:document.getElementById('bodyCustom').validationMessage,
+        ariaInvalid:document.getElementById('bodyCustom').getAttribute('aria-invalid')}
+    ));
+    assert.deepEqual(immediate,{body:20,points:[4,4,4,4,4],nextDisabled:true,value:'29.7',message:'Zadej celé číslo v povoleném rozsahu.',ariaInvalid:'true'});
+    assert.equal(afterUnrelated.body,20);assert.equal(afterUnrelated.nextDisabled,true);assert.equal(afterUnrelated.currentStep,2);
+    assert.equal(afterUnrelated.value,'29.7');assert.notEqual(afterUnrelated.message,'');
+    assert.equal(normalClickBlocked,true);assert.deepEqual(directAdvance,{returned:false,currentStep:2});
+    assert.deepEqual(afterPreset,{body:30,points:[6,6,6,6,6],nextDisabled:false,value:'30',message:'',ariaInvalid:null});
+    assert.equal(advancedAfterCorrection,3);
+    assert.deepEqual(afterTyped,{body:29,points:[6,6,6,6,5],nextDisabled:false,value:'29',message:'',ariaInvalid:null});
+    await pointPage.close();
+    return{immediate,afterUnrelated,normalClickBlocked,directAdvance,afterPreset,advancedAfterCorrection,afterTyped};
+  }
+  const pointInputWorkflow=await pointInputWorkflowCase();
+
   const controls = await page.evaluate(() => {
     const supported=[1,2,3,8,9,30];
     state.exerciseDetail=true;state.exerciseConfigSaved=true;state.pocet=5;state.body=20;
@@ -302,7 +359,7 @@ async function sessionPreservationCase() {
   assert.equal(sha256(csv3.bytes),sha256(csv1.bytes));
   assert.deepEqual(await snapshot(),runtimeBeforeManuals);
   assert.deepEqual(runtimeBeforeManuals.codes,before.codes);
-  return {recipients:28,csvSha256:sha256(csv1.bytes),codesStable:true,sessionKeyScope:'session-only',manualRoutes:3,controls};
+  return {recipients:28,csvSha256:sha256(csv1.bytes),codesStable:true,sessionKeyScope:'session-only',manualRoutes:3,controls,pointInputWorkflow};
 }
 
 try {
@@ -320,6 +377,8 @@ try {
       'header, About and Apps Script manual routes open in separate noopener tabs while the original generator runtime remains alive',
       '28 synthetic recipients retain the same in-memory codes and byte-identical repeated CSV',
       'session-scoped synthetic API key remains in the original session and is absent from localStorage',
+      'a real invalid points input remains blocking after an unrelated click and both normal and direct forward navigation fail closed',
+      'real preset and typed corrections clear stale validity state and restore navigation with exact point distributions',
       'fractional, empty, negative and out-of-range totals do not mutate the point plan; valid 29 remains 6+6+6+6+5',
       'Reading and Listening controls expose 1-30 and keep primary/secondary rows independent',
       'instant, secure student and teacher verifier render per-exercise Reading/Listening counts 1, 30, 2 and 9'

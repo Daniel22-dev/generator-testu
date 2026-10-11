@@ -101,12 +101,14 @@ function onCustomBody() {
   if(v===null||v<1||v>max){
     if(input){input.setAttribute('aria-invalid','true');input.setCustomValidity('Zadej celé číslo v povoleném rozsahu.');}
     const next=$('next2');if(next)next.disabled=true;
+    validate();
     return false;
   }
   if(state.exerciseConfig&&state.exerciseConfig.length){
     if(!syncExercisePoints(v)){
       if(input){input.setAttribute('aria-invalid','true');input.setCustomValidity('Celkový počet bodů musí umožnit alespoň 1 bod pro každé cvičení.');}
       const next=$('next2');if(next)next.disabled=true;
+      validate();
       return false;
     }
   }else state.body=v;
@@ -673,6 +675,11 @@ function validate() {
   const hasBody = hasConfiguredExercises(state)
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0) > 0
     : state.body > 0;
+  const bodyInput=$('bodyCustom');
+  const bodyInputInvalid=!!(bodyInput&&(
+    bodyInput.validationMessage
+    || (typeof bodyInput.getAttribute==='function'&&bodyInput.getAttribute('aria-invalid')==='true')
+  ));
   const effTotalBody = hasConfiguredExercises(state) && state.exerciseConfig && state.exerciseConfig.length
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0)
     : state.body;
@@ -686,7 +693,7 @@ function validate() {
   const scaleGaps=gradeScaleGaps(parsedForValidation);
   const scaleOverlaps=gradeScaleOverlaps(parsedForValidation);
   const gradeOk = state.gradeTyp !== 'vlastni' || ((localScaleValid || aiScaleValid) && scaleGaps.length===0 && scaleOverlaps.length===0);
-  $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk && (hasConfiguredExercises(state)||Number(state.body)>=Number(state.pocet)));
+  $('next2').disabled = !(state.odevzdavani && hasBody && !bodyInputInvalid && gradeOk && (hasConfiguredExercises(state)||Number(state.body)>=Number(state.pocet)));
   if(typeof renderGenerationEstimate==='function')renderGenerationEstimate();
   const skala = $('vlastniSkala');
   const skalaErr = $('vlastniSkalaErr');
@@ -1079,14 +1086,27 @@ function syncExerciseConfig() {
 }
 
 function syncExercisePoints(totalOverride) {
-  const raw=arguments.length?totalOverride:state.body;
+  const explicitTarget=arguments.length>0;
+  const raw=explicitTarget?totalOverride:state.body;
   if(!state.exerciseConfig.length)return false;
   const n = state.exerciseConfig.length;
   const distribution=exercisePointsDistribution(raw,n);
   if(!distribution)return false;
   const target=Number(raw);
+  const input=$('bodyCustom');
+  const preserveDirtyInput=!explicitTarget&&input&&(
+    input.validationMessage
+    || (typeof input.getAttribute==='function'&&input.getAttribute('aria-invalid')==='true')
+  );
   state.exerciseConfig.forEach((ex,i)=>{ex.body=distribution[i]});
-  state.body=target;setVal('bodyCustom',target);
+  state.body=target;
+  if(!preserveDirtyInput){
+    setVal('bodyCustom',target);
+    if(input){
+      if(typeof input.setCustomValidity==='function')input.setCustomValidity('');
+      if(typeof input.removeAttribute==='function')input.removeAttribute('aria-invalid');
+    }
+  }
   if (state.exerciseDetail) renderExerciseConfig();
   return true;
 }

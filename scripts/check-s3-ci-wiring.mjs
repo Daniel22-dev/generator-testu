@@ -9,10 +9,12 @@ const read=relative=>fs.readFileSync(path.join(root,relative),'utf8');
 const split=command=>String(command||'').split(' && ').map(step=>step.trim()).filter(Boolean);
 
 function validate(pkg,workflow){
-  assert.equal(pkg.scripts?.['check:s3-workflow-fidelity'],'node scripts/check-s3-workflow-fidelity.mjs && node scripts/check-s31-remediation.mjs',
-    'S3 source gate must execute the reviewed workflow fidelity and S3.1 remediation scripts');
-  assert.equal(pkg.scripts?.['check:s31-remediation'],'node scripts/check-s31-remediation.mjs',
-    'S3.1 remediation gate must execute the reviewed edge-case script');
+  assert.equal(pkg.scripts?.['check:s3-workflow-fidelity'],'node scripts/check-s3-workflow-fidelity.mjs && node scripts/check-s31-remediation.mjs && node scripts/check-s31-r2-point-validation.mjs',
+    'S3 source gate must execute the reviewed workflow fidelity, S3.1 and S3.1-R2 scripts');
+  assert.equal(pkg.scripts?.['check:s31-remediation'],'node scripts/check-s31-remediation.mjs && node scripts/check-s31-r2-point-validation.mjs',
+    'S3.1 remediation gate must execute both reviewed edge-case scripts');
+  assert.equal(pkg.scripts?.['check:s31-r2-point-validation'],'node scripts/check-s31-r2-point-validation.mjs',
+    'S3.1-R2 must expose a directly runnable fail-closed gate');
   assert.equal(pkg.scripts?.['check:s3-workflow-browser'],'node scripts/check-s3-workflow-browser.mjs',
     'S3 browser gate must execute the reviewed Chromium script');
   assert.equal(pkg.devDependencies?.playwright,'1.61.1','S3 browser evidence requires the reviewed Playwright pin');
@@ -40,6 +42,9 @@ validate(pkg,workflow);
 const noSource=structuredClone(pkg);
 noSource.scripts.prebuild=noSource.scripts.prebuild.replace(' && npm run check:s3-workflow-fidelity','');
 assert.throws(()=>validate(noSource,workflow),/blocking S3 source gate/);
+const noR2=structuredClone(pkg);
+noR2.scripts['check:s3-workflow-fidelity']=noR2.scripts['check:s3-workflow-fidelity'].replace(' && node scripts/check-s31-r2-point-validation.mjs','');
+assert.throws(()=>validate(noR2,workflow),/S3 source gate/);
 const noBrowser=structuredClone(pkg);
 noBrowser.scripts['qa:p5:ci']=noBrowser.scripts['qa:p5:ci'].replace(' && npm run check:s3-workflow-browser','');
 assert.throws(()=>validate(noBrowser,workflow),/blocking S3 browser gate/);

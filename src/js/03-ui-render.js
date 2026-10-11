@@ -219,6 +219,11 @@ function showOnlyStep(n) {
 
 function goTo(n) {
   if(window.__GHRAB_GENERATOR_WORKFLOW_ID__||outputMutationBusy)return;
+  if(n>currentStep){
+    validate();
+    const gate=$('next'+currentStep);
+    if(gate&&gate.disabled)return false;
+  }
   $('step'+currentStep).classList.add('hidden');
   $('step'+n).classList.remove('hidden');
   currentStep = n;
@@ -227,6 +232,7 @@ function goTo(n) {
   if (n === 4) renderResult();
   saveSnapshot();
   window.scrollTo({top:0,behavior:'smooth'});
+  return true;
 }
 
 function jumpTo(n) {
@@ -309,6 +315,24 @@ function pickNum(key, value) {
   // Ochrana identity studentů je od v7 povinná a nelze ji vypnout.
   if (key === 'anonymizace') value = 'ANO';
 
+  // Bodový preset je plnohodnotná oprava rozepsaného vlastního vstupu. Stejný
+  // striktní celočíselný kontrakt jako onCustomBody()/syncExercisePoints() musí
+  // platit i pro programové volání; teprve po úspěchu čistíme validační stav.
+  if(key==='body'){
+    const input=$('bodyCustom'),points=strictIntegerValue(value);
+    const count=state.exerciseConfig&&state.exerciseConfig.length?state.exerciseConfig.length:0;
+    const max=count?999*count:999;
+    if(points===null||points<1||points>max)return false;
+    if(count){if(!syncExercisePoints(points))return false;}
+    else{state.body=points;setVal('bodyCustom',points);}
+    if(input){
+      if(typeof input.setCustomValidity==='function')input.setCustomValidity('');
+      if(typeof input.removeAttribute==='function')input.removeAttribute('aria-invalid');
+    }
+    applyVisualState();validate();saveSnapshot();
+    return true;
+  }
+
   if (key === 'pocet' && !state.exerciseDetail) {
     if(state.exerciseConfigSaved){
       if(Number(value)<state.exerciseConfig.length){
@@ -336,7 +360,6 @@ function pickNum(key, value) {
   } else {
     state[key] = value;
     if (key==='cas') setVal('casCustom', value);
-    if (key==='body') { setVal('bodyCustom', value); syncExercisePoints(); }
     if (key==='pocet') { syncExerciseConfig(); state.typyCviceni=uniqueExerciseTypes(state.exerciseConfig.map(ex=>ex.typ)); renderSmartTimeTip(); }
   }
   applyVisualState(); validate(); saveSnapshot();
