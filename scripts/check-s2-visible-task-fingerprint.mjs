@@ -108,4 +108,3 @@ console.log(JSON.stringify({
   structuralControls: { passed: structuralControls.filter(result => result.pass).length, total: structuralControls.length, cases: structuralControls }
 }, null, 2));
 if (cases.concat(structuralControls).some(result => !result.pass)) process.exitCode = 1;
-
