@@ -241,7 +241,7 @@ async function sessionPreservationCase() {
         value:document.getElementById('bodyCustom').value,message:document.getElementById('bodyCustom').validationMessage,
         ariaInvalid:document.getElementById('bodyCustom').getAttribute('aria-invalid')}
     ));
-    await pointPage.locator('#randomBtns .tag-btn[data-val="ANO"]').click();
+    await pointPage.locator('#gradeSkola').click();
     const afterUnrelated=await pointPage.evaluate(()=>(
       {body:state.body,nextDisabled:document.getElementById('next2').disabled,currentStep,
         value:document.getElementById('bodyCustom').value,message:document.getElementById('bodyCustom').validationMessage}
