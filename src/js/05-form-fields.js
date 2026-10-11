@@ -970,6 +970,21 @@ function syncDetailedPointsTotal(st,reflectDom){
   if(!hasConfiguredExercises(st)||!Array.isArray(st.exerciseConfig))return Number(st.body)||0;
   const total=exercisePointsTotal(st);st.body=total;
   if(st===state&&reflectDom!==false)setVal('bodyCustom',total>0?total:'');
+  // Po vědomém zapnutí detailního režimu jsou autoritou body jednotlivých
+  // cvičení a globální pole je skryté. Jeho stará native validity proto smí
+  // zmizet pouze tehdy, když je celý autoritativní detailní plán platný.
+  // Samotný validate(), redraw ani synchronizace v globálním režimu chybu nemaže.
+  const detailValid=st.exerciseConfig.length>0&&st.exerciseConfig.every(ex=>{
+    const points=strictIntegerValue(ex&&ex.body);
+    return points!==null&&points>=1&&points<=999;
+  });
+  if(st===state&&st.exerciseDetail&&detailValid){
+    const input=$('bodyCustom');
+    if(input){
+      if(typeof input.setCustomValidity==='function')input.setCustomValidity('');
+      if(typeof input.removeAttribute==='function')input.removeAttribute('aria-invalid');
+    }
+  }
   return total;
 }
 function exercisePointsDistribution(total,count){

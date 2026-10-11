@@ -276,6 +276,83 @@ async function sessionPreservationCase() {
   }
   const pointInputWorkflow=await pointInputWorkflowCase();
 
+  async function detailPointAuthorityWorkflowCase(){
+    const detailPage=await context.newPage();
+    detailPage.on('pageerror',error=>pageErrors.push(`detail-point-authority: ${error.message}`));
+    await detailPage.goto(origin+'/generator/');
+    await detailPage.waitForFunction(()=>typeof onCustomBody==='function'&&typeof toggleExDetail==='function'&&typeof updateExField==='function');
+    await detailPage.evaluate(()=>{
+      Object.assign(state,{
+        appMode:'advanced',workPreset:'advanced',jazyk:'angličtina',uroven:['B2'],body:20,pocet:5,
+        odevzdavani:'B',gradeTyp:'standard',exerciseDetail:false,exerciseConfigSaved:false,
+        exerciseConfig:Array.from({length:5},(_,index)=>({
+          typ:['multiple choice','gap fill','true/false','translation','error correction'][index],pocetOtazek:4,body:4
+        })),
+        typyCviceni:['multiple choice','gap fill','true/false','translation','error correction']
+      });
+      document.querySelectorAll('[id^="step"]').forEach(step=>step.classList.add('hidden'));
+      document.getElementById('step2').classList.remove('hidden');
+      currentStep=2;maxStep=2;applyVisualState();validate();
+    });
+    const bodyInput=detailPage.locator('#bodyCustom');
+    await bodyInput.fill('29.7');
+    const invalidGlobal=await detailPage.evaluate(()=>(
+      {step:currentStep,body:state.body,points:state.exerciseConfig.map(ex=>ex.body),value:bodyCustom.value,
+        message:bodyCustom.validationMessage,ariaInvalid:bodyCustom.getAttribute('aria-invalid'),next2Disabled:next2.disabled}
+    ));
+    await detailPage.evaluate(()=>goTo(1));
+    await detailPage.locator('#btnExDetail').click();
+    const afterDetailSwitch=await detailPage.evaluate(()=>(
+      {step:currentStep,detail:state.exerciseDetail,body:state.body,points:state.exerciseConfig.map(ex=>ex.body),
+        value:bodyCustom.value,message:bodyCustom.validationMessage,ariaInvalid:bodyCustom.getAttribute('aria-invalid'),
+        globalBodyHidden:globalBodyField.classList.contains('hidden'),next1Disabled:next1.disabled}
+    ));
+    await detailPage.locator('#next1').click();
+    const detailTotal20=await detailPage.evaluate(()=>(
+      {step:currentStep,body:state.body,value:bodyCustom.value,message:bodyCustom.validationMessage,
+        ariaInvalid:bodyCustom.getAttribute('aria-invalid'),next2Disabled:next2.disabled}
+    ));
+    await detailPage.evaluate(()=>goTo(1));
+    let pointInputs=detailPage.locator('#exConfigList .ex-row input[type="number"][max="999"]');
+    assert.equal(await pointInputs.count(),5);
+    await pointInputs.nth(0).fill('5');await pointInputs.nth(0).press('Tab');
+    const validDetail21=await detailPage.evaluate(()=>(
+      {step:currentStep,body:state.body,points:state.exerciseConfig.map(ex=>ex.body),value:bodyCustom.value,
+        message:bodyCustom.validationMessage,ariaInvalid:bodyCustom.getAttribute('aria-invalid'),next1Disabled:next1.disabled}
+    ));
+    pointInputs=detailPage.locator('#exConfigList .ex-row input[type="number"][max="999"]');
+    await pointInputs.nth(0).fill('4.5');await pointInputs.nth(0).press('Tab');
+    const rejectedInvalidDetail=await detailPage.evaluate(()=>(
+      {body:state.body,points:state.exerciseConfig.map(ex=>ex.body),rendered:Array.from(document.querySelectorAll('#exConfigList .ex-row input[type="number"][max="999"]'),input=>input.value)}
+    ));
+    const target=[6,6,6,6,5];
+    for(let index=0;index<target.length;index++){
+      pointInputs=detailPage.locator('#exConfigList .ex-row input[type="number"][max="999"]');
+      await pointInputs.nth(index).fill(String(target[index]));await pointInputs.nth(index).press('Tab');
+    }
+    const validDetail29=await detailPage.evaluate(()=>(
+      {body:state.body,points:state.exerciseConfig.map(ex=>ex.body),value:bodyCustom.value,
+        message:bodyCustom.validationMessage,ariaInvalid:bodyCustom.getAttribute('aria-invalid'),next1Disabled:next1.disabled}
+    ));
+    await detailPage.locator('#next1').click();
+    const detailTotal29=await detailPage.evaluate(()=>(
+      {step:currentStep,body:state.body,value:bodyCustom.value,message:bodyCustom.validationMessage,
+        ariaInvalid:bodyCustom.getAttribute('aria-invalid'),next2Disabled:next2.disabled}
+    ));
+    assert.deepEqual(invalidGlobal,{step:2,body:20,points:[4,4,4,4,4],value:'29.7',
+      message:'Zadej celé číslo v povoleném rozsahu.',ariaInvalid:'true',next2Disabled:true});
+    assert.deepEqual(afterDetailSwitch,{step:1,detail:true,body:20,points:[4,4,4,4,4],value:'20',message:'',
+      ariaInvalid:null,globalBodyHidden:true,next1Disabled:false});
+    assert.deepEqual(detailTotal20,{step:2,body:20,value:'20',message:'',ariaInvalid:null,next2Disabled:false});
+    assert.deepEqual(validDetail21,{step:1,body:21,points:[5,4,4,4,4],value:'21',message:'',ariaInvalid:null,next1Disabled:false});
+    assert.deepEqual(rejectedInvalidDetail,{body:21,points:[5,4,4,4,4],rendered:['5','4','4','4','4']});
+    assert.deepEqual(validDetail29,{body:29,points:[6,6,6,6,5],value:'29',message:'',ariaInvalid:null,next1Disabled:false});
+    assert.deepEqual(detailTotal29,{step:2,body:29,value:'29',message:'',ariaInvalid:null,next2Disabled:false});
+    await detailPage.close();
+    return{invalidGlobal,afterDetailSwitch,detailTotal20,validDetail21,rejectedInvalidDetail,validDetail29,detailTotal29};
+  }
+  const detailPointAuthorityWorkflow=await detailPointAuthorityWorkflowCase();
+
   const controls = await page.evaluate(() => {
     const supported=[1,2,3,8,9,30];
     state.exerciseDetail=true;state.exerciseConfigSaved=true;state.pocet=5;state.body=20;
@@ -359,7 +436,7 @@ async function sessionPreservationCase() {
   assert.equal(sha256(csv3.bytes),sha256(csv1.bytes));
   assert.deepEqual(await snapshot(),runtimeBeforeManuals);
   assert.deepEqual(runtimeBeforeManuals.codes,before.codes);
-  return {recipients:28,csvSha256:sha256(csv1.bytes),codesStable:true,sessionKeyScope:'session-only',manualRoutes:3,controls,pointInputWorkflow};
+  return {recipients:28,csvSha256:sha256(csv1.bytes),codesStable:true,sessionKeyScope:'session-only',manualRoutes:3,controls,pointInputWorkflow,detailPointAuthorityWorkflow};
 }
 
 try {
@@ -379,6 +456,8 @@ try {
       'session-scoped synthetic API key remains in the original session and is absent from localStorage',
       'a real invalid points input remains blocking after an unrelated click and both normal and direct forward navigation fail closed',
       'real preset and typed corrections clear stale validity state and restore navigation with exact point distributions',
+      'real step 2 to step 1 detail-mode switch transfers point authority, clears only the hidden stale global error and preserves exact 20, 21 and 29 totals',
+      'a fractional detail-point edit is rejected without mutating the valid detailed point plan',
       'fractional, empty, negative and out-of-range totals do not mutate the point plan; valid 29 remains 6+6+6+6+5',
       'Reading and Listening controls expose 1-30 and keep primary/secondary rows independent',
       'instant, secure student and teacher verifier render per-exercise Reading/Listening counts 1, 30, 2 and 9'
