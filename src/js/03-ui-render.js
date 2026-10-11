@@ -62,7 +62,12 @@ function applyVisualState() {
   setVal('casCustom', state.cas);
   updateAppModeUI();
   updateSecurityGuideUI();
-  if (state.body) setVal('bodyCustom', state.body);
+  const bodyInput=$('bodyCustom');
+  const bodyInputDirtyInvalid=!!(bodyInput&&(
+    bodyInput.validationMessage
+    || (typeof bodyInput.getAttribute==='function'&&bodyInput.getAttribute('aria-invalid')==='true')
+  ));
+  if(state.body&&!bodyInputDirtyInvalid)setVal('bodyCustom',state.body);
 
   const fuzzyNote = $('fuzzyNote');
   if (fuzzyNote) {
