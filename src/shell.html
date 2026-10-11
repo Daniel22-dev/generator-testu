@@ -409,7 +409,7 @@
         <div id="compListeningSources" class="small-muted"></div>
         <div class="rc-sub-label">Počet otázek <button class="tt-icon" data-tip="Tento počet je společný pro AI návrh i finální Listening cvičení. Pokud používáš podrobné nastavení, změna se propíše i tam.">?</button></div>
         <select aria-label="Počet otázek Listening" id="listeningQuestionCount" onchange="setComprehensionQuestionCount('listening comprehension',this.value)" style="max-width:220px;margin-bottom:10px">
-          <option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option>
+          <option value="1">1 otázka</option><option value="2">2 otázky</option><option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option><option value="9">9 otázek</option><option value="10">10 otázek</option><option value="11">11 otázek</option><option value="12">12 otázek</option><option value="13">13 otázek</option><option value="14">14 otázek</option><option value="15">15 otázek</option><option value="16">16 otázek</option><option value="17">17 otázek</option><option value="18">18 otázek</option><option value="19">19 otázek</option><option value="20">20 otázek</option><option value="21">21 otázek</option><option value="22">22 otázek</option><option value="23">23 otázek</option><option value="24">24 otázek</option><option value="25">25 otázek</option><option value="26">26 otázek</option><option value="27">27 otázek</option><option value="28">28 otázek</option><option value="29">29 otázek</option><option value="30">30 otázek</option>
         </select>
         <div class="small-muted" id="listeningQuestionCountScope" aria-live="polite"></div>
         <textarea id="listeningFocus" rows="3" placeholder="Na co se má poslech ptát? Např. hlavní myšlenka, konkrétní údaje, postoje mluvčích, důvody rozhodnutí, pořadí událostí..." oninput="onInput()"></textarea>
@@ -445,7 +445,7 @@
         <div class="small-muted" style="margin-top:8px">Delší text doporučujeme spárovat s vyšším počtem otázek (4–6), aby se čtení vyplatilo. Skutečná délka se může mírně lišit podle tématu a úrovně CEFR.</div>
         <div class="rc-sub-label">Počet otázek <button class="tt-icon" data-tip="Tento počet je společný pro AI návrh i finální Reading cvičení. Volíš ho ty; délka textu je jen doporučení.">?</button></div>
         <select aria-label="Počet otázek Reading" id="readingQuestionCount" onchange="setComprehensionQuestionCount('reading comprehension',this.value)" style="max-width:220px;margin-bottom:10px">
-          <option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option>
+          <option value="1">1 otázka</option><option value="2">2 otázky</option><option value="3">3 otázky</option><option value="4" selected>4 otázky</option><option value="5">5 otázek</option><option value="6">6 otázek</option><option value="7">7 otázek</option><option value="8">8 otázek</option><option value="9">9 otázek</option><option value="10">10 otázek</option><option value="11">11 otázek</option><option value="12">12 otázek</option><option value="13">13 otázek</option><option value="14">14 otázek</option><option value="15">15 otázek</option><option value="16">16 otázek</option><option value="17">17 otázek</option><option value="18">18 otázek</option><option value="19">19 otázek</option><option value="20">20 otázek</option><option value="21">21 otázek</option><option value="22">22 otázek</option><option value="23">23 otázek</option><option value="24">24 otázek</option><option value="25">25 otázek</option><option value="26">26 otázek</option><option value="27">27 otázek</option><option value="28">28 otázek</option><option value="29">29 otázek</option><option value="30">30 otázek</option>
         </select>
         <div class="small-muted" id="readingQuestionCountScope" aria-live="polite"></div>
 
@@ -639,7 +639,7 @@
           <button class="tag-btn simple-card" data-val="100" onclick="pickNum('body',100)"><span class="choice-card-title">100 b</span></button>
         </div>
         <div class="num-row">
-          <input type="number" id="bodyCustom" min="1" max="999" value="" placeholder="—" oninput="onCustomBody()">
+          <input type="number" id="bodyCustom" min="1" max="9990" step="1" value="" placeholder="—" oninput="onCustomBody()">
           <span>bodů (vlastní hodnota)</span>
         </div>
       </div>

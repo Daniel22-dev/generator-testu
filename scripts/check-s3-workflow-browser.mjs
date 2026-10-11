@@ -54,6 +54,18 @@ function readingExercise(count, passage, prefix) {
   };
 }
 
+function listeningExercise(count, prefix) {
+  return {
+    type:'listening comprehension', style:'listening comprehension', title:`${prefix} listening`,
+    audio_prompt:'Teacher reads a synthetic classroom recording twice.', points_total:count * 2, points_each:2,
+    items:Array.from({length:count}, (_, index) => ({
+      question:`${prefix} synthetic listening question ${index + 1}?`,
+      options:['Synthetic A','Synthetic B','Synthetic C'], correct:index % 3,
+      explanation:'Synthetic explanation.'
+    }))
+  };
+}
+
 async function generatorRuntimeCase() {
   configure({
     exerciseDetail:true, exerciseConfigSaved:true, pocet:2, body:24,
@@ -93,28 +105,33 @@ async function rendererCase() {
     'Synthetic passage Beta describes a library project and its reading schedule.'
   ];
   const exerciseConfig = [
-    {typ:'reading comprehension',pocetOtazek:5,body:10},
-    {typ:'reading comprehension',pocetOtazek:7,body:14}
+    {typ:'reading comprehension',pocetOtazek:1,body:2},
+    {typ:'reading comprehension',pocetOtazek:30,body:60},
+    {typ:'listening comprehension',pocetOtazek:2,body:4},
+    {typ:'listening comprehension',pocetOtazek:9,body:18}
   ];
-  const exercises = [readingExercise(5,passages[0],'Alpha'),readingExercise(7,passages[1],'Beta')];
+  const exercises = [
+    readingExercise(1,passages[0],'Alpha'),readingExercise(30,passages[1],'Beta'),
+    listeningExercise(2,'Gamma'),listeningExercise(9,'Delta')
+  ];
 
   configure({
     testMode:'bezny', resultMode:'instant', screenGuard:false, feedbackMode:'brief', layout:'tabs',
-    exerciseDetail:true, exerciseConfigSaved:true, typyCviceni:['reading comprehension'], exerciseConfig, body:24, pocet:2,
-    readingQuestionCount:5
+    exerciseDetail:true, exerciseConfigSaved:true, typyCviceni:['reading comprehension','listening comprehension'], exerciseConfig, body:84, pocet:4,
+    readingQuestionCount:1, listeningQuestionCount:2
   });
   GEN.exercises = structuredClone(exercises);
   const instantHtml = await build();
   const instant = await generatedPage(instantHtml, 'instant-s3.html');
   await instant.locator('#studentName').fill('Synthetic Student');
   await instant.evaluate(() => startTest());
-  assert.deepEqual(await instant.locator('.ex-panel').evaluateAll(panels => panels.map(panel => panel.querySelectorAll('.question,.q').length)), [5,7]);
+  assert.deepEqual(await instant.locator('.ex-panel').evaluateAll(panels => panels.map(panel => panel.querySelectorAll('.question,.q').length)), [1,30,2,9]);
   assert.equal(await instant.locator('.reading-passage').count(), 2);
 
   configure({
     testMode:'prisny', resultMode:'secureOffline', screenGuard:true, feedbackMode:'none', layout:'tabs',
-    exerciseDetail:true, exerciseConfigSaved:true, typyCviceni:['reading comprehension'], exerciseConfig, body:24, pocet:2,
-    readingQuestionCount:5
+    exerciseDetail:true, exerciseConfigSaved:true, typyCviceni:['reading comprehension','listening comprehension'], exerciseConfig, body:84, pocet:4,
+    readingQuestionCount:1, listeningQuestionCount:2
   });
   GEN.exercises = structuredClone(exercises);
   const securePackage = await build();
@@ -122,19 +139,22 @@ async function rendererCase() {
   await secure.locator('#studentName').fill('Synthetic Student');
   await enterStartCode(secure, securePackage);
   await secure.evaluate(() => startTest());
-  assert.deepEqual(await secure.locator('.ex-panel').evaluateAll(panels => panels.map(panel => panel.querySelectorAll('.question,.q').length)), [5,7]);
+  assert.deepEqual(await secure.locator('.ex-panel').evaluateAll(panels => panels.map(panel => panel.querySelectorAll('.question,.q').length)), [1,30,2,9]);
   assert.equal(await secure.locator('.reading-passage').count(), 2);
 
   const verifier = await generatedPage(securePackage.teacherHtml, 'teacher-verifier-s3.html');
   await verifier.evaluate(() => renderTeacherPreview('__default'));
-  assert.equal(await verifier.locator('#teacherPreview .feedback h3').count(), 2);
+  assert.equal(await verifier.locator('#teacherPreview .feedback h3').count(), 4);
+  assert.deepEqual(await verifier.locator('#teacherPreview .feedback').evaluateAll(cards => cards.map(card => card.querySelectorAll('.q').length)), [1,30,2,9]);
   const verifierText = await verifier.locator('#teacherPreview').innerText();
   assert.match(verifierText, /Alpha reading/);
   assert.match(verifierText, /Beta reading/);
+  assert.match(verifierText, /Gamma listening/);
+  assert.match(verifierText, /Delta listening/);
 
   return {
     instantSha256:sha256(instantHtml), secureStudentSha256:sha256(securePackage.studentHtml),
-    verifierSha256:sha256(securePackage.teacherHtml), renderedCounts:[5,7], totalPoints:24
+    verifierSha256:sha256(securePackage.teacherHtml), renderedCounts:[1,30,2,9], totalPoints:84
   };
 }
 
@@ -198,24 +218,90 @@ async function sessionPreservationCase() {
   assert.equal(csv1.name, csv2.name);
   assert.equal(sha256(csv1.bytes), sha256(csv2.bytes));
 
-  const popupEvent = context.waitForEvent('page');
-  await page.locator('#btnManual').click();
-  const manual = await popupEvent;
-  await manual.waitForLoadState('domcontentloaded');
-  assert.match(manual.url(), /\/manual\/\?from=app$/);
-  assert.equal(page.url(), origin + '/generator/');
+  const controls = await page.evaluate(() => {
+    const supported=[1,2,3,8,9,30];
+    state.exerciseDetail=true;state.exerciseConfigSaved=true;state.pocet=5;state.body=20;
+    state.exerciseConfig=Array.from({length:5},()=>({typ:'multiple choice',pocetOtazek:4,body:4}));
+    const original=JSON.stringify({body:state.body,exerciseConfig:state.exerciseConfig});
+    const invalidTotals=['29.7','29.0','2e1','',0,-1,4996].map(value=>({value:String(value),accepted:syncExercisePoints(value)}));
+    const unchangedAfterDirect=JSON.stringify({body:state.body,exerciseConfig:state.exerciseConfig})===original;
+    const bodyInput=document.getElementById('bodyCustom');
+    bodyInput.value='29.7';bodyInput.dispatchEvent(new Event('input',{bubbles:true}));
+    const unchangedAfterInput=JSON.stringify({body:state.body,exerciseConfig:state.exerciseConfig})===original;
+    const detailBefore=JSON.stringify({body:state.body,exerciseConfig:state.exerciseConfig});
+    const detailAccepted=updateExField(0,'body','4.5');
+    const unchangedAfterDetail=JSON.stringify({body:state.body,exerciseConfig:state.exerciseConfig})===detailBefore;
+    bodyInput.value='29';bodyInput.dispatchEvent(new Event('input',{bubbles:true}));
+    const distributed=state.exerciseConfig.map(ex=>ex.body);
 
-  const after = await page.evaluate(() => ({
+    state.exerciseDetail=true;state.exerciseConfigSaved=true;state.pocet=4;state.body=84;
+    state.exerciseConfig=[
+      {typ:'reading comprehension',pocetOtazek:4,body:2},{typ:'reading comprehension',pocetOtazek:17,body:60},
+      {typ:'listening comprehension',pocetOtazek:4,body:4},{typ:'listening comprehension',pocetOtazek:19,body:18}
+    ];
+    state.typyCviceni=['reading comprehension','listening comprehension'];
+    applyVisualState();
+    const selections=[];
+    for(const value of supported){
+      setComprehensionQuestionCount('reading comprehension',String(value));
+      setComprehensionQuestionCount('listening comprehension',String(value));
+      selections.push({value,readingControl:document.getElementById('readingQuestionCount').value,listeningControl:document.getElementById('listeningQuestionCount').value,counts:state.exerciseConfig.map(ex=>ex.pocetOtazek)});
+    }
+    updateExField(1,'pocetOtazek','1');updateExField(3,'pocetOtazek','2');
+    return {
+      readingOptions:Array.from(document.getElementById('readingQuestionCount').options,option=>Number(option.value)),
+      listeningOptions:Array.from(document.getElementById('listeningQuestionCount').options,option=>Number(option.value)),
+      invalidTotals,unchangedAfterDirect,unchangedAfterInput,detailAccepted,unchangedAfterDetail,distributed,selections,
+      finalCounts:state.exerciseConfig.map(ex=>ex.pocetOtazek),primaryCounts:[state.readingQuestionCount,state.listeningQuestionCount]
+    };
+  });
+  assert.deepEqual(controls.readingOptions,Array.from({length:30},(_,index)=>index+1));
+  assert.deepEqual(controls.listeningOptions,Array.from({length:30},(_,index)=>index+1));
+  assert.ok(controls.invalidTotals.every(result=>result.accepted===false));
+  assert.equal(controls.unchangedAfterDirect,true);
+  assert.equal(controls.unchangedAfterInput,true);
+  assert.equal(controls.detailAccepted,false);
+  assert.equal(controls.unchangedAfterDetail,true);
+  assert.deepEqual(controls.distributed,[6,6,6,6,5]);
+  for(const selection of controls.selections){
+    assert.equal(selection.readingControl,String(selection.value));
+    assert.equal(selection.listeningControl,String(selection.value));
+    assert.deepEqual(selection.counts,[selection.value,17,selection.value,19]);
+  }
+  assert.deepEqual(controls.finalCounts,[30,1,30,2]);
+  assert.deepEqual(controls.primaryCounts,[30,30]);
+
+  async function snapshot(){return page.evaluate(() => ({
     codes:rosterEntries.map(entry => ({email:entry.email,code:entry.code})),
     name:document.getElementById('nazev').value,
     currentStep,maxStep,
     keyInMemory:geminiApiKey,
     keyInSession:sessionStorage.getItem(GEMINI_KEY_SESSION_SK),
-    keyInLocal:localStorage.getItem(GEMINI_KEY_SK)
-  }));
-  assert.deepEqual(after, before);
-  await manual.close();
-  return {recipients:28,csvSha256:sha256(csv1.bytes),codesStable:true,sessionKeyScope:'session-only'};
+    keyInLocal:localStorage.getItem(GEMINI_KEY_SK),
+    body:state.body,counts:state.exerciseConfig.map(ex=>ex.pocetOtazek),points:state.exerciseConfig.map(ex=>ex.body)
+  }));}
+  const runtimeBeforeManuals=await snapshot();
+  async function openManual(trigger,expected){
+    const popupEvent=context.waitForEvent('page');
+    await trigger();
+    const manual=await popupEvent;
+    await manual.waitForLoadState('domcontentloaded');
+    assert.match(manual.url(),expected);
+    assert.equal(await manual.evaluate(()=>window.opener===null),true);
+    assert.equal(page.url(),origin+'/generator/');
+    assert.deepEqual(await snapshot(),runtimeBeforeManuals);
+    await manual.close();
+  }
+  await openManual(()=>page.locator('#btnManual').click(),/\/manual\/\?from=app$/);
+  await page.locator('#releaseChangesBtn').click();
+  await openManual(()=>page.locator('#aboutAppGate .about-help-links a').click(),/\/manual\/\?from=app$/);
+  await page.locator('#aboutAppCloseBtn').click();
+  await openManual(()=>page.locator('a[href="./manual/rozesilani-kodu.html"]').evaluate(link=>link.click()),/\/manual\/rozesilani-kodu\.html$/);
+  const csv3=await downloadCsv();
+  assert.equal(sha256(csv3.bytes),sha256(csv1.bytes));
+  assert.deepEqual(await snapshot(),runtimeBeforeManuals);
+  assert.deepEqual(runtimeBeforeManuals.codes,before.codes);
+  return {recipients:28,csvSha256:sha256(csv1.bytes),codesStable:true,sessionKeyScope:'session-only',manualRoutes:3,controls};
 }
 
 try {
@@ -230,12 +316,12 @@ try {
     sprint:'03-session-scoring-reading', status:'PASS', startedAt, completedAt:new Date().toISOString(),
     provenance:source, browser:await browser.version(),
     checks:[
-      'manual opens in a separate noopener tab while the original generator runtime remains alive',
+      'header, About and Apps Script manual routes open in separate noopener tabs while the original generator runtime remains alive',
       '28 synthetic recipients retain the same in-memory codes and byte-identical repeated CSV',
       'session-scoped synthetic API key remains in the original session and is absent from localStorage',
-      'detailed point totals and confirmed 29-point distribution remain exact',
-      'primary and secondary Reading counts remain independent',
-      'instant, secure student and teacher verifier render per-exercise Reading counts 5 and 7'
+      'fractional, empty, negative and out-of-range totals do not mutate the point plan; valid 29 remains 6+6+6+6+5',
+      'Reading and Listening controls expose 1-30 and keep primary/secondary rows independent',
+      'instant, secure student and teacher verifier render per-exercise Reading/Listening counts 1, 30, 2 and 9'
     ],
     evidence:{generatorRuntime,renderers,session},
     limits:[

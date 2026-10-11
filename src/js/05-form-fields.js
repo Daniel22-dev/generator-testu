@@ -96,17 +96,25 @@ function clampTime() {
   state.cas = v; setVal('casCustom', v); applyVisualState(); validate(); saveSnapshot();
 }
 function onCustomBody() {
-  const v = parseInt($('bodyCustom').value,10);
-  if (!isNaN(v) && v > 0) {
-    state.body = v;
-    document.querySelectorAll('#bodyBtns .tag-btn').forEach(b => b.classList.remove('active'));
-    syncExercisePoints();
-  } else {
-    state.body = 0;
-    document.querySelectorAll('#bodyBtns .tag-btn').forEach(b => b.classList.remove('active'));
+  const input=$('bodyCustom'),v=strictIntegerValue(input&&input.value);
+  const max=state.exerciseConfig&&state.exerciseConfig.length?999*state.exerciseConfig.length:999;
+  if(v===null||v<1||v>max){
+    if(input){input.setAttribute('aria-invalid','true');input.setCustomValidity('Zadej celé číslo v povoleném rozsahu.');}
+    const next=$('next2');if(next)next.disabled=true;
+    return false;
   }
+  if(state.exerciseConfig&&state.exerciseConfig.length){
+    if(!syncExercisePoints(v)){
+      if(input){input.setAttribute('aria-invalid','true');input.setCustomValidity('Celkový počet bodů musí umožnit alespoň 1 bod pro každé cvičení.');}
+      const next=$('next2');if(next)next.disabled=true;
+      return false;
+    }
+  }else state.body=v;
+  if(input){input.removeAttribute('aria-invalid');input.setCustomValidity('');}
+  document.querySelectorAll('#bodyBtns .tag-btn').forEach(b => b.classList.remove('active'));
   validate();
   saveSnapshot();
+  return true;
 }
 
 // ═══ Tabs ═════════════════════════════════════════════════════════════════════
@@ -944,6 +952,12 @@ function syncComprehensionControl(type,st){
 function exercisePointsTotal(st){
   return (Array.isArray(st&&st.exerciseConfig)?st.exerciseConfig:[]).reduce((sum,ex)=>sum+(Number.isFinite(Number(ex&&ex.body))?Number(ex.body):0),0);
 }
+function strictIntegerValue(value){
+  if(typeof value==='number')return Number.isSafeInteger(value)?value:null;
+  if(typeof value!=='string'||!/^[-+]?\d+$/.test(value.trim()))return null;
+  const parsed=Number(value.trim());
+  return Number.isSafeInteger(parsed)?parsed:null;
+}
 function syncDetailedPointsTotal(st,reflectDom){
   st=st||state;
   if(!hasConfiguredExercises(st)||!Array.isArray(st.exerciseConfig))return Number(st.body)||0;
@@ -952,8 +966,14 @@ function syncDetailedPointsTotal(st,reflectDom){
   return total;
 }
 function exercisePointsDistribution(total,count){
-  const target=Number(total),n=Number(count);
-  if(!Number.isInteger(target)||!Number.isInteger(n)||n<1||target<n||target>999*n)return null;
+  const parse=value=>{
+    if(typeof value==='number')return Number.isSafeInteger(value)?value:null;
+    if(typeof value!=='string'||!/^[-+]?\d+$/.test(value.trim()))return null;
+    const parsed=Number(value.trim());
+    return Number.isSafeInteger(parsed)?parsed:null;
+  };
+  const target=parse(total),n=parse(count);
+  if(target===null||n===null||n<1||target<n||target>999*n)return null;
   const base=Math.floor(target/n),rem=target-base*n;
   return Array.from({length:n},(_,index)=>base+(index<rem?1:0));
 }
@@ -1060,11 +1080,11 @@ function syncExerciseConfig() {
 
 function syncExercisePoints(totalOverride) {
   const raw=arguments.length?totalOverride:state.body;
-  const target=parseInt(raw,10);
   if(!state.exerciseConfig.length)return false;
   const n = state.exerciseConfig.length;
-  const distribution=exercisePointsDistribution(target,n);
+  const distribution=exercisePointsDistribution(raw,n);
   if(!distribution)return false;
+  const target=Number(raw);
   state.exerciseConfig.forEach((ex,i)=>{ex.body=distribution[i]});
   state.body=target;setVal('bodyCustom',target);
   if (state.exerciseDetail) renderExerciseConfig();
@@ -1126,6 +1146,11 @@ function toggleExDetail() {
 
 function updateExField(i, field, value) {
   if (!state.exerciseConfig[i]) return;
+  if(field==='body'){
+    const points=strictIntegerValue(value);
+    if(points===null||points<1||points>999){renderExerciseConfig();validate();return false;}
+    value=points;
+  }
   // Boolean pole (manualMode) nepřevádíme přes parseInt — zachováme typ
   const BOOL_FIELDS = ['manualMode'];
   state.exerciseConfig[i][field] = field === 'typ' ? value
@@ -1215,8 +1240,8 @@ function renderExerciseConfig() {
       ${normalizeType(ex.typ||'')=='categorisation-board'
         ? '<div class="ex-catlock" title="Categorisation-board: vždy 1 tabule. Počet slov/vět (6–10) generuje model automaticky.">1 🔒</div>'
         : '<input type="number" min="1" max="30" value="'+ex.pocetOtazek+'" oninput="updateExField('+i+',\'pocetOtazek\',this.value)">'}
-      <input type="number" min="0" max="999" value="${ex.body}"
-        oninput="updateExField(${i},'body',this.value)">
+      <input type="number" min="1" max="999" step="1" value="${ex.body}"
+        onchange="updateExField(${i},'body',this.value)">
       <div class="ex-manual-toggle" title="AI: generuje Gemini · Ručně: zadáš přes formulář" style="${isManualSupported(ex.typ||'') ? '' : 'display:none'}"><button type="button" class="ex-manual-btn${!ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',false)" title="Generovat AI">🤖 AI</button><button type="button" class="ex-manual-btn${ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',true)" title="Zadat ručně">✏️ Ručně</button></div>
       <div class="ex-bpp">${bpp}</div>
     </div>`;

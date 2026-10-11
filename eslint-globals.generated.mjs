@@ -840,6 +840,7 @@ export const projectGlobals = {
   "storageWarnShown": 'writable',
   "storedGoogleFormsMetadataValue": 'writable',
   "storedGoogleFormsUrlValue": 'writable',
+  "strictIntegerValue": 'writable',
   "stripAiBoundaryTokens": 'writable',
   "stripItemForStudent": 'writable',
   "stripSensitiveKeysDeep": 'writable',

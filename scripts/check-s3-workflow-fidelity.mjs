@@ -83,7 +83,7 @@ function workflowContext(initialState) {
   });
   context.__setConfirm = value => { confirmResult = value; };
   for (const name of [
-    'hasConfiguredExercises', 'exercisePointsTotal', 'syncDetailedPointsTotal', 'exercisePointsDistribution',
+    'hasConfiguredExercises', 'strictIntegerValue', 'exercisePointsTotal', 'syncDetailedPointsTotal', 'exercisePointsDistribution',
     'syncExercisePoints', 'syncExerciseConfig', 'distributeExercisePoints', 'updateExField',
     'comprehensionCountKey', 'configuredComprehensionIndexes', 'effectiveComprehensionQuestionCount',
     'syncComprehensionCountsFromConfig', 'syncComprehensionControl'
@@ -188,7 +188,7 @@ await check('T05-loaded-state-reconciles-panel-to-primary-reading', () => {
   assert.equal(loaded.body, 16);
 });
 
-await check('T04-prompt-specs-preserve-per-exercise-reading-counts-and-points', () => {
+await check('T04-prompt-specs-preserve-per-exercise-comprehension-counts-and-points', () => {
   const context = vm.createContext({
     console,
     trim(){ return ''; },
@@ -202,14 +202,16 @@ await check('T04-prompt-specs-preserve-per-exercise-reading-counts-and-points', 
   for (const name of ['normalizeType','defaultItemCount','buildExerciseSpecs']) vm.runInContext(extractFunction(promptSource, name), context);
   context.fixture = {
     readingQuestionCount:5, listeningQuestionCount:4, exerciseDetail:true, exerciseConfigSaved:true,
-    typyCviceni:['reading comprehension'],
+    typyCviceni:['reading comprehension','listening comprehension'],
     exerciseConfig:[
-      {typ:'reading comprehension',pocetOtazek:7,body:14},
-      {typ:'reading comprehension',pocetOtazek:9,body:18}
+      {typ:'reading comprehension',pocetOtazek:1,body:2},
+      {typ:'reading comprehension',pocetOtazek:30,body:60},
+      {typ:'listening comprehension',pocetOtazek:2,body:4},
+      {typ:'listening comprehension',pocetOtazek:9,body:18}
     ]
   };
   const specs = vm.runInContext('buildExerciseSpecs(fixture)', context);
-  assert.deepEqual(Array.from(specs, spec => [spec.count,spec.pts]), [[7,14],[9,18]]);
+  assert.deepEqual(Array.from(specs, spec => [spec.count,spec.pts]), [[1,2],[30,60],[2,4],[9,18]]);
 });
 
 await check('T09-T10-roster-28-codes-and-repeat-csv-are-stable', () => {

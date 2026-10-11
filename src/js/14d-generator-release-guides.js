@@ -109,7 +109,7 @@ function showReleaseInfo(){
         '<div class="about-principles-grid">' +
           '<article class="about-principle-card"><div class="about-principle-no">01</div><div><h3>Kontrola před použitím</h3><p>Projdi náhled, zadání a správné odpovědi. U klasifikovaného testu využij dostupné kontrolní mechanismy.</p></div></article>' +
           '<article class="about-principle-card"><div class="about-principle-no">02</div><div><h3>Bezpečný test</h3><p>Studentům patří pouze studentský test. Verifier, klíče a další učitelské soubory zůstávají oddělené.</p></div></article>' +
-          '<article class="about-principle-card"><div class="about-principle-no">03</div><div><h3>Nápověda</h3><div class="about-help-links"><a href="./manual/">Interaktivní manuál</a><button type="button" data-about-security>Bezpečný provoz ve škole</button></div></div></article>' +
+          '<article class="about-principle-card"><div class="about-principle-no">03</div><div><h3>Nápověda</h3><div class="about-help-links"><a href="./manual/?from=app" target="_blank" rel="noopener">Interaktivní manuál</a><button type="button" data-about-security>Bezpečný provoz ve škole</button></div></div></article>' +
         '</div>' +
       '</section>' +
 

@@ -9,8 +9,10 @@ const read=relative=>fs.readFileSync(path.join(root,relative),'utf8');
 const split=command=>String(command||'').split(' && ').map(step=>step.trim()).filter(Boolean);
 
 function validate(pkg,workflow){
-  assert.equal(pkg.scripts?.['check:s3-workflow-fidelity'],'node scripts/check-s3-workflow-fidelity.mjs',
-    'S3 source gate must execute the reviewed workflow fidelity regression script');
+  assert.equal(pkg.scripts?.['check:s3-workflow-fidelity'],'node scripts/check-s3-workflow-fidelity.mjs && node scripts/check-s31-remediation.mjs',
+    'S3 source gate must execute the reviewed workflow fidelity and S3.1 remediation scripts');
+  assert.equal(pkg.scripts?.['check:s31-remediation'],'node scripts/check-s31-remediation.mjs',
+    'S3.1 remediation gate must execute the reviewed edge-case script');
   assert.equal(pkg.scripts?.['check:s3-workflow-browser'],'node scripts/check-s3-workflow-browser.mjs',
     'S3 browser gate must execute the reviewed Chromium script');
   assert.equal(pkg.devDependencies?.playwright,'1.61.1','S3 browser evidence requires the reviewed Playwright pin');
