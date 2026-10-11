@@ -61,6 +61,7 @@ function listeningExercise(count, prefix) {
     items:Array.from({length:count}, (_, index) => ({
       question:`${prefix} synthetic listening question ${index + 1}?`,
       options:['Synthetic A','Synthetic B','Synthetic C'], correct:index % 3,
+      transcript:`Synthetic teacher-only transcript for ${prefix} item ${index + 1}.`,
       explanation:'Synthetic explanation.'
     }))
   };
