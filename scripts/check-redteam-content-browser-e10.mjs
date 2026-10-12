@@ -9,7 +9,7 @@ import {mutateArtifact} from './redteam-regression-mutants-e9.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'git-e10-')),checks=[],negativeControls=[],errors=[],children=[];
 let browser;
 async function snap(p){return p.evaluate(()=>({active:isTestActive(),ready:CONTENT_READY,id:ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE,resp:RESP,locked:LOCKED,input:$('startCode').value,exercises:Object.keys(STUDENT_VARIANTS).length}));}
-async function attempt(p,code){await p.locator('#studentName').fill('Synthetic');await p.locator('#startCode').fill(code);await p.evaluate(()=>startTest());}
+async function attempt(p,code){await p.locator('#studentName').fill('Synthetic');await p.locator('#startCode').fill(code);await p.evaluate(()=>startTest());if(await p.evaluate(()=>!!STRICT_PREFLIGHT)){await p.locator('#strictFullscreenStartBtn').click();await p.waitForTimeout(30);}}
 async function dismiss(p){await p.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));}
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true});const pkg=await build();
@@ -25,7 +25,7 @@ try{
   await p.reload();await attempt(p,'');s=await snap(p);assert.equal(s.active,false);assert.equal(s.ready,false);assert.equal(s.exercises,0);await dismiss(p);
   const persisted=await p.evaluate(async()=>{const a=await loadActiveAttemptSeal();return {id:a.attemptId,deadline:a.timerDeadline,resp:a.resp};});assert.equal(persisted.id,before.id);assert.equal(persisted.deadline,before.deadline);assert.equal(persisted.resp['0_0'],1);
   checks.push({id:'reload-requires-code-preserves-persisted-origin',status:'PASS'});
-  await enterStartCode(p,pkg);await p.evaluate(()=>startTest());s=await snap(p);assert.equal(s.id,before.id);assert.equal(s.start,before.start);assert.equal(s.deadline,before.deadline);assert.equal(s.locked,true);
+  await enterStartCode(p,pkg);await attempt(p,pkg.startCode);s=await snap(p);assert.equal(s.id,before.id);assert.equal(s.start,before.start);assert.equal(s.deadline,before.deadline);assert.equal(s.locked,true);
   await p.evaluate(async code=>{$('unlockInp').value=code;await tryUnlock();},REC);assert.equal((await snap(p)).locked,false);await p.evaluate(()=>submitSecureTest());
   const v=genDom(pkg.teacherHtml);children.push(v);const pack=v.parseTxt(await p.locator('#answerBackup').inputValue());assert.equal(v.scorePayload(await v.decryptPayload(pack)).pct,20);
   checks.push({id:'reload-code-recovery-and-private-rescore',status:'PASS'});

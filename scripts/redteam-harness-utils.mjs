@@ -96,7 +96,29 @@ function genDom(h, storage, idbState=new Map(),enterCode=true) {
   if(enterCode){const input=d.window.document.getElementById('startCode');if(input)input.value=startCodes.get(d.window.eval('CFG.testId'))||'';}
   return d.window;
 }
+function installControlledFullscreen(x){
+  const doc=x.document,el=doc.documentElement;
+  let active=null;
+  try{Object.defineProperty(doc,'fullscreenElement',{configurable:true,get:()=>active});}catch{}
+  el.requestFullscreen=async()=>{active=el;doc.dispatchEvent(new x.Event('fullscreenchange'));};
+  doc.exitFullscreen=async()=>{active=null;doc.dispatchEvent(new x.Event('fullscreenchange'));};
+  return {active:()=>active,set:value=>{active=value;doc.dispatchEvent(new x.Event('fullscreenchange'));}};
+}
+async function startGeneratedTest(x){
+  if(x.eval("String(CFG.testMode||'')")!=='prisny'){await x.startTest();return;}
+  installControlledFullscreen(x);
+  await x.startTest();
+  await x.startStrictFullscreen();
+}
 export async function enterStartCode(page,pkg){await page.locator('#startCode').fill(pkg.startCode);}
+export async function completeGeneratedPageStart(page){
+  await page.evaluate(()=>startTest());
+  if(await page.locator('#strictFullscreenStartBtn').count()){
+    await page.waitForFunction(()=>!!STRICT_PREFLIGHT);
+    await page.locator('#strictFullscreenStartBtn').click();
+    await page.waitForFunction(()=>isTestActive()&&!!document.fullscreenElement);
+  }
+}
 export async function decryptedVariants(pkg){const x=genDom(pkg.studentHtml,undefined,new Map(),false);try{return await x.decryptStudentContent(x.eval('ENCRYPTED_CONTENT'),pkg.startCode,x.eval('CFG'));}finally{x.close();}}
 const dumpStorage = x => { const o = {}; for (let i = 0; i < x.localStorage.length; i++) { const k = x.localStorage.key(i); o[k] = x.localStorage.getItem(k); } return o; };
 const storedBody = raw => { const r = raw ? JSON.parse(raw) : null; return r && r.body ? r.body : r; };
@@ -104,4 +126,4 @@ const rawVariants = s => [s, s.toLowerCase()];
 const containsRaw = (txt, s) => rawVariants(s).some(v => txt.includes(v));
 
 
-export { w, gdom, configure, build, genDom, dumpStorage, cloneIdbState, fakeIndexedDb, GEN, TEACH, REC, html as generatorHarnessHtml };
+export { w, gdom, configure, build, genDom, installControlledFullscreen, startGeneratedTest, dumpStorage, cloneIdbState, fakeIndexedDb, GEN, TEACH, REC, html as generatorHarnessHtml };

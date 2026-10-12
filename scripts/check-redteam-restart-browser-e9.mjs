@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,genDom,REC} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,genDom,REC} from './redteam-harness-utils.mjs';
 import {createFixtures,policy} from './redteam-forgery-fixtures-e8.mjs';
 import {mutateArtifact} from './redteam-regression-mutants-e9.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'git-e9-native-')),checks=[],negativeControls=[];
@@ -18,12 +18,12 @@ async function scenario(f,mode,repeat,html=f.pkg.studentHtml){
   try{
     let page=await open();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,f.pkg);
     if(f.kind==='joker')await page.evaluate(()=>{chooseJokerStart(true);confirmJokerCommit=async()=>true;});
-    await page.evaluate(()=>startTest());
+    await completeGeneratedPageStart(page);
     const before=await page.evaluate(async()=>{setResp('0_0',1);await flushPendingAttemptWrites();for(let i=0;i<180;i++)recordSec('paste-blocked','synthetic metadata '+i);return {id:ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE,joker:JOKER_USED,jokerAt:JOKER_SELECTED_AT};});
     if(mode!=='pending-reload')await page.evaluate(()=>flushPendingAttemptWrites());
     if(mode==='profile-restart'){await context.close();context=null;page=await open();}
     else await page.reload();
-    await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,f.pkg);await page.evaluate(()=>startTest());
+    await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,f.pkg);await completeGeneratedPageStart(page);
     const after=await page.evaluate(()=>({id:ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE,joker:JOKER_USED,jokerAt:JOKER_SELECTED_AT,locked:LOCKED,integrityLock:PERSIST_INTEGRITY_BLOCK,answer:RESP['0_0'],events:activeAttemptBody().securityEvents}));
     assert.equal(after.id,before.id,'same-profile reload cannot create a new attempt');assert.equal(after.start,before.start,'reload preserves start');assert.equal(after.deadline,before.deadline,'reload cannot extend deadline');assert.equal(after.joker,before.joker);assert.equal(after.jokerAt,before.jokerAt);assert.equal(after.answer,1,'flushed answer survives');assert.equal(after.locked,true,'strict reload restores locked');
     assert.equal(after.events.filter(e=>e.type==='attempt-start').length,1,'original start marker retained');assert.equal(after.events.filter(e=>e.type==='joker-used').length,f.kind==='joker'?1:0);assert.ok(after.events.length<=120);

@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import vm from 'node:vm';
 
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
-const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant = read('src/js/14b-instant-test-runtime.js');
 
 function assert(cond, msg){

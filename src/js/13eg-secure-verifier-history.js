@@ -26,7 +26,11 @@ function verifierSplitWindowPct(e){
 function verifierSecuritySummary(r){
   const events=verifierSecurityEvents(r),type=e=>String(e&&e.type||'');
   const split=events.filter(e=>type(e)==='split-window');
+  const splitShadow=events.filter(e=>type(e)==='split-shadow');
+  const fullscreen=events.filter(e=>['fullscreen-enforced','fullscreen-fallback','fullscreen-unsupported','fullscreen-denied'].includes(type(e)));
   const splitPcts=split.map(verifierSplitWindowPct),validSplitPcts=splitPcts.filter(n=>n!=null);
+  const lastShadow=splitShadow.length?String(splitShadow[splitShadow.length-1].splitState||'').toUpperCase():'';
+  const fullscreenMode=fullscreen.some(e=>type(e)==='fullscreen-enforced')?'enforced':(fullscreen.some(e=>type(e)==='fullscreen-fallback')?'fallback':(fullscreen.some(e=>type(e)==='fullscreen-unsupported')?'unsupported':(fullscreen.some(e=>type(e)==='fullscreen-denied')?'denied':'unknown')));
   return {
     telemetryState:verifierTelemetryState(r),events,
     lockedCount:events.filter(e=>type(e)==='locked'||type(e)==='lock').length,
@@ -35,7 +39,10 @@ function verifierSecuritySummary(r){
     splitWindowEvents:split.length,
     splitWindowMaxPct:validSplitPcts.length?Math.max.apply(null,validSplitPcts):null,
     splitWindowUnknownPctCount:splitPcts.filter(n=>n==null).length,
-    splitWindowSamples:split.map((e,index)=>({t:String(e&&((e.t||e.ts))||''),pct:splitPcts[index],detail:String(e&&e.detail||'')}))
+    splitWindowSamples:split.map((e,index)=>({t:String(e&&((e.t||e.ts))||''),pct:splitPcts[index],detail:String(e&&e.detail||'')})),
+    fullscreenMode,fullscreenEvents:fullscreen.length,
+    splitShadowEvents:splitShadow.length,splitShadowState:/^(NORMAL|SUSPECTED|CONFIRMED|AMBIGUOUS|EXEMPT)$/.test(lastShadow)?lastShadow:'unknown',
+    splitShadowLockApplied:splitShadow.some(e=>e&&e.lockApplied===true)
   };
 }
 function splitWindowCsvHeaders(){return ['split_window_events','split_window_max_pct'];}
@@ -49,7 +56,7 @@ function criticalHistoryRequired(){const v=String(CONFIG.generatorVersion||'').s
 function criticalHistoryAssessment(r){
   if(!Array.isArray(r&&r.criticalEvents)||!r.criticalCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};
   const count={locks:0,unlocks:0,resumes:0,badUnlocks:0};r.criticalEvents.forEach(e=>{const k=({locked:'locks','recovery-unlock':'unlocks','attempt-resumed-after-reload':'resumes','bad-unlock':'badUnlocks'})[e.type];if(k)count[k]++;});
-  const types=['locked','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'];
+  const types=['locked','recovery-authorized','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'];
   const projected=(r.securityEvents||[]).filter(e=>types.includes(e.type));
   const listed=r.criticalEvents,ordered=es=>es.slice().sort((a,b)=>a.criticalSeq-b.criticalSeq);
   const overflow=listed.filter(e=>e.type==='critical-events-overflow');

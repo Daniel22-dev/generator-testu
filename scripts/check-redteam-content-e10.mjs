@@ -2,12 +2,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
-import {w,gdom,configure,build,genDom,decryptedVariants,GEN,TEACH,REC} from './redteam-harness-utils.mjs';
+import {w,gdom,configure,build,genDom,startGeneratedTest,decryptedVariants,GEN,TEACH,REC} from './redteam-harness-utils.mjs';
 import {readStaticConfig,scanStudentHtml} from './student-publication-lib.mjs';
 const checks=[],negativeControls=[],children=[];
 const child=html=>{const x=genDom(html,undefined,new Map(),false);children.push(x);return x;};
 function inactive(x){assert.equal(x.isTestActive(),false);assert.equal(x.eval('STARTED_AT'), '');assert.equal(x.eval('TIMER_DEADLINE'),0);assert.equal(x.eval('ATTEMPT_ID'),'');assert.equal(x.document.querySelectorAll('#exerciseArea input').length,0);assert.equal(Object.keys(x.eval('STUDENT_VARIANTS')).length,0);}
-async function blocked(pkg,code,html=pkg.studentHtml){const x=child(html);x.document.getElementById('studentName').value='Synthetic';x.document.getElementById('startCode').value=code;await x.startTest();inactive(x);return x;}
+async function blocked(pkg,code,html=pkg.studentHtml){const x=child(html);x.document.getElementById('studentName').value='Synthetic';x.document.getElementById('startCode').value=code;await startGeneratedTest(x);inactive(x);return x;}
 async function test(id,fn){await fn();checks.push({id,status:'PASS'});console.log('PASS E10',id);}
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true});
@@ -44,14 +44,14 @@ try{
     negativeControls.push({id:'no-randomness-no-export',detected:true});
   });
   await test('correct-code-memory-only-and-independent-scoring',async()=>{
-    const x=child(pkg.studentHtml);x.document.getElementById('studentName').value='Synthetic';x.document.getElementById('startCode').value=pkg.startCode.toLowerCase();await x.startTest();assert.equal(x.isTestActive(),true);assert.equal(x.eval('CONTENT_READY'),true);assert.equal(x.document.getElementById('startCode').value,'');
+    const x=child(pkg.studentHtml);x.document.getElementById('studentName').value='Synthetic';x.document.getElementById('startCode').value=pkg.startCode.toLowerCase();await startGeneratedTest(x);assert.equal(x.isTestActive(),true);assert.equal(x.eval('CONTENT_READY'),true);assert.equal(x.document.getElementById('startCode').value,'');
     x.setResp('0_0',1);await x.flushPendingAttemptWrites();
     for(let i=0;i<x.localStorage.length;i++){const value=x.localStorage.getItem(x.localStorage.key(i));assert.equal(value.includes(pkg.startCode),false);assert.equal(value.includes('Q1?'),false);}
     for(const stores of x.__qaIdbState.values())for(const entries of stores.values())for(const value of entries.values()){const text=JSON.stringify(value);assert.equal(text.includes(pkg.startCode),false);assert.equal(text.includes('Q1?'),false);}
     await x.submitSecureTest();const v=genDom(pkg.teacherHtml);children.push(v);const pack=v.parseTxt(x.document.getElementById('answerBackup').value),payload=await v.decryptPayload(pack);assert.equal(v.scorePayload(payload).pct,20);assert.equal('startCode' in payload,false);
   });
   await test('missing-webcrypto-fails-closed',async()=>{
-    const x=child(pkg.studentHtml);Object.defineProperty(x,'crypto',{value:{getRandomValues:w.crypto.getRandomValues.bind(w.crypto)}});x.document.getElementById('studentName').value='Synthetic';x.document.getElementById('startCode').value=pkg.startCode;await x.startTest();inactive(x);
+    const x=child(pkg.studentHtml);Object.defineProperty(x,'crypto',{value:{getRandomValues:w.crypto.getRandomValues.bind(w.crypto)}});x.document.getElementById('studentName').value='Synthetic';x.document.getElementById('startCode').value=pkg.startCode;await startGeneratedTest(x);inactive(x);
   });
   if(process.env.GIT_REDTEAM_E10_BASELINE_HTML){
     const result=spawnSync(process.execPath,[process.argv[1]],{env:{...process.env,GIT_REDTEAM_GENERATOR_HTML:process.env.GIT_REDTEAM_E10_BASELINE_HTML,GIT_REDTEAM_E10_OLD_PROBE:'1'},encoding:'utf8',timeout:45000});

@@ -22,6 +22,7 @@ function normalizeLoadedState(s) {
   if (['auto','content','vocabulary','grammar','model','combined'].indexOf(s.sourceUseMode) === -1) s.sourceUseMode = 'auto';
   if (s.appMode !== 'advanced') s.sourceUseMode = 'auto';
   if (typeof s.screenGuard !== 'boolean') s.screenGuard = false;
+  if (typeof s.strictFullscreenFallbackAllowed !== 'boolean') s.strictFullscreenFallbackAllowed = false;
   if (['none','brief','learning'].indexOf(s.feedbackMode) === -1) s.feedbackMode = 'brief';
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   s.readingQuestionCount = Math.max(1, Math.min(30, parseInt(s.readingQuestionCount,10) || 4));
@@ -757,7 +758,7 @@ function flashSave() {
 // ═══ Templates ════════════════════════════════════════════════════════════════
 function loadTemplates(){return readArr(TPL_KEY)}
 function saveTemplates(t){return safeSetItem(TPL_KEY,JSON.stringify(sanitizeStoredArray(t)))}
-const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni zadaniTab urls rcLength rcTopic readingQuestionCount listeningQuestionCount sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfigSaved exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard feedbackMode differentiationLevel'.split(' ');
+const TEMPLATE_PREFILL_KEYS='appMode workPreset jazyk instrJazyk uroven kombinovat pocet typyCviceni zadaniTab urls rcLength rcTopic readingQuestionCount listeningQuestionCount sourceUseMode cas odevzdavani randomizace testMode layout resultMode identityMode body gradeTyp exerciseDetail exerciseConfigSaved exerciseConfig fuzzyTolerance tema zolicek diferencovany overeni anonymizace ageGroup ageGroupCustom testPurpose simpleTemplate screenGuard strictFullscreenFallbackAllowed feedbackMode differentiationLevel'.split(' ');
 function getTemplatePrefill(){const p={};TEMPLATE_PREFILL_KEYS.forEach(k=>p[k]=cloneSafeStoredValue(state[k]));p.skupinyCount=(state.skupiny||[]).length;p.skupinyNazvy=(state.skupiny||[]).map(g=>g.nazev||'');return p}
 function getTemplateDomPrefill(){const dom={};DOM_FIELDS.forEach(id=>{if(!SENSITIVE_FIELD_IDS.includes(id))dom[id]=cloneSafeStoredValue(val(id))});return dom}
 function applyTemplatePrefill(p){if(!p)return;TEMPLATE_PREFILL_KEYS.forEach(k=>{if(p[k]!==undefined)state[k]=cloneSafeStoredValue(p[k])});const n=Math.max(0,Math.min(12,Number(p.skupinyCount)||0)),names=Array.isArray(p.skupinyNazvy)?p.skupinyNazvy:[];state.skupiny=[];if((state.diferencovany||'NE')==='ANO')for(let i=0;i<n;i++)state.skupiny.push({id:groupIdCounter++,nazev:names[i]||('Skupina '+(i+1)),podminky:'',studenti:[]})}

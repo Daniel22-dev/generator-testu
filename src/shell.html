@@ -526,6 +526,10 @@
             <div class="strict-risk-card"><span class="sri">⏱️</span><span>Odkaz zveřejni až na začátku a pro další skupinu vytvoř novou variantu</span></div>
             <div class="strict-risk-card"><span class="sri">📤</span><span>Odevzdání přes Forms je volitelné; answers.txt zůstává záloha</span></div>
           </div>
+          <label class="check-row" style="margin-top:14px">
+            <input id="strictFullscreenFallbackAllowed" type="checkbox" onchange="setStrictFullscreenFallbackAllowed(this.checked)">
+            <span><strong>Povolit kompatibilní start bez Fullscreen API pouze na skutečně nepodporovaném zařízení.</strong><br><small>Odmítnutí žádosti není nepodporované zařízení. Fallback se zapíše do auditu a není stejně bezpečný jako vynucený fullscreen.</small></span>
+          </label>
         </div>
       </div>
 

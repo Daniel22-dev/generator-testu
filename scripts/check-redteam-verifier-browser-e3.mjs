@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
 let browser;
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode'});
@@ -14,7 +14,7 @@ try{
   const publishedAt=new Date(Date.now()-60000).toISOString();
   const localParts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(publishedAt)).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
   const publishedDate=localParts.year+'-'+localParts.month+'-'+localParts.day,publishedTime=localParts.hour+':'+localParts.minute;
-  await student.goto('http://127.0.0.1:18779/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});
+  await student.goto('http://127.0.0.1:18779/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await completeGeneratedPageStart(student);await student.locator('#test').waitFor({state:'visible'});
   await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const nativeTxt=await student.locator('#answerBackup').inputValue();assert.ok(nativeTxt.startsWith('SECURE-ANSWERS-V1'));
   await verifier.goto('http://127.0.0.1:18779/verifier.html');await verifier.evaluate(()=>showVerifierPanel('results'));

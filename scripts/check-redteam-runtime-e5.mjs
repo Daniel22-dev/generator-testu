@@ -1,11 +1,11 @@
 // Actual exported runtime; DOM/lifecycle/failure inputs are controlled injections.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {w,gdom,configure,build,genDom,dumpStorage,cloneIdbState,REC} from './redteam-harness-utils.mjs';
+import {w,gdom,configure,build,genDom,startGeneratedTest,dumpStorage,cloneIdbState,REC} from './redteam-harness-utils.mjs';
 const children=[],checks=[],selected=process.env.GIT_REDTEAM_E5_CASE||'all';
 let pkg;
 async function group(id,fn){if(selected!=='all'&&selected!==id)return;await fn();checks.push(id);console.log('PASS E5 runtime',id);}
-async function fresh(html=pkg.studentHtml,storage,idb){const x=genDom(html,storage,idb);children.push(x);await new Promise(r=>setTimeout(r,0));x.document.getElementById('studentName').value='A7B9C2';await x.startTest();assert.equal(x.isTestActive(),true);await x.flushPendingAttemptWrites();return x;}
+async function fresh(html=pkg.studentHtml,storage,idb){const x=genDom(html,storage,idb);children.push(x);await new Promise(r=>setTimeout(r,0));x.document.getElementById('studentName').value='A7B9C2';await startGeneratedTest(x);assert.equal(x.isTestActive(),true);await x.flushPendingAttemptWrites();return x;}
 const event=(x,target,type,extra={})=>{const e=new x.Event(type,{bubbles:true,cancelable:true});for(const [k,v] of Object.entries(extra))Object.defineProperty(e,k,{value:v});target.dispatchEvent(e);return e;};
 const visibility=(x,v)=>{Object.defineProperty(x.document,'visibilityState',{value:v,configurable:true});event(x,x.document,'visibilitychange');};
 try{
@@ -26,9 +26,9 @@ try{
     x.eval('CFG.lockOnLeave=false');const ordinary=event(x,input,'paste',{clipboardData:{getData:()=>secret}});assert.equal(ordinary.defaultPrevented,false);assert.ok(x.eval("SEC_EVENTS.some(e=>e.type==='large-paste')"),'standard mode retains large-paste metadata');
   });
   await group('split-reload',async()=>{
-    const x=await fresh();x.eval('stopSplitMonitor();windowIsSmall=function(){return true;};for(var i=0;i<6;i++)splitSampleTick();');await x.flushPendingAttemptWrites();const before=x.eval('({attempt:ATTEMPT_ID,deadline:TIMER_DEADLINE,total:splitTotalMs,small:splitSmallMs,run:splitRunMs})');
+    const x=await fresh();x.eval("stopSplitMonitor();SPLIT_ORIENTATION_GRACE_UNTIL=0;Object.defineProperty(window,'innerWidth',{value:500,configurable:true});for(var i=0;i<6;i++){SPLIT_LAST_SAMPLE_AT=Date.now()-2000;if(i===1)SPLIT_SUSPECTED_AT=Date.now()-10000;splitSampleTick();}");await x.flushPendingAttemptWrites();const before=x.eval('({attempt:ATTEMPT_ID,deadline:TIMER_DEADLINE,total:splitTotalMs,small:splitSmallMs,run:splitRunMs})');
     const y=await fresh(pkg.studentHtml,dumpStorage(x),cloneIdbState(x.__qaIdbState));assert.equal(y.eval('ATTEMPT_ID'),before.attempt);assert.equal(y.eval('TIMER_DEADLINE'),before.deadline);assert.equal(y.eval('splitTotalMs'),before.total,'reload must preserve monitoring denominator');assert.equal(y.eval('splitSmallMs'),before.small);assert.equal(y.eval('splitRunMs'),before.run);assert.equal(y.eval('LOCKED'),true,'strict reload must restore locked');
-    y.eval('startSplitMonitor();recordSplitSummary();');assert.equal(y.eval('splitTotalMs'),before.total);const summary=y.eval("SEC_EVENTS.find(e=>e.type==='split-window')");assert.equal(summary.totalMs,12000);assert.equal(summary.smallMs,4000);
+    y.eval('startSplitMonitor();recordSplitSummary();');assert.equal(y.eval('splitTotalMs'),before.total);const summary=y.eval("SEC_EVENTS.find(e=>e.type==='split-window')");assert.equal(summary.totalMs,12000);assert.equal(summary.smallMs,10000);assert.equal(summary.shadowOnly,true);assert.equal(summary.lockApplied,false);
   });
   await group('unlock-race',async()=>{
     const x=await fresh();x.lockTest('controlled lock');x.eval('var E5_RELEASE;var e5Match=function(){return new Promise(r=>{E5_RELEASE=r;});};if(typeof unlockCodeMatches==="function")unlockCodeMatches=e5Match;else recoveryCodeMatches=e5Match;');x.document.getElementById('unlockInp').value=REC;const pending=x.tryUnlock();event(x,x,'beforeunload');x.eval('E5_RELEASE(true)');await pending;
@@ -47,7 +47,7 @@ try{
   await group('verifier-audit',async()=>{
     const x=await fresh();event(x,x.document.querySelector('#test [data-qid]')||x.document.getElementById('test'),'paste',{clipboardData:{getData:()=>''}});event(x,x,'popstate');event(x,x.document,'freeze');event(x,x.document,'resume');x.document.getElementById('unlockInp').value=REC;await x.tryUnlock();await x.submitSecureTest();const txt=x.document.getElementById('answerBackup').value;
     const v=genDom(pkg.teacherHtml);children.push(v);await new Promise(r=>setTimeout(r,0));const policy={schoolDomain:'example.invalid',publishedAt:new Date(Date.now()-120000).toISOString(),csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true};if(typeof v.setFormsAnchorPolicy==='function')v.setFormsAnchorPolicy(policy);
-    const out=await v.verifyText('e5-synthetic.txt',txt,{source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:new Date().toISOString()});assert.equal(out.row?.status,'OK','guard telemetry must pass schema/Forms checks and reach private scoring');
+    const out=await v.verifyText('e5-synthetic.txt',txt,{source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:new Date().toISOString()});assert.equal(out.row?.status,'OK','guard telemetry must pass schema/Forms checks and reach private scoring: '+JSON.stringify({status:out.row?.status,error:out.row?.error,notes:out.row?.anchorNotes}));
     const signals=v.securitySignalsFor(out.row);assert.ok(signals.some(s=>s.code==='runtime-guard'&&s.sev==='info'),'new guard events must be visible as client-controlled audit');const timeline=v.securityEventTimelineText(out.row);assert.ok(timeline.includes('paste-blocked'));assert.ok(timeline.includes('page-freeze'));assert.ok(timeline.includes('recovery-unlock'));assert.equal(v.resultTrust(out.row).classificationAuthorization,'REVIEW_REQUIRED');
   });
   assert.ok(checks.length,'unknown E5 runtime case');

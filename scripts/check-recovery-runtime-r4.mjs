@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13di-secure-strict-mode-runtime.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
 const instant = fs.readFileSync('src/js/14b-instant-test-runtime.js','utf8');
 
 function ok(cond,msg){
@@ -46,9 +46,11 @@ ok(/unlockBusy=true;try\{/.test(instant)&&/finally\{if\(input\)input\.value='';u
 ok(/warningCount=securityCounts\(\)\.warnings/.test(instant),'instant warningCount tracks warning-class events only');
 
 const secureTry=fnBlock(secure,'tryUnlock');
+const secureComplete=plainFn(secure,'completeRecoveryUnlock');
 const sctx={setTimeout,clearTimeout};vm.createContext(sctx);
 vm.runInContext(`
 let LOCKED=true,LOCK_REASON='focus lost',UNLOCK_BUSY=false,LOCK_TAPS=5,PERSIST_INTEGRITY_BLOCK=false,GUARD_EPOCH=0;
+let STRICT_RECOVERY_AUTHORIZED=false,STRICT_RECOVERY_REASON='',STRICT_RECOVERY_LOCK_EVENT=null,STRICT_FULLSCREEN_MODE='none';
 let CRITICAL_EVENTS_OVERFLOW=false;
 let SEC_EVENTS=[{t:'LOCK-1',type:'locked',detail:'focus lost'}];
 const elements={
@@ -65,6 +67,8 @@ let matchCalls=0,persistCalls=0;
 async function recoveryCodeMatches(v){matchCalls++;await new Promise(r=>setTimeout(r,20));return v==='REC-OK';}
 function persistActiveAttemptSeal(){persistCalls++;return true;}
 function recordSec(type,detail,extra){SEC_EVENTS.push({t:'EV-'+SEC_EVENTS.length,type,detail,...(extra||{})});}
+function strictRecoveryUi(){}
+${secureComplete}
 ${secureTry}
 globalThis.__state=()=>({LOCKED,UNLOCK_BUSY,LOCK_REASON,SEC_EVENTS:[...SEC_EVENTS],matchCalls,persistCalls,inputValue:elements.unlockInp.value});
 globalThis.__setLocked=v=>{LOCKED=v;};

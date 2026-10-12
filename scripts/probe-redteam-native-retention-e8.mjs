@@ -2,15 +2,15 @@
 // reload reliability remains unconfirmed. No private HTML or keys leave memory.
 import fs from 'node:fs';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom} from './redteam-harness-utils.mjs';
 import {createFixtures} from './redteam-forgery-fixtures-e8.mjs';
 let fixtures,browser;const observations=[];
 try{
   fixtures=await createFixtures();browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
   for(let i=0;i<5;i++){
     const context=await browser.newContext();try{
-      const page=await context.newPage(),url='http://127.0.0.1:18785/student.html';await page.route(url,r=>r.fulfill({status:200,contentType:'text/html',body:fixtures.default.pkg.studentHtml}));await page.goto(url);await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,fixtures.default.pkg);await page.evaluate(()=>startTest());
-      const before=await page.evaluate(async()=>{for(let i=0;i<180;i++)recordSec('paste-blocked','synthetic metadata '+i);await flushPendingAttemptWrites();return {id:ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE};});await page.reload();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,fixtures.default.pkg);await page.evaluate(()=>startTest());
+      const page=await context.newPage(),url='http://127.0.0.1:18785/student.html';await page.route(url,r=>r.fulfill({status:200,contentType:'text/html',body:fixtures.default.pkg.studentHtml}));await page.goto(url);await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,fixtures.default.pkg);await completeGeneratedPageStart(page);
+      const before=await page.evaluate(async()=>{for(let i=0;i<180;i++)recordSec('paste-blocked','synthetic metadata '+i);await flushPendingAttemptWrites();return {id:ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE};});await page.reload();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,fixtures.default.pkg);await completeGeneratedPageStart(page);
       const after=await page.evaluate(()=>({sameId:!!ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE,locked:LOCKED,integrityLock:PERSIST_INTEGRITY_BLOCK,markers:SEC_EVENTS.filter(e=>e.type==='attempt-start').length,retained:activeAttemptBody().securityEvents.length}));const idMatches=await page.evaluate(id=>ATTEMPT_ID===id,before.id);
       observations.push({run:i+1,idMatches,startMatches:before.start===after.start,deadlineMatches:before.deadline===after.deadline,locked:after.locked,integrityLock:after.integrityLock,startMarkerCount:after.markers,retained:after.retained,outcome:!idMatches||after.start!==before.start||after.deadline!==before.deadline||after.markers!==1?'INCONSISTENT_RELOAD':after.integrityLock?'INTEGRITY_LOCK_REQUIRES_INVESTIGATION':'ORIGIN_RETAINED'});
     }finally{await context.close();}

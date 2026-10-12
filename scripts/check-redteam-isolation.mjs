@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { w, gdom, configure, build, genDom, dumpStorage, cloneIdbState, TEACH, REC } from './redteam-harness-utils.mjs';
+import { w, gdom, configure, build, genDom, startGeneratedTest, dumpStorage, cloneIdbState, TEACH, REC } from './redteam-harness-utils.mjs';
 const checks=[];
 async function check(name,fn){await fn();checks.push(name);console.log('PASS',name);}
 const windows=[];
@@ -26,7 +26,7 @@ try {
     assert.equal(v.scorePayload({groupKey:'__default',resp:{'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1},pct:0,grade:5}).pct,100);
   });
   x.document.getElementById('studentName').value='A7B9C2';
-  await x.startTest();
+  await startGeneratedTest(x);
   assert.ok(x.eval('ATTEMPT_ID'));
   await check('classroom unlock preserves attempt, deadline, identity, answers and history',async()=>{
     x.setResp('0_0',1);await x.persistActiveAttemptSeal();await x.flushPendingAttemptWrites();
@@ -36,15 +36,15 @@ try {
     x.document.getElementById('unlockInp').value=REC.toLowerCase();await x.tryUnlock();await x.flushPendingAttemptWrites();assert.equal(x.eval('LOCKED'),false);
     assert.equal(x.eval('ATTEMPT_ID'),before.id);assert.equal(x.eval('TIMER_DEADLINE'),before.deadline);assert.equal(x.eval('ACTIVE_IDENTITY_HASH'),before.identity);assert.equal(x.eval("RESP['0_0']"),1);
     assert.equal(x.eval("SEC_EVENTS.filter(e=>e.type==='recovery-unlock').length"),1);
-    const y=child(pkg.studentHtml,dumpStorage(x),cloneIdbState(x.__qaIdbState));y.document.getElementById('studentName').value='A7B9C2';await y.startTest();assert.equal(y.eval('ATTEMPT_ID'),before.id);assert.equal(y.eval('TIMER_DEADLINE'),before.deadline);
+    const y=child(pkg.studentHtml,dumpStorage(x),cloneIdbState(x.__qaIdbState));y.document.getElementById('studentName').value='A7B9C2';await startGeneratedTest(y);assert.equal(y.eval('ATTEMPT_ID'),before.id);assert.equal(y.eval('TIMER_DEADLINE'),before.deadline);
   });
   await check('foreign identity cannot reset an active attempt',async()=>{
-    const y=child(pkg.studentHtml,dumpStorage(x),cloneIdbState(x.__qaIdbState));y.document.getElementById('studentName').value='D8E4F6';await y.startTest();
+    const y=child(pkg.studentHtml,dumpStorage(x),cloneIdbState(x.__qaIdbState));y.document.getElementById('studentName').value='D8E4F6';await startGeneratedTest(y);
     assert.ok(y.document.querySelector('.s-modal-bd'));assert.ok(!y.document.querySelector('.s-modal-bd input[type=password]'));assert.ok(y.document.getElementById('test').classList.contains('hidden'));
   });
   await check('submitted guard denies another attempt and output has no student grade',async()=>{
     await x.submitSecureTest();assert.ok(x.document.getElementById('answerBackup').value.startsWith('SECURE-ANSWERS-V1'));
-    assert.equal(await x.submittedLocked(),true);await x.startTest();assert.equal(await x.submittedLocked(),true);assert.ok(!x.document.querySelector('[data-retry-code]'));
+    assert.equal(await x.submittedLocked(),true);await startGeneratedTest(x);assert.equal(await x.submittedLocked(),true);assert.ok(!x.document.querySelector('[data-retry-code]'));
     assert.ok(!x.document.querySelector('#done .grade'));
   });
   await check('negative controls: teacher hash, code hashes, private JWK and answer key are rejected',async()=>{

@@ -792,6 +792,7 @@ export const projectGlobals = {
   "setReadingSourceOption": 'writable',
   "setRecoveryCode": 'writable',
   "setScreenGuard": 'writable',
+  "setStrictFullscreenFallbackAllowed": 'writable',
   "setTeacherAccessCode": 'writable',
   "setVal": 'writable',
   "settingsDrift": 'writable',

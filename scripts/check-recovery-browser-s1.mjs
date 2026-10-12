@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { enterStartCode, gdom, configure, build, REC, TEACH } from './redteam-harness-utils.mjs';
+import { enterStartCode, completeGeneratedPageStart, gdom, configure, build, REC, TEACH } from './redteam-harness-utils.mjs';
 
 const origin = 'http://127.0.0.1:18786';
 const contexts = [];
@@ -133,7 +133,7 @@ async function instantCase() {
   await assertHardenedInput(page, '#unlockInp', 'Odemykací kód testu');
   await assertHardenedInput(page, '#t-pin', 'Učitelský přístupový kód');
   await page.locator('#studentName').fill('Synthetic Student');
-  await page.evaluate(() => startTest());
+  await completeGeneratedPageStart(page);
 
   await page.evaluate(() => openTeacherModal());
   await page.locator('#t-name').fill('Daniel Teacher');
@@ -246,7 +246,7 @@ async function secureCase() {
   assert.equal(await page.locator('#teacherModal').count(), 0);
   await page.locator('#studentName').fill('Synthetic Student');
   await enterStartCode(page, pkg);
-  await page.evaluate(() => startTest());
+  await completeGeneratedPageStart(page);
   await page.evaluate(() => {
     setResp('0_0', 1);
     lockTest('synthetic browser recovery check');

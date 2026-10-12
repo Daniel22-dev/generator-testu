@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { configure, build, enterStartCode, GEN, gdom } from './redteam-harness-utils.mjs';
+import { configure, build, enterStartCode, completeGeneratedPageStart, GEN, gdom } from './redteam-harness-utils.mjs';
 
 const origin = 'http://127.0.0.1:18787';
 const styleNames = ['multiple choice', 'paraphrase the sentence', 'translation', 'reading comprehension', 'verb form'];
@@ -88,7 +88,7 @@ async function instantCase() {
   const overviewLabels = await page.locator('.ex-ov-name .ex-style-label').allTextContents();
   assert.deepEqual(overviewLabels.map(value => value.trim().toLowerCase()), styleNames, 'instant intro did not preserve selected styles');
   await page.locator('#studentName').fill('Synthetic Student');
-  await page.evaluate(() => startTest());
+  await completeGeneratedPageStart(page);
   await assertRenderedContract(page, 'instant');
   return {sha256:sha256(html), renderedExercises:5, renderedQuestions:18};
 }
@@ -103,7 +103,7 @@ async function secureCase() {
   const page = await pageFor(pkg.studentHtml, 'secure-s2.html');
   await page.locator('#studentName').fill('Synthetic Student');
   await enterStartCode(page, pkg);
-  await page.evaluate(() => startTest());
+  await completeGeneratedPageStart(page);
   await assertRenderedContract(page, 'secure');
   const tabLabels = await page.locator('.secure-tab strong').allTextContents();
   assert.deepEqual(tabLabels.map(value => value.trim().toLowerCase()), styleNames, 'secure tabs did not preserve selected styles');

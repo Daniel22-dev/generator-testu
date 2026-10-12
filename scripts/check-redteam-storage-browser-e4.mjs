@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
 const selected=process.env.GIT_REDTEAM_E4_CASE||'all',checks=[],limits=[],errors=[];
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'git-e4-private-')),contexts=new Set();
 const origin='http://127.0.0.1:18780',publishedAt=new Date(Date.now()-120000).toISOString();
@@ -14,7 +14,7 @@ let pkg;
 async function launch(profile){const c=await chromium.launchPersistentContext(path.join(temp,profile),{headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});contexts.add(c);await c.route(origin+'/**',r=>r.fulfill({status:200,contentType:'text/html',body:pkg.studentHtml}));c.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));for(const p of c.pages())p.on('pageerror',e=>errors.push(e.message));return c;}
 async function close(c){await c.close();contexts.delete(c);}
 async function page(c){const p=await c.newPage();await p.goto(origin+'/student.html');return p;}
-async function start(p,code='A7B9C2'){await p.locator('#studentName').fill(code);await enterStartCode(p,pkg);await p.evaluate(()=>startTest());}
+async function start(p,code='A7B9C2'){await p.locator('#studentName').fill(code);await enterStartCode(p,pkg);await completeGeneratedPageStart(p);}
 const state=p=>p.evaluate(async()=>{await flushPendingAttemptWrites();return {attemptId:ATTEMPT_ID,deadline:TIMER_DEADLINE,resp:RESP,locked:LOCKED,integrity:PERSIST_INTEGRITY_BLOCK,submitted:SUBMITTED,events:SEC_EVENTS.map(e=>e.type),active:isTestActive(),done:!$('done').classList.contains('hidden')};});
 async function group(id,fn){if(selected!=='all'&&selected!==id)return;await fn();checks.push(id);console.log('PASS E4',id);}
 const policy={schoolDomain:'example.invalid',publishedAt,csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true};
@@ -34,7 +34,9 @@ try{
   });
   await group('parallel-tabs',async()=>{
     const c=await launch('tabs'),a=await page(c),b=await page(c);await a.locator('#studentName').fill('A7B9C2');await enterStartCode(a,pkg);await b.locator('#studentName').fill('A7B9C2');await enterStartCode(b,pkg);
-    await Promise.all([a.evaluate(()=>startTest()),b.evaluate(()=>startTest())]);const sa=await state(a),sb=await state(b);assert.equal(Number(sa.active)+Number(sb.active),1,'two native tabs cannot run one browser-local attempt concurrently');
+    await Promise.all([a.evaluate(()=>startTest()),b.evaluate(()=>startTest())]);
+    for(const candidate of [a,b])if(await candidate.evaluate(()=>!!STRICT_PREFLIGHT)){await candidate.locator('#strictFullscreenStartBtn').click();await candidate.waitForTimeout(30);}
+    const sa=await state(a),sb=await state(b);assert.equal(Number(sa.active)+Number(sb.active),1,'two native tabs cannot run one browser-local attempt concurrently');
     const winner=sa.active?a:b,other=sa.active?b:a,id=(sa.active?sa:sb).attemptId;await winner.close();await start(other);assert.equal((await state(other)).attemptId,id);await close(c);
   });
   await group('integrity',async()=>{

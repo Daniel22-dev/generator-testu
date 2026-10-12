@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
-const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant = read('src/js/14b-instant-test-runtime.js');
 const verifier = read('src/js/13f-secure-teacher-verifier.js');
 

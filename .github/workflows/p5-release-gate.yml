@@ -66,6 +66,10 @@ jobs:
             qa-results/s41-teacher-verifier-remediation.json
             qa-results/s4-teacher-verifier-browser/evidence.json
             qa-results/s4-teacher-verifier-browser/*.png
+            qa-results/s5-strict-mode-source.json
+            qa-results/s5-strict-mode-browser/evidence.json
+            qa-results/s5-traceability-t64-t101.json
+            qa-results/s5-ci-wiring.json
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json

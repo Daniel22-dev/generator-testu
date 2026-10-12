@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 const helpers = read('src/js/13a-secure-helpers.js');
 const pkg = read('src/js/13c-secure-package.js');
-const secureRuntime = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const secureRuntime = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const assemble = read('src/js/13g-assemble-test-html.js');
 const builders = read('src/js/14a-test-html-builders.js');
 const instantRuntime = read('src/js/14b-instant-test-runtime.js');

@@ -1,0 +1,48 @@
+// Strict Mode Guard V2 start gate. This string is embedded only in secure student HTML.
+// Split-screen enforcement remains SHADOW/AUDIT-ONLY; no split signal calls lockTest().
+const SECURE_STRICT_MODE_RUNTIME_JS=String.raw`
+function strictModeRuntime(){return String(CFG.testMode||'')==='prisny';}
+function strictFullscreenElement(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function strictFullscreenRequestFunction(){var el=document.documentElement;return el&&(el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen)||null;}
+function strictFullscreenSupport(){if(STRICT_FULLSCREEN_CAPABILITY==='unsupported')return 'unsupported';return typeof strictFullscreenRequestFunction()==='function'?'supported':'unsupported';}
+function strictStartStatus(message,kind){var box=$('strictStartStatus');if(!box)return;box.textContent=String(message||'');box.className='small '+(kind==='error'?'danger':(kind==='ok'?'ok':'muted'));}
+function strictSetStartButtons(state){var verify=$('strictVerifyBtn'),fs=$('strictFullscreenStartBtn'),fallback=$('strictFallbackStartBtn');if(verify)verify.disabled=STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY;if(fs)fs.classList.toggle('hidden',state!=='supported-ready');if(fallback)fallback.classList.toggle('hidden',state!=='unsupported-ready');}
+function strictPreflightSignature(){return JSON.stringify({student:String($('studentName')&&$('studentName').value||'').trim(),variant:String($('studentVariant')&&$('studentVariant').value||''),joker:JOKER_CHOICE});}
+function strictQueuePrestart(type,detail,extra){var ev={t:new Date().toISOString(),type:String(type),detail:String(detail||'')};if(extra&&typeof extra==='object')Object.keys(extra).forEach(function(k){ev[k]=extra[k];});STRICT_PRESTART_EVENTS.push(ev);}
+function strictConsumePrestartEvents(){var out=STRICT_PRESTART_EVENTS.slice();STRICT_PRESTART_EVENTS=[];return out;}
+function strictInvalidatePreflight(message){STRICT_PREFLIGHT=null;strictSetStartButtons('verify');if(message)strictStartStatus(message,'error');if(!isTestActive())releaseAttemptTabLock();}
+async function strictPreflightChecks(){
+  const name=(CFG.identityMode==='oneTimeCode'?$('studentName').value.replace(/\s/g,'').toUpperCase():$('studentName').value.trim());$('studentName').value=name;
+  if(!name){$('studentName').focus();return null;}
+  try{if(!(await identityAllowed(name))){sModal(identityCodeProblem(name)||t('invalidIdentityCode'),t('codeVerification'));$('studentName').focus();return null;}}catch(err){sModal(String(err&&err.message?err.message:err),t('codeVerification'));return null;}
+  var identityHash='';try{identityHash=await activeAttemptIdentityHash(name);}catch(err){sModal(String(err&&err.message?err.message:err),t('codeVerification'));return null;}
+  if(!(await unlockTestContent()))return null;
+  if(await restoreSubmissionOutbox(name,identityHash))return null;
+  if(await submittedLocked()){showSubmittedLocked();return null;}
+  var seal=await loadActiveAttemptSeal();
+  if(seal&&seal.__integrityFailure){showActiveAttemptLocked();return null;}
+  if(seal&&seal.identityHash&&seal.identityHash!==identityHash){showActiveAttemptLocked();return null;}
+  if(!seal&&CFG.zolicek&&JOKER_CHOICE===null){sModal(t('jokerChoiceHint','Vyber před začátkem testu, zda píšeš test, nebo bereš žolíka.'),t('jokerChoiceTitle'));return null;}
+  if(!checkDevice(false))return null;
+  var activeKey='';try{activeKey=await chooseVariant(name);}catch(err){sModal(String(err&&err.message?err.message:err),t('differentiatedTest'));return null;}
+  if((CFG.diffGroups||[]).length&&!activeKey){sModal(t('unassignedIdentity'),t('differentiatedTest'));$('studentName').focus();return null;}
+  if(seal&&seal.activeKey&&seal.activeKey!==activeKey){showActiveAttemptLocked();return null;}
+  return {signature:strictPreflightSignature(),identityHash:identityHash,activeKey:activeKey,sealAttemptId:String(seal&&seal.attemptId||''),verifiedAt:Date.now()};
+}
+async function verifyStrictTest(){
+  if(!strictModeRuntime())return startTest();if(STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY||isTestActive())return;STRICT_PREFLIGHT_BUSY=true;strictSetStartButtons('verify');strictStartStatus(t('strictVerifying','Verifying test…'),'');
+  try{if(!(await acquireAttemptTabLock())){sModal(t('anotherTab','Tento test je otevřený v jiné kartě. Zavři ji a pokračuj zde.'),t('activeAttemptTitle'));return;}var prepared=await strictPreflightChecks();if(!prepared){strictInvalidatePreflight();return;}STRICT_PREFLIGHT=prepared;var support=strictFullscreenSupport();if(support==='supported'){strictSetStartButtons('supported-ready');strictStartStatus(t('strictVerified','Test verified. Use the second button to enter fullscreen and start.'),'ok');}else if(CFG.strictFullscreenFallbackAllowed){strictSetStartButtons('unsupported-ready');strictStartStatus(t('strictUnsupportedAllowed','Fullscreen API is not supported. The teacher-authorized compatibility path is available and will be recorded.'),'error');}else{strictSetStartButtons('unsupported-blocked');strictStartStatus(t('strictUnsupportedBlocked','Fullscreen API is not supported and the teacher did not authorize compatibility mode. Use another device.'),'error');}}
+  finally{STRICT_PREFLIGHT_BUSY=false;var state=STRICT_PREFLIGHT?(strictFullscreenSupport()==='supported'?'supported-ready':(CFG.strictFullscreenFallbackAllowed?'unsupported-ready':'unsupported-blocked')):'verify';strictSetStartButtons(state);if(!STRICT_PREFLIGHT&&!isTestActive())releaseAttemptTabLock();}
+}
+function strictPreflightStillValid(){return !!(STRICT_PREFLIGHT&&STRICT_PREFLIGHT.signature===strictPreflightSignature());}
+function strictFullscreenRequestNow(){var el=document.documentElement,fn=strictFullscreenRequestFunction();if(typeof fn!=='function')return null;try{return Promise.resolve(fn.call(el));}catch(err){return Promise.reject(err);}}
+function strictClassifyFullscreenError(err){return err&&String(err.name||'')==='NotSupportedError'?'unsupported':'denied';}
+async function strictFinishStarted(mode){STRICT_FULLSCREEN_MODE=mode;strictQueuePrestart(mode==='enforced'?'fullscreen-enforced':'fullscreen-fallback',mode==='enforced'?'Fullscreen API state confirmed before strict start':'Teacher-authorized unsupported-device compatibility start',{fullscreenMode:mode});await startTestAttempt();if(isTestActive()){STRICT_PREFLIGHT=null;strictSetStartButtons('started');if(mode==='enforced'&&typeof captureStrictFullscreenBaseline==='function')captureStrictFullscreenBaseline('start');return true;}STRICT_FULLSCREEN_MODE='none';strictInvalidatePreflight(t('strictStartFailed','The test did not start. Verify it again.'));return false;}
+async function startStrictFullscreen(){
+  if(!strictModeRuntime()||STRICT_START_BUSY||isTestActive())return;if(!strictPreflightStillValid()){strictInvalidatePreflight(t('strictPreflightStale','Inputs changed. Verify the test again.'));return;}var request=strictFullscreenRequestNow();if(!request){strictSetStartButtons(CFG.strictFullscreenFallbackAllowed?'unsupported-ready':'unsupported-blocked');strictStartStatus(t('strictUnsupportedBlocked','Fullscreen API is not supported. Use the authorized compatibility path or another device.'),'error');return;}STRICT_START_BUSY=true;strictSetStartButtons('supported-ready');
+  try{await request;if(!strictFullscreenElement()){await new Promise(function(resolve){setTimeout(resolve,0);});}if(!strictFullscreenElement())throw Object.assign(new Error('fullscreen state not acquired'),{name:'NotAllowedError'});STRICT_FULLSCREEN_CAPABILITY='supported';FULLSCREEN_WAS_ACTIVE=true;await strictFinishStarted('enforced');}
+  catch(err){var kind=strictClassifyFullscreenError(err);if(kind==='unsupported')STRICT_FULLSCREEN_CAPABILITY='unsupported';strictQueuePrestart(kind==='unsupported'?'fullscreen-unsupported':'fullscreen-denied',kind==='unsupported'?'Fullscreen API reported unsupported':'Fullscreen request denied or failed',{fullscreenMode:kind});if(kind==='unsupported'&&CFG.strictFullscreenFallbackAllowed){strictSetStartButtons('unsupported-ready');strictStartStatus(t('strictUnsupportedAllowed','Fullscreen is unsupported. Use the separately authorized compatibility button.'),'error');}else{strictSetStartButtons(kind==='unsupported'?'unsupported-blocked':'supported-ready');strictStartStatus(kind==='unsupported'?t('strictUnsupportedBlocked','Fullscreen is unsupported and compatibility mode is not authorized.'):t('strictFullscreenDenied','Fullscreen request was denied. No attempt or timer started; retry with the same button.'),'error');}}
+  finally{STRICT_START_BUSY=false;if(STRICT_PREFLIGHT){var s=strictFullscreenSupport()==='supported'?'supported-ready':(CFG.strictFullscreenFallbackAllowed?'unsupported-ready':'unsupported-blocked');strictSetStartButtons(s);}}
+}
+async function startStrictFallback(){if(!strictModeRuntime()||STRICT_START_BUSY||isTestActive())return;if(strictFullscreenSupport()==='supported'){strictSetStartButtons('supported-ready');strictStartStatus(t('strictFallbackDenied','Compatibility mode is only available when Fullscreen API is genuinely unsupported.'),'error');return;}if(!CFG.strictFullscreenFallbackAllowed){strictSetStartButtons('unsupported-blocked');strictStartStatus(t('strictUnsupportedBlocked','Compatibility mode was not authorized by the teacher.'),'error');return;}if(!strictPreflightStillValid()){strictInvalidatePreflight(t('strictPreflightStale','Inputs changed. Verify the test again.'));return;}STRICT_START_BUSY=true;strictQueuePrestart('fullscreen-unsupported','Fullscreen API unavailable',{fullscreenMode:'unsupported'});try{await strictFinishStarted('fallback');}finally{STRICT_START_BUSY=false;}}
+`;

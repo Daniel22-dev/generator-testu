@@ -9,7 +9,7 @@ const pass=(m)=>console.log('PASS',m);
 const must=(v,m)=>{if(!v)fail(m)};
 const read=(p)=>fs.readFileSync(new URL('../'+p, import.meta.url),'utf8');
 
-const student=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13dh-secure-student-submit.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const student=(fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13dh-secure-student-submit.js')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const verifier=read('src/js/13f-secure-teacher-verifier.js');
 const formsSrc=read('src/js/13ea-secure-verifier-forms.js');
 

@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { configure, build, enterStartCode, GEN, gdom, w } from './redteam-harness-utils.mjs';
+import { configure, build, enterStartCode, completeGeneratedPageStart, GEN, gdom, w } from './redteam-harness-utils.mjs';
 
 const origin = 'http://127.0.0.1:18789';
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
@@ -139,7 +139,7 @@ async function rendererCase() {
   const secure = await generatedPage(securePackage.studentHtml, 'secure-s3.html');
   await secure.locator('#studentName').fill('Synthetic Student');
   await enterStartCode(secure, securePackage);
-  await secure.evaluate(() => startTest());
+  await completeGeneratedPageStart(secure);
   assert.deepEqual(await secure.locator('.ex-panel').evaluateAll(panels => panels.map(panel => panel.querySelectorAll('.question,.q').length)), [1,30,2,9]);
   assert.equal(await secure.locator('.reading-passage').count(), 2);
 

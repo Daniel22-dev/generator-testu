@@ -11,6 +11,14 @@ const SECURE_VERIFIER_S4_CSS=String.raw`
 
 const SECURE_VERIFIER_S4_JS=String.raw`
 let S4_SECURITY_KIND='all';
+function appendStrictGuardSignals(r,add){
+  const guardAudit=eventCount(r,['paste-blocked','drop-blocked','clipboard-input-blocked','history-navigation','page-freeze','page-resumed','page-restored','page-discarded','fullscreen-left','fullscreen-unavailable','fullscreen-enforced','fullscreen-denied','fullscreen-unsupported','fullscreen-fallback','focus-transition','keyboard-dismiss-ios','keyboard-focus-return','fullscreen-exit-keyboard-ios']);
+  if(guardAudit)add('runtime-guard','události dohledu v prohlížeči','záznamů: '+guardAudit+'; podrobnosti v časové ose. Klientem uvedený audit, nikoli důkaz původu.','info');
+  const summary=verifierSecuritySummary(r);
+  if(summary.fullscreenMode==='fallback'||summary.fullscreenMode==='unsupported')add('fullscreen-fallback','přísný test bez vynuceného fullscreen','stav: '+summary.fullscreenMode+'; explicitně označený kompatibilní režim, nikoli stejné zabezpečení','info');
+  if(summary.fullscreenMode==='denied')add('fullscreen-denied','žádost o fullscreen byla odmítnuta','pokus se podle klientského auditu neměl spustit bez následného úspěšného fullscreen nebo autorizovaného unsupported fallbacku','soft');
+  if(summary.splitShadowEvents)add('split-shadow','split-screen SHADOW / audit-only','poslední stav: '+summary.splitShadowState+'; událostí: '+summary.splitShadowEvents+'; automatický split LOCK: '+(summary.splitShadowLockApplied?'ANO — neočekávané, vyžaduje kontrolu':'NE'),'info');
+}
 function s4LocalTime(value){
   if(!value)return 'čas neuveden';
   const date=new Date(value);if(!Number.isFinite(date.getTime()))return 'neplatný čas';
@@ -18,7 +26,7 @@ function s4LocalTime(value){
   catch(e){return date.toLocaleString('cs-CZ')+' lokální čas';}
 }
 function s4EventDisplayType(type){
-  const labels={'attempt-start':'zahájení pokusu',locked:'uzamknutí',lock:'uzamknutí','recovery-unlock':'úspěšné Recovery','bad-unlock':'chybné Recovery','split-window':'malé/rozdělené okno','keyboard-dismiss-ios':'iOS klávesnice','keyboard-focus-return':'návrat fokusu','attempt-resumed-after-reload':'obnovení po reloadu','paste-blocked':'blokované vložení','large-paste':'delší vložení','visibility-hidden':'skrytí stránky','left-window':'opuštění okna'};
+  const labels={'attempt-start':'zahájení pokusu',locked:'uzamknutí',lock:'uzamknutí','recovery-authorized':'Recovery ověřeno — čeká na fullscreen','recovery-unlock':'úspěšné Recovery','bad-unlock':'chybné Recovery','fullscreen-enforced':'fullscreen vynucen','fullscreen-denied':'fullscreen odmítnut','fullscreen-unsupported':'fullscreen nepodporován','fullscreen-fallback':'kompatibilní start bez fullscreen','split-shadow':'split SHADOW pozorování','split-window':'malé/rozdělené okno','keyboard-dismiss-ios':'iOS klávesnice','keyboard-focus-return':'návrat fokusu','attempt-resumed-after-reload':'obnovení po reloadu','paste-blocked':'blokované vložení','large-paste':'delší vložení','visibility-hidden':'skrytí stránky','left-window':'opuštění okna'};
   return labels[type]||type||'událost';
 }
 function s4SplitStateHtml(summary){
@@ -44,7 +52,7 @@ function s4ResultDetailHtml(r,index){
   return '<div class="s4-detail-panel" id="s4-detail-panel-'+index+'"><div class="s4-detail-grid">'+
     '<section class="s4-detail-card"><h4>Administrativa a Forms</h4><dl><dt>Student</dt><dd>'+esc(displayStudent(r)||'—')+'</dd><dt>Forms e-mail</dt><dd>'+esc(r.formIdentity||'—')+'</dd><dt>ID pokusu</dt><dd>'+esc(r.attemptId||'—')+'</dd><dt>Start</dt><dd>'+esc(r.startedAt||'—')+'</dd><dt>Odevzdáno</dt><dd>'+esc(r.submittedAt||'—')+'</dd><dt>Stav</dt><dd>'+esc(isScoredResult(r)?resultStateText(r):(r.error||r.status||'—'))+'</dd></dl></section>'+
     '<section class="s4-detail-card"><h4>Bodové hodnocení</h4><dl><dt>Body</dt><dd>'+esc(r.earned??'—')+' / '+esc(r.total??'—')+'</dd><dt>Úspěšnost</dt><dd>'+esc(r.pct??'—')+' %</dd><dt>Návrh známky</dt><dd>'+esc(r.grade??'—')+'</dd><dt>Skupina</dt><dd>'+esc(!r.groupKey||r.groupKey==='__default'?'základní':r.groupKey)+'</dd><dt>Žolík</dt><dd>'+esc(r.jokerUsed?'ANO — mimo klasifikaci':'NE')+'</dd></dl></section>'+
-    '<section class="s4-detail-card"><h4>Bezpečnostní souhrn</h4><dl><dt>Zámky</dt><dd>'+summary.lockedCount+'</dd><dt>Recovery OK</dt><dd>'+summary.recoveryCount+' <span class="small">legitimní servisní operace</span></dd><dt>Chybné Recovery</dt><dd>'+summary.badRecoveryCount+'</dd><dt>Split signály</dt><dd>'+summary.splitWindowEvents+'</dd><dt>Split bez měření</dt><dd>'+summary.splitWindowUnknownPctCount+'</dd><dt>Telemetrie</dt><dd>'+esc(summary.telemetryState)+'</dd></dl></section>'+
+    '<section class="s4-detail-card"><h4>Bezpečnostní souhrn</h4><dl><dt>Zámky</dt><dd>'+summary.lockedCount+'</dd><dt>Recovery OK</dt><dd>'+summary.recoveryCount+' <span class="small">legitimní servisní operace</span></dd><dt>Chybné Recovery</dt><dd>'+summary.badRecoveryCount+'</dd><dt>Fullscreen</dt><dd>'+esc(summary.fullscreenMode)+'</dd><dt>Split SHADOW</dt><dd>'+esc(summary.splitShadowState)+' <span class="small">audit-only, zámek: '+(summary.splitShadowLockApplied?'ANO':'NE')+'</span></dd><dt>Split signály</dt><dd>'+summary.splitWindowEvents+'</dd><dt>Split bez měření</dt><dd>'+summary.splitWindowUnknownPctCount+'</dd><dt>Telemetrie</dt><dd>'+esc(summary.telemetryState)+'</dd></dl></section>'+
     '<section class="s4-detail-card s4-detail-wide"><h4>Malé / rozdělené okno</h4>'+s4SplitSamplesHtml(summary)+'</section>'+
     '<section class="s4-detail-card s4-detail-wide"><h4>Kontrola a interpretace</h4><div class="s4-signal-labels">'+(signals.length?signals.map(function(s){return '<span class="s4-signal-label">'+esc(s.label)+(s.detail?' — '+esc(s.detail):'')+'</span>';}).join(''):'<span class="muted">Žádný další zobrazený signál.</span>')+'</div>'+(mismatch.length?'<div class="forms-warning">'+mismatch.map(esc).join('<br>')+'</div>':'')+'</section>'+
     '<section class="s4-detail-card s4-detail-wide"><details class="s4-timeline"><summary>Plná chronologická auditní osa ('+summary.events.length+' událostí)</summary>'+s4TimelineHtml(r)+'</details><details class="s4-technical"><summary>Technické detaily</summary><p class="small">Soubor: '+esc(r.file||'—')+' · submission digest: '+esc(r.submissionDigest||'—')+' · klasifikační stav: '+esc(classificationStatus(r))+'</p></details></section>'+

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom} from './redteam-harness-utils.mjs';
 import {createFixtures,clone,packet,text,policy} from './redteam-forgery-fixtures-e8.mjs';
 import {cases} from './redteam-forgery-cases-e8.mjs';
 const selected=['empty-telemetry','missing-attempt-start','duplicated-attempt-start','attempt-start-wrong-time','attempt-start-wrong-id','split-small-exceeds-total','split-percent-disagrees','joker-disabled-in-private-config','joker-event-without-choice','end-before-start','foreign-manifest-inner','forms-wrong-account','ciphertext-gcm-tamper'];
@@ -15,7 +15,7 @@ try{
   const localParts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(publishedAt)).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
   const publishedDate=localParts.year+'-'+localParts.month+'-'+localParts.day,publishedTime=localParts.hour+':'+localParts.minute;
   await student.route(origin+'/student.html',r=>r.fulfill({status:200,contentType:'text/html',body:f.pkg.studentHtml}));await verifier.route(origin+'/verifier.html',r=>r.fulfill({status:200,contentType:'text/html',body:f.pkg.teacherHtml}));
-  await student.goto(origin+'/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,f.pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
+  await student.goto(origin+'/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,f.pkg);await completeGeneratedPageStart(student);await student.locator('#test').waitFor({state:'visible'});await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});
   const nativeTxt=await student.locator('#answerBackup').inputValue(),nativePayload=await student.evaluate(()=>secureAnswers());
   await verifier.goto(origin+'/verifier.html');await verifier.evaluate(()=>showVerifierPanel('results'));
