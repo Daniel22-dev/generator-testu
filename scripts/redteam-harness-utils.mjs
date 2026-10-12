@@ -116,7 +116,7 @@ export async function completeGeneratedPageStart(page){
   if(await page.locator('#strictFullscreenStartBtn').count()){
     await page.waitForFunction(()=>!!STRICT_PREFLIGHT);
     await page.locator('#strictFullscreenStartBtn').click();
-    await page.waitForFunction(()=>isTestActive()&&!!document.fullscreenElement);
+    await page.waitForFunction(()=>!!document.fullscreenElement&&(isTestActive()||SUBMITTED||!$('done').classList.contains('hidden')));
   }
 }
 export async function decryptedVariants(pkg){const x=genDom(pkg.studentHtml,undefined,new Map(),false);try{return await x.decryptStudentContent(x.eval('ENCRYPTED_CONTENT'),pkg.startCode,x.eval('CFG'));}finally{x.close();}}
