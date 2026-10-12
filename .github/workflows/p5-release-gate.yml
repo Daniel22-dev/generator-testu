@@ -62,6 +62,9 @@ jobs:
             qa-results/recovery-browser-s1.json
             qa-results/pedagogical-fidelity-browser-s2.json
             qa-results/workflow-fidelity-browser-s3.json
+            qa-results/s4-teacher-verifier-source.json
+            qa-results/s4-teacher-verifier-browser/evidence.json
+            qa-results/s4-teacher-verifier-browser/*.png
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json

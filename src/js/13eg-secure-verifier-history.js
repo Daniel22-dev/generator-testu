@@ -6,6 +6,31 @@ function verifierSecurityEvents(r){
   const types=['locked','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'];
   return events.filter(e=>!types.includes(e.type)).concat(r.criticalEvents).sort((a,b)=>Date.parse(a.t)-Date.parse(b.t));
 }
+function verifierTelemetryState(r){
+  if(!r||!Object.prototype.hasOwnProperty.call(r,'securityEvents'))return 'ABSENT';
+  return Array.isArray(r.securityEvents)?'PRESENT':'INVALID';
+}
+function verifierSecuritySummary(r){
+  const events=verifierSecurityEvents(r),type=e=>String(e&&e.type||'');
+  const split=events.filter(e=>type(e)==='split-window');
+  const splitPcts=split.map(e=>Number(e&&e.pct)).filter(n=>Number.isFinite(n)&&n>=0&&n<=100);
+  return {
+    telemetryState:verifierTelemetryState(r),events,
+    lockedCount:events.filter(e=>type(e)==='locked'||type(e)==='lock').length,
+    recoveryCount:events.filter(e=>type(e)==='recovery-unlock').length,
+    badRecoveryCount:events.filter(e=>type(e)==='bad-unlock').length,
+    splitWindowEvents:split.length,
+    splitWindowMaxPct:splitPcts.length?Math.max.apply(null,splitPcts):null,
+    splitWindowSamples:split.map(e=>({t:String(e&&((e.t||e.ts))||''),pct:Number.isFinite(Number(e&&e.pct))?Number(e.pct):null,detail:String(e&&e.detail||'')}))
+  };
+}
+function splitWindowCsvHeaders(){return ['split_window_events','split_window_max_pct'];}
+function splitWindowCsvValues(r){
+  const s=verifierSecuritySummary(r);
+  if(s.telemetryState!=='PRESENT')return ['',''];
+  return [s.splitWindowEvents,s.splitWindowMaxPct==null?'':s.splitWindowMaxPct];
+}
+function splitWindowSecuritySignal(r){const s=verifierSecuritySummary(r);if(!s.splitWindowEvents)return null;return {label:'zjištěno malé / rozdělené okno — klientská heuristika',detail:'záznamů: '+s.splitWindowEvents+'; '+(s.splitWindowMaxPct==null?'maximum neuvedeno':('maximum '+s.splitWindowMaxPct+' %'))+'. Nejde o důkaz podvodu ani pravidlo automatického zámku.'};}
 function criticalHistoryRequired(){const v=String(CONFIG.generatorVersion||'').split('.').map(Number);return v[0]>7||v[0]===7&&(v[1]>1||v[1]===1&&v[2]>=92);}
 function criticalHistoryAssessment(r){
   if(!Array.isArray(r&&r.criticalEvents)||!r.criticalCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};
