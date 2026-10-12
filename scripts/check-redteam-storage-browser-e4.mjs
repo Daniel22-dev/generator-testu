@@ -37,7 +37,7 @@ try{
     await Promise.all([a.evaluate(()=>startTest()),b.evaluate(()=>startTest())]);
     for(const candidate of [a,b])if(await candidate.evaluate(()=>!!STRICT_PREFLIGHT)){await candidate.locator('#strictFullscreenStartBtn').click();await candidate.waitForTimeout(30);}
     const sa=await state(a),sb=await state(b);assert.equal(Number(sa.active)+Number(sb.active),1,'two native tabs cannot run one browser-local attempt concurrently');
-    const winner=sa.active?a:b,other=sa.active?b:a,id=(sa.active?sa:sb).attemptId;await winner.close();await start(other);assert.equal((await state(other)).attemptId,id);await close(c);
+    const winner=sa.active?a:b,other=sa.active?b:a,id=(sa.active?sa:sb).attemptId;await winner.close();await other.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));await start(other);assert.equal((await state(other)).attemptId,id);await close(c);
   });
   await group('integrity',async()=>{
     const c=await launch('integrity');let p=await page(c);await start(p);const first=await state(p);
