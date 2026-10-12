@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
 import {w,gdom,configure,build,genDom,installControlledFullscreen,REC} from './redteam-harness-utils.mjs';
 
@@ -153,7 +154,7 @@ try{
   assert.ok(signals.some(s=>s.code==='split-shadow'&&s.sev==='info'));
   pass('S5-SRC-14','Teacher Verifier interprets fullscreen/fallback and SHADOW events as audit evidence');
 
-  const report={schema:'git-s5-strict-mode-source-v1',stage:'S05',status:'PASS',checks,scope:'Generated strict and ordinary artifacts with Node WebCrypto plus controlled DOM/fullscreen/viewport inputs. No physical-device claim.',splitPolicy:'SHADOW/AUDIT-ONLY',physicalDevices:'NOT VERIFIED'};
+  const report={schema:'git-s5-strict-mode-source-v1',stage:'S05',status:'PASS',provenance:{sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,arch:process.arch},checks,scope:'Generated strict and ordinary artifacts with Node WebCrypto plus controlled DOM/fullscreen/viewport inputs. No physical-device claim.',splitPolicy:'SHADOW/AUDIT-ONLY',physicalDevices:'NOT VERIFIED'};
   fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/s5-strict-mode-source.json',JSON.stringify(report,null,2)+'\n');
   console.log(`PASS Sprint 05 Strict Mode source gate ${checks.length}/${checks.length}`);
 }finally{for(const x of children){try{x.close();}catch{}}gdom.window.close();}

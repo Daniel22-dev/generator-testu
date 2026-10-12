@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
 import {chromium} from 'playwright';
 import {w,gdom,configure,build,enterStartCode,REC} from './redteam-harness-utils.mjs';
@@ -85,6 +86,6 @@ try{
   pass('S5-B09','ordinary secure test and instant practice preserve one-step start without Strict Guard UI');
 
   assert.deepEqual(errors,[],'generated pages must have no unhandled page errors');
-  const report={schema:'git-s5-strict-mode-browser-v1',stage:'S05',status:'PASS',browser:await browser.version(),checks,inputs:{fullscreen:'native Chromium click/exit except explicitly named controlled denial and unsupported cases',split:'controlled viewport metrics inside real generated runtime'},splitPolicy:'SHADOW/AUDIT-ONLY',physicalDevices:'NOT VERIFIED',otherEngines:'NOT VERIFIED',limits:['Headless Chromium is not a physical iPad/iPhone/Android test','The unsupported branch removes Fullscreen API before loading the generated artifact','Split ratios are controlled runtime metrics; no OS split-window automation']};
+  const report={schema:'git-s5-strict-mode-browser-v1',stage:'S05',status:'PASS',provenance:{sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,arch:process.arch},browser:await browser.version(),checks,inputs:{fullscreen:'native Chromium click/exit except explicitly named controlled denial and unsupported cases',split:'controlled viewport metrics inside real generated runtime'},splitPolicy:'SHADOW/AUDIT-ONLY',physicalDevices:'NOT VERIFIED',otherEngines:'NOT VERIFIED',limits:['Headless Chromium is not a physical iPad/iPhone/Android test','The unsupported branch removes Fullscreen API before loading the generated artifact','Split ratios are controlled runtime metrics; no OS split-window automation']};
   fs.mkdirSync('qa-results/s5-strict-mode-browser',{recursive:true});fs.writeFileSync('qa-results/s5-strict-mode-browser/evidence.json',JSON.stringify(report,null,2)+'\n');console.log(`PASS Sprint 05 Chromium gate ${checks.length}/${checks.length}`);
 }finally{for(const c of contexts)await c.close().catch(()=>{});if(browser)await browser.close();gdom.window.close();}
