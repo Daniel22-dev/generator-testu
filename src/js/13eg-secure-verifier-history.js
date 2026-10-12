@@ -1,27 +1,41 @@
 // Private, informational history assessment. No automatic classification authority.
 const SECURE_VERIFIER_HISTORY_JS=String.raw`
 function verifierSecurityEvents(r){
-  const events=Array.isArray(r&&r.securityEvents)?r.securityEvents:[];
-  if(!Array.isArray(r&&r.criticalEvents))return events;
-  const types=['locked','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'];
-  return events.filter(e=>!types.includes(e.type)).concat(r.criticalEvents).sort((a,b)=>Date.parse(a.t)-Date.parse(b.t));
+  const routine=Array.isArray(r&&r.securityEvents)?r.securityEvents:[],critical=Array.isArray(r&&r.criticalEvents)?r.criticalEvents:[];
+  const stable=value=>{if(Array.isArray(value))return '['+value.map(stable).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).filter(k=>k!=='criticalSeq').sort().map(k=>JSON.stringify(k)+':'+stable(value[k])).join(',')+'}';return JSON.stringify(value);};
+  const routineKeys=routine.map(stable),matched=new Set(),merged=routine.map((event,index)=>({event,index}));
+  critical.forEach((event,criticalIndex)=>{
+    const key=stable(event);let match=-1;
+    for(let index=0;index<routine.length;index++)if(!matched.has(index)&&routineKeys[index]===key){match=index;break;}
+    if(match>=0){matched.add(match);merged[match]={event:Object.assign({},routine[match],event),index:match};}
+    else merged.push({event,index:routine.length+criticalIndex});
+  });
+  const time=event=>{const value=Date.parse(String(event&&((event.t||event.ts))||''));return Number.isFinite(value)?value:Number.POSITIVE_INFINITY;};
+  return merged.sort((a,b)=>time(a.event)-time(b.event)||a.index-b.index).map(item=>item.event);
 }
 function verifierTelemetryState(r){
   if(!r||!Object.prototype.hasOwnProperty.call(r,'securityEvents'))return 'ABSENT';
   return Array.isArray(r.securityEvents)?'PRESENT':'INVALID';
 }
+function verifierSplitWindowPct(e){
+  const raw=e&&e.pct;
+  if(raw==null||typeof raw==='string'&&!raw.trim())return null;
+  if(typeof raw!=='number'&&typeof raw!=='string')return null;
+  const value=Number(raw);return Number.isFinite(value)&&value>=0&&value<=100?value:null;
+}
 function verifierSecuritySummary(r){
   const events=verifierSecurityEvents(r),type=e=>String(e&&e.type||'');
   const split=events.filter(e=>type(e)==='split-window');
-  const splitPcts=split.map(e=>Number(e&&e.pct)).filter(n=>Number.isFinite(n)&&n>=0&&n<=100);
+  const splitPcts=split.map(verifierSplitWindowPct),validSplitPcts=splitPcts.filter(n=>n!=null);
   return {
     telemetryState:verifierTelemetryState(r),events,
     lockedCount:events.filter(e=>type(e)==='locked'||type(e)==='lock').length,
     recoveryCount:events.filter(e=>type(e)==='recovery-unlock').length,
     badRecoveryCount:events.filter(e=>type(e)==='bad-unlock').length,
     splitWindowEvents:split.length,
-    splitWindowMaxPct:splitPcts.length?Math.max.apply(null,splitPcts):null,
-    splitWindowSamples:split.map(e=>({t:String(e&&((e.t||e.ts))||''),pct:Number.isFinite(Number(e&&e.pct))?Number(e.pct):null,detail:String(e&&e.detail||'')}))
+    splitWindowMaxPct:validSplitPcts.length?Math.max.apply(null,validSplitPcts):null,
+    splitWindowUnknownPctCount:splitPcts.filter(n=>n==null).length,
+    splitWindowSamples:split.map((e,index)=>({t:String(e&&((e.t||e.ts))||''),pct:splitPcts[index],detail:String(e&&e.detail||'')}))
   };
 }
 function splitWindowCsvHeaders(){return ['split_window_events','split_window_max_pct'];}
@@ -30,7 +44,7 @@ function splitWindowCsvValues(r){
   if(s.telemetryState!=='PRESENT')return ['',''];
   return [s.splitWindowEvents,s.splitWindowMaxPct==null?'':s.splitWindowMaxPct];
 }
-function splitWindowSecuritySignal(r){const s=verifierSecuritySummary(r);if(!s.splitWindowEvents)return null;return {label:'zjištěno malé / rozdělené okno — klientská heuristika',detail:'záznamů: '+s.splitWindowEvents+'; '+(s.splitWindowMaxPct==null?'maximum neuvedeno':('maximum '+s.splitWindowMaxPct+' %'))+'. Nejde o důkaz podvodu ani pravidlo automatického zámku.'};}
+function splitWindowSecuritySignal(r){const s=verifierSecuritySummary(r);if(!s.splitWindowEvents)return null;return {label:'zjištěno malé / rozdělené okno — klientská heuristika',detail:'záznamů: '+s.splitWindowEvents+'; '+(s.splitWindowMaxPct==null?'maximum Nezjištěno':('maximum '+s.splitWindowMaxPct+' %'))+(s.splitWindowUnknownPctCount?'; bez měření: '+s.splitWindowUnknownPctCount:'')+'. Nejde o důkaz podvodu ani pravidlo automatického zámku.'};}
 function criticalHistoryRequired(){const v=String(CONFIG.generatorVersion||'').split('.').map(Number);return v[0]>7||v[0]===7&&(v[1]>1||v[1]===1&&v[2]>=92);}
 function criticalHistoryAssessment(r){
   if(!Array.isArray(r&&r.criticalEvents)||!r.criticalCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};

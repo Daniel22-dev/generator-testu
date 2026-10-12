@@ -50,6 +50,10 @@ try{
     rows.push(row('STRESS-302',stress));
     rows.push(row('TELEMETRY-ZERO',[]));
     const absent=row('TELEMETRY-ABSENT',[]);delete absent.securityEvents;rows.push(absent);
+    rows.push(row('UNKNOWN-PCT',[ev('split-window',2100,{pct:null,detail:'missing null'}),ev('split-window',2101,{pct:'',detail:'missing blank'}),ev('split-window',2102,{detail:'missing undefined'})]));
+    rows.push(row('VALID-SPLIT-ZERO',[ev('split-window',2200,{pct:0,detail:'measured zero'})]));
+    const criticalOnly=row('CRITICAL-ONLY',[]);delete criticalOnly.securityEvents;criticalOnly.criticalEvents=[ev('locked',2300,{detail:'critical-only lock',criticalSeq:1}),ev('recovery-unlock',2301,{detail:'critical-only recovery',lockReason:'critical-only lock',criticalSeq:2})];criticalOnly.criticalCounters={locks:1,unlocks:1,resumes:0,badUnlocks:0};criticalOnly.criticalOverflow=false;criticalOnly.criticalHistoryLegacy=false;rows.push(criticalOnly);
+    const duplicate=ev('locked',2400,{detail:'shared duplicate',criticalSeq:1});rows.push(row('MERGED-EVENTS',[{...duplicate},ev('locked',2401,{detail:'unique routine lock'})],{criticalEvents:[{...duplicate}],criticalCounters:{locks:1,unlocks:0,resumes:0,badUnlocks:0},criticalOverflow:false,criticalHistoryLegacy:false}));
     window.__s4Xss=0;RESULTS=rows;afterResultsChanged();showVerifierPanel('results');
   });
   await page.waitForSelector('.s4-result-main');
@@ -58,16 +62,20 @@ try{
     detailHidden:[...document.querySelectorAll('.s4-result-detail')].every(x=>x.hidden),
     sums:[...document.querySelectorAll('.s4-result-main')].slice(0,6).reduce((a,row)=>{const cells=row.cells;a.locks+=Number(cells[3].textContent);const recovery=cells[4].textContent.match(/(\d+)\s*\/\s*(\d+)/);a.recovery+=Number(recovery?.[1]||0);a.bad+=Number(recovery?.[2]||0);return a;},{locks:0,recovery:0,bad:0}),
     split:[...document.querySelectorAll('[data-s4-split-state="detected"]')].slice(0,3).map(x=>x.textContent.replace(/\s+/g,' ').trim()),
-    telemetry:[...document.querySelectorAll('.s4-result-main')].slice(-2).map(x=>x.querySelector('.s4-split')?.getAttribute('data-s4-split-state')+':'+x.querySelector('.s4-split')?.textContent.trim()),
+    telemetry:['TELEMETRY-ZERO','TELEMETRY-ABSENT'].map(id=>{const row=[...document.querySelectorAll('.s4-result-main')].find(x=>x.textContent.includes(id)),split=row?.querySelector('.s4-split');return split?.getAttribute('data-s4-split-state')+':'+split?.textContent.trim();}),
+    unknownSplit:(()=>{const row=[...document.querySelectorAll('.s4-result-main')].find(x=>x.textContent.includes('UNKNOWN-PCT'));return row?.querySelector('.s4-split')?.textContent.replace(/\s+/g,' ').trim();})(),
+    measuredZero:(()=>{const row=[...document.querySelectorAll('.s4-result-main')].find(x=>x.textContent.includes('VALID-SPLIT-ZERO'));return row?.querySelector('.s4-split')?.textContent.replace(/\s+/g,' ').trim();})(),
     xss:window.__s4Xss,
     injectedImages:document.querySelectorAll('.s4-detail-panel img').length,
     maxMainHeight:Math.max(...[...document.querySelectorAll('.s4-result-main')].map(x=>x.getBoundingClientRect().height))
   }));
-  check(initial.rows===9,'S4-B01','skutečně generovaný verifier vykreslil 9 syntetických pokusů');
+  check(initial.rows===13,'S4-B01','skutečně generovaný verifier vykreslil 13 syntetických pokusů včetně nápravných scénářů');
   check(initial.detailHidden,'S4-B02','plná telemetrie je ve výchozím stavu skrytá v detailu');
   check(initial.sums.locks===43&&initial.sums.recovery===43&&initial.sums.bad===13,'S4-B03',`souhrn 43/43/13 (${JSON.stringify(initial.sums)})`);
   check(initial.split.some(x=>/7\s*%/.test(x))&&initial.split.some(x=>/49\s*%/.test(x))&&initial.split.some(x=>/96\s*%/.test(x)),'S4-B04',`split-window 7/49/96 % (${initial.split.join(' | ')})`);
   check(initial.telemetry.some(x=>x.startsWith('none:Nezaznamenáno'))&&initial.telemetry.some(x=>x.startsWith('absent:Data nejsou k dispozici')),'S4-B05',`chybějící telemetrie je odlišena od validní nuly (${initial.telemetry.join(' | ')})`);
+  check(/maximum Nezjištěno/i.test(initial.unknownSplit)&&/3× Nezjištěno/i.test(initial.unknownSplit)&&!/0\s*%/.test(initial.unknownSplit),'S41-B15',`null/prázdná/nedefinovaná procenta nejsou 0 % (${initial.unknownSplit})`);
+  check(/max 0\s*%/.test(initial.measuredZero),'S41-B16',`skutečně naměřených 0 % zůstává 0 % (${initial.measuredZero})`);
   check(initial.maxMainHeight<150,'S4-B06',`kompaktní hlavní řádky, max ${Math.round(initial.maxMainHeight)} px`);
 
   const firstToggle=page.locator('.s4-detail-toggle').first();await firstToggle.focus();await page.keyboard.press('Tab');
@@ -80,10 +88,22 @@ try{
   check(detail.events===302&&detail.scrollable,'S4-B09',`v detailu je úplná scrollovatelná osa ${detail.events} událostí`);
   check(detail.xss===0&&detail.images===0,'S4-B10','nebezpečný obsah události zůstal textem');
 
+  const remediationDetails=await page.evaluate(()=>{
+    const inspect=id=>{const main=[...document.querySelectorAll('.s4-result-main')].find(x=>x.textContent.includes(id)),index=main?.dataset.resultIndex,toggle=document.querySelector(`.s4-detail-toggle[data-result-index="${index}"]`);if(toggle?.getAttribute('aria-expanded')!=='true')toggle?.click();const detail=document.querySelector(`#s4-result-detail-${index}`),eventTexts=[...(detail?.querySelectorAll('[data-s4-event]')||[])].map(x=>x.textContent);return {main:main?.textContent||'',detail:detail?.textContent||'',events:eventTexts.length,eventTexts};};
+    return {unknown:inspect('UNKNOWN-PCT'),critical:inspect('CRITICAL-ONLY'),merged:inspect('MERGED-EVENTS')};
+  });
+  check(remediationDetails.unknown.events===3&&(remediationDetails.unknown.detail.match(/Nezjištěno/g)||[]).length>=3&&!/podíl:\s*0\s*%/i.test(remediationDetails.unknown.detail),'S41-B17','detailní osa zobrazuje tři chybějící hodnoty jako Nezjištěno');
+  check(remediationDetails.critical.events===2&&/Běžná telemetrie není k dispozici/i.test(remediationDetails.critical.detail)&&/critical-only lock/.test(remediationDetails.critical.detail),'S41-B18','criticalEvents-only zůstávají viditelné při explicitně nedostupné běžné telemetrii');
+  check(remediationDetails.merged.events===2&&remediationDetails.merged.eventTexts.filter(x=>/shared duplicate/.test(x)).length===1&&remediationDetails.merged.eventTexts.some(x=>/unique routine lock/.test(x)),'S41-B19','společná událost je jednou a unikátní událost stejného typu se neztratí');
+  const csv=await page.evaluate(()=>{window.__s41Csv='';downloadText=function(txt){window.__s41Csv=txt;};downloadResultsCsv();return window.__s41Csv;});
+  const csvUnknown=csv.split('\n').find(line=>line.includes('UNKNOWN-PCT'))||'',csvZero=csv.split('\n').find(line=>line.includes('VALID-SPLIT-ZERO'))||'',csvCritical=csv.split('\n').find(line=>line.includes('CRITICAL-ONLY'))||'';
+  check(/split pct: Nezjištěno/.test(csvUnknown)&&!/split pct: 0 %/.test(csvUnknown)&&/split pct: 0 %/.test(csvZero),'S41-B20','CSV rozlišuje Nezjištěno od skutečných 0 %');
+  check(/critical-only lock/.test(csvCritical)&&/critical-only recovery/.test(csvCritical),'S41-B21','CSV chronologie obsahuje samostatné criticalEvents');
+
   await page.evaluate(()=>showVerifierPanel('security'));
   await page.selectOption('#v2SecurityKind','recovery');
   const filtered=await page.evaluate(()=>({value:document.querySelector('#v2SecurityKind').value,rows:document.querySelectorAll('.s4-security-table tr').length-1,text:document.querySelector('#securitySignals').textContent}));
-  check(filtered.value==='recovery'&&filtered.rows===6,'S4-B11',`filtr Recovery oddělil 6 relevantních pokusů`);
+  check(filtered.value==='recovery'&&filtered.rows===7,'S4-B11',`filtr Recovery oddělil 7 relevantních pokusů včetně criticalEvents-only`);
   check(/legitimní servisní operace/i.test(filtered.text)&&/nikoli automatický důkaz podvodu/i.test(filtered.text),'S4-B12','Recovery a heuristika mají neobviňující interpretaci');
 
   const viewports=[{name:'desktop',width:1440,height:900},{name:'tablet-landscape',width:1024,height:768},{name:'tablet-portrait',width:768,height:1024},{name:'mobile',width:390,height:844}];
