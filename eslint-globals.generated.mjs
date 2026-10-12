@@ -92,6 +92,7 @@ export const projectGlobals = {
   "SAVE_KEY": 'writable',
   "SECURE_CRITICAL_HISTORY_JS": 'writable',
   "SECURE_QUESTION_ORDER_JS": 'writable',
+  "SECURE_STRICT_MODE_RUNTIME_JS": 'writable',
   "SECURE_STUDENT_GUARD_JS": 'writable',
   "SECURE_STUDENT_SUBMIT_JS": 'writable',
   "SECURE_VERIFIER_ANCHORS_JS": 'writable',
