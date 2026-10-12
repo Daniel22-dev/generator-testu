@@ -114,7 +114,8 @@ export async function enterStartCode(page,pkg){await page.locator('#startCode').
 export async function completeGeneratedPageStart(page){
   await page.evaluate(()=>startTest());
   if(await page.locator('#strictFullscreenStartBtn').count()){
-    await page.waitForFunction(()=>!!STRICT_PREFLIGHT);
+    await page.waitForFunction(()=>!!STRICT_PREFLIGHT||SUBMITTED||!$('done').classList.contains('hidden'));
+    if(!(await page.evaluate(()=>!!STRICT_PREFLIGHT)))return;
     await page.locator('#strictFullscreenStartBtn').click();
     await page.waitForFunction(()=>!!document.fullscreenElement&&(isTestActive()||SUBMITTED||!$('done').classList.contains('hidden')));
   }
