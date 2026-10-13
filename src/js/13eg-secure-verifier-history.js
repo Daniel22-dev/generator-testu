@@ -56,7 +56,7 @@ function criticalHistoryRequired(){const v=String(CONFIG.generatorVersion||'').s
 function criticalHistoryAssessment(r){
   if(!Array.isArray(r&&r.criticalEvents)||!r.criticalCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};
   const count={locks:0,unlocks:0,resumes:0,badUnlocks:0};r.criticalEvents.forEach(e=>{const k=({locked:'locks','recovery-unlock':'unlocks','attempt-resumed-after-reload':'resumes','bad-unlock':'badUnlocks'})[e.type];if(k)count[k]++;});
-  const types=['locked','recovery-authorized','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'];
+  const types=['locked','recovery-authorized','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','identity-input-mismatch','critical-events-overflow'];
   const projected=(r.securityEvents||[]).filter(e=>types.includes(e.type));
   const listed=r.criticalEvents,ordered=es=>es.slice().sort((a,b)=>a.criticalSeq-b.criticalSeq);
   const overflow=listed.filter(e=>e.type==='critical-events-overflow');
@@ -86,5 +86,5 @@ function historyReviewHtml(r){
 }
 function historyCsvHeaders(){return ['locked_count','locked_times','locked_reasons','recovery_unlock_times','history_completeness','critical_locks','critical_unlocks','critical_resumes','critical_bad_unlocks'];}
 function historyCsvValues(r){const ev=verifierSecurityEvents(r),locks=ev.filter(e=>e.type==='locked'||e.type==='lock');return [locks.length,locks.map(e=>e.t).join(' | '),locks.map(e=>e.detail||'').join(' | '),ev.filter(e=>e.type==='recovery-unlock').map(e=>e.t).join(' | '),historyCompletenessAssessment(r).label,...['locks','unlocks','resumes','badUnlocks'].map(k=>r&&r.criticalCounters?r.criticalCounters[k]:'')];}
-function securityResultsReportHtml(){return '<h1>Bezpečnostní přehled výsledků</h1>'+trustNoticeHtml()+resolvedResults().map(r=>'<section class="q"><h2>'+esc(displayStudent(r))+'</h2><p>'+esc(classificationStatus(r))+' · '+esc(resultStateText(r))+'</p>'+historyReviewHtml(r)+'<p>'+esc(securitySignalText(r,duplicateInfo()).join(' | '))+'</p></section>').join('');}
+function securityResultsReportHtml(){return '<h1>Bezpečnostní přehled výsledků</h1>'+trustNoticeHtml()+securityReviewResults().map(r=>'<section class="q"><h2>'+esc(displayStudent(r))+'</h2><p>'+esc(classificationStatus(r))+' · '+esc(resultStateText(r))+'</p>'+historyReviewHtml(r)+'<p>'+esc(securitySignalText(r,duplicateInfo()).join(' | '))+'</p></section>').join('');}
 `;

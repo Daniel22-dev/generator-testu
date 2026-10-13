@@ -27,11 +27,50 @@ function proposeManualIdentity(payload,sm,error){
   validateSecurePayload(candidate);
   return {candidate,proof:{originalCode:payload.code,assignedCode:code,email}};
 }
+function diagnosticString(value,max){return typeof value==='string'?value.slice(0,max):'';}
+function diagnosticEvents(value,max){
+  if(!Array.isArray(value))return null;
+  return value.slice(0,max).map(function(event){
+    if(!e3Object(event))return null;
+    const out={};
+    Object.keys(event).slice(0,40).forEach(function(key){
+      if(!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(key))return;
+      const item=event[key];
+      if(typeof item==='string')out[key]=item.slice(0,2000);
+      else if(typeof item==='number'&&Number.isFinite(item))out[key]=item;
+      else if(typeof item==='boolean')out[key]=item;
+    });
+    if(!e3String(out.type,64)||!/^[a-z0-9-]+$/.test(out.type))return null;
+    return out;
+  }).filter(Boolean);
+}
+function diagnosticCriticalCounters(value){
+  if(!e3Object(value))return undefined;
+  const out={};for(const key of ['locks','unlocks','resumes','badUnlocks']){const n=Number(value[key]);if(!Number.isInteger(n)||n<0||n>902)return undefined;out[key]=n;}return out;
+}
+function invalidIdentityValidation(code){return ['schema.identity','schema.code','binding.identity-variant'].includes(String(code||''));}
+function diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message){
+  const row=Object.assign({
+    file:name,status:'DECRYPTED_INVALID_IDENTITY',diagnosticQuarantine:true,error:message,validationCodes:[code],
+    student:diagnosticString(payload.student,180),code:diagnosticString(payload.code,180),attemptId:diagnosticString(payload.attemptId,100),
+    identityMode:diagnosticString(payload.identityMode,40),groupKey:diagnosticString(payload.groupKey,180),
+    startedAt:diagnosticString(payload.startedAt,120),submittedAt:diagnosticString(payload.submittedAt,120),
+    answerCount:e3Object(payload.resp)?Object.keys(payload.resp).length:0,
+    routineHistoryTruncated:payload.routineHistoryTruncated===true,criticalOverflow:payload.criticalOverflow===true,criticalHistoryLegacy:payload.criticalHistoryLegacy===true,
+    userAgent:diagnosticString(payload.userAgent,2000),rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest,
+    metadataMismatch:metadataMismatchFor(sm),envelopeMismatch:[],anchorNotes:['Identita payloadu je neplatná; Forms metadata jsou pouze diagnostická a identitu nedoplňují.']
+  },sm);
+  if(Object.prototype.hasOwnProperty.call(payload,'securityEvents'))row.securityEvents=diagnosticEvents(payload.securityEvents,2048);
+  if(Object.prototype.hasOwnProperty.call(payload,'criticalEvents'))row.criticalEvents=diagnosticEvents(payload.criticalEvents,902);
+  const counters=diagnosticCriticalCounters(payload.criticalCounters);if(counters)row.criticalCounters=counters;
+  const trust=Object.freeze(Object.assign({},submissionTrust(payload,sm,{identity:'INVALID_NOT_ASSIGNED',timeWindow:'NOT_EVALUATED',diagnosticOnly:true}),{scoreSource:'NOT_SCORED',classificationAuthorization:'DIAGNOSTIC_QUARANTINE'}));
+  PRIVATE_SUBMISSION_TRUST.set(row,trust);row.trustAssessment=trust;return row;
+}
 async function verifyText(name,txt,meta){
-  const sm=verifierSourceMeta(meta),fullYear=!!(meta&&meta.fullYearCsv);let pack=null,payload=null,digest='';
+  const sm=verifierSourceMeta(meta),fullYear=!!(meta&&meta.fullYearCsv);let pack=null,payload=null,digest='',stage='source';
   try{
     if(sm.submissionSource==='google-forms-csv')e3Require(meta&&typeof meta.formIdentity==='string'&&meta.formIdentity.trim().length<=254&&typeof meta.formTimestamp==='string'&&meta.formTimestamp.trim().length<=120,'anchors.source-shape','Neplatn\u00fd typ nebo velikost Forms e-mailu/\u010dasu.');
-    pack=parseTxt(txt);validateSecureEnvelope(pack);digest=await sha256HexText(txt);payload=await decryptPayload(pack);
+    stage='parse';pack=parseTxt(txt);stage='envelope';validateSecureEnvelope(pack);stage='decrypt';digest=await sha256HexText(txt);payload=await decryptPayload(pack);stage='payload';
     e3Require(e3Object(payload),'schema.shape','Payload nen\u00ed objekt.');e3SafeTree(payload);e3Require(e3String(payload.testId,180)&&payload.testId.trim(),'schema.testId','Payload has no valid test identifier.');
     if(fullYear&&payload.testId!==CONFIG.testId)return {classification:'other-test',verifiedTestId:payload.testId};
     e3Require(payload.testId===CONFIG.testId&&pack.testId===CONFIG.testId,'binding.test','V\u00fdsledek pat\u0159\u00ed k jin\u00e9mu testu.');
@@ -55,7 +94,14 @@ async function verifyText(name,txt,meta){
   }catch(error){
     if(fullYear&&pack&&pack.testId!==CONFIG.testId&&!payload&&!error.validationCode)return {classification:'other-test',hintTestId:pack.testId,unverifiedOtherTest:true};
     const code=error.validationCode||'crypto.parse-decrypt',message=String(error&&error.message?error.message:error);
+    if(payload&&invalidIdentityValidation(code)){
+      const row=diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message);RESULTS.push(row);rebuildDuplicateState();return {classification:'diagnostic-quarantine',error:message,code,row};
+    }
+    // WebCrypto/UTF-8 failures have no verifier validationCode.  A schema error
+    // raised after successful decryption is not a cryptographic failure.
+    const failureStatus=stage==='decrypt'&&!error.validationCode?'CRYPTO_FAIL':(stage==='parse'||stage==='envelope'?'MALFORMED_CIPHERTEXT':'CHYBA');
     const row=Object.assign({file:name,status:'CHYBA',error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',earned:0,total:0,pct:0,grade:'?',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
+    if(failureStatus!=='CHYBA'){row.status=failureStatus;delete row.earned;delete row.total;delete row.pct;delete row.grade;}
     RESULTS.push(row);return {classification:'invalid-current',error:message,code,row};
   }
 }
@@ -140,7 +186,7 @@ function collectFormsLessonWindows(batches){
 }
 function formsSummaryRefresh(summary){
   if(!summary)return summary;
-  const rows=RESULTS.filter(r=>r.formBatchId===summary.batchId),bad=r=>r.status==='CHYBA'||r.exactDuplicate||r.hardReplayConflict;
+  const rows=RESULTS.filter(r=>r.formBatchId===summary.batchId),bad=r=>['CHYBA','DECRYPTED_INVALID_IDENTITY','MALFORMED_CIPHERTEXT','CRYPTO_FAIL'].includes(r.status)||r.exactDuplicate||r.hardReplayConflict;
   summary.ok=rows.filter(r=>r.status==='OK'&&!bad(r)).length;
   summary.pending=rows.filter(r=>r.status==='IDENTITY_REVIEW'&&!bad(r)).length;
   summary.invalid=rows.filter(bad).length;summary.current=rows.length;
@@ -160,7 +206,7 @@ function renderFormsImportSummary(summary){
   if(summary.otherTests)html+='<p class="muted">Jin\u00e9 testy v souboru: '+summary.otherTests+' (ignorov\u00e1no).</p>';
   if(summary.otherTestsUnverified)html+='<p class="muted">Z toho '+summary.otherTestsUnverified+' ob\u00e1lek pat\u0159\u00ed podle vn\u011bj\u0161\u00edho ID k jin\u00fdm test\u016fm. Tento verifier je nem\u016f\u017ee de\u0161ifrovat; nejde o kryptograficky ov\u011b\u0159en\u00e9 za\u0159azen\u00ed.</p>';
   if(summary.markers)html+='<p class="muted">Zna\u010dky hodiny: '+summary.markers+' \u0159\u00e1dk\u016f (nejsou to odevzd\u00e1n\u00ed).</p>';
-  const grouped=new Map();for(const r of RESULTS.filter(r=>r.formBatchId===summary.batchId&&(r.status==='CHYBA'||r.exactDuplicate||r.hardReplayConflict))){const code=r.exactDuplicate||r.hardReplayConflict?'replay.duplicate':r.validationCodes?.[0]||'unknown';if(!grouped.has(code))grouped.set(code,{count:0,message:r.exactDuplicate||r.hardReplayConflict?'Opakovan\u00e9 odevzd\u00e1n\u00ed je vy\u0159azeno. Zkontroluj p\u016fvodn\u00ed \u0159\u00e1dek CSV.':r.error});grouped.get(code).count++;}
+  const grouped=new Map();for(const r of RESULTS.filter(r=>r.formBatchId===summary.batchId&&(['CHYBA','DECRYPTED_INVALID_IDENTITY','MALFORMED_CIPHERTEXT','CRYPTO_FAIL'].includes(r.status)||r.exactDuplicate||r.hardReplayConflict))){const code=r.exactDuplicate||r.hardReplayConflict?'replay.duplicate':r.validationCodes?.[0]||'unknown';if(!grouped.has(code))grouped.set(code,{count:0,message:r.exactDuplicate||r.hardReplayConflict?'Opakovan\u00e9 odevzd\u00e1n\u00ed je vy\u0159azeno. Zkontroluj p\u016fvodn\u00ed \u0159\u00e1dek CSV.':r.error});grouped.get(code).count++;}
   for(const [code,g] of grouped)html+='<details class="forms-bad"><summary>'+g.count+'\u00d7 '+esc(g.message)+'</summary><code>'+esc(code)+'</code></details>';
   const received=new Set(RESULTS.filter(r=>r.status==='OK'||r.status==='IDENTITY_REVIEW').map(r=>String(r.code||r.student||'').toUpperCase()));
   const missing=(CONFIG.roster||[]).filter(r=>!received.has(String(r.code||'').toUpperCase()));

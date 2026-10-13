@@ -74,6 +74,10 @@ jobs:
             qa-results/s6-pedagogical-ai-browser/evidence.json
             qa-results/s6-traceability-t12-t42-t54-t63.json
             qa-results/s6-ci-wiring.json
+            qa-results/s61-identity-quarantine-source.json
+            qa-results/s61-identity-quarantine-browser/evidence.json
+            qa-results/s61-identity-quarantine-browser/*.png
+            qa-results/s61-ci-wiring.json
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json

@@ -38,9 +38,10 @@ try {
     const malformed=await iso.verifyText('synthetic-e2-malformed.txt',malformedTxt,{source:'google-forms-csv',fullYearCsv:true,formIdentity:'synthetic-a@example.invalid',formTimestamp:'2026-10-03T12:16:00Z'});
     assert.equal(malformed.classification,'identity-review');assert.equal(iso.classificationStatus(malformed.row),'IDENTITY_REVIEW_REQUIRED');assert.equal(iso.effectiveResults().length,0);
     // A well-formed code that is not in the roster is never recoverable.
-    const unknown=await forge({code:'ZZZZZZ',student:'ZZZZZZ'});assert.equal(unknown.classification,'invalid-current');
+    const unknown=await forge({code:'ZZZZZZ',student:'ZZZZZZ'});assert.equal(unknown.classification,'diagnostic-quarantine');assert.equal(unknown.row.status,'DECRYPTED_INVALID_IDENTITY');assert.equal(Object.hasOwn(unknown.row,'total'),false);
     assert.equal(v.resultTrust(unknown.row).scoreSource,'NOT_SCORED');
-    assert.equal(v.resultTrust(unknown.row).buildBinding,'NOT_VERIFIED');
+    assert.equal(v.resultTrust(unknown.row).buildBinding,'CHECKED_AGAINST_PRIVATE_VERIFIER');
+    assert.equal(v.resultTrust(unknown.row).classificationAuthorization,'DIAGNOSTIC_QUARANTINE');
   });
   await check('telemetry',async()=>{
     for(const [value,missing] of [[[],false],[null,false],[{},false],[undefined,true]]){
