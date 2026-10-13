@@ -99,13 +99,14 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   vm.runInContext(`
     let ATTEMPT_ID='ATT-E3-001', ACTIVE_IDENTITY_HASH='IDENTITY-HASH-001', ACTIVE_KEY='VARIANT-B', STARTED_AT='2026-10-02T15:00:00.000Z';
     let TIMER_DEADLINE=1999999999999, LOCKED=true, LOCK_REASON='Student left window', UNLOCK_BUSY=false, SUBMITTED=false, PERSIST_INTEGRITY_BLOCK=false,GUARD_EPOCH=0;
+    let STRICT_RECOVERY_AUTHORIZED=false,STRICT_RECOVERY_REASON='',STRICT_RECOVERY_LOCK_EVENT=null;
     let JOKER_USED=true, JOKER_SELECTED_AT='2026-10-02T15:00:05.000Z', JOKER_CHOICE=true;
     let RESP={q1:'A',q2:'B'}, SEC_EVENTS=[{t:'2026-10-02T15:05:00.000Z',type:'locked',detail:'Student left window'}];
     let LOCK_TAPS=0, LOCK_TAP_TIMER=null; let __lastSeal=null;
     function recordSec(type,detail){SEC_EVENTS.push({t:'NOW',type,detail});}
     function saveActiveAttemptSeal(seal){__lastSeal=JSON.parse(JSON.stringify(seal));return true;}
   `,ctx);
-  for(const fn of ['deriveSecretHash','teacherSecretMatches','recoveryCodeMatches','securityEventSnapshot','persistActiveAttemptSeal','lockTap','normLoginName','tryUnlock','teacherLogin']){
+  for(const fn of ['deriveSecretHash','teacherSecretMatches','recoveryCodeMatches','securityEventSnapshot','persistActiveAttemptSeal','lockTap','normLoginName','completeRecoveryUnlock','tryUnlock','teacherLogin']){
     vm.runInContext(extractFunction(secure,fn),ctx);
   }
   assert(await vm.runInContext(`teacherSecretMatches(${JSON.stringify(TEACHER)})`,ctx), 'E3 secure dynamic: Teacher/Admin secret matches Teacher/Admin branch');

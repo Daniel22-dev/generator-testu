@@ -95,6 +95,15 @@ try{
   assert.equal(denied.eval("SEC_EVENTS.filter(e=>e.type==='locked').length"),locksBefore);
   pass('S5-SRC-08','orientation grace is explicit and cannot create a lock');
 
+  denied.eval("Object.defineProperty(window,'visualViewport',{value:{width:800,height:1200,scale:1,addEventListener:function(){}},configurable:true});Object.defineProperty(window,'innerWidth',{value:800,configurable:true});Object.defineProperty(window,'innerHeight',{value:1200,configurable:true});Object.defineProperty(screen,'orientation',{value:{type:'portrait-primary',addEventListener:function(){}},configurable:true});SPLIT_BASELINE_WIDTH=1200;SPLIT_BASELINE_ORIENTATION='landscape';SPLIT_BASELINE_TRUSTED=true;SPLIT_SUSPECTED_AT=Date.now()-20000;");
+  assert.equal(denied.eval("captureStrictFullscreenBaseline('orientation')"),true);
+  assert.equal(denied.eval('SPLIT_BASELINE_WIDTH'),800,'a new legitimate portrait fullscreen baseline must replace the old landscape width');
+  assert.equal(denied.eval('SPLIT_BASELINE_ORIENTATION'),'portrait');
+  denied.eval('SPLIT_ORIENTATION_GRACE_UNTIL=0;');
+  assert.equal(denied.eval('strictSplitObservation(Date.now()).state'),'NORMAL');
+  assert.equal(denied.eval('LOCKED'),false);
+  pass('S5-SRC-15','orientation recalibration replaces the old fullscreen baseline and remains NORMAL after grace');
+
   await denied.submitSecureTest();
   active=null;denied.document.dispatchEvent(new denied.Event('fullscreenchange'));
   assert.equal(denied.eval('SUBMITTED'),true);
@@ -116,6 +125,17 @@ try{
   assert.equal(fallback.eval('SPLIT_SHADOW_STATE'),'AMBIGUOUS');
   assert.equal(fallback.eval('LOCKED'),false);
   pass('S5-SRC-10','teacher-authorized unsupported fallback is explicit, audited and has no false baseline');
+
+  fallback.eval("splitTotalMs=2000;splitMeasuredMs=0;splitSmallMs=0;SPLIT_STATE_COUNTS={NORMAL:0,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:1,EXEMPT:0};SPLIT_SHADOW_STATE='AMBIGUOUS';recordSplitSummary();");
+  const unknownRuntime=fallback.eval("SEC_EVENTS.filter(e=>e.type==='split-window').slice(-1)[0]");
+  assert.equal(unknownRuntime.pct,null);
+  assert.equal(unknownRuntime.measurementAvailable,false);
+  assert.match(unknownRuntime.detail,/Nezjištěno/);
+  denied.eval("splitTotalMs=4000;splitMeasuredMs=2000;splitSmallMs=0;SPLIT_STATE_COUNTS={NORMAL:1,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:0,EXEMPT:0};SPLIT_SHADOW_STATE='NORMAL';recordSplitSummary();");
+  const zeroRuntime=denied.eval("SEC_EVENTS.filter(e=>e.type==='split-window').slice(-1)[0]");
+  assert.equal(zeroRuntime.pct,0);
+  assert.equal(zeroRuntime.measurementAvailable,true);
+  assert.match(zeroRuntime.detail,/podil=0%/);
 
   const blocked=fresh(strictPkg);
   await verify(blocked);
@@ -153,6 +173,17 @@ try{
   assert.ok(signals.some(s=>s.code==='fullscreen-fallback'&&s.sev==='info'));
   assert.ok(signals.some(s=>s.code==='split-shadow'&&s.sev==='info'));
   pass('S5-SRC-14','Teacher Verifier interprets fullscreen/fallback and SHADOW events as audit evidence');
+
+  const unknownRecord={status:'OK',securityEvents:[{t:'2026-01-01T00:00:00Z',type:'split-window',pct:null,detail:'podil=Nezjištěno'}]},zeroRecord={status:'OK',securityEvents:[{t:'2026-01-01T00:00:00Z',type:'split-window',pct:0,detail:'podil=0%'}]};
+  assert.equal(verifier.verifierSecuritySummary(unknownRecord).splitWindowMaxPct,null);
+  assert.deepEqual(Array.from(verifier.splitWindowCsvValues(unknownRecord)),[1,'']);
+  assert.equal(verifier.splitWindowSecuritySignal(unknownRecord).severity,'info');
+  assert.match(verifier.securityEventTimelineText(unknownRecord),/Nezjištěno/);
+  assert.equal(verifier.verifierSecuritySummary(zeroRecord).splitWindowMaxPct,0);
+  assert.deepEqual(Array.from(verifier.splitWindowCsvValues(zeroRecord)),[1,0]);
+  assert.equal(verifier.splitWindowSecuritySignal(zeroRecord).severity,'info');
+  assert.match(verifier.securityEventTimelineText(zeroRecord),/0 %/);
+  pass('S5-SRC-16','runtime, verifier chronology and CSV distinguish unavailable split measurement from measured 0%');
 
   const report={schema:'git-s5-strict-mode-source-v1',stage:'S05',status:'PASS',provenance:{sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,arch:process.arch},checks,scope:'Generated strict and ordinary artifacts with Node WebCrypto plus controlled DOM/fullscreen/viewport inputs. No physical-device claim.',splitPolicy:'SHADOW/AUDIT-ONLY',physicalDevices:'NOT VERIFIED'};
   fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/s5-strict-mode-source.json',JSON.stringify(report,null,2)+'\n');

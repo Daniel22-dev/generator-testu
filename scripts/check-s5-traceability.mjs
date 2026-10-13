@@ -16,12 +16,12 @@ for(const [id,evidence] of [
   ['T64','S5-B01'],['T65','S5-B01'],['T66','S5-B01'],['T67','S5-B04/S5-B05'],
   ['T68','S5-B04'],['T69','S5-B06'],['T70','S5-B06'],['T71','S5-B08'],
   ['T72','S5-SRC-06/S5-B07'],['T74','S5-SRC-06'],['T75','S5-SRC-06'],['T76','S5-SRC-06'],
-  ['T78','S5-SRC-07'],['T79','S5-SRC-07'],['T81','S5-SRC-09/S5-B08'],
+  ['T78','S5-SRC-07'],['T79','S5-SRC-15/S5-B10'],['T81','S5-SRC-09/S5-B08'],
   ['T82','S5-SRC-05'],['T83','S5-SRC-05'],['T84','S5-SRC-05'],
   ['T90','S5-SRC-04/S5-B04'],['T91','S5-SRC-11/S5-B04'],['T92','S5-SRC-11/S5-B05'],
   ['T93','S5-SRC-05/S5-B06'],['T94','S5-SRC-05/S5-B06'],['T95','S5-SRC-05/S5-B06'],
   ['T96','S5-SRC-02/S5-B01'],['T97','S5-SRC-12/S5-B09'],['T98','S5-SRC-12/S5-B09'],
-  ['T99','S5-SRC-14'],['T100','S5-SRC-06/S5-B07'],['T101','S5 source + Chromium evidence and this matrix']
+  ['T99','S5-SRC-14/S5-SRC-16/S5-B11'],['T100','S5-SRC-06/S5-B07'],['T101','S5 source + Chromium evidence and this matrix']
 ])add(id,'PASS',evidence,'Automated synthetic/generated-artifact evidence; see environment metadata.');
 
 add('T73','NOT VERIFIED','S5-SRC-06/S5-B07','Automatic split-screen LOCK is intentionally disabled in SHADOW/AUDIT-ONLY mode pending physical calibration and owner approval.');
