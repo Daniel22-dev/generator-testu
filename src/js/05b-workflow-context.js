@@ -107,6 +107,7 @@ function refreshWorkflowSummary(){
 function refreshWorkflowContext(){
   refreshWorkflowSummary();renderReadingContext();
   if($('comprehensionSummary'))renderComprehensionSummaries();
+  if(typeof renderPedagogicalRecommendationLocal==='function')renderPedagogicalRecommendationLocal();
   if(typeof renderSuitabilityLocal==='function')renderSuitabilityLocal();
 }
 function beginComprehensionTask(kind,button){

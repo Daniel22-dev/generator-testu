@@ -70,6 +70,10 @@ jobs:
             qa-results/s5-strict-mode-browser/evidence.json
             qa-results/s5-traceability-t64-t101.json
             qa-results/s5-ci-wiring.json
+            qa-results/s6-pedagogical-ai-source.json
+            qa-results/s6-pedagogical-ai-browser/evidence.json
+            qa-results/s6-traceability-t12-t42-t54-t63.json
+            qa-results/s6-ci-wiring.json
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json

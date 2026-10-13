@@ -45,6 +45,7 @@ function applyVisualState() {
 
   document.querySelectorAll('#typyBtns .tag-btn').forEach(b =>
     b.classList.toggle('active', state.typyCviceni.includes(b.dataset.val)));
+  if(typeof renderFormatCatalogView==='function')renderFormatCatalogView();
   document.querySelectorAll('#ageGroupBtns .tag-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.val === state.ageGroup));
   setVal('ageGroupCustom', state.ageGroupCustom || '');
@@ -848,7 +849,8 @@ function filterPedagogy(fn){
   pedFilterActive = fn || 'all';
   document.querySelectorAll('#pedFilter .ped-chip').forEach(c =>
     c.classList.toggle('active', c.dataset.fn === pedFilterActive));
-  document.querySelectorAll('#typyBtns .type-group').forEach(g =>
+  if(typeof renderFormatCatalogView==='function')renderFormatCatalogView();
+  else document.querySelectorAll('#typyBtns .type-group').forEach(g =>
     g.classList.toggle('ped-hidden', pedFilterActive !== 'all' && g.dataset.fn !== pedFilterActive));
 }
 // Seskupí aktuálně vybrané typy (+ vlastní) podle pedagogické funkce.

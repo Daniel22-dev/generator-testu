@@ -52,6 +52,7 @@ function exerciseTypeHelpNodes(){
     title: document.getElementById('exerciseTypePopoverTitle'),
     desc: document.getElementById('exerciseTypePopoverDesc'),
     example: document.getElementById('exerciseTypePopoverExample')
+    ,meta: document.getElementById('exerciseTypePopoverMeta')
   };
 }
 function cancelExerciseTypeHelpHide(){
@@ -111,6 +112,10 @@ function showExerciseTypeHelp(anchor){
   if (n.title) n.title.textContent = type;
   if (n.desc) n.desc.textContent = help.summary;
   if (n.example) n.example.textContent = help.example;
+  const meta = typeof PEDAGOGICAL_FORMAT_BY_ID !== 'undefined' ? PEDAGOGICAL_FORMAT_BY_ID[type] : null;
+  if (n.meta) n.meta.textContent = meta
+    ? 'ES: '+meta.exampleEs+' · Cíle: '+meta.goalTags.join(', ')+' · Podmínka: '+meta.prerequisites.join(' ')+' · Hodnocení: '+meta.scorer
+    : '';
   btn.setAttribute('aria-describedby', 'exerciseTypePopover');
   n.pop.dataset.openFor = type;
   n.pop.style.visibility = 'hidden';

@@ -254,6 +254,16 @@
           <div class="source-use-card-grid" id="sourceUseCards" role="group" aria-label="Jak má AI použít tento podklad?"></div>
         </div>
       </div>
+      <section id="pedagogicalRecommendationPanel" class="workflow-advisor recommendation-panel" aria-labelledby="pedagogicalRecommendationTitle">
+        <div class="small-muted">Dobrovolný krok před výběrem formátů</div>
+        <div class="workflow-advisor-head">
+          <div><h3 id="pedagogicalRecommendationTitle">AI didaktický posudek podkladu</h3><p class="small-muted">Posoudí, jaké <strong>nové</strong> úlohy lze z podkladu vytvořit pro zvolený jazyk a CEFR. Nehledá jen formáty, které už jsou v předloze.</p></div>
+          <button type="button" class="btn-edit" id="pedagogicalRecommendationAiBtn" onclick="recommendPedagogicalFormats()">✨ Doporučit formáty</button>
+        </div>
+        <p class="small-muted">AI doporučení nic samo nezaškrtne. Každý návrh musíš přijmout jednotlivě; bez AI můžeš pokračovat ručním výběrem všech typů.</p>
+        <div id="pedagogicalRecommendationLocal" aria-live="polite"></div>
+        <div id="pedagogicalRecommendationResult" aria-live="polite"></div>
+      </section>
 <div class="workflow-heading"><span>2</span><h2>Cvičení a bodování</h2><p>Reading i Listening nyní použijí již nastavený kontext.</p></div>
 <div class="field" id="exerciseCountField">
         <div class="field-label">Počet cvičení</div>
@@ -293,6 +303,15 @@
 <div class="field" id="globalTypesField">
         <div class="field-label">Typy cvičení <button class="tt-icon" data-tip="Typy jsou rozdělené podle pedagogické funkce: co daná úloha u žáka skutečně měří. Vyber napříč kategoriemi pro vyvážený test. Každý zvolený typ vytvoří právě jedno cvičení.">?</button></div>
         <div class="field-hint">Vyber vše, co chceš použít. Najetím myší na kartu zobrazíš stručný popis a příklad; na dotykovém zařízení použij ikonu <strong>i</strong>.</div>
+        <div class="format-catalog-tools" aria-label="Filtry katalogu pedagogických typů">
+          <div class="ped-filter" id="formatCatalogModes"><span>Katalog:</span><button type="button" class="ped-chip active" data-catalog-mode="all" onclick="setFormatCatalogMode('all')">Všechny typy</button><button type="button" class="ped-chip" id="formatCatalogRecommended" data-catalog-mode="recommended" onclick="setFormatCatalogMode('recommended')" disabled>Doporučené</button><span id="formatCatalogCount" class="format-catalog-count">38 z 38 typů</span></div>
+          <label for="formatCatalogSearch">Hledat typ, cíl nebo prerequisite</label>
+          <input id="formatCatalogSearch" type="search" placeholder="např. conditionals, gramatika, počasí…" oninput="onFormatCatalogSearch(this.value)">
+          <label for="formatCatalogGoal">Výukový cíl</label>
+          <select id="formatCatalogGoal" onchange="onFormatCatalogGoal(this.value)">
+            <option value="all">Všechny cíle</option><option value="grammar">Gramatika</option><option value="vocabulary">Slovní zásoba</option><option value="reading">Reading</option><option value="listening">Listening</option><option value="use-of-english">Use of English</option><option value="writing">Writing</option><option value="combined">Kombinované</option>
+          </select>
+        </div>
         <div class="ped-filter advanced-only" id="pedFilter">
           <span>Zobrazit funkci:</span>
           <button type="button" class="ped-chip active" data-fn="all" onclick="filterPedagogy('all')">vše</button>
@@ -386,6 +405,7 @@
           <div class="exercise-type-popover-example-label">Příklad</div>
           <div class="exercise-type-popover-example" id="exerciseTypePopoverExample"></div>
         </div>
+        <div class="exercise-type-popover-meta" id="exerciseTypePopoverMeta"></div>
       </div>
 
       
