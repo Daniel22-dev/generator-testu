@@ -51,7 +51,7 @@ function splitWindowCsvValues(r){
   if(s.telemetryState!=='PRESENT')return ['',''];
   return [s.splitWindowEvents,s.splitWindowMaxPct==null?'':s.splitWindowMaxPct];
 }
-function splitWindowSecuritySignal(r){const s=verifierSecuritySummary(r);if(!s.splitWindowEvents)return null;return {label:'zjištěno malé / rozdělené okno — klientská heuristika',detail:'záznamů: '+s.splitWindowEvents+'; '+(s.splitWindowMaxPct==null?'maximum Nezjištěno':('maximum '+s.splitWindowMaxPct+' %'))+(s.splitWindowUnknownPctCount?'; bez měření: '+s.splitWindowUnknownPctCount:'')+'. Nejde o důkaz podvodu ani pravidlo automatického zámku.'};}
+function splitWindowSecuritySignal(r){const s=verifierSecuritySummary(r);if(!s.splitWindowEvents)return null;const unknown=s.splitWindowMaxPct==null,label=unknown?'split-window měření Nezjištěno':(s.splitWindowMaxPct===0?'split-window změřeno: 0 %':'zjištěno malé / rozdělené okno — klientská heuristika');return {label,detail:'záznamů: '+s.splitWindowEvents+'; '+(unknown?'maximum Nezjištěno':('maximum '+s.splitWindowMaxPct+' %'))+(s.splitWindowUnknownPctCount?'; bez měření: '+s.splitWindowUnknownPctCount:'')+'. '+(unknown?'Chybějící měření není bezpečnostní závěr.':'Nejde o důkaz podvodu ani pravidlo automatického zámku.'),severity:unknown||s.splitWindowMaxPct===0?'info':'soft'};}
 function criticalHistoryRequired(){const v=String(CONFIG.generatorVersion||'').split('.').map(Number);return v[0]>7||v[0]===7&&(v[1]>1||v[1]===1&&v[2]>=92);}
 function criticalHistoryAssessment(r){
   if(!Array.isArray(r&&r.criticalEvents)||!r.criticalCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};

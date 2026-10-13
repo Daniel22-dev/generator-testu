@@ -162,7 +162,7 @@ function securitySignalsFor(r,info){if(!isScoredResult(r))return [];info=info||d
   duplicateWarningsFor(r,info).forEach(w=>add('duplicate','opakovaný pokus / stejný kód',w,'hard'));
   const changes=answerChangeTotal(r);const qn=(r.details||[]).length||1;const changeLimit=Math.max(30,qn*5);if(changes>changeLimit)add('many-changes','neobvykle mnoho změn odpovědí',changes+' změn u '+qn+' položek','soft');
   const st=r.answerChangeStats||{};const maxOne=Math.max(0,...Object.keys(st).map(k=>Number(st[k])||0));if(maxOne>12)add('many-changes-one','neobvykle mnoho změn u jedné odpovědi','max. '+maxOne+' změn u jedné položky','soft');
-  const splitSignal=splitWindowSecuritySignal(r);if(splitSignal)add('split-window',splitSignal.label,splitSignal.detail,'soft');
+  const splitSignal=splitWindowSecuritySignal(r);if(splitSignal)add('split-window',splitSignal.label,splitSignal.detail,splitSignal.severity||'soft');
   const metadataMismatch=Array.isArray(r.metadataMismatch)?r.metadataMismatch.filter(Boolean):[];if(metadataMismatch.length)add('metadata-mismatch','METADATA MISMATCH — metadata Google Forms',metadataMismatch.join('; ')+' — dešifrovaný payload uvádí ID tohoto testu, ale popisná metadata formuláře nesedí; původ runtime tím není prokázán.','soft');
   const envelopeMismatch=Array.isArray(r.envelopeMismatch)?r.envelopeMismatch.filter(Boolean):[];if(envelopeMismatch.length)add('envelope-mismatch','METADATA MISMATCH — bezpečnostní obal',envelopeMismatch.join('; '),'hard');
   if(CONFIG.identityMode==='oneTimeCode' && (CONFIG.roster||[]).length && !rosterHasCode(r)){add('unknown-code','kód není v seznamu (roster)','zadáno: '+(submittedCode(r)||'—')+' — ověř přidělený kód studenta, může jít o překlep nebo cizí kód.','hard');}
