@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 
-const root=path.resolve('.'),checks=[];
+const root=path.resolve(process.env.S7_SOURCE_ROOT||'.'),checks=[];
 function check(id,condition,detail){const status=condition?'PASS':'FAIL';checks.push({id,status,detail});console.log(`${status} ${id} - ${detail}`);}
 function template(file,marker='String.raw`'){
   const source=fs.readFileSync(path.join(root,'src/js',file),'utf8'),start=source.indexOf(marker)+marker.length,end=source.lastIndexOf('`;');
