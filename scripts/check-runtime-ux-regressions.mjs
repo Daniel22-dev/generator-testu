@@ -59,7 +59,7 @@ need(secureRuntime, /resetTestScrollAfterStart\(\);armSecureStartInteractionGuar
 need(secureRuntime, /function refreshSecureTimer\(\)[\s\S]*submitSecureTest\(['"]timer-expired['"]\)/, 'Expired attempts preserve automatic submission');
 need(secureSubmit, /function showTimerExpiredNotice\(\)[\s\S]*submitted automatically/, 'Expired attempts explain the automatic submission reason');
 need(secure, /startTimer\(\);if\(isTestActive\(\)\)startSplitMonitor\(\)[\s\S]*if\(LOCKED&&isTestActive\(\)\)/, 'Expired resume cannot re-arm split monitoring or lock UI after auto-submit starts');
-need(secure, /function handlePageRestore\(event\)[\s\S]*restoreSubmissionOutbox\(\(\$\('studentName'\)[\s\S]*ACTIVE_IDENTITY_HASH\)/, 'BFCache/pageshow outbox recovery preserves the current identity binding');
+need(secure, /function handlePageRestore\(event\)[\s\S]*restoreSubmissionOutbox\(currentAttemptIdentity\(\),ACTIVE_IDENTITY_HASH\)/, 'BFCache/pageshow outbox recovery preserves the current identity binding');
 need(secure, /function storageGet\(kind\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return null/, 'Teacher preview cannot read persistent submitted/outbox state');
 need(secure, /async function submittedLocked\(\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return false/, 'Teacher preview never inherits a submitted lock');
 need(lab, /function downloadTargetContext\([\s\S]*window\.top\.location\.origin===window\.location\.origin[\s\S]*targetDocument=window\.top\.document/, 'Downloads are promoted to the same-origin AI Studio top-level context when embedded');
