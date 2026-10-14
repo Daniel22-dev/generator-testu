@@ -192,7 +192,8 @@
     "check:s7-teacher-workflow": "node scripts/check-s7-teacher-workflow.mjs",
     "check:s7-teacher-workflow-browser": "node scripts/check-s7-teacher-workflow-browser.mjs",
     "check:s7-traceability": "node scripts/check-s7-traceability.mjs",
-    "check:s7-ci-wiring": "node scripts/check-s7-ci-wiring.mjs"
+    "check:s7-ci-wiring": "node scripts/check-s7-ci-wiring.mjs",
+    "check:s8-certification-contract": "node scripts/check-s8-certification-contract.mjs"
   },
   "engines": {
     "node": ">=18"
