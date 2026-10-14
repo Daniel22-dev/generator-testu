@@ -4,7 +4,7 @@ const PRIVATE_SUBMISSION_TRUST=new WeakMap();
 function isScoredResult(r){return !!r&&(r.status==='OK'||r.status==='DIAGNOSTIC_ONLY'||r.status==='IDENTITY_REVIEW');}
 function isDiagnosticQuarantine(r){return !!r&&r.status==='DECRYPTED_INVALID_IDENTITY'&&r.diagnosticQuarantine===true;}
 function isSecurityReviewResult(r){return isScoredResult(r)||isDiagnosticQuarantine(r);}
-function securityReviewResults(){return resolvedResults().concat(RESULTS.filter(isDiagnosticQuarantine));}
+function securityReviewResults(){rebuildDuplicateState();return resolvedResults().concat(RESULTS.filter(r=>isDiagnosticQuarantine(r)&&!r.exactDuplicate));}
 function submissionTrust(payload,source,anchors){
   const hasEvents=Object.prototype.hasOwnProperty.call(payload,'securityEvents'),events=Array.isArray(payload.securityEvents)?payload.securityEvents:null;
   const claimed=String(payload.studentHtmlSha256||''),expected=String(CONFIG.studentHtmlSha256||'');

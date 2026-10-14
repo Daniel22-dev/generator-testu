@@ -54,7 +54,10 @@ function splitWindowCsvValues(r){
 function splitWindowSecuritySignal(r){const s=verifierSecuritySummary(r);if(!s.splitWindowEvents)return null;const unknown=s.splitWindowMaxPct==null,label=unknown?'split-window měření Nezjištěno':(s.splitWindowMaxPct===0?'split-window změřeno: 0 %':'zjištěno malé / rozdělené okno — klientská heuristika');return {label,detail:'záznamů: '+s.splitWindowEvents+'; '+(unknown?'maximum Nezjištěno':('maximum '+s.splitWindowMaxPct+' %'))+(s.splitWindowUnknownPctCount?'; bez měření: '+s.splitWindowUnknownPctCount:'')+'. '+(unknown?'Chybějící měření není bezpečnostní závěr.':'Nejde o důkaz podvodu ani pravidlo automatického zámku.'),severity:unknown||s.splitWindowMaxPct===0?'info':'soft'};}
 function criticalHistoryRequired(){const v=String(CONFIG.generatorVersion||'').split('.').map(Number);return v[0]>7||v[0]===7&&(v[1]>1||v[1]===1&&v[2]>=92);}
 function criticalHistoryAssessment(r){
-  if(!Array.isArray(r&&r.criticalEvents)||!r.criticalCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};
+  const counterState=String(r&&r.criticalCountersState||''),hasCounters=!!r&&Object.prototype.hasOwnProperty.call(r,'criticalCounters'),validCounters=hasCounters?diagnosticCriticalCounters(r.criticalCounters):undefined;
+  if(counterState==='INVALID'||hasCounters&&!validCounters)return {legacy:false,mismatch:false,missingRequired:false,countersUnavailable:true,counterState:'INVALID'};
+  if(counterState==='MISSING'&&isDiagnosticQuarantine(r))return {legacy:false,mismatch:false,missingRequired:false,countersUnavailable:true,counterState:'MISSING'};
+  if(!Array.isArray(r&&r.criticalEvents)||!validCounters)return {legacy:true,mismatch:false,missingRequired:criticalHistoryRequired()};
   const count={locks:0,unlocks:0,resumes:0,badUnlocks:0};r.criticalEvents.forEach(e=>{const k=({locked:'locks','recovery-unlock':'unlocks','attempt-resumed-after-reload':'resumes','bad-unlock':'badUnlocks'})[e.type];if(k)count[k]++;});
   const types=['locked','recovery-authorized','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','identity-input-mismatch','critical-events-overflow'];
   const projected=(r.securityEvents||[]).filter(e=>types.includes(e.type));
@@ -66,6 +69,7 @@ function criticalHistoryAssessment(r){
 }
 function historyCompletenessAssessment(r){
   const critical=criticalHistoryAssessment(r);
+  if(critical.countersUnavailable)return {possiblyIncomplete:true,label:critical.counterState==='MISSING'?'CHYBÍ KRITICKÉ ČÍTAČE':'NEOVĚŘITELNÉ KRITICKÉ ČÍTAČE',detail:'Chybějící nebo typově neplatné čítače nelze vykládat jako nulu. Dostupné jednotlivé události zůstávají zachovány a průběh vyžaduje ruční posouzení.'};
   if(critical.missingRequired)return {possiblyIncomplete:true,label:'CHYBÍ POVINNÁ KRITICKÁ HISTORIE',detail:'Tento export již vyžaduje samostatný seznam a čítače kritických událostí. Chybějící pole vyžadují ruční posouzení.'};
   if(critical.mismatch)return {possiblyIncomplete:true,label:'NESOULAD KRITICKÉ HISTORIE',detail:'Čítače, seznam nebo výsledková historie si odporují. Průběh vyžaduje ruční posouzení.'};
   if(r&&r.routineHistoryTruncated&&!critical.overflow)return {possiblyIncomplete:true,label:'BĚŽNÁ HISTORIE BYLA ZKRÁCENA',detail:'Výsledkový limit ponechal úvodní a nejnovější běžné události. Kritická historie je uložena samostatně.'};

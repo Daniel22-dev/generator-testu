@@ -46,7 +46,7 @@ function diagnosticEvents(value,max){
 }
 function diagnosticCriticalCounters(value){
   if(!e3Object(value))return undefined;
-  const out={};for(const key of ['locks','unlocks','resumes','badUnlocks']){const n=Number(value[key]);if(!Number.isInteger(n)||n<0||n>902)return undefined;out[key]=n;}return out;
+  const out={};for(const key of ['locks','unlocks','resumes','badUnlocks']){const n=value[key];if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>902)return undefined;out[key]=n;}return out;
 }
 function invalidIdentityValidation(code){return ['schema.identity','schema.code','binding.identity-variant'].includes(String(code||''));}
 function diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message){
@@ -62,7 +62,9 @@ function diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message){
   },sm);
   if(Object.prototype.hasOwnProperty.call(payload,'securityEvents'))row.securityEvents=diagnosticEvents(payload.securityEvents,2048);
   if(Object.prototype.hasOwnProperty.call(payload,'criticalEvents'))row.criticalEvents=diagnosticEvents(payload.criticalEvents,902);
-  const counters=diagnosticCriticalCounters(payload.criticalCounters);if(counters)row.criticalCounters=counters;
+  const counters=diagnosticCriticalCounters(payload.criticalCounters);
+  row.criticalCountersState=counters?'PRESENT':(Object.prototype.hasOwnProperty.call(payload,'criticalCounters')?'INVALID':'MISSING');
+  if(counters)row.criticalCounters=counters;
   const trust=Object.freeze(Object.assign({},submissionTrust(payload,sm,{identity:'INVALID_NOT_ASSIGNED',timeWindow:'NOT_EVALUATED',diagnosticOnly:true}),{scoreSource:'NOT_SCORED',classificationAuthorization:'DIAGNOSTIC_QUARANTINE'}));
   PRIVATE_SUBMISSION_TRUST.set(row,trust);row.trustAssessment=trust;return row;
 }

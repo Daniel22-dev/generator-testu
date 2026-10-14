@@ -24,17 +24,18 @@ function normStudentKey(s){return String(s||'').trim().toLowerCase().normalize('
 function rebuildDuplicateState(){
   const firstByDigest=new Map(),byStudent=new Map(),byAttempt=new Map();
   RESULTS.forEach((r,i)=>{
-    if(r.status!=='OK'&&r.status!=='IDENTITY_REVIEW')return;
+    const scoredCandidate=r.status==='OK'||r.status==='IDENTITY_REVIEW',quarantine=isDiagnosticQuarantine(r);
+    if(!scoredCandidate&&!quarantine)return;
     r.exactDuplicate=false;r.exactDuplicateOf=-1;r.attemptConflict=false;r.hardReplayConflict=false;r.replayStatus='CLEAR';
     const digest=String(r.semanticDigest||r.submissionDigest||'');
     if(digest&&firstByDigest.has(digest)){const first=firstByDigest.get(digest);r.exactDuplicate=true;r.exactDuplicateOf=first;r.replayStatus=r.submissionDigest===RESULTS[first].submissionDigest?'EXACT_DUPLICATE':'SEMANTIC_DUPLICATE';}
     else if(digest)firstByDigest.set(digest,i);
     if(r.semanticDigest&&r.replayIdentityDigest&&typeof VERIFIER_REPLAY_HISTORY!=='undefined'&&VERIFIER_REPLAY_HISTORY.some(h=>h.semanticDigest!==r.semanticDigest&&(h.identityDigest===r.replayIdentityDigest||h.attemptId===r.attemptId))){r.hardReplayConflict=true;r.attemptConflict=true;r.replayStatus='PERSISTED_REPLAY_CONFLICT';}
-    const sk=normStudentKey(r.student);if(sk&&!r.exactDuplicate){if(!byStudent.has(sk))byStudent.set(sk,[]);byStudent.get(sk).push(i);}
+    const sk=scoredCandidate?normStudentKey(r.student):'';if(sk&&!r.exactDuplicate){if(!byStudent.has(sk))byStudent.set(sk,[]);byStudent.get(sk).push(i);}
     const ak=String(r.attemptId||'');if(ak&&!r.exactDuplicate){if(!byAttempt.has(ak))byAttempt.set(ak,[]);byAttempt.get(ak).push(i);}
   });
   for(const rows of byStudent.values())if(rows.length>1){const strict=rows.some(i=>!!RESULTS[i].semanticDigest);for(const i of rows){RESULTS[i].attemptConflict=true;if(strict){RESULTS[i].hardReplayConflict=true;RESULTS[i].replayStatus='IDENTITY_REPLAY';}}}
-  for(const rows of byAttempt.values())if(rows.length>1&&rows.some(i=>RESULTS[i].semanticDigest))for(const i of rows){RESULTS[i].hardReplayConflict=true;RESULTS[i].attemptConflict=true;RESULTS[i].replayStatus='ATTEMPT_CONFLICT';}
+  for(const rows of byAttempt.values())if(rows.length>1&&rows.some(i=>RESULTS[i].semanticDigest||isDiagnosticQuarantine(RESULTS[i])))for(const i of rows){RESULTS[i].hardReplayConflict=true;RESULTS[i].attemptConflict=true;RESULTS[i].replayStatus='ATTEMPT_CONFLICT';}
 }
 function duplicateInfo(){rebuildDuplicateState();const byStudent={},byAttempt={},byDigest={};let exactDuplicateCount=0;RESULTS.forEach((r,i)=>{if(r.status!=='OK'&&r.status!=='IDENTITY_REVIEW')return;const sk=normStudentKey(r.student);if(sk)(byStudent[sk]||(byStudent[sk]=[])).push(i);const ak=String(r.attemptId||'').trim();if(ak)(byAttempt[ak]||(byAttempt[ak]=[])).push(i);const d=String(r.semanticDigest||r.submissionDigest||'');if(d)(byDigest[d]||(byDigest[d]=[])).push(i);if(r.exactDuplicate)exactDuplicateCount++;});const dupStudentKeys=Object.keys(byStudent).filter(k=>byStudent[k].length>1);const dupAttemptKeys=Object.keys(byAttempt).filter(k=>byAttempt[k].length>1);const conflictStudentKeys=Object.keys(byStudent).filter(k=>byStudent[k].some(i=>RESULTS[i].attemptConflict));return {byStudent,byAttempt,byDigest,dupStudentKeys,dupAttemptKeys,conflictStudentKeys,exactDuplicateCount};}
 function chooseAttemptByDigest(digest){const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate&&!x.hardReplayConflict&&x.submissionDigest===digest);if(!r)return;ATTEMPT_DECISIONS.set(normStudentKey(r.student),digest);afterResultsChanged();vToast('Pro studenta '+displayStudent(r)+' byl zvolen tento pokus.','ok');}
