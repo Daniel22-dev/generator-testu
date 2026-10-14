@@ -2,6 +2,11 @@
 const SECURE_VERIFIER_TRUST_JS=String.raw`
 const PRIVATE_SUBMISSION_TRUST=new WeakMap();
 function isScoredResult(r){return !!r&&(r.status==='OK'||r.status==='DIAGNOSTIC_ONLY'||r.status==='IDENTITY_REVIEW');}
+function verifierScoreValues(r){
+  const scored=isScoredResult(r)&&Number.isFinite(r.earned)&&Number.isFinite(r.total)&&Number.isFinite(r.pct)&&r.grade!==undefined&&r.grade!==null;
+  if(!scored)return {scored:false,earned:'',total:'',pct:'',grade:'',pointsText:'—',percentText:'—',gradeText:'—'};
+  return {scored:true,earned:r.earned,total:r.total,pct:r.pct,grade:r.grade,pointsText:String(r.earned)+'/'+String(r.total),percentText:String(r.pct)+' %',gradeText:String(r.grade)};
+}
 function isDiagnosticQuarantine(r){return !!r&&r.status==='DECRYPTED_INVALID_IDENTITY'&&r.diagnosticQuarantine===true;}
 function isSecurityReviewResult(r){return isScoredResult(r)||isDiagnosticQuarantine(r);}
 function securityReviewResults(){rebuildDuplicateState();return resolvedResults().concat(RESULTS.filter(r=>isDiagnosticQuarantine(r)&&!r.exactDuplicate));}

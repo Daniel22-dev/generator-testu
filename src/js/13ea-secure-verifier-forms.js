@@ -102,8 +102,7 @@ async function verifyText(name,txt,meta){
     // WebCrypto/UTF-8 failures have no verifier validationCode.  A schema error
     // raised after successful decryption is not a cryptographic failure.
     const failureStatus=stage==='decrypt'&&!error.validationCode?'CRYPTO_FAIL':(stage==='parse'||stage==='envelope'?'MALFORMED_CIPHERTEXT':'CHYBA');
-    const row=Object.assign({file:name,status:'CHYBA',error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',earned:0,total:0,pct:0,grade:'?',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
-    if(failureStatus!=='CHYBA'){row.status=failureStatus;delete row.earned;delete row.total;delete row.pct;delete row.grade;}
+    const row=Object.assign({file:name,status:failureStatus,error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
     RESULTS.push(row);return {classification:'invalid-current',error:message,code,row};
   }
 }
@@ -156,7 +155,7 @@ function parseFormsCsvText(text){
   const testIdIndex=hnorm.findIndex(h=>h==='test id'||h==='id testu'),testNameIndex=hnorm.findIndex(h=>h==='test name'||h==='nazev testu'),groupIndex=hnorm.findIndex(h=>['group','class','skupina','trida','trida skupina'].includes(h));
   return {headers,data,delimiter:best.delimiter,delimiterLabel:best.delimiterLabel,identityIndex,timestampIndex,testIdIndex,testNameIndex,groupIndex};
 }
-function formsPushRowError(rowNo,message,meta){RESULTS.push(Object.assign({file:'forms_radek_'+rowNo+'.txt',status:'CHYBA',error:String(message||'Neplatný řádek CSV.'),validationCodes:['csv.row'],student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:''},verifierSourceMeta(meta)));}
+function formsPushRowError(rowNo,message,meta){RESULTS.push(Object.assign({file:'forms_radek_'+rowNo+'.txt',status:'CHYBA',error:String(message||'Neplatný řádek CSV.'),validationCodes:['csv.row'],student:'?',rawTxt:''},verifierSourceMeta(meta)));}
 function setFormsProgress(done,total){const box=$('formsImportProgress');if(box)box.textContent=total?'Zpracování CSV: '+done+' / '+total+' ('+Math.round(done/Math.max(1,total)*100)+' %)':'';}
 let FORMS_CSV_BATCHES=[],FORMS_IMPORT_CHAIN=Promise.resolve(),FORMS_BATCH_SEQUENCE=0;
 function formsMetaFor(parsed,row,rowNo,batch){return {source:'google-forms-csv',fullYearCsv:true,formIdentity:row[parsed.identityIndex].trim(),formTimestamp:row[parsed.timestampIndex].trim(),formRow:rowNo,formFile:batch.fileName,formBatchId:batch.id,formTestId:parsed.testIdIndex>=0?row[parsed.testIdIndex].trim():'',formTestName:parsed.testNameIndex>=0?row[parsed.testNameIndex].trim():'',formGroup:parsed.groupIndex>=0?row[parsed.groupIndex].trim():''};}
