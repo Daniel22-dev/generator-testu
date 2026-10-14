@@ -78,10 +78,6 @@ jobs:
             qa-results/s61-identity-quarantine-browser/evidence.json
             qa-results/s61-identity-quarantine-browser/*.png
             qa-results/s61-ci-wiring.json
-            qa-results/s62-diagnostic-remediation-source.json
-            qa-results/s62-diagnostic-remediation-browser/evidence.json
-            qa-results/s62-diagnostic-remediation-browser/*.png
-            qa-results/s62-ci-wiring.json
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json
