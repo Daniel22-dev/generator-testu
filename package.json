@@ -36,7 +36,7 @@
     "test:reporter": "node scripts/test-error-reporter.mjs",
     "build:school-server": "npm run build && node scripts/build-school-profile.mjs && npm run garp25:vendored",
     "verify:platform": "node scripts/ghrab-platform-conformance.mjs",
-    "postbuild": "node scripts/ghrab-platform-conformance.mjs",
+    "postbuild": "node scripts/ghrab-platform-conformance.mjs && npm run check:s83-quality-optimization",
     "qa:platform": "node scripts/ghrab-platform-conformance.mjs",
     "test:p2": "npm run build && npm run qa:platform",
     "qa:quality": "node scripts/qa-p3-quality.mjs",
@@ -197,7 +197,11 @@
     "check:s7-teacher-workflow-browser": "node scripts/check-s7-teacher-workflow-browser.mjs",
     "check:s7-traceability": "node scripts/check-s7-traceability.mjs",
     "check:s7-ci-wiring": "node scripts/check-s7-ci-wiring.mjs",
-    "check:s8-certification-contract": "node scripts/check-s8-certification-contract.mjs"
+    "check:s8-certification-contract": "node scripts/check-s8-certification-contract.mjs",
+    "check:s83-quality-optimization": "node scripts/check-s83-quality-optimization.mjs",
+    "check:s83-quality-browser": "node scripts/check-s83-quality-browser.mjs",
+    "preqa:p5": "npm run build && npm run check:s83-quality-browser",
+    "preqa:p5:ci": "npm run build && npm run check:s83-quality-browser"
   },
   "engines": {
     "node": ">=18"

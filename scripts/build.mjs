@@ -20,6 +20,9 @@ const CORE_DIR = path.resolve('vendor', `ghrab-ai-core-${CORE_VERSION}`);
 const CORE_FILE = `ghrab-ai-core-${CORE_VERSION}.js`;
 const CORE_MANIFEST = `ghrab-ai-core-manifest-${CORE_VERSION}.json`;
 const EXPECTED_AI_OPERATIONS = 12;
+const ASSISTANT_FEATURE_FILE = 'generator-assistant.js';
+const ASSISTANT_SECTION_START = '/* Generator Assistant — lokální poradce ke generátoru (KB + UI + volitelné AI). */';
+const ASSISTANT_SECTION_END = '/* konec Generator Assistant */';
 // Staré názvy modulů zůstávají v repozitáři jen jako náhrobky pro nahrávání přes GitHub web.
 const MIGRATION_TOMBSTONES = new Set(['13-secure-export.js', '14-test-html-builders.js']);
 
@@ -90,6 +93,33 @@ function compactJsWhitespace(source, file) {
   const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType:'script',allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
   try{if(semantic(clean)!==semantic(out))fail('JS compaction changed AST: '+file);}catch(e){fail('JS compaction invalid: '+file+' '+e.message);}
   return out;
+}
+
+function splitGeneratorAssistant(source, file) {
+  const start = source.indexOf(ASSISTANT_SECTION_START);
+  const end = source.indexOf(ASSISTANT_SECTION_END);
+  if (start < 0 || end < start || source.indexOf(ASSISTANT_SECTION_START, start + 1) !== -1 || source.indexOf(ASSISTANT_SECTION_END, end + 1) !== -1) {
+    fail(`nelze jednoznačně oddělit Generator Assistant z ${file}`);
+  }
+  const sectionEnd = end + ASSISTANT_SECTION_END.length;
+  const feature = source.slice(start, sectionEnd) + `
+;(function registerGeneratorAssistantFeature(){
+  window.GHRABGeneratorFeatures=window.GHRABGeneratorFeatures||{};
+  window.GHRABGeneratorFeatures.generatorAssistant={open:window.openGeneratorAssistant,verify:window.verifyGeneratorAssistantKB};
+})();`;
+  const loader = `// Generator Assistant is loaded only after the teacher explicitly opens it.
+function loadGeneratorAssistantFeature(){
+  return ghrabGeneratorFeatureLoader('generatorAssistant','./features/${ASSISTANT_FEATURE_FILE}');
+}
+function openGeneratorAssistant(){
+  return loadGeneratorAssistantFeature().then(function(api){return api.open();}).catch(function(error){
+    try{uiAlert('Poradce se nepodařilo načíst: '+error.message,'Poradce ke generátoru');}catch(_){}
+    throw error;
+  });
+}
+function verifyGeneratorAssistantKB(){return loadGeneratorAssistantFeature().then(function(api){return api.verify();});}
+if(typeof window!=='undefined'){window.verifyGeneratorAssistantKB=verifyGeneratorAssistantKB;window.openGeneratorAssistant=openGeneratorAssistant;}`;
+  return { main: source.slice(0, start) + loader + source.slice(sectionEnd), feature };
 }
 
 // Odstraní CSS komentáře mimo řetězce.
@@ -242,7 +272,16 @@ const jsFiles = fs.readdirSync(jsDir)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 const mainParts = jsFiles.filter(f => !f.startsWith('50-') && !f.startsWith('60-'));
 
-const inlineScriptTag = file => `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(fs.readFileSync(path.join(jsDir, file), 'utf8'), file)}\n</script>`;
+let assistantFeatureSource = '';
+const inlineScriptTag = file => {
+  let source = fs.readFileSync(path.join(jsDir, file), 'utf8');
+  if (file === '01-core.js') {
+    const split = splitGeneratorAssistant(source, file);
+    source = split.main;
+    assistantFeatureSource = split.feature;
+  }
+  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(source, file)}\n</script>`;
+};
 const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
 const jsCsTag = inlineScriptTag('50-cs-module.js');
@@ -265,8 +304,18 @@ for (const file of (function walk(dir){return fs.readdirSync(dir,{withFileTypes:
   try { fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file,'utf8')))+'\n'); } catch {}
 }
 copyDir(path.resolve('src', 'features'), path.join(DIST_DIR, 'features'));
+if (!assistantFeatureSource) fail('Generator Assistant lazy feature nebyla vytvořena');
+fs.writeFileSync(
+  path.join(DIST_DIR, 'features', ASSISTANT_FEATURE_FILE),
+  compactJsWhitespace(assistantFeatureSource, `features/${ASSISTANT_FEATURE_FILE}`),
+  'utf8'
+);
 fs.mkdirSync(path.join(DIST_DIR, 'vendor'), { recursive: true });
-fs.copyFileSync(ACORN_BROWSER, path.join(DIST_DIR,'vendor','acorn.js'));
+fs.writeFileSync(
+  path.join(DIST_DIR, 'vendor', 'acorn.js'),
+  compactJsWhitespace(fs.readFileSync(ACORN_BROWSER, 'utf8'), 'vendor/acorn.js'),
+  'utf8'
+);
 fs.copyFileSync(ACORN_LICENSE, path.join(DIST_DIR, 'vendor', 'acorn-LICENSE.txt'));
 
 // ── Výstupní kontroly ───────────────────────────────────────────────────────
@@ -294,7 +343,7 @@ if (fs.existsSync(template)) {
   fs.writeFileSync(path.join(DIST_DIR, 'studio-manifest.json'), text);
 }
 
-console.log(`✅ Generátor ${appVersion}: Core ${CORE_VERSION} SHA-256 OK · ${operations.operations.length} operací · ${mainParts.length + 2} initial modulů + 2 lazy features · ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
+console.log(`✅ Generátor ${appVersion}: Core ${CORE_VERSION} SHA-256 OK · ${operations.operations.length} operací · ${mainParts.length + 2} initial modulů + 3 lazy features · ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
 
 // P2: canonical cross-application platform post-processing.
 await import("./apply-ghrab-platform.mjs");
