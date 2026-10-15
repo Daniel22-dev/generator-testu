@@ -3,6 +3,14 @@ import {spawnSync} from 'node:child_process';
 import {setTimeout as sleep} from 'node:timers/promises';
 
 const exited=child=>!child||child.exitCode!==null||child.signalCode!==null;
+function processExists(pid){
+  if(!Number.isInteger(pid)||pid<=0)return false;
+  if(process.platform==='win32'){
+    const result=spawnSync('tasklist.exe',['/fi',`PID eq ${pid}`,'/fo','csv','/nh'],{encoding:'utf8',windowsHide:true});
+    return result.status===0&&new RegExp(`"${pid}"`).test(result.stdout||'');
+  }
+  try{process.kill(pid,0);return true;}catch{return false;}
+}
 async function waitForExit(child,timeoutMs){
   if(exited(child))return true;
   await Promise.race([new Promise(resolve=>{child.once('exit',resolve);child.once('error',resolve);}),sleep(timeoutMs)]);
@@ -18,7 +26,7 @@ export async function stopBrowserProcess(child){
   if(process.platform==='win32')spawnSync('taskkill.exe',['/pid',String(child.pid),'/t','/f'],{stdio:'ignore',windowsHide:true});
   else try{process.kill(-child.pid,'SIGKILL');}catch{}
   await waitForExit(child,3000);
-  if(!exited(child))throw new Error('Chromium process tree did not terminate');
+  if(!exited(child)&&processExists(child.pid))throw new Error('Chromium process tree did not terminate');
 }
 export async function closeHttpServer(server){
   if(!server||!server.listening)return;
