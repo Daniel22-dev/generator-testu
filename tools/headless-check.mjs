@@ -7,6 +7,8 @@ import * as acorn from 'acorn';
 
 const target = process.argv[2] || 'dist/index.html';
 const protectedHtml = fs.readFileSync(target, 'utf8');
+const deploymentConfigPath = path.join(path.dirname(target), 'access', 'deployment-config.js');
+const deploymentConfigSource = fs.readFileSync(deploymentConfigPath, 'utf8');
 function executableHtml(html = protectedHtml){
   return html
     .replace(/<script type="module" data-ghrab-access-bootstrap>[\s\S]*?<\/script>/, '')
@@ -40,7 +42,8 @@ const checkAsync = async (name, fn) => { try { const v=await fn(); console.log('
 console.log('=== headless-check:', target, '===');
 check('veřejný build je fail-closed', () => {
   if (!/data-ghrab-access="checking"/.test(protectedHtml)) throw new Error('chybí checking stav');
-  if (!/app-guard\.js/.test(protectedHtml) || !/protectApp\(APP_ID/.test(protectedHtml)) throw new Error('chybí centrální guard');
+  if (!/import\(urls\.guardUrl\)/.test(protectedHtml) || !/protectApp\(APP_ID/.test(protectedHtml)) throw new Error('bootstrap nevolá centrální guard z ověřené deployment konfigurace');
+  if (!/guardUrl:\s*new URL\(["']access\/app-guard\.js["'],\s*studioBaseUrl\)\.href/.test(deploymentConfigSource)) throw new Error('deployment konfigurace nemapuje guardUrl na centrální app-guard.js');
   const protectedCount=(protectedHtml.match(/application\/ghrab-protected/g)||[]).length;
   if(protectedCount<27) throw new Error('jen '+protectedCount+' chráněných modulů');
   return protectedCount+' inertních modulů';
