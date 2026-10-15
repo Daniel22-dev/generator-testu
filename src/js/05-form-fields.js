@@ -1181,6 +1181,13 @@ function toggleExDetail() {
 
 function updateExField(i, field, value) {
   if (!state.exerciseConfig[i]) return;
+  // Při změně typu nesmí default číst zastaralý počet z právě měněného řádku.
+  // Ostatní Reading/Listening řádky však zůstávají legitimním zdrojem synchronizace.
+  const typeDefaultState = field === 'typ' ? {
+    ...state,
+    exerciseConfig: state.exerciseConfig.map((ex, index) => index === i ? {...ex, typ: ''} : ex)
+  } : state;
+  const typeDefaultCount = field === 'typ' ? defaultItemCount(value, typeDefaultState) : null;
   if(field==='body'){
     const points=strictIntegerValue(value);
     if(points===null||points<1||points>999){renderExerciseConfig();validate();return false;}
@@ -1198,7 +1205,7 @@ function updateExField(i, field, value) {
   }
   if (field === 'typ') {
     state.exerciseConfig[i].manualMode = false;
-    state.exerciseConfig[i].pocetOtazek = defaultItemCount(value);
+    state.exerciseConfig[i].pocetOtazek = typeDefaultCount;
     state.typyCviceni = uniqueExerciseTypes(state.exerciseConfig.map(ex => ex.typ));
     renderSmartTimeTip();
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;

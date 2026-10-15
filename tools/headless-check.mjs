@@ -303,7 +303,9 @@ await checkAsync('stage3 verifier: Google Forms CSV importuje, dešifruje a hlá
     if(summary.duplicates.exact!==1||summary.duplicates.conflicts!==0) throw new Error('duplicity nebyly zachyceny');
     if(results.length!==4||results[0].status!=='OK'||results[0].earned!==1||results[0].formIdentity!=='student@example.invalid'||results[0].submissionSource!=='google-forms-csv') throw new Error('validní řádek se neověřil');
     if(!results[1].exactDuplicate) throw new Error('identická duplicita nebyla označena');
-    if(results.slice(2).some(r=>r.status!=='CHYBA')) throw new Error('odmítnuté řádky musí zůstat v diagnostice');
+    const rejected=results.slice(2),rejectedStatuses=new Set(['CHYBA','MALFORMED_CIPHERTEXT','CRYPTO_FAIL','DECRYPTED_INVALID_IDENTITY']);
+    if(rejected.some(r=>!rejectedStatuses.has(r.status))) throw new Error('odmítnuté řádky musí zůstat v diagnostice');
+    if(rejected.some(r=>['earned','total','pct','grade'].some(key=>Object.prototype.hasOwnProperty.call(r,key)))) throw new Error('odmítnuté řádky nesmí vytvářet falešné skóre');
     /* 7.1.97: new CSV language = new session; settings changes re-evaluate loaded CSV instead of clearing it */tw.clearVerifierResults();await tw.setFormsAnchorPolicy({schoolDomain:'example.invalid',publishedAt:'2026-09-15T17:00:00Z',csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true});
     const semi='Timestamp;Email Address;Result\n'+[q('x'),q('student-two'),q(stage3Fixture.answerTxt)].join(';')+'\n';
     const p2=tw.parseFormsCsvText(semi);

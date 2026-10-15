@@ -79,6 +79,13 @@ async function createGeneratedDom(generatedHtml) {
   await new Promise(r => setTimeout(r, 80));
   return { window: generated.window, close: () => generated.window.close() };
 }
+function installControlledFullscreen(x){
+  const doc=x.document,el=doc.documentElement;
+  let active=null;
+  Object.defineProperty(doc,'fullscreenElement',{configurable:true,get:()=>active});
+  el.requestFullscreen=async()=>{active=el;doc.dispatchEvent(new x.Event('fullscreenchange'));};
+  doc.exitFullscreen=async()=>{active=null;doc.dispatchEvent(new x.Event('fullscreenchange'));};
+}
 // WORKFLOW-CHECKS-BEGIN
 let failed = 0, passed = 0;
 function ok(name, fn){
@@ -737,11 +744,15 @@ await okAsync('secure tabs: submit až na konci a strict odchod zamkne test', as
   assert(pkg&&pkg.mode==='secureOffline','nevznikl secure balík');
   const gd=await createGeneratedDom(pkg.studentHtml);
   try{
+    installControlledFullscreen(gd.window);
+    const submit=gd.window.document.getElementById('secureSubmitCard');
+    assert(submit&&submit.classList.contains('hidden'),'secure submit není před spuštěním fail-closed');
     gd.window.document.getElementById('studentName').value='Student';
     if(gd.window.document.getElementById('startCode'))gd.window.document.getElementById('startCode').value=pkg.startCode;
     await gd.window.startTest();
+    await gd.window.startStrictFullscreen();
+    assert(!gd.window.document.getElementById('test').classList.contains('hidden'),'přísný test se po fullscreen potvrzení nespustil');
     assert(!gd.window.document.getElementById('teacherModal')&&typeof gd.window.teacherLogin==='undefined','secure student přenáší učitelský mód');
-    const submit=gd.window.document.getElementById('secureSubmitCard');
     assert(submit&&submit.classList.contains('hidden'),'secure submit je vidět už u prvního cvičení');
     gd.window.switchExercise(1);
     assert(!submit.classList.contains('hidden'),'secure submit se nezobrazil u posledního cvičení');

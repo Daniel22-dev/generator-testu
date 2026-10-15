@@ -36,14 +36,12 @@ function buildSecureStudentHtml(publicCfg, encryptedContent) {
     '<label for="startCode">'+H(S.contentCodeLabel)+'</label><input id="startCode" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-describedby="startCodeHint"><div id="startCodeHint" class="small muted">'+H(S.contentCodeHint)+'</div>'+
     '<label for="studentName">'+(publicCfg.identityMode==='oneTimeCode'?H(S.individualCode):H(S.studentName))+'</label><input id="studentName" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="'+(publicCfg.identityMode==='oneTimeCode'?H(S.codePlaceholder):'')+'">'+strictStartControls+
     '</section>'+
-    '<section id="test" class="hidden"><div class="bar"><b>'+H(publicCfg.nazev)+'</b><span id="timer">--:--</span></div><div id="a11yNote" class="a11y-note hidden"></div><div id="jokerWatermark" class="joker-watermark hidden"></div><div class="wrap"><div id="exerciseArea"></div><div class="card" id="secureSubmitCard"><div id="submitError" class="danger hidden"></div><button onclick="requestSecureSubmit()">'+H(submitSecureText)+'</button></div></div></section>'+
+    '<section id="test" class="hidden"><div class="bar"><b>'+H(publicCfg.nazev)+'</b><span id="timer">--:--</span></div><div id="a11yNote" class="a11y-note hidden"></div><div id="jokerWatermark" class="joker-watermark hidden"></div><div class="wrap"><div id="exerciseArea"></div><div class="card hidden" id="secureSubmitCard"><div id="submitError" class="danger hidden"></div><button onclick="requestSecureSubmit()">'+H(submitSecureText)+'</button></div></div></section>'+
     '<section id="done" class="card hidden"><h1>'+H(S.done)+'</h1><div class="ok">'+H(doneText)+'</div><div id="jokerDoneBox" class="joker-result hidden"></div>'+formsBox+'<details id="answersFallback" class="archive-note"'+fallbackOpen+'><summary><b>'+H(formsEnabled ? (S.fallbackTitle || S.download) : S.download)+'</b></summary><div class="small muted" style="margin:8px 0">'+H(formsEnabled ? (S.fallbackHint || '') : '')+'</div><div class="row"><button onclick="downloadAnswers()">'+H(S.download)+'</button><button class="secondary" onclick="shareAnswers()">'+H(S.share)+'</button><button class="ghost" onclick="copyAnswers()">'+H(S.copyBackup)+'</button></div><textarea id="answerBackup" class="backup" readonly></textarea></details></section>'+
     '<div id="lockScreen" class="lockscreen hidden"><div class="lockbox"><h1 id="lockIcon" onclick="lockTap()" style="cursor:pointer;user-select:none;-webkit-user-select:none">🔒</h1><p><b>'+H(S.locked)+'</b></p><p id="lockContactMsg">'+H(S.lockContact||'Kontaktuj učitele.')+'</p><div id="unlockReveal" class="hidden"><p>'+H(S.lockedStrict)+'</p><div class="danger" id="lockReasonBox"></div><input id="unlockInp" type="password" aria-label="'+H(S.unlockPh)+'" placeholder="'+H(S.unlockPh)+'" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="row"><button onclick="tryUnlock()">'+H(S.unlock)+'</button></div></div><div id="strictRecoveryFullscreen" class="hidden"><p id="strictRecoveryStatus">'+H(S.strictRecoveryFullscreenHint||'Recovery was accepted. Re-enter fullscreen to continue.')+'</p><button type="button" onclick="startStrictRecoveryFullscreen()">'+H(S.strictRecoveryFullscreen||'Return to fullscreen and continue')+'</button></div></div></div>'+
     '</div>'+
     '<script>\n\'use strict\';\nconst CFG='+safeJsonForScript(publicCfg)+';\nconst STUDENT_VARIANTS={};\nconst ENCRYPTED_CONTENT='+safeJsonForScript(encryptedContent)+';\n'+[contentBytes,contentKey,contentBinding,decryptStudentContent].map(f=>f.toString()).join('\n')+'\n'+isolatedSecureStudentScript()+'\n<\/script></body></html>';
 }
-// Deterministické pořadí otázek při randomizaci — stejný kód běží ve studentském testu i ve verifieru
-// (verifier z attemptId/startedAt/groupKey dopočítá číslo, které student viděl).
 const SECURE_QUESTION_ORDER_JS=String.raw`
 function seedHash(str){let h=2166136261;str=String(str||'');for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 function seededRandom(seed){let x=seed>>>0;return function(){x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
@@ -75,9 +73,6 @@ function jokerText(){return (t('jokerReport','ŽOLÍK POUŽIT'))+' · '+(current
 function updateJokerUi(){var wm=$('jokerWatermark');if(wm){wm.textContent=jokerText();wm.classList.toggle('hidden',!JOKER_USED);}var db=$('jokerDoneBox');if(db){db.textContent='🃏 '+jokerText();db.classList.toggle('hidden',!JOKER_USED);}document.body.classList.toggle('joker-mode',!!JOKER_USED);}
 
 function detectDevice(){const ua=navigator.userAgent||'';if(/iPad|iPhone|iPod|Macintosh/.test(ua)&&navigator.maxTouchPoints>1)return 'apple';if(/Android/i.test(ua))return 'android';if(/Windows|Macintosh|Linux|CrOS/i.test(ua))return 'desktop';return 'auto';}
-// Rozpozná nespolehlivé prostředí: lokální HTML soubor, content://, náhled souboru
-// nebo vestavěný WebView (Gmail, Teams, Documents, Drive, Facebook…). Ostrý test má běžet
-// jako webová stránka z HTTPS odkazu v Safari/Chrome, ne jako stažený HTML soubor.
 function envInfo(){
   try{
     var ua=navigator.userAgent||'';
@@ -112,8 +107,6 @@ function shuffleOptionButtons(box, seed){if(!box)return;const nodes=[...box.chil
 function shuffleSelectOptions(sel, seed){if(!sel)return;const first=sel.querySelector('option[value=""]');const opts=[...sel.querySelectorAll('option')].filter(o=>o!==first);if(opts.length<2)return;opts.forEach((n,i)=>{if(!n.hasAttribute('data-shuffle-order'))n.setAttribute('data-shuffle-order',String(i));});opts.sort((a,b)=>Number(a.getAttribute('data-shuffle-order'))-Number(b.getAttribute('data-shuffle-order')));const rnd=seededRandom(seed);for(let i=opts.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}if(first)sel.appendChild(first);opts.forEach(o=>sel.appendChild(o));}
 function applyRuntimeRandomization(){
   if(!CFG.randomizace)return;
-  // Seed z ID pokusu, varianty a času startu: po obnovení stránky stejné pořadí (nezávisle na zápisu jména)
-  // a verifier ho deterministicky dopočítá (questionOrderFor = tentýž Fisher–Yates nad původním pořadím).
   const base=questionOrderBase(CFG.testId,currentAttemptId(),ACTIVE_KEY,STARTED_AT);
   document.querySelectorAll('.ex-panel .card, #exerciseArea > .card').forEach((card,ei)=>{
     shuffleElementChildren(card,'.q',questionOrderSeed(base,ei));
@@ -122,12 +115,8 @@ function applyRuntimeRandomization(){
       if(label)label.textContent=t('question','Question')+' '+(index+1);
       node.dataset.displayNumber=String(index+1);
     });
-    // Míchání otázek je přesouvá appendem na konec karty. navrow (Další/Předchozí) je
-    // přímým dítětem karty hned za otázkami, takže by skončil NAD nimi → tlačítka by
-    // vyskočila pod nadpis. Po zamíchání proto navrow vrátíme na konec, aby zůstal dole.
     const nav=card.querySelector(':scope > .navrow'); if(nav) card.appendChild(nav);
   });
-  // Tokeny věty u error-tagging se NEmíchají: pořadí slov je součástí zadání (duplicitní slova by nešla rozlišit).
   document.querySelectorAll('.opts:not(.et-list)').forEach((box,i)=>shuffleOptionButtons(box,base+i*307));
   document.querySelectorAll('select').forEach((sel,i)=>shuffleSelectOptions(sel,base+i*401));
 }

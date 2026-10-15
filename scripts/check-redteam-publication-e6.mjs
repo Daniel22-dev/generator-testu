@@ -24,9 +24,33 @@ try {
   await group('all-21-exercise-types',async()=>{
     const types='multiple choice|reading comprehension|listening comprehension|dialogue completion|true/false|matching|fill-in-the-blank|error correction|error-tagging|word order|translation|sentence transformation|word formation|categorization|cloze text|multi-select|ordering|categorisation-board|table-completion|transformation-chain|highlight-evidence'.split('|');
     const marker='E6_PRIVATE_SYNTHETIC_CANARY';
-    const items=(type,index)=>({question:'Q',prompt:'Prompt',sentence:'A ___ sentence',statement:'Statement',options:['A','B'],correct:type==='true/false'?true:(type==='multi-select'?[0]:0),answer:marker,answers:[marker],alt_answers:type==='cloze text'?[[marker]]:[marker],correct_order:[1,0],correct_category:'X',correct_sentence:marker,model_answer:marker,right:'Right '+index,transcript:marker,explanation:marker,error_token_index:1,error_type:'verb',correction:marker,teacherConfig:{privateKey:marker},answer_hash:marker,shuffle_seed:marker,words:['two','one'],text:type==='listening comprehension'?marker:'Passage with ___',source:type==='listening comprehension'?marker:'Source',passage:type==='listening comprehension'?marker:'Passage',audio_url:marker,source_url:marker,left:'L',item:'item',categories:['X','Y'],items:['two','one'],entries:[{text:'entry one',category:'X',answer_hash:marker},{text:'entry two',category:'Y',answer_hash:marker}],tokens:['A','token'],error_type_options:['verb','noun'],columns:['one','two'],rows:[['fixed',{answer:marker,secret:marker}]],base_sentence:'Base',transformations:[{instruction:'Transform',answer:marker,privateKey:marker}],sentences:['first','second']});
+    const privateFields=()=>({teacherConfig:{privateKey:marker},answer_hash:marker,shuffle_seed:marker,explanation:marker});
+    const item=(type,index)=>{
+      const stem='Synthetic '+type+' task '+(index+1),privateData=privateFields();
+      if(type==='multiple choice'||type==='reading comprehension')return {...privateData,question:stem,options:['Visible option A '+index,'Visible option B '+index],correct:0};
+      if(type==='listening comprehension')return {...privateData,question:stem,options:['Heard option A '+index,'Heard option B '+index],correct:0,transcript:marker};
+      if(type==='dialogue completion')return {...privateData,dialogue:stem,options:['Reply A '+index,'Reply B '+index],correct:0};
+      if(type==='true/false')return {...privateData,statement:stem,correct:true};
+      if(type==='matching')return {...privateData,left:'Left '+(index+1),right:'Right '+(index+1)};
+      if(type==='fill-in-the-blank')return {...privateData,sentence:stem+' ___',answer:marker,alt_answers:[marker+' ALT']};
+      if(type==='error correction')return {...privateData,sentence:stem+' contains an error.',correction:marker};
+      if(type==='error-tagging')return {...privateData,sentence:stem+' token.',tokens:['Synthetic','token'],error_token_index:1,error_type_options:['verb','noun'],error_type:'verb',correction:marker};
+      if(type==='word order')return {...privateData,prompt:stem,words:['visible-'+index+'-two','visible-'+index+'-one'],correct_sentence:marker};
+      if(type==='translation')return {...privateData,prompt:stem,answer:marker};
+      if(type==='sentence transformation')return {...privateData,prompt:stem,answer:marker};
+      if(type==='word formation')return {...privateData,sentence:stem+' (BASE)',answer:marker};
+      if(type==='categorization')return {...privateData,text:stem,categories:['Category X','Category Y'],correct_category:'Category X'};
+      if(type==='cloze text')return {...privateData,text:stem+' ___',answers:[marker],alt_answers:[[marker+' ALT']]};
+      if(type==='multi-select')return {...privateData,question:stem,options:['Visible A '+index,'Visible B '+index],correct:[0]};
+      if(type==='ordering')return {...privateData,question:stem,items:['Step B '+index,'Step A '+index],correct_order:[1,0]};
+      if(type==='categorisation-board')return {...privateData,question:stem,categories:['Category X','Category Y'],entries:[{text:'Entry X '+index,category:'Category X',answer_hash:marker},{text:'Entry Y '+index,category:'Category Y',answer_hash:marker}]};
+      if(type==='table-completion')return {...privateData,question:stem,columns:['Fixed','Input'],rows:[['Visible '+index,{answer:marker,secret:marker}]]};
+      if(type==='transformation-chain')return {...privateData,base_sentence:stem,transformations:[{instruction:'Transform '+index,answer:marker,privateKey:marker}]};
+      if(type==='highlight-evidence')return {...privateData,question:stem,sentences:['Evidence A '+index,'Evidence B '+index],correct:0};
+      throw new Error('Unsupported synthetic E6 type: '+type);
+    };
     const counts=type=>type==='matching'?2:1;
-    const gen={exercises:types.map(type=>({title:type,type,points_total:counts(type),points_each:1,teacherConfig:marker,items:Array.from({length:counts(type)},(_,i)=>items(type,i))}))};
+    const gen={exercises:types.map((type,typeIndex)=>({title:'Synthetic '+type,type,points_total:counts(type),points_each:1,teacherConfig:marker,...(type==='reading comprehension'?{passage:'Shared visible reading passage '+typeIndex+'. It contains unique context for its own questions.'}:{}),items:Array.from({length:counts(type)},(_,i)=>item(type,i))}))};
     const fixtureState={...w.eval('state'),exerciseDetail:true,exerciseConfig:types.map(typ=>({typ,pocetOtazek:counts(typ),body:counts(typ)}))};
     const result=await w.assembleTestHtml(fixtureState,gen);
     assert.equal(result.studentHtml.includes(marker),false,'all nested private canaries must be removed');
@@ -78,7 +102,16 @@ try {
       const p=path.join(out,name);fs.writeFileSync(p,name==='teacher.html'?pkg.teacherHtml:'synthetic');
       assert.equal(scanPublicationDirectory(out).status,'FAIL',name);fs.unlinkSync(p);
     }
-    fs.symlinkSync(teacher,path.join(out,'other.html'));assert.equal(scanPublicationDirectory(out).status,'FAIL');fs.unlinkSync(path.join(out,'other.html'));
+    // Windows without Developer Mode cannot create file symlinks. A directory
+    // junction exercises the same publication invariant (no followed links)
+    // without weakening or skipping the negative case.
+    const linkPath=path.join(out,process.platform==='win32'?'linked-private':'other.html');
+    if(process.platform==='win32'){
+      const privateDir=path.join(temp,'private-link-target');fs.mkdirSync(privateDir);fs.copyFileSync(teacher,path.join(privateDir,'PRIVATE.html'));
+      fs.symlinkSync(privateDir,linkPath,'junction');
+    }else fs.symlinkSync(teacher,linkPath);
+    assert.equal(fs.lstatSync(linkPath).isSymbolicLink(),true,'fixture must be an actual filesystem link');
+    assert.equal(scanPublicationDirectory(out).status,'FAIL');fs.rmSync(linkPath,{recursive:true,force:true});
     fs.appendFileSync(path.join(out,'index.html'),'<!-- mutation -->');assert.equal(scanPublicationDirectory(out).status,'FAIL');
     fs.writeFileSync(path.join(out,'index.html'),pkg.teacherHtml);assert.equal(scanPublicationDirectory(out).status,'FAIL','teacher renamed index');
     const bad=path.join(temp,'bad.html');fs.writeFileSync(bad,pkg.teacherHtml);assert.throws(()=>preparePublication(bad,teacher,path.join(temp,'no-output')),/preflight/);assert.equal(fs.existsSync(path.join(temp,'no-output')),false);

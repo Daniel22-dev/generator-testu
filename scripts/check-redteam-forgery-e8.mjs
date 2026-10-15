@@ -26,9 +26,10 @@ async function check(f,c,ctx){
   reset(f);if(ctx.missingPolicy)f.v.eval('FORMS_ANCHOR_POLICY=null;');
   const v=f.v,a=await v.verifyText('synthetic-'+c.id+'.txt',ctx.txt,ctx.source);
   if(c.expect==='REJECTED'){
-    assert.equal(a.classification,'invalid-current',c.id);assert.equal(a.code,c.code,c.id);
-    assert.equal(a.row.status,'CHYBA');assert.equal(a.row.total,0,'reject before private scoring');assert.equal(v.effectiveResults().length,0);
-    assert.equal(v.resultTrust(a.row).scoreSource,'NOT_SCORED');assert.equal(v.classificationStatus(a.row),'REJECTED');
+    const quarantine=v.invalidIdentityValidation(c.code);
+    assert.equal(a.classification,quarantine?'diagnostic-quarantine':'invalid-current',c.id);assert.equal(a.code,c.code,c.id);
+    if(quarantine)assert.equal(a.row.status,'DECRYPTED_INVALID_IDENTITY');else assert.ok(['CHYBA','MALFORMED_CIPHERTEXT','CRYPTO_FAIL'].includes(a.row.status),c.id+' has explicit rejected status');for(const key of ['earned','total','pct','grade'])assert.equal(Object.hasOwn(a.row,key),false,c.id+' must not create '+key);assert.equal(v.effectiveResults().length,0);
+    assert.equal(v.resultTrust(a.row).scoreSource,'NOT_SCORED');assert.equal(v.classificationStatus(a.row),quarantine?'DIAGNOSTIC_QUARANTINE':'REJECTED');
   }else if(c.expect==='METADATA_WARNING'){
     assert.equal(a.classification,'current',c.id);assert.equal(a.row.status,'OK');assert.equal(a.row.total,5);
     assert.ok(Array.isArray(a.row.metadataMismatch)&&a.row.metadataMismatch.length===1,c.id+' warning missing');
@@ -56,7 +57,7 @@ async function check(f,c,ctx){
     if(!diagnostic){assert.equal(trust.externalIdentity,'MATCHED_FORMS_ROSTER');assert.equal(trust.externalTimeWindow,'WITHIN_PUBLICATION_FORMS_WINDOW');}
     if(c.expect==='RESCORED')assert.equal(a.row.grade,v.gradeFor(c.pct),'client grade must be ignored');
   }
-  return {classification:a.classification,code:a.code||'',scored:a.row?.total||0,effective:v.effectiveResults().length};
+  return {classification:a.classification,code:a.code||'',scored:Object.hasOwn(a.row||{},'total'),effective:v.effectiveResults().length};
 }
 let fixtures;
 try{

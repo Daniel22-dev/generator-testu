@@ -14,7 +14,7 @@ try{
   function reset(p=policy){if(v.verifierReplayStorageKey){v.localStorage.removeItem(v.verifierReplayStorageKey());v.eval('VERIFIER_REPLAY_HISTORY=[];');}if(v.clearVerifierResults)v.clearVerifierResults();else v.eval('RESULTS=[];ATTEMPT_DECISIONS.clear();');/* since 7.1.97 a policy change re-evaluates instead of clearing */if(v.setFormsAnchorPolicy)v.setFormsAnchorPolicy(p);}
   async function text(payload=base){return 'SECURE-ANSWERS-V1\n'+JSON.stringify({testId:cfg.testId,manifestHash:cfg.manifestHash,payload:await x.encryptPayloadForTeacher(payload)});}
   async function submit(patch={},sm=source){return v.verifyText('e3-synthetic.txt',await text({...base,...patch}),sm);}
-  async function reject(patch,sm=source,code){reset();const result=await submit(patch,sm);if(result.classification==='diagnostic-quarantine'){assert.equal(result.row?.status,'DECRYPTED_INVALID_IDENTITY');assert.equal(result.row?.diagnosticQuarantine,true);for(const key of ['earned','total','pct','grade'])assert.equal(Object.hasOwn(result.row,key),false,'identity quarantine must not create '+key);}else{assert.equal(result.classification,'invalid-current');assert.equal(result.row?.status,'CHYBA');assert.equal(result.row?.total,0,'rejection must precede scoring');}assert.equal(v.effectiveResults().length,0);if(code)assert.equal(result.code,code);return result;}
+  async function reject(patch,sm=source,code){reset();const result=await submit(patch,sm);if(result.classification==='diagnostic-quarantine'){assert.equal(result.row?.status,'DECRYPTED_INVALID_IDENTITY');assert.equal(result.row?.diagnosticQuarantine,true);}else{assert.equal(result.classification,'invalid-current');assert.ok(['CHYBA','MALFORMED_CIPHERTEXT','CRYPTO_FAIL'].includes(result.row?.status));}for(const key of ['earned','total','pct','grade'])assert.equal(Object.hasOwn(result.row,key),false,'rejection must not create '+key);assert.equal(v.effectiveResults().length,0);if(code)assert.equal(result.code,code);return result;}
   async function group(id,fn){if(selected!=='all'&&selected!==id)return;reset();await fn();checks.push(id);console.log('PASS E3',id);}
   await group('forms-policy',async()=>{
     // Compare instants: the helper may emit UTC (Z) or an explicit Prague offset.
@@ -62,7 +62,7 @@ try{
     const p={...base,testId:acfg.testId,manifestHash:acfg.manifestHash,studentHtmlSha256:apkg.studentHtmlSha256,resp};
     const atxt=async data=>'SECURE-ANSWERS-V1\n'+JSON.stringify({testId:acfg.testId,manifestHash:acfg.manifestHash,payload:await ax.encryptPayloadForTeacher(data)});
     const good=await av.verifyText('all-answers.txt',await atxt(p),source);assert.equal(good.classification,'current');assert.equal(good.row.total,21);assert.equal(good.row.pct,100);
-    for(let i=0;i<cases.length;i++){const [t,,,bad]=cases[i],qid=i+(t==='matching'?'_match_':'_')+'0',invalid=await av.verifyText('invalid-answer.txt',await atxt({...p,resp:{...resp,[qid]:bad}}),source);assert.equal(invalid.row?.status,'CHYBA',t);assert.equal(invalid.row.total,0,t);}
+    for(let i=0;i<cases.length;i++){const [t,,,bad]=cases[i],qid=i+(t==='matching'?'_match_':'_')+'0',invalid=await av.verifyText('invalid-answer.txt',await atxt({...p,resp:{...resp,[qid]:bad}}),source);assert.equal(invalid.row?.status,'CHYBA',t);for(const key of ['earned','total','pct','grade'])assert.equal(Object.hasOwn(invalid.row,key),false,t+' must not create '+key);}
   });
   await group('identity',async()=>{
     await reject({}, {...source,formIdentity:'synthetic-b@example.invalid'},'anchors.identity-mismatch');
