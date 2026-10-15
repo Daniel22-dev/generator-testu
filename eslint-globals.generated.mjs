@@ -808,6 +808,7 @@ export const projectGlobals = {
   "secureStudentExtraCss": 'writable',
   "secureStudentScript": 'writable',
   "secureStudentThemeCss": 'writable',
+  "secureTeacherSafeConfig": 'writable',
   "secureTeacherScript": 'writable',
   "secureTeacherVerifierPdfRuntime": 'writable',
   "seedEmptyExerciseTypes": 'writable',
