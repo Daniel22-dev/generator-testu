@@ -206,6 +206,7 @@
     "qa:axe:required": "node scripts/required-axe-runner.mjs runtime",
     "qa:p5-release:required": "node scripts/required-axe-runner.mjs release",
     "check:s83-ci-portability": "node scripts/check-s83-ci-portability.mjs",
+    "check:s83-traceability": "node scripts/write-s83-traceability.mjs",
     "precheck:ci-orchestration": "npm run check:s83-ci-portability"
   },
   "engines": {
