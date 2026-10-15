@@ -47,8 +47,15 @@ function fixture(t) {
   write('package.json', JSON.stringify(pkg)); write('package-lock.json', JSON.stringify(lock));
   const gitConfig=path.join(temp,'git-global-config');fs.writeFileSync(gitConfig,'');
   const npmCli=path.join(temp,'synthetic-npm-cli.js');fs.writeFileSync(npmCli,`const a=process.argv.slice(2);if(a[0]==='--version'){console.log('10.9.2');process.exit(0)}if(a.join(' ')!=='ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org')process.exit(9);process.exit(Number(process.env.SYNTHETIC_NPM_EXIT||0));\n`);
+  // The production runner invokes the platform's npm command on POSIX.
+  // Scope the synthetic executable to this isolated test fixture only, not production CI.
+  if (process.platform !== 'win32') {
+    const quote = value => "'" + String(value).replace(/'/g, "'\\''") + "'";
+    fs.writeFileSync(path.join(temp, 'npm'), `#!/bin/sh\nexec ${quote(process.execPath)} ${quote(npmCli)} "$@"\n`, { mode: 0o700 });
+  }
   const env = { ...process.env, npm_execpath:npmCli, GIT_CONFIG_GLOBAL: gitConfig, GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 'Synthetic CI', GIT_COMMITTER_NAME: 'Synthetic CI',
     GIT_AUTHOR_EMAIL: 'ci@example.invalid', GIT_COMMITTER_EMAIL: 'ci@example.invalid' };
+  if (process.platform !== 'win32') env.PATH = `${temp}${path.delimiter}${env.PATH || ''}`;
   const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   git('init', '-q'); git('add', '.'); git('commit', '-qm', 'Synthetic test fixture, not a project change');
   const sha = git('rev-parse', 'HEAD');
