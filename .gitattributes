@@ -1,4 +1,4 @@
-* text=auto
+* text=auto eol=lf
 
 # Byte-pinned policies, contracts and executable test sources are canonical LF.
 # Git blobs already use LF; this prevents core.autocrlf from changing the bytes
