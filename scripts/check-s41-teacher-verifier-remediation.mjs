@@ -16,6 +16,7 @@ const dependencyFiles=[
   'src/js/13b-secure-shared-scoring.js','src/js/13ea-secure-verifier-forms.js','src/js/13eb-secure-teacher-verifier-v2-ui.js',
   'src/js/13ec-secure-verifier-trust.js','src/js/13ed-secure-verifier-validation.js','src/js/13ee-secure-verifier-anchors.js',
   'src/js/13ef-secure-verifier-replay.js','src/js/13eg-secure-verifier-history.js','src/js/13eh-secure-teacher-verifier-s4.js',
+  'src/js/13ez-secure-teacher-config.js',
   'src/js/13fa-secure-teacher-verifier-pdf.js',
 ];
 const context=vm.createContext({console,H:value=>String(value??''),secureCss:()=>'',auditCommentHtml:()=>'',safeJsonForScript:value=>JSON.stringify(value).replace(/</g,'\\u003c'),verifierLessonHtml:()=>'',verifierFormsStatusHtml:()=>'',verifierAnchorSettingsHtml:()=>''});
