@@ -201,7 +201,8 @@
     "check:s83-quality-optimization": "node scripts/check-s83-quality-optimization.mjs",
     "check:s83-quality-browser": "node scripts/check-s83-quality-browser.mjs",
     "preqa:p5": "npm run build && npm run check:s83-quality-browser",
-    "preqa:p5:ci": "npm run build && npm run check:s83-quality-browser"
+    "preqa:p5:ci": "npm run build && npm run check:s83-quality-browser",
+    "check:s83-ai-boundary-review": "node scripts/check-s83-ai-boundary-review.mjs"
   },
   "engines": {
     "node": ">=18"
