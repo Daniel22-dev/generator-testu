@@ -6,6 +6,7 @@ import vm from 'node:vm';
 const readNormalized = file => fs.readFileSync(file, 'utf8').replace(/\r\n?/g, '\n');
 const secure = readNormalized('src/js/13e-secure-student-runtime.js');
 const verifier = readNormalized('src/js/13f-secure-teacher-verifier.js');
+const verifierConfig = readNormalized('src/js/13ez-secure-teacher-config.js');
 const instant = readNormalized('src/js/14b-instant-test-runtime.js');
 let failed = 0; const pass = m => console.log('PASS ' + m); const fail = m => { failed++; console.error('FAIL ' + m); };
 const need = (c, m) => c ? pass(m) : fail(m);
@@ -21,7 +22,7 @@ need(/querySelectorAll\('\.opts:not\(\.et-list\)'\)/.test(secure), 'secure: toke
 need(/label\.textContent=String\(index\+1\)/.test(instant) && /querySelectorAll\('\.mc-opts:not\(\.et-list\)'\)/.test(instant), 'instant: přečíslování a nemíchání tokenů');
 need(/displayOrder\(ei,\(ex\.items\|\|\[\]\)\.length\)\.forEach/.test(instant), 'instant: zpětná vazba v pořadí studenta');
 need(/presentedQuestionNumbers\(payload,exs\)/.test(verifier) && /displayQ:pq\.map\[ei\]\[qi\]/.test(verifier), 'verifier: dopočítá číslo otázky u studenta');
-need(/randomizace:cfg\.randomizace===true\|\|cfg\.randomizace==='ANO'/.test(verifier), 'verifier CONFIG nese příznak randomizace');
+need(/randomizace:cfg\.randomizace===true\|\|cfg\.randomizace==='ANO'/.test(verifierConfig), 'verifier CONFIG nese příznak randomizace');
 const ctx = vm.createContext({}); vm.runInContext(body + ';globalThis.q=questionOrderFor;globalThis.b=questionOrderBase;globalThis.s=questionOrderSeed;', ctx);
 let okPerm = true, moved = 0;
 for (let n = 1; n <= 12; n++) for (let t = 0; t < 40; t++) {
