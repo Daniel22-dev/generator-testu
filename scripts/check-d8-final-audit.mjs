@@ -14,7 +14,7 @@ const files = {
   workflow: read('src/js/08a-output-workflow.js'),
   prompt: read('src/js/12-prompt-builder.js'),
   student: (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js')),
-  verifier: (read('src/js/13eg-secure-verifier-history.js')+'\n'+read('src/js/13eh-secure-teacher-verifier-s4.js')+'\n'+read('src/js/13f-secure-teacher-verifier.js')),
+  verifier: (read('src/js/13eg-secure-verifier-history.js')+'\n'+read('src/js/13eh-secure-teacher-verifier-s4.js')+'\n'+read('src/js/13ez-secure-teacher-config.js')+'\n'+read('src/js/13f-secure-teacher-verifier.js')),
   pdf: read('src/js/13fa-secure-teacher-verifier-pdf.js'),
   verifierUi: read('src/js/13eb-secure-teacher-verifier-v2-ui.js'),
   prodCheck: read('scripts/check-production-readiness.mjs'),
