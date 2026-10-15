@@ -13,6 +13,25 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const syncScript = path.join(ROOT, 'scripts/ci/sync-candidate.sh');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
+function commandPath(name) {
+  const locator=process.platform==='win32'?'where.exe':'which';
+  return execFileSync(locator,[name],{encoding:'utf8'}).split(/\r?\n/).map(x=>x.trim()).find(Boolean);
+}
+function gitShellPath(realGit) {
+  if(process.platform!=='win32')return commandPath('sh');
+  const configured=String(process.env.GIT_SH_PATH||process.env.GIT_BASH_PATH||'').trim();
+  const candidates=[configured,path.resolve(path.dirname(realGit),'../bin/sh.exe'),path.resolve(path.dirname(realGit),'../usr/bin/sh.exe')].filter(Boolean);
+  const found=candidates.find(file=>fs.existsSync(file));
+  assert.ok(found,'Git POSIX shell not found; set GIT_SH_PATH');return found;
+}
+function createSecurityLink(target,link,directory=false){
+  if(process.platform==='win32'){
+    const junctionTarget=directory?target:path.join(path.dirname(link),'link-target-'+path.basename(link));
+    if(!directory)fs.mkdirSync(junctionTarget);
+    fs.symlinkSync(junctionTarget,link,'junction');
+  }else fs.symlinkSync(target,link,directory?'dir':'file');
+  assert.equal(fs.lstatSync(link).isSymbolicLink(),true,'negative fixture must be an actual filesystem link');
+}
 function temporary(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'git-ci-p0-test-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
@@ -67,7 +86,7 @@ for (const name of REPORT_FILES) {
       if (mutation === 'missing') fs.unlinkSync(file);
       if (mutation === 'empty') fs.writeFileSync(file, '');
       if (mutation === 'stale') fs.utimesSync(file, new Date(0), new Date(0));
-      if (mutation === 'symlink') { fs.unlinkSync(file); fs.symlinkSync(path.join(f.root, 'package.json'), file); }
+      if (mutation === 'symlink') { fs.unlinkSync(file); createSecurityLink(path.join(f.root, 'package.json'), file); }
       assert.throws(() => createReleaseEvidence(f.options));
     });
   }
@@ -100,7 +119,7 @@ test('failed QA remains failed evidence, never a green gate', t => {
 test('linked evidence directory is rejected', t => {
   const f = evidenceFixture(t);
   fs.renameSync(path.join(f.root, 'qa-results'), path.join(f.root, 'linked-target'));
-  fs.symlinkSync(path.join(f.root, 'linked-target'), path.join(f.root, 'qa-results'));
+  createSecurityLink(path.join(f.root, 'linked-target'), path.join(f.root, 'qa-results'), true);
   assert.throws(() => createReleaseEvidence(f.options));
 });
 
@@ -108,10 +127,11 @@ test('linked evidence directory is rejected', t => {
 // local bare repositories. A wrapper only schedules the competing write.
 function gitFixture(t) {
   const root = temporary(t), remote = path.join(root, 'remote.git'), work = path.join(root, 'work');
+  const globalConfig=path.join(root,'global.gitconfig');fs.writeFileSync(globalConfig,'');
   const env = { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_CONFIG_NOSYSTEM: '1',
-    GIT_CONFIG_GLOBAL: '/dev/null', GIT_AUTHOR_NAME: 'Synthetic CI', GIT_COMMITTER_NAME: 'Synthetic CI',
+    GIT_CONFIG_GLOBAL: globalConfig, GIT_AUTHOR_NAME: 'Synthetic CI', GIT_COMMITTER_NAME: 'Synthetic CI',
     GIT_AUTHOR_EMAIL: 'ci@example.invalid', GIT_COMMITTER_EMAIL: 'ci@example.invalid' };
-  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
+  const realGit = commandPath('git'),shell=gitShellPath(realGit);
   const git = (...args) => execFileSync(realGit, args, { cwd: work, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   fs.mkdirSync(work);
   git('init', '--bare', '-q', remote);
@@ -129,13 +149,13 @@ function gitFixture(t) {
   git('push', '-q', 'origin', `${newer}:refs/heads/fixture-newer`, `${later}:refs/heads/fixture-later`);
   const remoteHead = () => git('--git-dir=' + remote, 'rev-parse', 'refs/heads/candidate');
   const setHead = value => git('--git-dir=' + remote, 'update-ref', 'refs/heads/candidate', value);
-  const run = (extra = {}, script = syncScript) => spawnSync('bash', [script], {
+  const run = (extra = {}, script = syncScript) => spawnSync(shell, [script], {
     cwd: work, encoding: 'utf8', timeout: 15000,
     env: { ...env, CERTIFIED_SHA: base, MAIN_HEAD: main, ...extra },
   });
   const inject = mode => {
     const bin = path.join(root, 'bin'); fs.mkdirSync(bin, { recursive: true });
-    const wrapper = `#!/usr/bin/env bash\nset -euo pipefail\ncase " $* " in\n*" push "*)\n` +
+    const wrapper = `#!/bin/sh\nset -eu\ncase " $* " in\n*" push "*)\n` +
       (mode === 'before' ? `  "${realGit}" --git-dir="${remote}" update-ref refs/heads/candidate ${newer} ${base}\n` : '') +
       (mode === 'transport' ? '  exit 1\n' : '') +
       (mode === 'delete' ? `  "${realGit}" --git-dir="${remote}" update-ref -d refs/heads/candidate\n` : '') +

@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import path from 'node:path';
+import { tmpdir } from 'node:os';
 import vm from 'node:vm';
 import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { removeBrowserProfile, stopBrowserProcess } from './lib/browser-process.mjs';
 
 const source=(fs.readFileSync('src/js/13df-secure-critical-history.js','utf8')+'\n'+fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+fs.readFileSync('src/js/13dh-secure-student-submit.js','utf8')+'\n'+fs.readFileSync('src/js/13di-secure-strict-mode-runtime.js','utf8')+'\n'+fs.readFileSync('src/js/13e-secure-student-runtime.js','utf8'));
 const ctx=vm.createContext({});
@@ -25,7 +28,7 @@ const W="document.getElementById('qaFrame').contentWindow";
 const D=W+".document";
 const childEval=(code)=>`${W}.eval(${JSON.stringify(code)})`;
 
-const debugPort=13500+(process.pid%300),profile=`/tmp/ghrab-joker-${process.pid}`;fs.rmSync(profile,{recursive:true,force:true});
+const debugPort=13500+(process.pid%300),profile=fs.mkdtempSync(path.join(tmpdir(),'ghrab-joker-'));
 const server=http.createServer((req,res)=>{res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});res.end('<!doctype html><html><body><iframe id="qaFrame"></iframe></body></html>');});
 await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
 const origin=`http://127.0.0.1:${server.address().port}`;
@@ -75,4 +78,4 @@ try{
   assert(failed.hidden&&/nelze bezpečně zahájit/.test(failed.text),'bez spolehlivé pečeti se bezpečný test nespustí');
 
   console.log('PASS joker workflow real-browser click test');
-}finally{client?.close();await new Promise(r=>server.close(r));if(chrome.exitCode===null){try{process.kill(-chrome.pid,'SIGTERM')}catch{}}await Promise.race([new Promise(r=>chrome.once('exit',r)),sleep(1500)]);if(chrome.exitCode===null){try{process.kill(-chrome.pid,'SIGKILL')}catch{}}fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}
+}finally{client?.close();await new Promise(r=>server.close(r));await stopBrowserProcess(chrome);await removeBrowserProfile(profile);}

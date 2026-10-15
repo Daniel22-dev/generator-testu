@@ -2,9 +2,11 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import { tmpdir } from 'node:os';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { closeHttpServer, removeBrowserProfile, stopBrowserProcess } from './lib/browser-process.mjs';
 
 const root = path.resolve('.');
 const dist = path.join(root, 'dist');
@@ -144,8 +146,7 @@ class Cdp {
   clearEvents(){this.events=[];}
   close(){try{this.ws.close();}catch{}}
 }
-const debugPort=12100+(process.pid%500), profile=`/tmp/ghrab-p5-runtime-${process.pid}`;
-fs.rmSync(profile,{recursive:true,force:true});
+const debugPort=12100+(process.pid%500), profile=fs.mkdtempSync(path.join(tmpdir(),'ghrab-p5-runtime-'));
 const chrome=spawn(chromiumPath(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--disable-extensions','--no-first-run','--mute-audio','--remote-allow-origins=*',`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore',detached:true});
 let client;
 const pageReports=[];
@@ -208,11 +209,10 @@ try {
     pageReports.push({page:rel,widths:widthsReport});
   }
 } finally {
-  client?.close(); server.close();
-  if(chrome.exitCode===null){try{process.kill(-chrome.pid,'SIGTERM')}catch{}}
-  await Promise.race([new Promise(resolve=>chrome.once('exit',resolve)),sleep(1500)]);
-  if(chrome.exitCode===null){try{process.kill(-chrome.pid,'SIGKILL')}catch{}}
-  await sleep(100); fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});
+  client?.close();
+  await closeHttpServer(server);
+  await stopBrowserProcess(chrome);
+  await removeBrowserProfile(profile);
 }
 const issueRows=pageReports.flatMap(p=>p.widths.flatMap(w=>w.audit.issues.map(i=>({...i,page:p.page,width:w.width}))));
 const exceptionRows=pageReports.flatMap(p=>p.widths.flatMap(w=>w.exceptions.map(detail=>({page:p.page,width:w.width,detail}))));
