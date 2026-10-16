@@ -1254,14 +1254,10 @@ function generatorAssistantEvidenceSymbolExists(bare, sourceOverride){
   if(src.indexOf(bare)>=0) return true;
   if(typeof sourceOverride==='string') return false;
   const builtSymbols=window.__GHRAB_GENERATOR_SOURCE_SYMBOLS__;
-  if(Array.isArray(builtSymbols)&&builtSymbols.includes(bare)) return true;
-  try{
-    // The assistant is a lazy external script. Global lexical declarations from
-    // that script are not serialized into document.outerHTML, but they remain
-    // resolvable in the shared browser global environment. `bare` is restricted
-    // by the identifier-only regexp below, so this lookup cannot execute KB text.
-    return (0,eval)('typeof '+bare+'!=="undefined"');
-  }catch(_){ return false; }
+  // The lazy script's lexical declarations are absent from outerHTML. The build
+  // therefore supplies a reviewed, immutable catalog derived from application
+  // modules outside this KB; no dynamic code evaluation is needed here.
+  return Array.isArray(builtSymbols)&&builtSymbols.includes(bare);
 }
 function verifyGeneratorAssistantKB(sourceOverride){
   const miss=[];

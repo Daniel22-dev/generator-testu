@@ -464,6 +464,7 @@ export const projectGlobals = {
   "generationResumeKey": 'writable',
   "generationUiLocked": 'writable',
   "generatorAssistantContext": 'writable',
+  "generatorAssistantEvidenceSymbolExists": 'writable',
   "generatorClearOwnedStorage": 'writable',
   "generatorClearRuntimeState": 'writable',
   "generatorEndWork": 'writable',
