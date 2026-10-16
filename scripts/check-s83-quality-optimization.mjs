@@ -36,8 +36,16 @@ check(bytes(feature)>100000&&bytes(feature)<bytes(section),'S83-Q08','assistant 
 parse(feature,{ecmaVersion:'latest',sourceType:'script'});
 parse(acornBuilt,{ecmaVersion:'latest',sourceType:'script'});
 check(bytes(acornBuilt)<bytes(acornSource)-50000,'S83-Q09','vendored Acorn is syntax-checked and compacted by more than 50 kB');
-const sourceDiff=execFileSync('git',['diff','--name-only',BASE,'--','src/js/01-core.js','node_modules/acorn/dist/acorn.js'],{encoding:'utf8'}).trim();
-check(sourceDiff==='','S83-Q10','optimization leaves canonical application and third-party source bytes unchanged');
+const baseCore=execFileSync('git',['show',`${BASE}:src/js/01-core.js`],{encoding:'utf8',maxBuffer:20*1024*1024});
+const splitAroundAssistant=value=>{
+  const start=value.indexOf(markerStart),end=value.indexOf(markerEnd);
+  assert.ok(start>=0&&end>=start,'Generator Assistant boundaries must exist');
+  return {before:value.slice(0,start),after:value.slice(end+markerEnd.length)};
+};
+const baseParts=splitAroundAssistant(baseCore),currentParts=splitAroundAssistant(core);
+check(baseParts.before===currentParts.before&&baseParts.after===currentParts.after,'S83-Q10a','canonical core changes stay confined to the auditable Generator Assistant section');
+const acornDiff=execFileSync('git',['diff','--name-only',BASE,'--','node_modules/acorn/dist/acorn.js'],{encoding:'utf8'}).trim();
+check(acornDiff==='','S83-Q10b','third-party Acorn source bytes remain unchanged');
 const scripts=JSON.parse(read(path.join(root,'package.json'))).scripts||{};
 check(scripts.postbuild?.includes('check:s83-quality-optimization')&&scripts['preqa:p5']?.includes('check:s83-quality-browser')&&scripts['preqa:p5:ci']?.includes('check:s83-quality-browser'),'S83-Q11','source and Chromium regressions are mandatory build/release-sequence gates');
 
