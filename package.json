@@ -200,8 +200,8 @@
     "check:s8-certification-contract": "node scripts/check-s8-certification-contract.mjs",
     "check:s83-quality-optimization": "node scripts/check-s83-quality-optimization.mjs",
     "check:s83-quality-browser": "node scripts/check-s83-quality-browser.mjs",
-    "preqa:p5": "npm run build && npm run check:s83-quality-browser && npm run check:s83a-assistant-remediation-browser",
-    "preqa:p5:ci": "npm run build && npm run check:s83-quality-browser && npm run check:s83a-assistant-remediation-browser",
+    "preqa:p5": "npm run build && npm run check:s83-quality-browser && npm run check:s83a-assistant-remediation-browser && npm run check:s83b-parallel-tabs-stability",
+    "preqa:p5:ci": "npm run build && npm run check:s83-quality-browser && npm run check:s83a-assistant-remediation-browser && npm run check:s83b-parallel-tabs-stability",
     "check:s83-ai-boundary-review": "node scripts/check-s83-ai-boundary-review.mjs",
     "qa:axe:required": "node scripts/required-axe-runner.mjs runtime",
     "qa:p5-release:required": "node scripts/required-axe-runner.mjs release",
@@ -211,6 +211,7 @@
     "check:s83a-assistant-remediation-browser": "node scripts/check-s83a-assistant-remediation-browser.mjs",
     "check:s83a-ai-boundary-behavior": "node scripts/check-s83a-ai-boundary-behavior.mjs",
     "check:s83a-ci-wiring": "node scripts/check-s83a-ci-wiring.mjs",
+    "check:s83b-parallel-tabs-stability": "node scripts/check-s83b-parallel-tabs-stability.mjs",
     "evidence:s83a-final": "node scripts/run-s83a-final-evidence.mjs",
     "check:s83a-traceability": "node scripts/write-s83a-traceability.mjs",
     "precheck:ci-orchestration": "npm run check:s83-ci-portability"

@@ -9,6 +9,7 @@ function validate(pkg,workflow,runner,evidenceRunner){
   assert.equal(pkg.scripts?.['check:s83a-assistant-remediation-browser'],'node scripts/check-s83a-assistant-remediation-browser.mjs');
   assert.equal(pkg.scripts?.['check:s83a-ai-boundary-behavior'],'node scripts/check-s83a-ai-boundary-behavior.mjs');
   assert.equal(pkg.scripts?.['check:s83a-ci-wiring'],'node scripts/check-s83a-ci-wiring.mjs');
+  assert.equal(pkg.scripts?.['check:s83b-parallel-tabs-stability'],'node scripts/check-s83b-parallel-tabs-stability.mjs');
 
   const postbuild=split(pkg.scripts?.postbuild);
   assert.equal(postbuild.filter(item=>item==='npm run check:s83a-assistant-remediation').length,1,'postbuild must run the assistant source gate exactly once');
@@ -18,8 +19,11 @@ function validate(pkg,workflow,runner,evidenceRunner){
     const steps=split(pkg.scripts?.[name]);
     const build=steps.indexOf('npm run build');
     const browser=steps.indexOf('npm run check:s83a-assistant-remediation-browser');
+    const stability=steps.indexOf('npm run check:s83b-parallel-tabs-stability');
     assert.equal(steps.filter(item=>item==='npm run check:s83a-assistant-remediation-browser').length,1,`${name} must run the S08.3a Chromium gate exactly once`);
+    assert.equal(steps.filter(item=>item==='npm run check:s83b-parallel-tabs-stability').length,1,`${name} must run the repeated E4 parallel-tab gate exactly once`);
     assert.ok(build>=0&&build<browser,`${name} must build before the S08.3a Chromium gate`);
+    assert.ok(browser>=0&&browser<stability,`${name} must run the assistant browser gate before repeated E4 stability`);
   }
 
   assert.ok(split(pkg.scripts?.['check:ci-orchestration']).includes('node scripts/check-s83a-ci-wiring.mjs'),'CI orchestration must self-check S08.3a wiring');
@@ -45,6 +49,8 @@ reject('drop-assistant-source',pkg=>{pkg.scripts.postbuild=pkg.scripts.postbuild
 reject('drop-ai-behavior',pkg=>{pkg.scripts.postbuild=pkg.scripts.postbuild.replace(' && npm run check:s83a-ai-boundary-behavior','');});
 reject('drop-local-browser',pkg=>{pkg.scripts['preqa:p5']=pkg.scripts['preqa:p5'].replace(' && npm run check:s83a-assistant-remediation-browser','');});
 reject('drop-ci-browser',pkg=>{pkg.scripts['preqa:p5:ci']=pkg.scripts['preqa:p5:ci'].replace(' && npm run check:s83a-assistant-remediation-browser','');});
+reject('drop-local-e4-stability',pkg=>{pkg.scripts['preqa:p5']=pkg.scripts['preqa:p5'].replace(' && npm run check:s83b-parallel-tabs-stability','');});
+reject('drop-ci-e4-stability',pkg=>{pkg.scripts['preqa:p5:ci']=pkg.scripts['preqa:p5:ci'].replace(' && npm run check:s83b-parallel-tabs-stability','');});
 reject('browser-before-build',pkg=>{pkg.scripts['preqa:p5:ci']=pkg.scripts['preqa:p5:ci'].replace('npm run build && npm run check:s83-quality-browser && npm run check:s83a-assistant-remediation-browser','npm run check:s83a-assistant-remediation-browser && npm run build && npm run check:s83-quality-browser');});
 reject('fake-ai-behavior',pkg=>{pkg.scripts['check:s83a-ai-boundary-behavior']='node -e "process.exit(0)"';});
 reject('drop-self-check',pkg=>{pkg.scripts['check:ci-orchestration']=pkg.scripts['check:ci-orchestration'].replace(' && node scripts/check-s83a-ci-wiring.mjs','');});
