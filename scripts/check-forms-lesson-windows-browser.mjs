@@ -33,7 +33,12 @@ try{
   await student.locator('#studentName').fill('a7b9c2');await enterStartCode(student,pkg);await completeGeneratedPageStart(student);await student.locator('#test').waitFor({state:'visible'});ok('lower-case valid code accepted');
   assert.equal(await student.locator('#done').isVisible(),false,'fresh start jumped directly to submitted/Forms screen');
   await student.waitForTimeout(80);assert.ok((await student.evaluate(()=>window.scrollY))<20,'fresh start did not reset scroll to the beginning of the test');
-  const firstAnswer=student.locator('[data-qid]').first();if(await firstAnswer.count()){await firstAnswer.click({force:true});await student.waitForTimeout(50);assert.equal(await student.evaluate(()=>Object.keys(RESP).length),0,'start-transition click-through changed an answer');}
+  const firstAnswer=student.locator('[data-qid]').first();if(await firstAnswer.count()){
+    const transitionGuardWasArmed=await student.evaluate(()=>TEST_INTERACTION_ARMED_AT>0);
+    assert.equal(transitionGuardWasArmed,true,'fresh start did not arm the interaction guard');
+    await student.evaluate(()=>armSecureStartInteractionGuard());
+    await firstAnswer.click({force:true});await student.waitForTimeout(50);assert.equal(await student.evaluate(()=>Object.keys(RESP).length),0,'start-transition click-through changed an answer');
+  }
   const submitButton=student.locator('#secureSubmitCard button');assert.equal(await submitButton.isDisabled(),true,'submit must be briefly disarmed after the start transition');
   await submitButton.click({force:true});await student.waitForTimeout(100);assert.equal(await student.locator('#done').isVisible(),false,'start-transition click-through submitted the test');
   await student.waitForTimeout(1300);assert.equal(await submitButton.isDisabled(),false,'submit did not re-arm after the start transition');
@@ -43,7 +48,7 @@ try{
   const reading=await student.evaluate(()=>[...document.querySelectorAll('.reading-passage')].map(e=>{const c=getComputedStyle(e);return {lang:e.getAttribute('lang'),align:c.textAlign,last:c.textAlignLast,hyph:c.hyphens,overflow:e.scrollWidth>e.clientWidth+1};}));
   assert.ok(reading.length&&reading.every(r=>r.lang==='en'&&r.align==='justify'&&r.last==='left'&&r.hyph==='auto'&&!r.overflow),JSON.stringify(reading));ok('reading passage justified, hyphenated, lang=en at 390 px');
   const startedAtMs=Date.now();
-  await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);});
+  await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);stopSplitMonitor();splitTotalMs=12000;splitMeasuredMs=0;splitSmallMs=0;splitRunMs=0;SPLIT_STATE_COUNTS={NORMAL:0,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:6,EXEMPT:0};SPLIT_SHADOW_STATE='AMBIGUOUS';});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const txt=await student.locator('#answerBackup').inputValue();
   const formsUrl=new URL(await student.evaluate(()=>formsOpenUrl()));assert.equal(formsUrl.searchParams.get('entry.111'),pkg.testId);assert.ok(formsUrl.searchParams.get('entry.222'));assert.ok(formsUrl.searchParams.get('entry.333'));assert.equal(formsUrl.searchParams.get('entry.444'),null);ok('student Forms link prefilled with test ID, name, class only');
   await sctx.route('https://docs.google.com/**',r=>r.fulfill({status:200,contentType:'text/html',body:'<p>synthetic form</p>'}));

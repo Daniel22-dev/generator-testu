@@ -72,6 +72,25 @@ function e3AnswerValid(ex,it,value){
   }
   return ['error correction','word order','translation','sentence transformation','word formation'].includes(t)&&text(value);
 }
+function e3SplitStateCounts(value){
+  const keys=['AMBIGUOUS','CONFIRMED','EXEMPT','NORMAL','SUSPECTED'];
+  return e3Object(value)&&Object.keys(value).sort().join(',')===keys.join(',')&&keys.every(key=>Number.isInteger(value[key])&&value[key]>=0&&value[key]<=1000000000);
+}
+function e3EventValue(event,key,value){
+  if(event.type==='split-window'&&key==='pct'&&value===null)return true;
+  if(event.type==='split-window'&&key==='splitStateCounts')return e3Object(value);
+  return e3String(value,2000)||typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=1e12||typeof value==='boolean';
+}
+function e3SplitEventValid(event){
+  const legacy=event.measuredMs===undefined&&event.measurementAvailable===undefined&&event.splitStateCounts===undefined;
+  if(legacy)return Number.isInteger(event.smallMs)&&Number.isInteger(event.totalMs)&&event.totalMs>0&&event.smallMs>=0&&event.smallMs<=event.totalMs&&event.pct===Math.round(event.smallMs/event.totalMs*100);
+  if(!Number.isInteger(event.smallMs)||!Number.isInteger(event.totalMs)||!Number.isInteger(event.measuredMs)||event.totalMs<=0||event.measuredMs<0||event.measuredMs>event.totalMs||event.smallMs<0||event.smallMs>event.measuredMs||typeof event.measurementAvailable!=='boolean')return false;
+  if(event.measurementAvailable){if(event.measuredMs<=0||!Number.isInteger(event.pct)||event.pct<0||event.pct>100||event.pct!==Math.round(event.smallMs/event.measuredMs*100))return false;}
+  else if(event.measuredMs!==0||event.smallMs!==0||event.pct!==null)return false;
+  if(event.splitState!==undefined&&!['NORMAL','SUSPECTED','CONFIRMED','AMBIGUOUS','EXEMPT'].includes(event.splitState))return false;
+  if(event.splitStateCounts!==undefined&&!e3SplitStateCounts(event.splitStateCounts))return false;
+  return true;
+}
 function validateSecurePayload(p){
   e3Require(e3Object(p),'schema.shape','Payload musí být objekt.');e3SafeTree(p);
   const fields=['v','testId','manifestHash','studentHtmlSha256','attemptId','student','identityMode','code','groupKey','startedAt','submittedAt','jokerUsed','jokerSelectedAt','resp','answerChangeStats','totalAnswerChanges','securityEvents','routineHistoryTruncated','criticalEvents','criticalCounters','criticalOverflow','criticalHistoryLegacy','userAgent','pct','grade'];
@@ -104,8 +123,8 @@ function validateSecurePayload(p){
   for(const event of p.securityEvents.concat(p.criticalEvents||[])){
     e3Require(e3Object(event)&&e3String(event.type,64)&&/^[a-z0-9-]+$/.test(event.type),'schema.event','Neplatný bezpečnostní záznam.');
     const at=e3Iso(event.t);e3Require(Number.isFinite(at)&&at<=end&&(at>=start||event.type==='joker-used'&&at===e3Iso(p.jokerSelectedAt)),'time.event','Událost je mimo klientem uvedený pokus.');
-    for(const [key,value] of Object.entries(event))e3Require(e3String(value,2000)||typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=1e12||typeof value==='boolean','schema.event','Nepodporovaná hodnota události '+key+'.');
-    if(event.type==='split-window')e3Require(Number.isInteger(event.smallMs)&&Number.isInteger(event.totalMs)&&event.totalMs>0&&event.smallMs<=event.totalMs&&event.pct===Math.round(event.smallMs/event.totalMs*100),'telemetry.split','Rozporná statistika malého okna.');
+    for(const [key,value] of Object.entries(event))e3Require(e3EventValue(event,key,value),'schema.event','Nepodporovaná hodnota události '+key+'.');
+    if(event.type==='split-window')e3Require(e3SplitEventValid(event),'telemetry.split','Rozporná statistika malého okna.');
   }
   const starts=p.securityEvents.filter(e=>e.type==='attempt-start'),jokers=p.securityEvents.filter(e=>e.type==='joker-used');
   e3Require(starts.length===1&&e3Iso(starts[0].t)===start&&(!starts[0].detail||starts[0].detail===p.attemptId),'telemetry.start','Záznam startu neodpovídá pokusu.');
