@@ -102,19 +102,39 @@ function splitGeneratorAssistant(source, file) {
     fail(`nelze jednoznačně oddělit Generator Assistant z ${file}`);
   }
   const sectionEnd = end + ASSISTANT_SECTION_END.length;
+  const coreWithoutAssistant = source.slice(0, start) + source.slice(sectionEnd);
+  const evidenceCorpus = [coreWithoutAssistant];
+  for (const dir of [path.resolve('src','js'), path.resolve('src','features')]) {
+    for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
+      if (!entry.isFile() || !entry.name.endsWith('.js') || (dir.endsWith(`${path.sep}js`) && entry.name === file)) continue;
+      evidenceCorpus.push(fs.readFileSync(path.join(dir,entry.name),'utf8'));
+    }
+  }
+  const applicationSource=evidenceCorpus.join('\n');
+  const evidenceSymbols=[...new Set([...source.slice(start,sectionEnd).matchAll(/[A-Za-z_][\w]*\(\)|[A-Z][A-Z0-9_]{3,}/g)]
+    .map(match=>match[0].replace(/\(\)$/,''))
+    .filter(symbol=>applicationSource.indexOf(symbol)>=0))].sort();
   const feature = source.slice(start, sectionEnd) + `
 ;(function registerGeneratorAssistantFeature(){
   window.GHRABGeneratorFeatures=window.GHRABGeneratorFeatures||{};
   window.GHRABGeneratorFeatures.generatorAssistant={open:window.openGeneratorAssistant,verify:window.verifyGeneratorAssistantKB};
 })();`;
   const loader = `// Generator Assistant is loaded only after the teacher explicitly opens it.
+Object.defineProperty(window,'__GHRAB_GENERATOR_SOURCE_SYMBOLS__',{value:Object.freeze(${JSON.stringify(evidenceSymbols)}),writable:false,configurable:false});
 function loadGeneratorAssistantFeature(){
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){
+    return Promise.reject(new Error('ASSISTANT_OFFLINE_FIRST_LOAD'));
+  }
   return ghrabGeneratorFeatureLoader('generatorAssistant','./features/${ASSISTANT_FEATURE_FILE}');
 }
 function openGeneratorAssistant(){
   return loadGeneratorAssistantFeature().then(function(api){return api.open();}).catch(function(error){
-    try{uiAlert('Poradce se nepodařilo načíst: '+error.message,'Poradce ke generátoru');}catch(_){}
-    throw error;
+    const offline=error&&error.message==='ASSISTANT_OFFLINE_FIRST_LOAD';
+    const message=offline
+      ? 'Poradce není při prvním otevření bez připojení k internetu dostupný. Generátor a studentské testy zůstávají plně funkční. Připoj se k internetu a otevři poradce znovu.'
+      : 'Poradce se nepodařilo načíst. Generátor a studentské testy zůstávají plně funkční. Zkontroluj připojení a zkus to znovu.';
+    try{uiAlert(message,'Poradce ke generátoru');}catch(_){}
+    return null;
   });
 }
 function verifyGeneratorAssistantKB(){return loadGeneratorAssistantFeature().then(function(api){return api.verify();});}

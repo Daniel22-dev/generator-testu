@@ -5,6 +5,7 @@ function ghrabGeneratorFeatureLoader(name, url) {
   if (ready) return Promise.resolve(ready);
   window.__GHRAB_GENERATOR_FEATURE_PROMISES = window.__GHRAB_GENERATOR_FEATURE_PROMISES || {};
   if (!window.__GHRAB_GENERATOR_FEATURE_PROMISES[name]) {
+    const absoluteUrl = new URL(url, window.location.href).href;
     const load = window.GHRAB_PLATFORM && window.GHRAB_PLATFORM.modules && window.GHRAB_PLATFORM.modules.loadScript
       ? window.GHRAB_PLATFORM.modules.loadScript(url, { name: 'generator:' + name })
       : new Promise(function(resolve, reject){
@@ -14,7 +15,18 @@ function ghrabGeneratorFeatureLoader(name, url) {
         });
     window.__GHRAB_GENERATOR_FEATURE_PROMISES[name] = load.then(function(){
       const api=window.GHRABGeneratorFeatures[name]; if(!api) throw new Error('Lazy feature did not register: '+name); return api;
-    }).catch(function(error){ delete window.__GHRAB_GENERATOR_FEATURE_PROMISES[name]; throw error; });
+    }).catch(function(error){
+      delete window.__GHRAB_GENERATOR_FEATURE_PROMISES[name];
+      // GHRAB Platform intentionally caches module promises. A rejected promise
+      // must not make a transient offline failure permanent. Clear only the exact
+      // failed promise for this URL; never disturb a successful or newer load.
+      const loaded=window.GHRAB_PLATFORM&&window.GHRAB_PLATFORM.modules&&window.GHRAB_PLATFORM.modules.loaded;
+      if(loaded&&typeof loaded.get==='function'&&typeof loaded.delete==='function'&&loaded.get(absoluteUrl)===load) loaded.delete(absoluteUrl);
+      document.querySelectorAll('script[data-ghrab-lazy-module]').forEach(function(script){
+        if(script.src===absoluteUrl&&!window.GHRABGeneratorFeatures[name]) script.remove();
+      });
+      throw error;
+    });
   }
   return window.__GHRAB_GENERATOR_FEATURE_PROMISES[name];
 }
