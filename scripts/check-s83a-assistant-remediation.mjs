@@ -19,6 +19,9 @@ check(core.includes("window.__GHRAB_GENERATOR_SOURCE_SYMBOLS__")&&build.includes
 check(build.includes("Object.defineProperty(window,'__GHRAB_GENERATOR_SOURCE_SYMBOLS__'")&&build.includes('writable:false,configurable:false'),'S83A-SRC-03','generated source-symbol catalog is immutable at runtime');
 check(build.includes("error.message==='ASSISTANT_OFFLINE_FIRST_LOAD'")&&/bez připojení k internetu/.test(build),'S83A-SRC-04','first offline open has an explicit non-destructive explanation');
 check(build.includes('Generátor a studentské testy zůstávají plně funkční')&&build.includes('return null;'),'S83A-SRC-05','assistant load failure is contained without an unhandled UI promise rejection');
+const cachedLookup=build.indexOf('const registered=window.GHRABGeneratorFeatures&&window.GHRABGeneratorFeatures.generatorAssistant;');
+const offlineGuard=build.indexOf("navigator.onLine===false",cachedLookup);
+check(cachedLookup>=0&&offlineGuard>cachedLookup&&build.slice(cachedLookup,offlineGuard).includes('return Promise.resolve(registered);'),'S83A-SRC-05B','a validated registered assistant is reused before the offline first-load guard');
 check(loader.includes('loaded.get(absoluteUrl)===load')&&loader.includes('loaded.delete(absoluteUrl)'),'S83A-SRC-06','retry clears only the matching rejected GHRAB Platform module promise');
 check(loader.includes("delete window.__GHRAB_GENERATOR_FEATURE_PROMISES[name]")&&loader.includes("!window.GHRABGeneratorFeatures[name]"),'S83A-SRC-07','failed feature promise and partial script are removed without evicting a registered feature');
 const student=read('src/js/13d-secure-student-shell.js')+read('src/js/13e-secure-student-runtime.js')+read('src/js/14b-instant-test-runtime.js');

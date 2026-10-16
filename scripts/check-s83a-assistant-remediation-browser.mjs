@@ -82,7 +82,30 @@ try{
   check(diagnostics.registered,'S83A-ASST-01','assistant lazy feature registers its public API');
   check(Array.isArray(diagnostics.positive)&&diagnostics.positive.length===0,'S83A-ASST-02',`runtime KB diagnostics have no false missing evidence (${diagnostics.positive.length}${diagnostics.positive.length?`: ${diagnostics.positive.slice(0,8).join(' | ')}`:''})`);
   check(Array.isArray(diagnostics.negative)&&diagnostics.negative.length>0,'S83A-ASST-03','empty evidence corpus is rejected by the same runtime diagnostic');
-  check(online.errors.length===0,'S83A-ASST-04','online diagnostics produce no page or console errors');
+  await online.page.evaluate(()=>{
+    window.__S83B_CACHED_API=window.GHRABGeneratorFeatures.generatorAssistant;
+    window.__S83B_CACHED_STATE=JSON.stringify(window.state||{});
+    window.__S83B_ALERTS=[];
+    window.uiAlert=(message,title)=>{window.__S83B_ALERTS.push({message:String(message||''),title:String(title||'')});return Promise.resolve();};
+  });
+  await online.page.locator('#gaClose').click();
+  await online.page.waitForSelector('#gaBackdrop',{state:'detached',timeout:5000});
+  await online.context.setOffline(true);
+  for(let cycle=0;cycle<3;cycle+=1){
+    await online.page.locator('#btnAssistant').click();
+    await online.page.waitForSelector('#gaBackdrop',{state:'attached',timeout:5000});
+    const cached=await online.page.evaluate(()=>({
+      sameApi:window.__S83B_CACHED_API===window.GHRABGeneratorFeatures.generatorAssistant,
+      stateUnchanged:window.__S83B_CACHED_STATE===JSON.stringify(window.state||{}),
+      dialogs:document.querySelectorAll('#gaBackdrop').length,
+      alerts:window.__S83B_ALERTS.length
+    }));
+    check(cached.sameApi,`S83B-CACHE-${cycle+1}A`,'offline reopen reuses the already validated assistant API');
+    check(cached.stateUnchanged&&cached.dialogs===1&&cached.alerts===0,`S83B-CACHE-${cycle+1}B`,'offline cached reopen preserves generator state and creates one dialog without a false alert');
+    await online.page.locator('#gaClose').click();
+    await online.page.waitForSelector('#gaBackdrop',{state:'detached',timeout:5000});
+  }
+  check(online.errors.length===0,'S83A-ASST-04','online load and repeated cached offline reopens produce no page or console errors');
   await online.context.close();
 
   const offline=await newPage();

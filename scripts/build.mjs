@@ -122,6 +122,10 @@ function splitGeneratorAssistant(source, file) {
   const loader = `// Generator Assistant is loaded only after the teacher explicitly opens it.
 Object.defineProperty(window,'__GHRAB_GENERATOR_SOURCE_SYMBOLS__',{value:Object.freeze(${JSON.stringify(evidenceSymbols)}),writable:false,configurable:false});
 function loadGeneratorAssistantFeature(){
+  const registered=window.GHRABGeneratorFeatures&&window.GHRABGeneratorFeatures.generatorAssistant;
+  if(registered&&typeof registered.open==='function'&&typeof registered.verify==='function'){
+    return Promise.resolve(registered);
+  }
   if(typeof navigator!=='undefined'&&navigator.onLine===false){
     return Promise.reject(new Error('ASSISTANT_OFFLINE_FIRST_LOAD'));
   }
