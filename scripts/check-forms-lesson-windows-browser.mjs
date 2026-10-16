@@ -39,6 +39,9 @@ try{
     await student.evaluate(()=>armSecureStartInteractionGuard());
     await firstAnswer.click({force:true});await student.waitForTimeout(50);assert.equal(await student.evaluate(()=>Object.keys(RESP).length),0,'start-transition click-through changed an answer');
   }
+  const submitGuardWasArmed=await student.evaluate(()=>SUBMIT_UI_ARMED_AT>0);
+  assert.equal(submitGuardWasArmed,true,'fresh start did not arm the submit guard');
+  await student.evaluate(()=>armSecureSubmitButton());
   const submitButton=student.locator('#secureSubmitCard button');assert.equal(await submitButton.isDisabled(),true,'submit must be briefly disarmed after the start transition');
   await submitButton.click({force:true});await student.waitForTimeout(100);assert.equal(await student.locator('#done').isVisible(),false,'start-transition click-through submitted the test');
   await student.waitForTimeout(1300);assert.equal(await submitButton.isDisabled(),false,'submit did not re-arm after the start transition');
