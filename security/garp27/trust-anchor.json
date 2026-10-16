@@ -23,6 +23,6 @@
     "scripts/garp27/contract-gate.mjs": "1e67d0823e2a6864fd172a68889307eb96a274d97deeb230e50535635de39c59",
     "scripts/garp27/policy-admission-mutations.mjs": "860e0f4b2d6f7323744aa9858c65a5ad1f20ed522c49b851fbe8b6cf8a9fd173",
     "scripts/garp27/auto-patch-contract.mjs": "a4da84c88114d779e5fbcdcf82ad7b237e1b2e09d820824926685fbbbe42f926",
-    "scripts/garp27/foundation-gate.mjs": "db6d07103ac0e192a5abd8eed8915a48f12c60c74c64976aada026ef86f8dbec"
+    "scripts/garp27/foundation-gate.mjs": "f48b3b315514c11ea89d47e94233d100cc7e0028236d9ba1c8cee6cbdf22abe6"
   }
 }

@@ -4,6 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { resolveNpmCommand } from '../lib/npm-command.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = path.join(ROOT, 'audit', 'evidence', 'garp27-current');
@@ -58,7 +59,10 @@ const steps = [
 const results = [];
 let failed = 0;
 for (const step of steps) {
-  const run = spawnSync(step.cmd[0], step.cmd.slice(1), {
+  const command = step.cmd[0] === 'npm'
+    ? resolveNpmCommand(step.cmd.slice(1))
+    : { program: step.cmd[0], args: step.cmd.slice(1) };
+  const run = spawnSync(command.program, command.args, {
     cwd: ROOT,
     encoding: 'utf8',
     env: process.env,
