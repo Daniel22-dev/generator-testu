@@ -9,7 +9,7 @@ import {mutateArtifact} from './redteam-regression-mutants-e9.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'git-e10-')),checks=[],negativeControls=[],errors=[],children=[];
 let browser;
 async function snap(p){return p.evaluate(()=>({active:isTestActive(),ready:CONTENT_READY,id:ATTEMPT_ID,start:STARTED_AT,deadline:TIMER_DEADLINE,resp:RESP,locked:LOCKED,input:$('startCode').value,exercises:Object.keys(STUDENT_VARIANTS).length}));}
-async function attempt(p,code){await p.locator('#studentName').fill('Synthetic');await p.locator('#startCode').fill(code);await p.evaluate(()=>startTest());if(await p.evaluate(()=>!!STRICT_PREFLIGHT)){await p.locator('#strictFullscreenStartBtn').click();await p.waitForTimeout(30);}}
+async function attempt(p,code,expectReady=false){await p.locator('#studentName').fill('Synthetic');await p.locator('#startCode').fill(code);await p.evaluate(()=>startTest());if(await p.evaluate(()=>!!STRICT_PREFLIGHT)){await p.locator('#strictFullscreenStartBtn').click();if(expectReady)await p.waitForFunction(()=>isTestActive()&&CONTENT_READY,null,{timeout:5000});else await p.waitForTimeout(30);}}
 async function dismiss(p){await p.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));}
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true});const pkg=await build();
@@ -20,16 +20,16 @@ try{
   const wrong=(pkg.startCode[0]==='A'?'B':'A')+pkg.startCode.slice(1);
   for(const code of ['',wrong,REC]){await attempt(p,code);const s=await snap(p);assert.equal(s.active,false);assert.equal(s.id,'');assert.equal(s.deadline,0);assert.equal(s.exercises,0);await dismiss(p);}
   checks.push({id:'pre-start-missing-wrong-classroom-code',status:'PASS'});
-  await attempt(p,pkg.startCode);let s=await snap(p);assert.equal(s.active,true);assert.equal(s.input,'');assert.equal(s.ready,true);await p.evaluate(async()=>{setResp('0_0',1);await flushPendingAttemptWrites();});const before=await snap(p);
+  await attempt(p,pkg.startCode,true);let s=await snap(p);assert.equal(s.active,true);assert.equal(s.input,'');assert.equal(s.ready,true);await p.evaluate(async()=>{setResp('0_0',1);await flushPendingAttemptWrites();});const before=await snap(p);
   checks.push({id:'native-correct-code',status:'PASS'});
   await p.reload();await attempt(p,'');s=await snap(p);assert.equal(s.active,false);assert.equal(s.ready,false);assert.equal(s.exercises,0);await dismiss(p);
   const persisted=await p.evaluate(async()=>{const a=await loadActiveAttemptSeal();return {id:a.attemptId,deadline:a.timerDeadline,resp:a.resp};});assert.equal(persisted.id,before.id);assert.equal(persisted.deadline,before.deadline);assert.equal(persisted.resp['0_0'],1);
   checks.push({id:'reload-requires-code-preserves-persisted-origin',status:'PASS'});
-  await enterStartCode(p,pkg);await attempt(p,pkg.startCode);s=await snap(p);assert.equal(s.id,before.id);assert.equal(s.start,before.start);assert.equal(s.deadline,before.deadline);assert.equal(s.locked,true);
+  await enterStartCode(p,pkg);await attempt(p,pkg.startCode,true);s=await snap(p);assert.equal(s.id,before.id);assert.equal(s.start,before.start);assert.equal(s.deadline,before.deadline);assert.equal(s.locked,true);
   await p.evaluate(async code=>{$('unlockInp').value=code;await tryUnlock();},REC);assert.equal((await snap(p)).locked,false);await p.evaluate(()=>submitSecureTest());
   const v=genDom(pkg.teacherHtml);children.push(v);const pack=v.parseTxt(await p.locator('#answerBackup').inputValue());assert.equal(v.scorePayload(await v.decryptPayload(pack)).pct,20);
   checks.push({id:'reload-code-recovery-and-private-rescore',status:'PASS'});
-  const offlineContext=await browser.newContext();await offlineContext.route(url,r=>r.fulfill({status:200,contentType:'text/html',body:pkg.studentHtml}));const offline=await offlineContext.newPage();await offline.goto(url);await offlineContext.setOffline(true);await attempt(offline,pkg.startCode);assert.equal((await snap(offline)).active,true);checks.push({id:'loaded-standalone-offline-start',status:'PASS'});await offlineContext.close();
+  const offlineContext=await browser.newContext();await offlineContext.route(url,r=>r.fulfill({status:200,contentType:'text/html',body:pkg.studentHtml}));const offline=await offlineContext.newPage();await offline.goto(url);await offlineContext.setOffline(true);await attempt(offline,pkg.startCode,true);assert.equal((await snap(offline)).active,true);checks.push({id:'loaded-standalone-offline-start',status:'PASS'});await offlineContext.close();
   const file=path.join(temp,'synthetic-student.html');fs.writeFileSync(file,pkg.studentHtml);const filePage=await context.newPage();await filePage.goto(pathToFileURL(file).href);await attempt(filePage,pkg.startCode);assert.equal((await snap(filePage)).active,false);checks.push({id:'file-protocol-existing-environment-block-preserved',status:'PASS'});
   const broken=mutateArtifact(pkg.studentHtml,'async function unlockTestContent(){','return true;');
   const badContext=await browser.newContext();await badContext.route(url,r=>r.fulfill({status:200,contentType:'text/html',body:broken}));const bad=await badContext.newPage();await bad.goto(url);await attempt(bad,wrong);let detected=false;try{assert.equal((await snap(bad)).active,false,'wrong code must block even an empty test');}catch(e){if(e.code!=='ERR_ASSERTION')throw e;detected=true;}assert.equal(detected,true);negativeControls.push({id:'bypassed-production-unlock',detected:true});await badContext.close();
