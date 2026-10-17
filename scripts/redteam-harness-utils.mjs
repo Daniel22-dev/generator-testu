@@ -1,7 +1,9 @@
 // R5 release-remediation adversarial gate, odvozený z nezávislého Claude harnessu pro GIT 7.1.76.
-// Spuštění z kořene repozitáře po buildu: node scripts/check-security-adversarial-r5.mjs
+// Spuštění z kořene repozitáře: node scripts/check-security-adversarial-r5.mjs
+// V čistém checkoutu harness vytvoří chybějící ignorovaný dist fixture přímo build skriptem.
 // Spouští SKUTEČNÝ generátor z dist/index.html a SKUTEČNĚ vygenerované instant/secure/verifier HTML v jsdom.
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { JSDOM } from 'jsdom';
 import { webcrypto } from 'node:crypto';
 import * as acorn from 'acorn';
@@ -14,7 +16,15 @@ async function T(id, fn) { try { const d = await fn(); rec(id, 'PASS', d || '');
 function must(c, m) { if (!c) { const e = new Error(m); e.isFinding = true; throw e; } }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-let html = fs.readFileSync(process.env.GIT_REDTEAM_GENERATOR_HTML || 'dist/index.html', 'utf8')
+const generatorHtml = process.env.GIT_REDTEAM_GENERATOR_HTML || 'dist/index.html';
+if (!fs.existsSync(generatorHtml) && !process.env.GIT_REDTEAM_GENERATOR_HTML) {
+  // S5 is intentionally a blocking prebuild gate. A clean checkout therefore
+  // has no ignored dist/ tree yet. Build the exact source fixture directly,
+  // without invoking the npm lifecycle (which would recursively re-enter S5).
+  execFileSync(process.execPath, ['scripts/build.mjs'], { stdio: 'inherit', env: process.env });
+}
+if (!fs.existsSync(generatorHtml)) throw new Error(`Missing generated harness input: ${generatorHtml}`);
+let html = fs.readFileSync(generatorHtml, 'utf8')
   .replace(/<script type="module" data-ghrab-access-bootstrap>[\s\S]*?<\/script>/, '')
   .replace(/type="application\/ghrab-protected"\s+data-ghrab-protected\s*/g, '')
   .replace('<body>', '<body><script>window.__GHRAB_STUDIO_ACCESS__={appId:"generator",permit:{sub:"ADV",displayName:"Adv",role:"admin",apps:["*"],iat:1,exp:4102444800,jti:"adv"}};<\/script>');
