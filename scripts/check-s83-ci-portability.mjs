@@ -23,21 +23,43 @@ check(true,'S83-CI05','negative mutation restores the Windows-breaking syntax an
 const fakeCli=path.join(root,'node_modules','npm','bin','npm-cli.js');
 const win=resolveNpmCommand(['run','build'],{platform:'win32',execPath:process.execPath,npmExecPath:fakeCli,exists:file=>file===fakeCli}),posix=resolveNpmCommand(['run','build'],{platform:'linux'});
 check(win.program===process.execPath&&win.args[0]===fakeCli&&posix.program==='npm','S83-CI06','npm subprocess resolution remains explicit on Windows and native on Linux');
+const fullHistoryWorkflows=new Set([
+  '.github/workflows/journey-e2e.yml',
+  '.github/workflows/p3-quality.yml',
+  '.github/workflows/p5-release-gate.yml'
+]);
+function checkoutUsesFullHistory(text){
+  return /uses:\s*actions\/checkout@[^\r\n]+[\s\S]{0,220}?fetch-depth:\s*0(?:\s|$)/.test(text);
+}
+for(const file of fullHistoryWorkflows){
+  const text=fs.readFileSync(path.join(root,file),'utf8');
+  check(checkoutUsesFullHistory(text),`S83-CI06-${path.basename(file,'.yml')}`,'certification checkout retains the approved historical baseline');
+}
+assert.equal(checkoutUsesFullHistory(fs.readFileSync(path.join(root,'.github/workflows/p5-release-gate.yml'),'utf8').replace('fetch-depth: 0','fetch-depth: 1')),false,'negative mutation must reject shallow checkout');
+check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before historical byte comparison');
 // The final certification may explicitly approve a trust-anchor pin rotation.
-// Normalize only that reviewed SHA replacement and compare every workflow byte
- // against the certified S08.2 baseline. Any other workflow change fails closed.
+// Normalize only that reviewed SHA replacement plus the three exact full-history
+// checkout lines required by the historical byte comparison itself. Any other
+// workflow change fails closed.
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
 const reviewedTrust='50ce942425eeb000bd183b860a6899e1949668e8dd8585edf3ab1ca0e9ef05d8';
 const baselineWorkflows=execFileSync('git',['ls-tree','-r','--name-only',baseline,'--','.github/workflows'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
 check(JSON.stringify(actualWorkflows)===JSON.stringify([...baselineWorkflows].sort()),'S83-CI07A','workflow file inventory stays unchanged');
+function normalizeReviewedWorkflow(text,file){
+  let normalized=text.replaceAll(reviewedTrust,oldTrust);
+  if(!fullHistoryWorkflows.has(file))return normalized;
+  normalized=normalized.replace(/^\s*fetch-depth:\s*0\s*\r?\n/m,'');
+  if(file==='.github/workflows/p3-quality.yml')normalized=normalized.replace(/^(\s*- uses: actions\/checkout@[^\r\n]+\r?\n)\s*with:\s*\r?\n(?=\s*- uses: actions\/setup-node@)/m,'$1');
+  return normalized;
+}
 const unexpected=actualWorkflows.filter(file=>{
   const baselineText=execFileSync('git',['show',baseline+':'+file],{encoding:'utf8'});
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
-  return currentText.replaceAll(reviewedTrust,oldTrust)!==baselineText;
+  return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve baseline except reviewed trust SHA rotation');
+check(unexpected.length===0,'S83-CI07B','workflow contents preserve baseline except reviewed trust SHA and full-history checkout');
 
 
 const result={schema:'git-s83-ci-portability-v1',status:'PASS',gitHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),platform:process.platform,node:process.version,checks};
