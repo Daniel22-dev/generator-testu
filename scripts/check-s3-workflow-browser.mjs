@@ -420,6 +420,7 @@ async function sessionPreservationCase() {
     const popupEvent=context.waitForEvent('page');
     await trigger();
     const manual=await popupEvent;
+    await manual.waitForURL(expected,{timeout:15000});
     await manual.waitForLoadState('domcontentloaded');
     assert.match(manual.url(),expected);
     assert.equal(await manual.evaluate(()=>window.opener===null),true);
