@@ -42,11 +42,19 @@ check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before his
 // checkout lines and the exact fresh-foundation evidence path. Any other
 // workflow change fails closed.
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
+const protectedMainBaseline='d7bf7875a33ca97fd619cd403a276973b23d14ea';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
 const reviewedTrust='88d23a5dbf68fdb787c94a2fa3b14dea076464ac79390d32b411e0e38e655b7c';
 const baselineWorkflows=execFileSync('git',['ls-tree','-r','--name-only',baseline,'--','.github/workflows'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
+const protectedMainWorkflowAdditions=new Set([
+  '.github/workflows/manual-browser-qa.yml',
+  '.github/workflows/manual-navigation-qa.yml'
+]);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
-check(JSON.stringify(actualWorkflows)===JSON.stringify([...baselineWorkflows].sort()),'S83-CI07A','workflow file inventory stays unchanged');
+const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions])].sort();
+const workflowInventoryMatches=files=>JSON.stringify([...files].sort())===JSON.stringify(expectedWorkflows);
+execFileSync('git',['merge-base','--is-ancestor',protectedMainBaseline,'HEAD']);
+check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','workflow inventory preserves the certified baseline plus two exact workflows inherited from protected main');
 function normalizeReviewedWorkflow(text,file){
   let normalized=text.replaceAll(reviewedTrust,oldTrust);
   if(!fullHistoryWorkflows.has(file))return normalized;
@@ -56,11 +64,19 @@ function normalizeReviewedWorkflow(text,file){
   return normalized;
 }
 const unexpected=actualWorkflows.filter(file=>{
+  if(protectedMainWorkflowAdditions.has(file)){
+    const protectedMainText=execFileSync('git',['show',protectedMainBaseline+':'+file],{encoding:'utf8'});
+    return fs.readFileSync(path.join(root,file),'utf8')!==protectedMainText;
+  }
   const baselineText=execFileSync('git',['show',baseline+':'+file],{encoding:'utf8'});
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
   return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve baseline except reviewed trust SHA, full-history checkout and fresh foundation evidence');
+check(unexpected.length===0,'S83-CI07B','workflow contents preserve the reviewed baseline exceptions and exact protected-main manual QA bytes');
+assert.equal(workflowInventoryMatches([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
+const changedManualBrowser=fs.readFileSync(path.join(root,'.github/workflows/manual-browser-qa.yml'),'utf8').replace('timeout-minutes: 24','timeout-minutes: 25');
+assert.notEqual(changedManualBrowser,execFileSync('git',['show',protectedMainBaseline+':.github/workflows/manual-browser-qa.yml'],{encoding:'utf8'}),'a protected-main workflow byte mutation must fail admission');
+check(true,'S83-CI07B-MUTATION','unreviewed workflow additions and protected-main workflow byte mutations are rejected');
 const p5File='.github/workflows/p5-release-gate.yml',p5Text=fs.readFileSync(path.join(root,p5File),'utf8'),p5Baseline=execFileSync('git',['show',baseline+':'+p5File],{encoding:'utf8'});
 assert.notEqual(normalizeReviewedWorkflow(p5Text.replace('qa-results/redteam-e10-ci/foundation-evidence/','qa-results/unreviewed-evidence/'),p5File),p5Baseline,'unreviewed artifact paths must remain visible to the baseline comparison');
 check(true,'S83-CI07C-MUTATION','an unreviewed evidence upload path is rejected');
