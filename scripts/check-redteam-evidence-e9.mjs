@@ -19,7 +19,7 @@ function validate(records,version,startedAt){
     if(d.summary){for(const key of ['failed','blockers','browserExceptions','initFailures','overflows'])if(key in d.summary)assert.equal(d.summary[key],0,'Failure '+file+' '+key);}
   }
   const get=name=>records['qa-results/redteam-'+name+'.json'].data;
-  const e8=get('e8-forgery');assert.equal(e8.caseCount,108);assert.equal(e8.negativeControls,108);assert.equal(e8.cases.length,108);assert.equal(e8.rejections,86);const metadataWarnings=e8.cases.filter(x=>['forms-metadata-id','forms-metadata-title','forms-metadata-group'].includes(x.id));assert.equal(metadataWarnings.length,3);assert.ok(metadataWarnings.every(x=>x.expect==='METADATA_WARNING'&&x.passed!==false),'F4 metadata mismatch controls must remain covered as review warnings');assert.equal(e8.replaySequences,6);assert.equal(e8.controls,16);
+  const e8=get('e8-forgery');assert.equal(e8.caseCount,112);assert.equal(e8.negativeControls,112);assert.equal(e8.cases.length,112);assert.equal(e8.rejections,90);const metadataWarnings=e8.cases.filter(x=>['forms-metadata-id','forms-metadata-title','forms-metadata-group'].includes(x.id));assert.equal(metadataWarnings.length,3);assert.ok(metadataWarnings.every(x=>x.expect==='METADATA_WARNING'&&x.passed!==false),'F4 metadata mismatch controls must remain covered as review warnings');const modernSplitIds=['split-modern-percent-disagrees','split-modern-missing-measurement-as-zero','split-modern-count-negative','split-modern-count-unknown-key'];const modernSplitCases=e8.cases.filter(x=>modernSplitIds.includes(x.id));assert.deepEqual(modernSplitCases.map(x=>x.id).sort(),modernSplitIds.toSorted(),'Modern split telemetry cases must remain in the admitted E8 inventory');assert.ok(modernSplitCases.every(x=>x.expect==='REJECTED'&&x.code==='telemetry.split'&&x.status==='PASS'&&x.negativeControl==='DETECTED_WEAKENED_BUILD'),'Modern split telemetry controls must reject and detect a weakened verifier');assert.equal(e8.replaySequences,6);assert.equal(e8.controls,16);
   assert.equal(get('e9-negative').controls.length,7);assert.ok(get('e9-negative').controls.every(x=>x.detected&&x.actualExit===1));
   assert.equal(get('e9-ci-contract').negativeControls.length,14);assert.ok(get('e9-ci-contract').negativeControls.every(x=>x.detected));
   const native=get('e9-restart-browser');assert.equal(native.checks.length,12);assert.ok(native.checks.every(x=>x.status==='PASS'&&x.originPreserved&&x.deadlinePreserved&&x.answerPreserved));assert.equal(native.negativeControls.length,2);assert.ok(native.negativeControls.every(x=>x.detected));
@@ -41,7 +41,7 @@ const mutations=[
   ['stale-report',x=>x['qa-results/redteam-e8-forgery.json'].mtimeMs=0],
   ['wrong-version',x=>x['qa-results/redteam-e8-forgery.json'].data.version='7.1.84'],
   ['failed-VM',x=>x['qa-results/redteam-e3-verifier.json'].data.status='FAIL'],
-  ['missing-forgery-negative',x=>x['qa-results/redteam-e8-forgery.json'].data.negativeControls=107],
+  ['missing-forgery-negative',x=>x['qa-results/redteam-e8-forgery.json'].data.negativeControls=111],
   ['failed-export-negative',x=>x['qa-results/redteam-e9-negative.json'].data.controls[0].detected=false],
   ['partial-native-matrix',x=>x['qa-results/redteam-e9-restart-browser.json'].data.checks.pop()],
   ['invented-mobile-proof',x=>x['qa-results/redteam-e7-mobile-protocol.json'].data.physicalDevicesTested=true],
