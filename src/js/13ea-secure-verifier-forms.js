@@ -72,14 +72,15 @@ async function verifyText(name,txt,meta){
   const sm=verifierSourceMeta(meta),fullYear=!!(meta&&meta.fullYearCsv);let pack=null,payload=null,digest='',stage='source';
   try{
     if(sm.submissionSource==='google-forms-csv')e3Require(meta&&typeof meta.formIdentity==='string'&&meta.formIdentity.trim().length<=254&&typeof meta.formTimestamp==='string'&&meta.formTimestamp.trim().length<=120,'anchors.source-shape','Neplatn\u00fd typ nebo velikost Forms e-mailu/\u010dasu.');
-    stage='parse';pack=parseTxt(txt);stage='envelope';validateSecureEnvelope(pack);stage='decrypt';digest=await sha256HexText(txt);payload=await decryptPayload(pack);stage='payload';
+    stage='parse';pack=parseTxt(txt);stage='envelope';validateSecureEnvelope(pack);
+    if(fullYear&&pack.testId!==CONFIG.testId)return {classification:'other-test',hintTestId:pack.testId,unverifiedOtherTest:true};
+    stage='decrypt';digest=await sha256HexText(txt);payload=await decryptPayload(pack,digest);stage='payload';
     e3Require(e3Object(payload),'schema.shape','Payload nen\u00ed objekt.');e3SafeTree(payload);e3Require(e3String(payload.testId,180)&&payload.testId.trim(),'schema.testId','Payload has no valid test identifier.');
     if(fullYear&&payload.testId!==CONFIG.testId)return {classification:'other-test',verifiedTestId:payload.testId};
     e3Require(payload.testId===CONFIG.testId&&pack.testId===CONFIG.testId,'binding.test','V\u00fdsledek pat\u0159\u00ed k jin\u00e9mu testu.');
     e3Require(payload.manifestHash===CONFIG.manifestHash&&pack.manifestHash===CONFIG.manifestHash,'binding.manifest','Payload nebo obal m\u00e1 jin\u00fd manifest testu.');
     let checked=payload,review=null;
     try{validateSecurePayload(payload);}catch(error){const proposal=proposeManualIdentity(payload,sm,error);checked=proposal.candidate;review=proposal.proof;}
-    // Schema errors keep priority (as before 7.1.97); the build-hash binding then applies to every accepted payload.
     e3Require(!payload.studentHtmlSha256||!CONFIG.studentHtmlSha256||payload.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Payload uv\u00e1d\u00ed jin\u00fd SHA-256 studentsk\u00e9ho HTML.');
     e3Require(!pack.studentHtmlSha256||!CONFIG.studentHtmlSha256||pack.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Obal uv\u00e1d\u00ed jin\u00fd SHA-256 studentsk\u00e9ho HTML.');
     const bindingError=await payloadBindingError(checked);e3Require(!bindingError,'binding.identity-variant',bindingError);
@@ -99,8 +100,6 @@ async function verifyText(name,txt,meta){
     if(payload&&invalidIdentityValidation(code)){
       const row=diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message);RESULTS.push(row);rebuildDuplicateState();return {classification:'diagnostic-quarantine',error:message,code,row};
     }
-    // WebCrypto/UTF-8 failures have no verifier validationCode.  A schema error
-    // raised after successful decryption is not a cryptographic failure.
     const failureStatus=stage==='decrypt'&&!error.validationCode?'CRYPTO_FAIL':(stage==='parse'||stage==='envelope'?'MALFORMED_CIPHERTEXT':'CHYBA');
     const row=Object.assign({file:name,status:failureStatus,error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
     RESULTS.push(row);return {classification:'invalid-current',error:message,code,row};
@@ -124,14 +123,15 @@ async function bulkVerifyPasted(){const txt=($('pasteBox').value||'').trim();if(
 const FORMS_CSV_MAX_BYTES=20*1024*1024;
 const FORMS_CSV_MAX_ROWS=5000;
 function csvParseDelimited(text,delimiter){
-  text=String(text==null?'':text).replace(/^\uFEFF/,'');const rows=[];let row=[],cell='',i=0,inQuotes=false,closed=false;
-  while(i<text.length){const ch=text[i];if(inQuotes){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i+=2;continue;}inQuotes=false;closed=true;i++;continue;}cell+=ch;i++;continue;}
-    if(ch==='"'){if(cell||closed)throw e3Error('csv.quote','Uvozovka uvnitř neuzavřeného pole CSV.');inQuotes=true;i++;continue;}
-    if(ch===delimiter){row.push(cell);cell='';closed=false;i++;continue;}
-    if(ch==='\r'||ch==='\n'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);rows.push(row);e3Require(rows.length<=FORMS_CSV_MAX_ROWS+2,'csv.rows','CSV překračuje limit řádků.');row=[];cell='';closed=false;i++;continue;}
-    if(closed)throw e3Error('csv.quote','Text za uzavřenými uvozovkami CSV.');cell+=ch;i++;
+  text=String(text==null?'':text).replace(/^\uFEFF/,'');const rows=[];let row=[],parts=[],i=0,start=0,inQuotes=false,closed=false;
+  const append=end=>{if(end>start)parts.push(text.slice(start,end));},cell=()=>{const value=parts.join('');parts=[];return value;};
+  while(i<text.length){const ch=text[i];if(inQuotes){if(ch==='"'){append(i);if(text[i+1]==='"'){parts.push('"');i+=2;start=i;continue;}inQuotes=false;closed=true;i++;start=i;continue;}i++;continue;}
+    if(ch==='"'){append(i);if(parts.length||closed)throw e3Error('csv.quote','Uvozovka uvnitř neuzavřeného pole CSV.');inQuotes=true;i++;start=i;continue;}
+    if(ch===delimiter){append(i);row.push(cell());closed=false;i++;start=i;continue;}
+    if(ch==='\r'||ch==='\n'){append(i);row.push(cell());if(ch==='\r'&&text[i+1]==='\n')i++;rows.push(row);e3Require(rows.length<=FORMS_CSV_MAX_ROWS+2,'csv.rows','CSV překračuje limit řádků.');row=[];closed=false;i++;start=i;continue;}
+    if(closed)throw e3Error('csv.quote','Text za uzavřenými uvozovkami CSV.');i++;
   }
-  if(inQuotes)throw e3Error('csv.quote','CSV obsahuje neukončené uvozovky.');row.push(cell);if(row.length>1||row[0]!==''||!rows.length)rows.push(row);return rows;
+  if(inQuotes)throw e3Error('csv.quote','CSV obsahuje neukončené uvozovky.');append(i);row.push(cell());if(row.length>1||row[0]!==''||!rows.length)rows.push(row);return rows;
 }
 function csvRowNonEmpty(row){return Array.isArray(row)&&row.some(v=>String(v||'').trim()!=='');}
 function csvCandidateScore(rows){if(!Array.isArray(rows)||!rows.length)return -1e9;const cols=rows[0].length;if(cols<2)return -10000+cols;const data=rows.slice(1,31).filter(csvRowNonEmpty);const consistent=data.filter(r=>r.length===cols).length;let payloadHits=0;data.forEach(r=>r.forEach(v=>{if(String(v||'').trim().startsWith('SECURE-ANSWERS-V1'))payloadHits++;}));return payloadHits*1000+consistent*40+Math.min(cols,30);}
@@ -246,7 +246,6 @@ async function reevaluateFormsBatches(){
   LAST_FORMS_IMPORT=last;afterResultsChanged();renderFormsImportSummary(last);return last;
 }
 async function importFormsCsvText(text,fileName){
-  parseFormsCsvText(text);
   e3Require(FORMS_CSV_BATCHES.length<20&&FORMS_CSV_BATCHES.reduce((n,b)=>n+b.text.length,0)+text.length<=FORMS_CSV_MAX_BYTES,'csv.batch-limit','Na\u010dten\u00e1 CSV p\u0159ekra\u010duj\u00ed limit. Ulo\u017e v\u00fdsledky a za\u010dni novou sadu.');
   const batch={id:'forms-'+(++FORMS_BATCH_SEQUENCE),text,fileName:String(fileName||'forms.csv').slice(0,180)};FORMS_CSV_BATCHES.push(batch);
   try{return await queueFormsReevaluation();}catch(error){FORMS_CSV_BATCHES=FORMS_CSV_BATCHES.filter(b=>b!==batch);throw error;}

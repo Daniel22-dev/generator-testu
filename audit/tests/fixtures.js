@@ -3,38 +3,38 @@
 // F2 / 7.1.76: audit credentials mirror the production privilege model: Teacher/Admin and Recovery are independent.
 window.AUDIT_TEACHER_SECRET='AUDIT-TEACH-482957';
 window.AUDIT_RECOVERY_CODE='AUDIT-RECOVERY-847362';
-window.auditFixtureItem=function(type,index,language){
+window.auditFixtureItem=function(type,index,language,style){
  const lex={en:['water','river'],es:['agua','r\u00edo'],de:['Wasser','Fluss'],fr:['eau','rivi\u00e8re'],la:['aqua','flumen'],cs:['voda','\u0159eka']};
- const [a,b]=lex[language]||lex.en, explain='Audit fixture '+index;
+ const [a,b]=lex[language]||lex.en, explain='Audit fixture '+index, task='[QA '+(style||type)+' '+(index+1)+'] ';
  const map={
- 'multiple choice':{question:'Select '+a,options:[b,a,'XYZ'],correct:1},
- 'multi-select':{question:'Select '+a+' and '+b,options:[a,'XYZ',b],correct:[0,2]},
- 'fill-in-the-blank':{sentence:'Word: ___',answer:a,alt_answers:[a+' ALT']},
- 'matching':{left:'L'+index,right:'R'+index},
- 'word order':{prompt:'Order these words',words:[b,a],correct_sentence:a+' '+b},
- 'ordering':{question:'Order 1, 2, 3',items:['2','3','1'],correct_order:[2,0,1]},
- 'highlight-evidence':{question:'Select '+b,sentences:[a,b,'XYZ'],correct:1},
- 'categorisation-board':{question:'Put A into category A and B into category B',categories:['A','B'],entries:[{text:'B',category:'B'},{text:'A',category:'A'}]},
- 'table-completion':{question:'Complete the table',columns:['Word','Answer'],rows:[[a,{answer:a,alt_answers:[a+' ALT']}],[b,{answer:b,alt_answers:[]}]]},
- 'transformation-chain':{base_sentence:a+' '+b,transformations:[{instruction:'Write the first word',answer:a,alt_answers:[a+' ALT']},{instruction:'Write the second word',answer:b,alt_answers:[]}]},
- 'translation':{prompt:'Translate water',answer:a,alt_answers:[a+' ALT']},
- 'true/false':{statement:a+' equals '+a,correct:true},
- 'error correction':{sentence:'X'+a,correction:a,alt_answers:[a+' ALT']},
- 'error-tagging':{sentence:'A X B',tokens:['A','X','B'],error_token_index:1,error_type_options:['A','B'],error_type:'B',correction:a,alt_answers:[a+' ALT']},
- 'cloze text':{text:'Words: ___ and ___',answers:[a,b],alt_answers:[[a+' ALT'],[b+' ALT']]},
- 'sentence transformation':{prompt:'Write '+a,keyword:a,answer:a,alt_answers:[a+' ALT']},
- 'reading comprehension':{question:'Select '+a,options:[a,b],correct:0},
- 'dialogue completion':{dialogue:'A: '+a+'\nB: ___',question:'Repeat '+a,options:[b,a],correct:1},
- 'categorization':{text:a,categories:[a,b],correct_category:a},
- 'word formation':{sentence:'___',base_word:a,answer:a,alt_answers:[a+' ALT']},
- 'listening comprehension':{transcript:a+' '+b,question:'Select the first word',options:[a,b],correct:0}
+ 'multiple choice':{question:task+'Select '+a,options:[b,a,'XYZ'],correct:1},
+ 'multi-select':{question:task+'Select '+a+' and '+b,options:[a,'XYZ',b],correct:[0,2]},
+ 'fill-in-the-blank':{sentence:task+'Word: ___',answer:a,alt_answers:[a+' ALT']},
+ 'matching':{left:task+'L'+index,right:'R'+index},
+ 'word order':{prompt:task+'Order these words',words:[b,a],correct_sentence:a+' '+b},
+ 'ordering':{question:task+'Order 1, 2, 3',items:['2','3','1'],correct_order:[2,0,1]},
+ 'highlight-evidence':{question:task+'Select '+b,sentences:[a,b,'XYZ'],correct:1},
+ 'categorisation-board':{question:task+'Put A into category A and B into category B',categories:['A','B'],entries:[{text:'B',category:'B'},{text:'A',category:'A'}]},
+ 'table-completion':{question:task+'Complete the table',columns:['Word','Answer'],rows:[[a,{answer:a,alt_answers:[a+' ALT']}],[b,{answer:b,alt_answers:[]}]]},
+ 'transformation-chain':{base_sentence:task+a+' '+b,transformations:[{instruction:'Write the first word',answer:a,alt_answers:[a+' ALT']},{instruction:'Write the second word',answer:b,alt_answers:[]}]},
+ 'translation':{prompt:task+'Translate water',answer:a,alt_answers:[a+' ALT']},
+ 'true/false':{statement:task+a+' equals '+a,correct:true},
+ 'error correction':{sentence:task+'X'+a,correction:a,alt_answers:[a+' ALT']},
+ 'error-tagging':{sentence:task+'A X B',tokens:['A',task+'X','B'],error_token_index:1,error_type_options:['A','B'],error_type:'B',correction:a,alt_answers:[a+' ALT']},
+ 'cloze text':{text:task+'Words: ___ and ___',answers:[a,b],alt_answers:[[a+' ALT'],[b+' ALT']]},
+ 'sentence transformation':{prompt:task+'Write '+a,keyword:a,answer:a,alt_answers:[a+' ALT']},
+ 'reading comprehension':{question:task+'Select '+a,options:[a,b],correct:0},
+ 'dialogue completion':{dialogue:task+'A: '+a+'\nB: ___',question:task+'Repeat '+a,options:[b,a],correct:1},
+ 'categorization':{text:task+a,categories:[a,b],correct_category:a},
+ 'word formation':{sentence:task+'___',base_word:a,answer:a,alt_answers:[a+' ALT']},
+ 'listening comprehension':{transcript:task+a+' '+b,question:task+'Select the first word',options:[a,b],correct:0}
  };
  if(!map[type])throw new Error('No fixture for '+type);
  return Object.assign({explanation:explain},JSON.parse(JSON.stringify(map[type])));
 };
 window.auditFixtures=function(st,language){
  const specs=buildExerciseSpecs(st);
- const make=()=>({exercises:specs.map(s=>Object.assign({type:s.type,style:s.style,title:s.style,points_total:s.pts,items:Array.from({length:s.count},(_,i)=>auditFixtureItem(s.type,i,language||'en'))},s.type==='reading comprehension'?{passage:'Shared reading passage: water river. '+('Useful source text. '.repeat(15))}:{}))});
+ const make=()=>({exercises:specs.map(s=>Object.assign({type:s.type,style:s.style,title:s.style,points_total:s.pts,items:Array.from({length:s.count},(_,i)=>auditFixtureItem(s.type,i,language||'en',s.style))},s.type==='reading comprehension'?{passage:'Shared reading passage: water river. '+('Useful source text. '.repeat(15))}:{}))});
  const groups=getApiDiffGroups(st);if(!groups.length)return make();
  return {group_variants:Object.fromEntries(groups.map(g=>[g.key,make()]))};
 };

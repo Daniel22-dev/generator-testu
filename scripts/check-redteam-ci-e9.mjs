@@ -24,7 +24,7 @@ export function validateRegressionCi({pkg,p5,deploy,runner,setup}){
   assert.ok(p5.includes('expected-sha: ${{ github.sha }}'));
   assert.match(p5,/name: p5-r2-\$\{\{ github\.sha \}\}/);
   assert.match(p5,/if-no-files-found: error/);
-  for(const path of ['qa-results/redteam-e*.json','qa-results/redteam-e9-*.json','qa-results/redteam-e9-negative/*.log','qa-results/redteam-e10-ci/*.log','audit/evidence/garp27-current/','dist/qa-p5-*.json'])assert.ok(p5.includes('            '+path),path+' must be retained by independent P5');
+  for(const path of ['qa-results/redteam-e*.json','qa-results/redteam-e9-*.json','qa-results/redteam-e9-negative/*.log','qa-results/redteam-e10-ci/*.log','qa-results/redteam-e10-ci/foundation-evidence/','audit/evidence/garp27-current/','dist/qa-p5-*.json'])assert.ok(p5.includes('            '+path),path+' must be retained by independent P5');
   for(const path of ['qa-results/p4-promotion-certificate.json','qa-results/p4-consumed-promotion-evidence.json','qa-results/premerge-p5/','dist/qa-p5-*.json'])assert.ok(deploy.includes('            '+path),path+' must be retained by P4 deploy');
   assert.match(deploy,/run: node scripts\/ci\/main-protection.mjs --live/,'Deployment must recheck live main protection');
   assert.match(deploy,/run: node scripts\/ci\/p4-promotion-evidence.mjs --consume/,'Deployment must verify exact-tree P4 evidence');
@@ -51,7 +51,7 @@ if(process.argv[1]?.endsWith('check-redteam-ci-e9.mjs')){
     ['optional-gate',x=>x.p5=x.p5.replace('run: npm run qa:redteam:ci','continue-on-error: true\n        run: npm run qa:redteam:ci')],
     ['unlocked-install',x=>x.setup.toolsRunner=x.setup.toolsRunner.replace("['npm', 'ci'","['npm', 'install'")],
     ['unbound-artifact',x=>x.p5=x.p5.replace('p5-r2-${{ github.sha }}','p5-r2-latest')],
-    ['missing-evidence',x=>x.p5=x.p5.replace('            audit/evidence/garp27-current/','')],
+    ['missing-evidence',x=>x.p5=x.p5.replace('            qa-results/redteam-e10-ci/foundation-evidence/','')],
     ['deploy-bypass',x=>x.deploy=x.deploy.replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume','run: true')],
   ];
   for(const [id,mutate] of mutations){const broken=structuredClone(input);mutate(broken);assert.throws(()=>validateRegressionCi(broken),{name:'AssertionError'},id);}

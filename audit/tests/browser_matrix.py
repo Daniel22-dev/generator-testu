@@ -1,7 +1,5 @@
 from harness import Harness,TESTS
 import json,time,traceback
-from datetime import datetime
-from zoneinfo import ZoneInfo
 OUT=TESTS.parent/'evidence'
 def click_attr(p,attr,val):p.locator('['+attr+'='+json.dumps(val)+']').click()
 def private_start_code(h,teacher_html):
@@ -36,8 +34,8 @@ def configure_forms_anchors(p,published_at,email_header='Email Address',timestam
   if trigger.count():trigger.click()
   else:p.locator('[data-v2-panel="security"]').click()
  domain.wait_for(state='visible')
- dt=datetime.fromisoformat(published_at.replace('Z','+00:00')).astimezone(ZoneInfo('Europe/Prague'))
- domain.fill('example.invalid');p.locator('#formsPublishedDate').fill(dt.strftime('%Y-%m-%d'));p.locator('#formsPublishedTime').fill(dt.strftime('%H:%M'))
+ local=p.evaluate("""value=>{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(value));const x=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));return {date:x.year+'-'+x.month+'-'+x.day,time:x.hour+':'+x.minute}}""",published_at)
+ domain.fill('example.invalid');p.locator('#formsPublishedDate').fill(local['date']);p.locator('#formsPublishedTime').fill(local['time'])
  advanced=p.locator('.forms-verify-advanced')
  if advanced.count() and not p.locator('#formsEmailHeader').is_visible():advanced.evaluate('el=>{el.open=true}')
  p.locator('#formsEmailHeader').fill(email_header);p.locator('#formsTimestampHeader').fill(timestamp_header)

@@ -93,4 +93,5 @@ jobs:
             qa-results/redteam-e9-*.json
             qa-results/redteam-e9-negative/*.log
             qa-results/redteam-e10-ci/*.log
+            qa-results/redteam-e10-ci/foundation-evidence/
             audit/evidence/garp27-current/
