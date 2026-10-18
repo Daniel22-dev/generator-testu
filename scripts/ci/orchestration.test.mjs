@@ -271,7 +271,7 @@ function validateWorkflowContracts(safe, deploy, p5, runner) {
   assert.match(deployJob, /if \[ \"\$current_main\" != \"\$EXPECTED_MAIN_SHA\" \]; then/);
   assert.ok(main.indexOf('run: npm run build') < main.indexOf('p4-promotion-evidence.mjs --materialize'), 'Final main build precedes reused evidence materialization');
   assert.doesNotMatch(main, /continue-on-error: true/);
-  assert.match(runner, /const steps=\['npm test','npm run qa:garp27:foundation','npm run qa:p5:ci','node scripts\/check-redteam-evidence-e10.mjs'\]/);
+  assert.match(runner, /const steps=\['npm test','npm run qa:garp27:foundation','node scripts\/preserve-foundation-evidence-e10.mjs','npm run qa:p5:ci','node scripts\/check-redteam-evidence-e10.mjs'\]/);
   assert.match(runner, /fs.rmSync\('qa-results',\{recursive:true,force:true\}\)/);
   assert.match(runner, /results.every\(x=>x.pass\)&&sourceUnchanged/);
   assert.match(runner, /durationMs:Math.round\(performance.now\(\)-stepClock\)/);
@@ -296,6 +296,7 @@ for (const [name, mutate] of [
   ['skip P4 main evidence validator', x => { x[1] = x[1].replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume', 'run: true'); }],
   ['accept stale main before deploy', x => { x[1] = x[1].replace('if [ \"$current_main\" != \"$EXPECTED_MAIN_SHA\" ]; then', 'if false; then'); }],
   ['drop cleanup freshness', x => { x[3] = x[3].replace("fs.rmSync('qa-results',{recursive:true,force:true})", ''); }],
+  ['drop foundation evidence isolation', x => { x[3] = x[3].replace("'node scripts/preserve-foundation-evidence-e10.mjs',", ''); }],
   ['drop source invariant', x => { x[3] = x[3].replace('&&sourceUnchanged', ''); }],
 ]) test(`workflow negative control: ${name}`, () => {
   const input = [safe, deploy, p5, runner]; mutate(input);
