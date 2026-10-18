@@ -38,8 +38,8 @@ for(const file of fullHistoryWorkflows){
 assert.equal(checkoutUsesFullHistory(fs.readFileSync(path.join(root,'.github/workflows/p5-release-gate.yml'),'utf8').replace('fetch-depth: 0','fetch-depth: 1')),false,'negative mutation must reject shallow checkout');
 check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before historical byte comparison');
 // The final certification may explicitly approve a trust-anchor pin rotation.
-// Normalize only that reviewed SHA replacement plus the three exact full-history
-// checkout lines required by the historical byte comparison itself. Any other
+// Normalize only that reviewed SHA replacement, the three exact full-history
+// checkout lines and the exact fresh-foundation evidence path. Any other
 // workflow change fails closed.
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
@@ -52,6 +52,7 @@ function normalizeReviewedWorkflow(text,file){
   if(!fullHistoryWorkflows.has(file))return normalized;
   normalized=normalized.replace(/^\s*fetch-depth:\s*0\s*\r?\n/m,'');
   if(file==='.github/workflows/p3-quality.yml')normalized=normalized.replace(/^(\s*- uses: actions\/checkout@[^\r\n]+\r?\n)\s*with:\s*\r?\n(?=\s*- uses: actions\/setup-node@)/m,'$1');
+  if(file==='.github/workflows/p5-release-gate.yml')normalized=normalized.replace(/^\s*qa-results\/redteam-e10-ci\/foundation-evidence\/\s*\r?\n/m,'');
   return normalized;
 }
 const unexpected=actualWorkflows.filter(file=>{
@@ -59,7 +60,10 @@ const unexpected=actualWorkflows.filter(file=>{
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
   return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve baseline except reviewed trust SHA and full-history checkout');
+check(unexpected.length===0,'S83-CI07B','workflow contents preserve baseline except reviewed trust SHA, full-history checkout and fresh foundation evidence');
+const p5File='.github/workflows/p5-release-gate.yml',p5Text=fs.readFileSync(path.join(root,p5File),'utf8'),p5Baseline=execFileSync('git',['show',baseline+':'+p5File],{encoding:'utf8'});
+assert.notEqual(normalizeReviewedWorkflow(p5Text.replace('qa-results/redteam-e10-ci/foundation-evidence/','qa-results/unreviewed-evidence/'),p5File),p5Baseline,'unreviewed artifact paths must remain visible to the baseline comparison');
+check(true,'S83-CI07C-MUTATION','an unreviewed evidence upload path is rejected');
 
 
 const result={schema:'git-s83-ci-portability-v1',status:'PASS',gitHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),platform:process.platform,node:process.version,checks};
