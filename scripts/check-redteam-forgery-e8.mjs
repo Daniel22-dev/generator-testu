@@ -10,7 +10,7 @@ function weakened(html,c,ctx){
   if(c.expect==='REJECTED'){
     // 7.1.97 parser rejections are thrown directly; the weakened build bypasses the whole parser instead.
     if(String(c.code).startsWith('anchors.timestamp-'))return replaceOnce(html,'function e3FormsTime(value){','function e3FormsTime(value){return {lower:0,upper:0};');
-    if(c.code==='crypto.parse-decrypt')return replaceOnce(html,'async function decryptPayload(pack){','async function decryptPayload(pack){return '+JSON.stringify(ctx.p)+';');
+    if(c.code==='crypto.parse-decrypt')return replaceOnce(html,'async function decryptPayload(pack,key){','async function decryptPayload(pack,key){return '+JSON.stringify(ctx.p)+';');
     return replaceOnce(html,'function e3Require(ok,code,message){','function e3Require(ok,code,message){if(code==='+JSON.stringify(c.code)+')return;');
   }
   if(c.expect==='METADATA_WARNING')return replaceOnce(html,'function metadataMismatchFor(sm){','function metadataMismatchFor(sm){return [];');
