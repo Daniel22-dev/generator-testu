@@ -1,48 +1,46 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.99",
-  "status": "READY FOR CONTROLLED STUDENT RED-TEAM",
+  "version": "7.1.100",
+  "status": "READY WITH DOCUMENTED LIMITATIONS",
   "blockers": [],
-  "f7": "IMPLEMENTED; current-version gates required",
-  "remotePath": "Owner approved preparation of GIT 7.1.99 on 2026-10-08, with commit to candidate only after all mandatory local precommit checks succeed; main remains protected pending independent exact-SHA CI, journey and promotion gates.",
-  "scope": "CONTROLLED_STUDENT_RED_TEAM_ONLY",
+  "f7": "IMPLEMENTED; exact-SHA current-version gates required",
+  "remotePath": "Owner authorized final GIT 7.1.100 GitHub publication and conditional standard promotion on 2026-10-17. Candidate/main/deployment remain fail-closed behind exact-SHA release gates.",
+  "scope": "CONTROLLED_CLASSROOM_WITH_DOCUMENTED_LIMITATIONS",
   "ownerDecision": {
-    "recordedOn": "2026-10-08",
-    "source": "Explicit owner approval on 2026-10-08: prepare version 7.1.99, run full precommit suite, and commit to candidate only if mandatory checks are green; keep main unchanged until independent CI certification.",
+    "recordedOn": "2026-10-17",
+    "source": "Explicit owner authorization to complete GIT 7.1.100, publish the isolated work branch immediately, and use the existing protected candidate/main release process only after all mandatory checks pass.",
     "authorizeGithubPublication": true,
+    "authorizeProductionReleaseAfterMandatoryGates": true,
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",
       "closed": false,
-      "note": "Owner deferred E6. Historical raw/cache purge and private credential rotation are not certified complete."
+      "note": "Historical cache purge and private credential rotation are not certified complete."
     },
     "LIVE_FORMS": {
-      "status": "OWNER_REPORTED_CHECKED",
+      "status": "NOT_VERIFIED_FOR_7_1_100",
       "independentlyVerified": false,
-      "note": "Owner previously checked school Form settings for prior release. Version 7.1.99 fixes the opening of a new tab in the student submission flow; real school Form and physical device verification have not been independently completed for this version."
+      "note": "Synthetic Forms CSV and Apps Script/Sheets/MailApp contracts passed; no live school submission or delivery was executed for 7.1.100."
     },
     "E7_PHYSICAL": {
-      "status": "SCHEDULED",
+      "status": "NOT_VERIFIED",
       "physicalDevicesTested": false,
-      "testDates": [
-        "2026-10-06",
-        "2026-10-09"
-      ],
-      "note": "Physical mobile behavior will be tested during the supervised Tuesday and Friday student experiment."
+      "testDates": [],
+      "note": "Physical iPadOS/iOS/Android behavior is not certified by desktop Chromium automation."
     },
     "independentReview": {
-      "status": "CLAUDE_AUDIT_AND_FIX",
-      "reviewedVersion": "7.1.97",
-      "currentVersion": "7.1.99",
+      "status": "PENDING_FINAL_EXACT_SHA_AUDIT",
+      "reviewedVersion": "7.1.100",
+      "currentVersion": "7.1.100",
       "currentVersionIndependentlyReviewed": false,
-      "note": "Claude analyzed the original incident and supplied the scoped 7.1.99 patch and claimed local E2E runs. The current 7.1.99 full exact-lockfile precommit suite, protected CI and physical device validation require independent evidence; none is claimed here."
+      "note": "Local and GitHub exact-SHA evidence is required; this source decision does not relabel physical or live-service checks as PASS."
     }
   },
   "limitations": [
-    "Publication is authorized for the supervised student red-team experiment; physical mobile compatibility is not certified.",
-    "E6 remains deferred and open; a clean current branch does not prove historical cache removal.",
-    "Client-controlled telemetry and consistent public-key forgery require teacher review; the static runtime is not trusted server authentication.",
-    "Physical phones and live Forms for this new export were not independently exercised. The 7.1.99 changes was not separately independently certified; this is not an independent PASS.",
-    "Exact candidate and protected-main CI must complete before the existing promotion workflow may deploy.",
-    "START marker tolerance is 10 minutes; a manually entered lesson time overrides CSV markers and is labelled as manual in results."
+    "Physical iPadOS/iOS/Android and non-Chromium browser behavior is NOT VERIFIED for this release.",
+    "Live school Google Forms, Sheets, Apps Script mail delivery and live Gemini transport are NOT VERIFIED for this release.",
+    "T110 server-side recovery/revocation remains SERVER-DEFERRED by owner decision.",
+    "Split-screen detection remains SHADOW/AUDIT-ONLY and never triggers an automatic lock.",
+    "Client-controlled telemetry, full storage wipe, a separate browser profile and a second device remain architectural limits requiring teacher review.",
+    "Promotion and deployment are authorized only through exact-SHA candidate, PR, P5, Journey, main-protection and live release-identity gates."
   ]
 }

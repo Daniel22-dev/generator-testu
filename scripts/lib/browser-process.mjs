@@ -18,13 +18,22 @@ async function waitForExit(child,timeoutMs){
 }
 export async function stopBrowserProcess(child){
   if(exited(child))return;
+  if(process.platform==='win32'){
+    // Chromium spawns a process tree whose utility children may retain the
+    // user-data directory briefly after the browser parent exits. Terminate
+    // the test-owned tree atomically before the parent PID disappears; never
+    // target unrelated Chromium processes by name.
+    spawnSync('taskkill.exe',['/pid',String(child.pid),'/t','/f'],{stdio:'ignore',windowsHide:true});
+    await waitForExit(child,5000);
+    await sleep(750);
+    if(!exited(child)&&processExists(child.pid))throw new Error('Chromium process tree did not terminate');
+    return;
+  }
   try{
-    if(process.platform==='win32')spawnSync('taskkill.exe',['/pid',String(child.pid),'/t'],{stdio:'ignore',windowsHide:true});
-    else process.kill(-child.pid,'SIGTERM');
+    process.kill(-child.pid,'SIGTERM');
   }catch{}
   if(await waitForExit(child,1200))return;
-  if(process.platform==='win32')spawnSync('taskkill.exe',['/pid',String(child.pid),'/t','/f'],{stdio:'ignore',windowsHide:true});
-  else try{process.kill(-child.pid,'SIGKILL');}catch{}
+  try{process.kill(-child.pid,'SIGKILL');}catch{}
   await waitForExit(child,3000);
   if(!exited(child)&&processExists(child.pid))throw new Error('Chromium process tree did not terminate');
 }

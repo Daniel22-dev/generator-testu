@@ -78,4 +78,4 @@ try{
   assert(failed.hidden&&/nelze bezpečně zahájit/.test(failed.text),'bez spolehlivé pečeti se bezpečný test nespustí');
 
   console.log('PASS joker workflow real-browser click test');
-}finally{client?.close();await new Promise(r=>server.close(r));await stopBrowserProcess(chrome);await removeBrowserProfile(profile);}
+}finally{try{await client?.call('Browser.close');}catch{}client?.close();await new Promise(r=>server.close(r));await stopBrowserProcess(chrome);await removeBrowserProfile(profile);}

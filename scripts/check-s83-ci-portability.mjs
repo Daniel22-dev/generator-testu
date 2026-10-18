@@ -43,7 +43,7 @@ check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before his
 // workflow change fails closed.
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
-const reviewedTrust='50ce942425eeb000bd183b860a6899e1949668e8dd8585edf3ab1ca0e9ef05d8';
+const reviewedTrust='88d23a5dbf68fdb787c94a2fa3b14dea076464ac79390d32b411e0e38e655b7c';
 const baselineWorkflows=execFileSync('git',['ls-tree','-r','--name-only',baseline,'--','.github/workflows'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
 check(JSON.stringify(actualWorkflows)===JSON.stringify([...baselineWorkflows].sort()),'S83-CI07A','workflow file inventory stays unchanged');
