@@ -50,6 +50,7 @@ const found = {
   'GARP 2.7 architecture version': jsonVersion('security/garp27/architecture-policy.json'),
   'GARP 2.7 capability inventory version': jsonVersion('security/garp27/capability-inventory.json'),
   'public/manual/index.html version': read('public/manual/index.html').match(/data-ghrab-app-version="([^"]+)"/)?.[1] || null,
+  'public/manual/index.html PDF contract version': read('public/manual/index.html').match(/GHRAB_MANUAL_DOC_INFO[\s\S]*?appVersion:\s*['"]([^'"]+)['"]/)?.[1] || null,
 };
 
 

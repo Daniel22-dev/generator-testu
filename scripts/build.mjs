@@ -222,6 +222,16 @@ function compactHtmlShell(source) {
   return out.join('\n');
 }
 
+function compactManualHtml(source, file) {
+  let styleIndex=0,scriptIndex=0;
+  const styles=source.replace(/<style([^>]*)>([\s\S]*?)<\/style>/gi,(match,attrs,body)=>
+    `<style${attrs}>${compactCss(body,`${file}#style-${++styleIndex}`)}</style>`);
+  return styles.replace(/<script([^>]*)>([\s\S]*?)<\/script>/gi,(match,attrs,body)=>{
+    if(/\bsrc\s*=/i.test(attrs)||!body.trim())return match;
+    return `<script${attrs}>${compactJsWhitespace(body,`${file}#script-${++scriptIndex}`)}</script>`;
+  });
+}
+
 function copyDir(src, dest) {
   if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
@@ -322,6 +332,21 @@ out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
 fs.writeFileSync(DIST, out, 'utf8');
 
 copyDir(PUBLIC_DIR, DIST_DIR);
+// Public helpers stay readable and independently testable in source, but ship
+// compacted. JS compaction verifies AST equivalence before writing; CSS uses the
+// same tokenizer-safe compactor as the application shell.
+for (const [relative,compact] of [
+  ['manual/navigation-context.js',compactJsWhitespace],
+  ['manual/pdf-download.js',compactJsWhitespace],
+  ['manual/navigation-context.css',compactCss],
+  ['access/access-gate.css',compactCss],
+  ['access/error-reporter.css',compactCss]
+]) {
+  const target=path.join(DIST_DIR,...relative.split('/'));
+  fs.writeFileSync(target,compact(fs.readFileSync(target,'utf8'),`public/${relative}`),'utf8');
+}
+const manualIndexTarget=path.join(DIST_DIR,'manual','index.html');
+fs.writeFileSync(manualIndexTarget,compactManualHtml(fs.readFileSync(manualIndexTarget,'utf8'),'public/manual/index.html'),'utf8');
 // JSON konfigurace se v dist ukládají kompaktně; zdrojové soubory zůstávají čitelné a byte-stable pro audit.
 for (const file of (function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)])})(DIST_DIR)) {
   if (!/\.(?:json|webmanifest)$/i.test(file)) continue;
