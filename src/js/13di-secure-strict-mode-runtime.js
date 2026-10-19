@@ -13,6 +13,7 @@ function strictFallbackAuthorization(){
   if(strictFullscreenSupport()==='supported')return {allowed:false,reason:'element-fullscreen-api-present'};
   try{
     if(window.self!==window.top)return {allowed:false,reason:'embedded-test'};
+    if(window.frameElement)return {allowed:false,reason:'embedded-test'};
     if(String(location.protocol||'')!=='https:')return {allowed:false,reason:'not-top-level-https'};
     var ua=String(navigator.userAgent||'');
     var inApp=/(?:; wv\)|\bWebView\b|\bFBAN\b|\bFBAV\b|\bInstagram\b|\bGSA\/|\bMicroMessenger\b|\bTikTok\b|\bLine\/)/i.test(ua);
