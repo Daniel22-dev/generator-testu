@@ -253,7 +253,7 @@ async function chooseVariant(name){const groups=CFG.diffGroups||[];if(!groups.le
 `+SECURE_STRICT_MODE_RUNTIME_JS+String.raw`
 async function startTest(){if(strictModeRuntime())return verifyStrictTest();if(ATTEMPT_START_BUSY||isTestActive())return;ATTEMPT_START_BUSY=true;try{if(!(await acquireAttemptTabLock())){sModal(t('anotherTab','Tento test je otevřený v jiné kartě. Zavři ji a pokračuj zde.'),t('activeAttemptTitle'));return;}await startTestAttempt();}finally{ATTEMPT_START_BUSY=false;if(!isTestActive())releaseAttemptTabLock();}}
 async function startTestAttempt(){
-  if(strictModeRuntime()&&(STRICT_FULLSCREEN_MODE!=='enforced'&&STRICT_FULLSCREEN_MODE!=='fallback')){strictStartStatus(t('strictGateRequired','Verify the test and use the fullscreen start button.'),'error');return false;}
+  if(strictModeRuntime()&&(STRICT_FULLSCREEN_MODE!=='enforced'&&STRICT_FULLSCREEN_MODE!=='fallback'&&!(STRICT_FULLSCREEN_MODE==='preview'&&strictTeacherPreview()))){strictStartStatus(t('strictGateRequired','Verify the test and use the fullscreen start button.'),'error');return false;}
   if(strictModeRuntime()&&STRICT_FULLSCREEN_MODE==='enforced'&&!strictFullscreenElement()){strictStartStatus(t('strictFullscreenStateMissing','Fullscreen was not confirmed. Retry the fullscreen start.'),'error');return false;}
   const name=normalizeAttemptIdentity($('studentName').value);
   $('studentName').value=name;
@@ -298,16 +298,16 @@ async function startTestAttempt(){
   }
   var strictStartEvents=strictConsumePrestartEvents();if(strictStartEvents.length)SEC_EVENTS=SEC_EVENTS.concat(strictStartEvents.map(function(e){return Object.assign({},e,{t:STARTED_AT});}));
   restoreRuntimeAudit(seal);if(seal&&CFG.lockOnLeave){var wasLocked=LOCKED;LOCKED=true;LOCK_REASON=LOCK_REASON||'attempt resumed after reload';if(!wasLocked)recordSec('locked',LOCK_REASON);}
-  prepareSecureTimerDeadline();
+  if(!strictTeacherPreview())prepareSecureTimerDeadline();
   if(!(await persistActiveAttemptSeal())){ACTIVE_IDENTITY='';ACTIVE_IDENTITY_HASH='';ATTEMPT_ID='';STARTED_AT='';TIMER_DEADLINE=0;SEC_EVENTS=[];LOCKED=false;LOCK_REASON='';if(!seal)JOKER_SELECTED_AT='';sModal(t('activeAttemptStorageError','Test nelze bezpečně zahájit, protože prohlížeč nepovolil místní uložení stavu pokusu. Povol úložiště webu nebo použij jiné zařízení.'),t('activeAttemptTitle','Rozpracovaný pokus je uzamčen'));return;}
-  renderTest();restoreResponseUi();applyRuntimeRandomization();$('intro').classList.add('hidden');$('test').classList.remove('hidden');updateJokerUi();resetTestScrollAfterStart();armSecureStartInteractionGuard();armSecureSubmitButton();startTimer();if(isTestActive())startSplitMonitor();
+  renderTest();restoreResponseUi();applyRuntimeRandomization();$('intro').classList.add('hidden');$('test').classList.remove('hidden');updateJokerUi();resetTestScrollAfterStart();armSecureStartInteractionGuard();armSecureSubmitButton();if(!strictTeacherPreview())startTimer();if(isTestActive()&&!strictTeacherPreview())startSplitMonitor();
   if(LOCKED&&isTestActive()){const r=$('lockReasonBox');if(r)r.textContent=t('lockReason','Důvod')+': '+(LOCK_REASON||t('lockedEvent','opuštění okna/aplikace'));$('lockScreen').classList.remove('hidden');applyGuardUi(true);}
   if(seal)handleReturn();if(document.wasDiscarded)recordSec('page-discarded','browser discarded/recreated page');
 }
 function secureTimerLimitSeconds(){const base=Math.max(1,Number(CFG.cas)||45)*60;return A11Y&&A11Y.timeMult>1?Math.round(base*A11Y.timeMult):base;}
-function prepareSecureTimerDeadline(){if(A11Y&&A11Y.noLimit){TIMER_DEADLINE=0;return;}if(Number(TIMER_DEADLINE)>0)return;var startMs=Date.parse(STARTED_AT)||Date.now();TIMER_DEADLINE=startMs+secureTimerLimitSeconds()*1000;}
+function prepareSecureTimerDeadline(){if(strictTeacherPreview()){TIMER_DEADLINE=0;return;}if(A11Y&&A11Y.noLimit){TIMER_DEADLINE=0;return;}if(Number(TIMER_DEADLINE)>0)return;var startMs=Date.parse(STARTED_AT)||Date.now();TIMER_DEADLINE=startMs+secureTimerLimitSeconds()*1000;}
 function refreshSecureTimer(){if(SUBMITTED)return false;const el=$('timer');if(A11Y&&A11Y.noLimit){if(el)el.textContent='∞';return true;}const remain=Math.max(0,Math.ceil((TIMER_DEADLINE-Date.now())/1000));if(el){const m=Math.floor(remain/60),sec=remain%60;el.textContent=String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}if(remain<=0){submitSecureTest('timer-expired');return false;}return true;}
-function startTimer(){prepareSecureTimerDeadline();persistActiveAttemptSeal();clearTimeout(TIMER_ID);const tick=()=>{if(!refreshSecureTimer())return;TIMER_ID=setTimeout(tick,1000);};tick();}
+function startTimer(){if(strictTeacherPreview()){TIMER_DEADLINE=0;clearTimeout(TIMER_ID);var timer=$('timer');if(timer)timer.textContent='NÁHLED · bez limitu';return;}prepareSecureTimerDeadline();persistActiveAttemptSeal();clearTimeout(TIMER_ID);const tick=()=>{if(!refreshSecureTimer())return;TIMER_ID=setTimeout(tick,1000);};tick();}
 function isTestActive(){return $('test')&&!$('test').classList.contains('hidden')&&!SUBMITTED;}
 function isTestRunning(){return isTestActive()&&!LOCKED;}
 function recordSec(type,detail,extra){var ev={t:new Date().toISOString(),type:String(type||'event'),detail:detail||''};if(extra&&typeof extra==='object'){Object.keys(extra).forEach(function(k){ev[k]=extra[k];});}SEC_EVENTS.push(ev);appendCriticalEvent(ev);persistActiveAttemptSeal();}
