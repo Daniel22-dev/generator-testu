@@ -55,6 +55,6 @@ if(process.argv[1]?.endsWith('check-redteam-ci-e9.mjs')){
     ['deploy-bypass',x=>x.deploy=x.deploy.replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume','run: true')],
   ];
   for(const [id,mutate] of mutations){const broken=structuredClone(input);mutate(broken);assert.throws(()=>validateRegressionCi(broken),{name:'AssertionError'},id);}
-  fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/redteam-e9-ci-contract.json',JSON.stringify({stage:'E9',version:input.pkg.version,status:'PASS',scope:'Static wiring contract with 14 intentional mutations; actual process evidence is separate',negativeControls:mutations.map(([id])=>({id,detected:true}))},null,2)+'\n');
+  fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/redteam-e9-ci-contract.json',JSON.stringify({stage:'E9',version:input.pkg.version,status:'PASS',scope:`Static wiring contract with ${mutations.length} intentional mutations; actual process evidence is separate`,negativeControls:mutations.map(([id])=>({id,detected:true}))},null,2)+'\n');
   console.log('PASS E9 CI wiring and',mutations.length,'negative controls');
 }
