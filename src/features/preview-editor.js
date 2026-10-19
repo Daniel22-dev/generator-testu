@@ -42,7 +42,7 @@ function createPreviewFrame(){
   frame.id='previewFrame';
   frame.className='preview-frame';
   frame.title='Náhled testu';
-  frame.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads');
+  frame.setAttribute('sandbox','allow-scripts allow-modals');
   frame.dataset.previewInstance=String(++previewFrameSeq);
   stage.appendChild(frame);
   return frame;
@@ -63,7 +63,7 @@ function openTestPreview(){
   const pv = getPreviewHtml();
   const modal = $('previewModal'), note = $('previewNote');
   if (!pv || !pv.html) { uiAlert('Nejdřív vygeneruj test, pak ho můžeš zobrazit v náhledu.'); return; }
-  if(note)note.textContent=state.identityMode==='oneTimeCode'&&pv.previewCode?'Učitelský náhled: platný kód je předvyplněn pouze zde; studentský soubor se nemění.':pv.secure?'Studentský test bez správných odpovědí. Správnost klíče zkontroluješ v učitelském verifieru.':'Hotový interaktivní test tak, jak ho uvidí studenti.';
+  if(note)note.textContent='UČITELSKÁ SIMULACE — bez skutečného pokusu, časovače a odevzdání. '+(state.identityMode==='oneTimeCode'&&pv.previewCode?'Kód je předvyplněn pouze v náhledu. ': '')+(pv.secure?'Správné odpovědi zůstávají v soukromém verifieru.':'');
   const frame=createPreviewFrame();
   if(!frame){ uiAlert('Náhled se nepodařilo připravit. Zavři dialog a zkus to znovu.'); return; }
   setPreviewWidth(360);
