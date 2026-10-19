@@ -14,7 +14,7 @@ function buildIntroHtml(cfg, exercises) {
     '<p class="test-id-lbl">Test ID: ' + H(cfg.testId) + '</p>' +
     '<div class="ex-ov">' +
     exercises.map((ex,i) => '<div class="ex-ov-row"><span class="ex-num-badge">' + (i+1) + '</span>' +
-      '<span class="ex-ov-name">' + H(ex.title||ex.type) + '</span>' +
+      '<span class="ex-ov-name"><strong class="ex-style-label">' + H(exerciseStyleLabel(ex)) + '</strong>' + (exerciseThemeTitle(ex)?'<small class="exercise-subtitle">'+H(exerciseThemeTitle(ex))+'</small>':'') + '</span>' +
       '<span class="ex-ov-pts">' + fmtPts(exerciseTotalPoints(ex)) + '&nbsp;' + H(L.points) + '</span></div>').join('') +
     '<div class="ex-ov-total"><span>' + H(L.total) + '</span><span>' + fmtPts(cfg.totalBody) + ' ' + H(L.points) + ' · ' + totalQ + ' ' + H(L.questions) + ' · ' + cfg.cas + ' ' + H(L.minutes) + (cfg.cefr ? ' · CEFR ' + H(cfg.cefr) : '') + '</span></div>' +
     '</div>' +
@@ -66,7 +66,7 @@ function buildTabsNavHtml(exercises, L) {
   return '<div class="tabs-nav" id="tabsNav">' +
     exercises.map((ex,i) => '<button class="tab-btn' + (i===0?' tab-active':'') + '" id="tabBtn' + i + '" onclick="switchTab(' + i + ')">' +
       '<span class="tab-num">' + (i+1) + '</span>' +
-      '<span class="tab-name" title="' + H(ex.title||ex.type) + '">' + H(ex.title||ex.type) + '</span>' +
+      '<span class="tab-name" title="' + H(exerciseDisplayName(ex)) + '"><strong class="ex-style-label">' + H(exerciseStyleLabel(ex)) + '</strong>' + (exerciseThemeTitle(ex)?'<small class="exercise-subtitle">'+H(exerciseThemeTitle(ex))+'</small>':'') + '</span>' +
       '<span class="tab-done hidden" id="tabDone' + i + '">&#10003;</span>' +
       '</button>').join('') +
     '</div>';
@@ -98,7 +98,7 @@ function buildExerciseHtml(ex, ei, cfg, totalEx) {
   return '<div class="ex-panel' + panelHidden + '" id="exPanel' + ei + '">' +
     '<div class="ex-hdr">' +
     '<span class="ex-hdr-num">' + H(L.exercise) + ' ' + (ei+1) + '</span>' +
-    '<span class="ex-hdr-title">' + H(ex.title||ex.type) + '</span>' +
+    '<span class="ex-hdr-title"><strong class="ex-style-label">' + H(exerciseStyleLabel(ex)) + '</strong>' + (exerciseThemeTitle(ex)?'<small class="exercise-subtitle">'+H(exerciseThemeTitle(ex))+'</small>':'') + '</span>' +
     '<span class="ex-hdr-pts">' + fmtPts(totalPts) + ' ' + H(L.points) + '</span>' +
     '</div>' +
     rcHead +
@@ -347,7 +347,7 @@ function buildTeacherHtml(cfg, exercises) {
     '<div class="modal-box teacher-box"><div id="t-login">' +
     '<div class="modal-title">&#128274; ' + H(L.teacher) + '</div>' +
     '<input type="text" id="t-name" class="modal-inp" placeholder="' + H(L.teacher) + '" autocomplete="off">' +
-    '<input type="password" id="t-pin" class="modal-inp" placeholder="PIN" onkeydown="if(event.key===\'Enter\')doTeacherLogin()">' +
+    '<input type="password" id="t-pin" class="modal-inp" placeholder="' + H(L.teacherAccess || L.teacher) + '" aria-label="' + H(L.teacherAccess || L.teacher) + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key===\'Enter\')doTeacherLogin()">' +
     '<div id="t-err" class="t-err hidden"></div>' +
     '<button class="btn-modal-ok" onclick="doTeacherLogin()">' + H(L.login) + '</button>' +
     '<button class="btn-modal-cancel" onclick="closeTeacherModal()">' + H(L.close) + '</button>' +
@@ -372,7 +372,7 @@ function buildModalsHtml(cfg) {
       '<div class="lock-icon" id="lockIcon" onclick="lockTap()" style="cursor:pointer;user-select:none;-webkit-user-select:none">&#128274;</div><div class="lock-title">' + H(L.locked) + '</div>' +
       '<div class="lock-reason" id="lockContactMsg">' + H(L.lockContact || 'Kontaktuj učitele.') + '</div>' +
       '<div id="unlockReveal" class="hidden"><div id="lockReason" class="lock-reason"></div>' +
-      '<input type="password" id="unlockInp" class="lock-inp" placeholder="' + H(L.unlockPh) + '" onkeydown="if(event.key===\'Enter\')tryUnlock()">' +
+      '<input type="password" id="unlockInp" class="lock-inp" aria-label="' + H(L.unlockPh) + '" placeholder="' + H(L.unlockPh) + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key===\'Enter\')tryUnlock()">' +
       '<button class="btn-modal-ok" onclick="tryUnlock()">' + H(L.unlock) + '</button></div></div></div>' : '');
 }
 

@@ -2,7 +2,7 @@
 const SECURE_CRITICAL_HISTORY_JS=String.raw`
 // The independent critical history has a reserved overflow record and final lock.
 const CRITICAL_EVENT_LIMIT=900;
-const CRITICAL_EVENT_TYPES=['locked','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','critical-events-overflow'];
+const CRITICAL_EVENT_TYPES=['locked','recovery-authorized','recovery-unlock','bad-unlock','persistence-integrity','attempt-resumed-after-reload','page-discarded','page-restored','left-window','large-paste','paste-blocked','identity-input-mismatch','critical-events-overflow'];
 let CRITICAL_EVENTS=[],CRITICAL_COUNTERS={locks:0,unlocks:0,resumes:0,badUnlocks:0},CRITICAL_EVENTS_OVERFLOW=false,CRITICAL_HISTORY_LEGACY=false;
 function criticalCounts(events){var out={locks:0,unlocks:0,resumes:0,badUnlocks:0};events.forEach(function(e){var k=({locked:'locks','recovery-unlock':'unlocks','attempt-resumed-after-reload':'resumes','bad-unlock':'badUnlocks'})[e.type];if(k)out[k]++;});return out;}
 function validCriticalState(body){

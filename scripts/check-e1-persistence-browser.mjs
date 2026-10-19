@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const ROOT=new URL('../',import.meta.url);
-const source=(fs.readFileSync(new URL('src/js/13df-secure-critical-history.js',ROOT),'utf8')+'\n'+fs.readFileSync(new URL('src/js/13de-secure-student-guard.js',ROOT),'utf8')+'\n'+fs.readFileSync(new URL('src/js/13e-secure-student-runtime.js',ROOT),'utf8'));
+const source=(fs.readFileSync(new URL('src/js/13df-secure-critical-history.js',ROOT),'utf8')+'\n'+fs.readFileSync(new URL('src/js/13de-secure-student-guard.js',ROOT),'utf8')+'\n'+fs.readFileSync(new URL('src/js/13di-secure-strict-mode-runtime.js',ROOT),'utf8')+'\n'+fs.readFileSync(new URL('src/js/13e-secure-student-runtime.js',ROOT),'utf8'));
 const x=vm.createContext({});
 vm.runInContext(source+'\n;globalThis.__runtime=secureStudentScript();',x);
 const runtime=x.__runtime;

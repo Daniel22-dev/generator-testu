@@ -2,14 +2,14 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.99",
-  "releaseStatus": "ready-for-controlled-student-redteam",
+  "appVersion": "7.1.100",
+  "releaseStatus": "ready-with-documented-limitations",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
     "offlineCapable": true,
     "currentUseApproved": true,
-    "useScope": "controlled-student-redteam-only"
+    "useScope": "controlled-classroom-with-documented-limitations"
   },
   "github": {
     "status": "not-yet-uploaded",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "AUDIT-7.1.99-FORMS-TAB-VERIFIER-WIDTH-2026-10-08",
+  "revision": "GIT-7.1.100-V7-FINAL-CERTIFICATION-2026-10-18",
   "runtimeAudit": {
     "required": true,
-    "scriptsExecuted": false,
+    "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
-    "browserRuntimeExecuted": false,
-    "transport": "Component tests: Chromium about:blank, actual source modules, synthetic access and in-memory storage; AI and Apps Script services mocked.",
-    "note": "7.1.99 modifies only the secure student Forms open-tab action and Teacher Verifier V2 CSS width plus regression tests; scoring, identity, cryptography and Forms-time anchors are unchanged. Full lockfile-based CI, exact-SHA release gates, physical devices and real school Forms remain pending until independently verified.",
+    "browserRuntimeExecuted": true,
+    "transport": "Exact-source local Chromium plus exact-SHA GitHub Actions; live AI, school Forms, Sheets/MailApp and physical devices remain separate operational acceptance.",
+    "note": "GIT 7.1.100 V7 consolidates Sprints 01–08.3a and owner-approved security changes A+B. Scoring, cryptography, identity quarantine, Recovery separation and split-screen SHADOW/AUDIT-ONLY remain enforced.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "7.1.99 local precommit candidate: Forms opens separately without redirecting the student page when popups are permitted; verifier V2 can use wide desktop viewport. Candidate commit requires complete local gates; P5 R2, journeys E2E and Safe Promotion must pass on the exact SHA before production promotion. Browser popup-blocked fallback is a documented limitation.",
+  "note": "Release candidate 7.1.100 requires exact-SHA P5, Journey, candidate/PR certification, protected main promotion and deployed release-identity verification. Physical devices and live school services are NOT VERIFIED by source automation.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

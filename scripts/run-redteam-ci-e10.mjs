@@ -1,11 +1,12 @@
-// One fail-fast chain for local execution and GitHub Actions. P5 runs last:
-// foundation builds dist, so running it afterwards would delete P5 evidence.
+// One fail-fast chain for local execution and GitHub Actions. Foundation runs
+// before P5, but its generated tracked evidence is archived and restored to
+// HEAD before browser provenance asserts a clean source tree.
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {performance} from 'node:perf_hooks';
 import {sourceSnapshot} from './redteam-source-snapshot-e9.mjs';
-const steps=['npm test','npm run qa:garp27:foundation','npm run qa:p5:ci','node scripts/check-redteam-evidence-e10.mjs'];
+const steps=['npm test','npm run qa:garp27:foundation','node scripts/preserve-foundation-evidence-e10.mjs','npm run qa:p5:ci','node scripts/check-redteam-evidence-e10.mjs'];
 const version=JSON.parse(fs.readFileSync('package.json')).version,startedAt=new Date().toISOString();
 const sourceBefore=sourceSnapshot();
 fs.rmSync('qa-results',{recursive:true,force:true});const dir='qa-results/redteam-e10-ci';fs.mkdirSync(dir,{recursive:true});

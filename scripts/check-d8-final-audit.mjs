@@ -13,8 +13,8 @@ const files = {
   gemini: read('src/js/07-gemini.js'),
   workflow: read('src/js/08a-output-workflow.js'),
   prompt: read('src/js/12-prompt-builder.js'),
-  student: (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js')),
-  verifier: read('src/js/13f-secure-teacher-verifier.js'),
+  student: (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js')),
+  verifier: (read('src/js/13eg-secure-verifier-history.js')+'\n'+read('src/js/13eh-secure-teacher-verifier-s4.js')+'\n'+read('src/js/13ez-secure-teacher-config.js')+'\n'+read('src/js/13f-secure-teacher-verifier.js')),
   pdf: read('src/js/13fa-secure-teacher-verifier-pdf.js'),
   verifierUi: read('src/js/13eb-secure-teacher-verifier-v2-ui.js'),
   prodCheck: read('scripts/check-production-readiness.mjs'),
@@ -73,7 +73,7 @@ check('B','7','distribution/item analytics use effectiveResults',
 check('B','8','metadata mismatch is a soft Security signal; split-window is explicitly heuristic/non-authoritative',
   has(files.verifier,'METADATA MISMATCH','metadata Google Forms',"'soft'") &&
   has(files.student,'Je to MĚKKÝ signál','druhé zařízení','SPLIT_RATIO=0.60','SPLIT_MIN_RUN_MS=10000') &&
-  has(files.verifier,'split-window','možný split screen','Toto není automatický důkaz podvodu.'),
+  has(files.verifier,'split-window','Nejde o důkaz podvodu ani pravidlo automatického zámku.','Chybějící měření není bezpečnostní závěr.'),
   'accepted limitation: browser telemetry cannot prove absence of a second device or every split-screen layout');
 
 // C — PDF/print quality and semantics.

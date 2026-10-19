@@ -126,8 +126,13 @@
         },
         {
           "file": "dist/index.html",
-          "regex": "app-guard\\.js",
-          "message": "Build nenačítá centrální guard."
+          "regex": "deploymentUrls\\(deployment\\)[\\s\\S]{0,1000}import\\(urls\\.guardUrl\\)",
+          "message": "Build nenačítá ověřenou adresu centrálního guardu z deployment konfigurace."
+        },
+        {
+          "file": "dist/access/deployment-config.js",
+          "regex": "guardUrl:\\s*new URL\\(\"access/app-guard\\.js\",\\s*studioBaseUrl\\)\\.href",
+          "message": "Sestavená deployment konfigurace neodkazuje na centrální app guard."
         }
       ]
     },

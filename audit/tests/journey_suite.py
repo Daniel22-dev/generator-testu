@@ -186,8 +186,8 @@ try:
   assert '"privateKey"' not in stu['text'] and '"d":' not in stu['text'] and 'alt_answers' not in stu['text'],'student file leaks key material'
   sp=h.new_page(stu['text']);sp.wait_for_timeout(700)
   enter_start_code(sp,private_start_code(h,tea['text']))
-  sp.fill('#studentName','Jana Nováková');sp.get_by_role('button',name=re.compile('Start')).first.click()
-  sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")')
+  sp.fill('#studentName','Jana Nováková');sp.locator('#strictVerifyBtn').click();sp.wait_for_function('!!STRICT_PREFLIGHT')
+  sp.locator('#strictFullscreenStartBtn').click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden") && !!document.fullscreenElement')
   for hidden in (True,False):
    sp.evaluate("(h)=>{Object.defineProperty(document,'visibilityState',{configurable:true,get:()=>h?'hidden':'visible'});document.dispatchEvent(new Event('visibilitychange',{bubbles:true}))}",hidden)
   sp.wait_for_timeout(300);assert sp.evaluate("!!document.getElementById('lockScreen').offsetWidth"),'strict test must lock after leaving'
@@ -210,9 +210,9 @@ try:
   vp.locator('#fallbackImportDetails summary').click();assert vp.locator('#pasteBox').is_visible(),'emergency paste fallback must be explicitly disclosed'
   vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
   t=vp.locator('#v2-results').inner_text()
-  cells=vp.locator('#resultTable tr').nth(1).locator('td').all_inner_texts()
-  assert len(cells)>=8 and cells[0].startswith('Jana Nováková') and cells[2]=='30/30' and cells[3]=='100 %' and cells[4]=='1',('verifier result cells',cells)
-  assert cells[5]!='__default' and 'plánovaných ? min' not in t,('verifier labels/time (F-14/F-15)',cells[5])
+  cells=vp.locator('#resultTable .s4-result-main').first.locator('td').all_inner_texts()
+  assert len(cells)>=7 and cells[0].startswith('Jana Nováková') and cells[1].splitlines()==['30/30','100 %'] and cells[2]=='1',('verifier result cells',cells)
+  assert '__default' not in t and 'plánovaných ? min' not in t,('verifier labels/time (F-14/F-15)',t[:800])
   dark_theme=vp.evaluate("""()=>{const c=s=>getComputedStyle(document.querySelector(s)).backgroundColor,m=document.createElement('div');m.className='v-modal-box';document.body.appendChild(m);const out={theme:document.body.dataset.verifierTheme,body:c('body'),card:c('.card'),nav:c('.v2-nav'),input:c('input'),modal:getComputedStyle(m).backgroundColor};m.remove();return out}""")
   assert dark_theme=={'theme':'dark','body':'rgb(11, 18, 32)','card':'rgb(17, 24, 39)','nav':'rgb(16, 24, 39)','input':'rgb(15, 23, 42)','modal':'rgb(17, 24, 39)'},('verifier dark palette must be real',dark_theme)
   vp.get_by_role('button',name='Přepnout na světlý režim').click();vp.wait_for_timeout(180)
@@ -334,15 +334,21 @@ try:
   sp.locator('button:visible',has_text=re.compile('^OK$')).first.click()
   sp.fill('#studentName',codes[0]);sp.get_by_role('button',name=re.compile('Start')).first.click();sp.wait_for_function('STARTED_AT!=="" && !document.getElementById("test").classList.contains("hidden")');answer_secure(sp)
   submit_secure(sp);sp.wait_for_timeout(200);backup=sp.evaluate("document.getElementById('answerBackup').value");sp.close()
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.locator('#fallbackImportDetails summary').click();vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click();vp.wait_for_timeout(2500)
-  t=vp.evaluate('document.body.innerText');vp.close()
-  assert re.search(r'novak \(kód '+codes[0]+r'\)\t\S+\t30/30\t100 %\t1\t',t),('verifier resolves the code to the roster e-mail',t[:500])
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();vp.locator('#fallbackImportDetails summary').click();vp.fill('#pasteBox',backup);vp.get_by_role('button',name='Načíst vloženou zálohu').click()
+  vp.wait_for_function('RESULTS.length===1 && document.querySelectorAll("#resultTable .s4-result-main").length===1',timeout=30000)
+  otc=vp.evaluate("()=>({cells:[...document.querySelector('#resultTable .s4-result-main').querySelectorAll('td')].map(x=>x.innerText.trim()),status:RESULTS[0].status,classification:classificationStatus(RESULTS[0])})");vp.close()
+  assert len(otc['cells'])>=3 and otc['cells'][0].startswith('novak (kód '+codes[0]+')') and otc['cells'][1].splitlines()==['30/30','100 %'] and otc['cells'][2]=='1',('verifier resolves the code to the roster e-mail',otc)
+  assert otc['status']=='DIAGNOSTIC_ONLY' and otc['classification']=='DIAGNOSTIC_ONLY',('backup without Forms must remain outside automatic classification',otc)
   import csv,io,tempfile
-  buf=io.StringIO();csv.writer(buf).writerows([['Časová značka','E-mailová adresa','Odevzdávací kód'],[datetime.now(timezone.utc).isoformat(timespec='milliseconds'),'novak@example.invalid',backup],[datetime.now(timezone.utc).isoformat(timespec='milliseconds'),'novak@example.invalid',backup.replace('"attemptId"','"attemptId"')]])
+  buf=io.StringIO();csv.writer(buf,lineterminator='\n').writerows([['Časová značka','E-mailová adresa','Odevzdávací kód'],[datetime.now(timezone.utc).isoformat(timespec='milliseconds'),'novak@example.invalid',backup],[datetime.now(timezone.utc).isoformat(timespec='milliseconds'),'novak@example.invalid',backup.replace('"attemptId"','"attemptId"')]])
   f=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);f.write(buf.getvalue());f.close()
-  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vp,published,'E-mailová adresa','Časová značka');vp.set_input_files('#formsCsvFile',f.name);vp.wait_for_timeout(2500)
-  t=vp.evaluate('document.body.innerText');vp.close()
-  assert 'novak@example.invalid' in t and ('Opakované odevzdání je vyřazeno' in t or 'replay.duplicate' in t),('Forms CSV import + repeated code must be flagged',t[:1200])
+  vp=h.new_page(tea['text']);vp.wait_for_timeout(700);vp.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vp,published,'E-mailová adresa','Časová značka');vp.set_input_files('#formsCsvFile',f.name)
+  vp.wait_for_function("LAST_FORMS_IMPORT && LAST_FORMS_IMPORT.rows===2 && document.querySelector('#formsImportProgress').textContent.includes('100 %')",timeout=30000)
+  t=vp.evaluate('document.body.innerText');forms_otc=vp.evaluate("()=>({summary:{...LAST_FORMS_IMPORT},results:RESULTS.map(r=>({identity:r.formIdentity,exactDuplicate:r.exactDuplicate,status:r.status}))})")
+  assert any(r['identity']=='novak@example.invalid' for r in forms_otc['results']) and any(r['exactDuplicate'] for r in forms_otc['results']),('Forms CSV import must retain the roster identity and reject the duplicate',forms_otc)
+  assert 'Opakované odevzdání je vyřazeno' in t and forms_otc['summary']['replayRejected']==1,('Forms CSV repeated code must be visibly flagged',t[:1200],forms_otc)
+  vp.locator('#resultTable .s4-result-main .s4-detail-toggle').first.click();otc_detail=vp.locator('#resultTable .s4-result-detail:not([hidden])').inner_text();vp.close()
+  assert 'novak@example.invalid' in otc_detail,('Forms identity must be visible in the expanded verifier detail',otc_detail)
   return {'codes':len(codes)}
  record('advanced-one-time-code-to-verifier',advanced_one_time_code_to_verifier)
 
@@ -416,11 +422,14 @@ try:
    [forms_time,'beta@example.invalid',test_b,name_b,group_b,backup_b],
    [forms_time,'alpha@example.invalid',test_a,name_a,group_a,corrupt_txt]
   ]
-  buf=io.StringIO();csv.writer(buf).writerows(rows);tmp=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);tmp.write(buf.getvalue());tmp.close()
+  buf=io.StringIO();csv.writer(buf,lineterminator='\n').writerows(rows);tmp=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);tmp.write(buf.getvalue());tmp.close()
 
-  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va,stu_a['publishedAt']);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_timeout(3500)
+  va=h.new_page(tea_a['text']);va.wait_for_timeout(600);va.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va,stu_a['publishedAt']);va.set_input_files('#formsCsvFile',tmp.name);va.wait_for_function("LAST_FORMS_IMPORT && LAST_FORMS_IMPORT.waitingForWindow===false && document.querySelector('#formsImportProgress').textContent.includes('100 %')",timeout=30000)
   ta=va.evaluate('document.body.innerText')
-  assert 'alpha@example.invalid' in ta and 'beta@example.invalid' not in va.locator('#resultTable').inner_text(),('verifier A must render only TEST-A results',ta[:800])
+  imported_a=va.evaluate("()=>RESULTS.map(r=>({identity:r.formIdentity,testId:r.formTestId,status:r.status}))")
+  assert any(r['identity']=='alpha@example.invalid' for r in imported_a) and not any(r['identity']=='beta@example.invalid' for r in imported_a),('verifier A must retain only TEST-A results',imported_a)
+  va.locator('#resultTable .s4-result-main .s4-detail-toggle').first.click();detail_a=va.locator('#resultTable .s4-result-detail:not([hidden])').inner_text()
+  assert 'alpha@example.invalid' in detail_a and 'beta@example.invalid' not in detail_a,('verifier A detail must show only TEST-A Forms identity',detail_a)
   # 7.1.97 / F4: descriptive Forms metadata is advisory only. It must surface as a warning,
   # never as the old binding.forms-metadata rejection. Security binding stays in the encrypted payload.
   assert not va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&r.validationCodes.includes('binding.forms-metadata'))"),'metadata mismatch must not be a hard rejection'
@@ -430,7 +439,8 @@ try:
   assert summary_a['otherTests']==1,('full CSV must classify TEST-B as another test',summary_a)
   assert summary_a['replayRejected']>=2,('duplicate/replay rows must stay rejected',summary_a)
   assert va.evaluate("RESULTS.some(r=>r.exactDuplicate)"),('identical payload must be duplicate',summary_a)
-  assert va.evaluate("RESULTS.some(r=>r.status==='CHYBA'&&!r.exactDuplicate&&!r.hardReplayConflict)"),('corrupt payload must remain invalid',summary_a)
+  corrupt_state=va.evaluate("()=>{const r=RESULTS.find(x=>['CRYPTO_FAIL','MALFORMED_CIPHERTEXT','CHYBA'].includes(x.status));return r&&{status:r.status,scored:verifierScoreValues(r).scored,classification:classificationStatus(r)}}")
+  assert corrupt_state and not corrupt_state['scored'] and corrupt_state['classification']=='REJECTED',('corrupt payload must remain rejected and unscored',summary_a,corrupt_state)
   va.evaluate("()=>{const r=RESULTS.find(x=>x.status==='OK'&&!x.exactDuplicate);chooseAttemptByDigest(r.submissionDigest)}")
   va.evaluate('downloadResultsCsv()');res_csv=va.evaluate("async()=>await __readDownloadText(-1)")
   assert len(res_csv.splitlines())==1,('manual selection must not classify replay-rejected submissions',res_csv)
@@ -438,9 +448,12 @@ try:
   assert test_b not in sub_csv and 'beta@example.invalid' not in sub_csv,('submissions export must exclude other tests',sub_csv[:500])
   va.close()
 
-  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vb,stu_b['publishedAt']);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_timeout(3500)
+  vb=h.new_page(tea_b['text']);vb.wait_for_timeout(600);vb.locator('[data-v2-panel="results"]').click();configure_forms_anchors(vb,stu_b['publishedAt']);vb.set_input_files('#formsCsvFile',tmp.name);vb.wait_for_function("LAST_FORMS_IMPORT && LAST_FORMS_IMPORT.waitingForWindow===false && document.querySelector('#formsImportProgress').textContent.includes('100 %')",timeout=30000)
   tb=vb.evaluate('document.body.innerText')
-  assert 'beta@example.invalid' in tb and 'alpha@example.invalid' not in vb.locator('#resultTable').inner_text(),('verifier B must select TEST-B from same full CSV',tb[:800])
+  imported_b=vb.evaluate("()=>RESULTS.map(r=>({identity:r.formIdentity,testId:r.formTestId,status:r.status}))")
+  assert any(r['identity']=='beta@example.invalid' for r in imported_b) and not any(r['identity']=='alpha@example.invalid' for r in imported_b),('verifier B must retain only TEST-B results',imported_b)
+  vb.locator('#resultTable .s4-result-main .s4-detail-toggle').first.click();detail_b=vb.locator('#resultTable .s4-result-detail:not([hidden])').inner_text()
+  assert 'beta@example.invalid' in detail_b and 'alpha@example.invalid' not in detail_b,('verifier B detail must show only TEST-B Forms identity',detail_b)
   summary_b=vb.evaluate("()=>({...LAST_FORMS_IMPORT})")
   assert summary_b['otherTests']>=1,('verifier B must classify TEST-A rows as other tests',summary_b)
   vb.close()
@@ -451,7 +464,11 @@ try:
   for size in (100,1000,3000,5000):
    va2=h.new_page(tea_a['text']);va2.wait_for_timeout(600);va2.locator('[data-v2-panel="results"]').click();configure_forms_anchors(va2,stu_a['publishedAt'])
    try:
-    big=io.StringIO();w=csv.writer(big);w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
+    # This is the real-browser throughput benchmark. Other audit cases retain the
+    # deterministic Node RPC bridge; here native Chromium WebCrypto prevents the
+    # bridge IPC latency from being mistaken for verifier performance.
+    va2.evaluate("()=>Object.defineProperty(crypto,'subtle',{configurable:true,value:window.__auditNativeSubtle})")
+    big=io.StringIO();w=csv.writer(big,lineterminator='\n');w.writerow(['Timestamp','Email Address','Test ID','Test name','Group','Secure submission'])
     current=0
     for i in range(size):
      is_a=(i%20==0)
@@ -460,7 +477,11 @@ try:
     bf=tempfile.NamedTemporaryFile('w',suffix='.csv',delete=False);bf.write(big.getvalue());bf.close()
     va2.evaluate("()=>{clearInterval(window.__formsHbTimer);window.__formsHb=0;window.__formsHbTimer=setInterval(()=>window.__formsHb++,25)}")
     t0=time.time();va2.set_input_files('#formsCsvFile',bf.name)
-    va2.wait_for_function("(n)=>!!LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===n&&!LAST_FORMS_IMPORT.waitingForWindow",arg=size,timeout=180000)
+    try:
+     va2.wait_for_function("(n)=>!!LAST_FORMS_IMPORT&&LAST_FORMS_IMPORT.rows===n&&!LAST_FORMS_IMPORT.waitingForWindow",arg=size,timeout=180000)
+    except Exception as exc:
+     progress=va2.evaluate("()=>({text:document.querySelector('#formsImportProgress')?.textContent||'',results:RESULTS.length,last:LAST_FORMS_IMPORT})")
+     raise AssertionError(('full-year import timeout',size,progress)) from exc
     elapsed=round(time.time()-t0,3);summary=va2.evaluate("()=>({...LAST_FORMS_IMPORT,duplicates:{...LAST_FORMS_IMPORT.duplicates}})")
     hb=va2.evaluate("()=>{clearInterval(window.__formsHbTimer);return window.__formsHb}")
     heap=va2.evaluate("()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576*10)/10:null")
@@ -544,7 +565,7 @@ try:
  def student_language_and_small_texts(j):
   j.new_test('Procvičování');d=j.download('#btnDownloadMain');sp=h.new_page(d['text']);sp.wait_for_timeout(600)
   tabs=sp.evaluate("[...document.querySelectorAll('.tab-name')].map(e=>e.textContent)")
-  assert 'multiple choice' in tabs,('tab names are not cut to 12 chars (F-12)',tabs)
+  assert 'multiple choice' in [x.casefold() for x in tabs],('tab names are not cut to 12 chars (F-12)',tabs)
   sp.fill('#studentName','Jana');sp.get_by_role('button',name=re.compile('Start')).first.click();answer_instant(sp.main_frame,lambda k:k%2==0);t=submit_instant(sp.main_frame);sp.close()
   assert 'Incorrect' in t and 'Explanation' in t and 'Správně' not in t and 'Vysvětlení' not in t,('practice feedback in test language (F-32)',t[t.find('MULTIPLE'):t.find('MULTIPLE')+200])
   p=j.p;j.ev("()=>goTo(0)");p.locator('#jazykBtns [data-val=\"čeština\"]').click();p.wait_for_timeout(300)

@@ -45,6 +45,7 @@ function applyVisualState() {
 
   document.querySelectorAll('#typyBtns .tag-btn').forEach(b =>
     b.classList.toggle('active', state.typyCviceni.includes(b.dataset.val)));
+  if(typeof renderFormatCatalogView==='function')renderFormatCatalogView();
   document.querySelectorAll('#ageGroupBtns .tag-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.val === state.ageGroup));
   setVal('ageGroupCustom', state.ageGroupCustom || '');
@@ -62,7 +63,12 @@ function applyVisualState() {
   setVal('casCustom', state.cas);
   updateAppModeUI();
   updateSecurityGuideUI();
-  if (state.body) setVal('bodyCustom', state.body);
+  const bodyInput=$('bodyCustom');
+  const bodyInputDirtyInvalid=!!(bodyInput&&(
+    bodyInput.validationMessage
+    || (typeof bodyInput.getAttribute==='function'&&bodyInput.getAttribute('aria-invalid')==='true')
+  ));
+  if(state.body&&!bodyInputDirtyInvalid)setVal('bodyCustom',state.body);
 
   const fuzzyNote = $('fuzzyNote');
   if (fuzzyNote) {
@@ -113,6 +119,8 @@ function applyVisualState() {
   });
   const strictRiskField = $('strictRiskField');
   if (strictRiskField) strictRiskField.classList.toggle('hidden', state.testMode !== 'prisny');
+  const strictFallback = $('strictFullscreenFallbackAllowed');
+  if (strictFallback) strictFallback.checked = !!state.strictFullscreenFallbackAllowed;
   // Hlídání obrazovky: aktivní tlačítko + skrytí pole v přísném režimu (tam je zámek vždy).
   document.querySelectorAll('#screenGuardBtns .tag-btn').forEach(function(b){
     b.classList.toggle('active', b.dataset.val === (state.screenGuard ? 'on' : 'off'));
@@ -161,8 +169,8 @@ function applyVisualState() {
   const rb = $('readingBlock');
   if (rb) rb.classList.toggle('hidden', !usesReadingComprehension());
   document.querySelectorAll('#rcLenBtns .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.val === (state.rcLength || 'medium')));
-  const rcCount=$('readingQuestionCount');if(rcCount)rcCount.value=String(Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4)));
-  const liCount=$('listeningQuestionCount');if(liCount)liCount.value=String(Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4)));
+  syncComprehensionControl('reading comprehension',state);
+  syncComprehensionControl('listening comprehension',state);
   renderRcTopics();
   renderComprehensionSummaries();
 
@@ -219,6 +227,11 @@ function showOnlyStep(n) {
 
 function goTo(n) {
   if(window.__GHRAB_GENERATOR_WORKFLOW_ID__||outputMutationBusy)return;
+  if(n>currentStep){
+    validate();
+    const gate=$('next'+currentStep);
+    if(gate&&gate.disabled)return false;
+  }
   $('step'+currentStep).classList.add('hidden');
   $('step'+n).classList.remove('hidden');
   currentStep = n;
@@ -227,6 +240,7 @@ function goTo(n) {
   if (n === 4) renderResult();
   saveSnapshot();
   window.scrollTo({top:0,behavior:'smooth'});
+  return true;
 }
 
 function jumpTo(n) {
@@ -299,6 +313,10 @@ function setScreenGuard(on){
   enforceModeConstraints();
   applyVisualState(); validate(); saveSnapshot();
 }
+function setStrictFullscreenFallbackAllowed(on){
+  state.strictFullscreenFallbackAllowed = !!on;
+  applyVisualState(); validate(); saveSnapshot();
+}
 function unmarkTemplateIfDiverged(key){
   // Účel testu zůstává zvoleným pedagogickým profilem i po ruční úpravě technických
   // detailů v pokročilém režimu. Profil se proto už automaticky neodepíná.
@@ -308,6 +326,24 @@ function unmarkTemplateIfDiverged(key){
 function pickNum(key, value) {
   // Ochrana identity studentů je od v7 povinná a nelze ji vypnout.
   if (key === 'anonymizace') value = 'ANO';
+
+  // Bodový preset je plnohodnotná oprava rozepsaného vlastního vstupu. Stejný
+  // striktní celočíselný kontrakt jako onCustomBody()/syncExercisePoints() musí
+  // platit i pro programové volání; teprve po úspěchu čistíme validační stav.
+  if(key==='body'){
+    const input=$('bodyCustom'),points=strictIntegerValue(value);
+    const count=state.exerciseConfig&&state.exerciseConfig.length?state.exerciseConfig.length:0;
+    const max=count?999*count:999;
+    if(points===null||points<1||points>max)return false;
+    if(count){if(!syncExercisePoints(points))return false;}
+    else{state.body=points;setVal('bodyCustom',points);}
+    if(input){
+      if(typeof input.setCustomValidity==='function')input.setCustomValidity('');
+      if(typeof input.removeAttribute==='function')input.removeAttribute('aria-invalid');
+    }
+    applyVisualState();validate();saveSnapshot();
+    return true;
+  }
 
   if (key === 'pocet' && !state.exerciseDetail) {
     if(state.exerciseConfigSaved){
@@ -336,7 +372,6 @@ function pickNum(key, value) {
   } else {
     state[key] = value;
     if (key==='cas') setVal('casCustom', value);
-    if (key==='body') { setVal('bodyCustom', value); syncExercisePoints(); }
     if (key==='pocet') { syncExerciseConfig(); state.typyCviceni=uniqueExerciseTypes(state.exerciseConfig.map(ex=>ex.typ)); renderSmartTimeTip(); }
   }
   applyVisualState(); validate(); saveSnapshot();
@@ -363,10 +398,11 @@ function pickTheme(t) { state.tema=t; applyVisualState(); saveSnapshot(); }
 function pickRcLength(v){ state.rcLength = v; applyVisualState(); saveSnapshot(); }
 function setComprehensionQuestionCount(type,value){
   const canonical=normalizeType(type),n=Math.max(1,Math.min(30,parseInt(value,10)||4));
-  const key=canonical==='reading comprehension'?'readingQuestionCount':'listeningQuestionCount';
+  const key=comprehensionCountKey(canonical);
   state[key]=n;
-  if(hasConfiguredExercises(state)&&Array.isArray(state.exerciseConfig))state.exerciseConfig.forEach(ex=>{if(normalizeType(ex.typ||'')===canonical)ex.pocetOtazek=n});
-  const el=document.getElementById(key);if(el)el.value=String(n);
+  const indexes=configuredComprehensionIndexes(state,canonical);
+  if(indexes.length)state.exerciseConfig[indexes[0]].pocetOtazek=n;
+  syncComprehensionControl(canonical,state);
   if(typeof renderExerciseConfig==='function'&&state.exerciseDetail)renderExerciseConfig();
   validate();saveSnapshot();
 }
@@ -528,7 +564,7 @@ async function aiSuggestListeningQuestions(){
     const fp=await buildGeminiFilePartsForApi();assertComprehensionTask(task);
     fileParts=fp?.parts||[];urlPack=buildGeminiUrlPartsForApi(state);fileParts=fileParts.concat(urlPack.parts||[]);
     if(btn)btn.textContent='Generuji…';
-  const n = Math.max(1,Math.min(30,parseInt(state.listeningQuestionCount,10)||4));
+  const n = effectiveComprehensionQuestionCount('listening comprehension',state);
   const prompt =
     'Jsi pomocník učitele jazyků. Navrhni ' + n + ' otázek k poslechu s porozuměním pro školní test.\n' +
     'Jazyk otázek: ' + jazyk + '. Úroveň CEFR: ' + lvl + '.\n' +
@@ -598,7 +634,7 @@ async function aiSuggestReading(){
     return;
   }
   const words = rcLenWords();
-  const nQ = Math.max(1,Math.min(30,parseInt(state.readingQuestionCount,10)||4));
+  const nQ = effectiveComprehensionQuestionCount('reading comprehension',state);
   const latka = trim('latka');
   const sourcePresent = readingSourcePresent();
   const sourceMode = normalizeSourceUseMode(state.sourceUseMode);
@@ -813,7 +849,8 @@ function filterPedagogy(fn){
   pedFilterActive = fn || 'all';
   document.querySelectorAll('#pedFilter .ped-chip').forEach(c =>
     c.classList.toggle('active', c.dataset.fn === pedFilterActive));
-  document.querySelectorAll('#typyBtns .type-group').forEach(g =>
+  if(typeof renderFormatCatalogView==='function')renderFormatCatalogView();
+  else document.querySelectorAll('#typyBtns .type-group').forEach(g =>
     g.classList.toggle('ped-hidden', pedFilterActive !== 'all' && g.dataset.fn !== pedFilterActive));
 }
 // Seskupí aktuálně vybrané typy (+ vlastní) podle pedagogické funkce.

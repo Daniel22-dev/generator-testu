@@ -1,37 +1,37 @@
 {
   "schema": "ghrab-ai-assurance-fingerprint-v1",
   "appId": "generator",
-  "appVersion": "7.1.99",
+  "appVersion": "7.1.100",
   "coreVersion": "1.0.0",
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
-  "fingerprintAlgorithm": "SHA-256(path\\0sha256\\0size\\n)",
-  "fingerprint": "4df59d23beb8c522042a4dc00c86a98ee0b7314e55e91c07956eb1c3245eaf08",
+  "fingerprintAlgorithm": "SHA-256(path\\0sha256(canonical-UTF8-LF)\\0canonical-size\\n)",
+  "fingerprint": "d13b93413691cf57bcbd74473cba019fccaa993a819fb345e6dcde8a16a0fe05",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 165911,
-      "sha256": "8b350a8cb264ddaa8c1f9c07470ca2b03ab3cbb80b6d38f64d79bdb871cf431e"
+      "size": 166824,
+      "sha256": "60966b0c1759528d382cbfcc09a997ab21d98cda0110eb3c50964690086d4b44"
     },
     {
       "path": "src/js/03-ui-render.js",
-      "size": 55853,
-      "sha256": "cc66e3f65c0b2bfb01230abc6dd3b94bb743fe16566a59b24230af724e6a260c"
+      "size": 57244,
+      "sha256": "ff103f0ae9ec9c015a1c490dd80fba3609fcbe0b5f8d71e487cd6563e0ddf0d8"
     },
     {
       "path": "src/js/05-form-fields.js",
-      "size": 120750,
-      "sha256": "7e4a85eaab8b7bbd9de85523274f219031b0a7dad1d5d7bcba5afc251e03a343"
+      "size": 128135,
+      "sha256": "cde4c0991a7a0db867d1dc24183af0a1bf65a5bebc042e30adeda29cddfedb5d"
     },
     {
       "path": "src/js/05b-workflow-context.js",
-      "size": 11346,
-      "sha256": "4badbc2446a252cac3c8ad8b57cde6a22ed42753bb7b3a91ecb356e3fcf947fb"
+      "size": 11528,
+      "sha256": "b974d3e76ae7514fa3de1c20671464af4b9d21323a1c599b16fd0e5a56e4a763"
     },
     {
       "path": "src/js/05c-exercise-suitability.js",
-      "size": 9398,
-      "sha256": "7a2d1033ef7bc42632d2cdc840a8c2831987f9baf77a42c58b9e9dbc3912c152"
+      "size": 31156,
+      "sha256": "fdfcb70306f8ff0bf6384793fad46f559f30f32c1f27191252d42d3b2e9320d0"
     },
     {
       "path": "src/js/07-gemini.js",
@@ -40,8 +40,8 @@
     },
     {
       "path": "src/js/07z-ai-core-integration.js",
-      "size": 14586,
-      "sha256": "7bdc3ed7f573ad587178068f6476495926ab362d67fa76396ead023b74e8d530"
+      "size": 14587,
+      "sha256": "17afd6906001a39c0b24e9ed4037ca5ea4d3a9f0631ec2c6dd3b0e06e1817dd9"
     },
     {
       "path": "src/js/08-manual-editor.js",
@@ -55,13 +55,13 @@
     },
     {
       "path": "src/js/12-prompt-builder.js",
-      "size": 62496,
-      "sha256": "a5c8a170575fefd54403a6da032ed93314bdca567ba331bf4b03aa201dc95c23"
+      "size": 64240,
+      "sha256": "5eabfc138e959c171a36b53c8d7d5cfbf151a7f6ef22a7e7a2ddc67ffcb6e82d"
     },
     {
       "path": "src/js/13a-secure-helpers.js",
-      "size": 35859,
-      "sha256": "a32104f2c3c3c7ba34e649fe1b15de5fee8cc154480401a1a5f1757e81719312"
+      "size": 52776,
+      "sha256": "5563b29f90d8ff4f567a066ee4d1134b6e0688411ecb7a4fce7fd449fb0e0ae6"
     },
     {
       "path": "src/js/50-cs-module.js",
@@ -70,8 +70,8 @@
     },
     {
       "path": "src/features/preview-editor.js",
-      "size": 65960,
-      "sha256": "b3831420a40c72825e24c270ee5b1e03188f3d9a914db98367172424f06c0cdd"
+      "size": 66115,
+      "sha256": "f2a0fe34837dd76e006cbad7c6deb1877459fa609efdeec9251a1bdae93b651d"
     },
     {
       "path": "src/features/testlab.js",
@@ -80,8 +80,8 @@
     },
     {
       "path": "public/ai-operations.json",
-      "size": 6212,
-      "sha256": "d09aee35df09296c8e0d8b2e8e99f66e8797ea67307a28ed117f1037189b773e"
+      "size": 6213,
+      "sha256": "67c2bbadb66dae249014cd0c538611ad00a3ac0e87036ab0838038d7a27f69a2"
     },
     {
       "path": "ghrab-ai-core.consumer.json",
@@ -128,5 +128,5 @@
     ],
     "untrackedSourceFiles": []
   },
-  "invalidationRule": "Any change to a listed file invalidates inherited behavioral AIR evidence until reviewed/re-executed. The generator also fails if a .js/.mjs source under src/ or public/ uses an AI/prompt-boundary token or direct Gemini transport token and is not listed. Model/provider/system-instruction changes must never remain current by version label alone."
+  "invalidationRule": "Any semantic change to a listed file invalidates inherited behavioral AIR evidence until reviewed/re-executed. Text inputs are canonicalized to UTF-8/LF so checkout line endings alone do not alter the fingerprint. The generator also fails if a .js/.mjs source under src/ or public/ uses an AI/prompt-boundary token or direct Gemini transport token and is not listed. Model/provider/system-instruction changes must never remain current by version label alone."
 }

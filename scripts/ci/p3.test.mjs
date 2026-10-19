@@ -42,6 +42,10 @@ function fixture(overrides = {}) {
 function temporary(t) {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'p3-standard-')); t.after(() => fs.rmSync(d, { recursive: true, force: true })); return d;
 }
+function makeRejectedLink(target,link){
+  if(process.platform==='win32')fs.symlinkSync(fs.statSync(target).isDirectory()?target:path.dirname(target),link,'junction');
+  else fs.symlinkSync(target,link);
+}
 function treeCopy(t) {
   const d = temporary(t);
   fs.cpSync(project, d, { recursive: true, filter: s => !path.relative(project, s).split(path.sep).some(x => ['.git', 'node_modules', 'dist', 'qa-results'].includes(x)) });
@@ -96,8 +100,9 @@ test('invalid UTF8 rejected', () => assert.throws(() => strictJson(Buffer.from([
 for (const p of ['../x', '/tmp/x', './x', 'a//x', 'a/../x', 'a\\x', 'a?x', 'a\nx']) test('unsafe path rejected: ' + JSON.stringify(p), () => assert.throws(() => relative(p)));
 test('repository dot segments rejected', () => { for (const r of ['../app', 'test/..', '-x/../../b']) assert.throws(() => repoName(r)); });
 test('symlink leaf + ancestor and oversize local files rejected', t => {
-  const d = temporary(t); fs.writeFileSync(path.join(d, 'file'), 'xx'); fs.symlinkSync('file', path.join(d, 'link'));
-  fs.mkdirSync(path.join(d, 'dir')); fs.writeFileSync(path.join(d, 'dir/f'), 'x'); fs.symlinkSync('dir', path.join(d, 'linked-dir'));
+  const d = temporary(t); fs.writeFileSync(path.join(d, 'file'), 'xx');
+  fs.mkdirSync(path.join(d, 'dir')); fs.writeFileSync(path.join(d, 'dir/f'), 'x');
+  makeRejectedLink(path.join(d,'dir'),path.join(d,'link'));makeRejectedLink(path.join(d,'dir'),path.join(d,'linked-dir'));
   assert.throws(() => regularRead(d, 'link')); assert.throws(() => regularRead(d, 'linked-dir/f')); assert.throws(() => regularRead(d, 'file', 1));
 });
 test('reference lock rejects mutation and cannot reduce its own coverage', t => {

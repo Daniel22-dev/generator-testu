@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
 const selected=process.env.GIT_REDTEAM_E4_CASE||'all',checks=[],limits=[],errors=[];
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'git-e4-private-')),contexts=new Set();
 const origin='http://127.0.0.1:18780',publishedAt=new Date(Date.now()-120000).toISOString();
@@ -14,8 +14,17 @@ let pkg;
 async function launch(profile){const c=await chromium.launchPersistentContext(path.join(temp,profile),{headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});contexts.add(c);await c.route(origin+'/**',r=>r.fulfill({status:200,contentType:'text/html',body:pkg.studentHtml}));c.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));for(const p of c.pages())p.on('pageerror',e=>errors.push(e.message));return c;}
 async function close(c){await c.close();contexts.delete(c);}
 async function page(c){const p=await c.newPage();await p.goto(origin+'/student.html');return p;}
-async function start(p,code='A7B9C2'){await p.locator('#studentName').fill(code);await enterStartCode(p,pkg);await p.evaluate(()=>startTest());}
+async function start(p,code='A7B9C2'){await p.locator('#studentName').fill(code);await enterStartCode(p,pkg);await completeGeneratedPageStart(p);}
 const state=p=>p.evaluate(async()=>{await flushPendingAttemptWrites();return {attemptId:ATTEMPT_ID,deadline:TIMER_DEADLINE,resp:RESP,locked:LOCKED,integrity:PERSIST_INTEGRITY_BLOCK,submitted:SUBMITTED,events:SEC_EVENTS.map(e=>e.type),active:isTestActive(),done:!$('done').classList.contains('hidden')};});
+const parallelState=p=>p.evaluate(async()=>({
+  active:isTestActive(),
+  attemptId:ATTEMPT_ID,
+  preflight:Boolean(STRICT_PREFLIGHT),
+  preflightBusy:Boolean(STRICT_PREFLIGHT_BUSY),
+  startBusy:Boolean(STRICT_START_BUSY),
+  ownsTabLock:typeof ATTEMPT_TAB_RELEASE==='function',
+  locks:typeof navigator.locks?.query==='function'?await navigator.locks.query():null
+}));
 async function group(id,fn){if(selected!=='all'&&selected!==id)return;await fn();checks.push(id);console.log('PASS E4',id);}
 const policy={schoolDomain:'example.invalid',publishedAt,csvTimezone:'Europe/Prague',emailHeader:'Email Address',timestampHeader:'Timestamp',verifiedEmailConfirmed:true,domainRestrictedConfirmed:true,csvOriginalConfirmed:true};
 try{
@@ -34,8 +43,26 @@ try{
   });
   await group('parallel-tabs',async()=>{
     const c=await launch('tabs'),a=await page(c),b=await page(c);await a.locator('#studentName').fill('A7B9C2');await enterStartCode(a,pkg);await b.locator('#studentName').fill('A7B9C2');await enterStartCode(b,pkg);
-    await Promise.all([a.evaluate(()=>startTest()),b.evaluate(()=>startTest())]);const sa=await state(a),sb=await state(b);assert.equal(Number(sa.active)+Number(sb.active),1,'two native tabs cannot run one browser-local attempt concurrently');
-    const winner=sa.active?a:b,other=sa.active?b:a,id=(sa.active?sa:sb).attemptId;await winner.close();await start(other);assert.equal((await state(other)).attemptId,id);await close(c);
+    await Promise.all([a.evaluate(()=>startTest()),b.evaluate(()=>startTest())]);
+    const starters=[];
+    for(const candidate of [a,b])if(await candidate.evaluate(()=>!!STRICT_PREFLIGHT)){
+      starters.push(candidate);
+      await candidate.bringToFront();
+      await candidate.locator('#strictFullscreenStartBtn').click();
+    }
+    assert.equal(starters.length,1,'exactly one tab may own the strict fullscreen preflight');
+    try{
+      await starters[0].waitForFunction(()=>isTestActive()||(!STRICT_PREFLIGHT_BUSY&&!STRICT_START_BUSY&&!STRICT_PREFLIGHT),null,{timeout:10000});
+      await Promise.all([a,b].map(candidate=>candidate.waitForFunction(()=>!STRICT_PREFLIGHT_BUSY&&!STRICT_START_BUSY,null,{timeout:10000})));
+    }catch(error){
+      const [failedA,failedB]=await Promise.all([parallelState(a),parallelState(b)]);
+      throw new Error(`parallel-tab start did not settle: ${JSON.stringify({a:failedA,b:failedB})}`,{cause:error});
+    }
+    const [pa,pb]=await Promise.all([parallelState(a),parallelState(b)]);
+    assert.equal(Number(pa.active)+Number(pb.active),1,`two native tabs cannot run one browser-local attempt concurrently: ${JSON.stringify({a:pa,b:pb})}`);
+    assert.equal(Number(pa.ownsTabLock)+Number(pb.ownsTabLock),1,`exactly one native tab must retain the attempt Web Lock: ${JSON.stringify({a:pa,b:pb})}`);
+    const sa=await state(a),sb=await state(b);
+    const winner=sa.active?a:b,other=sa.active?b:a,id=(sa.active?sa:sb).attemptId;await winner.close();await other.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));await start(other);assert.equal((await state(other)).attemptId,id);await close(c);
   });
   await group('integrity',async()=>{
     const c=await launch('integrity');let p=await page(c);await start(p);const first=await state(p);

@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import vm from 'node:vm';
 
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
-const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant = read('src/js/14b-instant-test-runtime.js');
 
 function assert(cond, msg){
@@ -68,7 +68,7 @@ assert(count(secure,'recoveryCodeMatches(')===2, 'E3 secure: Recovery helper is 
 assert(/function lockTap\(\).*LOCK_TAPS>=5/s.test(secure), 'E3 secure: hidden 5x lock-tap reveal is preserved');
 
 // Static privilege-boundary proof: instant runtime.
-const instantUnlock = between(instant, 'async function tryUnlock()', '`;\n}');
+const instantUnlock = extractFunction(instant, 'tryUnlock');
 const instantLogin = between(instant, 'async function doTeacherLogin()', 'function logoutTeacher');
 assert(/recoveryCodeMatches\(v\)/.test(instantUnlock) && !/teacherSecretMatches|teacher-pin|ucitelPinHash/.test(instantUnlock), 'E3 instant: tryUnlock accepts only Classroom Recovery authorization');
 assert(/teacherSecretMatches\(p\)/.test(instantLogin) && !/recoveryCodeMatches|recovery-code|recoveryCodeHash/.test(instantLogin), 'E3 instant: teacher login accepts only Teacher/Admin authorization');
@@ -99,13 +99,14 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   vm.runInContext(`
     let ATTEMPT_ID='ATT-E3-001', ACTIVE_IDENTITY_HASH='IDENTITY-HASH-001', ACTIVE_KEY='VARIANT-B', STARTED_AT='2026-10-02T15:00:00.000Z';
     let TIMER_DEADLINE=1999999999999, LOCKED=true, LOCK_REASON='Student left window', UNLOCK_BUSY=false, SUBMITTED=false, PERSIST_INTEGRITY_BLOCK=false,GUARD_EPOCH=0;
+    let STRICT_RECOVERY_AUTHORIZED=false,STRICT_RECOVERY_REASON='',STRICT_RECOVERY_LOCK_EVENT=null;
     let JOKER_USED=true, JOKER_SELECTED_AT='2026-10-02T15:00:05.000Z', JOKER_CHOICE=true;
     let RESP={q1:'A',q2:'B'}, SEC_EVENTS=[{t:'2026-10-02T15:05:00.000Z',type:'locked',detail:'Student left window'}];
     let LOCK_TAPS=0, LOCK_TAP_TIMER=null; let __lastSeal=null;
     function recordSec(type,detail){SEC_EVENTS.push({t:'NOW',type,detail});}
     function saveActiveAttemptSeal(seal){__lastSeal=JSON.parse(JSON.stringify(seal));return true;}
   `,ctx);
-  for(const fn of ['deriveSecretHash','teacherSecretMatches','recoveryCodeMatches','securityEventSnapshot','persistActiveAttemptSeal','lockTap','normLoginName','tryUnlock','teacherLogin']){
+  for(const fn of ['deriveSecretHash','teacherSecretMatches','recoveryCodeMatches','securityEventSnapshot','persistActiveAttemptSeal','lockTap','normLoginName','completeRecoveryUnlock','tryUnlock','teacherLogin']){
     vm.runInContext(extractFunction(secure,fn),ctx);
   }
   assert(await vm.runInContext(`teacherSecretMatches(${JSON.stringify(TEACHER)})`,ctx), 'E3 secure dynamic: Teacher/Admin secret matches Teacher/Admin branch');
@@ -116,14 +117,17 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   els.teacherName.value='Teacher'; els.teacherPin.value=RECOVERY;
   await vm.runInContext('teacherLogin()',ctx);
   assert(els.teacherPanel.classList.contains('hidden'), 'E3 secure dynamic: Recovery Code does not open teacher panel');
+  assert(els.teacherPin.value==='', 'E3 secure dynamic: rejected Teacher/Admin input is cleared immediately');
   els.teacherPin.value=TEACHER;
   await vm.runInContext('teacherLogin()',ctx);
   assert(!els.teacherPanel.classList.contains('hidden'), 'E3 secure dynamic: Teacher/Admin secret opens teacher panel');
+  assert(els.teacherPin.value==='', 'E3 secure dynamic: accepted Teacher/Admin input is cleared immediately');
 
   const before=vm.runInContext(`JSON.stringify({ATTEMPT_ID,TIMER_DEADLINE,ACTIVE_IDENTITY_HASH,ACTIVE_KEY,JOKER_USED,JOKER_SELECTED_AT,JOKER_CHOICE,STARTED_AT,RESP})`,ctx);
   els.unlockInp.value=TEACHER;
   await vm.runInContext('tryUnlock()',ctx);
   assert(vm.runInContext('LOCKED',ctx)===true, 'E3 secure dynamic: Teacher/Admin secret cannot unlock through the Recovery path');
+  assert(els.unlockInp.value==='', 'E3 secure dynamic: rejected Recovery input is cleared immediately');
 
   vm.runInContext(`SEC_EVENTS=[{t:'2026-10-02T15:05:00.000Z',type:'locked',detail:'Student left window'}]; LOCKED=true; LOCK_REASON='Student left window';`,ctx);
   els.unlockInp.value=RECOVERY;
@@ -131,6 +135,7 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   const after=vm.runInContext(`JSON.stringify({ATTEMPT_ID,TIMER_DEADLINE,ACTIVE_IDENTITY_HASH,ACTIVE_KEY,JOKER_USED,JOKER_SELECTED_AT,JOKER_CHOICE,STARTED_AT,RESP})`,ctx);
   assert(before===after, 'E3 secure dynamic: Recovery unlock preserves attemptId, deadline, identity, variant, joker choice, start time and answers');
   assert(vm.runInContext('LOCKED',ctx)===false, 'E3 secure dynamic: valid Recovery Code unlocks the current attempt');
+  assert(els.unlockInp.value==='', 'E3 secure dynamic: accepted Recovery input is cleared immediately');
   assert(vm.runInContext(`SEC_EVENTS.length===2 && SEC_EVENTS[0].type==='locked' && SEC_EVENTS[1].type==='recovery-unlock'`,ctx), 'E3 secure dynamic: Recovery unlock appends to existing securityEvents instead of replacing them');
   assert(vm.runInContext(`__lastSeal && __lastSeal.attemptId==='ATT-E3-001' && __lastSeal.timerDeadline===1999999999999 && __lastSeal.identityHash==='IDENTITY-HASH-001' && __lastSeal.activeKey==='VARIANT-B' && __lastSeal.jokerUsed===true`,ctx), 'E3 secure dynamic: persisted active-attempt seal retains immutable attempt identity/variant/joker/deadline');
 
@@ -158,7 +163,7 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   };
   vm.createContext(ctx);
   vm.runInContext(`
-    var teacherLogged=false, locked=true, unlockBusy=false, LOCK_TAPS=0, LOCK_TAP_TIMER=null;
+    var TEACHER_AUTH_EPOCH=0, teacherLogged=false, locked=true, unlockBusy=false, LOCK_TAPS=0, LOCK_TAP_TIMER=null;
     var attemptId='INSTANT-ATT-1', timerDeadline=1888888888888, jokerUsed=true, jokerSelectedAt='2026-10-02T15:00:05.000Z';
     var securityEvents=[{type:'lock',detail:'left',ts:'before'}], warningCount=1;
     function recordSecurityEvent(type,detail){securityEvents.push({type,detail,ts:'NOW'});warningCount=securityEvents.length;}
@@ -169,19 +174,68 @@ const recoveryHash=derive('recovery-code',RECOVERY,TEST_ID);
   els['t-name'].value='Teacher'; els['t-pin'].value=RECOVERY;
   await vm.runInContext('doTeacherLogin()',ctx);
   assert(vm.runInContext('teacherLogged',ctx)===false, 'E3 instant dynamic: Recovery Code does not open teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: rejected Teacher/Admin input is cleared immediately');
   els['t-pin'].value=TEACHER;
   await vm.runInContext('doTeacherLogin()',ctx);
   assert(vm.runInContext('teacherLogged',ctx)===true, 'E3 instant dynamic: Teacher/Admin secret opens teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: accepted Teacher/Admin input is cleared immediately');
+
+  // Regression: modal close/logout must invalidate both one pending login and
+  // multiple out-of-order authentication results.
+  vm.runInContext(extractFunction(instant,'logoutTeacher'),ctx);
+  vm.runInContext(extractFunction(instant,'closeTeacherModal'),ctx);
+  const originalTeacherMatcher=ctx.teacherSecretMatches;
+
+  vm.runInContext('logoutTeacher()',ctx);
+  let resolvePending;
+  ctx.teacherSecretMatches=()=>new Promise(resolve=>{resolvePending=resolve;});
+  els['t-pin'].value=TEACHER;
+  const pendingLogin=vm.runInContext('doTeacherLogin()',ctx);
+  vm.runInContext('closeTeacherModal()',ctx);
+  assert(vm.runInContext('teacherLogged',ctx)===false, 'E3 instant dynamic: close logs out before authorization returns');
+  resolvePending(true);
+  await pendingLogin;
+  assert(vm.runInContext('teacherLogged',ctx)===false && els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: late successful authorization cannot revive a closed teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: cancelled login leaves no credential in the DOM');
+
+  const concurrentResolvers=[];
+  ctx.teacherSecretMatches=()=>new Promise(resolve=>{concurrentResolvers.push(resolve);});
+  els['t-pin'].value=TEACHER;
+  const firstLogin=vm.runInContext('doTeacherLogin()',ctx);
+  els['t-pin'].value=TEACHER;
+  const secondLogin=vm.runInContext('doTeacherLogin()',ctx);
+  assert(concurrentResolvers.length===2, 'E3 instant dynamic: two asynchronous teacher checks are pending');
+  vm.runInContext('closeTeacherModal()',ctx);
+  concurrentResolvers[1](true);
+  await secondLogin;
+  concurrentResolvers[0](true);
+  await firstLogin;
+  assert(vm.runInContext('teacherLogged',ctx)===false && els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: out-of-order concurrent successes cannot revive a closed teacher panel');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: concurrent cancelled logins leave no credential in the DOM');
+
+  ctx.teacherSecretMatches=originalTeacherMatcher;
+  els['t-pin'].value=TEACHER;
+  await vm.runInContext('doTeacherLogin()',ctx);
+  assert(vm.runInContext('teacherLogged',ctx)===true && !els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: a fresh legitimate login still succeeds after cancellations');
+  vm.runInContext('logoutTeacher()',ctx);
+  assert(vm.runInContext('teacherLogged',ctx)===false && els['t-panel'].classList.contains('hidden'),
+    'E3 instant dynamic: explicit logout removes privilege after a successful login');
+  assert(els['t-pin'].value==='', 'E3 instant dynamic: logout clears the Teacher/Admin credential field');
 
   const before=vm.runInContext(`JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,group:CFG.activeGroupKey,variant:CFG.activeVariantKey})`,ctx);
   vm.runInContext('locked=true;',ctx); els.unlockInp.value=TEACHER;
   await vm.runInContext('tryUnlock()',ctx);
   assert(vm.runInContext('locked',ctx)===true, 'E3 instant dynamic: Teacher/Admin secret cannot unlock through Recovery path');
+  assert(els.unlockInp.value==='', 'E3 instant dynamic: rejected Recovery input is cleared immediately');
   vm.runInContext(`securityEvents=[{type:'lock',detail:'left',ts:'before'}]; locked=true;`,ctx); els.unlockInp.value=RECOVERY;
   await vm.runInContext('tryUnlock()',ctx);
   const after=vm.runInContext(`JSON.stringify({attemptId,timerDeadline,jokerUsed,jokerSelectedAt,group:CFG.activeGroupKey,variant:CFG.activeVariantKey})`,ctx);
   assert(before===after, 'E3 instant dynamic: Recovery unlock preserves attempt id, deadline, variant and joker state');
   assert(vm.runInContext(`!locked && securityEvents.length===2 && securityEvents[0].type==='lock' && securityEvents[1].type==='recovery-unlock'`,ctx), 'E3 instant dynamic: valid Recovery Code unlocks and appends an audit event');
+  assert(els.unlockInp.value==='', 'E3 instant dynamic: accepted Recovery input is cleared immediately');
 
   els.unlockReveal.classList.add('hidden'); vm.runInContext('LOCK_TAPS=0; lockTap(); lockTap(); lockTap(); lockTap();',ctx);
   assert(els.unlockReveal.classList.contains('hidden'), 'E3 instant dynamic: fewer than five lock taps do not reveal Recovery input');

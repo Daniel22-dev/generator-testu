@@ -27,18 +27,60 @@ function proposeManualIdentity(payload,sm,error){
   validateSecurePayload(candidate);
   return {candidate,proof:{originalCode:payload.code,assignedCode:code,email}};
 }
+function diagnosticString(value,max){return typeof value==='string'?value.slice(0,max):'';}
+function diagnosticEvents(value,max){
+  if(!Array.isArray(value))return null;
+  return value.slice(0,max).map(function(event){
+    if(!e3Object(event))return null;
+    const out={};
+    Object.keys(event).slice(0,40).forEach(function(key){
+      if(!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(key))return;
+      const item=event[key];
+      if(typeof item==='string')out[key]=item.slice(0,2000);
+      else if(typeof item==='number'&&Number.isFinite(item))out[key]=item;
+      else if(typeof item==='boolean')out[key]=item;
+    });
+    if(!e3String(out.type,64)||!/^[a-z0-9-]+$/.test(out.type))return null;
+    return out;
+  }).filter(Boolean);
+}
+function diagnosticCriticalCounters(value){
+  if(!e3Object(value))return undefined;
+  const out={};for(const key of ['locks','unlocks','resumes','badUnlocks']){const n=value[key];if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>902)return undefined;out[key]=n;}return out;
+}
+function invalidIdentityValidation(code){return ['schema.identity','schema.code','binding.identity-variant'].includes(String(code||''));}
+function diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message){
+  const row=Object.assign({
+    file:name,status:'DECRYPTED_INVALID_IDENTITY',diagnosticQuarantine:true,error:message,validationCodes:[code],
+    student:diagnosticString(payload.student,180),code:diagnosticString(payload.code,180),attemptId:diagnosticString(payload.attemptId,100),
+    identityMode:diagnosticString(payload.identityMode,40),groupKey:diagnosticString(payload.groupKey,180),
+    startedAt:diagnosticString(payload.startedAt,120),submittedAt:diagnosticString(payload.submittedAt,120),
+    answerCount:e3Object(payload.resp)?Object.keys(payload.resp).length:0,
+    routineHistoryTruncated:payload.routineHistoryTruncated===true,criticalOverflow:payload.criticalOverflow===true,criticalHistoryLegacy:payload.criticalHistoryLegacy===true,
+    userAgent:diagnosticString(payload.userAgent,2000),rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest,
+    metadataMismatch:metadataMismatchFor(sm),envelopeMismatch:[],anchorNotes:['Identita payloadu je neplatná; Forms metadata jsou pouze diagnostická a identitu nedoplňují.']
+  },sm);
+  if(Object.prototype.hasOwnProperty.call(payload,'securityEvents'))row.securityEvents=diagnosticEvents(payload.securityEvents,2048);
+  if(Object.prototype.hasOwnProperty.call(payload,'criticalEvents'))row.criticalEvents=diagnosticEvents(payload.criticalEvents,902);
+  const counters=diagnosticCriticalCounters(payload.criticalCounters);
+  row.criticalCountersState=counters?'PRESENT':(Object.prototype.hasOwnProperty.call(payload,'criticalCounters')?'INVALID':'MISSING');
+  if(counters)row.criticalCounters=counters;
+  const trust=Object.freeze(Object.assign({},submissionTrust(payload,sm,{identity:'INVALID_NOT_ASSIGNED',timeWindow:'NOT_EVALUATED',diagnosticOnly:true}),{scoreSource:'NOT_SCORED',classificationAuthorization:'DIAGNOSTIC_QUARANTINE'}));
+  PRIVATE_SUBMISSION_TRUST.set(row,trust);row.trustAssessment=trust;return row;
+}
 async function verifyText(name,txt,meta){
-  const sm=verifierSourceMeta(meta),fullYear=!!(meta&&meta.fullYearCsv);let pack=null,payload=null,digest='';
+  const sm=verifierSourceMeta(meta),fullYear=!!(meta&&meta.fullYearCsv);let pack=null,payload=null,digest='',stage='source';
   try{
     if(sm.submissionSource==='google-forms-csv')e3Require(meta&&typeof meta.formIdentity==='string'&&meta.formIdentity.trim().length<=254&&typeof meta.formTimestamp==='string'&&meta.formTimestamp.trim().length<=120,'anchors.source-shape','Neplatn\u00fd typ nebo velikost Forms e-mailu/\u010dasu.');
-    pack=parseTxt(txt);validateSecureEnvelope(pack);digest=await sha256HexText(txt);payload=await decryptPayload(pack);
+    stage='parse';pack=parseTxt(txt);stage='envelope';validateSecureEnvelope(pack);
+    if(fullYear&&pack.testId!==CONFIG.testId)return {classification:'other-test',hintTestId:pack.testId,unverifiedOtherTest:true};
+    stage='decrypt';digest=await sha256HexText(txt);payload=await decryptPayload(pack,digest);stage='payload';
     e3Require(e3Object(payload),'schema.shape','Payload nen\u00ed objekt.');e3SafeTree(payload);e3Require(e3String(payload.testId,180)&&payload.testId.trim(),'schema.testId','Payload has no valid test identifier.');
     if(fullYear&&payload.testId!==CONFIG.testId)return {classification:'other-test',verifiedTestId:payload.testId};
     e3Require(payload.testId===CONFIG.testId&&pack.testId===CONFIG.testId,'binding.test','V\u00fdsledek pat\u0159\u00ed k jin\u00e9mu testu.');
     e3Require(payload.manifestHash===CONFIG.manifestHash&&pack.manifestHash===CONFIG.manifestHash,'binding.manifest','Payload nebo obal m\u00e1 jin\u00fd manifest testu.');
     let checked=payload,review=null;
     try{validateSecurePayload(payload);}catch(error){const proposal=proposeManualIdentity(payload,sm,error);checked=proposal.candidate;review=proposal.proof;}
-    // Schema errors keep priority (as before 7.1.97); the build-hash binding then applies to every accepted payload.
     e3Require(!payload.studentHtmlSha256||!CONFIG.studentHtmlSha256||payload.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Payload uv\u00e1d\u00ed jin\u00fd SHA-256 studentsk\u00e9ho HTML.');
     e3Require(!pack.studentHtmlSha256||!CONFIG.studentHtmlSha256||pack.studentHtmlSha256===CONFIG.studentHtmlSha256,'binding.hash','Obal uv\u00e1d\u00ed jin\u00fd SHA-256 studentsk\u00e9ho HTML.');
     const bindingError=await payloadBindingError(checked);e3Require(!bindingError,'binding.identity-variant',bindingError);
@@ -55,7 +97,11 @@ async function verifyText(name,txt,meta){
   }catch(error){
     if(fullYear&&pack&&pack.testId!==CONFIG.testId&&!payload&&!error.validationCode)return {classification:'other-test',hintTestId:pack.testId,unverifiedOtherTest:true};
     const code=error.validationCode||'crypto.parse-decrypt',message=String(error&&error.message?error.message:error);
-    const row=Object.assign({file:name,status:'CHYBA',error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',earned:0,total:0,pct:0,grade:'?',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
+    if(payload&&invalidIdentityValidation(code)){
+      const row=diagnosticQuarantineRow(name,txt,payload,digest,sm,code,message);RESULTS.push(row);rebuildDuplicateState();return {classification:'diagnostic-quarantine',error:message,code,row};
+    }
+    const failureStatus=stage==='decrypt'&&!error.validationCode?'CRYPTO_FAIL':(stage==='parse'||stage==='envelope'?'MALFORMED_CIPHERTEXT':'CHYBA');
+    const row=Object.assign({file:name,status:failureStatus,error:message,validationCodes:[code],student:payload&&typeof payload.student==='string'?payload.student.slice(0,180):'?',attemptId:payload&&typeof payload.attemptId==='string'?payload.attemptId.slice(0,100):'',rawTxt:typeof txt==='string'&&txt.length<=E3_MAX_TXT?txt:'',submissionDigest:digest},sm);
     RESULTS.push(row);return {classification:'invalid-current',error:message,code,row};
   }
 }
@@ -77,14 +123,15 @@ async function bulkVerifyPasted(){const txt=($('pasteBox').value||'').trim();if(
 const FORMS_CSV_MAX_BYTES=20*1024*1024;
 const FORMS_CSV_MAX_ROWS=5000;
 function csvParseDelimited(text,delimiter){
-  text=String(text==null?'':text).replace(/^\uFEFF/,'');const rows=[];let row=[],cell='',i=0,inQuotes=false,closed=false;
-  while(i<text.length){const ch=text[i];if(inQuotes){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i+=2;continue;}inQuotes=false;closed=true;i++;continue;}cell+=ch;i++;continue;}
-    if(ch==='"'){if(cell||closed)throw e3Error('csv.quote','Uvozovka uvnitř neuzavřeného pole CSV.');inQuotes=true;i++;continue;}
-    if(ch===delimiter){row.push(cell);cell='';closed=false;i++;continue;}
-    if(ch==='\r'||ch==='\n'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);rows.push(row);e3Require(rows.length<=FORMS_CSV_MAX_ROWS+2,'csv.rows','CSV překračuje limit řádků.');row=[];cell='';closed=false;i++;continue;}
-    if(closed)throw e3Error('csv.quote','Text za uzavřenými uvozovkami CSV.');cell+=ch;i++;
+  text=String(text==null?'':text).replace(/^\uFEFF/,'');const rows=[];let row=[],parts=[],i=0,start=0,inQuotes=false,closed=false;
+  const append=end=>{if(end>start)parts.push(text.slice(start,end));},cell=()=>{const value=parts.join('');parts=[];return value;};
+  while(i<text.length){const ch=text[i];if(inQuotes){if(ch==='"'){append(i);if(text[i+1]==='"'){parts.push('"');i+=2;start=i;continue;}inQuotes=false;closed=true;i++;start=i;continue;}i++;continue;}
+    if(ch==='"'){append(i);if(parts.length||closed)throw e3Error('csv.quote','Uvozovka uvnitř neuzavřeného pole CSV.');inQuotes=true;i++;start=i;continue;}
+    if(ch===delimiter){append(i);row.push(cell());closed=false;i++;start=i;continue;}
+    if(ch==='\r'||ch==='\n'){append(i);row.push(cell());if(ch==='\r'&&text[i+1]==='\n')i++;rows.push(row);e3Require(rows.length<=FORMS_CSV_MAX_ROWS+2,'csv.rows','CSV překračuje limit řádků.');row=[];closed=false;i++;start=i;continue;}
+    if(closed)throw e3Error('csv.quote','Text za uzavřenými uvozovkami CSV.');i++;
   }
-  if(inQuotes)throw e3Error('csv.quote','CSV obsahuje neukončené uvozovky.');row.push(cell);if(row.length>1||row[0]!==''||!rows.length)rows.push(row);return rows;
+  if(inQuotes)throw e3Error('csv.quote','CSV obsahuje neukončené uvozovky.');append(i);row.push(cell());if(row.length>1||row[0]!==''||!rows.length)rows.push(row);return rows;
 }
 function csvRowNonEmpty(row){return Array.isArray(row)&&row.some(v=>String(v||'').trim()!=='');}
 function csvCandidateScore(rows){if(!Array.isArray(rows)||!rows.length)return -1e9;const cols=rows[0].length;if(cols<2)return -10000+cols;const data=rows.slice(1,31).filter(csvRowNonEmpty);const consistent=data.filter(r=>r.length===cols).length;let payloadHits=0;data.forEach(r=>r.forEach(v=>{if(String(v||'').trim().startsWith('SECURE-ANSWERS-V1'))payloadHits++;}));return payloadHits*1000+consistent*40+Math.min(cols,30);}
@@ -108,7 +155,7 @@ function parseFormsCsvText(text){
   const testIdIndex=hnorm.findIndex(h=>h==='test id'||h==='id testu'),testNameIndex=hnorm.findIndex(h=>h==='test name'||h==='nazev testu'),groupIndex=hnorm.findIndex(h=>['group','class','skupina','trida','trida skupina'].includes(h));
   return {headers,data,delimiter:best.delimiter,delimiterLabel:best.delimiterLabel,identityIndex,timestampIndex,testIdIndex,testNameIndex,groupIndex};
 }
-function formsPushRowError(rowNo,message,meta){RESULTS.push(Object.assign({file:'forms_radek_'+rowNo+'.txt',status:'CHYBA',error:String(message||'Neplatný řádek CSV.'),validationCodes:['csv.row'],student:'?',earned:0,total:0,pct:0,grade:'?',rawTxt:''},verifierSourceMeta(meta)));}
+function formsPushRowError(rowNo,message,meta){RESULTS.push(Object.assign({file:'forms_radek_'+rowNo+'.txt',status:'CHYBA',error:String(message||'Neplatný řádek CSV.'),validationCodes:['csv.row'],student:'?',rawTxt:''},verifierSourceMeta(meta)));}
 function setFormsProgress(done,total){const box=$('formsImportProgress');if(box)box.textContent=total?'Zpracování CSV: '+done+' / '+total+' ('+Math.round(done/Math.max(1,total)*100)+' %)':'';}
 let FORMS_CSV_BATCHES=[],FORMS_IMPORT_CHAIN=Promise.resolve(),FORMS_BATCH_SEQUENCE=0;
 function formsMetaFor(parsed,row,rowNo,batch){return {source:'google-forms-csv',fullYearCsv:true,formIdentity:row[parsed.identityIndex].trim(),formTimestamp:row[parsed.timestampIndex].trim(),formRow:rowNo,formFile:batch.fileName,formBatchId:batch.id,formTestId:parsed.testIdIndex>=0?row[parsed.testIdIndex].trim():'',formTestName:parsed.testNameIndex>=0?row[parsed.testNameIndex].trim():'',formGroup:parsed.groupIndex>=0?row[parsed.groupIndex].trim():''};}
@@ -140,7 +187,7 @@ function collectFormsLessonWindows(batches){
 }
 function formsSummaryRefresh(summary){
   if(!summary)return summary;
-  const rows=RESULTS.filter(r=>r.formBatchId===summary.batchId),bad=r=>r.status==='CHYBA'||r.exactDuplicate||r.hardReplayConflict;
+  const rows=RESULTS.filter(r=>r.formBatchId===summary.batchId),bad=r=>['CHYBA','DECRYPTED_INVALID_IDENTITY','MALFORMED_CIPHERTEXT','CRYPTO_FAIL'].includes(r.status)||r.exactDuplicate||r.hardReplayConflict;
   summary.ok=rows.filter(r=>r.status==='OK'&&!bad(r)).length;
   summary.pending=rows.filter(r=>r.status==='IDENTITY_REVIEW'&&!bad(r)).length;
   summary.invalid=rows.filter(bad).length;summary.current=rows.length;
@@ -160,7 +207,7 @@ function renderFormsImportSummary(summary){
   if(summary.otherTests)html+='<p class="muted">Jin\u00e9 testy v souboru: '+summary.otherTests+' (ignorov\u00e1no).</p>';
   if(summary.otherTestsUnverified)html+='<p class="muted">Z toho '+summary.otherTestsUnverified+' ob\u00e1lek pat\u0159\u00ed podle vn\u011bj\u0161\u00edho ID k jin\u00fdm test\u016fm. Tento verifier je nem\u016f\u017ee de\u0161ifrovat; nejde o kryptograficky ov\u011b\u0159en\u00e9 za\u0159azen\u00ed.</p>';
   if(summary.markers)html+='<p class="muted">Zna\u010dky hodiny: '+summary.markers+' \u0159\u00e1dk\u016f (nejsou to odevzd\u00e1n\u00ed).</p>';
-  const grouped=new Map();for(const r of RESULTS.filter(r=>r.formBatchId===summary.batchId&&(r.status==='CHYBA'||r.exactDuplicate||r.hardReplayConflict))){const code=r.exactDuplicate||r.hardReplayConflict?'replay.duplicate':r.validationCodes?.[0]||'unknown';if(!grouped.has(code))grouped.set(code,{count:0,message:r.exactDuplicate||r.hardReplayConflict?'Opakovan\u00e9 odevzd\u00e1n\u00ed je vy\u0159azeno. Zkontroluj p\u016fvodn\u00ed \u0159\u00e1dek CSV.':r.error});grouped.get(code).count++;}
+  const grouped=new Map();for(const r of RESULTS.filter(r=>r.formBatchId===summary.batchId&&(['CHYBA','DECRYPTED_INVALID_IDENTITY','MALFORMED_CIPHERTEXT','CRYPTO_FAIL'].includes(r.status)||r.exactDuplicate||r.hardReplayConflict))){const code=r.exactDuplicate||r.hardReplayConflict?'replay.duplicate':r.validationCodes?.[0]||'unknown';if(!grouped.has(code))grouped.set(code,{count:0,message:r.exactDuplicate||r.hardReplayConflict?'Opakovan\u00e9 odevzd\u00e1n\u00ed je vy\u0159azeno. Zkontroluj p\u016fvodn\u00ed \u0159\u00e1dek CSV.':r.error});grouped.get(code).count++;}
   for(const [code,g] of grouped)html+='<details class="forms-bad"><summary>'+g.count+'\u00d7 '+esc(g.message)+'</summary><code>'+esc(code)+'</code></details>';
   const received=new Set(RESULTS.filter(r=>r.status==='OK'||r.status==='IDENTITY_REVIEW').map(r=>String(r.code||r.student||'').toUpperCase()));
   const missing=(CONFIG.roster||[]).filter(r=>!received.has(String(r.code||'').toUpperCase()));
@@ -199,7 +246,6 @@ async function reevaluateFormsBatches(){
   LAST_FORMS_IMPORT=last;afterResultsChanged();renderFormsImportSummary(last);return last;
 }
 async function importFormsCsvText(text,fileName){
-  parseFormsCsvText(text);
   e3Require(FORMS_CSV_BATCHES.length<20&&FORMS_CSV_BATCHES.reduce((n,b)=>n+b.text.length,0)+text.length<=FORMS_CSV_MAX_BYTES,'csv.batch-limit','Na\u010dten\u00e1 CSV p\u0159ekra\u010duj\u00ed limit. Ulo\u017e v\u00fdsledky a za\u010dni novou sadu.');
   const batch={id:'forms-'+(++FORMS_BATCH_SEQUENCE),text,fileName:String(fileName||'forms.csv').slice(0,180)};FORMS_CSV_BATCHES.push(batch);
   try{return await queueFormsReevaluation();}catch(error){FORMS_CSV_BATCHES=FORMS_CSV_BATCHES.filter(b=>b!==batch);throw error;}

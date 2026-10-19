@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
-const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13e-secure-student-runtime.js'));
+const secure = (fs.readFileSync('src/js/13de-secure-student-guard.js','utf8')+'\n'+read('src/js/13di-secure-strict-mode-runtime.js')+'\n'+read('src/js/13e-secure-student-runtime.js'));
 const instant = read('src/js/14b-instant-test-runtime.js');
 const verifier = read('src/js/13f-secure-teacher-verifier.js');
+const verifierS4 = read('src/js/13eh-secure-teacher-verifier-s4.js');
 
 function assert(cond,msg){ if(!cond){console.error('FAIL',msg);process.exitCode=1;} else console.log('PASS',msg); }
 function extractFunction(src,name){
@@ -27,12 +28,12 @@ assert(/results:RESULTS/.test(verifier), 'E4 exports: archive JSON retains resul
 {
   const els={unlockInp:makeEl(),lockScreen:makeEl(false),unlockReveal:makeEl(true),lockReasonBox:makeEl()};
   const ctx={console,setTimeout:()=>1,clearTimeout:()=>{},$:id=>els[id]||makeEl(),t:(k,f)=>f||k,
-    SEC_EVENTS:[],LOCKED:true,LOCK_REASON:'first reason',UNLOCK_BUSY:false,LOCK_TAPS:0,PERSIST_INTEGRITY_BLOCK:false,GUARD_EPOCH:0,document:{visibilityState:"visible"},applyGuardUi:()=>{},CFG:{},
+    SEC_EVENTS:[],LOCKED:true,LOCK_REASON:'first reason',UNLOCK_BUSY:false,LOCK_TAPS:0,PERSIST_INTEGRITY_BLOCK:false,GUARD_EPOCH:0,STRICT_RECOVERY_AUTHORIZED:false,STRICT_RECOVERY_REASON:'',STRICT_RECOVERY_LOCK_EVENT:null,document:{visibilityState:"visible"},applyGuardUi:()=>{},CFG:{},
     recoveryCodeMatches:async v=>v==='REC',persistActiveAttemptSeal:()=>true};
   ctx.recordSec=function(type,detail,extra){const ev={t:'T'+(ctx.SEC_EVENTS.length+1),type,detail:detail||''};Object.assign(ev,extra||{});ctx.SEC_EVENTS.push(ev);};
   vm.createContext(ctx);
   vm.runInContext(fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8'),ctx);
-  vm.runInContext(vm.runInContext('SECURE_VERIFIER_TRUST_JS',ctx),ctx); vm.runInContext(extractFunction(secure,'tryUnlock'),ctx);
+  vm.runInContext(vm.runInContext('SECURE_VERIFIER_TRUST_JS',ctx),ctx); vm.runInContext(extractFunction(secure,'completeRecoveryUnlock'),ctx); vm.runInContext(extractFunction(secure,'tryUnlock'),ctx);
   ctx.SEC_EVENTS.push({t:'L1',type:'locked',detail:'first reason'}); els.unlockInp.value='REC'; await vm.runInContext('tryUnlock()',ctx);
   ctx.LOCKED=true;ctx.LOCK_REASON='second reason';ctx.SEC_EVENTS.push({t:'L2',type:'locked',detail:'second reason'});els.unlockInp.value='REC';await vm.runInContext('tryUnlock()',ctx);
   const seq=ctx.SEC_EVENTS.map(e=>e.type).join('>');
@@ -52,6 +53,7 @@ assert(/results:RESULTS/.test(verifier), 'E4 exports: archive JSON retains resul
   vm.runInContext(extractFunction(fs.readFileSync('src/js/13ee-secure-verifier-anchors.js','utf8'),'privatePlannedMinutes'),ctx);
   vm.runInContext(extractFunction(fs.readFileSync('src/js/13ed-secure-verifier-validation.js','utf8'),'e3Canonical'),ctx);
   vm.runInContext(extractFunction(fs.readFileSync('src/js/13ed-secure-verifier-validation.js','utf8'),'e3Object'),ctx);
+  vm.runInContext(extractFunction(verifierS4,'appendStrictGuardSignals'),ctx);
   for(const fn of ['eventCount','eventTime','eventDetails','recoveryUnlockEvents','legacyUnlockEvents','securityEventTimelineText','securitySignalsFor','securityIssueCount','securitySignalText','securityAuditText']) vm.runInContext(extractFunction(verifier,fn),ctx);
   const onlyAudit={status:'OK',securityEvents:[{t:'1',type:'recovery-unlock',detail:'unlocked',lockReason:'left window'}],details:[],answerChangeStats:{}};
   ctx.r=onlyAudit;

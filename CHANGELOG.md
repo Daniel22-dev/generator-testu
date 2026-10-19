@@ -1,3 +1,11 @@
+## 7.1.100 – 2026-10-18 – V7 consolidated security, pedagogy and certification
+
+- Dokončeny Sprinty 01–08.3a: credentials/Recovery, pedagogická věrnost, workflow a bodování, Teacher Verifier 2.0, Strict Mode Guard V2, AI didaktika, Forms/Apps Script UX a certifikační stabilizace.
+- Aktualizován owner-approved AI assurance fingerprint a GARP 2.7 trust anchor/piny pro přesnou release identitu 7.1.100.
+- Split-screen zůstává SHADOW/AUDIT-ONLY bez automatického zámku; T110 zůstává SERVER-DEFERRED.
+- Fyzická zařízení a živé školní Forms/Sheets/MailApp/Gemini nejsou zaměněny za syntetické PASS a vyžadují provozní akceptaci.
+- Produkční vydání smí pokračovat pouze přes chráněný exact-SHA candidate/main proces a ověření identity nasazeného artefaktu.
+
 ## 7.1.99 – 2026-10-08 – Forms new tab and Teacher Verifier V2 width hotfix
 
 - Studentské tlačítko „Otevřít formulář“ při povoleném popupu otevře právě jednu kartu Google Forms a zachová stránku testu s odevzdávacím kódem; `window.opener` se vynuluje.

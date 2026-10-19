@@ -2,7 +2,7 @@
 // Covers: export gate, 6-char code, prefill, justified reading, START/END markers, late/double START, manual override.
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,configure} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,configure} from './redteam-harness-utils.mjs';
 const FORM='https://docs.google.com/forms/d/e/SYNTHETIC-FORM-ID/viewform',PREFILL=FORM+'?usp=pp_url&entry.111=TESTID&entry.222=NAZEV&entry.333=TRIDA&entry.444=KOD';
 const TEACHER='teacher@school.example',A='student.a@school.example',B='student.b@school.example';
 const GEN={exercises:[{title:'MC',type:'multiple choice',points_total:5,points_each:1,items:[1,2,3,4,5].map(i=>({question:'Q'+i+'?',options:['A','B'],correct:i%2}))},
@@ -19,9 +19,9 @@ try{
   browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});const errors=[];
   const expiredCtx=await browser.newContext({viewport:{width:390,height:844}}),expired=await expiredCtx.newPage();expired.on('pageerror',e=>errors.push(e.message));
   await expired.route('http://127.0.0.1:18781/expired.html',r=>r.fulfill({status:200,contentType:'text/html',body:S}));await expired.goto('http://127.0.0.1:18781/expired.html');
-  await expired.locator('#studentName').fill('A7B9C2');await enterStartCode(expired,pkg);await expired.evaluate(()=>startTest());await expired.locator('#test').waitFor({state:'visible'});
+  await expired.locator('#studentName').fill('A7B9C2');await enterStartCode(expired,pkg);await completeGeneratedPageStart(expired);await expired.locator('#test').waitFor({state:'visible'});
   await expired.evaluate(async()=>{STARTED_AT=new Date(Date.now()-21*60000).toISOString();TIMER_DEADLINE=Date.now()-1000;await persistActiveAttemptSeal();});
-  await expired.reload();await expired.locator('#studentName').fill('A7B9C2');await enterStartCode(expired,pkg);await expired.evaluate(()=>startTest());await expired.locator('#done').waitFor({state:'visible'});
+  await expired.reload();await expired.locator('#studentName').fill('A7B9C2');await enterStartCode(expired,pkg);await completeGeneratedPageStart(expired);await expired.locator('#done').waitFor({state:'visible'});
   const expiredNotice=await expired.locator('.s-modal-bd').innerText();assert.match(expiredNotice,/time.*expired|expired.*time|čas.*vypršel|vypršel.*čas|submitted automatically/i,'expired resumed attempt lacks clear automatic-submit explanation');
   assert.equal(await expired.locator('#timer').textContent(),'00:00','expired resumed attempt did not preserve exhausted deadline');ok('expired resumed attempt auto-submits without resetting time and explains why');
   await expiredCtx.close();
@@ -30,10 +30,18 @@ try{
   for(const bad of [pkg.testId,'A1','A7B9C2X']){await student.locator('#studentName').fill(bad);await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.waitForTimeout(250);assert.equal(await student.locator('#test').isVisible(),false,'accepted '+bad);await student.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));}
   ok('test ID / short / long codes rejected');
   await student.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
-  await student.locator('#studentName').fill('a7b9c2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});ok('lower-case valid code accepted');
+  await student.locator('#studentName').fill('a7b9c2');await enterStartCode(student,pkg);await completeGeneratedPageStart(student);await student.locator('#test').waitFor({state:'visible'});ok('lower-case valid code accepted');
   assert.equal(await student.locator('#done').isVisible(),false,'fresh start jumped directly to submitted/Forms screen');
   await student.waitForTimeout(80);assert.ok((await student.evaluate(()=>window.scrollY))<20,'fresh start did not reset scroll to the beginning of the test');
-  const firstAnswer=student.locator('[data-qid]').first();if(await firstAnswer.count()){await firstAnswer.click({force:true});await student.waitForTimeout(50);assert.equal(await student.evaluate(()=>Object.keys(RESP).length),0,'start-transition click-through changed an answer');}
+  const firstAnswer=student.locator('[data-qid]').first();if(await firstAnswer.count()){
+    const transitionGuardWasArmed=await student.evaluate(()=>TEST_INTERACTION_ARMED_AT>0);
+    assert.equal(transitionGuardWasArmed,true,'fresh start did not arm the interaction guard');
+    await student.evaluate(()=>armSecureStartInteractionGuard());
+    await firstAnswer.click({force:true});await student.waitForTimeout(50);assert.equal(await student.evaluate(()=>Object.keys(RESP).length),0,'start-transition click-through changed an answer');
+  }
+  const submitGuardWasArmed=await student.evaluate(()=>SUBMIT_UI_ARMED_AT>0);
+  assert.equal(submitGuardWasArmed,true,'fresh start did not arm the submit guard');
+  await student.evaluate(()=>armSecureSubmitButton());
   const submitButton=student.locator('#secureSubmitCard button');assert.equal(await submitButton.isDisabled(),true,'submit must be briefly disarmed after the start transition');
   await submitButton.click({force:true});await student.waitForTimeout(100);assert.equal(await student.locator('#done').isVisible(),false,'start-transition click-through submitted the test');
   await student.waitForTimeout(1300);assert.equal(await submitButton.isDisabled(),false,'submit did not re-arm after the start transition');
@@ -43,7 +51,7 @@ try{
   const reading=await student.evaluate(()=>[...document.querySelectorAll('.reading-passage')].map(e=>{const c=getComputedStyle(e);return {lang:e.getAttribute('lang'),align:c.textAlign,last:c.textAlignLast,hyph:c.hyphens,overflow:e.scrollWidth>e.clientWidth+1};}));
   assert.ok(reading.length&&reading.every(r=>r.lang==='en'&&r.align==='justify'&&r.last==='left'&&r.hyph==='auto'&&!r.overflow),JSON.stringify(reading));ok('reading passage justified, hyphenated, lang=en at 390 px');
   const startedAtMs=Date.now();
-  await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);});
+  await student.evaluate(()=>{for(let i=0;i<5;i++)setResp('0_'+i,i%2);for(let i=0;i<4;i++)setResp('1_'+i,0);stopSplitMonitor();splitTotalMs=12000;splitMeasuredMs=0;splitSmallMs=0;splitRunMs=0;SPLIT_STATE_COUNTS={NORMAL:0,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:6,EXEMPT:0};SPLIT_SHADOW_STATE='AMBIGUOUS';});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const txt=await student.locator('#answerBackup').inputValue();
   const formsUrl=new URL(await student.evaluate(()=>formsOpenUrl()));assert.equal(formsUrl.searchParams.get('entry.111'),pkg.testId);assert.ok(formsUrl.searchParams.get('entry.222'));assert.ok(formsUrl.searchParams.get('entry.333'));assert.equal(formsUrl.searchParams.get('entry.444'),null);ok('student Forms link prefilled with test ID, name, class only');
   await sctx.route('https://docs.google.com/**',r=>r.fulfill({status:200,contentType:'text/html',body:'<p>synthetic form</p>'}));
@@ -64,7 +72,7 @@ try{
   assert.equal(await student.locator('#answerBackup').inputValue(),'','foreign identity received previous encrypted payload');
   ok('shared profile: completed outbox is not exposed to a different student code');
   await student.evaluate(()=>document.querySelectorAll('.s-modal-bd').forEach(x=>x.remove()));
-  await student.reload();await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#done').waitFor({state:'visible'});
+  await student.reload();await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await completeGeneratedPageStart(student);await student.locator('#done').waitFor({state:'visible'});
   assert.equal(await student.locator('#answerBackup').inputValue(),txt,'same student could not recover its completed outbox');
   ok('same student can recover its own encrypted outbox after reload');
   await sctx.close();

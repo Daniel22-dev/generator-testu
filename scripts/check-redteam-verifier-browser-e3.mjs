@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,configure,build} from './redteam-harness-utils.mjs';
 let browser;
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode'});
@@ -14,7 +14,7 @@ try{
   const publishedAt=new Date(Date.now()-60000).toISOString();
   const localParts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(publishedAt)).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
   const publishedDate=localParts.year+'-'+localParts.month+'-'+localParts.day,publishedTime=localParts.hour+':'+localParts.minute;
-  await student.goto('http://127.0.0.1:18779/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await student.evaluate(()=>startTest());await student.locator('#test').waitFor({state:'visible'});
+  await student.goto('http://127.0.0.1:18779/student.html');await student.locator('#studentName').fill('A7B9C2');await enterStartCode(student,pkg);await completeGeneratedPageStart(student);await student.locator('#test').waitFor({state:'visible'});
   await student.evaluate(()=>{for(const [q,a] of Object.entries({'0_0':1,'0_1':0,'0_2':1,'0_3':0,'0_4':1}))setResp(q,a);});
   await student.evaluate(()=>submitSecureTest());await student.locator('#done').waitFor({state:'visible'});const nativeTxt=await student.locator('#answerBackup').inputValue();assert.ok(nativeTxt.startsWith('SECURE-ANSWERS-V1'));
   await verifier.goto('http://127.0.0.1:18779/verifier.html');await verifier.evaluate(()=>showVerifierPanel('results'));
@@ -31,7 +31,7 @@ try{
   const forgeries=await student.evaluate(async txt=>{const p=await (async()=>{ /* Only the verifier has the private key; use the native payload before encryption. */return await secureAnswers();})();
     const out=[];for(const patch of [{securityEvents:[]},{startedAt:'2040-01-01T12:00:00Z',submittedAt:'2000-01-01T12:00:00Z'},{resp:{'0_0':999}},{groupKey:'fake'},{serverVerified:true}])out.push('SECURE-ANSWERS-V1\n'+JSON.stringify({testId:CFG.testId,manifestHash:CFG.manifestHash,payload:await encryptPayloadForTeacher({...p,...patch})}));return out;
   },nativeTxt);
-  for(const txt of forgeries){const bad=await verifier.evaluate(async text=>{const s=await importFormsCsvText(text,'bad-e3.csv');return {invalid:s.invalid,last:RESULTS.at(-1).status,score:RESULTS.at(-1).total,effective:effectiveResults().length};},csv(txt));assert.equal(bad.invalid,1);assert.equal(bad.last,'CHYBA');assert.equal(bad.score,0);assert.equal(bad.effective,1);}
+  for(const txt of forgeries){const bad=await verifier.evaluate(async text=>{const s=await importFormsCsvText(text,'bad-e3.csv'),row=RESULTS.at(-1);return {invalid:s.invalid,last:row.status,hasScore:['earned','total','pct','grade'].some(key=>Object.hasOwn(row,key)),effective:effectiveResults().length};},csv(txt));assert.equal(bad.invalid,1);assert.equal(bad.last,'CHYBA');assert.equal(bad.hasScore,false);assert.equal(bad.effective,1);}
   const wrong=await verifier.evaluate(async text=>{await importFormsCsvText(text,'wrong-account.csv');return RESULTS.at(-1).validationCodes;},csv(nativeTxt,'other@example.invalid'));assert.ok(wrong.includes('anchors.identity-mismatch'));
   await verifier.evaluate(async text=>importFormsCsvText(text,'duplicate-e3.csv'),csv(nativeTxt));assert.equal(await verifier.evaluate(()=>effectiveResults().length),1);assert.equal(await verifier.evaluate(()=>classificationStatus(RESULTS.at(-1))),'REJECTED');
   await verifier.evaluate(()=>showVerifierPanel('results'));assert.ok((await verifier.locator('#resultTable').innerText()).includes('PŮVOD NEPROKÁZÁN'));assert.ok((await verifier.locator('#resultTable').innerText()).includes('ODMÍTNUTO')||(await verifier.locator('#resultTable').innerText()).includes('DUPLICITA'));

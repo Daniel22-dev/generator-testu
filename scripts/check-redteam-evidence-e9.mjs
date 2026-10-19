@@ -6,7 +6,7 @@ const reports=[
   ...['e1-isolation','e1-browser','e2-trust','e2-browser','e3-verifier','e3-browser','e4-faults','e4-browser','e5-runtime','e5-browser','e6-publication','e7-mobile-protocol','e7-recorder','e8-forgery','e8-retention','e8-browser','e9-ci-contract','e9-negative','e9-restart-browser'].map(x=>'qa-results/redteam-'+x+'.json'),
   'qa-results/security-behavior-r3.json','qa-results/adversarial-harness-r5.json','qa-results/d7-regressions.json','qa-results/d8-final-audit.json','qa-results/stage3-pdf-runtime/summary.json','qa-results/stage3-pdf-quality/summary.json','qa-results/verifier-ui-runtime/summary.json',
   ...['qa-p3-browser-report','qa-p5-runtime-report','qa-p5-xss-sinks-report','qa-p5-axe-runtime-report','qa-p5-release-report','qa-p5-acceptance-report','quality-report'].map(x=>'dist/'+x+'.json'),
-  'audit/evidence/garp27-current/foundation-summary.json',
+  'qa-results/redteam-e10-ci/foundation-evidence/foundation-summary.json',
 ];
 function validate(records,version,startedAt){
   assert.ok(Number.isFinite(Date.parse(startedAt)),'Complete E9 chain start required');
@@ -19,13 +19,13 @@ function validate(records,version,startedAt){
     if(d.summary){for(const key of ['failed','blockers','browserExceptions','initFailures','overflows'])if(key in d.summary)assert.equal(d.summary[key],0,'Failure '+file+' '+key);}
   }
   const get=name=>records['qa-results/redteam-'+name+'.json'].data;
-  const e8=get('e8-forgery');assert.equal(e8.caseCount,108);assert.equal(e8.negativeControls,108);assert.equal(e8.cases.length,108);assert.equal(e8.rejections,86);const metadataWarnings=e8.cases.filter(x=>['forms-metadata-id','forms-metadata-title','forms-metadata-group'].includes(x.id));assert.equal(metadataWarnings.length,3);assert.ok(metadataWarnings.every(x=>x.expect==='METADATA_WARNING'&&x.passed!==false),'F4 metadata mismatch controls must remain covered as review warnings');assert.equal(e8.replaySequences,6);assert.equal(e8.controls,16);
+  const e8=get('e8-forgery');assert.equal(e8.caseCount,112);assert.equal(e8.negativeControls,112);assert.equal(e8.cases.length,112);assert.equal(e8.rejections,90);const metadataWarnings=e8.cases.filter(x=>['forms-metadata-id','forms-metadata-title','forms-metadata-group'].includes(x.id));assert.equal(metadataWarnings.length,3);assert.ok(metadataWarnings.every(x=>x.expect==='METADATA_WARNING'&&x.passed!==false),'F4 metadata mismatch controls must remain covered as review warnings');const modernSplitIds=['split-modern-percent-disagrees','split-modern-missing-measurement-as-zero','split-modern-count-negative','split-modern-count-unknown-key'];const modernSplitCases=e8.cases.filter(x=>modernSplitIds.includes(x.id));assert.deepEqual(modernSplitCases.map(x=>x.id).sort(),modernSplitIds.toSorted(),'Modern split telemetry cases must remain in the admitted E8 inventory');assert.ok(modernSplitCases.every(x=>x.expect==='REJECTED'&&x.code==='telemetry.split'&&x.status==='PASS'&&x.negativeControl==='DETECTED_WEAKENED_BUILD'),'Modern split telemetry controls must reject and detect a weakened verifier');assert.equal(e8.replaySequences,6);assert.equal(e8.controls,16);
   assert.equal(get('e9-negative').controls.length,7);assert.ok(get('e9-negative').controls.every(x=>x.detected&&x.actualExit===1));
-  assert.equal(get('e9-ci-contract').negativeControls.length,14);assert.ok(get('e9-ci-contract').negativeControls.every(x=>x.detected));
+  const expectedCiNegativeControls=['drop-VM','drop-native','drop-negatives','local-ci-drift','skip-admission','wrong-order','drop-foundation-preservation','changed-source-accepted','unsafe-log-path','swallow-failure','optional-gate','unlocked-install','unbound-artifact','missing-evidence','deploy-bypass'];const ciNegativeControls=get('e9-ci-contract').negativeControls;assert.deepEqual(ciNegativeControls.map(x=>x.id),expectedCiNegativeControls,'Exact E9 CI negative-control inventory required');assert.ok(ciNegativeControls.every(x=>x.detected));
   const native=get('e9-restart-browser');assert.equal(native.checks.length,12);assert.ok(native.checks.every(x=>x.status==='PASS'&&x.originPreserved&&x.deadlinePreserved&&x.answerPreserved));assert.equal(native.negativeControls.length,2);assert.ok(native.negativeControls.every(x=>x.detected));
   for(const name of ['e7-mobile-protocol','e7-recorder']){assert.equal(get(name).physicalDevicesTested,false);assert.equal(get(name).protocolVersion,'7.1.83');}
   assert.equal(get('e7-mobile-protocol').mobileStageStatus,'ANALYZED / NOT TESTED');
-  const f=records['audit/evidence/garp27-current/foundation-summary.json'].data;assert.deepEqual(f.summary,{total:12,passed:12,failed:0});assert.equal(f.liveStatus,'NOT_TESTED');
+  const f=records['qa-results/redteam-e10-ci/foundation-evidence/foundation-summary.json'].data;assert.deepEqual(f.summary,{total:12,passed:12,failed:0});assert.equal(f.liveStatus,'NOT_TESTED');
   if(process.env.GITHUB_SHA)assert.deepEqual(f.sourceIdentity,{value:process.env.GITHUB_SHA,kind:'git-commit'});
   const q=records['dist/quality-report.json'].data;
   const expectedBudget=JSON.parse(fs.readFileSync('ghrab-platform.consumer.json')).quality?.performanceBudget||{};
@@ -41,13 +41,14 @@ const mutations=[
   ['stale-report',x=>x['qa-results/redteam-e8-forgery.json'].mtimeMs=0],
   ['wrong-version',x=>x['qa-results/redteam-e8-forgery.json'].data.version='7.1.84'],
   ['failed-VM',x=>x['qa-results/redteam-e3-verifier.json'].data.status='FAIL'],
-  ['missing-forgery-negative',x=>x['qa-results/redteam-e8-forgery.json'].data.negativeControls=107],
+  ['missing-forgery-negative',x=>x['qa-results/redteam-e8-forgery.json'].data.negativeControls=111],
   ['failed-export-negative',x=>x['qa-results/redteam-e9-negative.json'].data.controls[0].detected=false],
+  ['missing-ci-contract-negative',x=>x['qa-results/redteam-e9-ci-contract.json'].data.negativeControls.pop()],
   ['partial-native-matrix',x=>x['qa-results/redteam-e9-restart-browser.json'].data.checks.pop()],
   ['invented-mobile-proof',x=>x['qa-results/redteam-e7-mobile-protocol.json'].data.physicalDevicesTested=true],
   ['failed-adversarial-list',x=>x['qa-results/adversarial-harness-r5.json'].data[0].status='ERROR'],
   ['increased-budget',x=>x['dist/quality-report.json'].data.budget.entryCriticalBytes=2000000],
-  ['failed-foundation',x=>x['audit/evidence/garp27-current/foundation-summary.json'].data.summary.failed=1],
+  ['failed-foundation',x=>x['qa-results/redteam-e10-ci/foundation-evidence/foundation-summary.json'].data.summary.failed=1],
 ];
 for(const [id,mutate] of mutations){const broken=structuredClone(records);mutate(broken);assert.throws(()=>validate(broken,version,startedAt),{name:'AssertionError'},id);}
 const report={stage:'E9',version,status:'PASS',startedAt,completedAt:new Date().toISOString(),scope:'Complete current-version process chain, report admission and SHA256 binding; local execution is not remote CI',reportCount:reports.length,reports:reports.map(file=>({file,sha256:records[file].sha256})),negativeControls:mutations.map(([id])=>({id,detected:true})),physicalMobile:'ANALYZED / NOT TESTED',...releaseDecision(JSON.parse(fs.readFileSync('security/release-readiness-e10.json')),version)};

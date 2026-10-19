@@ -2,8 +2,9 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
 import http from 'node:http';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const fixture = path.resolve('qa-results/qa-fixtures/teacher_verifier.html');
@@ -117,13 +118,22 @@ await new Promise((resolve, reject) => {
 });
 const listenPort = server.address().port;
 const debugPort = 12600 + (process.pid % 300);
-const profile = `/tmp/ghrab-verifier-ui-${process.pid}`;
+const profile = path.join(os.tmpdir(), `ghrab-verifier-ui-${process.pid}`);
 fs.rmSync(profile, { recursive: true, force: true });
 const chrome = spawn(chromiumPath(), [
   '--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
   '--disable-background-networking', '--disable-extensions', '--no-first-run', '--mute-audio',
   '--remote-allow-origins=*', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${profile}`, 'about:blank',
-], { stdio: 'ignore', detached: true });
+], { stdio: 'ignore', detached: process.platform !== 'win32' });
+function stopChrome(signal) {
+  if (chrome.exitCode !== null) return;
+  try {
+    if (process.platform === 'win32') {
+      spawnSync('taskkill', ['/PID', String(chrome.pid), '/T', '/F'], { stdio: 'ignore', windowsHide: true });
+    }
+    else process.kill(-chrome.pid, signal);
+  } catch {}
+}
 let client;
 const summary = { schema: 'ghrab-verifier-ui-runtime-v1', chromium: chromiumPath(), status: 'failed', checks: {} };
 try {
@@ -180,11 +190,13 @@ try {
   await fsp.writeFile(summaryPath, JSON.stringify(summary, null, 2) + '\n');
   throw error;
 } finally {
+  try { await client?.call('Browser.close'); } catch {}
   client?.close();
   server.close();
-  if (chrome.exitCode === null) { try { process.kill(-chrome.pid, 'SIGTERM'); } catch {} }
   await Promise.race([new Promise(resolve => chrome.once('exit', resolve)), sleep(1500)]);
-  if (chrome.exitCode === null) { try { process.kill(-chrome.pid, 'SIGKILL'); } catch {} }
-  await sleep(100);
+  stopChrome('SIGTERM');
+  await Promise.race([new Promise(resolve => chrome.once('exit', resolve)), sleep(1500)]);
+  stopChrome('SIGKILL');
+  await sleep(500);
   fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 }

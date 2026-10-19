@@ -20,6 +20,9 @@ const CORE_DIR = path.resolve('vendor', `ghrab-ai-core-${CORE_VERSION}`);
 const CORE_FILE = `ghrab-ai-core-${CORE_VERSION}.js`;
 const CORE_MANIFEST = `ghrab-ai-core-manifest-${CORE_VERSION}.json`;
 const EXPECTED_AI_OPERATIONS = 12;
+const ASSISTANT_FEATURE_FILE = 'generator-assistant.js';
+const ASSISTANT_SECTION_START = '/* Generator Assistant — lokální poradce ke generátoru (KB + UI + volitelné AI). */';
+const ASSISTANT_SECTION_END = '/* konec Generator Assistant */';
 // Staré názvy modulů zůstávají v repozitáři jen jako náhrobky pro nahrávání přes GitHub web.
 const MIGRATION_TOMBSTONES = new Set(['13-secure-export.js', '14-test-html-builders.js']);
 
@@ -90,6 +93,57 @@ function compactJsWhitespace(source, file) {
   const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType:'script',allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
   try{if(semantic(clean)!==semantic(out))fail('JS compaction changed AST: '+file);}catch(e){fail('JS compaction invalid: '+file+' '+e.message);}
   return out;
+}
+
+function splitGeneratorAssistant(source, file) {
+  const start = source.indexOf(ASSISTANT_SECTION_START);
+  const end = source.indexOf(ASSISTANT_SECTION_END);
+  if (start < 0 || end < start || source.indexOf(ASSISTANT_SECTION_START, start + 1) !== -1 || source.indexOf(ASSISTANT_SECTION_END, end + 1) !== -1) {
+    fail(`nelze jednoznačně oddělit Generator Assistant z ${file}`);
+  }
+  const sectionEnd = end + ASSISTANT_SECTION_END.length;
+  const coreWithoutAssistant = source.slice(0, start) + source.slice(sectionEnd);
+  const evidenceCorpus = [coreWithoutAssistant];
+  for (const dir of [path.resolve('src','js'), path.resolve('src','features')]) {
+    for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
+      if (!entry.isFile() || !entry.name.endsWith('.js') || (dir.endsWith(`${path.sep}js`) && entry.name === file)) continue;
+      evidenceCorpus.push(fs.readFileSync(path.join(dir,entry.name),'utf8'));
+    }
+  }
+  const applicationSource=evidenceCorpus.join('\n');
+  const evidenceSymbols=[...new Set([...source.slice(start,sectionEnd).matchAll(/[A-Za-z_][\w]*\(\)|[A-Z][A-Z0-9_]{3,}/g)]
+    .map(match=>match[0].replace(/\(\)$/,''))
+    .filter(symbol=>applicationSource.indexOf(symbol)>=0))].sort();
+  const feature = source.slice(start, sectionEnd) + `
+;(function registerGeneratorAssistantFeature(){
+  window.GHRABGeneratorFeatures=window.GHRABGeneratorFeatures||{};
+  window.GHRABGeneratorFeatures.generatorAssistant={open:window.openGeneratorAssistant,verify:window.verifyGeneratorAssistantKB};
+})();`;
+  const loader = `// Generator Assistant is loaded only after the teacher explicitly opens it.
+Object.defineProperty(window,'__GHRAB_GENERATOR_SOURCE_SYMBOLS__',{value:Object.freeze(${JSON.stringify(evidenceSymbols)}),writable:false,configurable:false});
+function loadGeneratorAssistantFeature(){
+  const registered=window.GHRABGeneratorFeatures&&window.GHRABGeneratorFeatures.generatorAssistant;
+  if(registered&&typeof registered.open==='function'&&typeof registered.verify==='function'){
+    return Promise.resolve(registered);
+  }
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){
+    return Promise.reject(new Error('ASSISTANT_OFFLINE_FIRST_LOAD'));
+  }
+  return ghrabGeneratorFeatureLoader('generatorAssistant','./features/${ASSISTANT_FEATURE_FILE}');
+}
+function openGeneratorAssistant(){
+  return loadGeneratorAssistantFeature().then(function(api){return api.open();}).catch(function(error){
+    const offline=error&&error.message==='ASSISTANT_OFFLINE_FIRST_LOAD';
+    const message=offline
+      ? 'Poradce není při prvním otevření bez připojení k internetu dostupný. Generátor a studentské testy zůstávají plně funkční. Připoj se k internetu a otevři poradce znovu.'
+      : 'Poradce se nepodařilo načíst. Generátor a studentské testy zůstávají plně funkční. Zkontroluj připojení a zkus to znovu.';
+    try{uiAlert(message,'Poradce ke generátoru');}catch(_){}
+    return null;
+  });
+}
+function verifyGeneratorAssistantKB(){return loadGeneratorAssistantFeature().then(function(api){return api.verify();});}
+if(typeof window!=='undefined'){window.verifyGeneratorAssistantKB=verifyGeneratorAssistantKB;window.openGeneratorAssistant=openGeneratorAssistant;}`;
+  return { main: source.slice(0, start) + loader + source.slice(sectionEnd), feature };
 }
 
 // Odstraní CSS komentáře mimo řetězce.
@@ -168,6 +222,16 @@ function compactHtmlShell(source) {
   return out.join('\n');
 }
 
+function compactManualHtml(source, file) {
+  let styleIndex=0,scriptIndex=0;
+  const styles=source.replace(/<style([^>]*)>([\s\S]*?)<\/style>/gi,(match,attrs,body)=>
+    `<style${attrs}>${compactCss(body,`${file}#style-${++styleIndex}`)}</style>`);
+  return styles.replace(/<script([^>]*)>([\s\S]*?)<\/script>/gi,(match,attrs,body)=>{
+    if(/\bsrc\s*=/i.test(attrs)||!body.trim())return match;
+    return `<script${attrs}>${compactJsWhitespace(body,`${file}#script-${++scriptIndex}`)}</script>`;
+  });
+}
+
 function copyDir(src, dest) {
   if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
@@ -242,7 +306,16 @@ const jsFiles = fs.readdirSync(jsDir)
   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 const mainParts = jsFiles.filter(f => !f.startsWith('50-') && !f.startsWith('60-'));
 
-const inlineScriptTag = file => `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(fs.readFileSync(path.join(jsDir, file), 'utf8'), file)}\n</script>`;
+let assistantFeatureSource = '';
+const inlineScriptTag = file => {
+  let source = fs.readFileSync(path.join(jsDir, file), 'utf8');
+  if (file === '01-core.js') {
+    const split = splitGeneratorAssistant(source, file);
+    source = split.main;
+    assistantFeatureSource = split.feature;
+  }
+  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(source, file)}\n</script>`;
+};
 const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
 const jsCsTag = inlineScriptTag('50-cs-module.js');
@@ -259,14 +332,39 @@ out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
 fs.writeFileSync(DIST, out, 'utf8');
 
 copyDir(PUBLIC_DIR, DIST_DIR);
+// Public helpers stay readable and independently testable in source, but ship
+// compacted. JS compaction verifies AST equivalence before writing; CSS uses the
+// same tokenizer-safe compactor as the application shell.
+for (const [relative,compact] of [
+  ['manual/navigation-context.js',compactJsWhitespace],
+  ['manual/pdf-download.js',compactJsWhitespace],
+  ['manual/navigation-context.css',compactCss],
+  ['access/access-gate.css',compactCss],
+  ['access/error-reporter.css',compactCss]
+]) {
+  const target=path.join(DIST_DIR,...relative.split('/'));
+  fs.writeFileSync(target,compact(fs.readFileSync(target,'utf8'),`public/${relative}`),'utf8');
+}
+const manualIndexTarget=path.join(DIST_DIR,'manual','index.html');
+fs.writeFileSync(manualIndexTarget,compactManualHtml(fs.readFileSync(manualIndexTarget,'utf8'),'public/manual/index.html'),'utf8');
 // JSON konfigurace se v dist ukládají kompaktně; zdrojové soubory zůstávají čitelné a byte-stable pro audit.
 for (const file of (function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)])})(DIST_DIR)) {
   if (!/\.(?:json|webmanifest)$/i.test(file)) continue;
   try { fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file,'utf8')))+'\n'); } catch {}
 }
 copyDir(path.resolve('src', 'features'), path.join(DIST_DIR, 'features'));
+if (!assistantFeatureSource) fail('Generator Assistant lazy feature nebyla vytvořena');
+fs.writeFileSync(
+  path.join(DIST_DIR, 'features', ASSISTANT_FEATURE_FILE),
+  compactJsWhitespace(assistantFeatureSource, `features/${ASSISTANT_FEATURE_FILE}`),
+  'utf8'
+);
 fs.mkdirSync(path.join(DIST_DIR, 'vendor'), { recursive: true });
-fs.copyFileSync(ACORN_BROWSER, path.join(DIST_DIR,'vendor','acorn.js'));
+fs.writeFileSync(
+  path.join(DIST_DIR, 'vendor', 'acorn.js'),
+  compactJsWhitespace(fs.readFileSync(ACORN_BROWSER, 'utf8'), 'vendor/acorn.js'),
+  'utf8'
+);
 fs.copyFileSync(ACORN_LICENSE, path.join(DIST_DIR, 'vendor', 'acorn-LICENSE.txt'));
 
 // ── Výstupní kontroly ───────────────────────────────────────────────────────
@@ -294,7 +392,7 @@ if (fs.existsSync(template)) {
   fs.writeFileSync(path.join(DIST_DIR, 'studio-manifest.json'), text);
 }
 
-console.log(`✅ Generátor ${appVersion}: Core ${CORE_VERSION} SHA-256 OK · ${operations.operations.length} operací · ${mainParts.length + 2} initial modulů + 2 lazy features · ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
+console.log(`✅ Generátor ${appVersion}: Core ${CORE_VERSION} SHA-256 OK · ${operations.operations.length} operací · ${mainParts.length + 2} initial modulů + 3 lazy features · ${(fs.statSync(DIST).size / 1024).toFixed(1)} kB`);
 
 // P2: canonical cross-application platform post-processing.
 await import("./apply-ghrab-platform.mjs");

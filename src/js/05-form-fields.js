@@ -96,17 +96,27 @@ function clampTime() {
   state.cas = v; setVal('casCustom', v); applyVisualState(); validate(); saveSnapshot();
 }
 function onCustomBody() {
-  const v = parseInt($('bodyCustom').value,10);
-  if (!isNaN(v) && v > 0) {
-    state.body = v;
-    document.querySelectorAll('#bodyBtns .tag-btn').forEach(b => b.classList.remove('active'));
-    syncExercisePoints();
-  } else {
-    state.body = 0;
-    document.querySelectorAll('#bodyBtns .tag-btn').forEach(b => b.classList.remove('active'));
+  const input=$('bodyCustom'),v=strictIntegerValue(input&&input.value);
+  const max=state.exerciseConfig&&state.exerciseConfig.length?999*state.exerciseConfig.length:999;
+  if(v===null||v<1||v>max){
+    if(input){input.setAttribute('aria-invalid','true');input.setCustomValidity('Zadej celé číslo v povoleném rozsahu.');}
+    const next=$('next2');if(next)next.disabled=true;
+    validate();
+    return false;
   }
+  if(state.exerciseConfig&&state.exerciseConfig.length){
+    if(!syncExercisePoints(v)){
+      if(input){input.setAttribute('aria-invalid','true');input.setCustomValidity('Celkový počet bodů musí umožnit alespoň 1 bod pro každé cvičení.');}
+      const next=$('next2');if(next)next.disabled=true;
+      validate();
+      return false;
+    }
+  }else state.body=v;
+  if(input){input.removeAttribute('aria-invalid');input.setCustomValidity('');}
+  document.querySelectorAll('#bodyBtns .tag-btn').forEach(b => b.classList.remove('active'));
   validate();
   saveSnapshot();
+  return true;
 }
 
 // ═══ Tabs ═════════════════════════════════════════════════════════════════════
@@ -665,6 +675,11 @@ function validate() {
   const hasBody = hasConfiguredExercises(state)
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0) > 0
     : state.body > 0;
+  const bodyInput=$('bodyCustom');
+  const bodyInputInvalid=!!(bodyInput&&(
+    bodyInput.validationMessage
+    || (typeof bodyInput.getAttribute==='function'&&bodyInput.getAttribute('aria-invalid')==='true')
+  ));
   const effTotalBody = hasConfiguredExercises(state) && state.exerciseConfig && state.exerciseConfig.length
     ? state.exerciseConfig.reduce((s,e)=>s+(e.body||0),0)
     : state.body;
@@ -678,7 +693,7 @@ function validate() {
   const scaleGaps=gradeScaleGaps(parsedForValidation);
   const scaleOverlaps=gradeScaleOverlaps(parsedForValidation);
   const gradeOk = state.gradeTyp !== 'vlastni' || ((localScaleValid || aiScaleValid) && scaleGaps.length===0 && scaleOverlaps.length===0);
-  $('next2').disabled = !(state.odevzdavani && hasBody && gradeOk && (hasConfiguredExercises(state)||Number(state.body)>=Number(state.pocet)));
+  $('next2').disabled = !(state.odevzdavani && hasBody && !bodyInputInvalid && gradeOk && (hasConfiguredExercises(state)||Number(state.body)>=Number(state.pocet)));
   if(typeof renderGenerationEstimate==='function')renderGenerationEstimate();
   const skala = $('vlastniSkala');
   const skalaErr = $('vlastniSkalaErr');
@@ -903,6 +918,88 @@ function defaultExercisePoints() {
 function hasConfiguredExercises(st){ return !!(st.exerciseDetail || st.exerciseConfigSaved); }
 function uniqueExerciseTypes(types){ return Array.from(new Set(sanitizeExerciseTypeList((types||[]).filter(t=>String(t||'').trim())))); }
 
+function comprehensionCountKey(type){
+  return normalizeType(type)==='reading comprehension'?'readingQuestionCount':'listeningQuestionCount';
+}
+function configuredComprehensionIndexes(st,type){
+  const canonical=normalizeType(type);
+  if(!hasConfiguredExercises(st)||!Array.isArray(st.exerciseConfig))return [];
+  const indexes=[];
+  st.exerciseConfig.forEach((ex,index)=>{if(normalizeType(ex&&ex.typ||'')===canonical)indexes.push(index)});
+  return indexes;
+}
+function effectiveComprehensionQuestionCount(type,st){
+  st=st||state;
+  const key=comprehensionCountKey(type),indexes=configuredComprehensionIndexes(st,type);
+  const configured=indexes.length?Number(st.exerciseConfig[indexes[0]].pocetOtazek):NaN;
+  return Math.max(1,Math.min(30,Number.isFinite(configured)&&configured>0?Math.trunc(configured):(parseInt(st[key],10)||4)));
+}
+function syncComprehensionCountsFromConfig(st){
+  st=st||state;
+  for(const type of ['reading comprehension','listening comprehension']){
+    const key=comprehensionCountKey(type),indexes=configuredComprehensionIndexes(st,type);
+    if(indexes.length)st[key]=effectiveComprehensionQuestionCount(type,st);
+    else st[key]=Math.max(1,Math.min(30,parseInt(st[key],10)||4));
+  }
+  return st;
+}
+function syncComprehensionControl(type,st){
+  st=st||state;
+  const canonical=normalizeType(type),key=comprehensionCountKey(canonical),indexes=configuredComprehensionIndexes(st,canonical);
+  const control=document.getElementById(key);if(control)control.value=String(effectiveComprehensionQuestionCount(canonical,st));
+  const note=document.getElementById(key+'Scope');if(!note)return;
+  const label=canonical==='reading comprehension'?'Reading':'Listening';
+  note.textContent=indexes.length>1
+    ? 'Tento ovladač řídí '+label+' cvičení č. '+(indexes[0]+1)+'. Další '+label+' cvičení mají vlastní počet v podrobném nastavení.'
+    : indexes.length===1
+      ? 'Počet je synchronizovaný s '+label+' cvičením č. '+(indexes[0]+1)+'.'
+      : 'Počet se použije pro nově přidané '+label+' cvičení.';
+}
+
+function exercisePointsTotal(st){
+  return (Array.isArray(st&&st.exerciseConfig)?st.exerciseConfig:[]).reduce((sum,ex)=>sum+(Number.isFinite(Number(ex&&ex.body))?Number(ex.body):0),0);
+}
+function strictIntegerValue(value){
+  if(typeof value==='number')return Number.isSafeInteger(value)?value:null;
+  if(typeof value!=='string'||!/^[-+]?\d+$/.test(value.trim()))return null;
+  const parsed=Number(value.trim());
+  return Number.isSafeInteger(parsed)?parsed:null;
+}
+function syncDetailedPointsTotal(st,reflectDom){
+  st=st||state;
+  if(!hasConfiguredExercises(st)||!Array.isArray(st.exerciseConfig))return Number(st.body)||0;
+  const total=exercisePointsTotal(st);st.body=total;
+  if(st===state&&reflectDom!==false)setVal('bodyCustom',total>0?total:'');
+  // Po vědomém zapnutí detailního režimu jsou autoritou body jednotlivých
+  // cvičení a globální pole je skryté. Jeho stará native validity proto smí
+  // zmizet pouze tehdy, když je celý autoritativní detailní plán platný.
+  // Samotný validate(), redraw ani synchronizace v globálním režimu chybu nemaže.
+  const detailValid=st.exerciseConfig.length>0&&st.exerciseConfig.every(ex=>{
+    const points=strictIntegerValue(ex&&ex.body);
+    return points!==null&&points>=1&&points<=999;
+  });
+  if(st===state&&st.exerciseDetail&&detailValid){
+    const input=$('bodyCustom');
+    if(input){
+      if(typeof input.setCustomValidity==='function')input.setCustomValidity('');
+      if(typeof input.removeAttribute==='function')input.removeAttribute('aria-invalid');
+    }
+  }
+  return total;
+}
+function exercisePointsDistribution(total,count){
+  const parse=value=>{
+    if(typeof value==='number')return Number.isSafeInteger(value)?value:null;
+    if(typeof value!=='string'||!/^[-+]?\d+$/.test(value.trim()))return null;
+    const parsed=Number(value.trim());
+    return Number.isSafeInteger(parsed)?parsed:null;
+  };
+  const target=parse(total),n=parse(count);
+  if(target===null||n===null||n<1||target<n||target>999*n)return null;
+  const base=Math.floor(target/n),rem=target-base*n;
+  return Array.from({length:n},(_,index)=>base+(index<rem?1:0));
+}
+
 function globalExerciseTypes() {
   const custom = trim('vlastniTyp');
   return uniqueExerciseTypes([...(state.typyCviceni || []), ...(custom ? [custom] : [])]).slice(0, 10);
@@ -995,28 +1092,59 @@ function syncExerciseConfig() {
   state.exerciseConfig = state.exerciseConfig.slice(0, n);
   // Doplň typy do prázdných řádků z aktuálního globálního výběru (viz výše).
   // Empty detail rows remain empty until the teacher chooses their type.
-  // Pokud existuje globální cíl bodů, rozdistribuj rovnoměrně.
-  if (state.body > 0 && oldLength!==n) syncExercisePoints();
+  // V detailním režimu už ručně nastavené body nepřepisuj. Přidaný/odebraný řádek
+  // pouze změní autoritativní součet. V globálním režimu je naopak state.body cíl.
+  if(oldLength!==n){
+    if(hasConfiguredExercises(state))syncDetailedPointsTotal(state);
+    else if(state.body>0)syncExercisePoints();
+  }
 }
 
 function syncExercisePoints(totalOverride) {
-  const target = parseInt(totalOverride || state.body, 10);
-  if (!target || !state.exerciseConfig.length) return;
+  const explicitTarget=arguments.length>0;
+  const raw=explicitTarget?totalOverride:state.body;
+  if(!state.exerciseConfig.length)return false;
   const n = state.exerciseConfig.length;
-  const base = Math.floor(target / n);
-  const rem  = target - base * n;
-  state.exerciseConfig.forEach((ex, i) => { ex.body = base + (i < rem ? 1 : 0); });
+  const distribution=exercisePointsDistribution(raw,n);
+  if(!distribution)return false;
+  const target=Number(raw);
+  const input=$('bodyCustom');
+  const preserveDirtyInput=!explicitTarget&&input&&(
+    input.validationMessage
+    || (typeof input.getAttribute==='function'&&input.getAttribute('aria-invalid')==='true')
+  );
+  state.exerciseConfig.forEach((ex,i)=>{ex.body=distribution[i]});
+  state.body=target;
+  if(!preserveDirtyInput){
+    setVal('bodyCustom',target);
+    if(input){
+      if(typeof input.setCustomValidity==='function')input.setCustomValidity('');
+      if(typeof input.removeAttribute==='function')input.removeAttribute('aria-invalid');
+    }
+  }
   if (state.exerciseDetail) renderExerciseConfig();
+  return true;
 }
 
-function distributeExercisePoints() {
+async function distributeExercisePoints() {
   syncExerciseConfig();
-  const currentSum = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
-  const target = state.body > 0 ? state.body : (currentSum > 0 ? currentSum : state.pocet * 10);
-  syncExercisePoints(target);
+  const target=exercisePointsTotal(state),distribution=exercisePointsDistribution(target,state.exerciseConfig.length);
+  if(!distribution){
+    await uiAlert('Celkový součet musí být celé kladné číslo alespoň rovné počtu cvičení. U každého cvičení musí po rozdělení zůstat nejméně 1 bod.','Body nelze rozdělit');
+    return false;
+  }
+  const current=state.exerciseConfig.map(ex=>Number(ex.body)||0);
+  if(current.every((value,index)=>value===distribution[index])){
+    syncDetailedPointsTotal(state);uiToast('Body už jsou rozdělené co nejrovnoměrněji.','info',3500);return true;
+  }
+  const accepted=await uiConfirm('Cílový součet: '+target+' bodů. Nové rozdělení: '+distribution.join(' + ')+'. Počty položek se nezmění. Přepsat ručně nastavené body?','Rozdělit celkové body?',true);
+  if(!accepted)return false;
+  if(!syncExercisePoints(target))return false;
+  syncDetailedPointsTotal(state);
   renderExerciseConfig();
   validate();
   saveSnapshot();
+  return true;
 }
 
 function toggleExDetail() {
@@ -1027,6 +1155,8 @@ function toggleExDetail() {
     else if (globalExerciseTypes().length) syncExerciseConfigFromGlobalTypes();
     else syncExerciseConfig();
     state.exerciseDetail = true;
+    syncComprehensionCountsFromConfig(state);
+    syncDetailedPointsTotal(state);
   } else {
     // Detail je při sbalení autoritou. Každý řádek musí mít platný typ, jinak by
     // kartičky nedokázaly konfiguraci věrně zobrazit.
@@ -1051,28 +1181,42 @@ function toggleExDetail() {
 
 function updateExField(i, field, value) {
   if (!state.exerciseConfig[i]) return;
+  // Při změně typu nesmí default číst zastaralý počet z právě měněného řádku.
+  // Ostatní Reading/Listening řádky však zůstávají legitimním zdrojem synchronizace.
+  const typeDefaultState = field === 'typ' ? {
+    ...state,
+    exerciseConfig: state.exerciseConfig.map((ex, index) => index === i ? {...ex, typ: ''} : ex)
+  } : state;
+  const typeDefaultCount = field === 'typ' ? defaultItemCount(value, typeDefaultState) : null;
+  if(field==='body'){
+    const points=strictIntegerValue(value);
+    if(points===null||points<1||points>999){renderExerciseConfig();validate();return false;}
+    value=points;
+  }
   // Boolean pole (manualMode) nepřevádíme přes parseInt — zachováme typ
   const BOOL_FIELDS = ['manualMode'];
   state.exerciseConfig[i][field] = field === 'typ' ? value
     : BOOL_FIELDS.includes(field) ? !!value
     : (String(value).trim()===''?0:Number(value));
   if (field === 'pocetOtazek') {
-    const canonical=normalizeType(state.exerciseConfig[i].typ||'');
-    if(canonical==='reading comprehension')state.readingQuestionCount=Math.max(1,Math.min(30,Number(state.exerciseConfig[i].pocetOtazek)||4));
-    if(canonical==='listening comprehension')state.listeningQuestionCount=Math.max(1,Math.min(30,Number(state.exerciseConfig[i].pocetOtazek)||4));
-    const id=canonical==='reading comprehension'?'readingQuestionCount':canonical==='listening comprehension'?'listeningQuestionCount':'';
-    if(id&&document.getElementById(id))document.getElementById(id).value=String(state[id]);
+    syncComprehensionCountsFromConfig(state);
+    syncComprehensionControl('reading comprehension',state);
+    syncComprehensionControl('listening comprehension',state);
   }
   if (field === 'typ') {
     state.exerciseConfig[i].manualMode = false;
-    state.exerciseConfig[i].pocetOtazek = defaultItemCount(value);
+    state.exerciseConfig[i].pocetOtazek = typeDefaultCount;
     state.typyCviceni = uniqueExerciseTypes(state.exerciseConfig.map(ex => ex.typ));
     renderSmartTimeTip();
     if (normalizeType(value) === 'categorisation-board') state.exerciseConfig[i].pocetOtazek = 1;
+    syncComprehensionCountsFromConfig(state);
+    syncComprehensionControl('reading comprehension',state);
+    syncComprehensionControl('listening comprehension',state);
     renderExerciseConfig();
     // Typ řídí i navazující Reading/Listening bloky; překresli je okamžitě.
     applyVisualState();
   }
+  if(field==='body')syncDetailedPointsTotal(state);
   // Update b/pol. cell inline (without re-rendering whole row → preserves input focus)
   const ex = state.exerciseConfig[i];
   const bpp = ex.body > 0 && ex.pocetOtazek > 0 ? (ex.body / ex.pocetOtazek).toFixed(1) : '—';
@@ -1138,8 +1282,8 @@ function renderExerciseConfig() {
       ${normalizeType(ex.typ||'')=='categorisation-board'
         ? '<div class="ex-catlock" title="Categorisation-board: vždy 1 tabule. Počet slov/vět (6–10) generuje model automaticky.">1 🔒</div>'
         : '<input type="number" min="1" max="30" value="'+ex.pocetOtazek+'" oninput="updateExField('+i+',\'pocetOtazek\',this.value)">'}
-      <input type="number" min="0" max="999" value="${ex.body}"
-        oninput="updateExField(${i},'body',this.value)">
+      <input type="number" min="1" max="999" step="1" value="${ex.body}"
+        onchange="updateExField(${i},'body',this.value)">
       <div class="ex-manual-toggle" title="AI: generuje Gemini · Ručně: zadáš přes formulář" style="${isManualSupported(ex.typ||'') ? '' : 'display:none'}"><button type="button" class="ex-manual-btn${!ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',false)" title="Generovat AI">🤖 AI</button><button type="button" class="ex-manual-btn${ex.manualMode ? ' active' : ''}" onclick="updateExField(${i},'manualMode',true)" title="Zadat ručně">✏️ Ručně</button></div>
       <div class="ex-bpp">${bpp}</div>
     </div>`;
@@ -1184,14 +1328,15 @@ function renderExTotals() {
   if (!el || !state.exerciseConfig.length) return;
   const totalBody = state.exerciseConfig.reduce((s, e) => s + (e.body || 0), 0);
   const totalQ    = state.exerciseConfig.reduce((s, e) => s + (e.pocetOtazek || 0), 0);
-  const globalBody = state.body;
-  const warn = globalBody > 0 && totalBody !== globalBody
-    ? `<span class="tot-warn"> ⚠ nesedí s globálním (${globalBody} b)</span>` : '';
+  if(hasConfiguredExercises(state)&&state.body!==totalBody){state.body=totalBody;setVal('bodyCustom',totalBody>0?totalBody:'')}
+  const distribution=exercisePointsDistribution(totalBody,state.exerciseConfig.length);
+  const preview=distribution?'Cílový součet '+totalBody+' b → '+distribution.join(' + '):'Součet nelze rozdělit bez nulových bodů.';
   el.innerHTML = `
     <div class="tot-item">Celkem položek: <span class="tot-val">${totalQ}</span></div>
-    <div class="tot-item">Celkem bodů: <span class="tot-val">${totalBody}</span>${warn}</div>
+    <div class="tot-item">Celkem bodů: <span class="tot-val">${totalBody}</span> <span class="small-muted">(součet řádků je zdroj pravdy)</span></div>
     <div class="ex-action">
-      <button class="btn-mini" type="button" onclick="distributeExercisePoints()">⚖️ Rozdělit body rovnoměrně</button>
+      <span class="small-muted">${preview}</span>
+      <button class="btn-mini" type="button" onclick="distributeExercisePoints()">⚖️ Rozdělit CELKOVÉ body mezi cvičení</button>
       <button class="tt-icon" type="button" data-tip="Použije se jen při podrobném nastavení cvičení. Generátor vezme cílový celkový počet bodů a rozdělí ho co nejrovnoměrněji mezi jednotlivá cvičení. Například 55 bodů mezi 4 cvičeními rozdělí jako 14 + 14 + 14 + 13. Počet položek se nemění; mění se pouze body za jednotlivá cvičení.">?</button>
     </div>`;
   setTimeout(initTooltips, 0);

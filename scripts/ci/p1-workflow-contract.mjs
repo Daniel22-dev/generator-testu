@@ -5,6 +5,7 @@ export function jobBlock(text, id) {
   const match = text.match(pattern); assert.ok(match, `Missing job ${id}`); return match[0];
 }
 export function validateP1Workflow(text, mode = 'parallel') {
+  text = String(text).replace(/\r\n?/g, '\n');
   assert.ok(['parallel', 'serial'].includes(mode));
   const prepare = jobBlock(text, 'prepare'), candidate = jobBlock(text, 'candidate-gate');
   const pr = jobBlock(text, 'pr-certification'), admission = jobBlock(text, 'admission'), promote = jobBlock(text, 'promote');

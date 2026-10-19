@@ -1,17 +1,21 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Only advance the exact certified candidate after verified production deployment.
 # The server-side explicit lease is the authority; the pre-read is only a fast path.
-set -euo pipefail
+set -eu
 : "${CERTIFIED_SHA:?Missing certified source SHA}"
 : "${MAIN_HEAD:?Missing verified deployed main SHA}"
-[[ "$CERTIFIED_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo 'Invalid certified SHA' >&2; exit 1; }
-[[ "$MAIN_HEAD" =~ ^[0-9a-f]{40}$ ]] || { echo 'Invalid deployed main SHA' >&2; exit 1; }
+is_commit_id() {
+  [ "${#1}" -eq 40 ] || return 1
+  case "$1" in *[!0-9a-f]*) return 1;; esac
+}
+is_commit_id "$CERTIFIED_SHA" || { echo 'Invalid certified SHA' >&2; exit 1; }
+is_commit_id "$MAIN_HEAD" || { echo 'Invalid deployed main SHA' >&2; exit 1; }
 
 read_candidate() {
-  local line
   line="$(git ls-remote --exit-code origin refs/heads/candidate)" || return 1
-  [[ "$line" =~ ^([0-9a-f]{40})[[:space:]]refs/heads/candidate$ ]] || return 1
-  printf '%s\n' "${BASH_REMATCH[1]}"
+  set -- $line
+  [ "$#" -eq 2 ] && is_commit_id "$1" && [ "$2" = 'refs/heads/candidate' ] || return 1
+  printf '%s\n' "$1"
 }
 
 git cat-file -e "${CERTIFIED_SHA}^{commit}"

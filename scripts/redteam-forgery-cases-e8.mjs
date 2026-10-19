@@ -61,10 +61,15 @@ p('duplicated-attempt-start','semantics','telemetry.start',x=>{x.securityEvents.
 p('attempt-start-wrong-time','semantics','telemetry.start',x=>{x.securityEvents[0].t='2026-10-04T12:01:00Z';});
 p('attempt-start-wrong-id','semantics','telemetry.start',x=>{x.securityEvents[0].detail='OTHER';});
 const split=(x,patch)=>x.securityEvents.push({type:'split-window',t:x.submittedAt,smallMs:4000,totalMs:12000,pct:33,...patch});
+const modernSplit=(x,patch)=>x.securityEvents.push({type:'split-window',t:x.submittedAt,detail:'podil=33%; shadow=NORMAL',smallMs:4000,totalMs:12000,measuredMs:12000,pct:33,measurementAvailable:true,splitState:'NORMAL',splitStateCounts:{NORMAL:6,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:0,EXEMPT:0},shadowOnly:true,lockApplied:false,baselineTrusted:true,...patch});
 p('split-small-exceeds-total','semantics','telemetry.split',x=>split(x,{smallMs:14000}));
 p('split-percent-disagrees','semantics','telemetry.split',x=>split(x,{pct:100}));
 p('split-zero-total','semantics','telemetry.split',x=>split(x,{totalMs:0}));
 p('split-missing-numbers','semantics','telemetry.split',x=>{x.securityEvents.push({type:'split-window',t:x.submittedAt});});
+p('split-modern-percent-disagrees','semantics','telemetry.split',x=>modernSplit(x,{pct:34}));
+p('split-modern-missing-measurement-as-zero','semantics','telemetry.split',x=>modernSplit(x,{smallMs:0,measuredMs:0,pct:0,measurementAvailable:false}));
+p('split-modern-count-negative','semantics','telemetry.split',x=>modernSplit(x,{splitStateCounts:{NORMAL:-1,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:0,EXEMPT:0}}));
+p('split-modern-count-unknown-key','semantics','telemetry.split',x=>modernSplit(x,{splitStateCounts:{NORMAL:6,SUSPECTED:0,CONFIRMED:0,AMBIGUOUS:0,EXEMPT:0,UNKNOWN:1}}));
 p('changes-negative','answers','schema.changes',x=>{x.answerChangeStats={'0_0':-1};x.totalAnswerChanges=-1;});
 p('changes-total-disagrees','answers','schema.changes',x=>{x.answerChangeStats={'0_0':2};x.totalAnswerChanges=3;});
 p('changes-unknown-question','answers','schema.changes',x=>{x.answerChangeStats={'99_0':1};x.totalAnswerChanges=1;});

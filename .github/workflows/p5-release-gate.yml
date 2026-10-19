@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Configure shared CI Node setup
         uses: ./.github/actions/setup-ci-node
@@ -46,7 +47,7 @@ jobs:
       - name: Run E9 regression, foundation and final P5 admission
         run: npm run qa:redteam:ci
         env:
-          GARP27_EXTERNAL_TRUST_SHA256: afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279
+          GARP27_EXTERNAL_TRUST_SHA256: 88d23a5dbf68fdb787c94a2fa3b14dea076464ac79390d32b411e0e38e655b7c
       - name: Upload audit evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -59,6 +60,25 @@ jobs:
             dist/quality-report.json
             qa-results/d7-regressions.json
             qa-results/d8-final-audit.json
+            qa-results/recovery-browser-s1.json
+            qa-results/pedagogical-fidelity-browser-s2.json
+            qa-results/workflow-fidelity-browser-s3.json
+            qa-results/s4-teacher-verifier-source.json
+            qa-results/s41-teacher-verifier-remediation.json
+            qa-results/s4-teacher-verifier-browser/evidence.json
+            qa-results/s4-teacher-verifier-browser/*.png
+            qa-results/s5-strict-mode-source.json
+            qa-results/s5-strict-mode-browser/evidence.json
+            qa-results/s5-traceability-t64-t101.json
+            qa-results/s5-ci-wiring.json
+            qa-results/s6-pedagogical-ai-source.json
+            qa-results/s6-pedagogical-ai-browser/evidence.json
+            qa-results/s6-traceability-t12-t42-t54-t63.json
+            qa-results/s6-ci-wiring.json
+            qa-results/s61-identity-quarantine-source.json
+            qa-results/s61-identity-quarantine-browser/evidence.json
+            qa-results/s61-identity-quarantine-browser/*.png
+            qa-results/s61-ci-wiring.json
             qa-results/redteam-e*.json
             qa-results/security-behavior-r3.json
             qa-results/adversarial-harness-r5.json
@@ -73,4 +93,5 @@ jobs:
             qa-results/redteam-e9-*.json
             qa-results/redteam-e9-negative/*.log
             qa-results/redteam-e10-ci/*.log
+            qa-results/redteam-e10-ci/foundation-evidence/
             audit/evidence/garp27-current/

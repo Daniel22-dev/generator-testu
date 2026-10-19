@@ -1,0 +1,24 @@
+* text=auto eol=lf
+
+# Byte-pinned policies, contracts and executable test sources are canonical LF.
+# Git blobs already use LF; this prevents core.autocrlf from changing the bytes
+# that GARP/F0 and AI assurance deliberately hash in a Windows worktree.
+*.js text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.py text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.zip binary
+*.bundle binary
+*.pdf binary

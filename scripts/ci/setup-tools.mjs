@@ -23,7 +23,7 @@ const inside = (parent, child) => child === parent || child.startsWith(parent + 
 const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 function regular(file) {
   const st = fs.lstatSync(file);
-  assert.ok(st.isFile() && !st.isSymbolicLink(), 'Expected an unlinked regular file');
+  assert.ok(st.isFile() && !st.isSymbolicLink() && st.nlink === 1, 'Expected an unlinked regular file');
   return st;
 }
 function scalar(value, pattern, field) {
@@ -116,7 +116,13 @@ export function runSetup({ root, env, execute = spawnSync, snapshot = sourceSnap
     fs.writeFileSync(tmp, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 }); fs.renameSync(tmp, reportFile);
   };
   const run = (command, { capture = false, timeout = 300000 } = {}) => {
-    const result = execute(command[0], command.slice(1), { cwd: root, env: { ...env, NPM_CONFIG_REGISTRY: 'https://registry.npmjs.org' },
+    let program=command[0],args=command.slice(1);
+    if(process.platform==='win32'&&program==='npm'){
+      const npmCli=env.npm_execpath||path.join(path.dirname(process.execPath),'node_modules','npm','bin','npm-cli.js');
+      assert.ok(path.isAbsolute(npmCli), 'Windows npm CLI path must be absolute'); regular(npmCli);
+      program=process.execPath;args=[npmCli,...args];
+    }
+    const result = execute(program, args, { cwd: root, env: { ...env, NPM_CONFIG_REGISTRY: 'https://registry.npmjs.org' },
       encoding: 'utf8', timeout, maxBuffer: 4 * 1024 * 1024, stdio: capture ? 'pipe' : 'inherit' });
     assert.ok(!result.error && !result.signal && result.status === 0, 'Required setup process did not complete successfully');
     return capture ? (result.stdout || '').trim() : '';
@@ -146,7 +152,9 @@ export function runSetup({ root, env, execute = spawnSync, snapshot = sourceSnap
     step('installed-browser-path', () => {
       browser = browserPath(root);
       assert.ok(typeof browser === 'string' && path.isAbsolute(browser) && !/[\r\n\0]/.test(browser), 'Invalid browser executable path');
-      regular(browser); fs.accessSync(browser, fs.constants.X_OK);
+      regular(browser);
+      if(process.platform==='win32')assert.match(browser,/\.(?:exe|com)$/i,'Windows browser path must name a native executable');
+      else fs.accessSync(browser, fs.constants.X_OK);
       report.browser = { variable: context.browserEnv, executable: browser, playwrightVersion: report.tools.versions.playwright };
     });
     step('unchanged-setup-inputs', () => {

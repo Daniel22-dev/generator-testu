@@ -1,0 +1,967 @@
+{
+  "schema": "git-s8-t01-t135-traceability-v1",
+  "testedProductSha": "33fcffeae9ab5b59c3be7d1213cf23a59c3f6054",
+  "branch": "codex/sprint-08-integration-certification",
+  "policy": {
+    "releaseAuthorized": false,
+    "splitScreen": "SHADOW/AUDIT-ONLY",
+    "automaticSplitLock": false,
+    "trustPinsChanged": false,
+    "aiAssuranceFingerprintChanged": false,
+    "t110": "DEFERRED"
+  },
+  "summary": {
+    "PASS": 105,
+    "FAIL": 7,
+    "NOT VERIFIED": 22,
+    "DEFERRED": 1
+  },
+  "total": 135,
+  "rows": [
+    {
+      "id": "T01",
+      "status": "PASS",
+      "claim": "Pedagogical type selected by the teacher remains authoritative",
+      "evidence": "check:s2-pedagogical-fidelity + check:s2-pedagogical-browser",
+      "limits": ""
+    },
+    {
+      "id": "T02",
+      "status": "PASS",
+      "claim": "Multiple Choice and Reading Comprehension remain structurally distinct",
+      "evidence": "check:s2-pedagogical-fidelity + check:s2-pedagogical-browser",
+      "limits": ""
+    },
+    {
+      "id": "T03",
+      "status": "PASS",
+      "claim": "Exercise names remain consistent in generator, student HTML and verifier",
+      "evidence": "check:s2-pedagogical-fidelity + check:s2-pedagogical-browser",
+      "limits": ""
+    },
+    {
+      "id": "T04",
+      "status": "PASS",
+      "claim": "Question counts, points and canonical structure remain stable",
+      "evidence": "check:s2-pedagogical-fidelity + check:s2-pedagogical-browser",
+      "limits": ""
+    },
+    {
+      "id": "T05",
+      "status": "PASS",
+      "claim": "Opening the manual preserves the active generator session",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T06",
+      "status": "PASS",
+      "claim": "Roster and one-time student codes remain stable in the same session",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T07",
+      "status": "PASS",
+      "claim": "Global point mode has one strict integer authority",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T08",
+      "status": "PASS",
+      "claim": "Detailed point mode has one strict integer authority",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T09",
+      "status": "PASS",
+      "claim": "Redistribution is bounded, explicit and preserves item counts",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T10",
+      "status": "PASS",
+      "claim": "Primary Reading/Listening count is synchronized in both directions",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T11",
+      "status": "PASS",
+      "claim": "Secondary Reading/Listening rows remain independent",
+      "evidence": "check:s3-workflow-fidelity + check:s3-workflow-browser",
+      "limits": ""
+    },
+    {
+      "id": "T12",
+      "status": "PASS",
+      "claim": "Didactic AI review uses the shared create-new-task policy",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T13",
+      "status": "PASS",
+      "claim": "Complete Sheets and Apps Script installation/setup guide",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T14",
+      "status": "NOT VERIFIED",
+      "claim": "Only explicitly selected recipients receive code messages",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": "Synthetic Sheets/MailApp simulation passed; no live Google authorization or delivery was performed."
+    },
+    {
+      "id": "T15",
+      "status": "NOT VERIFIED",
+      "claim": "Latecomers, deduplication and deliberate resend are handled",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": "Synthetic Sheets/MailApp simulation passed; no live Google authorization or delivery was performed."
+    },
+    {
+      "id": "T16",
+      "status": "NOT VERIFIED",
+      "claim": "START requires a submitted trusted Forms marker",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": "Synthetic Forms CSV/browser path passed; no live school Google Forms submission/export was performed."
+    },
+    {
+      "id": "T17",
+      "status": "NOT VERIFIED",
+      "claim": "END and chronology require submitted trusted Forms markers",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": "Synthetic Forms CSV/browser path passed; no live school Google Forms submission/export was performed."
+    },
+    {
+      "id": "T18",
+      "status": "PASS",
+      "claim": "Settings, icons, labels and navigation are accessible",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T19",
+      "status": "FAIL",
+      "claim": "Teacher preview, integrity panel and output review remain coherent",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": "workflow audit and workflow-update source gate found secure-submit visibility/configuration synchronization regressions."
+    },
+    {
+      "id": "T20",
+      "status": "PASS",
+      "claim": "AI progress is truthful and never invents percentages",
+      "evidence": "S07 source, traceability and Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T21",
+      "status": "PASS",
+      "claim": "Formats are recommended before the teacher selects them",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T22",
+      "status": "PASS",
+      "claim": "Recommendations reflect the supplied teaching context",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T23",
+      "status": "PASS",
+      "claim": "Recommendation cache/fingerprint invalidates on context changes",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T24",
+      "status": "PASS",
+      "claim": "Unverified URL/source context is represented honestly",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T25",
+      "status": "PASS",
+      "claim": "Manual workflow remains available and preserves teacher choice",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T26",
+      "status": "PASS",
+      "claim": "Composition review uses the shared policy",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T27",
+      "status": "PASS",
+      "claim": "The validated catalog contains all 38 formats",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T28",
+      "status": "PASS",
+      "claim": "Every catalog entry satisfies the metadata contract",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T29",
+      "status": "PASS",
+      "claim": "Conditionals search returns appropriate formats",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T30",
+      "status": "PASS",
+      "claim": "Nature/weather search returns appropriate formats",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T31",
+      "status": "PASS",
+      "claim": "Spanish/table search returns appropriate formats",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T32",
+      "status": "PASS",
+      "claim": "Reading prerequisites are enforced",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T33",
+      "status": "PASS",
+      "claim": "Heading prerequisites and filtering are enforced",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T34",
+      "status": "PASS",
+      "claim": "Listening source prerequisites are enforced",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T35",
+      "status": "PASS",
+      "claim": "Source, format, count and scoring stay independent",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T36",
+      "status": "PASS",
+      "claim": "Filtering does not silently change teacher selection",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T37",
+      "status": "PASS",
+      "claim": "Canonical formatId remains stable",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T38",
+      "status": "PASS",
+      "claim": "AI phases use indeterminate labels without fabricated percentage",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T39",
+      "status": "PASS",
+      "claim": "Catalog interaction remains keyboard and narrow-viewport usable",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T40",
+      "status": "PASS",
+      "claim": "AI receives only typed, allowlisted teaching context",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T41",
+      "status": "PASS",
+      "claim": "Prompt, student output and verifier preserve style fidelity",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T42",
+      "status": "PASS",
+      "claim": "AI review preserves security modes and existing gates",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T43",
+      "status": "PASS",
+      "claim": "Sprint work remains isolated from release branches",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": ""
+    },
+    {
+      "id": "T44",
+      "status": "PASS",
+      "claim": "No merge, push, staging or deployment occurs during certification",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": ""
+    },
+    {
+      "id": "T45",
+      "status": "NOT VERIFIED",
+      "claim": "Remote branch protection is effective",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Remote GitHub, staging, AI Studio or physical-device environment was not authorized/available."
+    },
+    {
+      "id": "T46",
+      "status": "NOT VERIFIED",
+      "claim": "GitHub-hosted Linux CI completes on the exact candidate SHA",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Remote GitHub, staging, AI Studio or physical-device environment was not authorized/available."
+    },
+    {
+      "id": "T47",
+      "status": "NOT VERIFIED",
+      "claim": "Staging, promotion and rollback paths are exercised",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Remote GitHub, staging, AI Studio or physical-device environment was not authorized/available."
+    },
+    {
+      "id": "T48",
+      "status": "FAIL",
+      "claim": "Release identity, version and signed evidence are internally current",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Package remains 7.1.99 and AI assurance evidence is stale; no version bump or fingerprint rewrite was authorized."
+    },
+    {
+      "id": "T49",
+      "status": "FAIL",
+      "claim": "Complete release preflight is green on all required platforms",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Windows CI, AI assurance, foundation evidence, XSS baseline and legacy harness blockers remain open."
+    },
+    {
+      "id": "T50",
+      "status": "NOT VERIFIED",
+      "claim": "AI Studio and physical-device smoke tests complete",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Remote GitHub, staging, AI Studio or physical-device environment was not authorized/available."
+    },
+    {
+      "id": "T51",
+      "status": "PASS",
+      "claim": "Audit handoff is reproducible from bundle, patches and hashes",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": ""
+    },
+    {
+      "id": "T52",
+      "status": "PASS",
+      "claim": "Certification evidence contains synthetic data only",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": ""
+    },
+    {
+      "id": "T53",
+      "status": "FAIL",
+      "claim": "Final release decision has no open blocking finding",
+      "evidence": "Sprint 08 Git/history/environment/release audit",
+      "limits": "Certification verdict is NO-GO pending remediation and independent audit."
+    },
+    {
+      "id": "T54",
+      "status": "PASS",
+      "claim": "AI does not invent format IDs or mutate scoring authority",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T55",
+      "status": "PASS",
+      "claim": "Five pedagogical styles keep their ordering and identity",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T56",
+      "status": "PASS",
+      "claim": "Secure output preserves pedagogical labels",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T57",
+      "status": "PASS",
+      "claim": "Instant output preserves pedagogical labels",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T58",
+      "status": "PASS",
+      "claim": "Preview, verifier and PDF agree on exercise identity",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T59",
+      "status": "PASS",
+      "claim": "Content and pedagogical style remain separate concepts",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T60",
+      "status": "PASS",
+      "claim": "Title and canonical type remain separate concepts",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T61",
+      "status": "PASS",
+      "claim": "Historic data receives a compatible fallback",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T62",
+      "status": "PASS",
+      "claim": "All 38 formats retain scorer mappings",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T63",
+      "status": "PASS",
+      "claim": "Variants and exports preserve pedagogical fidelity",
+      "evidence": "check:s6-pedagogical-ai + S06 traceability + Chromium",
+      "limits": ""
+    },
+    {
+      "id": "T64",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T64",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T65",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T65",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T66",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T66",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T67",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T67",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T68",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T68",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T69",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T69",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T70",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T70",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T71",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T71",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T72",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T72",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T73",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T73",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Automatic split-screen LOCK intentionally remains disabled in SHADOW/AUDIT-ONLY mode."
+    },
+    {
+      "id": "T74",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T74",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T75",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T75",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T76",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T76",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T77",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T77",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Automatic split-screen LOCK intentionally remains disabled in SHADOW/AUDIT-ONLY mode."
+    },
+    {
+      "id": "T78",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T78",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T79",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T79",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T80",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T80",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "No physical iPadOS Stage Manager/orientation calibration."
+    },
+    {
+      "id": "T81",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T81",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T82",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T82",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T83",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T83",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T84",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T84",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T85",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T85",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Required physical mobile/tablet behavior was not tested."
+    },
+    {
+      "id": "T86",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T86",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Required physical mobile/tablet behavior was not tested."
+    },
+    {
+      "id": "T87",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T87",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Required physical mobile/tablet behavior was not tested."
+    },
+    {
+      "id": "T88",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T88",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Required physical mobile/tablet behavior was not tested."
+    },
+    {
+      "id": "T89",
+      "status": "NOT VERIFIED",
+      "claim": "Strict Mode Guard V2 acceptance scenario T89",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": "Required physical mobile/tablet behavior was not tested."
+    },
+    {
+      "id": "T90",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T90",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T91",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T91",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T92",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T92",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T93",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T93",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T94",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T94",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T95",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T95",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T96",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T96",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T97",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T97",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T98",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T98",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T99",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T99",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T100",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T100",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T101",
+      "status": "PASS",
+      "claim": "Strict Mode Guard V2 acceptance scenario T101",
+      "evidence": "S05 source + Chromium + T64–T101 traceability",
+      "limits": ""
+    },
+    {
+      "id": "T102",
+      "status": "PASS",
+      "claim": "Credential/recovery audit covers both generated student channels",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T103",
+      "status": "NOT VERIFIED",
+      "claim": "Recovery behavior is verified on required desktop and physical tablet environments",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Local synthetic/Chromium evidence exists, but the required native device/browser or deployed environment was not tested."
+    },
+    {
+      "id": "T104",
+      "status": "PASS",
+      "claim": "Raw credentials do not enter application-controlled storage or exports",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T105",
+      "status": "NOT VERIFIED",
+      "claim": "Native password-manager behavior does not retain sensitive inputs",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Local synthetic/Chromium evidence exists, but the required native device/browser or deployed environment was not tested."
+    },
+    {
+      "id": "T106",
+      "status": "PASS",
+      "claim": "Recovery and Teacher/Admin purposes are explicit and localized",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T107",
+      "status": "PASS",
+      "claim": "Recovery, Teacher and Admin privileges remain separated",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T108",
+      "status": "PASS",
+      "claim": "Credential derivations and test binding remain separate",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T109",
+      "status": "PASS",
+      "claim": "All active credential branches are covered by regression contracts",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T110",
+      "status": "DEFERRED",
+      "claim": "Server-side recovery/revocation enforcement",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Explicitly deferred to the separately authorized server phase."
+    },
+    {
+      "id": "T111",
+      "status": "NOT VERIFIED",
+      "claim": "Recovery interoperability is verified on required physical devices",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Local synthetic/Chromium evidence exists, but the required native device/browser or deployed environment was not tested."
+    },
+    {
+      "id": "T112",
+      "status": "PASS",
+      "claim": "Both generated student modes pass a real local Chromium journey",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T113",
+      "status": "PASS",
+      "claim": "Storage, URL, log and export leakage scans pass",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T114",
+      "status": "NOT VERIFIED",
+      "claim": "Reload, navigation and BFCache behavior preserve attempt state",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Local synthetic/Chromium evidence exists, but the required native device/browser or deployed environment was not tested."
+    },
+    {
+      "id": "T115",
+      "status": "PASS",
+      "claim": "Negative control proves a client can capture a credential before cleanup",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T116",
+      "status": "NOT VERIFIED",
+      "claim": "Authorized GitHub Pages staging passes recovery tests",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Local synthetic/Chromium evidence exists, but the required native device/browser or deployed environment was not tested."
+    },
+    {
+      "id": "T117",
+      "status": "NOT VERIFIED",
+      "claim": "Republish/cache behavior preserves active attempt integrity",
+      "evidence": "S01 security gates + newly generated instant/secure Chromium evidence",
+      "limits": "Local synthetic/Chromium evidence exists, but the required native device/browser or deployed environment was not tested."
+    },
+    {
+      "id": "T118",
+      "status": "PASS",
+      "claim": "Verifier empty state is safe",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T119",
+      "status": "PASS",
+      "claim": "Verifier renders one compact result row",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T120",
+      "status": "PASS",
+      "claim": "Verifier aggregates the 43/43/13 fixture",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T121",
+      "status": "PASS",
+      "claim": "Verifier preserves split values 7%, 49% and 96%",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T122",
+      "status": "PASS",
+      "claim": "Missing split measurement differs from measured 0%",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T123",
+      "status": "PASS",
+      "claim": "More than 300 security events remain available",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T124",
+      "status": "PASS",
+      "claim": "Orientation/split telemetry stays non-accusatory and audit-only",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T125",
+      "status": "PASS",
+      "claim": "Lock, successful Recovery and failed Recovery remain separate",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T126",
+      "status": "FAIL",
+      "claim": "Replay, duplicate, identity and joker decisions remain coherent",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": "Legacy verifier/forgery and D7 effective-analytics harnesses fail after diagnostic-quarantine changes; product browser scenarios pass but complete regression certification does not."
+    },
+    {
+      "id": "T127",
+      "status": "FAIL",
+      "claim": "Scoring/import and effective-result analytics remain authoritative",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": "D7 effective-result analytics harness throws because its extracted runtime omits isDiagnosticQuarantine; full certification is blocked."
+    },
+    {
+      "id": "T128",
+      "status": "PASS",
+      "claim": "Teacher UI does not alter student or Forms behavior",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T129",
+      "status": "PASS",
+      "claim": "Verifier is responsive in required themes and viewports",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T130",
+      "status": "PASS",
+      "claim": "Verifier keyboard, ARIA and contrast contracts pass",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T131",
+      "status": "PASS",
+      "claim": "CSV remains append-only and backward compatible",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T132",
+      "status": "FAIL",
+      "claim": "Untrusted verifier content is XSS-safe",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": "Focused hostile text rendering passed, but global XSS sink inventory is 165 versus approved baseline 161."
+    },
+    {
+      "id": "T133",
+      "status": "PASS",
+      "claim": "Verifier is offline and CSP isolated",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T134",
+      "status": "PASS",
+      "claim": "A newly generated verifier is actually exercised",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    },
+    {
+      "id": "T135",
+      "status": "PASS",
+      "claim": "Normal/practice workflow remains unaffected",
+      "evidence": "S04/S04.1 source + newly generated Teacher Verifier Chromium evidence",
+      "limits": ""
+    }
+  ]
+}

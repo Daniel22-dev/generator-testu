@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {chromium} from 'playwright';
-import {enterStartCode,w,gdom,configure,GEN,TEACH,REC,generatorHarnessHtml} from './redteam-harness-utils.mjs';
+import {completeGeneratedPageStart,enterStartCode,w,gdom,configure,GEN,TEACH,REC,generatorHarnessHtml} from './redteam-harness-utils.mjs';
 configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode'});
 w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");
 let browser;
@@ -33,13 +33,13 @@ try {
   assert.equal(await page.evaluate(()=>typeof window.teacherLogin),'undefined');
   assert.equal(parserRequests,1);assert.equal(await generator.evaluate(()=>typeof window.acorn.parse),'function');
   await generator.close();
-  await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,pkg);await page.evaluate(()=>startTest());
+  await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,pkg);await completeGeneratedPageStart(page);
   await page.locator('#test').waitFor({state:'visible'});
   await page.evaluate(()=>setResp('0_0',1));await page.evaluate(()=>persistActiveAttemptSeal());await page.evaluate(()=>flushPendingAttemptWrites());
   const before=await page.evaluate(()=>({id:ATTEMPT_ID,deadline:TIMER_DEADLINE}));
   await page.evaluate(()=>lockTest('browser-negative-control'));
   await page.evaluate(()=>flushPendingAttemptWrites());
-  await page.reload();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,pkg);await page.evaluate(()=>startTest());
+  await page.reload();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,pkg);await completeGeneratedPageStart(page);
   assert.equal(await page.evaluate(()=>LOCKED),true);
   assert.deepEqual(await page.evaluate(()=>({id:ATTEMPT_ID,deadline:TIMER_DEADLINE})),before);
   assert.equal(await page.evaluate(()=>RESP['0_0']),1);
@@ -47,7 +47,7 @@ try {
   await page.evaluate(()=>tryUnlock());assert.equal(await page.evaluate(()=>LOCKED),false);
   await page.evaluate(()=>submitSecureTest());await page.locator('#done').waitFor({state:'visible'});
   assert.ok((await page.locator('#answerBackup').inputValue()).startsWith('SECURE-ANSWERS-V1'));
-  await page.reload();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,pkg);await page.evaluate(()=>startTest());
+  await page.reload();await page.locator('#studentName').fill('A7B9C2');await enterStartCode(page,pkg);await completeGeneratedPageStart(page);
   assert.equal(await page.evaluate(()=>submittedLocked()),true);
   assert.equal(await page.locator('[data-retry-code]').count(),0);
   assert.equal(await page.locator('#test').isVisible(),false);

@@ -17,6 +17,11 @@ const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
 const pinned = '49933ea5288caeca8642d1e84afbd3f7d6820020';
 const json = (p, value) => fs.writeFileSync(p, JSON.stringify(value, null, 2) + '\n');
 const load = p => JSON.parse(fs.readFileSync(p, 'utf8'));
+const isPlaywrightCliCall = call => path.basename(String(call?.[1]||''))==='cli.js'&&path.basename(path.dirname(String(call?.[1]||'')))==='playwright';
+const makeRejectedLink = (target, link) => {
+  if(process.platform==='win32')fs.symlinkSync(fs.statSync(target).isDirectory()?target:path.dirname(target),link,'junction');
+  else fs.symlinkSync(target,link);
+};
 function fixture(t) {
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'p2-synthetic-'));
   t.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
@@ -35,12 +40,22 @@ function fixture(t) {
     lock.packages['node_modules/' + name] = { version, integrity: 'sha512-' + Buffer.alloc(64).toString('base64') };
     write(`node_modules/${name}/package.json`, JSON.stringify({ name, version, main: 'index.cjs', ...(name === 'playwright' ? { bin: { playwright: 'cli.js' } } : {}) }));
   }
-  const browser = path.join(temp, 'synthetic-chromium'); fs.writeFileSync(browser, '#!/bin/sh\nexit 0\n', { mode: 0o700 });
+  const browser = process.platform==='win32'?process.execPath:path.join(temp, 'synthetic-chromium');
+  if(process.platform!=='win32')fs.writeFileSync(browser, '#!/bin/sh\nexit 0\n', { mode: 0o700 });
   write('node_modules/playwright/index.cjs', `module.exports={chromium:{executablePath:()=>${JSON.stringify(browser)}}};\n`);
   write('node_modules/playwright/cli.js', 'if (process.argv.slice(2).join(" ") !== "install --with-deps chromium") process.exit(9);\n');
   write('package.json', JSON.stringify(pkg)); write('package-lock.json', JSON.stringify(lock));
-  const env = { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 'Synthetic CI', GIT_COMMITTER_NAME: 'Synthetic CI',
+  const gitConfig=path.join(temp,'git-global-config');fs.writeFileSync(gitConfig,'');
+  const npmCli=path.join(temp,'synthetic-npm-cli.js');fs.writeFileSync(npmCli,`const a=process.argv.slice(2);if(a[0]==='--version'){console.log('10.9.2');process.exit(0)}if(a.join(' ')!=='ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org')process.exit(9);process.exit(Number(process.env.SYNTHETIC_NPM_EXIT||0));\n`);
+  // The production runner invokes the platform's npm command on POSIX.
+  // Scope the synthetic executable to this isolated test fixture only, not production CI.
+  if (process.platform !== 'win32') {
+    const quote = value => "'" + String(value).replace(/'/g, "'\\''") + "'";
+    fs.writeFileSync(path.join(temp, 'npm'), `#!/bin/sh\nexec ${quote(process.execPath)} ${quote(npmCli)} "$@"\n`, { mode: 0o700 });
+  }
+  const env = { ...process.env, npm_execpath:npmCli, GIT_CONFIG_GLOBAL: gitConfig, GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 'Synthetic CI', GIT_COMMITTER_NAME: 'Synthetic CI',
     GIT_AUTHOR_EMAIL: 'ci@example.invalid', GIT_COMMITTER_EMAIL: 'ci@example.invalid' };
+  if (process.platform !== 'win32') env.PATH = `${temp}${path.delimiter}${env.PATH || ''}`;
   const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   git('init', '-q'); git('add', '.'); git('commit', '-qm', 'Synthetic test fixture, not a project change');
   const sha = git('rev-parse', 'HEAD');
@@ -51,7 +66,7 @@ function fixture(t) {
   const calls = [];
   const execute = (program, args, options) => {
     calls.push([program, ...args]);
-    if (program === 'npm') return { status: 0, stdout: args[0] === '--version' ? '10.9.2\n' : '', stderr: '' };
+    if ((program === 'npm')||(program===process.execPath&&args[0]===npmCli)) return { status: 0, stdout: args.at(-1) === '--version' ? '10.9.2\n' : '', stderr: '' };
     return spawnSync(program, args, { ...options, stdio: 'pipe' });
   };
   return { root, temp, env, sha, git, write, browser, calls, execute, environmentFile,
@@ -64,8 +79,9 @@ test('P2 successful setup is independently executed and emits only diagnostic pr
   assert.equal(result.report.purpose, 'SETUP_PROVENANCE_ONLY_NOT_RELEASE_ADMISSION');
   assert.equal(result.report.sourceCommit, f.sha); assert.equal(result.report.sourceUnchanged, true);
   assert.equal(result.report.steps.length, 7); assert.ok(result.report.steps.every(s => s.status === 'PASS' && s.durationMs >= 0));
-  assert.deepEqual(f.calls.filter(c => c[0] === 'npm' && c[1] !== '--version'), [INSTALL_COMMAND]);
-  assert.deepEqual(f.calls.find(c => c[1]?.endsWith('/playwright/cli.js')).slice(2), BROWSER_ARGUMENTS);
+  const npmCalls=f.calls.filter(c=>(c[0]==='npm'&&c[1]!=='--version')||(c[0]===process.execPath&&c[1]===f.env.npm_execpath&&c[2]!=='--version'));
+  assert.deepEqual(npmCalls.map(c=>c.slice(process.platform==='win32'?2:1)), [INSTALL_COMMAND.slice(1)]);
+  assert.deepEqual(f.calls.find(isPlaywrightCliCall).slice(2), BROWSER_ARGUMENTS);
   assert.equal(fs.readFileSync(f.environmentFile, 'utf8'), `CHROMIUM_PATH=${f.browser}\n`);
   assert.doesNotMatch(fs.readFileSync(result.reportFile, 'utf8'), /SYNTHETIC_TOKEN_MUST_NOT_APPEAR/);
   assert.ok(!result.report.reuse.build && !result.report.reuse.certificate && !result.report.reuse.nodeModules);
@@ -78,7 +94,7 @@ test('P2 Journey preserves CHROMIUM_EXECUTABLE without adding another browser ov
 test('P2 second invocation in one job cannot consume or overwrite previous PASS', t => {
   const f = fixture(t), first = runSetup(f.options), bytes = fs.readFileSync(first.reportFile);
   assert.throws(() => runSetup(f.options)); assert.deepEqual(fs.readFileSync(first.reportFile), bytes);
-  assert.equal(f.calls.filter(c => c[0] === 'npm' && c[1] === 'ci').length, 1);
+  assert.equal(f.calls.filter(c => (c[0] === 'npm'&&c[1]==='ci')||(c[0]===process.execPath&&c[1]===f.env.npm_execpath&&c[2]==='ci')).length, 1);
 });
 test('P2 different attempt and job each performs its own install with separate evidence', t => {
   const f = fixture(t), files = [];
@@ -86,7 +102,7 @@ test('P2 different attempt and job each performs its own install with separate e
     Object.assign(f.env, { GITHUB_JOB: job, GITHUB_RUN_ATTEMPT: attempt }); const r = runSetup(f.options);
     assert.equal(r.pass, true); files.push(r.reportFile);
   }
-  assert.equal(new Set(files).size, 3); assert.equal(f.calls.filter(c => c[0] === 'npm' && c[1] === 'ci').length, 3);
+  assert.equal(new Set(files).size, 3); assert.equal(f.calls.filter(c => (c[0] === 'npm'&&c[1]==='ci')||(c[0]===process.execPath&&c[1]===f.env.npm_execpath&&c[2]==='ci')).length, 3);
 });
 
 for (const [name, mutate] of [
@@ -103,9 +119,9 @@ for (const [name, mutate] of [
   ['temp inside checkout', f => f.env.RUNNER_TEMP = f.root],
   ['relative temp', f => f.env.RUNNER_TEMP = '.'],
   ['environment injection', f => f.env.GITHUB_ENV += '\nINJECTED'],
-  ['linked environment file', f => { const dest = f.environmentFile + '.real'; fs.renameSync(f.environmentFile, dest); fs.symlinkSync(dest, f.environmentFile); }],
+  ['linked environment file', f => { const dest = f.environmentFile + '.real'; fs.renameSync(f.environmentFile, dest); makeRejectedLink(dest, f.environmentFile); }],
   ['environment outside temp', f => { f.env.GITHUB_ENV = path.join(f.root, 'outside-env'); fs.writeFileSync(f.env.GITHUB_ENV, ''); }],
-  ['linked evidence directory', f => fs.symlinkSync(f.root, path.join(f.temp, 'generator-ci-tools'))],
+  ['linked evidence directory', f => makeRejectedLink(f.root, path.join(f.temp, 'generator-ci-tools'))],
 ]) test('P2 rejects context: ' + name, t => {
   const f = fixture(t); mutate(f); assert.throws(() => setupContext(f.root, f.env)); assert.equal(f.calls.length, 0);
 });
@@ -119,9 +135,9 @@ for (const [name, change] of [
   ['missing integrity', f => { const p = path.join(f.root, 'package-lock.json'), x = load(p); delete x.packages['node_modules/playwright'].integrity; json(p, x); }],
   ['core mismatch', f => { const p = path.join(f.root, 'node_modules/playwright-core/package.json'), x = load(p); x.version = '0.0.1'; json(p, x); }],
   ['missing local CLI', f => fs.unlinkSync(path.join(f.root, 'node_modules/playwright/cli.js'))],
-  ['linked local CLI', f => { const p = path.join(f.root, 'node_modules/playwright/cli.js'); fs.unlinkSync(p); fs.symlinkSync(f.browser, p); }],
+  ['linked local CLI', f => { const p = path.join(f.root, 'node_modules/playwright/cli.js'); fs.unlinkSync(p); makeRejectedLink(f.browser, p); }],
   ['unexpected CLI mapping', f => { const p = path.join(f.root, 'node_modules/playwright/package.json'), x = load(p); x.bin.playwright = 'elsewhere.js'; json(p, x); }],
-  ['linked dependency', f => { const p = path.join(f.root, 'node_modules/axe-core'); fs.renameSync(p, p + '-real'); fs.symlinkSync(p + '-real', p); }],
+  ['linked dependency', f => { const p = path.join(f.root, 'node_modules/axe-core'); fs.renameSync(p, p + '-real'); makeRejectedLink(p + '-real', p); }],
 ]) test('P2 rejects installed tool drift: ' + name, t => { const f = fixture(t); change(f); assert.throws(() => verifyInstalledTools(f.root)); });
 
 test('P2 rejects an actual dirty checkout before invoking npm', t => {
@@ -138,7 +154,7 @@ for (const [name, failedCommand, failure] of [
   ['browser timeout', 'browser', { status: null, signal: 'SIGTERM' }],
 ]) test('P2 stops and retains BLOCKED setup: ' + name, t => {
   const f = fixture(t); f.options.execute = (program, args, opts) => {
-    if ((failedCommand === 'npm' && program === 'npm' && args[0] === 'ci') || (failedCommand === 'browser' && args[0]?.endsWith('/playwright/cli.js'))) return failure;
+    if ((failedCommand === 'npm' && ((program === 'npm'&&args[0]==='ci')||(program===process.execPath&&args[0]===f.env.npm_execpath&&args[1]==='ci'))) || (failedCommand === 'browser' && path.basename(String(args[0]||''))==='cli.js')) return failure;
     return f.execute(program, args, opts);
   };
   const r = runSetup(f.options); assert.equal(r.pass, false); assert.equal(load(r.reportFile).status, 'BLOCKED');
@@ -148,7 +164,7 @@ for (const [name, failedCommand, failure] of [
 test('P2 installation cannot change source without blocking environment export', t => {
   const f = fixture(t); f.options.execute = (program, args, opts) => {
     const result = f.execute(program, args, opts);
-    if (args[0]?.endsWith('/playwright/cli.js')) f.write('.github/actions/local/action.yml', 'changed during setup');
+    if (path.basename(String(args[0]||''))==='cli.js') f.write('.github/actions/local/action.yml', 'changed during setup');
     return result;
   };
   const r = runSetup(f.options); assert.equal(r.pass, false); assert.equal(r.report.sourceUnchanged, false);
@@ -156,8 +172,8 @@ test('P2 installation cannot change source without blocking environment export',
 });
 for (const [name, browser] of [
   ['relative', () => 'chrome'], ['newline', () => '/tmp/chrome\nPATH=bad'], ['missing', f => f.browser + '-missing'],
-  ['directory', f => f.temp], ['not executable', f => { fs.chmodSync(f.browser, 0o600); return f.browser; }],
-  ['linked', f => { const p = f.browser + '-link'; fs.symlinkSync(f.browser, p); return p; }],
+  ['directory', f => f.temp], ['not executable', f => { if(process.platform==='win32'){const p=path.join(f.temp,'not-browser.txt');fs.writeFileSync(p,'not an executable');return p;}fs.chmodSync(f.browser, 0o600);return f.browser; }],
+  ['linked', f => { const p = path.join(f.temp,'browser-link'); makeRejectedLink(f.browser,p); return p; }],
 ]) test('P2 refuses unsafe browser export: ' + name, t => {
   const f = fixture(t); f.options.browserPath = () => browser(f); const r = runSetup(f.options);
   assert.equal(r.pass, false); assert.equal(r.report.failureStage, 'installed-browser-path');
@@ -169,7 +185,7 @@ test('P2 source fingerprint includes local action metadata and npm config', t =>
   f.write('.npmrc', 'registry=https://registry.npmjs.org\n'); const after = sourceSnapshot({ root: f.root }); assert.notEqual(after.sha256, middle.sha256);
 });
 for (const rel of ['.github/actions/local/action.yml', '.github/actions', '.npmrc', 'package-lock.json']) test('P2 source fingerprint rejects linked input ' + rel, t => {
-  const f = fixture(t), target = path.join(f.root, rel); fs.rmSync(target, { recursive: true, force: true }); fs.symlinkSync(f.temp, target);
+  const f = fixture(t), target = path.join(f.root, rel); fs.rmSync(target, { recursive: true, force: true }); makeRejectedLink(f.temp, target);
   assert.throws(() => sourceSnapshot({ root: f.root }));
 });
 
@@ -231,9 +247,7 @@ test('P2 preflight retains all P1 phases and runs new setup checks before networ
 // Execute the actual production CLI with real Git and a synthetic npm executable.
 // The browser CLI is a local dummy fixture; this is NOT a real browser test.
 test('P2 production CLI integration: real local Git, no npx fallback, fail-closed process status', t => {
-  const f = fixture(t), bin = path.join(f.temp, 'bin'); fs.mkdirSync(bin);
-  fs.writeFileSync(path.join(bin, 'npm'), '#!/bin/sh\nif [ "$1" = "--version" ]; then echo 10.9.2; exit 0; fi\n[ "$*" = "ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org" ] || exit 9\nexit "${SYNTHETIC_NPM_EXIT:-0}"\n', { mode: 0o700 });
-  const env = { ...f.env, PATH: bin + path.delimiter + f.env.PATH };
+  const f = fixture(t), env = { ...f.env };
   const script = path.join(f.root, 'scripts/ci/setup-tools.mjs');
   const invoke = () => spawnSync(process.execPath, [script], { cwd: f.root, env, encoding: 'utf8', timeout: 20000 });
   const success = invoke(); assert.equal(success.status, 0, success.stdout + success.stderr); assert.equal(load(f.reportFile).status, 'PASS');

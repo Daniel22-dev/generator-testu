@@ -16,6 +16,7 @@ PRELUDE=r'''
  };
  function pack(v){if(v instanceof ArrayBuffer)return {$bytes:Array.from(new Uint8Array(v))};if(ArrayBuffer.isView(v))return {$bytes:Array.from(new Uint8Array(v.buffer,v.byteOffset,v.byteLength))};if(v&&v.$key)return {$key:v.$key};if(Array.isArray(v))return v.map(pack);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,pack(x)]));return v;}
  function unpack(v){if(v&&v.$bytes)return new Uint8Array(v.$bytes).buffer;if(v&&v.$key)return v;if(Array.isArray(v))return v.map(unpack);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,unpack(x)]));return v;}
+ Object.defineProperty(window,'__auditNativeSubtle',{configurable:false,writable:false,value:crypto.subtle});
  Object.defineProperty(crypto,'subtle',{configurable:true,value:new Proxy({}, {get:(_,method)=>(...args)=>__auditCrypto({method,args:pack(args)}).then(r=>{if(!r.ok)throw new Error(r.error);return unpack(r.value);})})});
  for(const key of ['localStorage','sessionStorage']){try{window[key].getItem('__probe__');}catch{let m=new Map();const storage={getItem:k=>m.has(String(k))?m.get(String(k)):null,setItem:(k,v)=>m.set(String(k),String(v)),removeItem:k=>m.delete(String(k)),clear:()=>m.clear(),key:i=>Array.from(m.keys())[i]||null,get length(){return m.size;}};Object.defineProperty(window,key,{configurable:true,value:storage});}}
  window.__GHRAB_STUDIO_ACCESS__={appId:'generator',permit:{sub:'AUDIT',displayName:'Audit Teacher',role:'admin',apps:['*'],iat:1,exp:4102444800,jti:'offline-review'}};

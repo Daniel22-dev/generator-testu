@@ -30,11 +30,11 @@ function readingPlainSource(){
 function readingContextFingerprint(){
   return workflowFingerprint({cefr:state.uroven,language:state.jazyk,age:ageGroupLabel(),topic:rcEffectiveTopic(),lesson:trim('latka'),
     source:readingSourceIsOwn()?{kind:'own',text:trim('readingSourceText')}:workflowSharedSource(),
-    use:state.sourceUseMode,scope:state.readingSourceScope,action:state.readingSourceAction,length:state.rcLength,count:state.readingQuestionCount});
+    use:state.sourceUseMode,scope:state.readingSourceScope,action:state.readingSourceAction,length:state.rcLength,count:effectiveComprehensionQuestionCount('reading comprehension',state)});
 }
 function comprehensionContextFingerprint(kind){
   return kind==='reading'?readingContextFingerprint():workflowFingerprint({cefr:state.uroven,source:workflowSharedSource(),
-    url:trim('compListeningUrl'),focus:trim('listeningFocus'),transcript:trim('listeningTranscript'),count:state.listeningQuestionCount,language:state.jazyk});
+    url:trim('compListeningUrl'),focus:trim('listeningFocus'),transcript:trim('listeningTranscript'),count:effectiveComprehensionQuestionCount('listening comprehension',state),language:state.jazyk});
 }
 function readingNeedsReview(){
   return usesReadingComprehension()&&!!state.readingConfigured&&(!state.readingProvenance||state.readingProvenance.context!==readingContextFingerprint());
@@ -107,6 +107,7 @@ function refreshWorkflowSummary(){
 function refreshWorkflowContext(){
   refreshWorkflowSummary();renderReadingContext();
   if($('comprehensionSummary'))renderComprehensionSummaries();
+  if(typeof renderPedagogicalRecommendationLocal==='function')renderPedagogicalRecommendationLocal();
   if(typeof renderSuitabilityLocal==='function')renderSuitabilityLocal();
 }
 function beginComprehensionTask(kind,button){

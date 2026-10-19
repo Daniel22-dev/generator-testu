@@ -22,6 +22,9 @@ export function readSetupSources(root = process.cwd()) {
   };
 }
 export function validateSetupSources({ nodeAction, toolsAction, toolsRunner }) {
+  nodeAction=String(nodeAction).replace(/\r\n?/g,'\n');
+  toolsAction=String(toolsAction).replace(/\r\n?/g,'\n');
+  toolsRunner=String(toolsRunner).replace(/\r\n?/g,'\n');
   for (const definition of [nodeAction, toolsAction]) {
     assert.match(definition, /^runs:\n  using: composite$/m);
     assert.doesNotMatch(definition, /continue-on-error:|\sif:|download-artifact|restore-keys:|secrets\.|permissions:/);
@@ -52,6 +55,7 @@ export function validateSetupSources({ nodeAction, toolsAction, toolsRunner }) {
 }
 export function validateP2Workflows(workflows, setup) {
   validateSetupSources(setup);
+  workflows=Object.fromEntries(Object.entries(workflows).map(([file,text])=>[file,String(text).replace(/\r\n?/g,'\n')]));
   for (const [file, id, sha, browser] of SETUP_JOBS) {
     const block = jobBlock(workflows[file], id);
     assert.equal((block.match(/uses: \.\/\.github\/actions\/setup-ci-node/g) || []).length, 1, id + ' configures Node once');

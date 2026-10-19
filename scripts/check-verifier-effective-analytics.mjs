@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const sourcePath = 'src/js/13f-secure-teacher-verifier.js';
-const source = fs.readFileSync(sourcePath, 'utf8')+'\n'+fs.readFileSync('src/js/13ef-secure-verifier-replay.js','utf8');
+const source = fs.readFileSync(sourcePath, 'utf8')+'\n'+fs.readFileSync('src/js/13ec-secure-verifier-trust.js','utf8')+'\n'+fs.readFileSync('src/js/13ef-secure-verifier-replay.js','utf8');
 
 function extractFunction(name) {
   const marker = `function ${name}(`;
@@ -40,6 +40,7 @@ function extractFunction(name) {
 
 const names = [
   'normStudentKey',
+  'isDiagnosticQuarantine',
   'rebuildDuplicateState',
   'duplicateInfo',
   'resolvedResults',
@@ -123,6 +124,15 @@ assert(ctx.resolvedResults().length === 2, 'joker: resolvedResults zachová žol
 assert(s.effective.length === 1 && s.effective[0] === 'a1', 'joker: effectiveResults vyřadí žolíka z klasifikace');
 assert(s.distribution.n === 1 && s.distribution.mean === 80, 'joker: třídní statistika žolíka nezapočítá');
 assert(s.items.length === 1 && s.items[0].n === 1, 'joker: položková analýza žolíka nezapočítá');
+
+// 5) Diagnostic quarantine remains reviewable evidence, never a scored analytic row.
+load([
+  row({student:'Alice',digest:'a1',attempt:'A1',pct:80,grade:2,earned:8,ok:true}),
+  {status:'DECRYPTED_INVALID_IDENTITY',diagnosticQuarantine:true,student:'Unknown',submissionDigest:'q1',attemptId:'Q1'},
+]);
+s = snap();
+assert(s.effective.length === 1 && s.effective[0] === 'a1', 'diagnostic quarantine: effectiveResults neobsahuje nevyhodnotitelný záznam');
+assert(s.distribution.n === 1 && s.items[0].n === 1, 'diagnostic quarantine: D7 statistiky zůstávají bez falešného skóre');
 
 // Contract guard: all analytics entry points must use the same authority.
 const distributionSource = extractFunction('distributionStats');

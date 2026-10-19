@@ -40,7 +40,7 @@ need(/Pouze soukromý počítač vlastníka mimo školu/,'Teacher-only archive r
 need(/Pro studenty[\s\S]*Feedback HTML/,'Student-facing feedback route is separated from teacher archive.');
 need(/Nejde o automatické obvinění z podvodu|Toto není automatický důkaz podvodu/,'Security signals retain non-accusatory interpretation.');
 
-need(/async function decryptPayload\(pack\)[\s\S]*RSA-OAEP[\s\S]*AES-GCM/,'RSA-OAEP/AES-GCM verifier decryption remains present.');
+need(/async function decryptPayload\(pack,key\)[\s\S]*RSA-OAEP[\s\S]*AES-GCM/,'RSA-OAEP/AES-GCM verifier decryption remains present with the exact-payload cache key.');
 need(/function parseTxt\(txt\)[\s\S]*SECURE-ANSWERS-V1/,'SECURE-ANSWERS-V1 parser remains present.');
 need(/function resolvedResults\(\)[\s\S]*exactDuplicate[\s\S]*hardReplayConflict[\s\S]*ATTEMPT_DECISIONS[\s\S]*function effectiveResults/,'Effective results exclude duplicates/hard replay conflicts and preserve legacy attempt decisions.');
 need(/function downloadResultsCsv\(\)[\s\S]*unresolvedAttemptConflicts\(\)[\s\S]*Nejdřív vyber pokus/,'Results CSV remains blocked on unresolved attempt conflicts.');

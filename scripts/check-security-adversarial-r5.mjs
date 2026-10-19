@@ -91,6 +91,8 @@ function genDom(h, storage, idbState=new Map()) {
   const inp=d.window.document.getElementById('startCode');if(inp)inp.value=startCodes.get(d.window.eval('CFG.testId'))||'';
   return d.window;
 }
+function installControlledFullscreen(x){let active=null;Object.defineProperty(x.document,'fullscreenElement',{configurable:true,get:()=>active});x.document.documentElement.requestFullscreen=async()=>{active=x.document.documentElement;x.document.dispatchEvent(new x.Event('fullscreenchange'));};x.document.exitFullscreen=async()=>{active=null;x.document.dispatchEvent(new x.Event('fullscreenchange'));};}
+async function startGenerated(x){if(x.eval("String(CFG.testMode||'')")!=='prisny'){await x.startTest();return;}installControlledFullscreen(x);await x.startTest();if(x.eval('!!STRICT_PREFLIGHT'))await x.startStrictFullscreen();}
 const dumpStorage = x => { const o = {}; for (let i = 0; i < x.localStorage.length; i++) { const k = x.localStorage.key(i); o[k] = x.localStorage.getItem(k); } return o; };
 const storedBody = raw => { const r = raw ? JSON.parse(raw) : null; return r && r.body ? r.body : r; };
 const rawVariants = s => [s, s.toLowerCase()];
@@ -131,7 +133,7 @@ await T('S/T instant: raw credentialy nejsou v HTML', async () => {
 });
 {
   const x = genDom(instantHtml); await sleep(150);
-  x.document.getElementById('studentName').value = 'Student'; await x.startTest(); await sleep(50);
+  x.document.getElementById('studentName').value = 'Student'; await startGenerated(x); await sleep(50);
   const panelHidden = () => x.document.getElementById('t-panel').classList.contains('hidden');
   const lockShown = () => !x.document.getElementById('lockScreen').classList.contains('hidden');
   const unlock = async v => { x.document.getElementById('unlockInp').value = v; await x.tryUnlock(); };
@@ -178,7 +180,7 @@ configure({ testMode: 'bezny', resultMode: 'instant', screenGuard: true, feedbac
 const instantB = await build();
 await T('P instant: Recovery z testu A neodemkne test B', async () => {
   const x = genDom(instantB); await sleep(150);
-  x.document.getElementById('studentName').value = 'S'; await x.startTest(); x.dispatchEvent(new x.Event('pagehide')); await sleep(20);
+  x.document.getElementById('studentName').value = 'S'; await startGenerated(x); x.dispatchEvent(new x.Event('pagehide')); await sleep(20);
   x.document.getElementById('unlockInp').value = REC; await x.tryUnlock();
   must(!x.document.getElementById('lockScreen').classList.contains('hidden'), 'kód z A odemkl B'); return 'B zůstal zamčen';
 });
@@ -199,7 +201,7 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
   const x = genDom(pack.studentHtml); await sleep(200);
   const S = k => x.eval(k);
   x.document.getElementById('studentName').value = 'Alice';
-  x.document.getElementById('jokerNo').click(); await x.startTest(); await sleep(50);
+  x.document.getElementById('jokerNo').click(); await startGenerated(x); await sleep(50);
   const seal = () => storedBody(x.localStorage.getItem(S("storageKey('activeAttempt')")));
   const s0 = seal();
   await T('secure: test běží a pečeť existuje', async () => { must(s0 && s0.attemptId, 'bez pečeti'); return s0.attemptId; });
@@ -242,7 +244,7 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
   const lockedStorage = dumpStorage(x), lockedIdb = cloneIdbState(x.__qaIdbState);
   await T('AA secure: reload po recovery unlocku nevytvoří nový pokus ani nový deadline', async () => {
     const y = genDom(pack.studentHtml, aliceStorage, cloneIdbState(aliceIdb)); await sleep(200);
-    y.document.getElementById('studentName').value = 'Alice'; await y.startTest(); await sleep(50);
+    y.document.getElementById('studentName').value = 'Alice'; await startGenerated(y); await sleep(50);
     const s = s0;
     must(y.eval('ATTEMPT_ID') === s.attemptId, 'nový attemptId'); must(Number(y.eval('TIMER_DEADLINE')) === s.timerDeadline, 'nový deadline');
     must(y.eval('LOCKED') === true, 'strict reload se musí obnovit zamčený');
@@ -251,13 +253,13 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
   });
   await T('AA secure: reload zamčeného pokusu zámek neobejde', async () => {
     const y = genDom(pack.studentHtml, lockedStorage, cloneIdbState(lockedIdb)); await sleep(200);
-    y.document.getElementById('studentName').value = 'Alice'; await y.startTest(); await sleep(50);
+    y.document.getElementById('studentName').value = 'Alice'; await startGenerated(y); await sleep(50);
     must(y.eval('LOCKED') === true && !y.document.getElementById('lockScreen').classList.contains('hidden'), 'reload odemkl'); return 'zůstává zamčeno';
   });
   await T('E secure: studentský soubor nepovoluje reset cizí identity', async () => {
     const y = genDom(pack.studentHtml, aliceStorage, cloneIdbState(aliceIdb)); await sleep(200);
     try {
-      y.document.getElementById('studentName').value = 'Bob'; y.document.getElementById('jokerNo').click(); await y.startTest();
+      y.document.getElementById('studentName').value = 'Bob'; y.document.getElementById('jokerNo').click(); await startGenerated(y);
       must(y.document.querySelector('.s-modal-bd'), 'foreign identity not blocked');
       must(!y.document.querySelector('.s-modal-bd input[type=password]'), 'secret reset entry point exported');
       must(y.localStorage.getItem(y.eval("storageKey('activeAttempt')")) !== null, 'foreign active state deleted');
@@ -271,7 +273,7 @@ let submissionTxt = '', aliceStorage = null, aliceIdb = null;
   submissionTxt = x.document.getElementById('answerBackup').value;
   await T('D/G secure: odevzdaný pokus nemá další spuštění přes žádné heslo', async () => {
     must((await x.submittedLocked()) === true, 'není submitted');
-    await x.startTest();
+    await startGenerated(x);
     must(!x.document.querySelector('[data-retry-code]'), 'retry credential form serialized');
     must((await x.submittedLocked()) === true, 'submitted guard cleared');
     return 'submitted remains locked';
@@ -344,7 +346,7 @@ await T('Q-bypass: applySettingsWithoutAi nesmí sestavit test s Teacher == Reco
   let teacherViaRecovery = false;
   if (same) {
     const x = genDom(w.eval('generatedTestHtml')); await sleep(150);
-    x.document.getElementById('studentName').value = 'S'; await x.startTest();
+    x.document.getElementById('studentName').value = 'S'; await startGenerated(x);
     x.openTeacherModal(); x.document.getElementById('t-name').value = TEACHER_NAME; x.document.getElementById('t-pin').value = REC; await x.doTeacherLogin();
     teacherViaRecovery = !x.document.getElementById('t-panel').classList.contains('hidden');
   }
