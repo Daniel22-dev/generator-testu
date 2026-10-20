@@ -1,0 +1,55 @@
+name: Prepare GIT 7.1.101 release metadata (temporary isolated workflow)
+on:
+  push:
+    branches:
+      - release/7.1.101-preview-iphone-changelog-20261020
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-7-1-101-metadata
+  cancel-in-progress: false
+
+jobs:
+  prepare-release:
+    if: "!contains(github.event.head_commit.message, '[release-prepared]')"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Prepare version, release notes, PWA, trust chain and SBOM
+        run: node scripts/prepare-release-7.1.101.mjs
+      - name: Remove temporary automation from release before certification
+        run: git rm .github/workflows/prepare-7-1-101.yml
+      - name: Validate version parity, structural limits and GARP byte trust
+        run: |
+          npm run check:versions
+          npm run check:structure
+          node scripts/check-s81-byte-checkout-policy.mjs
+          node scripts/check-s83-ci-portability.mjs
+      - name: Full production bundle build without deployment
+        run: npm run build
+      - name: Record exact release diff only on isolated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          git add RELEASE-NOTES-7.1.101.md security/sbom/generator-testu-7.1.101.cdx.json
+          echo "Release changed files:"
+          git diff --cached --name-only
+          if git diff --cached --name-only | grep -E '^src/js/(13|02|03|14)' ; then
+            echo "::error::Behavior/runtime change unexpectedly staged"
+            exit 1
+          fi
+          git commit -m "release: GIT 7.1.101 traceable strict preview/iPhone hotfix [release-prepared]"
+          git push origin HEAD:release/7.1.101-preview-iphone-changelog-20261020
