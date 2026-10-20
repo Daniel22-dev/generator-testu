@@ -17,6 +17,7 @@ try {
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");pkg=await build();
   await group('generated-student-and-private-pair',async()=>{
     const r=scanStudentHtml(pkg.studentHtml);assert.equal(r.status,'PASS',JSON.stringify(r.findings));
+    assert.equal(typeof readStaticConfig(pkg.studentHtml,'CFG').strictIPhoneCompatibilityAllowed,'boolean','public iPhone compatibility authorization must be an explicit boolean');
     assert.equal(validatePrivatePair(pkg.studentHtml,pkg.teacherHtml).status,'PASS');
     for(const secret of [TEACH,REC,'A7B9C2','synthetic-a@example.invalid'])assert.equal(pkg.studentHtml.includes(secret),false);
     assert.equal(scanStudentHtml(pkg.teacherHtml).status,'FAIL','renamed private verifier must be rejected');
@@ -82,6 +83,7 @@ try {
     rejected('private-rsa',changeCfg({publicKey:{...cfg.publicKey,d:privateCfg.privateKey.d}}));
     rejected('nested-roster',changeCfg({diffGroups:[{key:'x',name:'X',studentHashes:['synthetic']}]}));
     rejected('hidden-config',changeCfg({extra:{teacher_secret:'synthetic'}}));
+    rejected('iphone-compatibility-nonboolean',changeCfg({strictIPhoneCompatibilityAllowed:'yes'}));
     rejected('executable-cfg',pkg.studentHtml.replace('const CFG=','const CFG=window.__E6_EXECUTED=true,'));
     assert.equal(globalThis.__E6_EXECUTED,undefined,'scanner must not execute scanned HTML');
   });

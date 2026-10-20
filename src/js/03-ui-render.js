@@ -121,6 +121,8 @@ function applyVisualState() {
   if (strictRiskField) strictRiskField.classList.toggle('hidden', state.testMode !== 'prisny');
   const strictFallback = $('strictFullscreenFallbackAllowed');
   if (strictFallback) strictFallback.checked = !!state.strictFullscreenFallbackAllowed;
+  const iphoneCompatibility = $('strictIPhoneCompatibilityAllowed');
+  if (iphoneCompatibility) iphoneCompatibility.checked = !!state.strictIPhoneCompatibilityAllowed;
   // Hlídání obrazovky: aktivní tlačítko + skrytí pole v přísném režimu (tam je zámek vždy).
   document.querySelectorAll('#screenGuardBtns .tag-btn').forEach(function(b){
     b.classList.toggle('active', b.dataset.val === (state.screenGuard ? 'on' : 'off'));
@@ -311,6 +313,10 @@ function setScreenGuard(on){
   state.screenGuard = !!on;
   if (on) ensureRecoveryCodeForGuard();
   enforceModeConstraints();
+  applyVisualState(); validate(); saveSnapshot();
+}
+function setStrictIPhoneCompatibilityAllowed(on){
+  state.strictIPhoneCompatibilityAllowed = !!on;
   applyVisualState(); validate(); saveSnapshot();
 }
 function setStrictFullscreenFallbackAllowed(on){

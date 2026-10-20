@@ -547,6 +547,10 @@
             <div class="strict-risk-card"><span class="sri">📤</span><span>Odevzdání přes Forms je volitelné; answers.txt zůstává záloha</span></div>
           </div>
           <label class="check-row" style="margin-top:14px">
+            <input id="strictIPhoneCompatibilityAllowed" type="checkbox" onchange="setStrictIPhoneCompatibilityAllowed(this.checked)">
+            <span><strong>Výslovně povolit kompatibilní start na iPhonu/iPodu bez Element Fullscreen API.</strong><br><small>Jen samostatný HTTPS test v prohlížeči; ne iframe, WebView ani lokální soubor. Student uvidí upozornění a výjimka se zapíše do auditu. Ve výchozím stavu vypnuto.</small></span>
+          </label>
+          <label class="check-row" style="margin-top:14px">
             <input id="strictFullscreenFallbackAllowed" type="checkbox" onchange="setStrictFullscreenFallbackAllowed(this.checked)">
             <span><strong>Povolit kompatibilní start bez Fullscreen API pouze na skutečně nepodporovaném zařízení.</strong><br><small>Odmítnutí žádosti není nepodporované zařízení. Fallback se zapíše do auditu a není stejně bezpečný jako vynucený fullscreen.</small></span>
           </label>

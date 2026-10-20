@@ -6,7 +6,7 @@ function teacherPreviewCode(){
   const r=rosterEntries.find(x=>x&&String(x.code||'').trim());
   return r?String(r.code):'';
 }
-function teacherPreviewHtml(html,code){
+function teacherPreviewHtml(html,code,startCode){
   let out=String(html||'');
   // Náhled je učitelská simulace, ne ostrý studentský pokus. Příznak se vloží
   // před runtime skripty, aby preview nesdílelo zámek karty ani trvalý stav pokusu.
@@ -14,6 +14,10 @@ function teacherPreviewHtml(html,code){
   out=/<head\b[^>]*>/i.test(out)
     ? out.replace(/<head\b[^>]*>/i,tag=>tag+marker)
     : marker+out;
+  if(startCode){
+    const escaped=String(startCode).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    out=out.replace(/<input(?=[^>]*\bid=["']startCode["'])[^>]*>/i,tag=>tag.replace(/\s+value=(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'').replace(/>$/,' value="'+escaped+'">'));
+  }
   if(!code)return out;
   const value=String(code).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   return out.replace(/<input(?=[^>]*\bid=["']studentName["'])[^>]*>/i,tag=>{
@@ -24,7 +28,7 @@ function teacherPreviewHtml(html,code){
 function getPreviewHtml(){
   const previewCode=teacherPreviewCode();
   if(generatedPackage&&generatedPackage.mode==='secureOffline'&&generatedPackage.studentHtml){
-    return {html:teacherPreviewHtml(generatedPackage.studentHtml,previewCode),secure:true,previewCode};
+    return {html:teacherPreviewHtml(generatedPackage.studentHtml,previewCode,generatedPackage.startCode||''),secure:true,previewCode};
   }
   if(generatedTestHtml)return {html:teacherPreviewHtml(generatedTestHtml,previewCode),secure:false,previewCode};
   return null;
@@ -42,7 +46,7 @@ function createPreviewFrame(){
   frame.id='previewFrame';
   frame.className='preview-frame';
   frame.title='Náhled testu';
-  frame.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads');
+  frame.setAttribute('sandbox','allow-scripts allow-modals');
   frame.dataset.previewInstance=String(++previewFrameSeq);
   stage.appendChild(frame);
   return frame;
@@ -63,7 +67,7 @@ function openTestPreview(){
   const pv = getPreviewHtml();
   const modal = $('previewModal'), note = $('previewNote');
   if (!pv || !pv.html) { uiAlert('Nejdřív vygeneruj test, pak ho můžeš zobrazit v náhledu.'); return; }
-  if(note)note.textContent=state.identityMode==='oneTimeCode'&&pv.previewCode?'Učitelský náhled: platný kód je předvyplněn pouze zde; studentský soubor se nemění.':pv.secure?'Studentský test bez správných odpovědí. Správnost klíče zkontroluješ v učitelském verifieru.':'Hotový interaktivní test tak, jak ho uvidí studenti.';
+  if(note)note.textContent='UČITELSKÁ SIMULACE — bez skutečného pokusu, časovače a odevzdání. '+(state.identityMode==='oneTimeCode'&&pv.previewCode?'Kód je předvyplněn pouze v náhledu. ': '')+(pv.secure?'Správné odpovědi zůstávají v soukromém verifieru.':'');
   const frame=createPreviewFrame();
   if(!frame){ uiAlert('Náhled se nepodařilo připravit. Zavři dialog a zkus to znovu.'); return; }
   setPreviewWidth(360);

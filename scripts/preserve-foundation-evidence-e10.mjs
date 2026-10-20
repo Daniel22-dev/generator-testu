@@ -12,6 +12,7 @@ const statusOutsideEvidence = execFileSync('git', [
   'status', '--porcelain', '--untracked-files=no', '--', '.',
   `:(exclude)${evidenceRoot}/**`
 ], { encoding: 'utf8' }).trim();
+if(statusOutsideEvidence)console.error('FOUNDATION_TRACKED_DRIFT (paths only):\n'+statusOutsideEvidence);
 assert.equal(statusOutsideEvidence, '', 'Foundation may modify only its generated GARP evidence directory');
 assert.ok(fs.existsSync(evidenceRoot), 'Foundation evidence directory is missing');
 assert.ok(!fs.existsSync(archiveRoot), 'Foundation evidence archive already exists');

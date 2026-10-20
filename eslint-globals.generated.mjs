@@ -827,6 +827,7 @@ export const projectGlobals = {
   "setRecoveryCode": 'writable',
   "setScreenGuard": 'writable',
   "setStrictFullscreenFallbackAllowed": 'writable',
+  "setStrictIPhoneCompatibilityAllowed": 'writable',
   "setTeacherAccessCode": 'writable',
   "setVal": 'writable',
   "settingsDrift": 'writable',
