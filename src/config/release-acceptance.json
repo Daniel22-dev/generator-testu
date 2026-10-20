@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.100",
+  "appVersion": "7.1.101",
   "releaseStatus": "ready-with-documented-limitations",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "GIT-7.1.100-V7-FINAL-CERTIFICATION-2026-10-18",
+  "revision": "GIT-7.1.101-STRICT-PREVIEW-IPHONE-DOC-2026-10-20",
   "runtimeAudit": {
     "required": true,
     "scriptsExecuted": true,
     "partialStaticVmExecuted": true,
     "browserRuntimeExecuted": true,
     "transport": "Exact-source local Chromium plus exact-SHA GitHub Actions; live AI, school Forms, Sheets/MailApp and physical devices remain separate operational acceptance.",
-    "note": "GIT 7.1.100 V7 consolidates Sprints 01–08.3a and owner-approved security changes A+B. Scoring, cryptography, identity quarantine, Recovery separation and split-screen SHADOW/AUDIT-ONLY remain enforced.",
+    "note": "Hotfix was independently browser-tested on 7.1.100. Release 7.1.101 republishes unchanged behavior with corrected changelog, version/cache and new exact-SHA release certification. Physical Safari and live school Forms not independently verified.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
     "componentBrowserExecuted": true,
     "appsScriptMockExecuted": true
   },
-  "note": "Release candidate 7.1.100 requires exact-SHA P5, Journey, candidate/PR certification, protected main promotion and deployed release-identity verification. Physical devices and live school services are NOT VERIFIED by source automation.",
+  "note": "Require exact-SHA P5, Journey E2E, candidate and PR certification, protected main merge and production release identity verification for 7.1.101.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

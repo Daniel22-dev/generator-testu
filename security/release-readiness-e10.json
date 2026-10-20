@@ -1,14 +1,14 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.100",
+  "version": "7.1.101",
   "status": "READY WITH DOCUMENTED LIMITATIONS",
   "blockers": [],
   "f7": "IMPLEMENTED; exact-SHA current-version gates required",
-  "remotePath": "Owner authorized final GIT 7.1.100 GitHub publication and conditional standard promotion on 2026-10-17. Candidate/main/deployment remain fail-closed behind exact-SHA release gates.",
+  "remotePath": "Owner requested separate GIT 7.1.101 hotfix documentation/cache release on 2026-10-20. Only exact-SHA protected candidate/main admission may deploy.",
   "scope": "CONTROLLED_CLASSROOM_WITH_DOCUMENTED_LIMITATIONS",
   "ownerDecision": {
-    "recordedOn": "2026-10-17",
-    "source": "Explicit owner authorization to complete GIT 7.1.100, publish the isolated work branch immediately, and use the existing protected candidate/main release process only after all mandatory checks pass.",
+    "recordedOn": "2026-10-20",
+    "source": "Owner approval on 2026-10-20 to complete the 7.1.101 release for the already deployed strict preview / iPhone hotfix with recorded changelog and version/caching parity; all mandatory gates remain required.",
     "authorizeGithubPublication": true,
     "authorizeProductionReleaseAfterMandatoryGates": true,
     "E6_INCIDENT": {
@@ -29,8 +29,8 @@
     },
     "independentReview": {
       "status": "PENDING_FINAL_EXACT_SHA_AUDIT",
-      "reviewedVersion": "7.1.100",
-      "currentVersion": "7.1.100",
+      "reviewedVersion": "7.1.101",
+      "currentVersion": "7.1.101",
       "currentVersionIndependentlyReviewed": false,
       "note": "Local and GitHub exact-SHA evidence is required; this source decision does not relabel physical or live-service checks as PASS."
     }

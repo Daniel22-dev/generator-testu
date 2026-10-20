@@ -32,7 +32,7 @@ for(const file of bytePinned){
 
 const anchorBytes=fs.readFileSync(anchorPath),anchorSha=sha(anchorBytes);
 const trust=consumer.trustInputs?.find(item=>item.environment==='GARP27_EXTERNAL_TRUST_SHA256');
-assert.equal(anchorSha,'88d23a5dbf68fdb787c94a2fa3b14dea076464ac79390d32b411e0e38e655b7c','approved trust anchor bytes changed');
+assert.equal(anchorSha,'c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f','approved trust anchor bytes changed');
 assert.equal(trust?.sha256,anchorSha,'consumer profile pin differs from trust anchor');
 let workflowPins=0;
 for(const file of pinnedWorkflows)for(const match of fs.readFileSync(file,'utf8').matchAll(/GARP27_EXTERNAL_TRUST_SHA256:\s*([0-9a-f]{64})/gi)){
