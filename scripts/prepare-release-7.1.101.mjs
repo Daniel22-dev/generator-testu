@@ -12,9 +12,9 @@ const write=(p,s)=>fs.writeFileSync(path.join(ROOT,p),s,'utf8');
 const parse=p=>JSON.parse(read(p));
 const save=(p,x)=>write(p,JSON.stringify(x,null,2)+'\n');
 const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT,p))).digest('hex');
-const replaceOnce=(source,old,new,p)=>{
+const replaceOnce=(source,old,next,p)=>{
   if(!source.includes(old))throw Error(p+': missing '+old);
-  return source.replace(old,new);
+  return source.replace(old,next);
 };
 const pkg=parse('package.json');
 if(pkg.version!==FROM)throw Error('Expected certified '+FROM+' base, found '+pkg.version);
