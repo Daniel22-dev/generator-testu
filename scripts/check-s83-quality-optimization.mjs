@@ -46,7 +46,14 @@ const baseParts=splitAroundAssistant(baseCore),currentParts=splitAroundAssistant
 const releaseBlock=value=>value.match(/const RELEASE = Object\.freeze\(\{[\s\S]*?\n\}\);\n/)?.[0]||'';
 const baseRelease=releaseBlock(baseParts.before),currentRelease=releaseBlock(currentParts.before);
 assert.ok(baseRelease&&currentRelease,'release metadata block must remain structurally identifiable');
-assert.match(currentRelease,/version:\s*'7\.1\.100'[\s\S]*date:\s*'2026-10-18'[\s\S]*VELKÁ AKTUALIZACE V7 \(7\.1\.100\)/,'only the reviewed 7.1.100 release metadata delta is allowed outside the assistant section');
+const releaseVersion=JSON.parse(read(path.join(root,'package.json'))).version;
+const reviewedReleasePattern=releaseVersion==='7.1.101'
+  ? /version:\s*'7\.1\.101'[\s\S]*date:\s*'2026-10-20'[\s\S]*HOTFIX \(7\.1\.101, 20\. 10\. 2026\)[\s\S]*VELKÁ AKTUALIZACE V7 \(7\.1\.100\)/
+  : releaseVersion==='7.1.100'
+    ? /version:\s*'7\.1\.100'[\s\S]*date:\s*'2026-10-18'[\s\S]*VELKÁ AKTUALIZACE V7 \(7\.1\.100\)/
+    : null;
+assert.ok(reviewedReleasePattern,'unreviewed metadata version');
+assert.match(currentRelease,reviewedReleasePattern,'only the exact reviewed 7.1.100 or 7.1.101 release metadata is allowed outside the assistant section');
 const normalizedCurrentBefore=currentParts.before.replace(currentRelease,baseRelease);
 check(baseParts.before===normalizedCurrentBefore&&baseParts.after===currentParts.after,'S83-Q10a','canonical core changes stay confined to the auditable Generator Assistant section plus reviewed 7.1.100 release metadata');
 const acornDiff=execFileSync('git',['diff','--name-only',BASE,'--','node_modules/acorn/dist/acorn.js'],{encoding:'utf8'}).trim();

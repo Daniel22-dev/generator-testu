@@ -1,3 +1,5 @@
+> **7.1.101 – hotfix náhledu přísného testu a iPhone kompatibility (20. 10. 2026).** Jde o dokumentované, samostatně verzované vydání funkcí dříve nasazených pod 7.1.100; mění changelog, PWA cache a release evidenci, nikoli hodnoticí algoritmus. Podrobnosti [RELEASE-NOTES-7.1.101.md](RELEASE-NOTES-7.1.101.md).
+
 > **7.1.100 V7 – konsolidovaná bezpečnostní a výuková aktualizace.** Recovery/Teacher/Admin hardening, pedagogická věrnost, Teacher Verifier 2.0, Strict Mode Guard V2, didaktické AI workflow a závěrečné certifikační opravy. Split-screen zůstává SHADOW/AUDIT-ONLY. Podrobnosti [RELEASE-NOTES-7.1.100.md](RELEASE-NOTES-7.1.100.md).
 
 > **7.1.98 – classroom hotfix.** Identity-bound outbox recovery, fresh-start click-through protection, confirmed manual submit, expired-resume explanation and BFCache hardening. Viz [RELEASE-NOTES-7.1.98.md](RELEASE-NOTES-7.1.98.md).
@@ -50,7 +52,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.100 V7 (exact-SHA release gates required; physical devices and live school services remain separate acceptance checks)
+**Aktuální verze:** 7.1.101 (strict preview / iPhone hotfix evidence; exact-SHA release gates required; physical devices and live school services remain separate acceptance checks)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 
