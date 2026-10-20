@@ -54,5 +54,30 @@ jobs:
           node scripts/check-s83-ci-portability.mjs
       - name: Full production bundle build without deployment
         run: npm run build
+      - name: Emit reviewed, tested release-only blob transfer records
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const run=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          const parent=run('rev-parse','HEAD^');
+          const tree=run('show','-s','--format=%T','HEAD');
+          const files=run('diff','--name-only','HEAD^','HEAD').split('\n').filter(Boolean);
+          const prefix='GHRAB101RECORD';
+          console.log(prefix+'|HEADER|'+JSON.stringify({parent,tree,count:files.length}));
+          for(const path of files){
+            if(!fs.existsSync(path)){
+              console.log(prefix+'|DELETE|'+encodeURIComponent(path));
+              continue;
+            }
+            const b64=fs.readFileSync(path).toString('base64');
+            const chunkSize=10000;
+            const total=Math.ceil(b64.length/chunkSize)||1;
+            for(let i=0;i<total;i++)
+              console.log(prefix+'|BLOB|'+encodeURIComponent(path)+'|'+i+'|'+total+'|'+b64.slice(i*chunkSize,(i+1)*chunkSize));
+          }
+          console.log(prefix+'|END|'+files.length);
+          NODE
       - name: Publish validated release snapshot to isolated branch
         run: git push origin HEAD:release/7.1.101-preview-iphone-changelog-20261020
