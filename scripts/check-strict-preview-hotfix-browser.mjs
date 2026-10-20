@@ -13,7 +13,10 @@ try{
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");
   const pkg=await build();
   // The preview/editor is a lazy feature: load its real source into the generator harness.
-  w.eval(fs.readFileSync('src/features/preview-editor.js','utf8'));
+  const lazyScript=w.document.createElement('script');
+  lazyScript.textContent=fs.readFileSync('src/features/preview-editor.js','utf8');
+  w.document.body.appendChild(lazyScript);
+  assert.equal(typeof w.getPreviewHtml,'function','preview feature must register in the generator document');
   w.__hotfixPkg=pkg;
   w.eval('generatedPackage=window.__hotfixPkg');
   const pv=w.getPreviewHtml();
