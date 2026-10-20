@@ -44,7 +44,7 @@ check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before his
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
 const protectedMainBaseline='d7bf7875a33ca97fd619cd403a276973b23d14ea';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
-const reviewedTrust='88d23a5dbf68fdb787c94a2fa3b14dea076464ac79390d32b411e0e38e655b7c';
+const reviewedTrust='c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f';
 const baselineWorkflows=execFileSync('git',['ls-tree','-r','--name-only',baseline,'--','.github/workflows'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
 const protectedMainWorkflowAdditions=new Set([
   '.github/workflows/manual-browser-qa.yml',

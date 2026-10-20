@@ -1,3 +1,15 @@
+## 7.1.101 – 2026-10-20 – hotfix náhledu přísného testu a kompatibility iPhone
+
+- Opravené dvoukrokové spuštění učitelského náhledu přísného testu v odděleném sandboxu bez požadavku na fullscreen.
+- Učitelská simulace bez běžícího časovače a bez skutečného odevzdání; po zavření a opětovném otevření vznikne nový náhled.
+- Přístupový a studentský kód se předvyplňují pouze v dočasném učitelském náhledu, nikoli do veřejného studentského HTML.
+- Nové samostatné učitelské povolení kompatibilního startu na iPhonu/iPodu bez Element Fullscreen API; standardně vypnuto, pouze samostatný test přes HTTPS.
+- Nepovolený fullscreen s existujícím API nelze zaměnit za nepodporované API; skutečná kompatibilní výjimka má viditelné upozornění a auditní důvod.
+- Zachovány přísný režim, Recovery, odevzdání, Google Forms, Teacher Verifier, běžné testy a procvičování. Split-screen zůstává SHADOW/AUDIT-ONLY.
+- Doplněna browser/regresní certifikace a bezpečná DOM oprava XSS sinku ve výsledku simulace.
+- Tato funkční oprava již byla v produkčním commitu 7.1.100 ze dne 20. 10. 2026; vydání 7.1.101 napravuje její chybějící changelog, release identitu a verzování PWA cache.
+- Fyzické testování Safari na iPhonu/iPadu a živých školních formulářů se tímto dokumentačním vydáním nevydává za ověřené.
+
 ## 7.1.100 – 2026-10-18 – V7 consolidated security, pedagogy and certification
 
 - Dokončeny Sprinty 01–08.3a: credentials/Recovery, pedagogická věrnost, workflow a bodování, Teacher Verifier 2.0, Strict Mode Guard V2, AI didaktika, Forms/Apps Script UX a certifikační stabilizace.
