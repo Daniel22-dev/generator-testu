@@ -104,6 +104,8 @@ migration.releaseIdentity={...migration.releaseIdentity,appId:'generator',appVer
 save('security/garp27/application-migration-profile.json',migration);
 
 const anchorFile='security/garp27/trust-anchor.json';
+const reviewedOldPin='88d23a5dbf68fdb787c94a2fa3b14dea076464ac79390d32b411e0e38e655b7c';
+if(hash(anchorFile)!==reviewedOldPin)throw Error('The certified trust anchor moved; refuse unreviewed pin rotation');
 let anchor=parse(anchorFile);
 if(anchor.appVersion!==FROM)throw Error('GARP trust anchor baseline mismatch');
 anchor.appVersion=TO;
@@ -113,6 +115,13 @@ anchor.garpPolicySha256=hash('security/garp27/garp-policy.json');
 anchor.note='GIT 7.1.101: traceable version/PWA cache refresh of approved strict teacher preview + iPhone compatibility hotfix. Runtime contracts, limitations and protected release gates unchanged.';
 save(anchorFile,anchor);
 const trustPin=hash(anchorFile);
+// Rotate exactly the expected *certified* pin constants. The negative controls
+// and baseline normalization stay enabled. Never skip S81/S83 in release CI.
+for(const p of ['scripts/check-s81-byte-checkout-policy.mjs','scripts/check-s83-ci-portability.mjs']){
+  const original=read(p);
+  if(original.split(reviewedOldPin).length!==2)throw Error('Expected one approved old trust pin in '+p);
+  write(p,original.replace(reviewedOldPin,trustPin));
+}
 const workflowDir='.github/workflows';
 let changedPins=0;
 for(const name of fs.readdirSync(path.join(ROOT,workflowDir))){
