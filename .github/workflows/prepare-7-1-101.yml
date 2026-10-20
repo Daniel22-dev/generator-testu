@@ -31,14 +31,10 @@ jobs:
         run: node scripts/prepare-release-7.1.101.mjs
       - name: Remove temporary automation from release before certification
         run: git rm .github/workflows/prepare-7-1-101.yml
-      - name: Validate version parity, structural limits and GARP byte trust
+      - name: Validate version parity and structural limits before snapshot
         run: |
           npm run check:versions
           npm run check:structure
-          node scripts/check-s81-byte-checkout-policy.mjs
-          node scripts/check-s83-ci-portability.mjs
-      - name: Full production bundle build without deployment
-        run: npm run build
       - name: Record exact release diff only on isolated branch
         run: |
           git config user.name "github-actions[bot]"
@@ -52,4 +48,11 @@ jobs:
             exit 1
           fi
           git commit -m "release: GIT 7.1.101 traceable strict preview/iPhone hotfix [release-prepared]"
-          git push origin HEAD:release/7.1.101-preview-iphone-changelog-20261020
+      - name: Verify committed GARP bytes against Git blobs and CI topology
+        run: |
+          node scripts/check-s81-byte-checkout-policy.mjs
+          node scripts/check-s83-ci-portability.mjs
+      - name: Full production bundle build without deployment
+        run: npm run build
+      - name: Publish validated release snapshot to isolated branch
+        run: git push origin HEAD:release/7.1.101-preview-iphone-changelog-20261020
