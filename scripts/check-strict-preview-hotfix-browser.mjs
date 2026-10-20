@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {chromium} from 'playwright';
 import {configure,build,w,enterStartCode} from './redteam-harness-utils.mjs';
 
@@ -11,6 +12,8 @@ try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode',strictFullscreenFallbackAllowed:false,strictIPhoneCompatibilityAllowed:false});
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");
   const pkg=await build();
+  // The preview/editor is a lazy feature: load its real source into the generator harness.
+  w.eval(fs.readFileSync('src/features/preview-editor.js','utf8'));
   w.__hotfixPkg=pkg;
   w.eval('generatedPackage=window.__hotfixPkg');
   const pv=w.getPreviewHtml();
