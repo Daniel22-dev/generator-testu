@@ -122,6 +122,25 @@ for(const p of ['scripts/check-s81-byte-checkout-policy.mjs','scripts/check-s83-
   if(original.split(reviewedOldPin).length!==2)throw Error('Expected one approved old trust pin in '+p);
   write(p,original.replace(reviewedOldPin,trustPin));
 }
+// Preserve the S83 assistant's exact-source confinement check while teaching its
+// previously hardcoded 7.1.100 assertion the *reviewed* 7.1.101 metadata only.
+const qualityPath='scripts/check-s83-quality-optimization.mjs';
+let quality=read(qualityPath);
+const oldQuality=quality.split('\n').find(line=>line.startsWith('assert.match(currentRelease,'));
+if(!oldQuality||!oldQuality.includes('reviewed 7.1.100'))throw Error('S83 quality proof changed; no automatic policy relaxation allowed');
+const newQuality=[
+ "const releaseVersion=JSON.parse(read(path.join(root,'package.json'))).version;",
+ "const reviewedReleasePattern=releaseVersion==='7.1.101'",
+ "  ? /version:\\s*'7\\.1\\.101'[\\s\\S]*date:\\s*'2026-10-20'[\\s\\S]*HOTFIX \\(7\\.1\\.101, 20\\. 10\\. 2026\\)[\\s\\S]*VELKÁ AKTUALIZACE V7 \\(7\\.1\\.100\\)/",
+ "  : releaseVersion==='7.1.100'",
+ "    ? /version:\\s*'7\\.1\\.100'[\\s\\S]*date:\\s*'2026-10-18'[\\s\\S]*VELKÁ AKTUALIZACE V7 \\(7\\.1\\.100\\)/",
+ "    : null;",
+ "assert.ok(reviewedReleasePattern,'unreviewed metadata version');",
+ "assert.match(currentRelease,reviewedReleasePattern,'only the exact reviewed 7.1.100 or 7.1.101 release metadata is allowed outside the assistant section');"
+].join('\n');
+quality=quality.replace(oldQuality,newQuality);
+write(qualityPath,quality);
+
 const workflowDir='.github/workflows';
 let changedPins=0;
 for(const name of fs.readdirSync(path.join(ROOT,workflowDir))){
