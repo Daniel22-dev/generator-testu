@@ -1,0 +1,36 @@
+name: Production read-only AI Studio GIT smoke (QA branch only)
+
+on:
+  push:
+    branches:
+      - qa/live-studio-generator-smoke-20261020
+
+permissions:
+  contents: read
+
+jobs:
+  live-studio-generator:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact locked test dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Set up Chromium for live read-only test
+        run: npx playwright install --with-deps chromium
+      - name: Assert live GitHub Pages release, Studio registry and browser iframe
+        run: node scripts/check-live-studio-generator-smoke.mjs
+      - name: Preserve synthetic-only smoke evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: live-studio-generator-smoke
+          path: qa-results/live-smoke/
+          if-no-files-found: warn
+          retention-days: 7
