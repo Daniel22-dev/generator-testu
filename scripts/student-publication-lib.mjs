@@ -14,7 +14,7 @@ export function readUtf8(file) {
 const normalize = key => String(key).replace(/[^a-z0-9]/gi,'').toLowerCase();
 const privateNames = new Set(['startcode','ucitelpin','ucitelpinhash','uciteljmeno','teachersecret','teachersecrethash','teacherpin','teacherpinhash','teacherconfig','teacherconfiguration','recoverycode','recoverycodehash','hasrecoveryunlock','identitycodehashes','studenthashes','diffrostersalt','diffrosterscheme','privatekey','privatejwk','roster','rosterentries','variantsfull','answerkey','encryptedanswerkey','answerhash','answerhashes','answerchecksum','normalizedanswer','normalizedanswers','correcthash','correctchecksum','correctposition','originalcorrectposition','shuffleseed','answerseed','debugconfig']);
 const answerNames = new Set(['answer','answers','ans','acceptedanswers','correctanswer','correctindex','altanswers','correct','correctorder','correctcategory','correctsentence','modelanswer','right','transcript','explanation','errortokenindex','errortype','correction']);
-const publicFields = new Set('v mode resultMode generatorVersion buildHash releaseDate releaseStatus formsSubmissionUrl formsMetadata formsPayloadSafeChars creatorId creatorRole appMode testId manifestHash nazev proKoho jazyk uiLang cefr cefrLevels cefrCombined labels secureLabels identityMode isCzech csScoringPolicy cas tema testMode screenGuard strictFullscreenFallbackAllowed lockOnLeave layout odevzdavani fuzzyTolerance randomizace zolicek unlockCodeHash hasUnlockCode identityValidation diffGroups publicKey'.split(' '));
+const publicFields = new Set('v mode resultMode generatorVersion buildHash releaseDate releaseStatus formsSubmissionUrl formsMetadata formsPayloadSafeChars creatorId creatorRole appMode testId manifestHash nazev proKoho jazyk uiLang cefr cefrLevels cefrCombined labels secureLabels identityMode isCzech csScoringPolicy cas tema testMode screenGuard strictFullscreenFallbackAllowed strictIPhoneCompatibilityAllowed lockOnLeave layout odevzdavani fuzzyTolerance randomizace zolicek unlockCodeHash hasUnlockCode identityValidation diffGroups publicKey'.split(' '));
 const teacherFunctions = new Set('teacherLogin teacherSecretMatches openTeacherModal closeTeacherModal teacherLogout clearSubmittedLocked clearSealedJokerUi rosterHash identityCodeHash'.split(' '));
 
 export function literal(node) {
@@ -110,6 +110,7 @@ export function scanStudentHtml(html) {
     if(cfg) {
       if(cfg.mode!=='secureOffline'||cfg.resultMode!=='secureOffline'||cfg.identityValidation!=='teacher-verifier-only')add('secure-student-mode-required');
       for(const key of Object.keys(cfg))if(!publicFields.has(key))add('unexpected-public-config-field');
+      if(Object.hasOwn(cfg,'strictIPhoneCompatibilityAllowed')&&typeof cfg.strictIPhoneCompatibilityAllowed!=='boolean')add('invalid-iphone-compatibility-flag');
       walk(cfg,key=>{if(privateNames.has(normalize(key)))add('private-public-config');});
       if(!cfg.testId||!/^[A-Za-z0-9_-]{43}$/.test(cfg.manifestHash||''))add('invalid-test-identity');
       if(!cfg.publicKey||cfg.publicKey.kty!=='RSA'||!cfg.publicKey.n||!cfg.publicKey.e)add('invalid-public-key');
