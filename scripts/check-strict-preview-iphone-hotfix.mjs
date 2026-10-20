@@ -8,9 +8,9 @@ const runtime=new Function(source+';return SECURE_STRICT_MODE_RUNTIME_JS;')();
 new vm.Script(runtime);
 let pass=0;
 const iphone='Mozilla/5.0 (iPhone; CPU iPhone OS 17_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Mobile/15E148 Safari/604.1';
-const ipad=iphone.replace('iPhone','iPad');
+const ipad=iphone.replaceAll('iPhone','iPad');
 function make({ua=iphone,iphoneAllowed=false,general=false,api=false,denied=false,embedded=false,protocol='https:',preview=false,href='https://school.example/t.html'}={}){
- const nodes={};function el(){const flags=new Set(['hidden']);return {classList:{toggle:(key,on)=>on?flags.add(key):flags.delete(key),contains:key=>flags.has(key)},textContent:'',className:'',value:'',firstChild:null,insertBefore(x){this.firstChild=x}};}
+ const nodes={};function el(){const flags=new Set(['hidden']);return {classList:{toggle:(key,on)=>on?flags.add(key):flags.delete(key),contains:key=>flags.has(key)},textContent:'',className:'',style:{cssText:''},value:'',firstChild:null,insertBefore(x){this.firstChild=x}};}
  for(const id of ['strictVerifyBtn','strictFullscreenStartBtn','strictFallbackStartBtn','strictStartStatus','test','studentName','studentVariant'])nodes[id]=el();
  nodes.studentName.value='SYNTHETIC';
  const document={documentElement:{},fullscreenElement:null,getElementById:id=>nodes[id]||null,createElement:el};
