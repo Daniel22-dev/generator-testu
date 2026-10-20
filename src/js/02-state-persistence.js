@@ -23,6 +23,7 @@ function normalizeLoadedState(s) {
   if (s.appMode !== 'advanced') s.sourceUseMode = 'auto';
   if (typeof s.screenGuard !== 'boolean') s.screenGuard = false;
   if (typeof s.strictFullscreenFallbackAllowed !== 'boolean') s.strictFullscreenFallbackAllowed = false;
+  if (typeof s.strictIPhoneCompatibilityAllowed !== 'boolean') s.strictIPhoneCompatibilityAllowed = false;
   if (['none','brief','learning'].indexOf(s.feedbackMode) === -1) s.feedbackMode = 'brief';
   if (['basic','standard','challenge'].indexOf(s.differentiationLevel) === -1) s.differentiationLevel = 'standard';
   s.readingQuestionCount = Math.max(1, Math.min(30, parseInt(s.readingQuestionCount,10) || 4));

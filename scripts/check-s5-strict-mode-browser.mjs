@@ -5,7 +5,8 @@ import fs from 'node:fs';
 import {chromium} from 'playwright';
 import {w,gdom,configure,build,enterStartCode,REC} from './redteam-harness-utils.mjs';
 
-const origin='http://127.0.0.1:18805';
+// Strict compatibility policy requires HTTPS; route.fulfill provides a synthetic secure origin.
+const origin='https://strict-tests.example';
 const checks=[];
 const errors=[];
 const contexts=[];

@@ -1,0 +1,42 @@
+name: Strict preview and iPhone hotfix validation
+on:
+  push:
+    branches: [fix/strict-preview-iphone-fullscreen-20261019]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hotfix-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium for browser regression
+        run: npx playwright install --with-deps chromium
+      - name: Policy regression
+        run: node scripts/check-strict-preview-iphone-hotfix.mjs
+      - name: Strict mode source regression
+        run: npm run check:s5-strict-mode
+      - name: Strict mode native browser regression
+        run: npm run check:s5-strict-mode-browser
+      - name: Teacher preview browser journey
+        run: node scripts/check-strict-preview-hotfix-browser.mjs
+      - name: Runtime UX regression
+        run: npm run check:runtime-ux
+      - name: Forms workflow regression
+        run: npm run check:forms-workflow
+      - name: Verifier generated syntax
+        run: npm run check:verifier-generated-syntax
+      - name: Full build, prebuild and platform checks (without deployment)
+        run: npm run build

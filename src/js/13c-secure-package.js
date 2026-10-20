@@ -151,6 +151,7 @@ function securePublicCfg(cfg, keyInfo) {
     testMode:cfg.testMode,
     screenGuard:!!cfg.screenGuard,
     strictFullscreenFallbackAllowed:cfg.testMode==='prisny'&&!!cfg.strictFullscreenFallbackAllowed,
+    strictIPhoneCompatibilityAllowed:cfg.testMode==='prisny'&&!!cfg.strictIPhoneCompatibilityAllowed,
     // Přísný test se musí zamknout při opuštění okna i tehdy, kdy starší volající
     // neposlal explicitní lockOnLeave. Tím se zároveň opravuje stav, kdy verifier
     // odchod zaznamenal, ale studentský test se nezamkl.
