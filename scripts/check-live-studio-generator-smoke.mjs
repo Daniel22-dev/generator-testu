@@ -41,7 +41,10 @@ try {
   await page.locator('#strictIPhoneCompatibilityAllowed').waitFor({state:'attached',timeout:25000});
   const checked=await page.locator('#strictIPhoneCompatibilityAllowed').isChecked();
   assert.equal(checked,false,'Fresh browser must default iPhone strict fallback to OFF');
-  record('LIVE_STANDALONE_GIT_BROWSER_PASS',{checkboxPresent:true,defaultOptIn:false,pageTitle:await page.title(),pageErrors:pageErrors.slice(0,10)});
+  await page.waitForTimeout(6000); // distinguish a loaded public UI from static hidden source DOM
+  const visible=await page.evaluate(()=>{const el=document.getElementById('strictIPhoneCompatibilityAllowed');const card=el?.closest('label');return {inputVisible:!!el&&el.getClientRects().length>0,sectionVisible:!!card&&card.getClientRects().length>0,bodyText:String(document.body?.innerText||'').slice(0,450),bodyBg:getComputedStyle(document.body).backgroundColor};});
+  if(!visible.inputVisible)output.limitations.push('The live GIT setting is present in HTML, but is not visually displayed to an unauthenticated browser.');
+  record('LIVE_STANDALONE_GIT_BROWSER_PASS',{checkboxPresent:true,defaultOptIn:false,pageTitle:await page.title(),visibility:visible,pageErrors:pageErrors.slice(0,10)});
   await fs.mkdir('qa-results/live-smoke',{recursive:true});
   await page.screenshot({path:'qa-results/live-smoke/git-standalone.png',fullPage:false});
   await page.goto(stamp(STUDIO+'app/?app=generator'),{waitUntil:'domcontentloaded',timeout:45000});
