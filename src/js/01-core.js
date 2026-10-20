@@ -272,8 +272,7 @@ const DEFAULT = {
   testPurpose:'',                            // pedagogický účel testu (label presetu)
   simpleTemplate:'',                         // interní profil účelu testu; v simple řídí skryté technické volby, v advanced pouze předvyplňuje
   screenGuard:false,                         // hlídání obrazovky (zámek při opuštění) nezávisle na testMode
-  strictFullscreenFallbackAllowed:false,
-  strictIPhoneCompatibilityAllowed:false,     // učitel může výslovně povolit pouze unsupported fullscreen fallback
+  strictFullscreenFallbackAllowed:false,     // učitel může výslovně povolit pouze unsupported fullscreen fallback
   feedbackMode:'brief',                      // BOD 8 — none | brief | learning
   differentiationLevel:'standard',           // BOD 7 — basic | standard | challenge (celý test)
   exercisePedagogyMap:null,                  // BOD 5 — typ → pedagogická funkce (cache)
