@@ -61,17 +61,38 @@ try{
   assert.match(audit,/SIMULACE/);
   const before=await frame.locator('#exerciseArea [data-qid]').count();
   assert.ok(before>0);
+  const previewRuntime=await frame.locator('body').evaluate(async()=>({
+    verified:strictTeacherPreview(),
+    timerDeadline:TIMER_DEADLINE,
+    answerText:ANSWER_TXT,
+    activeAttempt:storageGet('activeAttempt'),
+    submitted:storageGet('submitted'),
+    signedAttempt:await loadSignedRecord('activeAttempt')
+  }));
+  assert.equal(previewRuntime.verified,true,'preview privilege must be context verified');
+  assert.equal(previewRuntime.timerDeadline,0,'preview must not arm a real timer deadline');
+  assert.equal(previewRuntime.answerText,'','preview must not create a real answer payload');
+  assert.equal(previewRuntime.activeAttempt,null,'preview must not share active-attempt persistence');
+  assert.equal(previewRuntime.submitted,null,'preview must not share submitted persistence');
+  assert.deepEqual(previewRuntime.signedAttempt,{record:null,tamper:false},'preview must not create a signed persistence record');
   await page.evaluate(()=>{document.querySelector('#teacher-preview').style.width='768px'});
   await frame.locator('#exerciseArea [data-qid]').first().waitFor();
   await page.evaluate(()=>{document.querySelector('#teacher-preview').style.width='100%'});
   assert.ok(await frame.locator('#exerciseArea [data-qid]').count()>0);
+  const submitted=await frame.locator('body').evaluate(async()=>{
+    let opened=0;window.open=()=>{opened++;return {};};
+    const accepted=await requestSecureSubmit();
+    openSubmissionForm();
+    return {accepted,opened,answerText:ANSWER_TXT,timerDeadline:TIMER_DEADLINE,done:!document.getElementById('done').classList.contains('hidden')};
+  });
+  assert.deepEqual(submitted,{accepted:true,opened:0,answerText:'',timerDeadline:0,done:true},'preview submit must remain a local simulation without Forms or result payload');
   await page.evaluate(()=>document.getElementById('stage').innerHTML='');
   frame=await openPreview(360);
   assert.equal(await frame.locator('#studentName').inputValue(),'A7B9C2');
   assert.equal(await frame.locator('#intro').isVisible(),true);
   assert.equal(await frame.locator('#test').isVisible(),false);
   assert.deepEqual(errors,[]);
-  console.log('PASS strict nested teacher preview: second-step simulation, unlocked exercises, no running timer, widths, close/reopen');
+  console.log('PASS strict nested teacher preview: verified context, no persistence/timer/result/Forms, widths, close/reopen');
 }finally{
   for(const c of contexts)try{await c.close();}catch{}
   if(browser)await browser.close();

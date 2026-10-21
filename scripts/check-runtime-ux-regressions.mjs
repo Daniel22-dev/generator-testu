@@ -42,12 +42,14 @@ need(forms, /bulkVerifyPasted\([\s\S]*Nejdřív vlož celý záložní blok SECU
 need(forms, /importFormsCsvFile\([\s\S]*CSV import dokončen/, 'Forms import confirms successful completion');
 need(verifier, /function downloadText\([\s\S]*Stažení bylo spuštěno:/, 'download actions give visible confirmation');
 need(preview, /__GHRAB_TEACHER_PREVIEW__=true/, 'Teacher preview injects an explicit preview-only runtime flag');
+need(secureStrict, /function strictTeacherPreview\(\)[\s\S]*window\.self!==window\.top[\s\S]*about:srcdoc/, 'Teacher preview privilege requires a nested about:srcdoc browsing context');
+(secure.match(/__GHRAB_TEACHER_PREVIEW__/g)||[]).length===1 ? pass('Writable teacher-preview marker is consumed only by the context verifier') : fail('Raw teacher-preview marker must not authorize persistence, locking or submission behavior');
 need(preview, /function createPreviewFrame\([\s\S]*createElement\(['"]iframe['"]\)[\s\S]*previewInstance/, 'Teacher preview creates a fresh iframe browsing context for every open');
 need(preview, /function destroyPreviewFrame\([\s\S]*parentNode\.removeChild/, 'Teacher preview destroys the iframe browsing context on close');
 !/srcdoc\s*=\s*['"]['"]/.test(preview) ? pass('Teacher preview teardown never navigates a reused iframe to blank srcdoc') : fail('Teacher preview must destroy, not blank and reuse, its iframe');
 !/id=["']previewFrame["']/.test(shell) ? pass('Preview shell does not ship a reusable iframe browsing context') : fail('Preview shell must create iframe only on demand');
-need(secure, /function acquireAttemptTabLock\(\)[\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return true/, 'Secure runtime bypasses cross-tab locking only in explicit teacher preview');
-need(secure, /function handleLeave\([\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return/, 'Teacher preview cannot trigger the real leave-test lock');
+need(secure, /function acquireAttemptTabLock\(\)\{if\(typeof strictTeacherPreview===['"]function['"]&&strictTeacherPreview\(\)\)return true/, 'Secure runtime bypasses cross-tab locking only in verified teacher preview');
+need(secure, /function handleLeave\([^)]*\)\{if\(typeof strictTeacherPreview===['"]function['"]&&strictTeacherPreview\(\)\)return/, 'Verified teacher preview cannot trigger the real leave-test lock');
 need(secure, /function submissionOutboxMatchesIdentity\([\s\S]*body\.identityHash===expectedIdentityHash[\s\S]*normRosterIdentity\(body\.student\)===normRosterIdentity\(expectedStudent\)/, 'Completed submission outbox is cryptographically bound to the currently entered identity');
 need(secure, /function startTestAttempt\([\s\S]*identityAllowed\(name\)[\s\S]*activeAttemptIdentityHash\(name\)[\s\S]*unlockTestContent\(\)[\s\S]*restoreSubmissionOutbox\(name,identityHash\)[\s\S]*submittedLocked\(\)/, 'Start flow validates identity and start code before any completed outbox can be restored');
 need(secure, /function restoreSubmissionOutbox\(expectedStudent,expectedIdentityHash\)[\s\S]*submissionOutboxMatchesIdentity[\s\S]*showSubmissionOutboxIdentityConflict[\s\S]*ANSWER_TXT=b\.txt/, 'Foreign completed outbox is blocked before ciphertext is assigned to the UI');
@@ -60,8 +62,8 @@ need(secureRuntime, /function refreshSecureTimer\(\)[\s\S]*submitSecureTest\(['"
 need(secureSubmit, /function showTimerExpiredNotice\(\)[\s\S]*submitted automatically/, 'Expired attempts explain the automatic submission reason');
 need(secure, /startTimer\(\);if\(isTestActive\(\)\)startSplitMonitor\(\)[\s\S]*if\(LOCKED&&isTestActive\(\)\)/, 'Expired resume cannot re-arm split monitoring or lock UI after auto-submit starts');
 need(secure, /function handlePageRestore\(event\)[\s\S]*restoreSubmissionOutbox\(currentAttemptIdentity\(\),ACTIVE_IDENTITY_HASH\)/, 'BFCache/pageshow outbox recovery preserves the current identity binding');
-need(secure, /function storageGet\(kind\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return null/, 'Teacher preview cannot read persistent submitted/outbox state');
-need(secure, /async function submittedLocked\(\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return false/, 'Teacher preview never inherits a submitted lock');
+need(secure, /function storageGet\(kind\)\{if\(typeof strictTeacherPreview===['"]function['"]&&strictTeacherPreview\(\)\)return null/, 'Verified teacher preview cannot read persistent submitted/outbox state');
+need(secure, /async function submittedLocked\(\)\{if\(typeof strictTeacherPreview===['"]function['"]&&strictTeacherPreview\(\)\)return false/, 'Verified teacher preview never inherits a submitted lock');
 need(lab, /function downloadTargetContext\([\s\S]*window\.top\.location\.origin===window\.location\.origin[\s\S]*targetDocument=window\.top\.document/, 'Downloads are promoted to the same-origin AI Studio top-level context when embedded');
 need(shell, /Roster a kódy zůstávají jen v paměti právě otevřené relace GIT[\s\S]*Otevřít samostatně/, 'Roster UI explains that standalone opens a new in-memory preparation session');
 need(shell, /ui-modal generator-settings-dialog/, 'Generator settings uses the dedicated large responsive dialog');
