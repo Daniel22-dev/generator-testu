@@ -65,10 +65,13 @@ try{
   w.eval('generatedPackage=window.__hotfixPkg');
   const pv=w.getPreviewHtml();
   assert.ok(pv&&pv.html&&pv.secure);
-  assert.ok(pv.html.includes('__GHRAB_TEACHER_PREVIEW__=true'));
+  assert.ok(pv.html.includes('data-ghrab-private-teacher-preview="1"'));
+  assert.ok(pv.html.includes('__GHRAB_PRIVATE_TEACHER_PREVIEW__'));
   assert.ok(pv.html.includes(pkg.startCode),'private unlock code should exist only in transient teacher preview');
   assert.ok(!pkg.studentHtml.includes(pkg.startCode),'student export must not publish the unlock code');
-  assert.ok(!pkg.studentHtml.includes('__GHRAB_TEACHER_PREVIEW__=true'),'student export must not activate preview');
+  for(const forbidden of ['__GHRAB_TEACHER_PREVIEW__','strictTeacherPreview','__GHRAB_PRIVATE_TEACHER_PREVIEW__','data-ghrab-private-teacher-preview']){
+    assert.ok(!pkg.studentHtml.includes(forbidden),`student export must not contain ${forbidden}`);
+  }
   browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
   const ctx=await browser.newContext({viewport:{width:1280,height:850}});
   contexts.push(ctx);
@@ -90,6 +93,8 @@ try{
     },{html:pv.html,width});
     const frame=page.frameLocator('#teacher-preview');
     await frame.locator('#studentName').waitFor();
+    const boot=await frame.locator('body').evaluate(()=>({privatePreview:window.__GHRAB_PRIVATE_TEACHER_PREVIEW__===true,ready:strictReadyState(),verifySource:String(verifyStrictTest).slice(0,120)}));
+    assert.equal(boot.privatePreview,true,'generator-only private adapter must initialize in the isolated iframe');
     return frame;
   }
   let frame=await openPreview(360);
@@ -105,7 +110,10 @@ try{
   assert.equal(await frame.locator('#studentName').inputValue(),'A7B9C2');
   assert.equal(await frame.locator('#startCode').inputValue(),pkg.startCode);
   await frame.locator('#strictVerifyBtn').click();
-  await frame.locator('#strictFallbackStartBtn').waitFor({state:'visible',timeout:15000});
+  await page.waitForTimeout(500);
+  const verifiedState=await frame.locator('body').evaluate(()=>({ready:strictReadyState(),preflight:STRICT_PREFLIGHT,status:$('strictStartStatus')&&$('strictStartStatus').textContent||'',fallbackHidden:$('strictFallbackStartBtn').classList.contains('hidden')}));
+  assert.equal(verifiedState.ready,'private-preview-ready',JSON.stringify(verifiedState));
+  assert.equal(verifiedState.fallbackHidden,false,JSON.stringify(verifiedState));
   await frame.locator('#strictFallbackStartBtn').click();
   await frame.locator('#exerciseArea').locator('[data-qid]').first().waitFor({timeout:15000});
   let state=await frame.locator('#timer').textContent();
@@ -116,14 +124,16 @@ try{
   const before=await frame.locator('#exerciseArea [data-qid]').count();
   assert.ok(before>0);
   const previewRuntime=await frame.locator('body').evaluate(async()=>({
-    verified:strictTeacherPreview(),
+    privatePreview:window.__GHRAB_PRIVATE_TEACHER_PREVIEW__===true,
+    mode:STRICT_FULLSCREEN_MODE,
     timerDeadline:TIMER_DEADLINE,
     answerText:ANSWER_TXT,
     activeAttempt:storageGet('activeAttempt'),
     submitted:storageGet('submitted'),
     signedAttempt:await loadSignedRecord('activeAttempt')
   }));
-  assert.equal(previewRuntime.verified,true,'preview privilege must be context verified');
+  assert.equal(previewRuntime.privatePreview,true,'generator-only private adapter must be active');
+  assert.equal(previewRuntime.mode,'private-preview','private adapter must identify the isolated simulation');
   assert.equal(previewRuntime.timerDeadline,0,'preview must not arm a real timer deadline');
   assert.equal(previewRuntime.answerText,'','preview must not create a real answer payload');
   assert.equal(previewRuntime.activeAttempt,null,'preview must not share active-attempt persistence');
@@ -148,14 +158,14 @@ try{
   nativeAfter=await nativeStorageSnapshot(page);
   assert.deepEqual(nativeAfter,nativeBefore,'legitimate preview must not mutate native parent-origin localStorage, sessionStorage or IndexedDB');
   assert.deepEqual(errors,[]);
-  console.log('PASS strict nested teacher preview: verified context, no persistence/timer/result/Forms, widths, close/reopen');
+  console.log('PASS strict nested teacher preview: private adapter, no persistence/timer/result/Forms, widths, close/reopen');
 }finally{
   for(const c of contexts)try{await c.close();}catch{}
   if(browser)await browser.close();
   w.close();
 }
 
-const report={schema:'git-r1a1-preview-native-storage-v1',sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,browser:'Chromium via Playwright 1.61.1',status:'PASS',nativeBefore,nativeAfter,nativeFrameAccess,pageErrors:errors,scope:'Fresh generated private teacher preview in a sandboxed about:srcdoc iframe; native read-only storage snapshots, synthetic data only.'};
-fs.mkdirSync('qa-results/r1a1-c32',{recursive:true});
+const report={schema:'git-r1a2-preview-native-storage-v2',sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,browser:'Chromium via Playwright 1.61.1',status:'PASS',nativeBefore,nativeAfter,nativeFrameAccess,pageErrors:errors,scope:'Fresh generated private teacher preview adapter in a sandboxed about:srcdoc iframe; native read-only storage snapshots, synthetic data only.'};
+fs.mkdirSync('qa-results/r1a2-d02',{recursive:true});
 const evidenceTag=String(process.env.PREVIEW_STORAGE_EVIDENCE_TAG||'preview-native-storage').replace(/[^a-z0-9._-]+/gi,'-');
-fs.writeFileSync(`qa-results/r1a1-c32/${evidenceTag}.json`,JSON.stringify(report,null,2)+'\n');
+fs.writeFileSync(`qa-results/r1a2-d02/${evidenceTag}.json`,JSON.stringify(report,null,2)+'\n');
