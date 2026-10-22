@@ -101,6 +101,7 @@
     "check:s5-strict-mode": "node scripts/check-s5-strict-mode.mjs",
     "check:s5-strict-mode-browser": "node scripts/check-s5-strict-mode-browser.mjs",
     "check:c32-preview-boundary-browser": "node scripts/check-c32-preview-boundary-browser.mjs",
+    "probe:d02-foreign-preview-context-browser": "node scripts/check-d02-foreign-preview-context-browser.mjs",
     "check:s5-traceability": "node scripts/check-s5-traceability.mjs",
     "check:s5-ci-wiring": "node scripts/check-s5-ci-wiring.mjs",
     "check:s6-pedagogical-ai": "node scripts/check-s6-pedagogical-ai.mjs",

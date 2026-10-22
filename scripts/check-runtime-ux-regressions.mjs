@@ -42,7 +42,8 @@ need(forms, /bulkVerifyPasted\([\s\S]*Nejdřív vlož celý záložní blok SECU
 need(forms, /importFormsCsvFile\([\s\S]*CSV import dokončen/, 'Forms import confirms successful completion');
 need(verifier, /function downloadText\([\s\S]*Stažení bylo spuštěno:/, 'download actions give visible confirmation');
 need(preview, /__GHRAB_TEACHER_PREVIEW__=true/, 'Teacher preview injects an explicit preview-only runtime flag');
-need(secureStrict, /function strictTeacherPreview\(\)[\s\S]*window\.self!==window\.top[\s\S]*about:srcdoc/, 'Teacher preview privilege requires a nested about:srcdoc browsing context');
+need(secureStrict, /const strictTeacherPreview=function\(\)[\s\S]*window\.self!==window\.top[\s\S]*about:srcdoc/, 'Teacher preview privilege uses an immutable lexical verifier and requires a nested about:srcdoc browsing context');
+!/function strictTeacherPreview\(\)/.test(secureStrict) ? pass('Teacher preview verifier is not exposed as a replaceable global function declaration') : fail('Teacher preview verifier must not be a replaceable global function declaration');
 (secure.match(/__GHRAB_TEACHER_PREVIEW__/g)||[]).length===1 ? pass('Writable teacher-preview marker is consumed only by the context verifier') : fail('Raw teacher-preview marker must not authorize persistence, locking or submission behavior');
 need(preview, /function createPreviewFrame\([\s\S]*createElement\(['"]iframe['"]\)[\s\S]*previewInstance/, 'Teacher preview creates a fresh iframe browsing context for every open');
 need(preview, /function destroyPreviewFrame\([\s\S]*parentNode\.removeChild/, 'Teacher preview destroys the iframe browsing context on close');

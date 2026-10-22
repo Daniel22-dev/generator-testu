@@ -50,6 +50,28 @@ async function startStrict(page,pkg){
   await page.waitForFunction(()=>isTestActive()&&STRICT_FULLSCREEN_MODE==='enforced'&&!!document.fullscreenElement);
 }
 
+async function overwritePreviewVerifier(page){
+  return page.evaluate(()=>{
+    const before=strictTeacherPreview();
+    let directError='';
+    try{strictTeacherPreview=()=>true;}catch(error){directError=String(error&&error.name||error);}
+    const afterDirect=strictTeacherPreview();
+    let propertyError='';
+    try{Object.defineProperty(window,'strictTeacherPreview',{value:()=>true,writable:true,configurable:true});}
+    catch(error){propertyError=String(error&&error.name||error);}
+    return {before,afterDirect,resolved:strictTeacherPreview(),directError,propertyError,windowPropertyResult:typeof window.strictTeacherPreview==='function'?window.strictTeacherPreview():null};
+  });
+}
+
+async function startAfterOverwrite(page,pkg){
+  await prepareStrict(page,pkg);
+  const state=await page.evaluate(()=>strictReadyState());
+  if(state==='supported-ready')await page.locator('#strictFullscreenStartBtn').click();
+  else if(state==='preview-ready')await page.locator('#strictFallbackStartBtn').click();
+  else throw new Error('unexpected strict ready state after overwrite: '+state);
+  await page.waitForFunction(()=>isTestActive());
+}
+
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode',strictFullscreenFallbackAllowed:false});
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");
@@ -152,6 +174,113 @@ try{
     assert.match(state.status,/otev|open/i);
   });
 
+  await scenario('C32-H01','same-context helper overwrite before start cannot select preview mode or suppress signed persistence',async()=>{
+    const context=await newContext(pkg.studentHtml);
+    const page=await newPage(context,'/helper-prestart.html');
+    const overwrite=await overwritePreviewVerifier(page);
+    await startAfterOverwrite(page,pkg);
+    await page.evaluate(()=>flushPendingAttemptWrites());
+    const state=await page.evaluate(()=>({preview:strictTeacherPreview(),mode:STRICT_FULLSCREEN_MODE,active:isTestActive(),attempt:ATTEMPT_ID,deadline:TIMER_DEADLINE,stored:localStorage.getItem(storageKey('activeAttempt'))}));
+    assert.equal(overwrite.before,false);
+    assert.equal(overwrite.afterDirect,false,'direct assignment must not replace the verifier binding');
+    assert.equal(overwrite.resolved,false,'a window property must not shadow the verifier binding');
+    assert.equal(state.preview,false);
+    assert.equal(state.mode,'enforced','public strict test must use confirmed fullscreen, never preview mode');
+    assert.equal(state.active,true);
+    assert.ok(state.attempt);
+    assert.ok(state.deadline>0);
+    assert.ok(typeof state.stored==='string'&&state.stored.includes(state.attempt),'native localStorage must contain the signed active attempt');
+  });
+
+  await scenario('C32-H02','same-context helper overwrite during an attempt cannot bypass leave lock or dual persistence',async()=>{
+    const context=await newContext(pkg.studentHtml);
+    const page=await newPage(context,'/helper-during.html');
+    await startStrict(page,pkg);
+    const overwrite=await overwritePreviewVerifier(page);
+    const state=await page.evaluate(async()=>{
+      handleLeave('c32-helper-leave','controlled same-context helper overwrite');
+      await flushPendingAttemptWrites();
+      const local=localStorage.getItem(storageKey('activeAttempt'));
+      let idb=null;try{idb=await idbGet('activeAttempt');}catch(error){idb={error:String(error&&error.message||error)};}
+      return {preview:strictTeacherPreview(),attempt:ATTEMPT_ID,locked:LOCKED,events:SEC_EVENTS.filter(event=>event.type==='c32-helper-leave').length,local,idb};
+    });
+    assert.equal(overwrite.afterDirect,false);
+    assert.equal(overwrite.resolved,false);
+    assert.equal(state.preview,false);
+    assert.equal(state.locked,true,'leave protection must still lock the attempt');
+    assert.equal(state.events,1,'leave event must remain in the chronology');
+    assert.ok(typeof state.local==='string'&&state.local.includes(state.attempt),'signed attempt must remain in native localStorage');
+    assert.ok(state.idb&&state.idb.body&&state.idb.body.attemptId,'signed attempt must remain in IndexedDB');
+  });
+
+  await scenario('C32-H03','same-context helper overwrite cannot bypass the concurrent-tab guard',async()=>{
+    const context=await newContext(pkg.studentHtml);
+    const first=await newPage(context,'/helper-tab-a.html');
+    const second=await newPage(context,'/helper-tab-b.html');
+    const firstOverwrite=await overwritePreviewVerifier(first);
+    const secondOverwrite=await overwritePreviewVerifier(second);
+    await prepareStrict(first,pkg);
+    await second.locator('#studentName').fill('A7B9C2');
+    await enterStartCode(second,pkg);
+    await second.locator('#strictVerifyBtn').click();
+    await second.waitForTimeout(250);
+    const states=await Promise.all([
+      first.evaluate(()=>({preflight:!!STRICT_PREFLIGHT,preview:strictTeacherPreview()})),
+      second.evaluate(()=>({preflight:!!STRICT_PREFLIGHT,preview:strictTeacherPreview(),active:isTestActive()})),
+    ]);
+    assert.equal(firstOverwrite.resolved,false);
+    assert.equal(secondOverwrite.resolved,false);
+    assert.deepEqual(states[0],{preflight:true,preview:false});
+    assert.equal(states[1].preview,false);
+    assert.equal(states[1].active,false);
+    assert.equal(states[1].preflight,false,'second tab must not obtain a preflight while the first owns the lock');
+  });
+
+  await scenario('C32-H04','same-context helper overwrite after reload cannot hide submitted state or create a replacement attempt',async()=>{
+    const context=await newContext(pkg.studentHtml);
+    const page=await newPage(context,'/helper-submitted.html');
+    await startStrict(page,pkg);
+    await page.evaluate(()=>submitSecureTest());
+    await page.waitForFunction(()=>SUBMITTED&&ANSWER_TXT.startsWith('SECURE-ANSWERS-V1'));
+    await page.reload();
+    await page.locator('#studentName').fill('A7B9C2');
+    await enterStartCode(page,pkg);
+    const overwrite=await overwritePreviewVerifier(page);
+    const state=await page.evaluate(async()=>({preview:strictTeacherPreview(),guard:localStorage.getItem(storageKey('submitted')),guardLocked:await submittedLocked(),prepared:!!(await strictPreflightChecks()),submitted:SUBMITTED,answer:ANSWER_TXT,done:!$('done').classList.contains('hidden')}));
+    assert.equal(overwrite.resolved,false);
+    assert.equal(state.preview,false);
+    assert.equal(state.guard,'1');
+    assert.equal(state.guardLocked,true);
+    assert.equal(state.prepared,false,'completed submission must not create a replacement preflight');
+    assert.equal(state.submitted,true);
+    assert.ok(state.answer.startsWith('SECURE-ANSWERS-V1'));
+    assert.equal(state.done,true);
+  });
+
+  await scenario('C32-H05','same-context helper overwrite cannot turn real submit and Forms handoff into preview simulation',async()=>{
+    const context=await newContext(pkg.studentHtml);
+    const page=await newPage(context,'/helper-submit.html');
+    await startStrict(page,pkg);
+    const overwrite=await overwritePreviewVerifier(page);
+    const state=await page.evaluate(async()=>{
+      let opened='';
+      CFG.formsSubmissionUrl='https://docs.google.com/forms/d/e/SYNTHETIC-C32/viewform';
+      window.open=url=>{opened=String(url);return {opener:null};};
+      await submitSecureTest();
+      openSubmissionForm();
+      await flushPendingAttemptWrites();
+      let outbox=null;try{outbox=await idbGet('submissionOutbox');}catch(error){outbox={error:String(error&&error.message||error)};}
+      return {preview:strictTeacherPreview(),submitted:SUBMITTED,answer:ANSWER_TXT,opened,guard:localStorage.getItem(storageKey('submitted')),outbox};
+    });
+    assert.equal(overwrite.resolved,false);
+    assert.equal(state.preview,false);
+    assert.equal(state.submitted,true);
+    assert.ok(state.answer.startsWith('SECURE-ANSWERS-V1'),'real encrypted payload must be created');
+    assert.equal(state.opened,'https://docs.google.com/forms/d/e/SYNTHETIC-C32/viewform');
+    assert.equal(state.guard,'1');
+    assert.ok(state.outbox&&state.outbox.body&&state.outbox.body.txt===state.answer,'IndexedDB outbox must contain the encrypted payload');
+  });
+
   assert.deepEqual(pageErrors,[],'generated student pages must have no unhandled page errors');
 }finally{
   for(const context of contexts)await context.close().catch(()=>{});
@@ -161,7 +290,7 @@ try{
 
 const failed=results.filter(result=>result.status!=='PASS');
 const report={
-  schema:'git-r1a1-c32-browser-v1',
+  schema:'git-r1a1-c32-browser-v2',
   stage:'R1-A1',
   sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   node:process.version,
@@ -173,6 +302,7 @@ const report={
   scope:'Fresh generated strict student HTML on a synthetic HTTPS origin. No physical-device, live Forms or server-authority claim.',
 };
 fs.mkdirSync('qa-results/r1a1-c32',{recursive:true});
-fs.writeFileSync('qa-results/r1a1-c32/browser-evidence.json',JSON.stringify(report,null,2)+'\n');
+const evidenceTag=String(process.env.C32_EVIDENCE_TAG||'browser-evidence').replace(/[^a-z0-9._-]+/gi,'-');
+fs.writeFileSync(`qa-results/r1a1-c32/${evidenceTag}.json`,JSON.stringify(report,null,2)+'\n');
 console.log(`${report.status} R1-A1 C32 browser boundary ${results.length-failed.length}/${results.length}`);
 if(failed.length)process.exit(1);

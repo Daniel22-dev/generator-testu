@@ -5,10 +5,10 @@ function strictModeRuntime(){return String(CFG.testMode||'')==='prisny';}
 function strictFullscreenElement(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
 function strictFullscreenRequestFunction(){var el=document.documentElement;return el&&(el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen)||null;}
 function strictFullscreenSupport(){return typeof strictFullscreenRequestFunction()==='function'?'supported':'unsupported';}
-function strictTeacherPreview(){
+const strictTeacherPreview=function(){
   try{return window.__GHRAB_TEACHER_PREVIEW__===true&&window.self!==window.top&&/^about:srcdoc(?:[?#]|$)/i.test(String(window.location.href||''));}
   catch(_){return false;}
-}
+};
 function strictFallbackAuthorization(){
   if(strictFullscreenSupport()==='supported')return {allowed:false,reason:'element-fullscreen-api-present'};
   try{

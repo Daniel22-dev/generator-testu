@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
 import {chromium} from 'playwright';
 import {configure,build,w,enterStartCode} from './redteam-harness-utils.mjs';
@@ -8,6 +9,49 @@ const origin='http://127.0.0.1:18809';
 const contexts=[];
 let browser;
 const errors=[];
+let nativeBefore=null,nativeAfter=null,nativeFrameAccess=null;
+
+async function nativeStorageSnapshot(page){
+  return page.evaluate(async()=>{
+    const local={};
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      local[key]=localStorage.getItem(key);
+    }
+    const session={};
+    for(let i=0;i<sessionStorage.length;i++){
+      const key=sessionStorage.key(i);
+      session[key]=sessionStorage.getItem(key);
+    }
+    const databases=typeof indexedDB.databases==='function'?await indexedDB.databases():[];
+    const idb=[];
+    for(const info of databases){
+      if(!info||!info.name)continue;
+      const detail=await new Promise((resolve,reject)=>{
+        const request=indexedDB.open(info.name);
+        request.onerror=()=>reject(request.error||new Error('IndexedDB open failed'));
+        request.onsuccess=()=>{
+          const db=request.result;
+          const stores=Array.from(db.objectStoreNames);
+          if(!stores.length){db.close();resolve({name:info.name,version:info.version||db.version,stores:[]});return;}
+          let pending=stores.length;
+          const rows=[];
+          for(const storeName of stores){
+            const tx=db.transaction(storeName,'readonly');
+            const store=tx.objectStore(storeName);
+            const keys=store.getAllKeys();
+            const values=store.getAll();
+            tx.oncomplete=()=>{rows.push({name:storeName,keys:keys.result.map(String),values:values.result.map(value=>JSON.stringify(value))});if(--pending===0){db.close();resolve({name:info.name,version:info.version||db.version,stores:rows.sort((a,b)=>a.name.localeCompare(b.name))});}};
+            tx.onerror=()=>reject(tx.error||new Error('IndexedDB read failed'));
+            tx.onabort=()=>reject(tx.error||new Error('IndexedDB read aborted'));
+          }
+        };
+      });
+      idb.push(detail);
+    }
+    return {local,session,idb:idb.sort((a,b)=>a.name.localeCompare(b.name))};
+  });
+}
 try{
   configure({testMode:'prisny',resultMode:'secureOffline',screenGuard:true,identityMode:'oneTimeCode',strictFullscreenFallbackAllowed:false,strictIPhoneCompatibilityAllowed:false});
   w.eval("rosterEntries=[{code:'A7B9C2',label:'Synthetic A',email:'synthetic-a@example.invalid'}];");
@@ -31,8 +75,9 @@ try{
   const shell='<html><head><meta charset="utf-8"></head><body><main id="stage"></main></body></html>';
   await ctx.route(origin+'/**',route=>route.fulfill({status:200,contentType:'text/html',body:shell}));
   const page=await ctx.newPage();
-  page.on('pageerror',e=>errors.push(e.message));
+  page.on('pageerror',e=>errors.push(String(e&&e.message||e||'unknown page error')));
   await page.goto(origin+'/preview');
+  nativeBefore=await nativeStorageSnapshot(page);
   async function openPreview(width){
     await page.evaluate(({html,width})=>{
       document.getElementById('stage').innerHTML='';
@@ -48,6 +93,15 @@ try{
     return frame;
   }
   let frame=await openPreview(360);
+  assert.deepEqual(errors,[],'preview must load without page errors before native storage probe');
+  nativeFrameAccess=await frame.locator('body').evaluate(async()=>{
+    const out={};
+    try{out.localStorage={available:true,length:localStorage.length,keys:Array.from({length:localStorage.length},(_,i)=>localStorage.key(i))};}
+    catch(error){out.localStorage={available:false,error:String(error&&error.name||error)};}
+    return out;
+  });
+  assert.deepEqual(errors,[],'native storage probe must not create page errors');
+  assert.ok(nativeFrameAccess.localStorage.available===false||nativeFrameAccess.localStorage.length===0,'legitimate preview must not observe native localStorage records');
   assert.equal(await frame.locator('#studentName').inputValue(),'A7B9C2');
   assert.equal(await frame.locator('#startCode').inputValue(),pkg.startCode);
   await frame.locator('#strictVerifyBtn').click();
@@ -91,6 +145,8 @@ try{
   assert.equal(await frame.locator('#studentName').inputValue(),'A7B9C2');
   assert.equal(await frame.locator('#intro').isVisible(),true);
   assert.equal(await frame.locator('#test').isVisible(),false);
+  nativeAfter=await nativeStorageSnapshot(page);
+  assert.deepEqual(nativeAfter,nativeBefore,'legitimate preview must not mutate native parent-origin localStorage, sessionStorage or IndexedDB');
   assert.deepEqual(errors,[]);
   console.log('PASS strict nested teacher preview: verified context, no persistence/timer/result/Forms, widths, close/reopen');
 }finally{
@@ -98,3 +154,8 @@ try{
   if(browser)await browser.close();
   w.close();
 }
+
+const report={schema:'git-r1a1-preview-native-storage-v1',sourceHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,browser:'Chromium via Playwright 1.61.1',status:'PASS',nativeBefore,nativeAfter,nativeFrameAccess,pageErrors:errors,scope:'Fresh generated private teacher preview in a sandboxed about:srcdoc iframe; native read-only storage snapshots, synthetic data only.'};
+fs.mkdirSync('qa-results/r1a1-c32',{recursive:true});
+const evidenceTag=String(process.env.PREVIEW_STORAGE_EVIDENCE_TAG||'preview-native-storage').replace(/[^a-z0-9._-]+/gi,'-');
+fs.writeFileSync(`qa-results/r1a1-c32/${evidenceTag}.json`,JSON.stringify(report,null,2)+'\n');
