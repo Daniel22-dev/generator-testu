@@ -10,6 +10,10 @@ const publicFiles=[
 ];
 const publicSource=publicFiles.map(file=>fs.readFileSync(file,'utf8')).join('\n');
 const previewSource=fs.readFileSync('src/features/preview-editor.js','utf8');
+const privateAdapterSource=previewSource.slice(
+  previewSource.indexOf('function installSecureTeacherPreviewRuntime()'),
+  previewSource.indexOf('function privateTeacherPreviewRuntimeHtml()'),
+);
 const forbidden=[
   '__GHRAB_TEACHER_PREVIEW__',
   'strictTeacherPreview',
@@ -32,6 +36,7 @@ assert.match(previewSource,/function destroyPreviewFrame\([\s\S]*removeChild/,'c
 assert.match(previewSource,/storageGet=function\(\)\{return null;\}/,'private adapter must use memory-only storage behavior');
 assert.match(previewSource,/idbPut=async function\(\)\{return true;\}/,'private adapter must not write IndexedDB');
 assert.match(previewSource,/openSubmissionForm=function\(\)\{\}/,'private adapter must not open Forms');
+assert.doesNotMatch(privateAdapterSource,/\.innerHTML\s*=/,'private adapter must not introduce a new HTML sink');
 
 const mutations=[
   ['legacy-marker',publicSource+'\nwindow.__GHRAB_TEACHER_PREVIEW__=true;'],
@@ -47,4 +52,7 @@ for(const [name,mutated] of mutations){
 const weakenedPreview=previewSource.replace('openSubmissionForm=function(){};','openSubmissionForm=function(){window.open(CFG.formsSubmissionUrl);};');
 assert.equal(/openSubmissionForm=function\(\)\{\}/.test(weakenedPreview),false,'Forms-enabling preview mutation must be rejected');
 
-console.log(`PASS R1-A2 preview separation: ${publicFiles.length} public modules clean, ${mutations.length+1} negative mutations rejected`);
+const sinkMutation=privateAdapterSource.replace('box.replaceChildren(ok);','box.innerHTML="<div>preview</div>";');
+assert.match(sinkMutation,/\.innerHTML\s*=/,'private-preview HTML-sink mutation must be detected');
+
+console.log(`PASS R1-A2 preview separation: ${publicFiles.length} public modules clean, ${mutations.length+2} negative mutations rejected`);

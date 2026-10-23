@@ -10,57 +10,43 @@ function installSecureTeacherPreviewRuntime(){
   'use strict';
   if(window.self===window.top)throw new Error('Private teacher preview requires an isolated iframe.');
   Object.defineProperty(window,'__GHRAB_PRIVATE_TEACHER_PREVIEW__',{value:true,writable:false,configurable:false});
-  // Public runtime may have probed opaque-frame storage before this generator-only
-  // adapter loaded. That probe is irrelevant to the memory-only simulation.
   PERSIST_INTEGRITY_BLOCK=false;
   PERSIST_KEY_PROMISE=null;
-  envInfo=function(){return {href:String(location&&location.href||''),protocol:String(location&&location.protocol||''),contentUri:false,localFile:false,webview:false,noCrypto:false,noBlob:false,privatePreview:true,broken:false};};
+  var y=function(){return true;},n=function(){},ay=async function(){return true;};
+  envInfo=function(){return {privatePreview:true,broken:false};};
   isBrokenEnv=function(){return false;};
-  checkDevice=function(){var box=$('deviceStatus');if(box)box.innerHTML='<div class="ok">✓ Učitelská simulace je připravena v izolovaném rámci.</div>';updateEnvWarning();return true;};
+  checkDevice=function(){var box=$('deviceStatus');if(box){var ok=document.createElement('div');ok.className='ok';ok.textContent='✓ Izolovaný učitelský náhled je připraven.';box.replaceChildren(ok);}updateEnvWarning();return true;};
   storageGet=function(){return null;};
-  storageSet=function(){return true;};
-  storageRemove=function(){return true;};
+  storageSet=storageRemove=y;
   idbGet=async function(){return null;};
   idbPut=async function(){return true;};
-  idbDelete=async function(){return true;};
-  persistenceKey=async function(){return null;};
-  saveSignedRecord=async function(_kind,body,rev){return {v:2,rev:rev,body:body,mac:'private-preview-memory-only'};};
+  idbDelete=idbPut;
+  persistenceKey=idbGet;
+  saveSignedRecord=async function(_kind,body,rev){return {v:2,rev:rev,body:body,mac:'preview-memory-only'};};
   loadSignedRecord=async function(){return {record:null,tamper:false};};
-  persistActiveAttemptSeal=function(){return Promise.resolve(true);};
-  queuePersistActiveAttemptSeal=function(){};
-  flushPendingAttemptWrites=async function(){return true;};
-  clearActiveAttemptSeal=async function(){return true;};
+  persistActiveAttemptSeal=function(){return Promise.resolve(true);};queuePersistActiveAttemptSeal=n;
+  flushPendingAttemptWrites=clearActiveAttemptSeal=setSubmittedLocked=acquireAttemptTabLock=ay;
   submittedLocked=async function(){return false;};
-  setSubmittedLocked=async function(){return true;};
-  acquireAttemptTabLock=async function(){return true;};
-  releaseAttemptTabLock=function(){};
-  handleLeave=function(){};
-  startSplitMonitor=function(){};
-  stopSplitMonitor=function(){};
+  releaseAttemptTabLock=handleLeave=startSplitMonitor=stopSplitMonitor=n;
   prepareSecureTimerDeadline=function(){TIMER_DEADLINE=0;};
   startTimer=function(){TIMER_DEADLINE=0;clearTimeout(TIMER_ID);var timer=$('timer');if(timer)timer.textContent='NÁHLED · bez limitu';};
   strictReadyState=function(){return STRICT_PREFLIGHT?'private-preview-ready':'verify';};
   strictSetStartButtons=function(state){var verify=$('strictVerifyBtn'),fs=$('strictFullscreenStartBtn'),fallback=$('strictFallbackStartBtn');if(verify)verify.disabled=STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY;if(fs)fs.classList.add('hidden');if(fallback){fallback.classList.toggle('hidden',state!=='private-preview-ready');fallback.textContent='2. Spustit simulaci náhledu';}};
-  strictRuntimeNotice=function(){var test=$('test');if(!test||$('strictRuntimeModeNotice'))return;var note=document.createElement('div');note.id='strictRuntimeModeNotice';note.className='archive-note';note.style.cssText='padding:10px 14px;margin:10px auto;border:2px solid #d97706;border-radius:10px;max-width:900px;font-weight:700;';note.textContent='UČITELSKÝ NÁHLED — IZOLOVANÁ SIMULACE. Bez Fullscreen API, časového limitu, trvalého pokusu a odevzdání.';test.insertBefore(note,test.firstChild);};
-  verifyStrictTest=async function(){if(!strictModeRuntime())return startTest();if(STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY||isTestActive())return;STRICT_PREFLIGHT_BUSY=true;strictSetStartButtons('verify');strictStartStatus('Ověřuji soukromou simulaci…','');try{var prepared=await strictPreflightChecks();if(!prepared){strictInvalidatePreflight();return;}STRICT_PREFLIGHT=prepared;strictSetStartButtons('private-preview-ready');strictStartStatus('UČITELSKÝ NÁHLED — připraveno ke spuštění izolované simulace.','ok');}finally{STRICT_PREFLIGHT_BUSY=false;strictSetStartButtons(strictReadyState());}};
+  strictRuntimeNotice=function(){var test=$('test');if(!test||$('strictRuntimeModeNotice'))return;var note=document.createElement('div');note.id='strictRuntimeModeNotice';note.className='archive-note';note.textContent='UČITELSKÝ NÁHLED — SIMULACE bez limitu, trvalého pokusu a odevzdání.';test.insertBefore(note,test.firstChild);};
+  verifyStrictTest=async function(){if(!strictModeRuntime())return startTest();if(STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY||isTestActive())return;STRICT_PREFLIGHT_BUSY=true;strictSetStartButtons('verify');strictStartStatus('Ověřuji náhled…','');try{var prepared=await strictPreflightChecks();if(!prepared){strictInvalidatePreflight();return;}STRICT_PREFLIGHT=prepared;strictSetStartButtons('private-preview-ready');strictStartStatus('UČITELSKÝ NÁHLED — připraveno.','ok');}finally{STRICT_PREFLIGHT_BUSY=false;strictSetStartButtons(strictReadyState());}};
   startStrictFallback=async function(){if(!strictModeRuntime()||STRICT_START_BUSY||isTestActive())return;if(!strictPreflightStillValid()){strictInvalidatePreflight(t('strictPreflightStale','Inputs changed. Verify the test again.'));return;}STRICT_START_BUSY=true;STRICT_FULLSCREEN_MODE='fallback';try{await startTestAttempt();if(isTestActive()){STRICT_FULLSCREEN_MODE='private-preview';STRICT_PREFLIGHT=null;strictSetStartButtons('started');strictRuntimeNotice();}}finally{STRICT_START_BUSY=false;}};
   startStrictFullscreen=startStrictFallback;
   function finishPrivatePreview(){if(!isTestActive()||SUBMITTED)return false;SUBMITTED=true;clearTimeout(TIMER_ID);stopSplitMonitor();ANSWER_TXT='';$('test').classList.add('hidden');$('done').classList.remove('hidden');var done=$('done');if(done){var title=document.createElement('h1');title.textContent='UČITELSKÝ NÁHLED — konec simulace';var paragraph=document.createElement('p');paragraph.textContent='Žádný skutečný pokus, výsledek ani odevzdání nebyly vytvořeny. Zavři a znovu otevři náhled pro čistý začátek.';done.replaceChildren(title,paragraph);}return true;}
   requestSecureSubmit=async function(){return finishPrivatePreview();};
   submitSecureTest=async function(){return finishPrivatePreview();};
   openSubmissionForm=function(){};
-  copySubmissionPayload=async function(){};
-  downloadAnswers=function(){};
-  shareAnswers=async function(){};
-  copyAnswers=async function(){};
+  copySubmissionPayload=downloadAnswers=shareAnswers=copyAnswers=n;
 }
 function privateTeacherPreviewRuntimeHtml(){
   return '<script data-ghrab-private-teacher-preview="1">('+installSecureTeacherPreviewRuntime.toString()+')();<\/script>';
 }
 function teacherPreviewHtml(html,code,startCode,secure){
   let out=String(html||'');
-  // Bezpečnostní výjimky nejsou součástí veřejného studentského runtime. Generátor
-  // přidává privátní memory-only adaptér pouze do této dočasné neexportované kopie.
   if(secure){
     const adapter=privateTeacherPreviewRuntimeHtml();
     out=/<\/body\s*>/i.test(out)?out.replace(/<\/body\s*>/i,adapter+'</body>'):out+adapter;
