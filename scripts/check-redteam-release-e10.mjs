@@ -3,9 +3,10 @@ import { validateP1Workflow } from './ci/p1-workflow-contract.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 export function requireReady(state,version){
-  assert.equal(state.schema,'git-release-readiness-e10-v1');assert.equal(state.version,version);
+  assert.equal(state.schema,'git-release-readiness-e10-v2');assert.equal(state.version,version);
   assert.ok(['READY FOR CONTROLLED STUDENT RED-TEAM','READY WITH DOCUMENTED LIMITATIONS'].includes(state.status),'Release is blocked: '+state.status);
   assert.deepEqual(state.blockers,[],'Unclosed classroom blockers');
+  assert.deepEqual(state.productionAuthorization,{status:'EXTERNAL_OWNER_APPROVAL_REQUIRED',mechanism:'github-owner-pr-review-v1',binding:'exact repository + promotion PR + candidate SHA/tree + prepared main SHA + version + scope + release actions',note:'This tracked readiness record is a technical precondition only. It can never authorize a merge or deployment.'});
   if(state.status==='READY FOR CONTROLLED STUDENT RED-TEAM'){
     assert.equal(state.scope,'CONTROLLED_STUDENT_RED_TEAM_ONLY','Controlled release scope required');
     assert.equal(state.ownerDecision?.authorizeGithubPublication,true,'Explicit owner publication decision required');
@@ -21,10 +22,10 @@ export function requireReady(state,version){
   }
 }
 export function releaseDecision(state,version){
-  try{requireReady(state,version);return {releaseReadiness:state.status,releaseBlocked:false};}
+  try{requireReady(state,version);return {releaseReadiness:state.status,releaseBlocked:true,releaseAuthorization:'EXTERNAL_OWNER_APPROVAL_REQUIRED'};}
   catch(error){if(error instanceof assert.AssertionError)return {releaseReadiness:state.status,releaseBlocked:true};throw error;}
 }
-function wiring({pkg,deploy,promotion}){
+function wiring({pkg,deploy,promotion,p4}){
   validateP1Workflow(promotion);
   for(const chain of ['test','qa:p5','qa:p5:ci'])for(const gate of ['content','e10'])assert.ok(pkg.scripts[chain].split(' && ').includes('npm run check:redteam-'+gate),chain+' requires '+gate);
   for(const chain of ['qa:p5','qa:p5:ci'])assert.ok(pkg.scripts[chain].split(' && ').includes('npm run check:redteam-content-browser'));
@@ -33,15 +34,19 @@ function wiring({pkg,deploy,promotion}){
   assert.doesNotMatch(deploy,/push:\s*\n\s*branches: \[main\]/);assert.match(deploy,/workflow_dispatch:/);assert.match(deploy,/deploy:\s*\n\s*if: github.ref == 'refs\/heads\/main'/);
   assert.match(deploy,/run: node scripts\/check-redteam-release-e10.mjs --require-ready/);assert.match(deploy,/run: node scripts\/ci\/main-protection.mjs --live/);assert.match(deploy,/run: node scripts\/ci\/p4-promotion-evidence.mjs --consume/);assert.match(deploy,/if \[ \"\$current_main\" != \"\$EXPECTED_MAIN_SHA\" \]; then/);
   assert.match(promotion,/run: node scripts\/check-redteam-release-e10.mjs --require-ready/);
+  assert.equal((promotion.match(/run: node scripts\/ci\/release-authorization\.mjs --premerge/g)||[]).length,2,'Owner authorization required in admission and promotion lock');
   assert.ok(promotion.indexOf('--require-ready')<promotion.indexOf('gh pr merge'),'Readiness precedes merge');
+  assert.ok(promotion.lastIndexOf('release-authorization.mjs --premerge')<promotion.indexOf('gh pr merge'),'Owner approval precedes merge');
+  assert.equal((p4.match(/checkLiveReleaseAuthorization/g)||[]).length,3,'P4 must import, capture and revalidate owner authorization');
+  assert.match(p4,/Owner release authorization changed after promotion/);
   assert.equal((promotion.match(/run: npm run qa:redteam:ci/g)||[]).length,2,'Both candidate certifications use complete regression chain');
 }
 if(process.argv[1]?.endsWith('check-redteam-release-e10.mjs')){
   const pkg=JSON.parse(fs.readFileSync('package.json')),state=JSON.parse(fs.readFileSync('security/release-readiness-e10.json'));
-  if(process.argv.includes('--require-ready')){requireReady(state,pkg.version);console.log('PASS release readiness');}
+  if(process.argv.includes('--require-ready')){requireReady(state,pkg.version);console.log('PASS technical readiness precondition; external exact-release owner authorization is still required');}
   else{
-    const input={pkg,deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),promotion:fs.readFileSync('.github/workflows/safe-promotion.yml','utf8')};wiring(input);
-    const mutations=[['drop-content',x=>x.pkg.scripts.test=x.pkg.scripts.test.replace('npm run check:redteam-content && ','')],['drop-native',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:redteam-content-browser','')],['drop-c32-preview-boundary',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:c32-preview-boundary-browser','')],['drop-d02-preview-separation',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:d02-preview-separation-browser','')],['drop-merge-readiness',x=>x.promotion=x.promotion.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['drop-deploy-readiness',x=>x.deploy=x.deploy.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['deploy-candidate',x=>x.deploy=x.deploy.replace("deploy:\n    if: github.ref == 'refs/heads/main'","deploy:\n    if: true")],['deploy-without-p4-evidence',x=>x.deploy=x.deploy.replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume','run: true')],['partial-promotion-gate',x=>x.promotion=x.promotion.replace('run: npm run qa:redteam:ci','run: npm run qa:p5:ci')]];
+    const input={pkg,deploy:fs.readFileSync('.github/workflows/deploy.yml','utf8'),promotion:fs.readFileSync('.github/workflows/safe-promotion.yml','utf8'),p4:fs.readFileSync('scripts/ci/p4-promotion-evidence.mjs','utf8')};wiring(input);
+    const mutations=[['drop-content',x=>x.pkg.scripts.test=x.pkg.scripts.test.replace('npm run check:redteam-content && ','')],['drop-native',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:redteam-content-browser','')],['drop-c32-preview-boundary',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:c32-preview-boundary-browser','')],['drop-d02-preview-separation',x=>x.pkg.scripts['qa:p5:ci']=x.pkg.scripts['qa:p5:ci'].replace(' && npm run check:d02-preview-separation-browser','')],['drop-merge-readiness',x=>x.promotion=x.promotion.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['drop-owner-authorization',x=>x.promotion=x.promotion.replace('run: node scripts/ci/release-authorization.mjs --premerge','run: true')],['drop-p4-authorization',x=>x.p4=x.p4.replace('checkLiveReleaseAuthorization','removedAuthorizationCheck')],['drop-deploy-readiness',x=>x.deploy=x.deploy.replace('run: node scripts/check-redteam-release-e10.mjs --require-ready','run: true')],['deploy-candidate',x=>x.deploy=x.deploy.replace("deploy:\n    if: github.ref == 'refs/heads/main'","deploy:\n    if: true")],['deploy-without-p4-evidence',x=>x.deploy=x.deploy.replace('run: node scripts/ci/p4-promotion-evidence.mjs --consume','run: true')],['partial-promotion-gate',x=>x.promotion=x.promotion.replace('run: npm run qa:redteam:ci','run: npm run qa:p5:ci')]];
     for(const [id,mutate] of mutations){const broken=structuredClone(input);mutate(broken);assert.throws(()=>wiring(broken),{name:'AssertionError'},id);}
     const ready={...state,status:'READY WITH DOCUMENTED LIMITATIONS',blockers:[]};requireReady(ready,pkg.version);
     const negativeControls=mutations.map(([id])=>({id,detected:true}));

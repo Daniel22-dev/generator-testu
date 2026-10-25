@@ -178,7 +178,7 @@
     "checkpoint:redteam-e9": "node scripts/bump-redteam-e9.mjs",
     "check:redteam-content": "node scripts/check-redteam-content-e10.mjs",
     "check:redteam-content-browser": "node scripts/check-redteam-content-browser-e10.mjs",
-    "check:redteam-e10": "node scripts/check-redteam-release-e10.mjs",
+    "check:redteam-e10": "node --test scripts/ci/release-authorization.test.mjs && node scripts/check-redteam-release-e10.mjs",
     "checkpoint:redteam-e10": "node scripts/bump-redteam-e10.mjs",
     "check:workflow-update": "node tools/workflow-update-check.mjs",
     "check:workflow-update-browser": "node tools/workflow-update-browser.mjs",
