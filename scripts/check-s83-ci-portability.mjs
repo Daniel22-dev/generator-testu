@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {resolveNpmCommand} from './lib/npm-command.mjs';
+import {validateOwnerApprovalPlacement} from './check-redteam-release-e10.mjs';
+import {jobBlock} from './ci/p1-workflow-contract.mjs';
 
 const root=path.resolve('.'),pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')),checks=[];
 function check(condition,id,detail){assert.ok(condition,`${id}: ${detail}`);checks.push({id,status:'PASS',detail});console.log(`PASS ${id} - ${detail}`);}
@@ -62,6 +64,7 @@ function normalizeReviewedWorkflow(text,file){
     normalized=normalized.replaceAll(snippet,'');
   };
   if(file==='.github/workflows/safe-promotion.yml'){
+    validateOwnerApprovalPlacement(normalized);
     removeExact(`
       - name: Require exact authenticated owner approval for this release
         env:
@@ -108,8 +111,19 @@ const unexpected=actualWorkflows.filter(file=>{
 check(unexpected.length===0,'S83-CI07B','workflow contents preserve the reviewed baseline exceptions and exact protected-main manual QA bytes');
 const unsafeE10Mutation=fs.readFileSync(path.join(root,'.github/workflows/safe-promotion.yml'),'utf8')
   .replace('release-authorization.mjs --premerge','release-authorization.mjs --postmerge');
-assert.throws(()=>normalizeReviewedWorkflow(unsafeE10Mutation,'.github/workflows/safe-promotion.yml'),/reviewed E10 sequence count drift/,
+assert.throws(()=>normalizeReviewedWorkflow(unsafeE10Mutation,'.github/workflows/safe-promotion.yml'),/reviewed E10 sequence count drift|must execute the exact premerge authorization command/,
   'altered owner-authorization semantics must remain visible to workflow admission');
+const relocationSource=fs.readFileSync(path.join(root,'.github/workflows/safe-promotion.yml'),'utf8');
+const relocationPromote=jobBlock(relocationSource,'promote');
+const relocationStep=relocationPromote.match(/^      - name: Recheck exact owner approval inside the promotion lock\r?\n[\s\S]*?(?=^      - (?:name|uses):|(?![\s\S]))/m)?.[0];
+assert.ok(relocationStep,'promotion-lock owner authorization fixture is missing');
+const relocationCandidate=jobBlock(relocationSource,'candidate-gate');
+const relocationAnchor=[...relocationCandidate.matchAll(/^      - name: Verify exact PR candidate and prepared main\r?\n[\s\S]*?(?=^      - (?:name|uses):|(?![\s\S]))/gm)].at(-1)?.[0];
+assert.ok(relocationAnchor,'candidate freshness fixture is missing');
+const unsafeRelocation=relocationSource.replace(relocationStep,'').replace(relocationAnchor,relocationStep+relocationAnchor);
+assert.throws(()=>normalizeReviewedWorkflow(unsafeRelocation,'.github/workflows/safe-promotion.yml'),/Expected exactly one Recheck exact owner approval inside the promotion lock step|Promotion-lock owner authorization/,
+  'moving the late authorization check outside promote must fail before byte normalization');
+check(true,'S83-CI07B-E10-PLACEMENT-MUTATION','owner authorization relocation outside promote is rejected before workflow normalization');
 assert.equal(workflowInventoryMatches([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
 const changedManualBrowser=fs.readFileSync(path.join(root,'.github/workflows/manual-browser-qa.yml'),'utf8').replace('timeout-minutes: 24','timeout-minutes: 25');
 assert.notEqual(changedManualBrowser,execFileSync('git',['show',protectedMainBaseline+':.github/workflows/manual-browser-qa.yml'],{encoding:'utf8'}),'a protected-main workflow byte mutation must fail admission');
