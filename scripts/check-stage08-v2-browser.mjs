@@ -50,7 +50,7 @@ try{
   await page.goto(origin+"/generator-testu/");
   assert.equal(await page.evaluate(()=>typeof window.GHRABGeneratorFeatures?.centralGroups?.open),"function");
   await page.evaluate(()=>window.GHRABGeneratorFeatures.centralGroups.open());
-  await page.locator("#centralGroupsSelect option").getByText(/Synthetic English/).waitFor();
+  await page.waitForFunction(() => [...document.querySelectorAll("#centralGroupsSelect option")].some(x => x.textContent.includes("Synthetic English")));
   assert.equal(await page.evaluate(()=>window.__lastConsumer),"generator");
   assert.equal(await page.locator("#centralGroupsSelect option").count(),1);
   console.log("PASS T01 v2-only client, correct consumer ID and metadata list");
