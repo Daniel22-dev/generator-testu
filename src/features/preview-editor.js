@@ -28,6 +28,9 @@ function teacherPreviewCode(){
 /* global strictPreflightStillValid: writable, strictReadyState: writable, strictRuntimeNotice: writable */
 /* global strictSetStartButtons: writable, strictStartStatus: writable, submitSecureTest: writable */
 /* global submittedLocked: writable, t: writable, verifyStrictTest: writable */
+/* global PERSIST_INTEGRITY_BLOCK: writable, PERSIST_KEY_PROMISE: writable, envInfo: writable, isBrokenEnv: writable */
+/* global checkDevice: writable, updateEnvWarning: writable, storageGet: writable, storageSet: writable */
+/* global storageRemove: writable */
 function installSecureTeacherPreviewRuntime(){
   'use strict';
   if(window.self===window.top)throw new Error('Private teacher preview requires an isolated iframe.');
