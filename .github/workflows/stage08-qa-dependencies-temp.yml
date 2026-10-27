@@ -1,0 +1,36 @@
+name: Temporary Stage08 public locked test dependencies
+
+on:
+  push:
+    branches: [feature/stage08-groups-direct-r3-20261026]
+
+permissions:
+  contents: read
+
+jobs:
+  locked-test-dependencies:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Install public exact lockfile-only dependencies (no project scripts)
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Snapshot package directory without npm config, Git metadata or any secrets
+        run: |
+          set -eu
+          test -d node_modules
+          tar -czf stage08-locked-node-modules.tar.gz node_modules
+          sha256sum stage08-locked-node-modules.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage08-locked-deps-${{ github.sha }}
+          path: stage08-locked-node-modules.tar.gz
+          retention-days: 1
+          if-no-files-found: error
