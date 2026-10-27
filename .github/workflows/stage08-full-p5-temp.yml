@@ -1,0 +1,58 @@
+name: Temporary Stage08 exact-commit supplemental regressions (non-deploy)
+
+on:
+  push:
+    branches: [feature/stage08-groups-direct-r3-20261026]
+
+permissions:
+  contents: read
+
+jobs:
+  stage08-supplemental-full-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - name: Checkout exact clean Stage08 commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 37f953d873cbd6f97ffc7739a482c15648fd4a7b
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Assert exact source without unapproved temporary workflows
+        run: |
+          test "$(git rev-parse HEAD)" = "37f953d873cbd6f97ffc7739a482c15648fd4a7b"
+          test ! -e .github/workflows/stage08-full-p5-temp.yml
+          test -z "$(git status --porcelain)"
+      - name: Configure pinned Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Install locked public test tools
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Install pinned Playwright Chromium
+        run: |
+          node -e "const p=require('./node_modules/playwright/package.json');if(p.version!=='1.61.1')process.exit(1)"
+          node -e "const p=require('./node_modules/axe-core/package.json');if(p.version!=='4.12.1')process.exit(1)"
+          npx playwright install --with-deps chromium
+          node -e "console.log('CHROMIUM_PATH=' + require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Execute existing complete npm test command
+        run: npm test
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f
+      - name: Execute supplemental P5 CI tests only after complete npm test passes
+        run: npm run qa:p5:ci
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f
+      - name: Preserve supplemental regression output without any deployment
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage08-supplemental-regression-37f953d873cbd6f97ffc7739a482c15648fd4a7b
+          path: |
+            qa-results/
+            dist/qa-p5-*.json
+            dist/quality-report.json
+          retention-days: 14
+          if-no-files-found: warn
