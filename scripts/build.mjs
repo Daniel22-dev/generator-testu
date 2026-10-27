@@ -420,7 +420,8 @@ for(const relative of [
   const target=path.join(DIST_DIR,...relative.split('/'));
   if(!fs.existsSync(target))fail('Chybí veřejný pomocný skript: '+relative);
   fs.writeFileSync(target,
-    compactJsWhitespaceTight(fs.readFileSync(target,'utf8'),'public/'+relative),
+    compactJsWhitespaceTight(fs.readFileSync(target,'utf8'),'public/'+relative,
+      ['error-reporter.js','deployment-config.js','reporter-bootstrap.js'].includes(path.basename(relative))?'module':'script'),
     'utf8');
 }
 if (!assistantFeatureSource) fail('Generator Assistant lazy feature nebyla vytvořena');
