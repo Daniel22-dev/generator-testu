@@ -2,6 +2,7 @@
 // Stage08A portable contract test. No browser credentials or genuine pupils.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import vm from 'node:vm';
 const code=fs.readFileSync('src/features/central-groups.js','utf8');
 const loader=fs.readFileSync('src/js/18-central-groups.js','utf8');
@@ -82,3 +83,19 @@ stub.__GHRAB_STUDIO_URL__=undefined;
 stub.document.documentElement.dataset.ghrabAccess='denied';
 assert.throws(()=>a.permitted(),/CENTRAL_ACCESS_DENIED/);
 console.log('STAGE08A PORTABLE CHECKS: PASS (contracts, privacy, revocation, UI wiring)');
+
+// Stage08 trust-anchor/workflow binding: a new signed release must never
+// retain a prior version's GARP2.7 external trust SHA in promotion workflows.
+const expectedTrustHash=crypto.createHash('sha256')
+  .update(fs.readFileSync('security/garp27/trust-anchor.json')).digest('hex');
+let trustBindingCount=0;
+for(const filename of fs.readdirSync('.github/workflows').filter(x=>/\.ya?ml$/.test(x))){
+  const content=fs.readFileSync('.github/workflows/'+filename,'utf8');
+  for(const match of content.matchAll(/GARP27_EXTERNAL_TRUST_SHA256:\s*([a-f0-9]{64})/g)){
+    assert.equal(match[1],expectedTrustHash,
+      filename+' has a stale GARP2.7 external trust binding');
+    trustBindingCount++;
+  }
+}
+assert.ok(trustBindingCount>=7,'Required release workflows must bind the GARP trust anchor');
+console.log('Stage08 GARP trust bindings verified: '+trustBindingCount);
