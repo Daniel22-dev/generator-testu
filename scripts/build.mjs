@@ -37,10 +37,10 @@ function fail(message) {
 
 // Odstraní JS komentáře podle AST (Acorn), takže nezasáhne řetězce ani regexy.
 // Blokový komentář se nahradí stejným počtem odřádkování, aby seděla čísla řádků.
-function stripJsComments(source, file) {
+function stripJsComments(source, file, sourceType='script') {
   const comments = [];
   try {
-    parse(source, { ecmaVersion: 'latest', sourceType: 'script', allowAwaitOutsideFunction: true, onComment: comments, ranges: true });
+    parse(source, { ecmaVersion: 'latest', sourceType, allowAwaitOutsideFunction: true, onComment: comments, ranges: true });
   } catch (error) {
     fail(`nelze analyzovat ${file} pro build kompakci: ${error.message}`);
   }
@@ -59,11 +59,11 @@ function stripJsComments(source, file) {
   return out + source.slice(cursor);
 }
 
-function compactJsWhitespace(source, file) {
-  const clean = stripJsComments(source, file);
+function compactJsWhitespace(source, file, sourceType='script') {
+  const clean = stripJsComments(source, file, sourceType);
   let scan;
   try {
-    scan = tokenizer(clean, { ecmaVersion:'latest', sourceType:'script', allowAwaitOutsideFunction:true });
+    scan = tokenizer(clean, { ecmaVersion:'latest', sourceType, allowAwaitOutsideFunction:true });
   } catch (error) {
     fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
   }
@@ -90,9 +90,52 @@ function compactJsWhitespace(source, file) {
     out += clean.slice(token.start, token.end);
     end = token.end;
   }
-  const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType:'script',allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
+  const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType,allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
   try{if(semantic(clean)!==semantic(out))fail('JS compaction changed AST: '+file);}catch(e){fail('JS compaction invalid: '+file+' '+e.message);}
   return out;
+}
+
+// Optional, tokenizer-safe reduction of nonsemantic line breaks in shipped JS.
+// All candidate outputs must parse to an AST identical to the existing compiler output.
+// The source tree, line-number-preserving fallback, student/verifier templates and
+// release security policies are unchanged. No budget thresholds are changed.
+function compactJsWhitespaceTight(source,file,sourceType='script') {
+  const baseline=compactJsWhitespace(source,file,sourceType);
+  let scan;
+  try {scan=tokenizer(baseline,{ecmaVersion:'latest',sourceType,allowAwaitOutsideFunction:true});}
+  catch (_) {return baseline;}
+  const tokens=[];
+  try {for (;;) {const token=scan.getToken();if(token.type.label==='eof')break;tokens.push(token);}}
+  catch (_) {return baseline;}
+  const semantic=value=>JSON.stringify(parse(value,{
+    ecmaVersion:'latest',sourceType,allowAwaitOutsideFunction:true
+  }),(key,part)=>['start','end','raw'].includes(key)?undefined:part);
+  const reference=semantic(baseline);
+  const attempt=mayTighten=>{
+    let out='',end=0,previous=null;
+    for(const token of tokens) {
+      const gap=baseline.slice(end,token.start);
+      if(/[\\r\\n]/.test(gap)&&mayTighten(previous,token)){
+        const left=baseline[end-1]||'',right=baseline[token.start]||'';
+        const needSpace=(/[\\w$\\\\]/.test(left)&&/[\\w$\\\\]/.test(right))||
+          (['num','regexp'].includes(previous?.type.label))||
+          (/[+\\-/?.]/.test(left)&&/[+\\-/*.]/.test(right));
+        if(needSpace)out+=' ';
+      }else out+=gap;
+      out+=baseline.slice(token.start,token.end);
+      end=token.end;previous=token;
+    }
+    return out+baseline.slice(end);
+  };
+  for(const accept of [
+    ()=>true,
+    previous=>[';','{','}',','].includes(previous?.type.label)
+  ]) {
+    const candidate=attempt(accept);
+    if(candidate.length>=baseline.length)continue;
+    try {if(semantic(candidate)===reference)return candidate;}catch (_) {}
+  }
+  return baseline;
 }
 
 function splitGeneratorAssistant(source, file) {
@@ -314,7 +357,7 @@ const inlineScriptTag = file => {
     source = split.main;
     assistantFeatureSource = split.feature;
   }
-  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(source, file)}\n</script>`;
+  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespaceTight(source, file)}\n</script>`;
 };
 const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
@@ -353,6 +396,31 @@ for (const file of (function walk(dir){return fs.readdirSync(dir,{withFileTypes:
   try { fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file,'utf8')))+'\n'); } catch {}
 }
 copyDir(path.resolve('src', 'features'), path.join(DIST_DIR, 'features'));
+// Keep the canonical source legible. Compact deployed teacher-only optional modules
+// with Acorn-verified AST equivalence, including the Stage08 ESM ledger.
+for(const name of ['testlab.js','preview-editor.js','central-groups.js','central-results.js','group-result-ledger.js']){
+  const target=path.join(DIST_DIR,'features',name);
+  if(!fs.existsSync(target))fail('Chybí povinný modul v distribuci: '+name);
+  const kind=name==='group-result-ledger.js'?'module':'script';
+  fs.writeFileSync(target,
+    compactJsWhitespaceTight(fs.readFileSync(target,'utf8'),'src/features/'+name,kind),
+    'utf8');
+}
+// Legacy public helpers were previously copied verbatim; only remove provably
+// nonsemantic whitespace/comments from the deployed copies (never Studio guards).
+for(const relative of [
+  'access/error-reporter.js',
+  'access/suite-session-cleanup.js',
+  'access/deployment-config.js',
+  'access/reporter-bootstrap.js',
+  'frame-guard.js'
+]){
+  const target=path.join(DIST_DIR,...relative.split('/'));
+  if(!fs.existsSync(target))fail('Chybí veřejný pomocný skript: '+relative);
+  fs.writeFileSync(target,
+    compactJsWhitespaceTight(fs.readFileSync(target,'utf8'),'public/'+relative),
+    'utf8');
+}
 if (!assistantFeatureSource) fail('Generator Assistant lazy feature nebyla vytvořena');
 fs.writeFileSync(
   path.join(DIST_DIR, 'features', ASSISTANT_FEATURE_FILE),
