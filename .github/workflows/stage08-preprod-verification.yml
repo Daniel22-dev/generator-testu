@@ -95,3 +95,49 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
           path: audit/evidence/
+
+  diagnose:
+    name: stage08-architecture-diagnostics-NONCERTIFYING
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact push SHA
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up pinned Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install source-locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Build exact source without promotion
+        run: npm run build
+      - name: Report direct GARP architecture and negative mutation failures
+        shell: bash
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: |
+          set +e
+          mkdir -p qa-results
+          node scripts/garp27/architecture-integrity.mjs --out qa-results/stage08-direct-architecture.json
+          architecture_status=$?
+          node scripts/garp27/mutation-tests.mjs > qa-results/stage08-direct-mutations.json
+          mutation_status=$?
+          echo "STAGE08_DIRECT_ARCHITECTURE_EXIT=$architecture_status"
+          echo "STAGE08_DIRECT_MUTATIONS_EXIT=$mutation_status"
+          cat qa-results/stage08-direct-mutations.json
+          if [ "$architecture_status" -ne 0 ] || [ "$mutation_status" -ne 0 ]; then exit 1; fi
+      - name: Preserve exact GARP diagnostic report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage08-direct-GARP-diagnostics-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            qa-results/stage08-direct-architecture.json
+            qa-results/stage08-direct-mutations.json
