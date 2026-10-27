@@ -6,6 +6,9 @@ import vm from 'node:vm';
 const source=fs.readFileSync('src/js/13di-secure-strict-mode-runtime.js','utf8');
 const runtime=new Function(source+';return SECURE_STRICT_MODE_RUNTIME_JS;')();
 new vm.Script(runtime);
+assert.equal(runtime.includes('__GHRAB_TEACHER_PREVIEW__'),false,'public strict runtime must exclude the legacy preview marker');
+assert.equal(runtime.includes('strictTeacherPreview'),false,'public strict runtime must exclude the legacy preview helper');
+assert.equal(runtime.includes('about:srcdoc'),false,'public strict runtime must not privilege about:srcdoc');
 let pass=0;
 const iphone='Mozilla/5.0 (iPhone; CPU iPhone OS 17_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Mobile/15E148 Safari/604.1';
 const ipad=iphone.replaceAll('iPhone','iPad');
@@ -27,6 +30,6 @@ await check('iPad separate authorization',async()=>{const a=make({ua:ipad,iphone
 await check('native confirmed fullscreen',async()=>{const x=make({api:true,iphoneAllowed:true});await x.verify();assert.equal(x.allowed(),false);await x.ctx.startStrictFullscreen();assert.equal(x.ctx.STRICT_FULLSCREEN_MODE,'enforced');});
 await check('denied API cannot fall back',async()=>{const x=make({api:true,denied:true,iphoneAllowed:true,general:true});await x.verify();await x.ctx.startStrictFullscreen();assert.equal(x.ctx.started,0);assert.equal(x.allowed(),false);});
 await check('embedded and file contexts denied',async()=>{for(const opts of [{embedded:true},{protocol:'file:',href:'file:///t.html'},{protocol:'http:',href:'http://school/t.html'}]){const x=make({...opts,iphoneAllowed:true});await x.verify();assert.equal(x.allowed(),false);}});
-await check('teacher srcdoc only',async()=>{const a=make({embedded:true,preview:true,protocol:'about:',href:'about:srcdoc'});await a.verify();assert.equal(a.allowed(),true);await a.ctx.startStrictFallback();assert.equal(a.ctx.STRICT_FULLSCREEN_MODE,'preview');const b=make({embedded:true,protocol:'about:',href:'about:srcdoc'});await b.verify();assert.equal(b.allowed(),false);});
+await check('legacy marker cannot authorize foreign srcdoc',async()=>{const a=make({embedded:true,preview:true,protocol:'about:',href:'about:srcdoc'});a.ctx.strictTeacherPreview=()=>true;await a.verify();assert.equal(a.allowed(),false);await a.ctx.startStrictFallback();assert.equal(a.ctx.started,0);assert.equal(a.ctx.STRICT_FULLSCREEN_MODE,'none');});
 await check('stale preflight',async()=>{const x=make({iphoneAllowed:true});await x.verify();x.nodes.studentName.value='OTHER';await x.ctx.startStrictFallback();assert.equal(x.ctx.started,0);});
 console.log('Strict hotfix policy checks:',pass,'/ 8');
