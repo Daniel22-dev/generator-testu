@@ -524,6 +524,7 @@ async function generateTest(){
   geminiCancelRequested=false;genBeginAiWorkflow();lockGenerationInputs(true);
   variantSeq=0;variantSlug='';if($('variantNote'))$('variantNote').classList.add('hidden');
   generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; lastSelfTest=null; secureGapsAcknowledged=false;
+  renderStartCode();
   resetKeyCheckState(); selfTestStaleReason='';
   resetVerificationReports();
   setGenUI('loading');setGenMsg('Kontroluji soubory a připravuji zdroje…');

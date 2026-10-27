@@ -417,6 +417,7 @@ function secureDownloadAllowed(){
 }
 function updateSecureDownloadGate(){
   if(typeof renderResultSteps==='function')renderResultSteps();
+  if(typeof renderStartCode==='function')renderStartCode();
   const lockHint=$('lockUnlockHint');if(lockHint)lockHint.classList.toggle('hidden',!(lastAssembled&&lastAssembled.cfg&&lastAssembled.cfg.lockOnLeave));
   const banner=$('secureGateBanner');
   const btnMain=$('btnDownloadMain'), btnStu=$('btnDownloadStudent'), btnTea=$('btnDownloadTeacher');
