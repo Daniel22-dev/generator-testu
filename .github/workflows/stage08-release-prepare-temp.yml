@@ -1,4 +1,4 @@
-name: Stage08 one-shot release preparation (NO DEPLOY)
+name: Stage08 one-shot release metadata only (NO DEPLOY)
 on:
   push:
     branches: [feature/stage08-groups-direct-r3-20261026]
@@ -32,7 +32,7 @@ jobs:
           set -euo pipefail
           test "$(node -p "require('./package.json').version")" = '7.1.101'
           node scripts/stage08-release-prepare-temp.mjs
-          rm .github/workflows/stage08-release-prepare-temp.yml scripts/stage08-release-prepare-temp.mjs
+          git restore -- .github/workflows
           node scripts/check-versions.mjs
           node scripts/check-stage08-groups.mjs
           node scripts/check-stage08-results.mjs
@@ -41,9 +41,10 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          test ! -e scripts/stage08-release-prepare-temp.mjs
-          test ! -e .github/workflows/stage08-release-prepare-temp.yml
-          test "$(git diff --cached --name-only | wc -l)" -ge 22
+          test -e scripts/stage08-release-prepare-temp.mjs
+          test -e .github/workflows/stage08-release-prepare-temp.yml
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
+          test "$(git diff --cached --name-only | wc -l)" -ge 18
           current="$(git ls-remote origin refs/heads/feature/stage08-groups-direct-r3-20261026 | cut -f1)"
           test "$current" = "$GITHUB_SHA"
           git commit -m 'release(stage08): GIT 7.1.102 exact version, GARP hashes, SBOM, and source acceptance'
