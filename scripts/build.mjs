@@ -115,11 +115,13 @@ function compactJsWhitespaceTight(source,file,sourceType='script') {
     let out='',end=0,previous=null;
     for(const token of tokens) {
       const gap=baseline.slice(end,token.start);
-      if(/[\\r\\n]/.test(gap)&&mayTighten(previous,token)){
+      const lineBreak=gap.includes(String.fromCharCode(10))||gap.includes(String.fromCharCode(13));
+      if(lineBreak&&mayTighten(previous,token)){
         const left=baseline[end-1]||'',right=baseline[token.start]||'';
-        const needSpace=(/[\\w$\\\\]/.test(left)&&/[\\w$\\\\]/.test(right))||
+        const isIdentifierChar=ch=>!!ch&&(/[A-Za-z0-9_$]/.test(ch)||ch.charCodeAt(0)===92);
+        const needSpace=(isIdentifierChar(left)&&isIdentifierChar(right))||
           (['num','regexp'].includes(previous?.type.label))||
-          (/[+\\-/?.]/.test(left)&&/[+\\-/*.]/.test(right));
+          ('+-/?'.includes(left)&&'+-/*.'.includes(right));
         if(needSpace)out+=' ';
       }else out+=gap;
       out+=baseline.slice(token.start,token.end);
