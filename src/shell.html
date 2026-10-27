@@ -576,6 +576,16 @@
       </div>
 
       <div class="field" id="rosterField">
+        <div class="btn-row" style="margin-bottom:10px">
+          <button type="button" class="btn-edit" onclick="GHRAB_GENERATOR_GROUPS.open()">Načíst z Moje skupiny</button>
+        </div>
+        <p class="small-muted" id="centralGroupsStatus" role="status">Volitelné načtení z AI Studia; ruční zadání zůstává dostupné.</p>
+        <details style="margin:10px 0 12px">
+          <summary><strong>Soukromá evidence výsledků · Moje skupiny</strong></summary>
+          <p class="small-muted">Volitelná učitelská evidence založená na stabilním ID studenta. Výsledky zůstávají jen v paměti otevřené relace; pro pozdější obnovu je nutné stáhnout soukromý archiv. Nenahrazuje učitelský verifier ani neověřuje původ CSV.</p>
+          <button type="button" class="btn-edit" onclick="GHRAB_GENERATOR_GROUPS.openResults()">Otevřít soukromou evidenci</button>
+          <p class="small-muted" id="centralGroupsResultsStatus" role="status"></p>
+        </details>
         <div class="field-label">Individuální kódy: připrav skupinu, příjemce vyber až v Sheets</div>
         <label for="rosterEmails">E-maily celé skupiny z IS</label>
         <textarea id="rosterEmails" oninput="rosterRefreshParticipants()" rows="4" placeholder="Vlož e-maily celé skupiny z IS"></textarea>
