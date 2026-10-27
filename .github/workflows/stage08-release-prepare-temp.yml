@@ -1,0 +1,50 @@
+name: Stage08 one-shot release preparation (NO DEPLOY)
+on:
+  push:
+    branches: [feature/stage08-groups-direct-r3-20261026]
+    paths:
+      - '.github/workflows/stage08-release-prepare-temp.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage08-one-shot-release-prep
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/feature/stage08-groups-direct-r3-20261026'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+      - name: Prepare exact release metadata, remove one-shot workflow, and validate locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(node -p "require('./package.json').version")" = '7.1.101'
+          node scripts/stage08-release-prepare-temp.mjs
+          rm .github/workflows/stage08-release-prepare-temp.yml scripts/stage08-release-prepare-temp.mjs
+          node scripts/check-versions.mjs
+          node scripts/check-stage08-groups.mjs
+          node scripts/check-stage08-results.mjs
+          node scripts/generate-cyclonedx-sbom.mjs security/sbom/generator-testu-7.1.102.cdx.json --check
+          node scripts/generate-ai-assurance-fingerprint.mjs security/evidence/ai-assurance-fingerprint.json --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          test ! -e scripts/stage08-release-prepare-temp.mjs
+          test ! -e .github/workflows/stage08-release-prepare-temp.yml
+          test "$(git diff --cached --name-only | wc -l)" -ge 22
+          current="$(git ls-remote origin refs/heads/feature/stage08-groups-direct-r3-20261026 | cut -f1)"
+          test "$current" = "$GITHUB_SHA"
+          git commit -m 'release(stage08): GIT 7.1.102 exact version, GARP hashes, SBOM, and source acceptance'
+          git push origin HEAD:refs/heads/feature/stage08-groups-direct-r3-20261026
