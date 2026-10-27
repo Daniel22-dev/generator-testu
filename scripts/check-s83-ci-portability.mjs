@@ -55,7 +55,7 @@ const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter
 // Stage08 temporary non-deploy preproduction workflow is an exact-byte,
 // branch-scoped exception only. It cannot become part of candidate/main.
 const stage08Workflow='.github/workflows/stage08-preprod-verification.yml';
-const stage08Sha='f460df9ecd0ea1eb0c1aa9e8cc28f5eb2bebc6da36cb138c6d5cab9c70312031';
+const stage08Sha='aa8165a5bf4f83f63cc9f1b3f62c184635334992d2f765a3c55b28b89b90d870';
 const stage08AllowedRef='refs/heads/feature/stage08-groups-direct-r3-20261026';
 
 const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions,stage08Workflow])].sort();
