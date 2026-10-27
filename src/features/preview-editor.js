@@ -6,6 +6,28 @@ function teacherPreviewCode(){
   const r=rosterEntries.find(x=>x&&String(x.code||'').trim());
   return r?String(r.code):'';
 }
+/*
+ * ESLint virtual-runtime contract: the following identifiers belong to the
+ * generated secure student script. This function is serialized and executed
+ * ONLY inside the sandboxed teacher-preview iframe, not in the generator realm.
+ * Explicit names preserve no-undef enforcement for every other identifier.
+ */
+/* global ANSWER_TXT: writable, STRICT_FULLSCREEN_MODE: writable, STRICT_PREFLIGHT: writable */
+/* global STRICT_PREFLIGHT_BUSY: writable, STRICT_START_BUSY: writable, SUBMITTED: writable */
+/* global TIMER_DEADLINE: writable, TIMER_ID: writable, acquireAttemptTabLock: writable */
+/* global clearActiveAttemptSeal: writable, copyAnswers: writable, copySubmissionPayload: writable */
+/* global downloadAnswers: writable, flushPendingAttemptWrites: writable, handleLeave: writable */
+/* global idbDelete: writable, idbGet: writable, idbPut: writable, isTestActive: writable */
+/* global loadSignedRecord: writable, openSubmissionForm: writable, persistActiveAttemptSeal: writable */
+/* global persistenceKey: writable, prepareSecureTimerDeadline: writable, queuePersistActiveAttemptSeal: writable */
+/* global releaseAttemptTabLock: writable, requestSecureSubmit: writable, saveSignedRecord: writable */
+/* global setSubmittedLocked: writable, shareAnswers: writable, startSplitMonitor: writable */
+/* global startStrictFallback: writable, startStrictFullscreen: writable, startTest: writable */
+/* global startTestAttempt: writable, startTimer: writable, stopSplitMonitor: writable */
+/* global strictInvalidatePreflight: writable, strictModeRuntime: writable, strictPreflightChecks: writable */
+/* global strictPreflightStillValid: writable, strictReadyState: writable, strictRuntimeNotice: writable */
+/* global strictSetStartButtons: writable, strictStartStatus: writable, submitSecureTest: writable */
+/* global submittedLocked: writable, t: writable, verifyStrictTest: writable */
 function installSecureTeacherPreviewRuntime(){
   'use strict';
   if(window.self===window.top)throw new Error('Private teacher preview requires an isolated iframe.');
