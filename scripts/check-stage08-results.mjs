@@ -92,6 +92,12 @@ await asyncOk(async()=>await assert.rejects(()=>cappedAdapter.commitBatch([{...p
 await asyncOk(async()=>assert.equal((await cappedAdapter.listGroupResults(ID)).length,10000));
 await cappedAdapter.clear();
 const source=fs.readFileSync('src/features/group-result-ledger.js','utf8');
+const cspScanner=fs.readFileSync('scripts/check-csp.mjs','utf8');
+const lintRules=fs.readFileSync('eslint.config.mjs','utf8');
+ok(()=>assert.ok(cspScanner.includes("file===path.join('src','features','group-result-ledger.js')?'module':'script'"),
+  'CSP must parse the exact ledger as a module and keep inspecting its AST'));
+ok(()=>assert.ok(lintRules.includes("files: ['src/features/group-result-ledger.js']") && lintRules.includes("sourceType: 'module'"),
+  'ESLint must analyze the exact ledger as ESM'));
 const bridge=fs.readFileSync('src/js/18-central-groups.js','utf8');
 const ui=fs.readFileSync('src/features/central-results.js','utf8');
 // Lazy browser module is deployed to /features/; resolve sibling ledger there.

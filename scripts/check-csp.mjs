@@ -67,7 +67,10 @@ if(!/function\s+ensureJavascriptParser\s*\(/.test(gemini)||!/["']\.\/vendor\/aco
 if(!/async\s+function\s+parseGeneratedJavascriptSyntax\s*\(/.test(gemini)||!/parser\.parse\(/.test(gemini))fail('Smoke validátor nepoužívá asynchronní CSP-safe parser.');
 
 for(const file of collectJs('src')){
-  try{walk(parse(read(file),{ecmaVersion:'latest',sourceType:'script',allowHashBang:true}),file);}
+  // A single teacher-private result ledger is a real ESM imported by the lazy UI.
+  // Keep the exact module in the same unsafe-eval AST walk; all other src remains classic script.
+  const sourceType=file===path.join('src','features','group-result-ledger.js')?'module':'script';
+  try{walk(parse(read(file),{ecmaVersion:'latest',sourceType,allowHashBang:true}),file);}
   catch(error){fail(`${file}: zdroj nelze analyzovat pro CSP (${error.message}).`);}
 }
 for(const file of collectJs('public')){
