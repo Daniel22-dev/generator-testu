@@ -59,7 +59,7 @@ function stripJsComments(source, file) {
   return out + source.slice(cursor);
 }
 
-function compactJsWhitespace(source, file) {
+function compactJsWhitespace(source, file, collapseLines=false) {
   const clean = stripJsComments(source, file);
   let scan;
   try {
@@ -81,11 +81,15 @@ function compactJsWhitespace(source, file) {
   for (let ti=0;ti<tokens.length;ti++) {
     const token=tokens[ti];
     const gap = clean.slice(end, token.start);
-    if (/\r|\n/.test(gap)) out += '\n';
+    if (!collapseLines && /\r|\n/.test(gap)) out += '\n';
     else if (gap.length) {
       const prev=tokens[ti-1];
       const left=clean[end-1]||'',right=clean[token.start]||'';
-      if((/[\w$\\]/.test(left)&&/[\w$\\]/.test(right))||(['num','regexp'].includes(prev?.type.label))||(/[+\-/?.]/.test(left)&&/[+\-/*.]/.test(right)))out+=' ';
+      const lineBreak=/\r|\n/.test(gap);
+      const asiKeyword=['return','throw','break','continue','yield'].includes(prev?.type.keyword);
+      const asiUpdate=['++','--'].includes(prev?.type.label)||['++','--'].includes(token.type.label);
+      if(lineBreak&&(asiKeyword||asiUpdate))out+='\n';
+      else if((/[\w$\\]/.test(left)&&/[\w$\\]/.test(right))||(['num','regexp'].includes(prev?.type.label))||(/[+\-/?.]/.test(left)&&/[+\-/*.]/.test(right)))out+=' ';
     }
     out += clean.slice(token.start, token.end);
     end = token.end;
@@ -314,7 +318,7 @@ const inlineScriptTag = file => {
     source = split.main;
     assistantFeatureSource = split.feature;
   }
-  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(source, file)}\n</script>`;
+  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(source, file, true)}\n</script>`;
 };
 const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
