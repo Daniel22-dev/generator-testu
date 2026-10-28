@@ -1,0 +1,91 @@
+name: Stage08 v2 verified reader complete E10 P5 and journeys (NO DEPLOY)
+on:
+  push:
+    branches: [qa/stage08-v2-full-20261028]
+permissions:
+  contents: read
+jobs:
+  full-e10-p5:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - name: Checkout exact no-deploy source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify source is unchanged from pinned GIT Stage08 v2 PR139
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git diff --name-only "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD)" = ".github/workflows/stage08-v2-full-p5-preprod.yml"
+      - uses: ./.github/actions/setup-ci-node
+      - name: Install independently verified locked CI tools and browser
+        uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: ${{ github.sha }}
+          browser-env: CHROMIUM_PATH
+      - name: Full existing strict-test E10 plus GARP foundation and P5
+        timeout-minutes: 65
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: npm run qa:redteam:ci
+      - name: Preserve independent no-deploy evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage08-v2-e10-p5-${{ github.sha }}-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            qa-results/redteam-e10-ci/
+            qa-results/redteam-e10-ci-run.json
+            audit/evidence/garp27-current/
+            dist/qa-p5-*.json
+  complete-stage08-journeys:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify identical pinned app code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD
+          test "$(git diff --name-only "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD)" = ".github/workflows/stage08-v2-full-p5-preprod.yml"
+      - uses: ./.github/actions/setup-ci-node
+      - name: Install original independent browser test tools
+        uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: ${{ github.sha }}
+          browser-env: CHROMIUM_EXECUTABLE
+      - name: Install pinned Python audit requirements
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/audit-venv"
+          "$RUNNER_TEMP/audit-venv/bin/pip" install --disable-pip-version-check -r audit/requirements-audit.txt
+      - name: Full real-source teacher/student journeys (synthetic data only)
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf audit/evidence
+          mkdir -p audit/evidence
+          npm run build
+          "$RUNNER_TEMP/audit-venv/bin/python" audit/run_audit.py --suite journey_suite --suite integration_suite --suite identity_suite --suite state_transition_suite --suite feature_suite
+      - name: Archive no-deploy journey results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stage08-v2-journeys-${{ github.sha }}-${{ github.run_id }}
+          path: audit/evidence/
+          if-no-files-found: warn
+          retention-days: 14
