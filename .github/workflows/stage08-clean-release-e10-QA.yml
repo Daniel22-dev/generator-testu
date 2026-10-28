@@ -1,0 +1,81 @@
+name: Stage08 clean GIT 7.1.102 complete-source E10/P5 diagnostics (NO DEPLOY)
+on:
+  push:
+    branches:
+      - qa/stage08-clean-e10-release-check-20261028
+permissions:
+  contents: read
+jobs:
+  full-e10-p5:
+    name: immutable clean source full E10/P5 and GARP (NONCERTIFYING)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - name: Checkout exact clean Stage08 source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Pinned Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install clean locked dependencies and browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2"
+          test ! -e .github/workflows/stage08-preprod-verification.yml
+          test ! -e .github/workflows/stage08-v2-reader-preprod.yml
+          test ! -e .github/workflows/stage08-v2-full-p5-preprod.yml
+          npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+          npx playwright install --with-deps chromium
+          node -e "const p=require('./node_modules/playwright/package.json');if(p.version!=='1.61.1')process.exit(1);console.log('CHROMIUM_PATH='+require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Run exact clean Stage08 source complete security suite
+        shell: bash
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: |
+          set -euo pipefail
+          node scripts/check-s83-ci-portability.mjs
+          npm run qa:redteam:ci
+      - name: Evidence is preproduction only
+        run: echo 'NO MERGE / NO DEPLOY / real school Forms and physical devices not certified'
+  classroom-journeys:
+    name: immutable Stage08 teacher and student E2E scenarios (NONCERTIFYING)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact clean source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Pinned Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked tools and isolated Python audit environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2"
+          npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+          npx playwright install --with-deps chromium
+          python3 -m venv "$RUNNER_TEMP/stage08-audit-venv"
+          "$RUNNER_TEMP/stage08-audit-venv/bin/pip" install --disable-pip-version-check -r audit/requirements-audit.txt
+          node -e "console.log('CHROMIUM_PATH='+require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Run original teacher/student scenario matrix
+        shell: bash
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: |
+          set -euo pipefail
+          npm run build
+          "$RUNNER_TEMP/stage08-audit-venv/bin/python" audit/run_audit.py --suite journey_suite --suite integration_suite --suite identity_suite --suite state_transition_suite --suite feature_suite
+      - name: Explicitly noncertifying
+        run: echo 'This is detached exact-source QA, not protected candidate/main or live school UAT'
