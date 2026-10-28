@@ -1,0 +1,59 @@
+name: Stage08 clean S83 source audit (NO DEPLOY - NONCERTIFYING)
+on:
+  push:
+    branches:
+      - qa/stage08-s83-audit-20261028
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage08-s83-nondeploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  independent-s83:
+    name: pinned release source S83 on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    steps:
+      - name: Checkout immutable clean release source (not QA branch)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up pinned Node runtime
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Verify immutable tested SHA and clean release inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2"
+          test ! -e .github/workflows/stage08-preprod-verification.yml
+          test ! -e .github/workflows/stage08-v2-reader-preprod.yml
+          test ! -e .github/workflows/stage08-v2-full-p5-preprod.yml
+          echo "SOURCE=9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2"
+          echo "WORKFLOW_EVENT_SHA=$GITHUB_SHA (separate QA-only branch)"
+      - name: Execute release-mode S83 integrity and negative checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/check-s83-ci-portability.mjs
+      - name: Execute independent Groups v2 Stage08 portable regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/check-stage08-groups.mjs
+          node scripts/check-stage08-results.mjs
+      - name: Assert release remains blocked in source metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          node -e "const d=require('./security/release-readiness-e10.json');if(d.ownerDecision.authorizeGithubPublication!==false||d.ownerDecision.authorizeProductionReleaseAfterMandatoryGates!==false||!d.blockers?.length)process.exit(1);console.log('PASS: publishing remains blocked; no release authorization claimed')"
