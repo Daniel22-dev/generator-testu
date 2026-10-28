@@ -41,13 +41,18 @@ need(ui, /\[['"]results['"],['"]Načtení výsledků['"]\]/, 'Verifier V2 moves 
 need(forms, /bulkVerifyPasted\([\s\S]*Nejdřív vlož celý záložní blok SECURE-ANSWERS-V1/, 'Pasted-backup button gives feedback when no payload is present');
 need(forms, /importFormsCsvFile\([\s\S]*CSV import dokončen/, 'Forms import confirms successful completion');
 need(verifier, /function downloadText\([\s\S]*Stažení bylo spuštěno:/, 'download actions give visible confirmation');
-need(preview, /__GHRAB_TEACHER_PREVIEW__=true/, 'Teacher preview injects an explicit preview-only runtime flag');
+need(preview, /function installSecureTeacherPreviewRuntime\(\)[\s\S]*__GHRAB_PRIVATE_TEACHER_PREVIEW__[\s\S]*memory-only/, 'Teacher preview installs a generator-only memory-only adapter');
+need(preview, /function teacherPreviewHtml\([^)]*secure[^)]*\)[\s\S]*privateTeacherPreviewRuntimeHtml\(\)[\s\S]*<\\\/body/, 'Generator injects the private adapter only into its transient secure-preview copy');
+for(const forbidden of ['__GHRAB_TEACHER_PREVIEW__','strictTeacherPreview','preview-ready','isolated-teacher-srcdoc','__GHRAB_PRIVATE_TEACHER_PREVIEW__']){
+  !secure.includes(forbidden) ? pass(`Public secure runtime excludes ${forbidden}`) : fail(`Public secure runtime must exclude ${forbidden}`);
+}
+!/about:srcdoc/.test(secure) ? pass('Public secure runtime has no privileged about:srcdoc branch') : fail('Public secure runtime must not privilege about:srcdoc');
 need(preview, /function createPreviewFrame\([\s\S]*createElement\(['"]iframe['"]\)[\s\S]*previewInstance/, 'Teacher preview creates a fresh iframe browsing context for every open');
 need(preview, /function destroyPreviewFrame\([\s\S]*parentNode\.removeChild/, 'Teacher preview destroys the iframe browsing context on close');
 !/srcdoc\s*=\s*['"]['"]/.test(preview) ? pass('Teacher preview teardown never navigates a reused iframe to blank srcdoc') : fail('Teacher preview must destroy, not blank and reuse, its iframe');
 !/id=["']previewFrame["']/.test(shell) ? pass('Preview shell does not ship a reusable iframe browsing context') : fail('Preview shell must create iframe only on demand');
-need(secure, /function acquireAttemptTabLock\(\)[\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return true/, 'Secure runtime bypasses cross-tab locking only in explicit teacher preview');
-need(secure, /function handleLeave\([\s\S]*__GHRAB_TEACHER_PREVIEW__===true[\s\S]*return/, 'Teacher preview cannot trigger the real leave-test lock');
+need(secureRuntime, /async function acquireAttemptTabLock\(\)\{if\(ATTEMPT_TAB_RELEASE\)return true;[\s\S]*navigator\.locks\.request/, 'Public secure runtime retains its real concurrent-tab lock without a preview bypass');
+need(secure, /function handleLeave\([^)]*\)\{if\(!isTestActive\(\)\)return;[\s\S]*recordSec[\s\S]*lockTest/, 'Public secure runtime retains its real leave-test lock without a preview bypass');
 need(secure, /function submissionOutboxMatchesIdentity\([\s\S]*body\.identityHash===expectedIdentityHash[\s\S]*normRosterIdentity\(body\.student\)===normRosterIdentity\(expectedStudent\)/, 'Completed submission outbox is cryptographically bound to the currently entered identity');
 need(secure, /function startTestAttempt\([\s\S]*identityAllowed\(name\)[\s\S]*activeAttemptIdentityHash\(name\)[\s\S]*unlockTestContent\(\)[\s\S]*restoreSubmissionOutbox\(name,identityHash\)[\s\S]*submittedLocked\(\)/, 'Start flow validates identity and start code before any completed outbox can be restored');
 need(secure, /function restoreSubmissionOutbox\(expectedStudent,expectedIdentityHash\)[\s\S]*submissionOutboxMatchesIdentity[\s\S]*showSubmissionOutboxIdentityConflict[\s\S]*ANSWER_TXT=b\.txt/, 'Foreign completed outbox is blocked before ciphertext is assigned to the UI');
@@ -60,8 +65,8 @@ need(secureRuntime, /function refreshSecureTimer\(\)[\s\S]*submitSecureTest\(['"
 need(secureSubmit, /function showTimerExpiredNotice\(\)[\s\S]*submitted automatically/, 'Expired attempts explain the automatic submission reason');
 need(secure, /startTimer\(\);if\(isTestActive\(\)\)startSplitMonitor\(\)[\s\S]*if\(LOCKED&&isTestActive\(\)\)/, 'Expired resume cannot re-arm split monitoring or lock UI after auto-submit starts');
 need(secure, /function handlePageRestore\(event\)[\s\S]*restoreSubmissionOutbox\(currentAttemptIdentity\(\),ACTIVE_IDENTITY_HASH\)/, 'BFCache/pageshow outbox recovery preserves the current identity binding');
-need(secure, /function storageGet\(kind\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return null/, 'Teacher preview cannot read persistent submitted/outbox state');
-need(secure, /async function submittedLocked\(\)\{if\(\(typeof window!==['"]undefined['"]&&window\.__GHRAB_TEACHER_PREVIEW__===true\)\)return false/, 'Teacher preview never inherits a submitted lock');
+need(secureRuntime, /function storageGet\(kind\)\{try\{return localStorage\.getItem/, 'Public secure runtime always uses real persistent storage');
+need(secureRuntime, /async function submittedLocked\(\)\{if\(storageGet\(['"]submitted['"]\)===['"]1['"]\)return true;[\s\S]*loadSignedRecord\(['"]attemptGuard['"]\)/, 'Public secure runtime always enforces the submitted lock');
 need(lab, /function downloadTargetContext\([\s\S]*window\.top\.location\.origin===window\.location\.origin[\s\S]*targetDocument=window\.top\.document/, 'Downloads are promoted to the same-origin AI Studio top-level context when embedded');
 need(shell, /Roster a kódy zůstávají jen v paměti právě otevřené relace GIT[\s\S]*Otevřít samostatně/, 'Roster UI explains that standalone opens a new in-memory preparation session');
 need(shell, /ui-modal generator-settings-dialog/, 'Generator settings uses the dedicated large responsive dialog');

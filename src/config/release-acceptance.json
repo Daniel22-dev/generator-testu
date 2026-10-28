@@ -2,7 +2,7 @@
   "schema": "ghrab-release-acceptance-v1",
   "stage": "P5",
   "appId": "generator",
-  "appVersion": "7.1.101",
+  "appVersion": "7.1.102",
   "releaseStatus": "ready-with-documented-limitations",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
@@ -40,21 +40,21 @@
     "sourceRepositoriesExcludedFromSchoolOperationalPackage": true,
     "legalTermsRequireSeparateAgreement": true
   },
-  "revision": "GIT-7.1.101-STRICT-PREVIEW-IPHONE-DOC-2026-10-20",
+  "revision": "GIT-7.1.102-STAGE08-GROUPS-CANDIDATE-2026-10-27",
   "runtimeAudit": {
     "required": true,
-    "scriptsExecuted": true,
-    "partialStaticVmExecuted": true,
-    "browserRuntimeExecuted": true,
+    "scriptsExecuted": false,
+    "partialStaticVmExecuted": false,
+    "browserRuntimeExecuted": false,
     "transport": "Exact-source local Chromium plus exact-SHA GitHub Actions; live AI, school Forms, Sheets/MailApp and physical devices remain separate operational acceptance.",
-    "note": "Hotfix was independently browser-tested on 7.1.100. Release 7.1.101 republishes unchanged behavior with corrected changelog, version/cache and new exact-SHA release certification. Physical Safari and live school Forms not independently verified.",
+    "note": "7.1.101 acceptance cannot certify the new 7.1.102 E8 source. CI and school signed-access UAT pending.",
     "exactLockfileCiExecuted": false,
     "liveAiExecuted": false,
     "productionDeploymentVerified": false,
-    "componentBrowserExecuted": true,
-    "appsScriptMockExecuted": true
+    "componentBrowserExecuted": false,
+    "appsScriptMockExecuted": false
   },
-  "note": "Require exact-SHA P5, Journey E2E, candidate and PR certification, protected main merge and production release identity verification for 7.1.101.",
+  "note": "Stage08 candidate requires exact-SHA P5, Journey E2E, protected Safe Promotion, Pages byte parity and signed-school positive UAT. School server remains disconnected.",
   "publication": {
     "runtimeDistributed": false,
     "liveStatusAuthority": [

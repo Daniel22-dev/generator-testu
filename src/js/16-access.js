@@ -103,6 +103,7 @@ function generatorClearOwnedStorage(store, options={}){
   return {removed,failures};
 }
 function generatorClearRuntimeState(){
+  try { globalThis.GHRAB_GENERATOR_GROUPS?.clearPrivateState?.(); } catch(_e) {}
   // Stop late asynchronous work before clearing references so an in-flight AI
   // response cannot repopulate the just-ended shared-device session.
   try { geminiCancelRequested=true; } catch(_e) {}

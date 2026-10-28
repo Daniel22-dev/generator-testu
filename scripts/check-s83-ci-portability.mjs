@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -44,17 +45,23 @@ check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before his
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
 const protectedMainBaseline='d7bf7875a33ca97fd619cd403a276973b23d14ea';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
-const reviewedTrust='c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f';
+const reviewedTrust='ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006';
 const baselineWorkflows=execFileSync('git',['ls-tree','-r','--name-only',baseline,'--','.github/workflows'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
 const protectedMainWorkflowAdditions=new Set([
   '.github/workflows/manual-browser-qa.yml',
   '.github/workflows/manual-navigation-qa.yml'
 ]);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
-const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions])].sort();
+// Stage08 temporary non-deploy preproduction workflow is an exact-byte,
+// branch-scoped exception only. It cannot become part of candidate/main.
+const stage08Workflow='.github/workflows/stage08-preprod-verification.yml';
+const stage08Sha='aa8165a5bf4f83f63cc9f1b3f62c184635334992d2f765a3c55b28b89b90d870';
+const stage08AllowedRef='refs/heads/feature/stage08-groups-direct-r3-20261026';
+
+const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions,stage08Workflow])].sort();
 const workflowInventoryMatches=files=>JSON.stringify([...files].sort())===JSON.stringify(expectedWorkflows);
 execFileSync('git',['merge-base','--is-ancestor',protectedMainBaseline,'HEAD']);
-check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','workflow inventory preserves the certified baseline plus two exact workflows inherited from protected main');
+check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','workflow inventory contains reviewed baseline, two protected-main workflows, and one exact SHA-pinned temporary Stage08 test workflow');
 function normalizeReviewedWorkflow(text,file){
   let normalized=text.replaceAll(reviewedTrust,oldTrust);
   if(!fullHistoryWorkflows.has(file))return normalized;
@@ -64,6 +71,12 @@ function normalizeReviewedWorkflow(text,file){
   return normalized;
 }
 const unexpected=actualWorkflows.filter(file=>{
+  if(file===stage08Workflow){
+    const source=fs.readFileSync(path.join(root,file));
+    const actualSha=crypto.createHash('sha256').update(source).digest('hex');
+    const branchAllowed=process.env.CI!=='true'||process.env.GITHUB_REF===stage08AllowedRef;
+    return pkg.version!=='7.1.102'||actualSha!==stage08Sha||!branchAllowed;
+  }
   if(protectedMainWorkflowAdditions.has(file)){
     const protectedMainText=execFileSync('git',['show',protectedMainBaseline+':'+file],{encoding:'utf8'});
     return fs.readFileSync(path.join(root,file),'utf8')!==protectedMainText;
@@ -72,7 +85,7 @@ const unexpected=actualWorkflows.filter(file=>{
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
   return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve the reviewed baseline exceptions and exact protected-main manual QA bytes');
+check(unexpected.length===0,'S83-CI07B','workflow contents preserve reviewed exceptions, protected-main manual QA, and the exact Stage08 test-only SHA');
 assert.equal(workflowInventoryMatches([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
 const changedManualBrowser=fs.readFileSync(path.join(root,'.github/workflows/manual-browser-qa.yml'),'utf8').replace('timeout-minutes: 24','timeout-minutes: 25');
 assert.notEqual(changedManualBrowser,execFileSync('git',['show',protectedMainBaseline+':.github/workflows/manual-browser-qa.yml'],{encoding:'utf8'}),'a protected-main workflow byte mutation must fail admission');
