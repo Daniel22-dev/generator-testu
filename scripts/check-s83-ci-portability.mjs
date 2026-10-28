@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -52,16 +51,23 @@ const protectedMainWorkflowAdditions=new Set([
   '.github/workflows/manual-navigation-qa.yml'
 ]);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
-// Stage08 temporary non-deploy preproduction workflow is an exact-byte,
-// branch-scoped exception only. It cannot become part of candidate/main.
-const stage08Workflow='.github/workflows/stage08-preprod-verification.yml';
-const stage08Sha='aa8165a5bf4f83f63cc9f1b3f62c184635334992d2f765a3c55b28b89b90d870';
-const stage08AllowedRef='refs/heads/feature/stage08-groups-direct-r3-20261026';
-
-const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions,stage08Workflow])].sort();
+// Release-admission profile: no temporary branch-scoped Stage08 workflow is
+// authorized in the final candidate or main tree, regardless of branch/ref.
+// The original reviewed feature branch remains immutable and separately pinned.
+const forbiddenReviewWorkflows=Object.freeze([
+  '.github/workflows/stage08-preprod-verification.yml',
+  '.github/workflows/stage08-v2-reader-preprod.yml',
+  '.github/workflows/stage08-v2-full-p5-preprod.yml'
+]);
+const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions])].sort();
 const workflowInventoryMatches=files=>JSON.stringify([...files].sort())===JSON.stringify(expectedWorkflows);
 execFileSync('git',['merge-base','--is-ancestor',protectedMainBaseline,'HEAD']);
-check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','workflow inventory contains reviewed baseline, two protected-main workflows, and one exact SHA-pinned temporary Stage08 test workflow');
+check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','final release workflow inventory contains only reviewed baseline and protected-main manual QA (zero Stage08 test workflows)');
+for(const forbidden of forbiddenReviewWorkflows){
+  assert.equal(actualWorkflows.includes(forbidden),false, 'release must not ship temporary '+forbidden);
+  assert.equal(workflowInventoryMatches([...actualWorkflows,forbidden]),false,'restoring forbidden review workflow must fail inventory admission');
+}
+check(true,'S83-CI07A-RELEASE-NEGATIVE','release rejects all three temporary Stage08 workflow additions, even if byte-identical to prior review');
 function normalizeReviewedWorkflow(text,file){
   let normalized=text.replaceAll(reviewedTrust,oldTrust);
   if(!fullHistoryWorkflows.has(file))return normalized;
@@ -71,12 +77,6 @@ function normalizeReviewedWorkflow(text,file){
   return normalized;
 }
 const unexpected=actualWorkflows.filter(file=>{
-  if(file===stage08Workflow){
-    const source=fs.readFileSync(path.join(root,file));
-    const actualSha=crypto.createHash('sha256').update(source).digest('hex');
-    const branchAllowed=process.env.CI!=='true'||process.env.GITHUB_REF===stage08AllowedRef;
-    return pkg.version!=='7.1.102'||actualSha!==stage08Sha||!branchAllowed;
-  }
   if(protectedMainWorkflowAdditions.has(file)){
     const protectedMainText=execFileSync('git',['show',protectedMainBaseline+':'+file],{encoding:'utf8'});
     return fs.readFileSync(path.join(root,file),'utf8')!==protectedMainText;
@@ -85,7 +85,7 @@ const unexpected=actualWorkflows.filter(file=>{
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
   return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve reviewed exceptions, protected-main manual QA, and the exact Stage08 test-only SHA');
+check(unexpected.length===0,'S83-CI07B','release workflow contents retain only reviewed baseline normalizations and byte-exact protected-main manual QA');
 assert.equal(workflowInventoryMatches([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
 const changedManualBrowser=fs.readFileSync(path.join(root,'.github/workflows/manual-browser-qa.yml'),'utf8').replace('timeout-minutes: 24','timeout-minutes: 25');
 assert.notEqual(changedManualBrowser,execFileSync('git',['show',protectedMainBaseline+':.github/workflows/manual-browser-qa.yml'],{encoding:'utf8'}),'a protected-main workflow byte mutation must fail admission');
