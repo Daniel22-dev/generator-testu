@@ -12,3 +12,14 @@ setGenUI=function(mode){
   if(mode==='loading'&&typeof renderStartCode==='function')renderStartCode();
   return result;
 };
+const c29CommitAnswerData=commitAnswerData;
+commitAnswerData=async function(){
+  let pending;
+  try{
+    pending=c29CommitAnswerData.apply(this,arguments);
+    if(typeof renderStartCode==='function')renderStartCode();
+    return await pending;
+  }finally{
+    if(typeof renderStartCode==='function')renderStartCode();
+  }
+};

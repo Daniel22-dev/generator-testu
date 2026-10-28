@@ -93,7 +93,7 @@ function renderQualityDiagnostics(){
   renderDidacticReview();
 }
 let handoffLessonCodeRevealed=false;
-function handoffLessonAllowed(){return !!(generatedPackage?.mode==='secureOffline'&&generatedPackage.startCode&&secureDownloadAllowed());}
+function handoffLessonAllowed(){return !!(!outputMutationBusy&&generatedPackage?.mode==='secureOffline'&&generatedPackage.startCode&&secureDownloadAllowed());}
 function handoffLessonUrl(kind){
   if(!handoffLessonAllowed())return '';
   try{return normalizeGoogleFormsResponderUrl(generatedPackage[kind==='END'?'lessonEndUrl':'lessonStartUrl']||'');}catch(_){return '';}
@@ -102,51 +102,62 @@ function handoffLessonStatus(text,tone=''){const el=$('handoffLessonStatus');if(
 function c29El(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function c29Button(text,fn,secondary=false){const el=c29El('button','handoff-lesson-button'+(secondary?' secondary':''),text);el.type='button';el.addEventListener('click',fn);return el;}
 function selectHandoffText(el){if(!el)return false;try{const r=document.createRange(),s=getSelection();r.selectNodeContents(el);s.removeAllRanges();s.addRange(r);el.tabIndex=0;el.focus();return true;}catch(_){return false;}}
-function toggleHandoffStartCode(button){
-  if(!handoffLessonAllowed()){handoffLessonCodeRevealed=false;renderStartCode();return false;}
+function handoffPackageContext(expectedPackage){
+  const box=$('privateStartCode'),pack=expectedPackage||box?.__c29Package;
+  return box&&pack&&generatedPackage===pack&&box.__c29Package===pack&&handoffLessonAllowed()?{box,pack}:null;
+}
+function handoffLessonContext(kind,expectedPackage,expectedUrl){
+  const context=handoffPackageContext(expectedPackage),url=handoffLessonUrl(kind);
+  return context&&url&&(!expectedUrl||url===expectedUrl)?{...context,url}:null;
+}
+function toggleHandoffStartCode(button,expectedPackage){
+  const context=handoffPackageContext(expectedPackage);if(!context){handoffLessonCodeRevealed=false;renderStartCode();return false;}
   const value=$('handoffStartCodeValue');if(!value)return false;
   handoffLessonCodeRevealed=!handoffLessonCodeRevealed;
-  value.textContent=handoffLessonCodeRevealed?generatedPackage.startCode:'';
+  value.textContent=handoffLessonCodeRevealed?context.pack.startCode:'';
   value.classList.toggle('hidden',!handoffLessonCodeRevealed);
   if(button){button.textContent=handoffLessonCodeRevealed?'Skrýt kód':'Zobrazit kód';button.setAttribute('aria-expanded',String(handoffLessonCodeRevealed));}
   handoffLessonStatus(handoffLessonCodeRevealed?'Kód je zobrazen. Ukaž jej studentům až po skutečném odeslání formuláře START.':'Kód je znovu skrytý.','');
   return true;
 }
-async function copyHandoffStartCode(){
-  if(!handoffLessonAllowed()){handoffLessonCodeRevealed=false;renderStartCode();return false;}
-  const code=generatedPackage.startCode;if(!code)return false;
+async function copyHandoffStartCode(expectedPackage,expectedCode){
+  const context=handoffPackageContext(expectedPackage);if(!context||expectedCode&&context.pack.startCode!==expectedCode){handoffLessonCodeRevealed=false;renderStartCode();return false;}
+  const code=context.pack.startCode;if(!code)return false;
   try{await navigator.clipboard.writeText(code);handoffLessonStatus('Startovní kód byl zkopírován.','ok');return true;}
   catch(_){if(!handoffLessonCodeRevealed)toggleHandoffStartCode($('handoffStartCodeToggle'));selectHandoffText($('handoffStartCodeValue'));handoffLessonStatus('Kód je zobrazený a označený; zkopíruj jej ručně.','warn');return false;}
 }
-function openHandoffLesson(kind){
-  const url=handoffLessonUrl(kind);if(!url){renderStartCode();return false;}
+function openHandoffLesson(kind,expectedPackage,expectedUrl){
+  const context=handoffLessonContext(kind,expectedPackage,expectedUrl);if(!context){renderStartCode();return false;}const url=context.url;
   let opened;try{opened=open(url,'_blank','noopener,noreferrer');if(opened)opened.opener=null;}catch(_){}
   handoffLessonStatus('Formulář '+(kind==='END'?'END':'START')+' byl otevřen. Časová kotva vznikne až po kliknutí na Odeslat a přijetí záznamu ve Forms/CSV.','');
   return !!opened;
 }
-async function copyHandoffLessonValue(kind){
-  const url=handoffLessonUrl(kind);if(!url){renderStartCode();return false;}
+async function copyHandoffLessonValue(kind,expectedPackage,expectedUrl){
+  const context=handoffLessonContext(kind,expectedPackage,expectedUrl);if(!context){renderStartCode();return false;}const url=context.url;
   try{await navigator.clipboard.writeText(url);handoffLessonStatus(kind+' odkaz byl zkopírován.','ok');return true;}
   catch(_){const details=$('handoffLessonPhoneDetails');if(details)details.open=true;selectHandoffText($(kind==='END'?'handoffLessonEndValue':'handoffLessonStartValue'));handoffLessonStatus('Odkaz je rozbalený a označený; zkopíruj jej ručně.','warn');return false;}
 }
 function renderStartCode(){
-  let box=$('privateStartCode');if(box)box.remove();
-  handoffLessonCodeRevealed=false;
-  if(!generatedPackage||generatedPackage.mode!=='secureOffline'||!generatedPackage.startCode)return;
+  let box=$('privateStartCode');
+  if(!generatedPackage||generatedPackage.mode!=='secureOffline'||!generatedPackage.startCode){if(box)box.remove();handoffLessonCodeRevealed=false;return;}
   const mount=$('lessonHandoffSlot')||$('resultPanel4');if(!mount)return;
   const allowed=handoffLessonAllowed(),start=handoffLessonUrl('START'),end=handoffLessonUrl('END');
+  if(box&&box.__c29Package===generatedPackage&&box.__c29Allowed===allowed&&box.__c29Start===start&&box.__c29End===end&&box.__c29Code===generatedPackage.startCode)return;
+  if(box)box.remove();handoffLessonCodeRevealed=false;
   box=c29El('section','handoff-lesson-card');box.id='privateStartCode';box.setAttribute('aria-labelledby','handoffLessonTitle');
+  box.__c29Package=generatedPackage;box.__c29Allowed=allowed;box.__c29Start=start;box.__c29End=end;box.__c29Code=generatedPackage.startCode;
   const head=c29El('div','handoff-lesson-head'),title=c29El('h4','', 'Zahájení a ukončení hodiny');title.id='handoffLessonTitle';head.append(title,c29El('span','handoff-lesson-badge',allowed?'Připraveno k předání':'Čeká na bezpečnostní kontroly'));box.append(head,c29El('p','handoff-lesson-intro','Nejdříve otevři START formulář pod školním účtem a skutečně klikni na Odeslat. Potom studentům ukaž startovní kód.'));
   if(!allowed){const el=c29El('div','handoff-lesson-locked','Startovní kód a odkazy se zpřístupní až po dokončení stejné bezpečnostní brány jako stažení klasifikovaného testu.');el.role='status';box.append(el);mount.append(box);return;}
-  const codeBox=c29El('div','handoff-lesson-code'),value=c29El('output','handoff-lesson-code-value hidden',''),codeActions=c29El('div','handoff-lesson-code-actions'),reveal=c29Button('Zobrazit kód',()=>toggleHandoffStartCode(reveal),true);value.id='handoffStartCodeValue';value.setAttribute('aria-live','polite');reveal.id='handoffStartCodeToggle';reveal.setAttribute('aria-controls',value.id);reveal.setAttribute('aria-expanded','false');codeActions.append(reveal,c29Button('Kopírovat kód',copyHandoffStartCode,true));codeBox.append(c29El('strong','', 'Startovní kód pro studenty'),value,codeActions);box.append(codeBox);
+  const renderedPackage=generatedPackage,renderedCode=generatedPackage.startCode;
+  const codeBox=c29El('div','handoff-lesson-code'),value=c29El('output','handoff-lesson-code-value hidden',''),codeActions=c29El('div','handoff-lesson-code-actions'),reveal=c29Button('Zobrazit kód',()=>toggleHandoffStartCode(reveal,renderedPackage),true);value.id='handoffStartCodeValue';value.setAttribute('aria-live','polite');reveal.id='handoffStartCodeToggle';reveal.setAttribute('aria-controls',value.id);reveal.setAttribute('aria-expanded','false');codeActions.append(reveal,c29Button('Kopírovat kód',()=>copyHandoffStartCode(renderedPackage,renderedCode),true));codeBox.append(c29El('strong','', 'Startovní kód pro studenty'),value,codeActions);box.append(codeBox,c29El('p','handoff-lesson-diagnostic','Startovní kód není osobní jednorázový kód žáka, Classroom Recovery Code ani Teacher/Admin kód. Každý z těchto kódů má jiný účel a oprávnění.'));
   const actions=c29El('div','handoff-lesson-actions');
   for(const item of [{kind:'START',url:start,text:'Otevřít formulář START'},{kind:'END',url:end,text:'Otevřít formulář END'}]){
     const card=c29El('div','handoff-lesson-action');card.append(c29El('strong','',item.kind),c29El('p','', 'Předvyplněný formulář — je nutné jej odeslat.'));
-    if(item.url){const link=c29El('a','handoff-lesson-button',item.text);link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.addEventListener('click',event=>{if(!handoffLessonUrl(item.kind)){event.preventDefault();renderStartCode();return;}handoffLessonStatus('Formulář '+item.kind+' byl otevřen. Časová kotva vznikne až po kliknutí na Odeslat a přijetí záznamu ve Forms/CSV.');});card.append(link);}
+    if(item.url){const link=c29El('a','handoff-lesson-button',item.text);link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.addEventListener('click',event=>{if(!handoffLessonContext(item.kind,renderedPackage,item.url)||link.href!==item.url){event.preventDefault();renderStartCode();return;}handoffLessonStatus('Formulář '+item.kind+' byl otevřen. Časová kotva vznikne až po kliknutí na Odeslat a přijetí záznamu ve Forms/CSV.');});card.append(link);}
     else{const disabled=c29Button(item.text,()=>{});disabled.disabled=true;card.append(disabled,c29El('span','handoff-lesson-diagnostic',item.kind+' odkaz není dostupný nebo nemá bezpečný Google Forms formát.'));}actions.append(card);
   }
   box.append(actions,c29El('p','handoff-lesson-warning','Samotné otevření odkazu nic nezahajuje ani neukončuje. Záznam časové kotvy musí pocházet z přijatého formuláře/CSV.'));
-  if(start||end){const details=c29El('details','handoff-lesson-phone');details.id='handoffLessonPhoneDetails';details.append(c29El('summary','', 'Odkazy pro telefon'));for(const item of [{kind:'START',url:start,id:'handoffLessonStartValue'},{kind:'END',url:end,id:'handoffLessonEndValue'}]){if(!item.url)continue;const row=c29El('div','handoff-lesson-phone-row'),url=c29El('code','handoff-lesson-url',item.url);url.id=item.id;row.append(c29El('strong','',item.kind),url,c29Button('Kopírovat '+item.kind+' odkaz',()=>copyHandoffLessonValue(item.kind),true));details.append(row);}box.append(details);}else box.append(c29El('p','handoff-lesson-diagnostic','Odkazy START/END nejsou dostupné. Zkontroluj bezpečné nastavení Google Forms; startovní kód lze přesto předat po dokončení kontrol.'));
+  if(start||end){const details=c29El('details','handoff-lesson-phone');details.id='handoffLessonPhoneDetails';details.append(c29El('summary','', 'Odkazy pro telefon'));for(const item of [{kind:'START',url:start,id:'handoffLessonStartValue'},{kind:'END',url:end,id:'handoffLessonEndValue'}]){if(!item.url)continue;const row=c29El('div','handoff-lesson-phone-row'),url=c29El('code','handoff-lesson-url',item.url);url.id=item.id;row.append(c29El('strong','',item.kind),url,c29Button('Kopírovat '+item.kind+' odkaz',()=>copyHandoffLessonValue(item.kind,renderedPackage,item.url),true));details.append(row);}box.append(details);}else box.append(c29El('p','handoff-lesson-diagnostic','Odkazy START/END nejsou dostupné. Zkontroluj bezpečné nastavení Google Forms; startovní kód lze přesto předat po dokončení kontrol.'));
   const status=c29El('div','handoff-lesson-status');status.id='handoffLessonStatus';status.role='status';status.setAttribute('aria-live','polite');box.append(status);mount.append(box);
 }
 // ── Didaktická kontrola po vygenerování (pravidlová, BOD 5–8 + 15) ─────────────

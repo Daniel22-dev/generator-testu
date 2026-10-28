@@ -15,6 +15,10 @@ function validate(pkg){
 }
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 validate(pkg);
+const browserSource=fs.readFileSync('scripts/check-r1b1-c29-browser.mjs','utf8');
+const microfixScenarios=['B1-26','B1-27','B1-28','B1-29','B1-30'];
+function validateMicrofixScenarios(source){for(const id of microfixScenarios)assert.ok(source.includes(`'${id}'`),`C29 microfix browser gate must retain ${id}`);}
+validateMicrofixScenarios(browserSource);
 const mutations=[];
 function reject(id,mutate){const changed=structuredClone(pkg);mutate(changed);assert.throws(()=>validate(changed),{name:'AssertionError'});mutations.push({id,detected:true});}
 reject('drop-local-gate',pkg=>{pkg.scripts['qa:p5']=pkg.scripts['qa:p5'].replace(' && npm run check:r1b1-c29-browser','');});
@@ -23,6 +27,7 @@ reject('duplicate-ci-gate',pkg=>{pkg.scripts['qa:p5:ci']+=' && npm run check:r1b
 reject('fake-browser-gate',pkg=>{pkg.scripts['check:r1b1-c29-browser']='node -e "process.exit(0)"';});
 reject('gate-before-build',pkg=>{const steps=split(pkg.scripts['qa:p5:ci']),gate=steps.indexOf('npm run check:r1b1-c29-browser');steps.splice(gate,1);steps.unshift('npm run check:r1b1-c29-browser');pkg.scripts['qa:p5:ci']=steps.join(' && ');});
 reject('drop-orchestration-guard',pkg=>{pkg.scripts['check:ci-orchestration']=pkg.scripts['check:ci-orchestration'].replace(' && node scripts/check-r1b1-c29-ci-wiring.mjs','');});
+for(const id of microfixScenarios){const changed=browserSource.replace(`'${id}'`,`'REMOVED-${id}'`);assert.throws(()=>validateMicrofixScenarios(changed),{name:'AssertionError'});mutations.push({id:`drop-${id.toLowerCase()}`,detected:true});}
 fs.mkdirSync('qa-results',{recursive:true});
 fs.writeFileSync('qa-results/r1b1-c29-ci-wiring.json',JSON.stringify({schema:'git-r1b1-c29-ci-wiring-v1',stage:'R1-B1',status:'PASS',negativeControls:mutations},null,2)+'\n');
 console.log(`PASS R1-B1 C29 CI wiring and ${mutations.length} negative controls`);
