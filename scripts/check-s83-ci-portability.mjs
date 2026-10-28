@@ -52,16 +52,31 @@ const protectedMainWorkflowAdditions=new Set([
   '.github/workflows/manual-navigation-qa.yml'
 ]);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
-// Stage08 temporary non-deploy preproduction workflow is an exact-byte,
-// branch-scoped exception only. It cannot become part of candidate/main.
+// Two explicit, negatively-tested admissions: original SHA-pinned Stage08
+// review workflow on its exact feature branch OR a CLEAN release tree with
+// no temporary Stage08 workflows. Unknown workflows remain disallowed.
+// Release trees are not grandfathered by an arbitrary GitHub ref.
 const stage08Workflow='.github/workflows/stage08-preprod-verification.yml';
 const stage08Sha='aa8165a5bf4f83f63cc9f1b3f62c184635334992d2f765a3c55b28b89b90d870';
 const stage08AllowedRef='refs/heads/feature/stage08-groups-direct-r3-20261026';
-
-const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions,stage08Workflow])].sort();
-const workflowInventoryMatches=files=>JSON.stringify([...files].sort())===JSON.stringify(expectedWorkflows);
-execFileSync('git',['merge-base','--is-ancestor',protectedMainBaseline,'HEAD']);
-check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','workflow inventory contains reviewed baseline, two protected-main workflows, and one exact SHA-pinned temporary Stage08 test workflow');
+const v2Workflow='.github/workflows/stage08-v2-reader-preprod.yml';
+const permanentWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions])].sort();
+const reviewWorkflows=[...new Set([...permanentWorkflows,stage08Workflow])].sort();
+const workflowInventoryMatches=(files,expected)=>JSON.stringify([...files].sort())===JSON.stringify(expected);
+const hasReviewWorkflow=actualWorkflows.includes(stage08Workflow);
+const releaseTree=!hasReviewWorkflow;
+const expectedWorkflows=releaseTree?permanentWorkflows:reviewWorkflows;
+function admissibleWorkflowInventory(files,mode=releaseTree){
+  return workflowInventoryMatches(files,mode?permanentWorkflows:reviewWorkflows);
+}
+check(admissibleWorkflowInventory(actualWorkflows),'S83-CI07A',
+  releaseTree?'clean release inventory contains only reviewed permanent workflows':'review inventory includes exactly the pinned Stage08 test workflow');
+assert.equal(admissibleWorkflowInventory([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'unreviewed workflow must be rejected');
+assert.equal(admissibleWorkflowInventory([...actualWorkflows,v2Workflow]),false,'second Stage08 test workflow must be rejected');
+assert.equal(admissibleWorkflowInventory([...actualWorkflows,stage08Workflow]),false,'reintroduced temporary Stage08 workflow must be rejected in release mode');
+assert.equal(admissibleWorkflowInventory([...actualWorkflows,stage08Workflow],false),!releaseTree,
+  'only reviewed legacy workflow inventory may be admitted in review mode');
+check(true,'S83-CI07A-MUTATION','unknown and reintroduced test workflows fail inventory admission');
 function normalizeReviewedWorkflow(text,file){
   let normalized=text.replaceAll(reviewedTrust,oldTrust);
   if(!fullHistoryWorkflows.has(file))return normalized;
@@ -72,6 +87,7 @@ function normalizeReviewedWorkflow(text,file){
 }
 const unexpected=actualWorkflows.filter(file=>{
   if(file===stage08Workflow){
+    if(releaseTree)return true;
     const source=fs.readFileSync(path.join(root,file));
     const actualSha=crypto.createHash('sha256').update(source).digest('hex');
     const branchAllowed=process.env.CI!=='true'||process.env.GITHUB_REF===stage08AllowedRef;
@@ -85,8 +101,13 @@ const unexpected=actualWorkflows.filter(file=>{
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
   return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve reviewed exceptions, protected-main manual QA, and the exact Stage08 test-only SHA');
-assert.equal(workflowInventoryMatches([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
+check(unexpected.length===0,'S83-CI07B',releaseTree?'clean release workflows match protected source bytes':'review workflow matches pinned SHA/ref and protected source bytes');
+assert.equal(admissibleWorkflowInventory([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
+if(releaseTree) {
+  assert.equal(actualWorkflows.includes(stage08Workflow),false,'release must exclude first temporary workflow');
+  assert.equal(actualWorkflows.includes(v2Workflow),false,'release must exclude second temporary workflow');
+  check(true,'S83-CI07-RELEASE','no test-only Stage08 workflow shipped in final source');
+}
 const changedManualBrowser=fs.readFileSync(path.join(root,'.github/workflows/manual-browser-qa.yml'),'utf8').replace('timeout-minutes: 24','timeout-minutes: 25');
 assert.notEqual(changedManualBrowser,execFileSync('git',['show',protectedMainBaseline+':.github/workflows/manual-browser-qa.yml'],{encoding:'utf8'}),'a protected-main workflow byte mutation must fail admission');
 check(true,'S83-CI07B-MUTATION','unreviewed workflow additions and protected-main workflow byte mutations are rejected');
