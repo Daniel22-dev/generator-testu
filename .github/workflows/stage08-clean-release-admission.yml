@@ -1,0 +1,86 @@
+name: GIT Stage08 clean release SHA isolated E10 and journeys (NO DEPLOY)
+on:
+  push:
+    branches: [qa/stage08-clean-59b1f9-20261028]
+permissions:
+  contents: read
+jobs:
+  clean-source-e10:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 59b1f900af8efb2d42094cb04349042a0d402e7d
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact clean release SHA and no ephemeral workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "59b1f900af8efb2d42094cb04349042a0d402e7d"
+          test ! -e .github/workflows/stage08-preprod-verification.yml
+          test ! -e .github/workflows/stage08-v2-reader-preprod.yml
+          test ! -e .github/workflows/stage08-v2-full-p5-preprod.yml
+          test ! -e .github/workflows/stage08-clean-release-admission.yml
+      - uses: ./.github/actions/setup-ci-node
+      - uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: 59b1f900af8efb2d42094cb04349042a0d402e7d
+          browser-env: CHROMIUM_PATH
+      - name: Execute full unmodified E10, GARP and P5 at exact clean SHA
+        timeout-minutes: 70
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: npm run qa:redteam:ci
+      - name: Archive source-bound results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: git-clean-stage08-e10-59b1f900af8efb2d42094cb04349042a0d402e7d
+          path: |
+            qa-results/redteam-e10-ci/
+            qa-results/redteam-e10-ci-run.json
+          retention-days: 14
+          if-no-files-found: warn
+  clean-source-journeys:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 59b1f900af8efb2d42094cb04349042a0d402e7d
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify clean review source
+        run: |
+          test "$(git rev-parse HEAD)" = "59b1f900af8efb2d42094cb04349042a0d402e7d"
+          test ! -e .github/workflows/stage08-clean-release-admission.yml
+      - uses: ./.github/actions/setup-ci-node
+      - uses: ./.github/actions/install-ci-tools
+        with:
+          expected-sha: 59b1f900af8efb2d42094cb04349042a0d402e7d
+          browser-env: CHROMIUM_EXECUTABLE
+      - name: Install pinned audit requirements
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/audit-venv"
+          "$RUNNER_TEMP/audit-venv/bin/pip" install --disable-pip-version-check -r audit/requirements-audit.txt
+      - name: Run five existing student-teacher audit suites
+        shell: bash
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: |
+          set -euo pipefail
+          rm -rf audit/evidence
+          mkdir -p audit/evidence
+          npm run build
+          "$RUNNER_TEMP/audit-venv/bin/python" audit/run_audit.py --suite journey_suite --suite integration_suite --suite identity_suite --suite state_transition_suite --suite feature_suite
+      - name: Archive journey evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: git-clean-stage08-journeys-59b1f900af8efb2d42094cb04349042a0d402e7d
+          path: audit/evidence/
+          retention-days: 14
+          if-no-files-found: warn
