@@ -14,12 +14,12 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Verify source is unchanged from pinned GIT Stage08 v2 PR139
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "a3fd61885552c03d12b83c3a8a16ec8af4a9e762"
+          git merge-base --is-ancestor "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git diff --name-only "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD)" = ".github/workflows/stage08-v2-full-p5-preprod.yml"
       - uses: ./.github/actions/setup-ci-node
@@ -53,12 +53,12 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Verify identical pinned app code
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "a3fd61885552c03d12b83c3a8a16ec8af4a9e762"
+          git merge-base --is-ancestor "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD
           test "$(git diff --name-only "a3fd61885552c03d12b83c3a8a16ec8af4a9e762" HEAD)" = ".github/workflows/stage08-v2-full-p5-preprod.yml"
       - uses: ./.github/actions/setup-ci-node
       - name: Install original independent browser test tools
