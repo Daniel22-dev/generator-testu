@@ -10,6 +10,7 @@
   const PROJECTION_KEYS = new Set(['contract','consumerAppId','group','members']);
   const MEMBER_KEYS = new Set(['memberId','name','schoolEmail']);
   let servicePromise = null;
+  let pendingLegacyMigration = false;
   let dialog = null;
   let sequence = 0;
   let preview = null;
@@ -93,7 +94,7 @@
     if (!['http:','https:'].includes(base.protocol) || base.origin !== location.origin ||
         base.username || base.password || base.search || base.hash) throw error('CENTRAL_ORIGIN_DENIED');
     if (!base.pathname.endsWith('/')) base.pathname += '/';
-    const src = new URL('groups/group-service.js',base);
+    const src = new URL('groups/verified-client.js',base);
     if (src.origin !== location.origin || !src.pathname.startsWith(base.pathname)) throw error('CENTRAL_SERVICE_PATH_DENIED');
     return src.href;
   }
@@ -102,12 +103,20 @@
     if (!servicePromise) {
       servicePromise = (async () => {
         const mod = await import(currentStudioBase());
-        if (typeof mod.createGroupsService !== 'function') throw error('CENTRAL_SERVICE_MISSING');
-        const service = mod.createGroupsService();
-        if (service.schema !== 'ghrab-groups-service-v1' || service.contractVersion !== 1 ||
+        if (typeof mod.openVerifiedGroupsV2 !== 'function') throw error('CENTRAL_VERIFIED_CLIENT_REQUIRED');
+        const verified = await mod.openVerifiedGroupsV2('generator');
+        permitted();
+        if (verified?.schema !== 'ghrab-groups-verified-consumer-v2' ||
+            verified.consumerAppId !== 'generator' ||
+            typeof verified.legacyStorePresent !== 'boolean') {
+          throw error('CENTRAL_V2_CONTRACT_MISMATCH');
+        }
+        const service = verified.service;
+        if (service?.schema !== 'ghrab-groups-service-v1' || service.contractVersion !== 1 ||
             typeof service.listGroupMetadata !== 'function' || typeof service.getRosterProjection !== 'function') {
           throw error('CENTRAL_SERVICE_CONTRACT_MISMATCH');
         }
+        pendingLegacyMigration = verified.legacyStorePresent;
         return service;
       })().catch(e => {servicePromise = null; throw e;});
     }
@@ -182,7 +191,10 @@
         opt.value=group.groupId;select.append(opt);
       }
       if (linked?.groupId && groups.some(g=>g.groupId===linked.groupId))select.value=linked.groupId;
-      modalStatus(groups.length ? 'Vyber skupinu a zobraz n\u00e1hled.':'Nem\u00e1\u0161 v AI Studiu \u017e\u00e1dnou aktivn\u00ed skupinu.');
+      modalStatus(groups.length ? 'Vyber skupinu a zobraz n\u00e1hled.' :
+        pendingLegacyMigration
+          ? 'Star\u0161\u00ed skupiny jsou ve spole\u010dn\u00e9m \u00falo\u017ei\u0161ti. Opr\u00e1vn\u011bn\u00fd p\u0159evod do tv\u00e9ho \u00fa\u010dtu je nutn\u00fd; automatick\u00fd import nen\u00ed povolen.'
+          : 'Nem\u00e1\u0161 v AI Studiu \u017e\u00e1dnou aktivn\u00ed skupinu.');
     } catch(e) {modalStatus(readableError(e));}
   }
   async function previewSelection() {
