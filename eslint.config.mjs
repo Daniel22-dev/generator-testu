@@ -35,6 +35,17 @@ export default [
     },
   },
   {
+    files: ['src/features/group-result-ledger.js'],
+    languageOptions: {
+      sourceType: 'module',
+    },
+    rules: {
+      'no-eval': 'error',
+      'no-new-func': 'error',
+      'no-undef': 'error',
+    },
+  },
+  {
     files: ['public/access/*.js'],
     languageOptions: {
       ecmaVersion: 2022,

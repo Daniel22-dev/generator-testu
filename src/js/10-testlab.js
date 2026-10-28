@@ -189,10 +189,19 @@ async function downloadGeneratedTeacherVerifier() {
 
 // GIT full-roster workflow: operativní výběr příjemců patří výhradně do Sheets.
 function rosterRefreshParticipants(){
+  globalThis.GHRAB_GENERATOR_GROUPS?.onRosterInput?.(val('rosterEmails'));
   rosterSyncActiveCodes();rosterRender();validate();saveSnapshot();
 }
 function rosterRenderParticipants(){}
-function rosterChosenParticipants(){return rosterParseEmails(val('rosterEmails'));}
+function rosterChosenParticipants(){
+  const raw=val('rosterEmails');
+  globalThis.GHRAB_GENERATOR_GROUPS?.onRosterInput?.(raw);
+  const parsed=rosterParseEmails(raw);
+  const mapped=globalThis.GHRAB_GENERATOR_GROUPS?.mapRoster?.(parsed);
+  // Keep the entire input roster even if an optional consumer returns a stale or partial projection.
+  if(!Array.isArray(mapped)||mapped.length!==parsed.length||mapped.some((entry,i)=>entry?.email!==parsed[i].email))return parsed;
+  return mapped;
+}
 async function rosterApplyToOutput(){
   if(!lastAssembled||!lastGenData){rosterRender('Nejdřív vytvoř obsah testu.');return;}
   if(!rosterEntries.length){rosterRender('Nejdřív připrav kódy celé skupině.');return;}

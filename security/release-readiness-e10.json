@@ -1,16 +1,32 @@
 {
   "schema": "git-release-readiness-e10-v1",
-  "version": "7.1.101",
-  "status": "READY WITH DOCUMENTED LIMITATIONS",
-  "blockers": [],
-  "f7": "IMPLEMENTED; exact-SHA current-version gates required",
-  "remotePath": "Owner requested separate GIT 7.1.101 hotfix documentation/cache release on 2026-10-20. Only exact-SHA protected candidate/main admission may deploy.",
-  "scope": "CONTROLLED_CLASSROOM_WITH_DOCUMENTED_LIMITATIONS",
+  "version": "7.1.102",
+  "status": "NOT READY – BLOCKING ISSUE",
+  "blockers": [
+    {
+      "id": "E8-EXACT-SHA-P5",
+      "status": "PENDING",
+      "detail": "Full exact-SHA GIT 7.1.102 P5 and Journey gates must pass before release admission."
+    },
+    {
+      "id": "E8-SCHOOL-UAT",
+      "status": "PENDING",
+      "detail": "Authorized teacher login and real desktop/iPad/iPhone/Android school UAT not yet independently accepted."
+    },
+    {
+      "id": "E8-OWNER-RELEASE-APPROVAL",
+      "status": "PENDING",
+      "detail": "Owner authorization for 7.1.101 is not transferable to GIT 7.1.102 E8."
+    }
+  ],
+  "f7": "IMPLEMENTED_STAGE08_CANDIDATE; independent versioned P5 and classroom UAT pending",
+  "remotePath": "GIT 7.1.102 Stage08 remains in draft PR #138. Do not promote to candidate/main or deploy until exact source gates, school UAT and independent version-specific owner approval pass.",
+  "scope": "PREPRODUCTION_REVIEW_ONLY",
   "ownerDecision": {
     "recordedOn": "2026-10-20",
-    "source": "Owner approval on 2026-10-20 to complete the 7.1.101 release for the already deployed strict preview / iPhone hotfix with recorded changelog and version/caching parity; all mandatory gates remain required.",
-    "authorizeGithubPublication": true,
-    "authorizeProductionReleaseAfterMandatoryGates": true,
+    "source": "HISTORICAL ONLY: approval on 2026-10-20 covered the GIT 7.1.101 hotfix. There is no authorization in this record to publish GIT 7.1.102 Stage08.",
+    "authorizeGithubPublication": false,
+    "authorizeProductionReleaseAfterMandatoryGates": false,
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",
       "closed": false,
@@ -28,14 +44,15 @@
       "note": "Physical iPadOS/iOS/Android behavior is not certified by desktop Chromium automation."
     },
     "independentReview": {
-      "status": "PENDING_FINAL_EXACT_SHA_AUDIT",
+      "status": "PENDING_STAGE08_7_1_102_EXACT_SHA_REVIEW",
       "reviewedVersion": "7.1.101",
-      "currentVersion": "7.1.101",
+      "currentVersion": "7.1.102",
       "currentVersionIndependentlyReviewed": false,
-      "note": "Local and GitHub exact-SHA evidence is required; this source decision does not relabel physical or live-service checks as PASS."
+      "note": "Stage08 independent P5 and signed-school UAT pending. Historical 7.1.101 evidence is not a passing decision for 7.1.102."
     }
   },
   "limitations": [
+    "Stage08 7.1.102 is a DRAFT PREPRODUCTION candidate; never publish using the 7.1.101 owner decision.",
     "Physical iPadOS/iOS/Android and non-Chromium browser behavior is NOT VERIFIED for this release.",
     "Live school Google Forms, Sheets, Apps Script mail delivery and live Gemini transport are NOT VERIFIED for this release.",
     "T110 server-side recovery/revocation remains SERVER-DEFERRED by owner decision.",
