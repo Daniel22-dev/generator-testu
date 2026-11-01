@@ -3,13 +3,13 @@
   "stage": "P5",
   "appId": "generator",
   "appVersion": "7.1.102",
-  "releaseStatus": "ready-with-documented-limitations",
+  "releaseStatus": "stage08-preproduction-blocked",
   "primaryRuntime": {
     "mode": "standalone-github-pages",
     "serverRequired": false,
     "offlineCapable": true,
-    "currentUseApproved": true,
-    "useScope": "controlled-classroom-with-documented-limitations"
+    "currentUseApproved": false,
+    "useScope": "synthetic-preproduction-only"
   },
   "github": {
     "status": "not-yet-uploaded",

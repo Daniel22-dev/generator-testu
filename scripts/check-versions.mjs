@@ -3,6 +3,7 @@
 // Cilem je zabranit situaci, kdy aplikace ma novy RELEASE, ale service worker
 // nebo manifest porad drzi starou cache / start_url.
 import fs from 'node:fs';
+import { releaseDecision } from './check-redteam-release-e10.mjs';
 
 function fail(message) {
   console.error(`❌ ${message}`);
@@ -15,6 +16,19 @@ function read(file) {
 
 const pkg = JSON.parse(read('package.json'));
 const packageVersion = String(pkg.version || '').trim();
+const acceptance=JSON.parse(read('src/config/release-acceptance.json'));
+const readiness=JSON.parse(read('security/release-readiness-e10.json'));
+if(readiness.version!==packageVersion)fail('E10 readiness version does not match release package.');
+const e10Blocked=releaseDecision(readiness,packageVersion).releaseBlocked;
+if(e10Blocked && (
+  acceptance.primaryRuntime?.currentUseApproved!==false ||
+  acceptance.releaseStatus==='ready-with-documented-limitations' ||
+  acceptance.publication?.runtimeDistributed===true
+))fail('E10 is blocking release, but release-acceptance claims it is ready or distributed.');
+if(acceptance.github?.status!=='deployed-verified' && (
+  acceptance.primaryRuntime?.currentUseApproved===true ||
+  acceptance.publication?.runtimeDistributed===true
+))fail('Non-deployed GIT cannot claim current-use approval or distribution.');
 const lock = JSON.parse(read('package-lock.json'));
 
 const core = read('src/js/01-core.js');
