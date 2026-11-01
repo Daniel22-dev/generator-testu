@@ -1,0 +1,46 @@
+name: GIT E10 owner parity cross-OS source QA (NO DEPLOY, NONCERTIFYING)
+on:
+  push:
+    branches:
+      - qa/groups-v2-git-e10-owner-parity-20261101
+permissions:
+  contents: read
+jobs:
+  parity-and-negative-tests:
+    name: reviewed E10 owner gates (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    timeout-minutes: 25
+    steps:
+      - name: Checkout immutable PATCH source, not QA workflow commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: e914d05ab38a554bb686880d1a5c38e445a4e9c7
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Configure reviewed Node toolchain
+        uses: ./.github/actions/setup-ci-node
+      - name: Verify no test workflow shipped in inspected source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "e914d05ab38a554bb686880d1a5c38e445a4e9c7"
+          test ! -e .github/workflows/groups-v2-git-e10-owner-parity-qa.yml
+          git diff --exit-code HEAD -- .github/workflows
+          node --check scripts/check-redteam-release-e10.mjs
+          node --check scripts/check-redteam-evidence-e10.mjs
+          node --check scripts/check-versions.mjs
+          node --check scripts/qa-p5-acceptance.mjs
+      - name: Run exact-version E10 metadata parity and mutation regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/check-versions.mjs
+          node scripts/check-redteam-release-e10.mjs
+          node scripts/check-s83-ci-portability.mjs
+          node scripts/check-stage08-groups.mjs
+          node scripts/check-stage08-results.mjs
+          echo 'SOURCE-ONLY QA PASS; no real student, no protected candidate promotion, no full E10/P5.'
