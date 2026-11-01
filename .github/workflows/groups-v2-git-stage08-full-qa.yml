@@ -1,0 +1,96 @@
+name: GIT Stage08 immutable-source E10/P5 + Groups diagnostic (NO DEPLOY)
+on:
+  push:
+    branches:
+      - qa/stage08-groups-full-source-20261101
+permissions:
+  contents: read
+jobs:
+  clean-stage08-cross-os:
+    name: GIT v2 Groups and release guards on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.22.2
+      - name: Verify immutable source, no temporary QA and version
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2"
+          test ! -e .github/workflows/groups-v2-git-stage08-full-qa.yml
+          test "$(node -p 'require("./package.json").version')" = '7.1.102'
+      - name: Install exact locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Verify Stage08, strict release block and source syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run check:stage08-groups
+          npm run check:stage08-results
+          npm run check:versions
+          npm run check:redteam-e10
+          npm run check:s83-ci-portability
+  full-e10-p5-source-diagnostics:
+    name: GIT complete E10 + P5 / GARP (separate QA event is NOT a release certificate)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.22.2
+          cache: npm
+      - name: Verify exact source and report event/source SHA distinction
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "9ae2a93aef91c37cdfb23f36245d6bfa8717bdc2"
+          test ! -e .github/workflows/groups-v2-git-stage08-full-qa.yml
+          echo 'This run is only an immutable checked-out-source diagnostic.'
+          echo 'GITHUB_SHA denotes the separate QA workflow event and is not clean release SHA.'
+      - name: Locked independent tools (not protected composite action)
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
+      - name: Check pinned versions before Playwright browser provisioning
+        shell: bash
+        run: |
+          node -e "if(require('./node_modules/playwright/package.json').version!=='1.61.1'||require('./node_modules/axe-core/package.json').version!=='4.12.1')process.exit(1)"
+      - name: Install pinned headless Chromium
+        shell: bash
+        run: |
+          node node_modules/playwright/cli.js install --with-deps chromium
+          node -e "console.log('CHROMIUM_PATH='+require('playwright').chromium.executablePath())" >> "$GITHUB_ENV"
+      - name: Real red-team E10, foundation, full P5 browser regression and evidence admission
+        shell: bash
+        env:
+          GARP27_EXTERNAL_TRUST_SHA256: ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006
+        run: |
+          set -euo pipefail
+          npm run qa:redteam:ci
+      - name: Evidence retained for diagnostic review only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: git-v2-stage08-clean-source-noncert-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            qa-results/redteam-e10-*.json
+            qa-results/redteam-e10-ci/
+            qa-results/garp27-current/
+            audit/evidence/garp27-current/
+            dist/qa-p5-*.json
