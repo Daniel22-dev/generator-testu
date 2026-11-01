@@ -123,8 +123,8 @@ function toggleHandoffStartCode(button,expectedPackage){
 async function copyHandoffStartCode(expectedPackage,expectedCode){
   const context=handoffPackageContext(expectedPackage);if(!context||expectedCode&&context.pack.startCode!==expectedCode){handoffLessonCodeRevealed=false;renderStartCode();return false;}
   const code=context.pack.startCode;if(!code)return false;
-  try{await navigator.clipboard.writeText(code);handoffLessonStatus('Startovní kód byl zkopírován.','ok');return true;}
-  catch(_){if(!handoffLessonCodeRevealed)toggleHandoffStartCode($('handoffStartCodeToggle'));selectHandoffText($('handoffStartCodeValue'));handoffLessonStatus('Kód je zobrazený a označený; zkopíruj jej ručně.','warn');return false;}
+  try{await navigator.clipboard.writeText(code);const current=handoffPackageContext(expectedPackage);if(!current||current.pack.startCode!==code)return false;handoffLessonStatus('Startovní kód byl zkopírován.','ok');return true;}
+  catch(_){const current=handoffPackageContext(expectedPackage);if(!current||current.pack.startCode!==code)return false;const toggle=current.box.querySelector('#handoffStartCodeToggle'),value=current.box.querySelector('#handoffStartCodeValue');if(!handoffLessonCodeRevealed)toggleHandoffStartCode(toggle,expectedPackage);selectHandoffText(value);handoffLessonStatus('Kód je zobrazený a označený; zkopíruj jej ručně.','warn');return false;}
 }
 function openHandoffLesson(kind,expectedPackage,expectedUrl){
   const context=handoffLessonContext(kind,expectedPackage,expectedUrl);if(!context){renderStartCode();return false;}const url=context.url;
@@ -134,8 +134,8 @@ function openHandoffLesson(kind,expectedPackage,expectedUrl){
 }
 async function copyHandoffLessonValue(kind,expectedPackage,expectedUrl){
   const context=handoffLessonContext(kind,expectedPackage,expectedUrl);if(!context){renderStartCode();return false;}const url=context.url;
-  try{await navigator.clipboard.writeText(url);handoffLessonStatus(kind+' odkaz byl zkopírován.','ok');return true;}
-  catch(_){const details=$('handoffLessonPhoneDetails');if(details)details.open=true;selectHandoffText($(kind==='END'?'handoffLessonEndValue':'handoffLessonStartValue'));handoffLessonStatus('Odkaz je rozbalený a označený; zkopíruj jej ručně.','warn');return false;}
+  try{await navigator.clipboard.writeText(url);if(!handoffLessonContext(kind,expectedPackage,url))return false;handoffLessonStatus(kind+' odkaz byl zkopírován.','ok');return true;}
+  catch(_){const current=handoffLessonContext(kind,expectedPackage,url);if(!current)return false;const details=current.box.querySelector('#handoffLessonPhoneDetails'),value=current.box.querySelector(kind==='END'?'#handoffLessonEndValue':'#handoffLessonStartValue');if(details)details.open=true;selectHandoffText(value);handoffLessonStatus('Odkaz je rozbalený a označený; zkopíruj jej ručně.','warn');return false;}
 }
 function renderStartCode(){
   let box=$('privateStartCode');

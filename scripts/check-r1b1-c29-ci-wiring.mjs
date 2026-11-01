@@ -16,7 +16,7 @@ function validate(pkg){
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 validate(pkg);
 const browserSource=fs.readFileSync('scripts/check-r1b1-c29-browser.mjs','utf8');
-const microfixScenarios=['B1-26','B1-27','B1-28','B1-29','B1-30'];
+const microfixScenarios=['B1-26','B1-27','B1-28','B1-29','B1-30','B1-32','B1-33','B1-34','B1-35','B1-36'];
 function validateMicrofixScenarios(source){for(const id of microfixScenarios)assert.ok(source.includes(`'${id}'`),`C29 microfix browser gate must retain ${id}`);}
 validateMicrofixScenarios(browserSource);
 const mutations=[];

@@ -143,6 +143,24 @@ await check('B1-27','stale DOM controls are bound to their rendered package and 
 await check('B1-28','stable rerender preserves revealed code, details state and focused control',async()=>{await state('allowed');await page.getByRole('button',{name:'Zobrazit kód'}).click();await page.locator('#privateStartCode details summary').click();await page.getByRole('button',{name:/Kopírovat START odkaz/}).focus();const before=await page.evaluate(()=>{window.__c29BeforeCard=$('privateStartCode');return {text:$('handoffStartCodeValue').textContent};});await page.evaluate(()=>updateSecureDownloadGate());const after=await page.evaluate(()=>({sameCard:$('privateStartCode')===window.__c29BeforeCard,expanded:$('handoffStartCodeToggle').getAttribute('aria-expanded'),details:$('handoffLessonPhoneDetails').open,focused:/Kopírovat START odkaz/.test(document.activeElement?.textContent||''),text:$('handoffStartCodeValue').textContent}));assert.equal(before.text,CODE);assert.deepEqual(after,{sameCard:true,expanded:'true',details:true,focused:true,text:CODE});});
 await check('B1-29','a real gate lock removes every previously revealed value',async()=>{await state('allowed');await page.getByRole('button',{name:'Zobrazit kód'}).click();await page.locator('#privateStartCode details summary').click();await page.evaluate(()=>{lastSelfTest=null;updateSecureDownloadGate();});const s=await snapshot();assert.equal(s.html.includes(CODE)||s.html.includes(START)||s.html.includes(END),false);assert.equal(s.hrefs.length,0);});
 await check('B1-30','handoff guidance distinguishes all four code authorities',async()=>{await state('allowed');const text=(await snapshot()).text;assert.match(text,/startovn/i);assert.match(text,/osobn/i);assert.match(text,/Recovery/);assert.match(text,/Teacher\/Admin/);});
+async function staleClipboardRace(target,outcome){
+  await state('allowed',{startCode:`A-${target}-${outcome}`});
+  return page.evaluate(async({target,outcome,start,end})=>{
+    const label=target==='code'?'Kopírovat kód':'Kopírovat START odkaz';
+    const oldButton=[...$('privateStartCode').querySelectorAll('button')].find(button=>button.textContent===label);
+    let settle;
+    Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:()=>new Promise((resolve,reject)=>{settle=outcome==='resolve'?resolve:()=>reject(new Error('synthetic clipboard rejection'));})}});
+    oldButton.click();
+    generatedPackage={...generatedPackage,startCode:`B-${target}-${outcome}`,lessonStartUrl:start.replace('SYNTHETIC-C29','B-C29'),lessonEndUrl:end.replace('SYNTHETIC-C29','B-C29')};
+    renderStartCode();
+    const card=$('privateStartCode'),capture=()=>({sameCard:$('privateStartCode')===card,html:card.innerHTML,status:$('handoffLessonStatus')?.textContent||'',code:$('handoffStartCodeValue')?.textContent||'',expanded:$('handoffStartCodeToggle')?.getAttribute('aria-expanded'),details:$('handoffLessonPhoneDetails')?.open||false,selection:getSelection()?.toString()||'',focus:document.activeElement?.id||''});
+    const before=capture();settle();await new Promise(resolve=>setTimeout(resolve,0));return {before,after:capture()};
+  },{target,outcome,start:START,end:END});
+}
+for(const [id,target,outcome] of [['B1-32','code','resolve'],['B1-33','code','reject'],['B1-34','url','resolve'],['B1-35','url','reject']]){
+  await check(id,`late clipboard ${outcome} from an old ${target} control cannot mutate the current package card`,async()=>{const result=await staleClipboardRace(target,outcome);assert.deepEqual(result.after,result.before,`stale ${outcome} changed the new ${target} card`);});
+}
+await check('B1-36','current URL clipboard rejection still exposes the exact manual fallback',async()=>{await state('allowed');const result=await page.evaluate(async()=>{const pack=generatedPackage,url=handoffLessonUrl('START');Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw new Error('synthetic clipboard rejection');}}});const copied=await copyHandoffLessonValue('START',pack,url);return {copied,details:$('handoffLessonPhoneDetails')?.open||false,selection:getSelection()?.toString()||'',status:$('handoffLessonStatus')?.textContent||'',url};});assert.equal(result.copied,false);assert.equal(result.details,true);assert.equal(result.selection,result.url);assert.match(result.status,/ručně|označen/i);});
 await check('B1-31','browser scenario completes without page or console errors',async()=>assert.deepEqual(pageErrors,[]));
 
 const evidence={schema:'git-r1b1-c29-browser-v1',status:failures.length?'FAIL':'PASS',gitHead,gitTree:execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim(),node:process.version,chromium:executablePath,fixture:{startSha256:sha(START),endSha256:sha(END),code:'synthetic-redacted'},checks,pageErrors,failures};
