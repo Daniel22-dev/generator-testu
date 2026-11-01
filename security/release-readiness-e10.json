@@ -20,7 +20,7 @@
     }
   ],
   "f7": "IMPLEMENTED_STAGE08_CANDIDATE; independent versioned P5 and classroom UAT pending",
-  "remotePath": "GIT 7.1.102 Stage08 remains in draft PR #138. Do not promote to candidate/main or deploy until exact source gates, school UAT and independent version-specific owner approval pass.",
+  "remotePath": "GIT 7.1.102 Stage08 clean Draft #141 remains PREPRODUCTION ONLY. Current exact SHA may be reviewed but must not be merged into candidate/main or deployed before authorized exact-SHA E10/P5, Journey, staff UAT and version-specific school approval.",
   "scope": "PREPRODUCTION_REVIEW_ONLY",
   "ownerDecision": {
     "recordedOn": "2026-10-20",
