@@ -16,7 +16,7 @@ export function requireReady(state,version){
   assert.equal(owner?.independentReview?.currentVersion,version,'Owner review must identify current version');
   if(state.status==='READY WITH DOCUMENTED LIMITATIONS'){
     assert.equal(owner?.authorizeProductionReleaseAfterMandatoryGates,true,'Production release authorization is required');
-    assert.notEqual(state.scope,'PREPRODUCTION_REVIEW_ONLY','Preproduction scope cannot certify production readiness');
+    assert.equal(state.scope,'CONTROLLED_CLASSROOM_WITH_DOCUMENTED_LIMITATIONS','Controlled classroom scope required');
     assert.equal(owner?.LIVE_FORMS?.independentlyVerified,true,'Current-version live Forms integration requires school verification');
     assert.equal(owner?.E7_PHYSICAL?.physicalDevicesTested,true,'Current-version physical device UAT must be completed');
     assert.ok(Array.isArray(state.limitations)&&state.limitations.length>0,'Documented limitations required');
@@ -78,6 +78,8 @@ if(process.argv[1]?.endsWith('check-redteam-release-e10.mjs')){
       ['ready-unverified-physical-uat',x=>x.ownerDecision.E7_PHYSICAL.physicalDevicesTested=false],
       ['ready-unverified-forms',x=>x.ownerDecision.LIVE_FORMS.independentlyVerified=false],
       ['ready-preproduction-scope',x=>x.scope='PREPRODUCTION_REVIEW_ONLY'],
+      ['ready-unrestricted-scope',x=>x.scope='UNRESTRICTED'],
+      ['ready-missing-scope',x=>delete x.scope],
     ]){
       const broken=structuredClone(ready);mutate(broken);
       assert.throws(()=>requireReady(broken,pkg.version),{name:'AssertionError'},id);
