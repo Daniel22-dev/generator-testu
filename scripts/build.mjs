@@ -352,8 +352,32 @@ const jsFiles = fs.readdirSync(jsDir)
 const mainParts = jsFiles.filter(f => !f.startsWith('50-') && !f.startsWith('60-'));
 
 let assistantFeatureSource = '';
+// Source Stage09 dynamic import specifiers are literal and source-relative for
+// GARP 2.7's enforced import resolver. The generator embeds classic src/js files
+// in the HTML document, where dynamic imports must instead be document-relative.
+// Rebase only the exact reviewed three imports; unexpected counts abort the build.
+function rebaseInlinedStage09Imports(source, file) {
+  if (file !== '17a-stage09-material-outbound.js') return source;
+  for (const [name, expected] of [
+    ['stage09-material.js', 2],
+    ['stage09-save-to-studio-local.js', 1],
+  ]) {
+    const from = "import('../features/" + name + "')";
+    const to = "import('./features/" + name + "')";
+    if (source.split(from).length - 1 !== expected ||
+        source.includes(to)) {
+      fail('Stage09 module import source graph or rebasing count drift: ' + name);
+    }
+    source = source.replaceAll(from, to);
+    if (source.split(to).length - 1 !== expected) {
+      fail('Stage09 module import rebasing incomplete: ' + name);
+    }
+  }
+  return source;
+}
 const inlineScriptTag = file => {
   let source = fs.readFileSync(path.join(jsDir, file), 'utf8');
+  source = rebaseInlinedStage09Imports(source, file);
   if (file === '01-core.js') {
     const split = splitGeneratorAssistant(source, file);
     source = split.main;

@@ -107,6 +107,25 @@ test('official helper passes reviewed material to Platform Bridge v2 and decline
   } finally {globalThis.location=beforeLoc;globalThis.GHRAB_PLATFORM=beforePlatform;}
 });
 
+test('Stage09 source imports resolve under src/js while bundle rebases exactly for teacher HTML',()=>{
+  const ui=fs.readFileSync('src/js/17a-stage09-material-outbound.js','utf8');
+  const builder=fs.readFileSync('scripts/build.mjs','utf8');
+  for(const [name,expected] of [['stage09-material.js',2],['stage09-save-to-studio-local.js',1]]) {
+    const sourceImport="import('../features/"+name+"')";
+    const wrongSourceImport="import('./features/"+name+"')";
+    assert.equal(ui.split(sourceImport).length-1,expected,'Source resolver must see exact real dependency: '+name);
+    assert.equal(ui.split(wrongSourceImport).length-1,0,'Source must not mask bad relative path: '+name);
+    assert.match(builder,/rebaseInlinedStage09Imports\(source, file\)/);
+    assert.ok(builder.includes("'"+name+"', "+expected), 'Exact rebasing count pinned: '+name);
+    assert.ok(fs.existsSync('src/features/'+name),'Source dependency must exist: '+name);
+  }
+  // The build must fail closed if an import count changes; it may never
+  // suppress GARP's source edge validation or use eval/new Function.
+  assert.match(builder,/source\.split\(from\)\.length - 1 !== expected/);
+  assert.match(builder,/source = source\.replaceAll\(from, to\)/);
+  assert.match(builder,/source\.split\(to\)\.length - 1 !== expected/);
+});
+
 test('actual teacher UI and offline service worker retain the consent and reviewed-state safety rails',()=>{
   const ui=fs.readFileSync('src/js/17a-stage09-material-outbound.js','utf8');
   const html=fs.readFileSync('src/shell.html','utf8');

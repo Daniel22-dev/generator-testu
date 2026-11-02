@@ -109,7 +109,7 @@
       const attemptedToken=dialogToken;
       try{
         if(source()!==inspected)throw Error('STAGE09_CONTENT_CHANGED');
-        const mod=await import('./features/stage09-material.js');
+        const mod=await import('../features/stage09-material.js');
         if(attemptedToken!==dialogToken||!dialog.open)return;
         if(source()!==inspected)throw Error('STAGE09_CONTENT_CHANGED');
         const currentKey=key();if(!currentKey)throw Error('STAGE09_CONTENT_CHANGED');
@@ -131,7 +131,7 @@
         const snapshot=globalThis.__GHRAB_STUDIO_ACCESS__;
         if(!reviewedKey||key()!==reviewedKey)throw Error('STAGE09_PREVIEW_STALE');
         if(!globalThis.crypto?.randomUUID)throw Error('STAGE09_CRYPTO_UNAVAILABLE');
-        const m=await import('./features/stage09-material.js');
+        const m=await import('../features/stage09-material.js');
         if(attemptedToken!==dialogToken||!dialog.open)throw Error('STAGE09_DIALOG_CANCELLED');
         if(!q('stage09Consent').checked||!allowed()||snapshot!==globalThis.__GHRAB_STUDIO_ACCESS__||key()!==reviewedKey)
           throw Error('STAGE09_ACCESS_OR_CONTENT_CHANGED');
@@ -150,7 +150,7 @@
         } catch {
           // Offline fallback: exact source-pinned copy of the SAME Studio helper.
           // This is static code only; Bridge handoff still follows Platform 2.0.
-          helper=await import('./features/stage09-save-to-studio-local.js');
+          helper=await import('../features/stage09-save-to-studio-local.js');
         }
         if(attemptedToken!==dialogToken||!dialog.open)throw Error('STAGE09_DIALOG_CANCELLED');
         if(!q('stage09Consent').checked||!allowed()||snapshot!==globalThis.__GHRAB_STUDIO_ACCESS__||key()!==reviewedKey)
