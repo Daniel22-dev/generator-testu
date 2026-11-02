@@ -94,8 +94,14 @@ await cappedAdapter.clear();
 const source=fs.readFileSync('src/features/group-result-ledger.js','utf8');
 const cspScanner=fs.readFileSync('scripts/check-csp.mjs','utf8');
 const lintRules=fs.readFileSync('eslint.config.mjs','utf8');
-ok(()=>assert.ok(cspScanner.includes("file===path.join('src','features','group-result-ledger.js')?'module':'script'"),
-  'CSP must parse the exact ledger as a module and keep inspecting its AST'));
+// The original ledger AND the two newly reviewed Stage09 ESM files must all
+// receive the same AST security checks. The module list is exact and explicit.
+ok(()=>assert.ok(
+  ['group-result-ledger.js','stage09-material.js','stage09-save-to-studio-local.js']
+    .every(name=>cspScanner.includes("path.join('src','features','"+name+"')")) &&
+  cspScanner.includes("sourceModules.has(file)?'module':'script'") &&
+  cspScanner.includes("walk(parse(read(file),"),
+  'CSP must parse the exact ledger and Stage09 ESM modules and inspect all ASTs'));
 ok(()=>assert.ok(lintRules.includes("files: ['src/features/group-result-ledger.js']") && lintRules.includes("sourceType: 'module'"),
   'ESLint must analyze the exact ledger as ESM'));
 const bridge=fs.readFileSync('src/js/18-central-groups.js','utf8');

@@ -46,6 +46,22 @@ export default [
     },
   },
   {
+    // Stage09 teachers' export modules are ESM, not classic scripts.
+    // Retain no-eval/no-new-func/no-undef and the base browser rules.
+    files: [
+      'src/features/stage09-material.js',
+      'src/features/stage09-save-to-studio-local.js',
+    ],
+    languageOptions: {
+      sourceType: 'module',
+    },
+    rules: {
+      'no-eval': 'error',
+      'no-new-func': 'error',
+      'no-undef': 'error',
+    },
+  },
+  {
     files: ['public/access/*.js'],
     languageOptions: {
       ecmaVersion: 2022,

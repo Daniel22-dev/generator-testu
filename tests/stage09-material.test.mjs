@@ -153,6 +153,12 @@ test('CSP security scanner accepts exact reviewed Stage09 ESM modules without by
   }
   assert.match(source,/sourceModules\.has\(file\)\?'module':'script'/);
   assert.match(source,/walk\(parse\(read\(file\)/);
+  const lintConfig=fs.readFileSync('eslint.config.mjs','utf8');
+  for(const name of ['stage09-material.js','stage09-save-to-studio-local.js'])
+    assert.ok(lintConfig.includes("src/features/"+name),name+' missing from strict ESM lint rules');
+  assert.match(lintConfig,/'no-eval': 'error'/);
+  assert.match(lintConfig,/'no-new-func': 'error'/);
+  assert.match(lintConfig,/'no-undef': 'error'/);
   const actual=spawnSync(process.execPath,['scripts/check-csp.mjs'],{
     encoding:'utf8',timeout:30000,maxBuffer:1024*1024,
   });
