@@ -66,10 +66,15 @@ if(!/['"]node_modules['"]\s*,\s*['"]acorn['"]/.test(build)||!/['"]vendor['"]\s*,
 if(!/function\s+ensureJavascriptParser\s*\(/.test(gemini)||!/["']\.\/vendor\/acorn\.js["']/.test(gemini))fail('Smoke validátor nemá lokální lazy loader Acorn parseru.');
 if(!/async\s+function\s+parseGeneratedJavascriptSyntax\s*\(/.test(gemini)||!/parser\.parse\(/.test(gemini))fail('Smoke validátor nepoužívá asynchronní CSP-safe parser.');
 
+// Reviewed lazy features are actual ESM; they must still receive the same
+// unsafe-eval AST walk as classic scripts. Do not blanket-exempt src/features.
+const sourceModules = new Set([
+  path.join('src','features','group-result-ledger.js'),
+  path.join('src','features','stage09-material.js'),
+  path.join('src','features','stage09-save-to-studio-local.js'),
+]);
 for(const file of collectJs('src')){
-  // A single teacher-private result ledger is a real ESM imported by the lazy UI.
-  // Keep the exact module in the same unsafe-eval AST walk; all other src remains classic script.
-  const sourceType=file===path.join('src','features','group-result-ledger.js')?'module':'script';
+  const sourceType=sourceModules.has(file)?'module':'script';
   try{walk(parse(read(file),{ecmaVersion:'latest',sourceType,allowHashBang:true}),file);}
   catch(error){fail(`${file}: zdroj nelze analyzovat pro CSP (${error.message}).`);}
 }

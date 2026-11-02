@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import {
   mapGeneratedTestToMaterial, describeMaterialForReview, trustedStudioRoot
 } from '../src/features/stage09-material.js';
@@ -140,4 +141,21 @@ test('legacy inbound accepts verified bridge v2 but rejects absent or malformed 
   }
   const accepted=run('2099-01-01T00:00:00Z');
   assert.equal(accepted.material.material.id,'synthetic');
+});
+
+// The complete CSP audit must parse the TWO new Stage09 ESM files as modules
+// while retaining its AST safety scan (eval/new Function/string timers).
+// This runs the same public security gate that release certification invokes.
+test('CSP security scanner accepts exact reviewed Stage09 ESM modules without bypass',()=>{
+  const source=fs.readFileSync('scripts/check-csp.mjs','utf8');
+  for(const name of ['group-result-ledger.js','stage09-material.js','stage09-save-to-studio-local.js']){
+    assert.ok(source.includes("path.join('src','features','"+name+"')"),name+' must be explicit in ESM allowlist');
+  }
+  assert.match(source,/sourceModules\.has\(file\)\?'module':'script'/);
+  assert.match(source,/walk\(parse\(read\(file\)/);
+  const actual=spawnSync(process.execPath,['scripts/check-csp.mjs'],{
+    encoding:'utf8',timeout:30000,maxBuffer:1024*1024,
+  });
+  assert.equal(actual.status,0,actual.stderr||actual.stdout||String(actual.error));
+  assert.match(actual.stdout,/bez unsafe-eval/);
 });
