@@ -26,7 +26,9 @@ const CORE_ASSETS = [
   "./access/suite-session-cleanup.js",
   "./ghrab/ghrab-platform.js",
   "./features/testlab.js",
-  "./features/preview-editor.js"
+  "./features/preview-editor.js",
+  "./features/stage09-material.js",
+  "./features/stage09-save-to-studio-local.js"
 ];
 
 self.addEventListener('message', (event) => {
