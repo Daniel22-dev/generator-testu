@@ -1,6 +1,16 @@
 name: Groups v2 full protected P5/GARP preproduction (NO DEPLOY)
 
 on:
+  push:
+    branches: ['preprod/stage08-v2-clean-s83-release-20261028']
+    paths:
+      - '.github/workflows/groups-v2-full-preprod-gate.yml'
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'public/**'
   pull_request:
     branches: ['candidate']
     paths:
@@ -22,7 +32,7 @@ concurrency:
 
 jobs:
   full-p5-garp:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'preprod/stage08-v2-clean-s83-release-20261028' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref_name == 'preprod/stage08-v2-clean-s83-release-20261028') || (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'preprod/stage08-v2-clean-s83-release-20261028') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
