@@ -12,7 +12,7 @@
     const v2=window.GHRAB_PLATFORM?.bridge?.take?.({target:'generator',maxBytes:500000});if(v2)return v2;
     const p=parse(HANDOFF_KEY,null);
     if(!p||p.schema!=='ghrab-handoff-v1'||p.target!=='generator'||!validMaterial(p.material))return null;
-    if(Date.parse(p.expiresAt||'')<Date.now()){remove(HANDOFF_KEY);return null}
+    const expiry=Date.parse(p.expiresAt||'');if(!Number.isFinite(expiry)||expiry<=Date.now()){remove(HANDOFF_KEY);return null}
     remove(HANDOFF_KEY);return p;
   }
   function setValue(id,value){const el=document.getElementById(id);if(!el)return;el.value=value||'';el.dispatchEvent(new Event('input',{bubbles:true}))}
