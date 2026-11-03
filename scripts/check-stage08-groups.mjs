@@ -104,3 +104,64 @@ for(const filename of fs.readdirSync('.github/workflows').filter(x=>/\.ya?ml$/.t
 }
 assert.ok(trustBindingCount>=7,'Required release workflows must bind the GARP trust anchor');
 console.log('Stage08 GARP trust bindings verified: '+trustBindingCount);
+
+
+// R20: teacher approval is asynchronous and may outlive a local edit.
+// Synthetic browser state only: no actual pupil data, Google Forms or network.
+assert.ok(code.includes('assertLocalImportUnchanged(localBefore,ticket,selected.id)'),
+  'Central revision check must be combined with the local draft recheck');
+const r20Source=code.replace(inject,
+  "  globalThis.__R20__={apply:applySelection,init(p,svc,d){preview=p;servicePromise=Promise.resolve(svc);dialog=d},current:()=>linked};\n"+inject);
+async function runR20(mutate=()=>{}) {
+  const nodes={
+    centralGroupsApply:{disabled:false},
+    centralGroupsSelect:{value:group.groupId},
+    rosterEmails:{value:'old@example.invalid'},
+    centralGroupsPreview:{textContent:''},
+    centralGroupsStatus:{textContent:''}
+  };
+  const modal={open:true,close(){this.open=false}};
+  const current=projection();
+  const service={getRosterProjection:()=>current};
+  const ctx={
+    console,URL,Date,Set,Map,Object,JSON,
+    location:{href:'https://school.example/generator-testu/',origin:'https://school.example'},
+    document:{documentElement:{dataset:{ghrabAccess:'granted'}},
+      getElementById:key=>nodes[key]||null},
+    rosterIssuedCodes:new Set(['ABCDEF']),
+    rosterEntries:[{code:'ABCDEF',email:'old@example.invalid'}],
+    lastAssembled:{sourceState:{__roster:[]}},
+    rosterRefreshParticipants(){},
+    __GHRAB_STUDIO_ACCESS__:{appId:'generator'}
+  };
+  ctx.uiConfirm=async()=>{mutate({nodes,modal,ctx});return true};
+  ctx.globalThis=ctx;
+  vm.createContext(ctx);
+  vm.runInContext(r20Source,ctx,{filename:'central-groups-r20-synthetic.js'});
+  ctx.__R20__.init({id:group.groupId,revision:7,fingerprint:JSON.stringify(current)},service,modal);
+  await ctx.__R20__.apply();
+  return{nodes,modal,ctx,link:ctx.__R20__.current()};
+}
+const r20Healthy=await runR20();
+assert.equal(r20Healthy.nodes.rosterEmails.value,'alice@example.edu\nboris@example.edu');
+assert.equal(r20Healthy.ctx.rosterIssuedCodes.size,0);
+assert.equal(r20Healthy.link?.groupId,group.groupId);
+assert.equal(r20Healthy.modal.open,false);
+for(const [name,edit] of [
+  ['teacher changed input',({nodes})=>{nodes.rosterEmails.value='new@example.invalid'}],
+  ['issued codes changed',({ctx})=>{ctx.rosterIssuedCodes.add('GHJKMN')}],
+  ['local roster changed',({ctx})=>{ctx.rosterEntries.push({code:'GHJKMN',email:'new@example.invalid'})}],
+  ['selection changed',({nodes})=>{nodes.centralGroupsSelect.value='grp_999999999999'}],
+  ['dialog closed',({modal})=>{modal.open=false}],
+  ['access revoked',({ctx})=>{ctx.document.documentElement.dataset.ghrabAccess='denied'}],
+  ['test assembled',({ctx})=>{ctx.lastAssembled.sourceState.__roster.push({code:'GHJKMN'})}]
+]) {
+  const outcome=await runR20(edit);
+  assert.equal(outcome.link,null,name+' cannot attach a stale group');
+  assert.notEqual(outcome.nodes.rosterEmails.value,'alice@example.edu\nboris@example.edu',
+    name+' cannot overwrite a local teacher field');
+  assert.ok(outcome.ctx.rosterIssuedCodes.size>0,name+' cannot clear issued codes');
+  assert.ok(outcome.ctx.rosterEntries.length>0,name+' cannot clear local rows');
+  console.log('PASS Stage08 R20 - '+name+' fails closed');
+}
+console.log('PASS Stage08 R20 - async local draft integrity and teacher identity');
