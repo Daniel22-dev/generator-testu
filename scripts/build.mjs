@@ -386,7 +386,10 @@ const inlineScriptTag = file => {
   }
   return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespaceTight(source, file)}\n</script>`;
 };
-const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
+// The pinned vendor source is still SHA-verified above. Its emitted inline
+// runtime is AST-equivalently compacted only in this isolated R29 trial;
+// no trust metadata, source vendor bytes, or release limits are changed.
+const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${compactJsWhitespaceTight(fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8'),'vendor/'+CORE_FILE)}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
 const jsCsTag = inlineScriptTag('50-cs-module.js');
 const jsPwaTag = inlineScriptTag('60-pwa.js');
@@ -464,8 +467,7 @@ for(const [relative,filter,strategy,type] of [
   ['icons/icon-512.png',4,1,6],
   ['icons/icon-maskable-512.png',4,1,6],
   ['icons/icon-192.png',4,1,6],
-  ['icons/apple-touch-icon.png',4,1,6],
-  ['assets/brand/school-logo.png',0,0,2]
+  ['icons/apple-touch-icon.png',4,1,6]
 ])compactDisplayPng(relative,filter,strategy,type);
 // Public helpers stay readable and independently testable in source, but ship
 // compacted. JS compaction verifies AST equivalence before writing; CSS uses the
