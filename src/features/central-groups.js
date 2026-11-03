@@ -221,12 +221,35 @@
       document.getElementById('centralGroupsApply').disabled = !!plan.missing || !plan.total;
     } catch(e) {modalStatus(readableError(e));}
   }
+  // Snapshot local teacher work before every asynchronous confirmation.
+  // Canonical roster revision alone cannot protect a modified local draft.
+  function localImportSnapshot() {
+    const input=document.getElementById('rosterEmails');
+    if(!input) throw error('CENTRAL_ROSTER_UI_MISSING');
+    return {
+      input:input.value,
+      codes:typeof rosterIssuedCodes==='undefined'?null:JSON.stringify([...rosterIssuedCodes]),
+      entries:typeof rosterEntries==='undefined'?null:JSON.stringify(rosterEntries),
+      sealed:typeof lastAssembled==='undefined'?null:
+        JSON.stringify(lastAssembled?.sourceState?.__roster ?? null)
+    };
+  }
+  function assertLocalImportUnchanged(before,ticket,id) {
+    permitted();
+    if(ticket!==sequence||!dialog?.open||
+       document.getElementById('centralGroupsSelect')?.value!==id||
+       JSON.stringify(localImportSnapshot())!==JSON.stringify(before))
+      throw error('CENTRAL_LOCAL_DRAFT_CHANGED');
+  }
   async function applySelection() {
     const selected=preview;
+    const ticket=sequence;
     preview=null;document.getElementById('centralGroupsApply').disabled = true;
     if (!selected || document.getElementById('centralGroupsSelect').value!==selected.id) return;
     try {
+      const localBefore=localImportSnapshot();
       const service=await getService();
+      assertLocalImportUnchanged(localBefore,ticket,selected.id);
       const latest=checkProjection(service.getRosterProjection(selected.id,ROSTER_CONSUMER),selected.id);
       if (latest.group.revision!==selected.revision || JSON.stringify(latest)!==selected.fingerprint) {
         throw error('CENTRAL_STALE_PREVIEW');
@@ -239,12 +262,14 @@
       const current=document.getElementById('rosterEmails').value.trim();
       if ((current || (typeof rosterIssuedCodes !== 'undefined' && rosterIssuedCodes.size)) &&
           !(await globalThis.uiConfirm?.('Nahradit dosavadn\u00ed e-maily skupinou z AI Studia? Lok\u00e1ln\u00ed nerozeslan\u00e9 k\u00f3dy se vyma\u017eou; nov\u00e9 vytvo\u0159\u00ed\u0161 samostatn\u011b.','Na\u010d\u00edst skupinu'))) return;
-      // The teacher confirmation is asynchronous. Read again to close the TOCTOU window.
-      permitted();
+      // Recheck local state as well as the server-authoritative revision.
+      assertLocalImportUnchanged(localBefore,ticket,selected.id);
       const confirmed=checkProjection(service.getRosterProjection(selected.id,ROSTER_CONSUMER),selected.id);
       if (confirmed.group.revision!==selected.revision || JSON.stringify(confirmed)!==selected.fingerprint) {
         throw error('CENTRAL_STALE_PREVIEW');
       }
+      // No await after this check: local replacement is synchronous.
+      assertLocalImportUnchanged(localBefore,ticket,selected.id);
       const target=document.getElementById('rosterEmails');
       if (!target) throw error('CENTRAL_ROSTER_UI_MISSING');
       target.value=plan.rows.map(r=>r.email).join('\n');
@@ -256,7 +281,13 @@
       if (typeof globalThis.rosterRefreshParticipants==='function') globalThis.rosterRefreshParticipants();
       status('Napojeno na Moje skupiny \u00b7 revize '+plan.revision+' \u00b7 '+plan.total+' student\u016f. K\u00f3dy teprve p\u0159iprav pomoc\u00ed st\u00e1vaj\u00edc\u00edho tla\u010d\u00edtka.');
       dialog.close();
-    } catch(e) {modalStatus(e?.code==='CENTRAL_STALE_PREVIEW'?'Skupina se od n\u00e1hledu zm\u011bnila. Obnov n\u00e1hled.':readableError(e));}
+    } catch(e) {
+      modalStatus(e?.code==='CENTRAL_STALE_PREVIEW'
+        ? 'Skupina se od nahledu zmenila. Obnov nahled.'
+        : e?.code==='CENTRAL_LOCAL_DRAFT_CHANGED'
+          ? 'Rozpracovany seznam, kody nebo vyber skupiny se zmenily. Nic jsem neprepsal; obnov nahled.'
+          : readableError(e));
+    }
   }
   function onRosterInput(text) {
     if (linked && String(text)!==expectedInput) {
