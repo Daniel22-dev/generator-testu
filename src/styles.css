@@ -844,7 +844,9 @@ body:not(.simple-mode) .simple-only { display: none !important; }
 .gemini-model-quick button:hover { border-color:var(--acc-b); color:var(--acc); }
 .gemini-model-quick button.active { border-color:var(--ok); color:var(--ok); background:rgba(16,185,129,.10); font-weight:700; }
 .gemini-model-quick .qm-sub { display:block; font-family:monospace; font-size:10px; opacity:.75; margin-top:2px; }
-.gen-progress { text-align:center; padding:18px; color:var(--t3); font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px; }
+.gen-progress { padding:14px; color:var(--t3); font-size:14px; }
+#genProgressBar { width:100%; accent-color:var(--ok); }
+#genProgressSummary,#genProgressMsg { overflow-wrap:anywhere; display:block; margin-top:8px; }
 .gen-spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--bdr); border-top-color:var(--ok); border-radius:50%; animation:gspin .8s linear infinite; flex-shrink:0; }
 
 .btn-cancel-gen { border:1px solid var(--bdr); background:transparent; color:var(--t3); border-radius:8px; padding:7px 11px; cursor:pointer; font-size:13.5px; font-family:Georgia,serif; min-height:34px; }

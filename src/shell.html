@@ -935,8 +935,9 @@
       <div id="generationEstimate" class="small-muted" role="status"></div>
       <!-- PROGRESS -->
       <div class="gen-progress hidden" id="genProgress">
-        <span class="gen-spinner"></span>
-        <span id="genProgressMsg" role="status" aria-live="polite">Generuji…</span>
+        <progress id="genProgressBar" max="100" value="0" aria-describedby="genProgressSummary genProgressMsg"></progress>
+        <div id="genProgressSummary">Dokončeno 0/0 kroků (0 %).</div>
+        <div class="gen-progress-phase"><span class="gen-spinner" aria-hidden="true"></span><span id="genProgressMsg" role="status" aria-live="polite">Připravuji…</span></div>
         <button type="button" class="btn-cancel-gen hidden" id="btnCancelGen" onclick="cancelGeneration()">Zrušit</button>
       </div>
 
