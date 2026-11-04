@@ -445,9 +445,17 @@ async function generateTestWithManual(st,filePack,useUrlContext,progressId){
   const combined=mergeExerciseSlices(st,parts);lastGenData=combined;
   return await assembleTestHtml(st,combined);
 }
-const runHybridGeneration=generateTestWithManual;
+async function runHybridGeneration(st,filePack,useUrlContext,complexIdxs,simpleIdxs){
+  const parts=[],slices=complexIdxs.map(i=>[i]);if(simpleIdxs.length)slices.push(simpleIdxs);
+  for(const indices of slices){
+    setGenMsg('Hybrid: '+indices.map(i=>i+1).join(', '));
+    parts.push(await generatedSlice(st,indices,filePack,useUrlContext));
+  }
+  const data=mergeExerciseSlices(st,parts);lastGenData=data;
+  return assembleTestHtml(st,data);
+}
 function recordGeneratorTelemetry(outcome){
-  try{window.GHRABTelemetry?.recordOutput({outputKind:'test-package',attemptedQuantity:1,successfulQuantity:+(outcome==='success'),failedQuantity:+(outcome==='error'),cancelledQuantity:+(outcome==='cancelled'),outcome})}catch{}
+  try{window.GHRABTelemetry?.recordOutput({outputKind:'test-package',attemptedQuantity:1,successfulQuantity:+(outcome==='success'),failedQuantity:+(outcome==='error'),cancelledQuantity:+(outcome==='cancelled'),outcome})}catch(error){console.warn('Telemetrie Generátoru selhala.',error)}
 }
 
 function generationOutputSnapshot(){return[lastAssembled,lastGenData,generatedTestHtml,generatedPackage,generatedIntegrity,variantSeq,variantSlug,exportChecklist,lastSelfTest,secureGapsAcknowledged,lastKeyCheck,keyDiffsAcknowledged,selfTestStaleReason]}
@@ -491,10 +499,10 @@ async function generateTest(){
     const typed=getGeminiInputKey();
     if(typed){ useGeminiKeyForSession(); }
   }
-  if(!genAiAvailable()&&plan.batches.length){$('geminiKeyInput')?.focus();setGenErr('AI není dostupná. Zadej klíč jen pro relaci nebo obnov školní serverovou relaci.');return;}
+  if(!genAiAvailable()&&plan.batches.length){$('geminiKeyInput')?.focus();setGenErr('AI služba není dostupná. GitHub: zadej API klíč jen pro relaci. Škola: obnov serverovou relaci.');return;}
   const cooldownMs = geminiCooldownRemainingMs();
   if(cooldownMs > 0){
-    setGenErr('Limit Gemini API: zkus to za '+geminiFormatWait(cooldownMs)+'. Neklikej opakovaně.');
+    setGenErr('Limit Gemini API: zkus znovu za '+geminiFormatWait(cooldownMs)+'. Neopakuj kliknutí; prodloužila by limit.');
     geminiUpdateCooldownUI();
     return;
   } else {
@@ -556,13 +564,13 @@ async function generateTest(){
     renderQualityDiagnostics();
     renderExportChecklist(true);
     if (lastGeminiJsonRepaired) {
-      const warning='AI opravila JSON. Ověř odpovědi; surový výstup je v diagnostice.';
+      const repairedWarning='AI opravila nevalidní JSON a mohla změnit obsah. ';
       $('geminiRawDiag')?.remove();
       if (lastGeminiRawResponse) {
         const d=document.createElement('details'),raw=String(lastGeminiRawResponse);d.id='geminiRawDiag';d.innerHTML='<summary>🔍 Surový výstup AI</summary><pre>'+esc(raw.slice(0,2000)+(raw.length>2000?'\n…':''))+'</pre><button type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(lastGeminiRawResponse)">Kopírovat</button>';$('genResult')?.appendChild(d);
       }
       if (generatedPackage?.mode === 'secureOffline') {
-        const ok=await uiModal({title:'⚠️ Opravený JSON',message:warning,okText:'Ověřeno — pokračovat',cancelText:'Zahodit'});
+        const ok=await uiModal({title:'⚠️ Klasifikovaný test — opravený JSON',message:repairedWarning+'KLASIFIKOVANÝ test: PŘED ZVEŘEJNĚNÍM ověř odpovědi v Teacher preview. „Zahodit“ výsledek odstraní; pak generuj znovu.',okText:'Zkontrolováno — pokračovat',cancelText:'Zahodit a generovat znovu'});
         if (!ok) {
           $('geminiRawDiag')?.remove();generatedPackage=null;generatedTestHtml='';generatedIntegrity=null;
           GHRAB_GENERATION_PROGRESS.stop('cancel',progressId);recordGeneratorTelemetry('cancelled');
@@ -570,7 +578,7 @@ async function generateTest(){
           return;
         }
       } else {
-        await uiAlert(warning,'⚠️ Opravený JSON');
+        await uiAlert(repairedWarning+'Před předáním ověř odpovědi v učitelském náhledu nebo přes „🔑 Ověřit klíč druhým průchodem (AI)“. Surový výstup je v diagnostice.','⚠️ Obsah byl automaticky opraven');
       }
     }
     generationResumeCheckpoint=null;GHRAB_GENERATION_PROGRESS.done(['acceptance'],progressId);setGenUI('done');
