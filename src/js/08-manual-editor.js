@@ -445,6 +445,7 @@ async function generateTestWithManual(st,filePack,useUrlContext,progressId){
   const combined=mergeExerciseSlices(st,parts);lastGenData=combined;
   return await assembleTestHtml(st,combined);
 }
+const runHybridGeneration=generateTestWithManual;
 function recordGeneratorTelemetry(outcome){
   try{window.GHRABTelemetry?.recordOutput({outputKind:'test-package',attemptedQuantity:1,successfulQuantity:+(outcome==='success'),failedQuantity:+(outcome==='error'),cancelledQuantity:+(outcome==='cancelled'),outcome})}catch{}
 }
@@ -472,7 +473,7 @@ async function generateTest(){
   if ((state.resultMode || 'instant') === 'secureOffline' && typeof Access !== 'undefined' && Access.envKind === 'local'){
     const isAdmin = !!(Access.profile && Access.profile.role === 'admin');
     if (!isAdmin){
-      setGenErr('Místní klasifikovaný test smí vytvořit jen ověřený správce. Pro známkování použij oficiální adresu.');
+      setGenErr('Místní klasifikovaný test: jen ověřený správce. Známkuj z oficiální adresy.');
       return;
     }
     const proceed=await uiConfirm('Místní spuštění je jen pro technický test, ne pro známkování. Pokračovat?','Vývojové spuštění — ostrý test',true);
@@ -493,7 +494,7 @@ async function generateTest(){
   if(!genAiAvailable()&&plan.batches.length){$('geminiKeyInput')?.focus();setGenErr('AI není dostupná. Zadej klíč jen pro relaci nebo obnov školní serverovou relaci.');return;}
   const cooldownMs = geminiCooldownRemainingMs();
   if(cooldownMs > 0){
-    setGenErr('Limit Gemini API: zkus to za '+geminiFormatWait(cooldownMs)+'. Opakované klikání čekání prodlužuje.');
+    setGenErr('Limit Gemini API: zkus to za '+geminiFormatWait(cooldownMs)+'. Neklikej opakovaně.');
     geminiUpdateCooldownUI();
     return;
   } else {
@@ -582,7 +583,7 @@ async function generateTest(){
     GHRAB_GENERATION_PROGRESS.stop(cancelled?'cancel':'fail',progressId);recordGeneratorTelemetry(cancelled?'cancelled':'error');
     setGenErr((e?.message||String(e))+resume);
     setGenUI('error');
-    if(previousOutput[0])restoreGenerationOutput(previousOutput,'Nový test nevznikl; původní zůstal zachován. '+(e?.message||String(e))+resume);
+    if(previousOutput[0])restoreGenerationOutput(previousOutput,'Nový test nevznikl; původní zůstal. '+(e?.message||String(e))+resume);
   } finally { genEndAiWorkflow();lockGenerationInputs(false); }
 }
 
