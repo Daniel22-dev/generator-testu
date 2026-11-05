@@ -572,7 +572,7 @@ async function generateTest(){
       if (generatedPackage?.mode === 'secureOffline') {
         const ok=await uiModal({title:'⚠️ Klasifikovaný test — opravený JSON',message:repairedWarning+'KLASIFIKOVANÝ test: PŘED ZVEŘEJNĚNÍM ověř odpovědi v Teacher preview. „Zahodit“ výsledek odstraní; pak generuj znovu.',okText:'Rozumím — pokračovat ke kontrole',cancelText:'Zahodit a generovat znovu'});
         if (!ok) {
-          $('geminiRawDiag')?.remove();generatedPackage=null;generatedTestHtml='';generatedIntegrity=null;
+          $('geminiRawDiag')?.remove();generatedPackage=null;generatedTestHtml='';generatedIntegrity=null;lastGenData=null;lastAssembled=null;generationResumeCheckpoint=null;
           GHRAB_GENERATION_PROGRESS.stop('cancel',progressId);recordGeneratorTelemetry('cancelled');
           setGenUI('idle');uiToast('Test byl zahozen; generuj znovu.','warn',4500);
           return;

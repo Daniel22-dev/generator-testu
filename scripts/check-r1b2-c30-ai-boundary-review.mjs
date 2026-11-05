@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 const source=fs.readFileSync(new URL('../src/js/08-manual-editor.js',import.meta.url),'utf8');
 const repairedStart=source.indexOf("const repairedWarning='AI opravila nevalidní JSON");
-const repairedBlock=source.slice(repairedStart,source.indexOf('generationResumeCheckpoint=null',repairedStart));
+const repairedBlock=source.slice(repairedStart,source.indexOf("GHRAB_GENERATION_PROGRESS.done(['acceptance']",repairedStart));
 const checks=[];
 function check(id,title,fn){try{fn();checks.push({id,title,status:'PASS'});console.log(`PASS ${id} - ${title}`)}catch(error){checks.push({id,title,status:'FAIL',detail:error.message});console.error(`FAIL ${id} - ${title}: ${error.message}`)}}
 
