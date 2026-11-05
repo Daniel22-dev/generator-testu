@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const source=fs.readFileSync(new URL('../src/js/08-manual-editor.js',import.meta.url),'utf8');
-const repairedBlock=source.slice(source.indexOf('if (lastGeminiJsonRepaired)'),source.indexOf('generationResumeCheckpoint=null',source.indexOf('if (lastGeminiJsonRepaired)')));
+const repairedStart=source.indexOf("const repairedWarning='AI opravila nevalidní JSON");
+const repairedBlock=source.slice(repairedStart,source.indexOf('generationResumeCheckpoint=null',repairedStart));
 const checks=[];
 function check(id,title,fn){try{fn();checks.push({id,title,status:'PASS'});console.log(`PASS ${id} - ${title}`)}catch(error){checks.push({id,title,status:'FAIL',detail:error.message});console.error(`FAIL ${id} - ${title}: ${error.message}`)}}
 
@@ -27,7 +28,16 @@ check('C30-AI-06','AI-unavailable guidance distinguishes session-key and school-
   assert.match(source,/AI služba není dostupná[\s\S]{0,300}GitHub[\s\S]{0,300}klíč jen pro relaci[\s\S]{0,300}(?:škol|škola)[\s\S]{0,300}serverovou relaci/i);
 });
 check('C30-AI-07','quota guidance retains a concrete retry delay and warns against repeated requests',()=>{
-  assert.match(source,/limit Gemini API[\s\S]{0,200}geminiFormatWait[\s\S]{0,240}(?:Neklikej|opakuj)/i);
+  assert.match(source,/limit Gemini API[\s\S]{0,200}geminiFormatWait[\s\S]{0,240}(?:Počkej|odpočet)/i);
+});
+check('C30-AI-08','repair evidence is scoped to accepted slices and survives verified resume checkpoints',()=>{
+  assert.match(source,/repairEvidence:acceptedAiRepairEvidence\(\)/);
+  assert.match(source,/acceptedRepairEvidence[\s\S]{0,300}cp\.p/);
+  assert.doesNotMatch(repairedBlock,/lastGeminiRawResponse/);
+});
+check('C30-AI-09','secure modal acknowledgement does not claim the teacher already reviewed the test',()=>{
+  assert.doesNotMatch(repairedBlock,/okText:'Zkontrolováno/i);
+  assert.match(repairedBlock,/okText:'Rozumím[^']*kontrol/i);
 });
 
 const failed=checks.filter(x=>x.status==='FAIL');

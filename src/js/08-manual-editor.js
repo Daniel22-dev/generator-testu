@@ -402,7 +402,8 @@ function exerciseSliceState(st,indices){
   if(st.csModule&&config.some(e=>e.csExerciseKey))out.csModule=Object.assign({},st.csModule,{exerciseTypes:config.map(e=>e.csExerciseKey).filter(Boolean)});
   return out;
 }
-async function generatedSlice(st,indices,filePack,useUrlContext,progressId){const data=await requestValidatedExerciseData(exerciseSliceState(st,indices),filePack,useUrlContext);if(progressId)GHRAB_GENERATION_PROGRESS.exercises(indices,progressId);return{indices,data}}
+function acceptedAiRepairEvidence(){return lastGeminiJsonRepaired?{repaired:true}:null}
+async function generatedSlice(st,indices,filePack,useUrlContext,progressId){const data=await requestValidatedExerciseData(exerciseSliceState(st,indices),filePack,useUrlContext);if(progressId)GHRAB_GENERATION_PROGRESS.exercises(indices,progressId);return{indices,data,repairEvidence:acceptedAiRepairEvidence()}}
 function mergeExerciseSlices(st,parts){
   const groups=getApiDiffGroups(st),keys=groups.length?groups.map(g=>g.key):['__default'];
   const out=groups.length?{group_variants:{}}:{exercises:[]};
@@ -418,7 +419,7 @@ function mergeExerciseSlices(st,parts){
   }
   return out;
 }
-async function generateTestWithManual(st,filePack,useUrlContext,progressId){
+async function generateTestWithManual(st,filePack,useUrlContext,progressId,acceptedRepairEvidence=[]){
   const parts=[],aiIndices=[],groups=getApiDiffGroups(st);
   for(let idx=0;idx<st.exerciseConfig.length;idx++){
     const cfg=st.exerciseConfig[idx];
@@ -439,7 +440,7 @@ async function generateTestWithManual(st,filePack,useUrlContext,progressId){
   }
   if(aiIndices.length){
     for(const indices of generationPlan(st).batches){
-      parts.push(await generatedSlice(st,indices,filePack,useUrlContext,progressId));
+      const part=await generatedSlice(st,indices,filePack,useUrlContext,progressId);parts.push(part);if(part.repairEvidence)acceptedRepairEvidence.push(part.repairEvidence);
     }
   }
   const combined=mergeExerciseSlices(st,parts);lastGenData=combined;
@@ -502,7 +503,7 @@ async function generateTest(){
   if(!genAiAvailable()&&plan.batches.length){$('geminiKeyInput')?.focus();setGenErr('AI služba není dostupná. GitHub: zadej API klíč jen pro relaci. Škola: obnov serverovou relaci.');return;}
   const cooldownMs = geminiCooldownRemainingMs();
   if(cooldownMs > 0){
-    setGenErr('Limit Gemini API: zkus znovu za '+geminiFormatWait(cooldownMs)+'. Neopakuj kliknutí; prodloužila by limit.');
+    setGenErr('Limit Gemini API: zkus znovu za '+geminiFormatWait(cooldownMs)+'. Počkej na odpočet a potom generování spusť znovu.');
     geminiUpdateCooldownUI();
     return;
   } else {
@@ -511,6 +512,7 @@ async function generateTest(){
   // Kontroly patří k artefaktu. Když nový test nevznikne, obnoví se původní test i jeho kontroly.
   const previousOutput=generationOutputSnapshot();
   let cp=null;
+  const acceptedRepairEvidence=[];
   geminiCancelRequested=false;genBeginAiWorkflow();const progressId=GHRAB_GENERATION_PROGRESS.begin(workState,plan);lockGenerationInputs(true);
   variantSeq=0;variantSlug='';if($('variantNote'))$('variantNote').classList.add('hidden');
   generatedTestHtml=''; generatedPackage=null; generatedIntegrity=null; lastGenData=null; lastAssembled=null; lastSelfTest=null; secureGapsAcknowledged=false;
@@ -536,13 +538,14 @@ async function generateTest(){
       if(geminiCancelRequested) throw new Error('Generování zrušeno.');
     }
     let built;
-    if(plan.manual){built=await generateTestWithManual(workState,filePack,useUrlContext,progressId);}
+    if(plan.manual){built=await generateTestWithManual(workState,filePack,useUrlContext,progressId,acceptedRepairEvidence);}
     else {
       const parts=cp?cp.p.slice():[];
+      if(cp?.p?.length)acceptedRepairEvidence.push(...cp.p.filter(part=>part.repairEvidence).map(part=>part.repairEvidence));
       for(let b=parts.length;b<plan.batches.length;b++){
         if(geminiCancelRequested)throw new Error('Generov\u00e1n\u00ed zru\u0161eno.');
         const indices=plan.batches[b];setGenMsg((parts.length?'Navazuji · ':'')+'Část '+(b+1)+' / '+plan.batches.length+' · cvičení '+indices.map(i=>i+1).join(', '));
-        parts.push(await generatedSlice(workState,indices,filePack,useUrlContext,progressId));if(cp)cp.p=parts.slice();
+        const part=await generatedSlice(workState,indices,filePack,useUrlContext,progressId);parts.push(part);if(part.repairEvidence)acceptedRepairEvidence.push(part.repairEvidence);if(cp)cp.p=parts.slice();
       }
       const data=mergeExerciseSlices(workState,parts);lastGenData=data;built=await assembleTestHtml(workState,data);
     }
@@ -563,14 +566,11 @@ async function generateTest(){
     resetVerificationReports();
     renderQualityDiagnostics();
     renderExportChecklist(true);
-    if (lastGeminiJsonRepaired) {
+    $('geminiRawDiag')?.remove();
+    if (acceptedRepairEvidence.length) {
       const repairedWarning='AI opravila nevalidní JSON a mohla změnit obsah. ';
-      $('geminiRawDiag')?.remove();
-      if (lastGeminiRawResponse) {
-        const d=document.createElement('details'),raw=String(lastGeminiRawResponse);d.id='geminiRawDiag';d.innerHTML='<summary>🔍 Surový výstup AI</summary><pre>'+esc(raw.slice(0,2000)+(raw.length>2000?'\n…':''))+'</pre><button type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(lastGeminiRawResponse)">Kopírovat</button>';$('genResult')?.appendChild(d);
-      }
       if (generatedPackage?.mode === 'secureOffline') {
-        const ok=await uiModal({title:'⚠️ Klasifikovaný test — opravený JSON',message:repairedWarning+'KLASIFIKOVANÝ test: PŘED ZVEŘEJNĚNÍM ověř odpovědi v Teacher preview. „Zahodit“ výsledek odstraní; pak generuj znovu.',okText:'Zkontrolováno — pokračovat',cancelText:'Zahodit a generovat znovu'});
+        const ok=await uiModal({title:'⚠️ Klasifikovaný test — opravený JSON',message:repairedWarning+'KLASIFIKOVANÝ test: PŘED ZVEŘEJNĚNÍM ověř odpovědi v Teacher preview. „Zahodit“ výsledek odstraní; pak generuj znovu.',okText:'Rozumím — pokračovat ke kontrole',cancelText:'Zahodit a generovat znovu'});
         if (!ok) {
           $('geminiRawDiag')?.remove();generatedPackage=null;generatedTestHtml='';generatedIntegrity=null;
           GHRAB_GENERATION_PROGRESS.stop('cancel',progressId);recordGeneratorTelemetry('cancelled');
@@ -578,7 +578,7 @@ async function generateTest(){
           return;
         }
       } else {
-        await uiAlert(repairedWarning+'Před předáním ověř odpovědi v učitelském náhledu nebo přes „🔑 Ověřit klíč druhým průchodem (AI)“. Surový výstup je v diagnostice.','⚠️ Obsah byl automaticky opraven');
+        await uiAlert(repairedWarning+'Před předáním ověř odpovědi v učitelském náhledu nebo přes „🔑 Ověřit klíč druhým průchodem (AI)“.','⚠️ Obsah byl automaticky opraven');
       }
     }
     generationResumeCheckpoint=null;GHRAB_GENERATION_PROGRESS.done(['acceptance'],progressId);setGenUI('done');
