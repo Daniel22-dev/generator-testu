@@ -419,7 +419,7 @@ const GENERATOR_ASSISTANT_KB = [
   keywords:['split screen','rozdelena obrazovka','rozdeleni obrazovky','male okno','split window','multitasking','okno vedle sebe','dve aplikace vedle sebe'],
   simple:'Částečně. Klientská heuristika může zaznamenat změnu velikosti okna jako SHADOW/AUDIT-ONLY signál. Sama test nezamyká a není důkazem podvodu.',
   detailed:'Prohlížeč porovnává dostupný viewport s důvěryhodnou výchozí plochou a může uložit split-window telemetrii. Skutečně naměřených 0 % se liší od stavu Nezjištěno. Údaj je client-controlled a lze jej pozměnit nebo vynechat. Slide Over, Split View, Stage Manager, systémový sidebar, softwarová klávesnice nebo zoom mohou měnit viewport podobně; některé rozvržení naopak prohlížeč nerozliší. Split-screen proto zůstává SHADOW/AUDIT-ONLY bez automatického zámku či sankce.',
-  evidence:['secureSplitEvaluate()','split-window','SHADOW/AUDIT-ONLY','Teacher Verifier: Nezjištěno != 0 %']},
+  evidence:['strictSplitObservation()','startSplitMonitor()','recordSplitSummary()','split-window','SHADOW/AUDIT-ONLY','Teacher Verifier: Nezjištěno != 0 %']},
 
  {id:'limity-detekce',title:'Co generátor NEdetekuje (druhé zařízení, kamera, nahrávání, Bluetooth)',status:'ne',
   keywords:['druhy mobil','druhe zarizeni','druhy telefon','telefon vedle','mobil vedle','vedle notebooku','jine zarizeni','kamera','webkamera','nahravani obrazovky','screen recording','screrecording','obs','bluetooth','sluchatka','odposlech','spy','druhy pocitac','tablet vedle','mistnost','v mistnosti','kamera v mistnosti'],
