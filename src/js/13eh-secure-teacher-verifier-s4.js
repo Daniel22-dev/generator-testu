@@ -33,7 +33,7 @@ function s4SplitStateHtml(summary){
   if(summary.telemetryState!=='PRESENT')return '<span class="s4-split" data-s4-split-state="absent">Data nejsou k dispozici</span>';
   if(!summary.splitWindowEvents)return '<span class="s4-split" data-s4-split-state="none">Nezaznamenáno</span>';
   if(summary.splitWindowMaxPct==null)return '<span class="s4-split" data-s4-split-state="unknown">'+esc(summary.splitWindowEvents)+' záznam'+(summary.splitWindowEvents===1?'':'y')+' · maximum Nezjištěno'+(summary.splitWindowUnknownPctCount?(' · '+esc(summary.splitWindowUnknownPctCount)+'× Nezjištěno'):'')+'<small>bez bezpečnostního závěru</small></span>';
-  if(summary.splitWindowMaxPct===0&&!summary.splitWindowUnknownPctCount)return '<span class="s4-split" data-s4-split-state="measured-zero">'+esc(summary.splitWindowEvents)+' záznam'+(summary.splitWindowEvents===1?'':'y')+' · max 0 %<small>důvěryhodně změřeno</small></span>';
+  if(summary.splitWindowMaxPct===0&&!summary.splitWindowUnknownPctCount)return '<span class="s4-split" data-s4-split-state="measured-zero">'+esc(summary.splitWindowEvents)+' záznam'+(summary.splitWindowEvents===1?'':'y')+' · max 0 %<small>klientsky hlášené měření; neprokazuje nepřítomnost jiné aplikace ani AI</small></span>';
   const max=summary.splitWindowMaxPct==null?'maximum Nezjištěno':('max '+esc(summary.splitWindowMaxPct)+' %'),unknown=summary.splitWindowUnknownPctCount?(' · '+esc(summary.splitWindowUnknownPctCount)+'× Nezjištěno'):'';
   return '<span class="s4-split" data-s4-split-state="detected" title="Klientská heuristika; nejde o důkaz podvodu ani automatický zámek.">'+esc(summary.splitWindowEvents)+' záznam'+(summary.splitWindowEvents===1?'':'y')+' · '+max+unknown+'<small>klientská heuristika</small></span>';
 }

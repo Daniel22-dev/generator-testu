@@ -12,6 +12,8 @@ const teacher=read('src/js/13f-secure-teacher-verifier.js');
 const instantCss=read('src/js/14c-test-css.js');
 const secureCss=read('src/js/13d-secure-student-shell.js');
 const core=read('src/js/01-core.js');
+const guard=read('src/js/13de-secure-student-guard.js');
+const verifierS4=read('src/js/13eh-secure-teacher-verifier-s4.js');
 const limitsPath=path.join(root,'docs','SECURITY-BROWSER-LIMITS.md');
 
 check(/reading-passage[^']*white-space:pre-line[^']*text-align:justify/.test(instantCss),'ID13-01','instant LF/CRLF preservation and justify CSS');
@@ -31,6 +33,8 @@ check(!/vzorkuje každé 2 s|menší než 60 %|1–3 signály mohou|10\+ je pode
 check(/status:'castecne'[\s\S]{0,450}SHADOW\/AUDIT-ONLY/.test(core),'C34-03','assistant labels split detection as partial audit-only telemetry');
 check(/client-controlled|klientem ovladateln/i.test(core),'C34-04','assistant states client control');
 check(/DevTools/.test(core)&&/same-origin/.test(core),'C34-05','assistant threat model names DevTools and same-origin boundary');
+check(!/Slide Over[^\n]*dál hlídá visibilitychange\/blur/.test(guard)&&/OS overlay včetně Slide Over nemusí být prohlížečem pozorovatelný/.test(guard),'C34-06','guard comment does not promise browser visibility of OS overlays');
+check(!/důvěryhodně změřeno/.test(verifierS4)&&/klientsky hlášené měření/.test(verifierS4)&&/neprokazuje nepřítomnost jiné aplikace ani AI/.test(verifierS4),'C34-07','verifier labels measured zero as a client-reported signal, not proof');
 
 for(const row of checks)console.log(`${row.ok?'PASS':'FAIL'} ${row.id}${row.detail?`: ${row.detail}`:''}`);
 const failed=checks.filter(row=>!row.ok);

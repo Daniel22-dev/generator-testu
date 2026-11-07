@@ -39,7 +39,7 @@ window.addEventListener('popstate',()=>{if(isTestActive())handleLeave('history-n
 document.addEventListener('freeze',()=>{if(isTestActive())handleLeave('page-freeze','freeze');});
 document.addEventListener('resume',()=>{if(isTestActive()){handleReturn();recordSec('page-resumed','resume');refreshSecureTimer();}});
 // iPadOS může při otevření softwarové klávesnice ukončit režim celé obrazovky. Takový odchod se jen zapíše;
-// skutečné opuštění (jiná karta/aplikace, Slide Over mimo okno klávesnice) dál hlídá visibilitychange/blur.
+// visibilitychange/blur zaznamenají jen události, které browser skutečně oznámí; OS overlay včetně Slide Over nemusí být prohlížečem pozorovatelný.
 function keyboardFullscreenExitLikely(){return isIPadOSWebKitRuntime()&&document.visibilityState==='visible'&&(runtimeEditable(document.activeElement)||(Date.now()-IOS_KBD_EDITABLE_AT<2600));}
 function monitorFullscreen(){var active=!!(document.fullscreenElement||document.webkitFullscreenElement);if(isTestActive()){recordSec(active?'fullscreen-enter':'fullscreen-exit','fullscreenchange',{fullscreenMode:STRICT_FULLSCREEN_MODE||'none'});var guardedExit=strictModeRuntime()?STRICT_FULLSCREEN_MODE==='enforced':!!CFG.lockOnLeave;if(guardedExit&&FULLSCREEN_WAS_ACTIVE&&!active){if(keyboardFullscreenExitLikely())recordSec('fullscreen-exit-keyboard-ios','fullscreen exit while editing on iOS/iPadOS; leave guards remain active');else handleLeave('fullscreen-left','fullscreen exit');}}FULLSCREEN_WAS_ACTIVE=active;if(active&&strictModeRuntime()&&isTestActive())captureStrictFullscreenBaseline('fullscreenchange');}
 document.addEventListener('fullscreenchange',monitorFullscreen);
