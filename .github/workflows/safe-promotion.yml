@@ -354,6 +354,15 @@ jobs:
       - name: Require classroom release readiness
         run: node scripts/check-redteam-release-e10.mjs --require-ready
 
+      - name: Require exact authenticated owner approval for this release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+          RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
+        run: node scripts/ci/release-authorization.mjs --premerge
+
       - name: Admit only the still-current PR candidate and main
         id: admitted
         env:
@@ -369,7 +378,9 @@ jobs:
         with:
           name: generator-premerge-admission-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           if-no-files-found: error
-          path: qa-results/*-p1.json
+          path: |
+            qa-results/*-p1.json
+            qa-results/release-authorization-e10.json
 
   promote:
     name: promote-certified-pr
@@ -411,6 +422,15 @@ jobs:
 
       - name: Require classroom release readiness
         run: node scripts/check-redteam-release-e10.mjs --require-ready
+
+      - name: Recheck exact owner approval inside the promotion lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+          RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
+        run: node scripts/ci/release-authorization.mjs --premerge
 
       - name: Final fail-closed freshness gate immediately before merge
         id: premerge
@@ -456,6 +476,7 @@ jobs:
           PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
           MERGED_MAIN_SHA: ${{ steps.merged.outputs.main_head }}
           PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+          RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
           GARP27_EXTERNAL_TRUST_SHA256: c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f
         run: node scripts/ci/p4-promotion-evidence.mjs --produce
 

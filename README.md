@@ -26,7 +26,7 @@
 
 > **7.1.74 — zpevnění workflow žolíka.** Po spuštění bezpečného testu se volba žolíka, identita pokusu, attempt ID, deadline a stav zámku lokálně zapečetí; běžný reload už nemůže změnit volbu ani resetovat čas. Verifier žolíkový pokus zachová pro kontrolu a bezpečnost, ale vyřadí jej z klasifikačních statistik; CSV obsahuje explicitní stav žolíka/klasifikace. D7 navíc obsahuje klikací Chromium regresní test tohoto workflow. Viz RELEASE-NOTES-7.1.74.md.
 
-> **7.1.73 — iPadOS klávesnice + workflow Verifieru.** Zavření softwarové klávesnice systémovým tlačítkem na iPadu už nemá vyvolat falešný zámek testu; skutečné opuštění stránky a split-screen monitoring zůstávají aktivní. Teacher Verifier nyní nabízí Google Forms CSV jako první a doporučenou cestu, nouzovou zálohu až pod ní a po importu/exportu zobrazuje viditelné potvrzení. Viz RELEASE-NOTES-7.1.73.md.
+> **7.1.73 — iPadOS klávesnice + workflow Verifieru.** Zavření softwarové klávesnice systémovým tlačítkem na iPadu už nemá vyvolat falešný zámek testu; události opuštění stránky zůstávají aktivní a split-screen telemetrie je pouze SHADOW/AUDIT-ONLY. Teacher Verifier nyní nabízí Google Forms CSV jako první a doporučenou cestu, nouzovou zálohu až pod ní a po importu/exportu zobrazuje viditelné potvrzení. Limity prohlížeče popisuje [docs/SECURITY-BROWSER-LIMITS.md](docs/SECURITY-BROWSER-LIMITS.md). Viz RELEASE-NOTES-7.1.73.md.
 
 > **7.1.72 — GARP 2.8 hardening + PDF layout.** Bezpečnostní workflow mají oddělené minimální pravomoci, přidán frame guard a další redakce citlivých klíčů. Přímé student/teacher PDF nyní používá konzistentní horní/dolní okraj a nenechává nadpis nového cvičení osamocený na konci stránky. Viz RELEASE-NOTES-7.1.72.md.
 

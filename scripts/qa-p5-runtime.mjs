@@ -147,7 +147,7 @@ class Cdp {
   close(){try{this.ws.close();}catch{}}
 }
 const debugPort=12100+(process.pid%500), profile=fs.mkdtempSync(path.join(tmpdir(),'ghrab-p5-runtime-'));
-const chrome=spawn(chromiumPath(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--disable-extensions','--no-first-run','--mute-audio','--remote-allow-origins=*',`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore',detached:true});
+const chrome=spawn(chromiumPath(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--disable-extensions','--disable-breakpad','--disable-crash-reporter','--no-first-run','--mute-audio','--remote-allow-origins=*',`--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore',detached:true});
 let client;
 const pageReports=[];
 const auditExpr = `(()=>{
@@ -209,6 +209,7 @@ try {
     pageReports.push({page:rel,widths:widthsReport});
   }
 } finally {
+  try { await client?.call('Browser.close'); } catch {}
   client?.close();
   await closeHttpServer(server);
   await stopBrowserProcess(chrome);

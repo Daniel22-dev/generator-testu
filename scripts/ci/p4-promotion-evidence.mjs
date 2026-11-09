@@ -9,10 +9,11 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { githubRead, readCollection, repositoryName, exactSha, positiveId } from './github-read.mjs';
+import { checkLiveReleaseAuthorization, releaseVersion, RELEASE_SCOPE } from './release-authorization.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-export const SCHEMA = 'git-p4-promotion-certificate-v1';
-export const CONSUMED_SCHEMA = 'git-p4-consumed-promotion-evidence-v1';
+export const SCHEMA = 'git-p4-promotion-certificate-v2';
+export const CONSUMED_SCHEMA = 'git-p4-consumed-promotion-evidence-v2';
 export const ACTIONS_APP_ID = 15368;
 export const PROMOTION_WORKFLOW = '.github/workflows/safe-promotion.yml';
 export const PROMOTION_JOB = 'promote-certified-pr';
@@ -31,7 +32,9 @@ export const REQUIRED_P5_REPORTS = Object.freeze([
   'qa-p5-axe-runtime-report.json',
 ]);
 export const CONFIG_PATHS = Object.freeze([
+  'package.json',
   'package-lock.json',
+  'security/release-readiness-e10.json',
   'security/ci/main-ruleset-attestation.json',
   '.github/workflows/safe-promotion.yml',
   '.github/workflows/p5-release-gate.yml',
@@ -43,6 +46,8 @@ export const CONFIG_PATHS = Object.freeze([
   'scripts/ci/promotion-freshness.mjs',
   'scripts/ci/release-admission.mjs',
   'scripts/ci/release-evidence.mjs',
+  'scripts/ci/release-authorization.mjs',
+  'scripts/check-redteam-release-e10.mjs',
   'scripts/run-redteam-ci-e10.mjs',
 ]);
 
@@ -236,6 +241,11 @@ export function createPromotionCertificate({ root = ROOT, env, read = githubRead
   const pr = read(`repos/${repo}/pulls/${prNumber}`);
   validatePr(pr, { repo, prNumber, sourceSha, preparedMainSha, mergedMainSha });
   const gitId = gitIdentity({ root, sourceSha, preparedMainSha, mergedMainSha, git, checkoutRole: 'source' });
+  const authorization = checkLiveReleaseAuthorization({
+    repository: repo, prNumber, sourceSha, sourceTree: gitId.sourceTree,
+    preparedMainSha, mergedMainSha, version: releaseVersion(root),
+    scope: env.RELEASE_SCOPE || RELEASE_SCOPE,
+  }, { read, collection, stage: 'postmerge' });
 
   const currentArtifacts = collection(`repos/${repo}/actions/runs/${runId}/artifacts`, 'artifacts', read);
   const jobs = collection(`repos/${repo}/actions/runs/${runId}/attempts/${runAttempt}/jobs`, 'jobs', read);
@@ -275,6 +285,7 @@ export function createPromotionCertificate({ root = ROOT, env, read = githubRead
     preparedMain: { commit: preparedMainSha },
     mergedMain: { commit: mergedMainSha, tree: gitId.mergedMainTree, parents: gitId.parents },
     pullRequest: { number: Number(prNumber), headSha: sourceSha, baseSha: preparedMainSha, mergeCommitSha: mergedMainSha },
+    authorization,
     producer: { workflow: PROMOTION_WORKFLOW, runId: Number(runId), runAttempt: Number(runAttempt), job: PROMOTION_JOB,
       event: run.event, headBranch: run.head_branch, headSha: run.head_sha },
     certifications: { ...currentCertifications, ...independentCertifications },
@@ -286,7 +297,7 @@ export function createPromotionCertificate({ root = ROOT, env, read = githubRead
       'exact-repository-and-workflow-identity', 'exact-run-attempt-job-check-identity',
       'github-actions-app-identity', 'exact-artifact-digests', 'prepared-main-parent-binding',
       'certified-source-tree-equals-merged-main-tree', 'lockfile-and-trust-input-binding',
-      'fail-closed-current-main-validation',
+      'fail-closed-current-main-validation', 'authenticated-owner-approval-bound-to-exact-release',
     ],
   };
   return certificate;
@@ -320,6 +331,11 @@ function verifyCertificateShape(c, { repo, sourceSha, mergedMainSha, runId, runA
   assert.equal(c.producer?.runId, Number(runId)); assert.equal(c.producer?.runAttempt, Number(runAttempt));
   assert.equal(c.producer?.job, PROMOTION_JOB); assert.equal(c.producer?.headSha, sourceSha);
   assert.equal(c.producer?.headBranch, 'candidate');
+  assert.equal(c.authorization?.status, 'PASS');
+  assert.equal(c.authorization?.source?.commit, sourceSha);
+  assert.equal(c.authorization?.source?.tree, c.source.tree);
+  assert.equal(c.authorization?.preparedMain?.commit, c.preparedMain.commit);
+  assert.equal(c.authorization?.mergedMain?.commit, mergedMainSha);
   assert.match(artifact?.digest || '', /^sha256:[0-9a-f]{64}$/);
   assert.equal(artifact?.name, artifactName);
   const produced = Date.parse(c.producedAt || '');
@@ -391,6 +407,13 @@ export function validatePromotionCertificate({ root = ROOT, env, certificate, ar
   const pr = read(`repos/${repo}/pulls/${certificate.pullRequest.number}`);
   validatePr(pr, { repo, prNumber: certificate.pullRequest.number, sourceSha,
     preparedMainSha: certificate.preparedMain.commit, mergedMainSha });
+  const authorization = checkLiveReleaseAuthorization({
+    repository: repo, prNumber: certificate.pullRequest.number, sourceSha,
+    sourceTree: certificate.source.tree, preparedMainSha: certificate.preparedMain.commit,
+    mergedMainSha, version: releaseVersion(root), scope: env.RELEASE_SCOPE || RELEASE_SCOPE,
+  }, { read, collection, stage: 'postmerge' });
+  assert.deepEqual(authorization, certificate.authorization,
+    'Owner release authorization changed after promotion');
 
   const expectedConfig = configDigests(root);
   assert.deepEqual(certificate.trust.configDigests, expectedConfig, 'Dependency/workflow/security input changed since certification');
@@ -402,6 +425,7 @@ export function validatePromotionCertificate({ root = ROOT, env, certificate, ar
     mergedMain: { commit: mergedMainSha, tree: certificate.mergedMain.tree },
     promotion: { runId: Number(runId), runAttempt: Number(runAttempt), artifactName,
       artifactId: artifact.id, artifactDigest: artifact.digest },
+    authorization,
     promotionCertificateSha256: sha256(Buffer.from(JSON.stringify(certificate, null, 2) + '\n')),
     validatedAt: new Date(now).toISOString(),
     assurance: 'PREMERGE_CERTIFICATION_REUSED_ONLY_FOR_IDENTICAL_GIT_TREE; FINAL_BUILD_CREATED_FROM_MERGED_MAIN',

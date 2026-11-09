@@ -6,14 +6,51 @@ function teacherPreviewCode(){
   const r=rosterEntries.find(x=>x&&String(x.code||'').trim());
   return r?String(r.code):'';
 }
-function teacherPreviewHtml(html,code,startCode){
+function installSecureTeacherPreviewRuntime(){
+  'use strict';
+  if(window.self===window.top)throw new Error('Private teacher preview requires an isolated iframe.');
+  Object.defineProperty(window,'__GHRAB_PRIVATE_TEACHER_PREVIEW__',{value:true,writable:false,configurable:false});
+  PERSIST_INTEGRITY_BLOCK=false;
+  PERSIST_KEY_PROMISE=null;
+  var y=function(){return true;},n=function(){},ay=async function(){return true;};
+  envInfo=function(){return {privatePreview:true,broken:false};};
+  isBrokenEnv=function(){return false;};
+  checkDevice=function(){var box=$('deviceStatus');if(box){var ok=document.createElement('div');ok.className='ok';ok.textContent='✓ Izolovaný učitelský náhled je připraven.';box.replaceChildren(ok);}updateEnvWarning();return true;};
+  storageGet=function(){return null;};
+  storageSet=storageRemove=y;
+  idbGet=async function(){return null;};
+  idbPut=async function(){return true;};
+  idbDelete=idbPut;
+  persistenceKey=idbGet;
+  saveSignedRecord=async function(_kind,body,rev){return {v:2,rev:rev,body:body,mac:'preview-memory-only'};};
+  loadSignedRecord=async function(){return {record:null,tamper:false};};
+  persistActiveAttemptSeal=function(){return Promise.resolve(true);};queuePersistActiveAttemptSeal=n;
+  flushPendingAttemptWrites=clearActiveAttemptSeal=setSubmittedLocked=acquireAttemptTabLock=ay;
+  submittedLocked=async function(){return false;};
+  releaseAttemptTabLock=handleLeave=startSplitMonitor=stopSplitMonitor=n;
+  prepareSecureTimerDeadline=function(){TIMER_DEADLINE=0;};
+  startTimer=function(){TIMER_DEADLINE=0;clearTimeout(TIMER_ID);var timer=$('timer');if(timer)timer.textContent='NÁHLED · bez limitu';};
+  strictReadyState=function(){return STRICT_PREFLIGHT?'private-preview-ready':'verify';};
+  strictSetStartButtons=function(state){var verify=$('strictVerifyBtn'),fs=$('strictFullscreenStartBtn'),fallback=$('strictFallbackStartBtn');if(verify)verify.disabled=STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY;if(fs)fs.classList.add('hidden');if(fallback){fallback.classList.toggle('hidden',state!=='private-preview-ready');fallback.textContent='2. Spustit simulaci náhledu';}};
+  strictRuntimeNotice=function(){var test=$('test');if(!test||$('strictRuntimeModeNotice'))return;var note=document.createElement('div');note.id='strictRuntimeModeNotice';note.className='archive-note';note.textContent='UČITELSKÝ NÁHLED — SIMULACE bez limitu, trvalého pokusu a odevzdání.';test.insertBefore(note,test.firstChild);};
+  verifyStrictTest=async function(){if(!strictModeRuntime())return startTest();if(STRICT_PREFLIGHT_BUSY||STRICT_START_BUSY||isTestActive())return;STRICT_PREFLIGHT_BUSY=true;strictSetStartButtons('verify');strictStartStatus('Ověřuji náhled…','');try{var prepared=await strictPreflightChecks();if(!prepared){strictInvalidatePreflight();return;}STRICT_PREFLIGHT=prepared;strictSetStartButtons('private-preview-ready');strictStartStatus('UČITELSKÝ NÁHLED — připraveno.','ok');}finally{STRICT_PREFLIGHT_BUSY=false;strictSetStartButtons(strictReadyState());}};
+  startStrictFallback=async function(){if(!strictModeRuntime()||STRICT_START_BUSY||isTestActive())return;if(!strictPreflightStillValid()){strictInvalidatePreflight(t('strictPreflightStale','Inputs changed. Verify the test again.'));return;}STRICT_START_BUSY=true;STRICT_FULLSCREEN_MODE='fallback';try{await startTestAttempt();if(isTestActive()){STRICT_FULLSCREEN_MODE='private-preview';STRICT_PREFLIGHT=null;strictSetStartButtons('started');strictRuntimeNotice();}}finally{STRICT_START_BUSY=false;}};
+  startStrictFullscreen=startStrictFallback;
+  function finishPrivatePreview(){if(!isTestActive()||SUBMITTED)return false;SUBMITTED=true;clearTimeout(TIMER_ID);stopSplitMonitor();ANSWER_TXT='';$('test').classList.add('hidden');$('done').classList.remove('hidden');var done=$('done');if(done){var title=document.createElement('h1');title.textContent='UČITELSKÝ NÁHLED — konec simulace';var paragraph=document.createElement('p');paragraph.textContent='Žádný skutečný pokus, výsledek ani odevzdání nebyly vytvořeny. Zavři a znovu otevři náhled pro čistý začátek.';done.replaceChildren(title,paragraph);}return true;}
+  requestSecureSubmit=async function(){return finishPrivatePreview();};
+  submitSecureTest=async function(){return finishPrivatePreview();};
+  openSubmissionForm=function(){};
+  copySubmissionPayload=downloadAnswers=shareAnswers=copyAnswers=n;
+}
+function privateTeacherPreviewRuntimeHtml(){
+  return '<script data-ghrab-private-teacher-preview="1">('+installSecureTeacherPreviewRuntime.toString()+')();<\/script>';
+}
+function teacherPreviewHtml(html,code,startCode,secure){
   let out=String(html||'');
-  // Náhled je učitelská simulace, ne ostrý studentský pokus. Příznak se vloží
-  // před runtime skripty, aby preview nesdílelo zámek karty ani trvalý stav pokusu.
-  const marker='<script>window.__GHRAB_TEACHER_PREVIEW__=true;<\/script>';
-  out=/<head\b[^>]*>/i.test(out)
-    ? out.replace(/<head\b[^>]*>/i,tag=>tag+marker)
-    : marker+out;
+  if(secure){
+    const adapter=privateTeacherPreviewRuntimeHtml();
+    out=/<\/body\s*>/i.test(out)?out.replace(/<\/body\s*>/i,adapter+'</body>'):out+adapter;
+  }
   if(startCode){
     const escaped=String(startCode).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     out=out.replace(/<input(?=[^>]*\bid=["']startCode["'])[^>]*>/i,tag=>tag.replace(/\s+value=(?:"[^"]*"|'[^']*'|[^\s>]+)/i,'').replace(/>$/,' value="'+escaped+'">'));
@@ -28,9 +65,9 @@ function teacherPreviewHtml(html,code,startCode){
 function getPreviewHtml(){
   const previewCode=teacherPreviewCode();
   if(generatedPackage&&generatedPackage.mode==='secureOffline'&&generatedPackage.studentHtml){
-    return {html:teacherPreviewHtml(generatedPackage.studentHtml,previewCode,generatedPackage.startCode||''),secure:true,previewCode};
+    return {html:teacherPreviewHtml(generatedPackage.studentHtml,previewCode,generatedPackage.startCode||'',true),secure:true,previewCode};
   }
-  if(generatedTestHtml)return {html:teacherPreviewHtml(generatedTestHtml,previewCode),secure:false,previewCode};
+  if(generatedTestHtml)return {html:teacherPreviewHtml(generatedTestHtml,previewCode,'',false),secure:false,previewCode};
   return null;
 }
 function previewEscHandler(e){ if (e && e.key === 'Escape') closeTestPreview(); }

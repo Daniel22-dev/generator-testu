@@ -11,6 +11,7 @@ import {
   materializeReusedEvidence,
 } from './p4-promotion-evidence.mjs';
 import { buildPlan } from './preflight.mjs';
+import { approvalStatement, RELEASE_SCOPE } from './release-authorization.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const sha = c => c.repeat(40);
@@ -20,6 +21,7 @@ const source = sha('a'), base = sha('b'), merged = sha('c'), tree = sha('d');
 const repo = 'synthetic/fixture';
 const promotionRunId = 1001, promotionAttempt = 2, p5RunId = 2001, journeyRunId = 3001;
 const prNumber = 77;
+const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
 
 test('P4 promotion trust pin matches the reviewed current GARP anchor', () => {
   const expected = hash(fs.readFileSync(path.join(ROOT, 'security/garp27/trust-anchor.json')));
@@ -103,6 +105,12 @@ function fixture(t, { candidateSha = source } = {}) {
   const pr = { number: prNumber, state: 'closed', merged: true, merge_commit_sha: merged,
     head: { ref: 'candidate', sha: source, repo: { full_name: repo } },
     base: { ref: 'main', sha: base, repo: { full_name: repo } } };
+  const authExpected = { repository: repo, prNumber, sourceSha: source, sourceTree: tree,
+    preparedMainSha: base, mergedMainSha: merged, version, scope: RELEASE_SCOPE };
+  const reviews = [{ id: 901, node_id: 'PRR_fixture_901',
+    html_url: `https://github.com/${repo}/pull/${prNumber}#pullrequestreview-901`,
+    user: { login: 'synthetic', type: 'User' }, author_association: 'OWNER', state: 'APPROVED',
+    commit_id: source, submitted_at: '2026-10-06T19:45:00Z', body: approvalStatement(authExpected) }];
   const ref = { main: { ref: 'refs/heads/main', object: { type: 'commit', sha: merged } },
     candidate: { ref: 'refs/heads/candidate', object: { type: 'commit', sha: candidateSha } } };
   const read = endpoint => {
@@ -112,12 +120,14 @@ function fixture(t, { candidateSha = source } = {}) {
     if (endpoint.endsWith(`pulls/${prNumber}`)) return structuredClone(pr);
     if (endpoint.endsWith('git/ref/heads/main')) return structuredClone(ref.main);
     if (endpoint.endsWith('git/ref/heads/candidate')) return structuredClone(ref.candidate);
+    if (endpoint.endsWith(`git/commits/${source}`)) return { sha: source, tree: { sha: tree } };
     throw new Error('Unexpected read ' + endpoint);
   };
   const collection = (endpoint, key) => {
     let m;
     if ((m = endpoint.match(/actions\/runs\/(\d+)\/attempts\/(\d+)\/jobs/))) return structuredClone(jobs[Number(m[1])]);
     if ((m = endpoint.match(/actions\/runs\/(\d+)\/artifacts/))) return structuredClone(artifacts[Number(m[1])]);
+    if (endpoint.endsWith(`pulls/${prNumber}/reviews`)) return structuredClone(reviews);
     throw new Error('Unexpected collection ' + endpoint + ' ' + key);
   };
   const git = args => {
@@ -130,7 +140,7 @@ function fixture(t, { candidateSha = source } = {}) {
   };
   const producerEnv = { GITHUB_REPOSITORY: repo, CERTIFIED_SHA: source, PREPARED_MAIN_SHA: base, MERGED_MAIN_SHA: merged,
     PR_NUMBER: String(prNumber), GITHUB_RUN_ID: String(promotionRunId), GITHUB_RUN_ATTEMPT: String(promotionAttempt),
-    GITHUB_JOB: 'promote', GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
+    GITHUB_JOB: 'promote', RELEASE_SCOPE, GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
   const now = Date.parse('2026-10-06T20:00:00Z');
   const certificate = createPromotionCertificate({ root, env: producerEnv, read, collection, git, now });
   const certArtifact = artifact(401, `generator-p4-promotion-${merged}-${promotionRunId}-${promotionAttempt}`, promotionRunId, `sha256:${sha256('9')}`);
@@ -138,13 +148,13 @@ function fixture(t, { candidateSha = source } = {}) {
   const consumerEnv = { GITHUB_REPOSITORY: repo, CERTIFIED_SHA: source, MERGED_MAIN_SHA: merged,
     PROMOTION_RUN_ID: String(promotionRunId), PROMOTION_RUN_ATTEMPT: String(promotionAttempt), PROMOTION_ARTIFACT_NAME: certArtifact.name,
     GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/main', GITHUB_SHA: merged,
-    GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
+    RELEASE_SCOPE, GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
   const consumerGit = args => {
     const key = args.join(' ');
     if (key === 'rev-parse HEAD') return merged;
     return git(args);
   };
-  return { root, runs, jobs, artifacts, checks, pr, ref, read, collection, git, consumerGit, producerEnv, consumerEnv, now, certificate, certArtifact };
+  return { root, runs, jobs, artifacts, checks, pr, reviews, ref, read, collection, git, consumerGit, producerEnv, consumerEnv, now, certificate, certArtifact };
 }
 
 test('P4 producer creates exact-tree, exact-run, exact-artifact certificate', t => {
@@ -156,6 +166,8 @@ test('P4 producer creates exact-tree, exact-run, exact-artifact certificate', t 
   assert.equal(c.certifications.p5ReleaseGate.runId, p5RunId);
   assert.equal(c.trust.garp27ExternalTrustSha256, GARP27_TRUST_SHA256);
   assert.equal(c.trust.configDigests.length, CONFIG_PATHS.length);
+  assert.equal(c.authorization.status, 'PASS');
+  assert.equal(c.authorization.approval.reviewId, 901);
 });
 
 
@@ -192,6 +204,8 @@ const mutations = [
   ['completed producer replay', f => { f.runs[promotionRunId].status = 'completed'; f.runs[promotionRunId].conclusion = 'success'; }],
   ['producer no longer dispatching this deploy', f => { const s=f.jobs[promotionRunId][2].steps[2]; s.status='completed'; s.conclusion='success'; }],
   ['stale certificate', f => { f.certificate.producedAt = new Date(f.now - 31 * 60_000).toISOString(); }],
+  ['dismissed owner approval', f => { f.reviews.push({ ...f.reviews[0], id: 902, state: 'DISMISSED' }); }],
+  ['authorization certificate tampering', f => { f.certificate.authorization.scope = 'UNRESTRICTED'; }],
 ];
 for (const [name, mutate] of mutations) test(`P4 consumer rejects ${name}`, t => {
   const f = fixture(t); mutate(f);
@@ -218,7 +232,7 @@ test('P4 materialization copies only verified P5 reports and names reused eviden
   const walk=(dir,base='')=>{for(const name of fs.readdirSync(dir).sort()){const full=path.join(dir,name),rel=path.posix.join(base,name),st=fs.lstatSync(full); if(st.isDirectory())walk(full,rel); else rows.push({path:rel,size:st.size,sha256:hash(fs.readFileSync(full))});}};
   walk(path.join(reuse,'p5'));
   fs.writeFileSync(path.join(reuse, 'p4-consumed-promotion-evidence.json'), JSON.stringify({
-    schema:'git-p4-consumed-promotion-evidence-v1',status:'PASS',certifiedSource:{tree},mergedMain:{tree},
+    schema:'git-p4-consumed-promotion-evidence-v2',status:'PASS',certifiedSource:{tree},mergedMain:{tree},
     promotionCertificateSha256:hash(certBytes),reusedP5:{extractedSha256:hash(Buffer.from(JSON.stringify(rows))),fileCount:rows.length,requiredReports}
   }));
   const r = materializeReusedEvidence({ root, reuseDir: reuse });

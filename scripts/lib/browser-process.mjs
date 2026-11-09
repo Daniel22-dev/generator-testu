@@ -3,14 +3,6 @@ import {spawnSync} from 'node:child_process';
 import {setTimeout as sleep} from 'node:timers/promises';
 
 const exited=child=>!child||child.exitCode!==null||child.signalCode!==null;
-function processExists(pid){
-  if(!Number.isInteger(pid)||pid<=0)return false;
-  if(process.platform==='win32'){
-    const result=spawnSync('tasklist.exe',['/fi',`PID eq ${pid}`,'/fo','csv','/nh'],{encoding:'utf8',windowsHide:true});
-    return result.status===0&&new RegExp(`"${pid}"`).test(result.stdout||'');
-  }
-  try{process.kill(pid,0);return true;}catch{return false;}
-}
 async function waitForExit(child,timeoutMs){
   if(exited(child))return true;
   await Promise.race([new Promise(resolve=>{child.once('exit',resolve);child.once('error',resolve);}),sleep(timeoutMs)]);
@@ -23,10 +15,14 @@ export async function stopBrowserProcess(child){
     // user-data directory briefly after the browser parent exits. Terminate
     // the test-owned tree atomically before the parent PID disappears; never
     // target unrelated Chromium processes by name.
-    spawnSync('taskkill.exe',['/pid',String(child.pid),'/t','/f'],{stdio:'ignore',windowsHide:true});
+    const termination=spawnSync('taskkill.exe',['/pid',String(child.pid),'/t','/f'],{encoding:'utf8',windowsHide:true});
     await waitForExit(child,5000);
     await sleep(750);
-    if(!exited(child)&&processExists(child.pid))throw new Error('Chromium process tree did not terminate');
+    if(termination.error)throw termination.error;
+    if(!exited(child)){
+      const diagnostic=[termination.stdout,termination.stderr].filter(Boolean).join(' ').trim();
+      throw new Error(`Chromium process tree did not terminate (taskkill exit ${termination.status}): ${diagnostic}`);
+    }
     return;
   }
   try{
@@ -35,7 +31,7 @@ export async function stopBrowserProcess(child){
   if(await waitForExit(child,1200))return;
   try{process.kill(-child.pid,'SIGKILL');}catch{}
   await waitForExit(child,3000);
-  if(!exited(child)&&processExists(child.pid))throw new Error('Chromium process tree did not terminate');
+  if(!exited(child))throw new Error('Chromium process tree did not terminate');
 }
 export async function closeHttpServer(server){
   if(!server||!server.listening)return;

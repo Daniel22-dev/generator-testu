@@ -6,12 +6,12 @@
   "providerBoundary": "deployment-profile-controlled",
   "aiCoreContract": "1",
   "fingerprintAlgorithm": "SHA-256(path\\0sha256(canonical-UTF8-LF)\\0canonical-size\\n)",
-  "fingerprint": "3206078967e433205b0fe837b64d55c571dc726a1a2186658045d7b36cd05bf6",
+  "fingerprint": "f5a6df04ec2ab98feab240ea4fa9e0e4e2eb28d722371252441b255b7bec1b28",
   "files": [
     {
       "path": "src/js/01-core.js",
-      "size": 167151,
-      "sha256": "aeaf012fb783fbf9a66c45cc4285899adacc0f01a09ef8d32b19beeba79dd8d2"
+      "size": 166994,
+      "sha256": "d92015cc224c33d7596cc5f53c4499e83d0bb3e8dd8b4ccf2f33ce5e55c224f7"
     },
     {
       "path": "src/js/03-ui-render.js",
@@ -45,8 +45,8 @@
     },
     {
       "path": "src/js/08-manual-editor.js",
-      "size": 68013,
-      "sha256": "27451771459f5eeeb78140eb140972ca5f6d96b94a5b8026f0aa3b6998bf1142"
+      "size": 66309,
+      "sha256": "34b99289e38d2d6fe7374a4d7a3082c84106fe992b8e53659e3db56b3d00a37f"
     },
     {
       "path": "src/js/09-selftest-keycheck.js",
@@ -70,8 +70,8 @@
     },
     {
       "path": "src/features/preview-editor.js",
-      "size": 66360,
-      "sha256": "6eae4497e17c9c2a29ff15b44fc24ea0d080f61020b1da601a9c3ab084341253"
+      "size": 70792,
+      "sha256": "0826cf3423cdfcb973f2e977f32f07e1bdc21b1ee81ce75ace09f873fc8c98a8"
     },
     {
       "path": "src/features/testlab.js",

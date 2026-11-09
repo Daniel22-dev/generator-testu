@@ -1,16 +1,23 @@
 {
-  "schema": "git-release-readiness-e10-v1",
+  "schema": "git-release-readiness-e10-v2",
   "version": "7.1.101",
   "status": "READY WITH DOCUMENTED LIMITATIONS",
   "blockers": [],
   "f7": "IMPLEMENTED; exact-SHA current-version gates required",
   "remotePath": "Owner requested separate GIT 7.1.101 hotfix documentation/cache release on 2026-10-20. Only exact-SHA protected candidate/main admission may deploy.",
   "scope": "CONTROLLED_CLASSROOM_WITH_DOCUMENTED_LIMITATIONS",
+  "productionAuthorization": {
+    "status": "EXTERNAL_OWNER_APPROVAL_REQUIRED",
+    "mechanism": "github-owner-pr-review-v1",
+    "binding": "exact repository + promotion PR + candidate SHA/tree + prepared main SHA + version + scope + release actions",
+    "note": "This tracked readiness record is a technical precondition only. It can never authorize a merge or deployment."
+  },
   "ownerDecision": {
     "recordedOn": "2026-10-20",
     "source": "Owner approval on 2026-10-20 to complete the 7.1.101 release for the already deployed strict preview / iPhone hotfix with recorded changelog and version/caching parity; all mandatory gates remain required.",
-    "authorizeGithubPublication": true,
-    "authorizeProductionReleaseAfterMandatoryGates": true,
+    "historicalAuthorizeGithubPublication": true,
+    "historicalAuthorizeProductionReleaseAfterMandatoryGates": true,
+    "appliesOnlyTo": "7.1.101 strict-preview / iPhone hotfix state from 2026-10-20; not C32/D02 or later commits",
     "E6_INCIDENT": {
       "status": "DEFERRED_BY_OWNER",
       "closed": false,
