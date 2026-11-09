@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.101',
-  date:    '2026-10-20',
+  version: '7.1.102',
+  date:    '2026-10-27',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'MOJE SKUPINY E8 (7.1.102): volitelný učitelský import kanonické skupiny z AI Studia, školní e-maily pouze pro individuální kódy Forms; soukromá přenositelná evidence proti groupId/memberId. Studentský runtime, verifier a integrita testu se nemění. Školní UAT vyžaduje samostatné potvrzení.',
     'HOTFIX (7.1.101, 20. 10. 2026): opraven učitelský náhled přísného testu (dvoukrokové spuštění simulace bez fullscreenu, časovače a skutečného odevzdání; soukromé předvyplnění kódů), přidána volitelná kompatibilita iPhone/iPod při chybějícím Fullscreen API, důvod výjimky se audituje. Recovery, Forms, Teacher Verifier a ostatní režimy zachovány. Funkční oprava byla poprvé publikována pod 7.1.100; nyní ji zpřehledňuje samostatné verzované vydání a obnovená PWA cache.',
     'VELKÁ AKTUALIZACE V7 (7.1.100): sjednocené opravy Sprintů 01–08.3a, Teacher Verifier 2.0, Strict Mode Guard V2, pedagogická věrnost, Forms workflow a schválené bezpečnostní změny A+B. Split-screen zůstává SHADOW/AUDIT-ONLY; živé služby a fyzická zařízení zůstávají samostatnou provozní akceptací.',
     'E2E OPRAVY (7.1.99): tlačítko „Otevřít formulář“ otevírá školní formulář pouze v nové kartě při povolených pop-upech a obrazovka s odevzdávacím kódem zůstává otevřená; Teacher Verifier V2 využívá šířku obrazovky. Přidány regresní testy (unit + browser).',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'HOTFIX NÁHLEDU (7.1.96): učitelský náhled při každém otevření vytváří nový iframe a při zavření jej zcela zahodí; opakované otevření stejného instant i secure testu je kryté browser regresí. Verze a PWA cache byly posunuty, aby se oprava nenačítala ze staré cache.',
     'UX A WORKFLOW (7.1.94): zpřehledněné Reading comprehension, prémiovější AI posudek vhodnosti cvičení, opravený učitelský náhled bez kolize se studentským zámkem a srozumitelné ověření Google Forms přesunuté mimo běžné výsledky. CI migrace a P5 performance budgety byly opraveny bez oslabení bezpečnostních gateů.',
     'PŘEHLED PRŮBĚHU (7.1.93): výsledková historie s úplným dostupným záznamem, soukromé termíny podle individuálního plánu a čitelné časové pásmo. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
-    'HISTORIE POKUSU (7.1.92): uchování kritických událostí a součtů při obnově; soukromé ověření konzistence a zpětná kompatibilita. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.

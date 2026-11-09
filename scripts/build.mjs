@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { parse, tokenizer } from 'acorn';
+import { PNG } from 'pngjs';
 
 const APP_ID = 'generator';
 const CORE_VERSION = '1.0.0';
@@ -37,10 +38,10 @@ function fail(message) {
 
 // Odstraní JS komentáře podle AST (Acorn), takže nezasáhne řetězce ani regexy.
 // Blokový komentář se nahradí stejným počtem odřádkování, aby seděla čísla řádků.
-function stripJsComments(source, file) {
+function stripJsComments(source, file, sourceType='script') {
   const comments = [];
   try {
-    parse(source, { ecmaVersion: 'latest', sourceType: 'script', allowAwaitOutsideFunction: true, onComment: comments, ranges: true });
+    parse(source, { ecmaVersion: 'latest', sourceType, allowAwaitOutsideFunction: true, onComment: comments, ranges: true });
   } catch (error) {
     fail(`nelze analyzovat ${file} pro build kompakci: ${error.message}`);
   }
@@ -59,11 +60,11 @@ function stripJsComments(source, file) {
   return out + source.slice(cursor);
 }
 
-function compactJsWhitespace(source, file) {
-  const clean = stripJsComments(source, file);
+function compactJsWhitespace(source, file, sourceType='script') {
+  const clean = stripJsComments(source, file, sourceType);
   let scan;
   try {
-    scan = tokenizer(clean, { ecmaVersion:'latest', sourceType:'script', allowAwaitOutsideFunction:true });
+    scan = tokenizer(clean, { ecmaVersion:'latest', sourceType, allowAwaitOutsideFunction:true });
   } catch (error) {
     fail(`nelze tokenizovat ${file} pro build kompakci: ${error.message}`);
   }
@@ -90,9 +91,54 @@ function compactJsWhitespace(source, file) {
     out += clean.slice(token.start, token.end);
     end = token.end;
   }
-  const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType:'script',allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
+  const semantic=(s)=>JSON.stringify(parse(s,{ecmaVersion:'latest',sourceType,allowAwaitOutsideFunction:true}), (k,v)=>['start','end','raw'].includes(k)?undefined:v);
   try{if(semantic(clean)!==semantic(out))fail('JS compaction changed AST: '+file);}catch(e){fail('JS compaction invalid: '+file+' '+e.message);}
   return out;
+}
+
+// Optional, tokenizer-safe reduction of nonsemantic line breaks in shipped JS.
+// All candidate outputs must parse to an AST identical to the existing compiler output.
+// The source tree, line-number-preserving fallback, student/verifier templates and
+// release security policies are unchanged. No budget thresholds are changed.
+function compactJsWhitespaceTight(source,file,sourceType='script') {
+  const baseline=compactJsWhitespace(source,file,sourceType);
+  let scan;
+  try {scan=tokenizer(baseline,{ecmaVersion:'latest',sourceType,allowAwaitOutsideFunction:true});}
+  catch (_) {return baseline;}
+  const tokens=[];
+  try {for (;;) {const token=scan.getToken();if(token.type.label==='eof')break;tokens.push(token);}}
+  catch (_) {return baseline;}
+  const semantic=value=>JSON.stringify(parse(value,{
+    ecmaVersion:'latest',sourceType,allowAwaitOutsideFunction:true
+  }),(key,part)=>['start','end','raw'].includes(key)?undefined:part);
+  const reference=semantic(baseline);
+  const attempt=mayTighten=>{
+    let out='',end=0,previous=null;
+    for(const token of tokens) {
+      const gap=baseline.slice(end,token.start);
+      const lineBreak=gap.includes(String.fromCharCode(10))||gap.includes(String.fromCharCode(13));
+      if(lineBreak&&mayTighten(previous,token)){
+        const left=baseline[end-1]||'',right=baseline[token.start]||'';
+        const isIdentifierChar=ch=>!!ch&&(/[A-Za-z0-9_$]/.test(ch)||ch.charCodeAt(0)===92);
+        const needSpace=(isIdentifierChar(left)&&isIdentifierChar(right))||
+          (['num','regexp'].includes(previous?.type.label))||
+          ('+-/?'.includes(left)&&'+-/*.'.includes(right));
+        if(needSpace)out+=' ';
+      }else out+=gap;
+      out+=baseline.slice(token.start,token.end);
+      end=token.end;previous=token;
+    }
+    return out+baseline.slice(end);
+  };
+  for(const accept of [
+    ()=>true,
+    previous=>[';','{','}',','].includes(previous?.type.label)
+  ]) {
+    const candidate=attempt(accept);
+    if(candidate.length>=baseline.length)continue;
+    try {if(semantic(candidate)===reference)return candidate;}catch (_) {}
+  }
+  return baseline;
 }
 
 function splitGeneratorAssistant(source, file) {
@@ -307,16 +353,43 @@ const jsFiles = fs.readdirSync(jsDir)
 const mainParts = jsFiles.filter(f => !f.startsWith('50-') && !f.startsWith('60-'));
 
 let assistantFeatureSource = '';
+// Source Stage09 dynamic import specifiers are literal and source-relative for
+// GARP 2.7's enforced import resolver. The generator embeds classic src/js files
+// in the HTML document, where dynamic imports must instead be document-relative.
+// Rebase only the exact reviewed three imports; unexpected counts abort the build.
+function rebaseInlinedStage09Imports(source, file) {
+  if (file !== '17a-stage09-material-outbound.js') return source;
+  for (const [name, expected] of [
+    ['stage09-material.js', 2],
+    ['stage09-save-to-studio-local.js', 1],
+  ]) {
+    const from = "import('../features/" + name + "')";
+    const to = "import('./features/" + name + "')";
+    if (source.split(from).length - 1 !== expected ||
+        source.includes(to)) {
+      fail('Stage09 module import source graph or rebasing count drift: ' + name);
+    }
+    source = source.replaceAll(from, to);
+    if (source.split(to).length - 1 !== expected) {
+      fail('Stage09 module import rebasing incomplete: ' + name);
+    }
+  }
+  return source;
+}
 const inlineScriptTag = file => {
   let source = fs.readFileSync(path.join(jsDir, file), 'utf8');
+  source = rebaseInlinedStage09Imports(source, file);
   if (file === '01-core.js') {
     const split = splitGeneratorAssistant(source, file);
     source = split.main;
     assistantFeatureSource = split.feature;
   }
-  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespace(source, file)}\n</script>`;
+  return `<script type="application/ghrab-protected" data-ghrab-protected data-source="${file}">\n${compactJsWhitespaceTight(source, file)}\n</script>`;
 };
-const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8')}\n</script>`;
+// The pinned vendor source is still SHA-verified above. Its emitted inline
+// runtime is AST-equivalently compacted only in this isolated R29 trial;
+// no trust metadata, source vendor bytes, or release limits are changed.
+const coreTag = `<script type="application/ghrab-protected" data-ghrab-protected data-source="${CORE_FILE}">\n${compactJsWhitespaceTight(fs.readFileSync(path.join(CORE_DIR, CORE_FILE), 'utf8'),'vendor/'+CORE_FILE)}\n</script>`;
 const jsMainTags = [coreTag, ...mainParts.map(inlineScriptTag)].join('\n');
 const jsCsTag = inlineScriptTag('50-cs-module.js');
 const jsPwaTag = inlineScriptTag('60-pwa.js');
@@ -332,12 +405,76 @@ out = out.replace(/(<html[^>]*>)/i, `$1\n<!-- BUILD: ${buildTime} -->`);
 fs.writeFileSync(DIST, out, 'utf8');
 
 copyDir(PUBLIC_DIR, DIST_DIR);
+
+// R26: lossless PNG recompression of PUBLIC display assets. The checked-in
+// originals are never modified. Every decoded RGBA pixel and all original
+// reviewed ICC metadata must survive the emitted asset transformation.
+function pngChunks(bytes,label) {
+  if(bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
+    fail('Not a PNG: '+label);
+  const result=[];
+  let offset=8;
+  while(offset+12<=bytes.length){
+    const n=bytes.readUInt32BE(offset);
+    const type=bytes.toString('ascii',offset+4,offset+8);
+    const end=offset+12+n;
+    if(end>bytes.length)fail('Invalid PNG chunk size: '+label);
+    result.push({type,offset,end,bytes:bytes.subarray(offset,end)});
+    offset=end;
+    if(type==='IEND')break;
+  }
+  if(result.at(-1)?.type!=='IEND'||offset!==bytes.length||result[0]?.type!=='IHDR')
+    fail('Invalid PNG structure: '+label);
+  return result;
+}
+function compactDisplayPng(relative,filterType,deflateStrategy,colorType){
+  const target=path.join(DIST_DIR,...relative.split('/'));
+  const original=fs.readFileSync(target);
+  const originalParts=pngChunks(original,relative);
+  if(originalParts.some(c=>!['IHDR','IDAT','IEND','iCCP'].includes(c.type)))
+    fail('Unreviewed source PNG metadata: '+relative);
+  const firstData=originalParts.find(c=>c.type==='IDAT')?.offset;
+  const metadata=originalParts.filter(c=>c.type==='iCCP');
+  if(!Number.isSafeInteger(firstData)||metadata.some(c=>c.offset>=firstData))
+    fail('Unsafe original PNG metadata ordering: '+relative);
+  const decoded=PNG.sync.read(original);
+  if(colorType===2){
+    for(let i=3;i<decoded.data.length;i+=4)
+      if(decoded.data[i]!==255)fail('RGB optimization would drop transparency: '+relative);
+  }
+  const output=PNG.sync.write({
+    width:decoded.width,height:decoded.height,data:decoded.data
+  },{inputHasAlpha:true,colorType,filterType,deflateStrategy,deflateLevel:9});
+  const emittedParts=pngChunks(output,relative);
+  if(emittedParts[0].end!==33||emittedParts[1]?.type!=='IDAT')
+    fail('Unexpected encoder PNG structure: '+relative);
+  // ICC chunks contain their own original CRCs. Preserve them byte-for-byte,
+  // including the profile, when switching opaque 8-bit RGBA artwork to RGB.
+  const optimized=Buffer.concat([
+    output.subarray(0,33),...metadata.map(c=>c.bytes),output.subarray(33)
+  ]);
+  const actual=PNG.sync.read(optimized);
+  if(actual.width!==decoded.width||actual.height!==decoded.height||
+     !Buffer.from(actual.data).equals(Buffer.from(decoded.data)))
+    fail('Lossless PNG pixel parity failed: '+relative);
+  const actualICC=pngChunks(optimized,relative).filter(c=>c.type==='iCCP');
+  if(actualICC.length!==metadata.length||
+     actualICC.some((c,i)=>!c.bytes.equals(metadata[i].bytes)))
+    fail('Lossless PNG ICC profile parity failed: '+relative);
+  if(optimized.length<original.length)fs.writeFileSync(target,optimized);
+}
+for(const [relative,filter,strategy,type] of [
+  ['icons/icon-512.png',4,1,6],
+  ['icons/icon-maskable-512.png',4,1,6],
+  ['icons/icon-192.png',4,1,6],
+  ['icons/apple-touch-icon.png',4,1,6]
+])compactDisplayPng(relative,filter,strategy,type);
 // Public helpers stay readable and independently testable in source, but ship
 // compacted. JS compaction verifies AST equivalence before writing; CSS uses the
 // same tokenizer-safe compactor as the application shell.
 for (const [relative,compact] of [
-  ['manual/navigation-context.js',compactJsWhitespace],
-  ['manual/pdf-download.js',compactJsWhitespace],
+  ['manual/navigation-context.js',compactJsWhitespaceTight],
+  ['manual/pdf-download.js',compactJsWhitespaceTight],
   ['manual/navigation-context.css',compactCss],
   ['access/access-gate.css',compactCss],
   ['access/error-reporter.css',compactCss]
@@ -353,16 +490,42 @@ for (const file of (function walk(dir){return fs.readdirSync(dir,{withFileTypes:
   try { fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file,'utf8')))+'\n'); } catch {}
 }
 copyDir(path.resolve('src', 'features'), path.join(DIST_DIR, 'features'));
+// Keep the canonical source legible. Compact deployed teacher-only optional modules
+// with Acorn-verified AST equivalence, including the Stage08 ESM ledger.
+for(const name of ['testlab.js','preview-editor.js','central-groups.js','central-results.js','group-result-ledger.js','stage09-material.js','stage09-save-to-studio-local.js']){
+  const target=path.join(DIST_DIR,'features',name);
+  if(!fs.existsSync(target))fail('Chybí povinný modul v distribuci: '+name);
+  const kind=['group-result-ledger.js','stage09-material.js','stage09-save-to-studio-local.js'].includes(name)?'module':'script';
+  fs.writeFileSync(target,
+    compactJsWhitespaceTight(fs.readFileSync(target,'utf8'),'src/features/'+name,kind),
+    'utf8');
+}
+// Legacy public helpers were previously copied verbatim; only remove provably
+// nonsemantic whitespace/comments from the deployed copies (never Studio guards).
+for(const relative of [
+  'access/error-reporter.js',
+  'access/suite-session-cleanup.js',
+  'access/deployment-config.js',
+  'access/reporter-bootstrap.js',
+  'frame-guard.js'
+]){
+  const target=path.join(DIST_DIR,...relative.split('/'));
+  if(!fs.existsSync(target))fail('Chybí veřejný pomocný skript: '+relative);
+  fs.writeFileSync(target,
+    compactJsWhitespaceTight(fs.readFileSync(target,'utf8'),'public/'+relative,
+      ['error-reporter.js','deployment-config.js','reporter-bootstrap.js'].includes(path.basename(relative))?'module':'script'),
+    'utf8');
+}
 if (!assistantFeatureSource) fail('Generator Assistant lazy feature nebyla vytvořena');
 fs.writeFileSync(
   path.join(DIST_DIR, 'features', ASSISTANT_FEATURE_FILE),
-  compactJsWhitespace(assistantFeatureSource, `features/${ASSISTANT_FEATURE_FILE}`),
+  compactJsWhitespaceTight(assistantFeatureSource, `features/${ASSISTANT_FEATURE_FILE}`),
   'utf8'
 );
 fs.mkdirSync(path.join(DIST_DIR, 'vendor'), { recursive: true });
 fs.writeFileSync(
   path.join(DIST_DIR, 'vendor', 'acorn.js'),
-  compactJsWhitespace(fs.readFileSync(ACORN_BROWSER, 'utf8'), 'vendor/acorn.js'),
+  compactJsWhitespaceTight(fs.readFileSync(ACORN_BROWSER, 'utf8'), 'vendor/acorn.js'),
   'utf8'
 );
 fs.copyFileSync(ACORN_LICENSE, path.join(DIST_DIR, 'vendor', 'acorn-LICENSE.txt'));

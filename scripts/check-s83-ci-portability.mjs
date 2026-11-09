@@ -44,17 +44,30 @@ check(true,'S83-CI06-MUTATION','shallow checkout mutation is rejected before his
 const baseline='156b8ba3157a13aa5f8b711e3173cb9518cb8469';
 const protectedMainBaseline='d7bf7875a33ca97fd619cd403a276973b23d14ea';
 const oldTrust='afc16d2a0318a5448ef1855fb4966a326278ee95f47ce1e5c8bf2786aeedb279';
-const reviewedTrust='c228a89d1d162e859dc92c9befeb9b4833255848c94a9eca575f793689ff917f';
+const reviewedTrust='ec7aa8abbc4a4a915627f569eaa69b3a8da56155565b955814263bead2061006';
 const baselineWorkflows=execFileSync('git',['ls-tree','-r','--name-only',baseline,'--','.github/workflows'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
 const protectedMainWorkflowAdditions=new Set([
   '.github/workflows/manual-browser-qa.yml',
   '.github/workflows/manual-navigation-qa.yml'
 ]);
 const actualWorkflows=fs.readdirSync(path.join(root,'.github/workflows')).filter(name=>/\.ya?ml$/i.test(name)).map(name=>'.github/workflows/'+name).sort();
+// Release-admission profile: no temporary branch-scoped Stage08 workflow is
+// authorized in the final candidate or main tree, regardless of branch/ref.
+// The original reviewed feature branch remains immutable and separately pinned.
+const forbiddenReviewWorkflows=Object.freeze([
+  '.github/workflows/stage08-preprod-verification.yml',
+  '.github/workflows/stage08-v2-reader-preprod.yml',
+  '.github/workflows/stage08-v2-full-p5-preprod.yml'
+]);
 const expectedWorkflows=[...new Set([...baselineWorkflows,...protectedMainWorkflowAdditions])].sort();
 const workflowInventoryMatches=files=>JSON.stringify([...files].sort())===JSON.stringify(expectedWorkflows);
 execFileSync('git',['merge-base','--is-ancestor',protectedMainBaseline,'HEAD']);
-check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','workflow inventory preserves the certified baseline plus two exact workflows inherited from protected main');
+check(workflowInventoryMatches(actualWorkflows),'S83-CI07A','final release workflow inventory contains only reviewed baseline and protected-main manual QA (zero Stage08 test workflows)');
+for(const forbidden of forbiddenReviewWorkflows){
+  assert.equal(actualWorkflows.includes(forbidden),false, 'release must not ship temporary '+forbidden);
+  assert.equal(workflowInventoryMatches([...actualWorkflows,forbidden]),false,'restoring forbidden review workflow must fail inventory admission');
+}
+check(true,'S83-CI07A-RELEASE-NEGATIVE','release rejects all three temporary Stage08 workflow additions, even if byte-identical to prior review');
 function normalizeReviewedWorkflow(text,file){
   let normalized=text.replaceAll(reviewedTrust,oldTrust);
   if(!fullHistoryWorkflows.has(file))return normalized;
@@ -72,7 +85,7 @@ const unexpected=actualWorkflows.filter(file=>{
   const currentText=fs.readFileSync(path.join(root,file),'utf8');
   return normalizeReviewedWorkflow(currentText,file)!==baselineText;
 });
-check(unexpected.length===0,'S83-CI07B','workflow contents preserve the reviewed baseline exceptions and exact protected-main manual QA bytes');
+check(unexpected.length===0,'S83-CI07B','release workflow contents retain only reviewed baseline normalizations and byte-exact protected-main manual QA');
 assert.equal(workflowInventoryMatches([...actualWorkflows,'.github/workflows/unapproved.yml']),false,'an unreviewed workflow addition must fail inventory admission');
 const changedManualBrowser=fs.readFileSync(path.join(root,'.github/workflows/manual-browser-qa.yml'),'utf8').replace('timeout-minutes: 24','timeout-minutes: 25');
 assert.notEqual(changedManualBrowser,execFileSync('git',['show',protectedMainBaseline+':.github/workflows/manual-browser-qa.yml'],{encoding:'utf8'}),'a protected-main workflow byte mutation must fail admission');
