@@ -1,10 +1,10 @@
 {
   "schema": "git-release-readiness-e10-v2",
-  "version": "7.1.101",
+  "version": "7.1.103",
   "status": "READY WITH DOCUMENTED LIMITATIONS",
   "blockers": [],
   "f7": "IMPLEMENTED; exact-SHA current-version gates required",
-  "remotePath": "Owner requested separate GIT 7.1.101 hotfix documentation/cache release on 2026-10-20. Only exact-SHA protected candidate/main admission may deploy.",
+  "remotePath": "Owner authorized local R1 7.1.103 release preparation on 2026-11-17. Publication still requires exact-SHA protected candidate/main admission and a new authenticated external owner approval.",
   "scope": "CONTROLLED_CLASSROOM_WITH_DOCUMENTED_LIMITATIONS",
   "productionAuthorization": {
     "status": "EXTERNAL_OWNER_APPROVAL_REQUIRED",
@@ -37,7 +37,7 @@
     "independentReview": {
       "status": "PENDING_FINAL_EXACT_SHA_AUDIT",
       "reviewedVersion": "7.1.101",
-      "currentVersion": "7.1.101",
+      "currentVersion": "7.1.103",
       "currentVersionIndependentlyReviewed": false,
       "note": "Local and GitHub exact-SHA evidence is required; this source decision does not relabel physical or live-service checks as PASS."
     }

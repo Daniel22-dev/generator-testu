@@ -10,10 +10,14 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { githubRead, readCollection, repositoryName, exactSha, positiveId } from './github-read.mjs';
 import { checkLiveReleaseAuthorization, releaseVersion, RELEASE_SCOPE } from './release-authorization.mjs';
+import {
+  P4_CONSUMED_PROMOTION_EVIDENCE_SCHEMA,
+  P4_PROMOTION_CERTIFICATE_SCHEMA,
+} from './p4-contract.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-export const SCHEMA = 'git-p4-promotion-certificate-v2';
-export const CONSUMED_SCHEMA = 'git-p4-consumed-promotion-evidence-v2';
+export const SCHEMA = P4_PROMOTION_CERTIFICATE_SCHEMA;
+export const CONSUMED_SCHEMA = P4_CONSUMED_PROMOTION_EVIDENCE_SCHEMA;
 export const ACTIONS_APP_ID = 15368;
 export const PROMOTION_WORKFLOW = '.github/workflows/safe-promotion.yml';
 export const PROMOTION_JOB = 'promote-certified-pr';

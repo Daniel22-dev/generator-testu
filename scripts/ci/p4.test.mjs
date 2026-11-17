@@ -12,6 +12,10 @@ import {
 } from './p4-promotion-evidence.mjs';
 import { buildPlan } from './preflight.mjs';
 import { approvalStatement, RELEASE_SCOPE } from './release-authorization.mjs';
+import {
+  assertP4ConsumedPromotionEvidence,
+  P4_CONSUMED_PROMOTION_EVIDENCE_SCHEMA,
+} from './p4-contract.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const sha = c => c.repeat(40);
@@ -29,6 +33,19 @@ test('P4 promotion trust pin matches the reviewed current GARP anchor', () => {
   const pin = consumer.trustInputs.find(input => input.environment === 'GARP27_EXTERNAL_TRUST_SHA256')?.sha256;
   assert.equal(pin, expected, 'CI consumer trust pin must match current GARP anchor');
   assert.equal(GARP27_TRUST_SHA256, expected, 'P4 promotion must use current reviewed GARP pin');
+});
+
+test('P4 release identity accepts only the current consumed-evidence schema', () => {
+  const current = { schema: P4_CONSUMED_PROMOTION_EVIDENCE_SCHEMA, status: 'PASS' };
+  assert.equal(assertP4ConsumedPromotionEvidence(current), current);
+  assert.throws(
+    () => assertP4ConsumedPromotionEvidence({ ...current, schema: 'git-p4-consumed-promotion-evidence-v1' }),
+    /Invalid P4 consumed evidence schema/,
+  );
+  assert.throws(
+    () => assertP4ConsumedPromotionEvidence({ ...current, status: 'FAIL' }),
+    /Invalid P4 consumed evidence status/,
+  );
 });
 
 
