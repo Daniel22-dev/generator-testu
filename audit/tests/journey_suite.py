@@ -285,7 +285,7 @@ try:
 
  def failed_regeneration_keeps_reviewed_test(j):
   j.new_test('Přísný test');j.selftest();j.checklist();tid=j.ev('()=>lastAssembled.cfg.testId')
-  j.p.click('#btnGenerate');j.p.wait_for_timeout(300);m=j.modal();assert m and 'místo hotového' in m,('replace needs confirmation (F-18)',m);j.cancel()
+  j.p.click('#btnGenerate');j.p.wait_for_timeout(300);m=j.modal();assert m and 'Nahradit hotový test?' in m and 'Hotový test se nahradí a kontroly se zahodí.' in m,('replace needs confirmation (F-18)',m);j.cancel()
   assert j.ev('()=>__aiLog.length')==1 and j.gate()['allowed'],'cancel must not call AI or touch checks'
   j.ev("()=>{for(let i=0;i<12;i++)__aiScript.push({status:429,apiStatus:'RESOURCE_EXHAUSTED'})}")
   seen=j.generate(accept=True)
