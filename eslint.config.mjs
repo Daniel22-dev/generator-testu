@@ -1,7 +1,7 @@
 // ESLint pro projekt složený z více classic scriptů ve sdíleném globálním scope.
 // Seznam projektových globálů se generuje z top-level deklarací před každým lintem.
 import globals from 'globals';
-import { projectGlobals } from './eslint-globals.generated.mjs';
+import { projectGlobals, securePreviewRuntimeGlobals } from './eslint-globals.generated.mjs';
 
 export default [
   {
@@ -32,6 +32,12 @@ export default [
       'no-undef': 'error',
       'no-empty': ['warn', { allowEmptyCatch: true }],
       'no-console': 'off',
+    },
+  },
+  {
+    files: ['src/features/preview-editor.js'],
+    languageOptions: {
+      globals: { ...securePreviewRuntimeGlobals },
     },
   },
   {

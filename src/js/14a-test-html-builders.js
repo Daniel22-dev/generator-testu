@@ -93,7 +93,7 @@ function buildExerciseHtml(ex, ei, cfg, totalEx) {
   let rcHead = '', rcSkip = false;
   if (ex.type === 'reading comprehension') {
     const sp = rcSharedPassage(ex);
-    if (sp) { rcHead = '<div class="source-box reading-passage"><strong>' + H(L.passage) + ':</strong><br>' + H(sp).replace(/\n/g,'<br>') + '</div>'; rcSkip = true; }
+    if (sp) { rcHead = '<div class="source-box reading-passage"><strong>' + H(L.passage) + ':</strong><br>' + H(sp) + '</div>'; rcSkip = true; }
   }
   return '<div class="ex-panel' + panelHidden + '" id="exPanel' + ei + '">' +
     '<div class="ex-hdr">' +
@@ -231,7 +231,7 @@ function buildQuestionHtml(item, qi, ei, type, pts, cfg, rcSkip) {
       '<input type="text" class="err-inp" data-qid="' + qid + '" oninput="updateText(\'' + qid + '\',this.value,\'sentence transformation\')" placeholder="' + H(L.writeSentence) + '" autocomplete="off" autocorrect="off" spellcheck="false"></div>';
   }
   if (type === 'reading comprehension') {
-    return '<div class="question" id="q_' + qid + '">' + hdr + ((!rcSkip && item.passage) ? '<div class="source-box"><strong>' + H(L.passage) + ':</strong><br>' + H(item.passage) + '</div>' : '') +
+    return '<div class="question" id="q_' + qid + '">' + hdr + ((!rcSkip && item.passage) ? '<div class="source-box reading-passage"><strong>' + H(L.passage) + ':</strong><br>' + H(item.passage) + '</div>' : '') +
       '<div class="q-text">' + H(item.question||'') + '</div>' + (Array.isArray(item.options) ? buildChoiceHtml(qid, item.options) + joker : '<textarea class="open-inp" oninput="updateText(\'' + qid + '\',this.value,\'reading comprehension\')" rows="3"></textarea>') + '</div>';
   }
   if (type === 'dialogue completion') {

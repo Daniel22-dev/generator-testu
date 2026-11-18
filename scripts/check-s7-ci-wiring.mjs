@@ -24,6 +24,6 @@ reject('drop-source',pkg=>{pkg.scripts.prebuild=pkg.scripts.prebuild.replace(' &
 reject('drop-ci-browser',pkg=>{pkg.scripts['qa:p5:ci']=pkg.scripts['qa:p5:ci'].replace(' && npm run check:s7-teacher-workflow-browser','');});
 reject('drop-local-traceability',pkg=>{pkg.scripts['qa:p5']=pkg.scripts['qa:p5'].replace(' && npm run check:s7-traceability','');});
 reject('fake-source',pkg=>{pkg.scripts['check:s7-teacher-workflow']='node -e "process.exit(0)"';});
-reject('trace-before-browser',pkg=>{pkg.scripts['qa:p5:ci']=pkg.scripts['qa:p5:ci'].replace('npm run check:s7-teacher-workflow-browser && npm run check:s7-traceability','npm run check:s7-traceability && npm run check:s7-teacher-workflow-browser');});
+reject('trace-before-browser',pkg=>{const steps=split(pkg.scripts['qa:p5:ci']),browser=steps.indexOf('npm run check:s7-teacher-workflow-browser'),trace=steps.indexOf('npm run check:s7-traceability');steps.splice(trace,1);steps.splice(browser,0,'npm run check:s7-traceability');pkg.scripts['qa:p5:ci']=steps.join(' && ');});
 reject('drop-release-chain',(_pkg,_wf,run)=>{run.value=run.value.replace("'npm run qa:p5:ci'", "'node -e \\\"process.exit(0)\\\"'");});
 fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/s7-ci-wiring.json',JSON.stringify({schema:'git-s7-ci-wiring-v1',stage:'S07',status:'PASS',negativeControls:mutations},null,2)+'\n');console.log(`PASS S7 CI wiring and ${mutations.length} negative controls`);

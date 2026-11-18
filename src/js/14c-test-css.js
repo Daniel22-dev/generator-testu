@@ -55,6 +55,7 @@ function getTestBaseCSS() {
 '.ex-hdr-pts{font-size:12px;color:var(--muted)}' +
 '.q-list{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}' +
 '.question{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative}' +
+'.reading-passage{white-space:pre-line;text-align:justify;text-align-last:left;overflow-wrap:anywhere;word-break:normal;line-height:1.65;max-width:100%}' +
 '.question.joker-used{opacity:.65;border-style:dashed}' +
 '.q-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}' +
 '.q-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}' +

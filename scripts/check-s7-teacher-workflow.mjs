@@ -51,6 +51,7 @@ const anchorsSource=fs.readFileSync(path.join(root,'src/js/13ee-secure-verifier-
 const teacherSource=fs.readFileSync(path.join(root,'src/js/13f-secure-teacher-verifier.js'),'utf8');
 const geminiSource=fs.readFileSync(path.join(root,'src/js/07-gemini.js'),'utf8');
 const outputWorkflow=fs.readFileSync(path.join(root,'src/js/08a-output-workflow.js'),'utf8');
+const generationProgress=fs.readFileSync(path.join(root,'src/js/15a-generation-progress.js'),'utf8');
 
 function appsHarness(rows,options={}){
   const headers=['email','code','test_id','odeslat','odeslano','stav'],values=[headers.slice(),...rows.map(row=>row.slice())],formulas=values.map(row=>row.map(()=>''));
@@ -111,7 +112,7 @@ check('S07-LESSON-R01',anchorsSource.includes('Samotné otevření odkazu nic ne
 check('S07-LESSON-R02',formsSource.includes('GIT-LESSON-(START|END)-V1')&&formsSource.includes("policy.teacherEmails.includes(email)")&&formsSource.includes('markers.sort'),'lesson state is derived from submitted CSV markers, an allowed teacher and chronology');
 check('S07-LESSON-R03',anchorsSource.includes("window.open(link,'_blank','noopener,noreferrer')")&&!/function openFormsLesson\([^)]*\)[\s\S]{0,500}(FORMS_LESSON_WINDOWS\s*=|\.push\()/.test(anchorsSource),'opening a START/END link cannot mutate the verified lesson-window state');
 
-check('S07-UX-R01',shell.includes('id="genProgressMsg" role="status" aria-live="polite"')&&!/id="genProgress"[^>]*aria-valuenow/.test(shell),'AI generation exposes an indeterminate accessible status, not invented percentages');
+check('S07-UX-R01',shell.includes('id="genProgressBar" max="100" value="0"')&&shell.includes('id="genProgressSummary"')&&generationProgress.includes("type==='complete'")&&generationProgress.includes('completed?.length'),'generation exposes a determinate accessible status credited only by completed verified units');
 check('S07-UX-R02',geminiSource.includes("function setGenMsg(msg) { const el = $('genProgressMsg'); if (el) el.textContent = msg; }")&&outputWorkflow.includes('Jde o pl\\u00e1n, nikoli z\\u00e1ruku v\\u00fdsledku AI.'),'AI status reflects actual operations and estimates are explicitly labelled as plans');
 check('S07-UX-R03',geminiSource.includes('Kontrolní otisky souborů')&&teacherSource.includes('Náhled testu pro učitele')&&shell.includes('data-result-step="1"'),'teacher workflow retains preview, integrity and step-oriented controls');
 check('S07-UX-R04',shell.includes('field-hint')&&shell.includes('preset-card-emoji')&&shell.includes('aria-label'),'settings retain explanatory hints, icons and accessible labels');

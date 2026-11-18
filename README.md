@@ -1,4 +1,4 @@
-> **7.1.101 – hotfix náhledu přísného testu a iPhone kompatibility (20. 10. 2026).** Jde o dokumentované, samostatně verzované vydání funkcí dříve nasazených pod 7.1.100; mění changelog, PWA cache a release evidenci, nikoli hodnoticí algoritmus. Podrobnosti [RELEASE-NOTES-7.1.101.md](RELEASE-NOTES-7.1.101.md).
+> **7.1.103 – R1 final release candidate (17. 11. 2026).** Konsoliduje dokončené R1 bezpečnostní, učitelské workflow, generovací a QA opravy bez Stage08. Produkční vydání vyžaduje novou exact-SHA GitHub certifikaci a externí schválení vlastníka. Podrobnosti [RELEASE-NOTES-7.1.103.md](RELEASE-NOTES-7.1.103.md).
 
 > **7.1.100 V7 – konsolidovaná bezpečnostní a výuková aktualizace.** Recovery/Teacher/Admin hardening, pedagogická věrnost, Teacher Verifier 2.0, Strict Mode Guard V2, didaktické AI workflow a závěrečné certifikační opravy. Split-screen zůstává SHADOW/AUDIT-ONLY. Podrobnosti [RELEASE-NOTES-7.1.100.md](RELEASE-NOTES-7.1.100.md).
 
@@ -26,7 +26,7 @@
 
 > **7.1.74 — zpevnění workflow žolíka.** Po spuštění bezpečného testu se volba žolíka, identita pokusu, attempt ID, deadline a stav zámku lokálně zapečetí; běžný reload už nemůže změnit volbu ani resetovat čas. Verifier žolíkový pokus zachová pro kontrolu a bezpečnost, ale vyřadí jej z klasifikačních statistik; CSV obsahuje explicitní stav žolíka/klasifikace. D7 navíc obsahuje klikací Chromium regresní test tohoto workflow. Viz RELEASE-NOTES-7.1.74.md.
 
-> **7.1.73 — iPadOS klávesnice + workflow Verifieru.** Zavření softwarové klávesnice systémovým tlačítkem na iPadu už nemá vyvolat falešný zámek testu; skutečné opuštění stránky a split-screen monitoring zůstávají aktivní. Teacher Verifier nyní nabízí Google Forms CSV jako první a doporučenou cestu, nouzovou zálohu až pod ní a po importu/exportu zobrazuje viditelné potvrzení. Viz RELEASE-NOTES-7.1.73.md.
+> **7.1.73 — iPadOS klávesnice + workflow Verifieru.** Zavření softwarové klávesnice systémovým tlačítkem na iPadu už nemá vyvolat falešný zámek testu; události opuštění stránky zůstávají aktivní a split-screen telemetrie je pouze SHADOW/AUDIT-ONLY. Teacher Verifier nyní nabízí Google Forms CSV jako první a doporučenou cestu, nouzovou zálohu až pod ní a po importu/exportu zobrazuje viditelné potvrzení. Limity prohlížeče popisuje [docs/SECURITY-BROWSER-LIMITS.md](docs/SECURITY-BROWSER-LIMITS.md). Viz RELEASE-NOTES-7.1.73.md.
 
 > **7.1.72 — GARP 2.8 hardening + PDF layout.** Bezpečnostní workflow mají oddělené minimální pravomoci, přidán frame guard a další redakce citlivých klíčů. Přímé student/teacher PDF nyní používá konzistentní horní/dolní okraj a nenechává nadpis nového cvičení osamocený na konci stránky. Viz RELEASE-NOTES-7.1.72.md.
 
@@ -52,7 +52,7 @@
 
 # Generátor interaktivních testů
 
-**Aktuální verze:** 7.1.101 (strict preview / iPhone hotfix evidence; exact-SHA release gates required; physical devices and live school services remain separate acceptance checks)
+**Aktuální verze:** 7.1.103 (R1 final release candidate; exact-SHA release gates and new external owner approval required; physical devices and live school services remain separate acceptance checks)
 
 > **7.1.59 Workflow audit (2026-09-29):** jednotný stavový model finálního workflow, akční chybové hlášky, hlídání změn nastavení po vygenerování, opravy studentských textů; viz RELEASE-NOTES-7.1.59.md.
 

@@ -14,11 +14,12 @@ const STEP_LABELS = ["Základní info","Cvičení","Čas & forma","Doplňky"];
 
 // Release metadata; changelog drží posledních 10 položek.
 const RELEASE = Object.freeze({
-  version: '7.1.101',
-  date:    '2026-10-20',
+  version: '7.1.103',
+  date:    '2026-11-17',
   status:  'production-serverless',
   sourceAuditPending: true, // Deployment profile retained; release acceptance is still pending exact CI and live checks.
   changes: [
+    'R1 RELEASE CANDIDATE (7.1.103, 17. 11. 2026): konsolidované bezpečnostní opravy C32/D02 a E10 governance, učitelská karta START/END, pravdivý průběh generování C30, Reading rendering a Windows QA portability. GARP 2.7 se mění pouze verzí a odvozenými piny; produkční vydání vyžaduje novou exact-SHA GitHub certifikaci a externí schválení vlastníka. Stage08 není součástí vydání.',
     'HOTFIX (7.1.101, 20. 10. 2026): opraven učitelský náhled přísného testu (dvoukrokové spuštění simulace bez fullscreenu, časovače a skutečného odevzdání; soukromé předvyplnění kódů), přidána volitelná kompatibilita iPhone/iPod při chybějícím Fullscreen API, důvod výjimky se audituje. Recovery, Forms, Teacher Verifier a ostatní režimy zachovány. Funkční oprava byla poprvé publikována pod 7.1.100; nyní ji zpřehledňuje samostatné verzované vydání a obnovená PWA cache.',
     'VELKÁ AKTUALIZACE V7 (7.1.100): sjednocené opravy Sprintů 01–08.3a, Teacher Verifier 2.0, Strict Mode Guard V2, pedagogická věrnost, Forms workflow a schválené bezpečnostní změny A+B. Split-screen zůstává SHADOW/AUDIT-ONLY; živé služby a fyzická zařízení zůstávají samostatnou provozní akceptací.',
     'E2E OPRAVY (7.1.99): tlačítko „Otevřít formulář“ otevírá školní formulář pouze v nové kartě při povolených pop-upech a obrazovka s odevzdávacím kódem zůstává otevřená; Teacher Verifier V2 využívá šířku obrazovky. Přidány regresní testy (unit + browser).',
@@ -28,7 +29,6 @@ const RELEASE = Object.freeze({
     'HOTFIX NÁHLEDU (7.1.96): učitelský náhled při každém otevření vytváří nový iframe a při zavření jej zcela zahodí; opakované otevření stejného instant i secure testu je kryté browser regresí. Verze a PWA cache byly posunuty, aby se oprava nenačítala ze staré cache.',
     'UX A WORKFLOW (7.1.94): zpřehledněné Reading comprehension, prémiovější AI posudek vhodnosti cvičení, opravený učitelský náhled bez kolize se studentským zámkem a srozumitelné ověření Google Forms přesunuté mimo běžné výsledky. CI migrace a P5 performance budgety byly opraveny bez oslabení bezpečnostních gateů.',
     'PŘEHLED PRŮBĚHU (7.1.93): výsledková historie s úplným dostupným záznamem, soukromé termíny podle individuálního plánu a čitelné časové pásmo. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
-    'HISTORIE POKUSU (7.1.92): uchování kritických událostí a součtů při obnově; soukromé ověření konzistence a zpětná kompatibilita. Kandidát pro nezávislou kontrolu; fyzické zkoušky čekají.',
   ]
 });
 // Stabilní nekryptografický build identifikátor.
@@ -415,22 +415,22 @@ function setErrorTextWithHttpHelp(el,msg){if(!el)return;const next=errorNextStep
 /* Generator Assistant — core (KB + search). Vkládá se 1:1 do generátoru. */
 // Stav: 'reseno' | 'castecne' | 'ne'
 const GENERATOR_ASSISTANT_KB = [
- {id:'split-screen',title:'Rozdělená obrazovka (split screen)',status:'reseno',
+ {id:'split-screen',title:'Rozdělená obrazovka (split screen)',status:'castecne',
   keywords:['split screen','rozdelena obrazovka','rozdeleni obrazovky','male okno','split window','multitasking','okno vedle sebe','dve aplikace vedle sebe'],
-  simple:'Ano, částečně. Test si hlídá, jestli neběží dlouho v malém okně (typické pro rozdělenou obrazovku), a zapíše to učiteli jako signál k posouzení.',
-  detailed:'Generovaný test vzorkuje každé 2 s poměr velikosti okna k displeji. Když je okno souvisle (od ~10 s) menší než 60 % displeje, počítá to jako „malé/rozdělené okno". Při odevzdání uloží jeden souhrnný signál split-window s podílem času v malém okně; ten se objeví v bezpečnostním záznamu, ve výsledku i v učitelském ověření. Je to vodítko, ne obvinění. Pozor: cílené rozdělení 70/30 nebo druhé fyzické zařízení tím nechytíš.',
-  evidence:['startSplitMonitor()','stopSplitMonitor()','recordSplitSummary()','windowIsSmall()','SPLIT_RATIO=0.60','SPLIT_MIN_RUN_MS','signál split-window']},
+  simple:'Částečně. Klientská heuristika může zaznamenat změnu velikosti okna jako SHADOW/AUDIT-ONLY signál. Sama test nezamyká a není důkazem podvodu.',
+  detailed:'Prohlížeč porovnává dostupný viewport s důvěryhodnou výchozí plochou a může uložit split-window telemetrii. Skutečně naměřených 0 % se liší od stavu Nezjištěno. Údaj je client-controlled a lze jej pozměnit nebo vynechat. Slide Over, Split View, Stage Manager, systémový sidebar, softwarová klávesnice nebo zoom mohou měnit viewport podobně; některé rozvržení naopak prohlížeč nerozliší. Split-screen proto zůstává SHADOW/AUDIT-ONLY bez automatického zámku či sankce.',
+  evidence:['strictSplitObservation()','startSplitMonitor()','recordSplitSummary()','split-window','SHADOW/AUDIT-ONLY','Teacher Verifier: Nezjištěno != 0 %']},
 
  {id:'limity-detekce',title:'Co generátor NEdetekuje (druhé zařízení, kamera, nahrávání, Bluetooth)',status:'ne',
   keywords:['druhy mobil','druhe zarizeni','druhy telefon','telefon vedle','mobil vedle','vedle notebooku','jine zarizeni','kamera','webkamera','nahravani obrazovky','screen recording','screrecording','obs','bluetooth','sluchatka','odposlech','spy','druhy pocitac','tablet vedle','mistnost','v mistnosti','kamera v mistnosti'],
   simple:'Ne. Generátor vidí jen dění ve svém okně/prohlížeči na tomtéž zařízení. Druhý telefon vedle notebooku, kameru v místnosti, nahrávání obrazovky ani Bluetooth zařízení nepozná a ani poznat nemůže.',
-  detailed:'Veškerá detekce je vázaná na okno a prohlížeč: opuštění okna (visibilitychange, pagehide, blur), fullscreen, velikost okna (split monitor) a heartbeat. Nic z toho nevidí mimo prohlížeč. Druhé fyzické zařízení, kamera, odposlech, nahrávání obrazovky či Bluetooth jsou mimo dosah webové stránky. I split monitor podle vlastního komentáře v kódu „cílenou snahu (rozdělení 70/30, druhé zařízení) nechytí". Bezpečnost je tedy vodítko k lidskému posouzení, ne neprůstřelný dohled.',
-  evidence:['komentář u split monitoru: „druhé zařízení nechytí"','detekce jen okno/prohlížeč (visibilitychange, pagehide, blur)','detectDevice() určuje jen TYP aktuálního zařízení, ne počet zařízení']},
+  detailed:'Veškerá telemetrie je client-controlled a vázaná na stejné okno/prohlížeč: visibilitychange, pagehide, blur, fullscreen, viewport a heartbeat. Same-origin pravidla nedávají stránce přístup k jiným aplikacím, jinému zařízení ani k UI operačního systému. Student s DevTools nebo upravenou kopií HTML může klientské události změnit či vynechat. Druhé zařízení, kamera, odposlech, nahrávání, Bluetooth, systémový sidebar a obsah notifikací jsou mimo spolehlivý dosah webové stránky. Signály jsou podklad k lidskému posouzení, ne automatický důkaz.',
+  evidence:['client-controlled telemetry','same-origin browser boundary','Teacher Verifier trust notice','detectDevice() určuje jen typ aktuálního zařízení']},
 
  {id:'opusteni-okna',title:'Opuštění testu / přepnutí aplikace / blur',status:'reseno',
   keywords:['opusteni testu','opustit test','prepnuti aplikace','prepnuti karty','blur','visibilitychange','pagehide','beforeunload','reload','ztrata fokusu','odejit z testu','alt tab'],
-  simple:'Ano. Když student během testu přepne aplikaci/kartu, otevře jiné okno nebo stránku načte znovu, test to pozná. V přísném režimu se zamkne, v běžném se to jen zapíše.',
-  detailed:'Detekce je vícevrstvá: visibilitychange (hidden), pagehide, beforeunload/reload příznak v sessionStorage/localStorage, heartbeat (lastActiveAt) a hlídaný blur fallback (jen když test běží, není otevřený modal, student nepíše do inputu a stránka je bez fokusu déle než ~800–1200 ms). Podezřelá mezera od heartbeatu nad 2–3 s = zámek (v přísném režimu). Nezamyká se při běžné mobilní klávesnici, file pickeru, selectu ani vlastním modalu.',
+  simple:'Částečně. Prohlížeč může nahlásit skrytí stránky, ztrátu fokusu, reload nebo pagehide. V přísném režimu může spolehlivá událost vyvolat zámek; ne každou interakci operačního systému ale web uvidí.',
+  detailed:'Ochrana kombinuje visibilitychange, pagehide, reload příznak, heartbeat a opatrný blur fallback. Výjimky omezují falešné zámky při softwarové klávesnici, file pickeru, selectu a vlastním modalu. Operační systém a prohlížeč však nemusí vystavit každé překrytí, notifikaci, sidebar nebo multitasking stejnou událostí. Klientskou telemetrii lze navíc upravit; Teacher Verifier ji proto vykládá v kontextu.',
   evidence:['getCompactSecurityBlock() (přísný i běžný)','visibilitychange / pagehide / beforeunload','heartbeat lastActiveAt','hlídaný blur fallback ~800–1200 ms','mezera >2–3 s = zámek']},
 
  {id:'fullscreen',title:'Fullscreen / celá obrazovka',status:'reseno',
@@ -800,8 +800,8 @@ const GENERATOR_ASSISTANT_KB = [
 
  {id:'bezpecnostni-signaly-vyznam',title:'Bezpečnostní signály ve výsledku — co znamenají a kolik je normální',status:'reseno',
   keywords:['bezpecnostni signal','bezpečnostní signál','blur','split screen signal','opusteni testu','opuštění testu','podvadeni','podvádění','bezpecnostni zaznam','bezpečnostní záznam','jak cist bezpecnostni','jak číst bezpečnostní','kolik signalu je normal','kolik signálů je normální'],
-  simple:'Bezpečnostní signály jsou indicie, ne důkazy. Blur = student přepnul okno/aplikaci. Split-screen = test běžel v malém okně. Fullscreen exit = opustil fullscreen. Každý student je jiný — 1–3 signály mohou být náhodné.',
-  detailed:'Typy signálů: blur-count (kolikrát student přepnul z okna testu — 1–2 může být náhodné, 10+ je podezřelé), blur-total-ms (celkový čas mimo okno), split-window (podíl času s malým oknem — typické pro rozdělenou obrazovku), fullscreen-exit (kolikrát opustil povinný fullscreen). Signály jsou vodítko pro učitele, ne automatické hodnocení. Kontext je důležitý: student s dyslexií mohl mít zapnutou čtečku v druhém okně; student na slabém PC mohl mít pomalé překreslování. Signály vidíš v teacher verifieru v záložce Bezpečnostní záznam.',
+  simple:'Bezpečnostní signály jsou klientské indicie, ne důkazy ani automatická známka. Jejich význam závisí na typu zařízení, úplnosti telemetrie a okolnostech pokusu.',
+  detailed:'Blur/pagehide/fullscreen-exit popisují událost, kterou prohlížeč oznámil; split-window je pouze heuristika velikosti viewportu. Neexistuje univerzální bezpečný počet „normálních" událostí. Chybějící telemetrie není nula ani důkaz čistého průběhu a skutečná nula se zobrazuje odděleně. Recovery je legitimní auditní operace. Učitel musí porovnat čas, chronologii, zařízení, dostupnostní potřeby a práci studenta.',
   evidence:['setupLockDetection()','guardedBlurCheck()','startSplitMonitor()','recordSplitSummary()','security{}','SPLIT_RATIO']},
 
  {id:'bodovani-nesedi',title:'Bodování nesedí — co dělat',status:'reseno',

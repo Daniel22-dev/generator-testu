@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { assertP4ConsumedPromotionEvidence } from './ci/p4-contract.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
@@ -68,7 +69,7 @@ if (p4EvidenceRel) {
   assert(p4EvidencePath.startsWith(root + path.sep), 'P4 evidence must stay inside repository root');
   ensureFile(p4EvidencePath);
   p4Evidence = readJson(p4EvidencePath);
-  assert(p4Evidence.schema === 'git-p4-consumed-promotion-evidence-v1' && p4Evidence.status === 'PASS', 'Invalid P4 consumed evidence contract');
+  assertP4ConsumedPromotionEvidence(p4Evidence);
   assert(String(p4Evidence.repository || '').toLowerCase() === sourceRepository.toLowerCase(), 'P4 evidence repository drift');
   assert(String(p4Evidence.mergedMain?.commit || '').toLowerCase() === sourceCommit, 'P4 evidence belongs to another merged main commit');
   assert(SHA40.test(p4Evidence.certifiedSource?.commit || ''), 'P4 certified source SHA missing');
