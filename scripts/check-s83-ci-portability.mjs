@@ -65,6 +65,14 @@ function normalizeReviewedWorkflow(text,file){
   };
   if(file==='.github/workflows/safe-promotion.yml'){
     validateOwnerApprovalPlacement(normalized);
+    assert.equal(normalized.split('  push:\n    branches: [candidate]\n').length-1,1,`${file}: native push trigger drift`);
+    normalized=normalized.replace('  push:\n    branches: [candidate]\n','  push:\n    branches: [candidate]\n  workflow_dispatch:\n');
+    assert.equal(normalized.split('    timeout-minutes: 90\n').length-1,1,`${file}: admission timeout drift`);
+    normalized=normalized.replace('    timeout-minutes: 90\n','    timeout-minutes: 40\n');
+    removeExact(`
+      - name: Require authentic first-attempt candidate push
+        run: node scripts/ci/promotion-origin.mjs
+`,2);
     removeExact(`
       - name: Require exact authenticated owner approval for this release
         env:
@@ -73,7 +81,7 @@ function normalizeReviewedWorkflow(text,file){
           PREPARED_MAIN_SHA: \${{ needs.prepare.outputs.main_sha }}
           PR_NUMBER: \${{ needs.prepare.outputs.pr_number }}
           RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
-        run: node scripts/ci/release-authorization.mjs --premerge
+        run: node scripts/ci/release-authorization.mjs --wait-premerge
 `);
     removeExact(`
       - name: Recheck exact owner approval inside the promotion lock
@@ -84,6 +92,25 @@ function normalizeReviewedWorkflow(text,file){
           PR_NUMBER: \${{ needs.prepare.outputs.pr_number }}
           RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
         run: node scripts/ci/release-authorization.mjs --premerge
+`);
+    removeExact(`
+      - name: Require complete P4 evidence before irreversible merge
+        env:
+          GH_TOKEN: \${{ github.token }}
+          CERTIFIED_SHA: \${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: \${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: \${{ needs.prepare.outputs.pr_number }}
+          RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
+        run: node scripts/ci/p4-promotion-evidence.mjs --premerge
+`);
+    removeExact(`
+      - name: Wait for native GitHub merge readiness
+        env:
+          GH_TOKEN: \${{ github.token }}
+          CERTIFIED_SHA: \${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: \${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: \${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/native-merge-readiness.mjs --wait
 `);
     const evidence=`          path: |
             qa-results/*-p1.json
@@ -111,7 +138,7 @@ const unexpected=actualWorkflows.filter(file=>{
 check(unexpected.length===0,'S83-CI07B','workflow contents preserve the reviewed baseline exceptions and exact protected-main manual QA bytes');
 const unsafeE10Mutation=fs.readFileSync(path.join(root,'.github/workflows/safe-promotion.yml'),'utf8')
   .replace('release-authorization.mjs --premerge','release-authorization.mjs --postmerge');
-assert.throws(()=>normalizeReviewedWorkflow(unsafeE10Mutation,'.github/workflows/safe-promotion.yml'),/reviewed E10 sequence count drift|must execute the exact premerge authorization command/,
+assert.throws(()=>normalizeReviewedWorkflow(unsafeE10Mutation,'.github/workflows/safe-promotion.yml'),/reviewed E10 sequence count drift|must execute the exact --premerge authorization command/,
   'altered owner-authorization semantics must remain visible to workflow admission');
 const relocationSource=fs.readFileSync(path.join(root,'.github/workflows/safe-promotion.yml'),'utf8');
 const relocationPromote=jobBlock(relocationSource,'promote');
