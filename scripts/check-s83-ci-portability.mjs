@@ -101,6 +101,7 @@ function normalizeReviewedWorkflow(text,file){
           PREPARED_MAIN_SHA: \${{ needs.prepare.outputs.main_sha }}
           PR_NUMBER: \${{ needs.prepare.outputs.pr_number }}
           RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
+          GARP27_EXTERNAL_TRUST_SHA256: ${oldTrust}
         run: node scripts/ci/p4-promotion-evidence.mjs --premerge
 `);
     removeExact(`

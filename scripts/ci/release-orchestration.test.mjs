@@ -58,6 +58,14 @@ test('historical approval is pending and new exact approval during wait is accep
   assert.equal(evidence.status, 'PASS'); assert.equal(evidence.source.commit, source);
 });
 
+test('WAIT validates release context without constructing a synthetic review', () => {
+  const api = authorizationApi([]);
+  const result = inspectLiveReleaseAuthorization(expected, api);
+  assert.deepEqual(result, { status: 'WAIT', reason: 'MISSING_CURRENT_OWNER_APPROVAL' });
+  const sourceText = fs.readFileSync(new URL('./release-authorization.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(sourceText, /PENDING_CONTEXT_ONLY/);
+});
+
 test('missing new approval times out fail-closed', async () => {
   const api = authorizationApi([approval(1, 'd'.repeat(40))]);
   let clock = 0;

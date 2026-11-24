@@ -55,7 +55,7 @@ function ownerLogin(repository) {
   return repository.split('/')[0];
 }
 
-export function verifyReleaseAuthorization({ expected, pr, reviews, candidateRef, mainRef, sourceCommit, stage = 'premerge' }) {
+export function verifyReleaseContext({ expected, pr, candidateRef, mainRef, sourceCommit, stage = 'premerge' }) {
   const payload = approvalPayload(expected);
   const repo = payload.repository;
   assert.ok(['premerge', 'postmerge'].includes(stage), 'Unknown authorization stage');
@@ -80,6 +80,13 @@ export function verifyReleaseAuthorization({ expected, pr, reviews, candidateRef
     assert.equal(mainRef?.object?.sha, exactSha(expected.mergedMainSha), 'Merged main moved before deployment');
     assert.equal(pr?.merge_commit_sha, expected.mergedMainSha, 'Unexpected promotion merge commit');
   }
+
+  return payload;
+}
+
+export function verifyReleaseAuthorization({ expected, pr, reviews, candidateRef, mainRef, sourceCommit, stage = 'premerge' }) {
+  const payload = verifyReleaseContext({ expected, pr, candidateRef, mainRef, sourceCommit, stage });
+  const repo = payload.repository;
 
   assert.ok(Array.isArray(reviews), 'Reviews collection required');
   const owner = ownerLogin(repo).toLowerCase();
@@ -166,13 +173,9 @@ export function inspectLiveReleaseAuthorization(expected, options = {}) {
   // Reuse the strict verifier for every PASS. A historical review on an older
   // SHA is merely absent for this release; it can never authorize the new SHA.
   if (!currentReviews.length) {
-    const contextOnly = { ...input, reviews: [{
-      id: 1, node_id: 'PENDING_CONTEXT_ONLY', html_url: `https://github.com/${input.expected.repository}/pull/${input.expected.prNumber}`,
-      user: { login: ownerLogin(input.expected.repository), type: 'User' }, author_association: 'OWNER', state: 'APPROVED',
-      commit_id: input.expected.sourceSha, submitted_at: new Date(0).toISOString(), body: approvalStatement(input.expected),
-    }] };
-    // This proves that PR/ref/tree/main context is still exact before waiting.
-    verifyReleaseAuthorization(contextOnly);
+    // Validate the immutable release/PR/ref context without inventing an
+    // approval. Only a real authenticated review may enter the strict verifier.
+    verifyReleaseContext(input);
     return { status: 'WAIT', reason: 'MISSING_CURRENT_OWNER_APPROVAL' };
   }
   const latest = currentReviews.at(-1);

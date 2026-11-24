@@ -68,7 +68,14 @@ function tempRoot(t) {
       { workflow: 'journey-e2e.yml', job: 'journey-e2e', runId: journeyRunId, attempt: 1, jobId: 31, sha: source },
     ],
   }));
-  return root;
+  const p5EvidenceRoot = path.join(root, 'premerge-p5');
+  fs.mkdirSync(path.join(p5EvidenceRoot, 'dist'), { recursive: true });
+  for (const name of REQUIRED_P5_REPORTS) {
+    fs.writeFileSync(path.join(p5EvidenceRoot, 'dist', name), JSON.stringify({
+      appId: 'generator', appVersion: version, status: 'passed',
+    }));
+  }
+  return { root, p5EvidenceRoot };
 }
 function runObj(id, attempt, workflow, status = 'completed', conclusion = 'success') {
   return { id, run_attempt: attempt, path: workflow, head_sha: source, head_branch: 'candidate', event: 'push',
@@ -87,7 +94,7 @@ function artifact(id, name, runId, digest = `sha256:${sha256(String((id % 9) + 1
     workflow_run: { id: runId } };
 }
 function fixture(t, { candidateSha = source } = {}) {
-  const root = tempRoot(t);
+  const { root, p5EvidenceRoot } = tempRoot(t);
   const currentArtifacts = [
     artifact(101, `generator-candidate-release-${source}-${promotionRunId}-${promotionAttempt}`, promotionRunId),
     artifact(102, `generator-candidate-qa-${source}`, promotionRunId),
@@ -175,7 +182,7 @@ function fixture(t, { candidateSha = source } = {}) {
     if (key === 'rev-parse HEAD') return merged;
     return git(args);
   };
-  return { root, runs, jobs, artifacts, checks, pr, reviews, ref, read, collection, git, consumerGit, producerEnv, consumerEnv, now, certificate, certArtifact };
+  return { root, p5EvidenceRoot, runs, jobs, artifacts, checks, pr, reviews, ref, read, collection, git, consumerGit, producerEnv, consumerEnv, now, certificate, certArtifact };
 }
 
 test('P4 producer creates exact-tree, exact-run, exact-artifact certificate', t => {
@@ -204,12 +211,15 @@ function makePremerge(f) {
 test('P4 premerge readiness authenticates the complete attempt-1 evidence chain', t => {
   const f = makePremerge(fixture(t));
   const result = validatePremergeReadiness({ root: f.root, env: f.producerEnv,
-    read: f.read, collection: f.collection, git: f.git });
+    read: f.read, collection: f.collection, git: f.git, p5EvidenceRoot: f.p5EvidenceRoot });
   assert.equal(result.status, 'PASS');
   assert.equal(result.schema, 'git-p4-premerge-readiness-v1');
   assert.equal(result.producer.runAttempt, 1);
   assert.equal(result.currentCertifications['release-admission'].checkAppId, ACTIONS_APP_ID);
   assert.equal(result.independentCertifications.length, 2);
+  assert.equal(result.p5Evidence.requiredReports.length, REQUIRED_P5_REPORTS.length);
+  assert.equal(result.trust.configDigests.length, CONFIG_PATHS.length);
+  assert.equal(result.trust.garp27ExternalTrustSha256, GARP27_TRUST_SHA256);
 });
 
 const premergeMutations = [
@@ -223,11 +233,47 @@ const premergeMutations = [
     const evidence = JSON.parse(fs.readFileSync(file, 'utf8')); evidence.evidence[0].attempt = 2;
     fs.writeFileSync(file, JSON.stringify(evidence));
   }],
+  ['two P5 certifications without Journey', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8'));
+    evidence.evidence[1] = { ...evidence.evidence[0], runId: journeyRunId, jobId: 31 };
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['two Journey certifications without P5', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8'));
+    evidence.evidence[0] = { ...evidence.evidence[1], runId: p5RunId, jobId: 21 };
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['independent workflow and job role mismatch', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8'));
+    evidence.evidence[0].workflow = 'journey-e2e.yml';
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['missing required configuration file', f => { fs.rmSync(path.join(f.root, CONFIG_PATHS[0])); }],
+  ['invalid GARP trust input', f => { f.producerEnv.GARP27_EXTERNAL_TRUST_SHA256 = sha256('8'); }],
+  ['missing required P5 report', f => { fs.rmSync(path.join(f.p5EvidenceRoot, 'dist', REQUIRED_P5_REPORTS[0])); }],
 ];
 for (const [name, mutate] of premergeMutations) test(`P4 premerge readiness rejects ${name}`, t => {
   const f = makePremerge(fixture(t)); mutate(f);
   assert.throws(() => validatePremergeReadiness({ root: f.root, env: f.producerEnv,
-    read: f.read, collection: f.collection, git: f.git }));
+    read: f.read, collection: f.collection, git: f.git, p5EvidenceRoot: f.p5EvidenceRoot }));
+});
+
+test('P4 premerge and producer share independent-role and deterministic-input validation', t => {
+  const duplicate = fixture(t);
+  const admissionFile = path.join(duplicate.root, 'qa-results/independent-admission-p1.json');
+  const admission = JSON.parse(fs.readFileSync(admissionFile, 'utf8'));
+  admission.evidence[1] = { ...admission.evidence[0], runId: journeyRunId, jobId: 31 };
+  fs.writeFileSync(admissionFile, JSON.stringify(admission));
+  assert.throws(() => createPromotionCertificate({ root: duplicate.root, env: duplicate.producerEnv,
+    read: duplicate.read, collection: duplicate.collection, git: duplicate.git, now: duplicate.now }));
+
+  const missingConfig = fixture(t);
+  fs.rmSync(path.join(missingConfig.root, CONFIG_PATHS.at(-1)));
+  assert.throws(() => createPromotionCertificate({ root: missingConfig.root, env: missingConfig.producerEnv,
+    read: missingConfig.read, collection: missingConfig.collection, git: missingConfig.git, now: missingConfig.now }));
 });
 
 

@@ -435,6 +435,7 @@ jobs:
           PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
           PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
           RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
+          GARP27_EXTERNAL_TRUST_SHA256: ca917fc08b10da17e0d6fdcae273177e587758fda5271cf56bfb4f8330eb05b8
         run: node scripts/ci/p4-promotion-evidence.mjs --premerge
 
       - name: Wait for native GitHub merge readiness
