@@ -7,6 +7,8 @@ export function jobBlock(text, id) {
 export function validateP1Workflow(text, mode = 'parallel') {
   text = String(text).replace(/\r\n?/g, '\n');
   assert.ok(['parallel', 'serial'].includes(mode));
+  assert.match(text, /^on:\n  push:\n    branches: \[candidate\]$/m);
+  assert.doesNotMatch(text, /^  workflow_dispatch:$/m, 'Production Safe Promotion must not be manually dispatched');
   const prepare = jobBlock(text, 'prepare'), candidate = jobBlock(text, 'candidate-gate');
   const pr = jobBlock(text, 'pr-certification'), admission = jobBlock(text, 'admission'), promote = jobBlock(text, 'promote');
   assert.match(candidate, /^    needs: prepare$/m);
@@ -16,6 +18,7 @@ export function validateP1Workflow(text, mode = 'parallel') {
   assert.match(prepare, /run: node scripts\/ci\/promotion-freshness.mjs --prepare/);
   assert.match(prepare, /run: node scripts\/ci\/promotion-freshness.mjs --pr/);
   assert.match(admission, /^    if: always\(\)$/m);
+  assert.match(admission, /^    timeout-minutes: 90$/m);
   assert.match(admission, /^    needs: \[prepare, candidate-gate, pr-certification\]$/m);
   for (const part of [admission, promote]) {
     assert.match(part, /run: node scripts\/ci\/main-protection.mjs --live/);
@@ -25,10 +28,17 @@ export function validateP1Workflow(text, mode = 'parallel') {
     assert.match(part, /checks: read/);
   }
   assert.match(admission, /run: node scripts\/ci\/release-admission.mjs --prerequisites/);
+  assert.match(admission, /run: node scripts\/ci\/promotion-origin.mjs/);
+  assert.match(admission, /run: node scripts\/ci\/release-authorization.mjs --wait-premerge/);
   assert.match(admission, /CI_NEEDS_JSON: \$\{\{ toJSON\(needs\) \}\}/);
   assert.match(promote, /^    needs: \[prepare, candidate-gate, pr-certification, admission\]$/m);
+  assert.match(promote, /run: node scripts\/ci\/promotion-origin.mjs/);
+  assert.match(promote, /run: node scripts\/ci\/p4-promotion-evidence.mjs --premerge/);
+  assert.match(promote, /run: node scripts\/ci\/native-merge-readiness.mjs --wait/);
   assert.match(promote, /needs.admission.result == 'success' && needs.admission.outputs.eligible == 'true' && needs.admission.outputs.certified_sha == github.sha/);
   assert.ok(promote.indexOf('promotion-freshness.mjs --pr') < promote.indexOf('gh pr merge'));
+  assert.ok(promote.indexOf('native-merge-readiness.mjs --wait') < promote.lastIndexOf('release-authorization.mjs --premerge'));
+  assert.ok(promote.lastIndexOf('release-authorization.mjs --premerge') < promote.lastIndexOf('promotion-freshness.mjs --pr'));
   assert.match(promote, /--match-head-commit "\$CERTIFIED_SHA"/);
   assert.match(promote, /run: node scripts\/ci\/p4-promotion-evidence\.mjs --produce/);
   assert.match(promote, /name: generator-p4-promotion-\$\{\{ steps\.merged\.outputs\.main_head \}\}-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}/);
@@ -47,4 +57,9 @@ export function validateP1Workflow(text, mode = 'parallel') {
     assert.match(part, /ref: \$\{\{ needs.prepare.outputs.certified_sha \}\}/);
     assert.match(part, /persist-credentials: false/);
   }
+}
+
+export function validateDeployDispatchContract(text) {
+  text = String(text).replace(/\r\n?/g, '\n');
+  assert.match(text, /^on:\n  workflow_dispatch:\n/m, 'P4 deploy must retain its authenticated workflow_dispatch entry point');
 }

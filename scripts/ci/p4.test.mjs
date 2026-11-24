@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import {
   ACTIONS_APP_ID, CONFIG_PATHS, GARP27_TRUST_SHA256, PROMOTION_JOB, PROMOTION_WORKFLOW,
   REQUIRED_P5_REPORTS, SCHEMA, createPromotionCertificate, validatePromotionCertificate,
-  materializeReusedEvidence,
+  materializeReusedEvidence, validatePremergeReadiness,
 } from './p4-promotion-evidence.mjs';
 import { buildPlan } from './preflight.mjs';
 import { approvalStatement, RELEASE_SCOPE } from './release-authorization.mjs';
@@ -23,7 +23,7 @@ const sha256 = c => c.repeat(64);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const source = sha('a'), base = sha('b'), merged = sha('c'), tree = sha('d');
 const repo = 'synthetic/fixture';
-const promotionRunId = 1001, promotionAttempt = 2, p5RunId = 2001, journeyRunId = 3001;
+const promotionRunId = 1001, promotionAttempt = 1, p5RunId = 2001, journeyRunId = 3001;
 const prNumber = 77;
 const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
 
@@ -95,6 +95,7 @@ function fixture(t, { candidateSha = source } = {}) {
     artifact(104, `generator-pr-release-${source}-${promotionRunId}-${promotionAttempt}`, promotionRunId),
     artifact(105, `generator-pr-certification-${source}`, promotionRunId),
     artifact(106, `generator-toolchain-${source}-${promotionRunId}-${promotionAttempt}-pr-certification`, promotionRunId),
+    artifact(107, `generator-premerge-admission-${source}-${promotionRunId}-${promotionAttempt}`, promotionRunId),
   ];
   const p5Artifacts = [artifact(201, `p5-r2-${source}`, p5RunId), artifact(202, `generator-toolchain-${source}-${p5RunId}-1-p5-release-gate`, p5RunId)];
   const journeyArtifacts = [artifact(301, `journey-e2e-evidence-${source}`, journeyRunId), artifact(302, `generator-toolchain-${source}-${journeyRunId}-1-journey-e2e`, journeyRunId)];
@@ -108,6 +109,7 @@ function fixture(t, { candidateSha = source } = {}) {
       jobObj(11, promotionRunId, promotionAttempt, 'candidate-gate'),
       jobObj(12, promotionRunId, promotionAttempt, 'pr-certification'),
       jobObj(13, promotionRunId, promotionAttempt, PROMOTION_JOB, 'in_progress', null, producerSteps),
+      jobObj(14, promotionRunId, promotionAttempt, 'release-admission'),
     ],
     [p5RunId]: [jobObj(21, p5RunId, 1, 'p5-release-gate')],
     [journeyRunId]: [jobObj(31, journeyRunId, 1, 'journey-e2e')],
@@ -118,7 +120,7 @@ function fixture(t, { candidateSha = source } = {}) {
     [journeyRunId]: runObj(journeyRunId, 1, '.github/workflows/journey-e2e.yml'),
   };
   const artifacts = { [promotionRunId]: currentArtifacts, [p5RunId]: p5Artifacts, [journeyRunId]: journeyArtifacts };
-  const checks = { 11: checkObj(11, 'candidate-gate'), 12: checkObj(12, 'pr-certification'), 21: checkObj(21, 'p5-release-gate'), 31: checkObj(31, 'journey-e2e') };
+  const checks = { 11: checkObj(11, 'candidate-gate'), 12: checkObj(12, 'pr-certification'), 14: checkObj(14, 'release-admission'), 21: checkObj(21, 'p5-release-gate'), 31: checkObj(31, 'journey-e2e') };
   const pr = { number: prNumber, state: 'closed', merged: true, merge_commit_sha: merged,
     head: { ref: 'candidate', sha: source, repo: { full_name: repo } },
     base: { ref: 'main', sha: base, repo: { full_name: repo } } };
@@ -157,7 +159,9 @@ function fixture(t, { candidateSha = source } = {}) {
   };
   const producerEnv = { GITHUB_REPOSITORY: repo, CERTIFIED_SHA: source, PREPARED_MAIN_SHA: base, MERGED_MAIN_SHA: merged,
     PR_NUMBER: String(prNumber), GITHUB_RUN_ID: String(promotionRunId), GITHUB_RUN_ATTEMPT: String(promotionAttempt),
-    GITHUB_JOB: 'promote', RELEASE_SCOPE, GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
+    GITHUB_JOB: 'promote', GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'push',
+    GITHUB_REF: 'refs/heads/candidate', GITHUB_SHA: source,
+    RELEASE_SCOPE, GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
   const now = Date.parse('2026-10-06T20:00:00Z');
   const certificate = createPromotionCertificate({ root, env: producerEnv, read, collection, git, now });
   const certArtifact = artifact(401, `generator-p4-promotion-${merged}-${promotionRunId}-${promotionAttempt}`, promotionRunId, `sha256:${sha256('9')}`);
@@ -185,6 +189,45 @@ test('P4 producer creates exact-tree, exact-run, exact-artifact certificate', t 
   assert.equal(c.trust.configDigests.length, CONFIG_PATHS.length);
   assert.equal(c.authorization.status, 'PASS');
   assert.equal(c.authorization.approval.reviewId, 901);
+});
+
+function makePremerge(f) {
+  f.pr.state = 'open';
+  f.pr.merged = false;
+  f.pr.merge_commit_sha = null;
+  f.ref.main.object.sha = base;
+  f.reviews[0].body = approvalStatement({ repository: repo, prNumber, sourceSha: source,
+    sourceTree: tree, preparedMainSha: base, version, scope: RELEASE_SCOPE });
+  return f;
+}
+
+test('P4 premerge readiness authenticates the complete attempt-1 evidence chain', t => {
+  const f = makePremerge(fixture(t));
+  const result = validatePremergeReadiness({ root: f.root, env: f.producerEnv,
+    read: f.read, collection: f.collection, git: f.git });
+  assert.equal(result.status, 'PASS');
+  assert.equal(result.schema, 'git-p4-premerge-readiness-v1');
+  assert.equal(result.producer.runAttempt, 1);
+  assert.equal(result.currentCertifications['release-admission'].checkAppId, ACTIONS_APP_ID);
+  assert.equal(result.independentCertifications.length, 2);
+});
+
+const premergeMutations = [
+  ['workflow dispatch origin', f => { f.producerEnv.GITHUB_EVENT_NAME = 'workflow_dispatch'; }],
+  ['rerun attempt', f => { f.producerEnv.GITHUB_RUN_ATTEMPT = '2'; }],
+  ['main drift', f => { f.ref.main.object.sha = sha('e'); }],
+  ['missing release admission artifact', f => { f.artifacts[promotionRunId] = f.artifacts[promotionRunId].filter(a => !a.name.startsWith('generator-premerge-admission-')); }],
+  ['foreign release admission app', f => { f.checks[14].app.id = 999; }],
+  ['independent workflow rerun evidence', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8')); evidence.evidence[0].attempt = 2;
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+];
+for (const [name, mutate] of premergeMutations) test(`P4 premerge readiness rejects ${name}`, t => {
+  const f = makePremerge(fixture(t)); mutate(f);
+  assert.throws(() => validatePremergeReadiness({ root: f.root, env: f.producerEnv,
+    read: f.read, collection: f.collection, git: f.git }));
 });
 
 

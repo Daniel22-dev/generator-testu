@@ -10,6 +10,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { githubRead, readCollection, repositoryName, exactSha, positiveId } from './github-read.mjs';
 import { checkLiveReleaseAuthorization, releaseVersion, RELEASE_SCOPE } from './release-authorization.mjs';
+import { requirePromotionOrigin } from './promotion-origin.mjs';
 import {
   P4_CONSUMED_PROMOTION_EVIDENCE_SCHEMA,
   P4_PROMOTION_CERTIFICATE_SCHEMA,
@@ -51,6 +52,8 @@ export const CONFIG_PATHS = Object.freeze([
   'scripts/ci/release-admission.mjs',
   'scripts/ci/release-evidence.mjs',
   'scripts/ci/release-authorization.mjs',
+  'scripts/ci/promotion-origin.mjs',
+  'scripts/ci/native-merge-readiness.mjs',
   'scripts/check-redteam-release-e10.mjs',
   'scripts/run-redteam-ci-e10.mjs',
 ]);
@@ -74,7 +77,7 @@ const digestFile = (root, rel) => {
 export function configDigests(root = ROOT) {
   return CONFIG_PATHS.map(rel => ({ path: rel, sha256: digestFile(root, rel) }));
 }
-function verifyRun(run, { repo, runId, runAttempt, workflow, headSha, headBranch, allowedEvents = ['push', 'workflow_dispatch'] }) {
+function verifyRun(run, { repo, runId, runAttempt, workflow, headSha, headBranch, allowedEvents = ['push'] }) {
   assert.equal(String(run.id), String(positiveId(runId)), 'Wrong workflow run ID');
   assert.equal(String(run.run_attempt), String(positiveId(runAttempt)), 'Wrong workflow attempt');
   assert.equal(run.path, workflow, 'Wrong workflow path');
@@ -153,6 +156,9 @@ function expectedCurrentArtifacts(sha, runId, attempt, role) {
     `generator-pr-release-${sha}-${runId}-${attempt}`,
     `generator-pr-certification-${sha}`,
     `generator-toolchain-${sha}-${runId}-${attempt}-pr-certification`,
+  ];
+  if (role === 'release-admission') return [
+    `generator-premerge-admission-${sha}-${runId}-${attempt}`,
   ];
   throw new Error('Unknown current certification role');
 }
@@ -233,6 +239,8 @@ export function createPromotionCertificate({ root = ROOT, env, read = githubRead
   const prNumber = positiveId(env.PR_NUMBER);
   const runId = positiveId(env.GITHUB_RUN_ID);
   const runAttempt = positiveId(env.GITHUB_RUN_ATTEMPT);
+  requirePromotionOrigin(env);
+  assert.equal(Number(runAttempt), 1, 'P4 producer requires first promotion attempt');
   assert.equal(env.GITHUB_JOB, 'promote', 'Certificate may only be produced by promote job');
   assert.equal(env.GARP27_EXTERNAL_TRUST_SHA256, GARP27_TRUST_SHA256, 'GARP trust pin drift');
 
@@ -268,6 +276,7 @@ export function createPromotionCertificate({ root = ROOT, env, read = githubRead
   const independentCertifications = {};
   for (const e of independent.evidence) {
     assert.ok(['p5-release-gate.yml', 'journey-e2e.yml'].includes(e.workflow), 'Unexpected independent workflow');
+    assert.equal(Number(e.attempt), 1, `${e.job}: rerun evidence cannot authorize promotion`);
     const role = e.job;
     const cert = collectCertification({ repo, sha: sourceSha, runId: e.runId, runAttempt: e.attempt,
       workflow: `.github/workflows/${e.workflow}`, headBranch: 'candidate', jobName: role,
@@ -305,6 +314,67 @@ export function createPromotionCertificate({ root = ROOT, env, read = githubRead
     ],
   };
   return certificate;
+}
+
+export function validatePremergeReadiness({ root = ROOT, env, read = githubRead,
+  collection = readCollection, git = runGit }) {
+  const origin = requirePromotionOrigin(env);
+  const repo = repositoryName(env.GITHUB_REPOSITORY);
+  const sourceSha = exactSha(env.CERTIFIED_SHA);
+  const preparedMainSha = exactSha(env.PREPARED_MAIN_SHA);
+  const prNumber = positiveId(env.PR_NUMBER);
+  const runId = positiveId(env.GITHUB_RUN_ID);
+  const runAttempt = positiveId(env.GITHUB_RUN_ATTEMPT);
+  assert.equal(env.GITHUB_JOB, 'promote', 'Premerge readiness may only run in promote job');
+  assert.equal(origin.sha, sourceSha, 'Promotion event SHA differs from certified source');
+  assert.equal(Number(runAttempt), 1, 'P4 premerge readiness rejects reruns');
+
+  const run = verifyRun(read(`repos/${repo}/actions/runs/${runId}`), {
+    repo, runId, runAttempt, workflow: PROMOTION_WORKFLOW, headSha: sourceSha, headBranch: 'candidate',
+  });
+  assert.equal(run.status, 'in_progress', 'Promotion run must be active before merge');
+  const candidate = read(`repos/${repo}/git/ref/heads/candidate`);
+  const main = read(`repos/${repo}/git/ref/heads/main`);
+  assert.equal(candidate.object?.sha, sourceSha, 'Candidate moved before P4 readiness');
+  assert.equal(main.object?.sha, preparedMainSha, 'Main moved before P4 readiness');
+  assert.equal(git(['rev-parse', 'HEAD'], root), sourceSha, 'Premerge checkout differs from source');
+  const sourceTree = exactSha(git(['rev-parse', `${sourceSha}^{tree}`], root));
+  const authorization = checkLiveReleaseAuthorization({ repository: repo, prNumber, sourceSha, sourceTree,
+    preparedMainSha, version: releaseVersion(root), scope: env.RELEASE_SCOPE || RELEASE_SCOPE },
+  { read, collection, stage: 'premerge' });
+
+  const jobs = collection(`repos/${repo}/actions/runs/${runId}/attempts/${runAttempt}/jobs`, 'jobs', read);
+  const artifacts = collection(`repos/${repo}/actions/runs/${runId}/artifacts`, 'artifacts', read);
+  const current = {};
+  for (const jobName of ['candidate-gate', 'pr-certification', 'release-admission']) {
+    const job = verifyJob({ repo, run: { ...run, status: 'completed', conclusion: 'success' }, jobs, jobName, sha: sourceSha, read });
+    current[jobName] = {
+      ...job,
+      artifacts: expectedCurrentArtifacts(sourceSha, runId, runAttempt, jobName).map(name =>
+        artifactRecord(artifacts, name, runId, runAttempt, { startedAt: job.jobStartedAt, completedAt: job.jobCompletedAt })),
+    };
+  }
+
+  const independent = independentAdmission(root, sourceSha, runId, runAttempt);
+  const independentCertifications = [];
+  for (const evidence of independent.evidence) {
+    assert.ok(['p5-release-gate.yml', 'journey-e2e.yml'].includes(evidence.workflow));
+    assert.equal(Number(evidence.attempt), 1, `${evidence.job}: rerun evidence cannot authorize premerge readiness`);
+    const certification = collectCertification({ repo, sha: sourceSha, runId: evidence.runId,
+      runAttempt: evidence.attempt, workflow: `.github/workflows/${evidence.workflow}`, headBranch: 'candidate',
+      jobName: evidence.job, artifactNames: expectedIndependentArtifacts(sourceSha, evidence.runId, evidence.attempt, evidence.job),
+      read, collection });
+    assert.equal(certification.jobId, evidence.jobId, `${evidence.job}: independent admission job ID drift`);
+    independentCertifications.push(certification);
+  }
+  assert.equal(independentCertifications.length, 2, 'P5 and Journey evidence both required before merge');
+  return {
+    schema: 'git-p4-premerge-readiness-v1', status: 'PASS', repository: repo,
+    source: { commit: sourceSha, tree: sourceTree }, preparedMain: { commit: preparedMainSha },
+    pullRequest: { number: Number(prNumber) }, producer: { runId: Number(runId), runAttempt: 1, event: run.event },
+    authorization, currentCertifications: current, independentCertifications,
+    protection: protectionEvidence(root, repo), checkedAt: new Date().toISOString(),
+  };
 }
 function producerStep(job, name) {
   const steps = (job.steps || []).filter(s => s.name === name);
@@ -392,6 +462,7 @@ export function validatePromotionCertificate({ root = ROOT, env, certificate, ar
   assert.equal(env.GITHUB_REF, 'refs/heads/main', 'Production deploy must target main');
   assert.equal(exactSha(env.GITHUB_SHA), mergedMainSha, 'Workflow-dispatch SHA differs from merged main');
   assert.equal(env.GARP27_EXTERNAL_TRUST_SHA256, GARP27_TRUST_SHA256, 'GARP trust pin drift');
+  assert.equal(Number(runAttempt), 1, 'P4 consumer rejects a rerun promotion attempt');
 
   const run = producerRun || verifyRun(read(`repos/${repo}/actions/runs/${runId}`), {
     repo, runId, runAttempt, workflow: PROMOTION_WORKFLOW, headSha: sourceSha, headBranch: 'candidate',
@@ -505,7 +576,14 @@ export function materializeReusedEvidence({ root = ROOT, reuseDir }) {
 }
 
 async function main() {
-  const mode = process.argv[2]; assert.ok(['--produce', '--consume', '--materialize'].includes(mode));
+  const mode = process.argv[2]; assert.ok(['--premerge', '--produce', '--consume', '--materialize'].includes(mode));
+  if (mode === '--premerge') {
+    const evidence = validatePremergeReadiness({ env: process.env });
+    fs.mkdirSync('qa-results', { recursive: true });
+    fs.writeFileSync('qa-results/p4-premerge-readiness.json', JSON.stringify(evidence, null, 2) + '\n');
+    console.log('PASS P4 premerge readiness: all exact-run evidence exists before merge');
+    return;
+  }
   if (mode === '--produce') {
     const certificate = createPromotionCertificate({ env: process.env });
     fs.mkdirSync('qa-results', { recursive: true });

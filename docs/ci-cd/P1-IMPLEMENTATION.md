@@ -1,5 +1,39 @@
 # CI/CD P1 - guarded independent parallel certification
 
+## 2026-11-24 native release-orchestration correction
+
+Production Safe Promotion is now accepted only from the first attempt of an
+authentic `push` to `candidate`. The production `workflow_dispatch` entry point
+was removed from `safe-promotion.yml`; it remains intentionally available in
+`deploy.yml` as the authenticated P4 consumer invoked after a protected merge.
+Reruns and manually dispatched promotion runs fail closed and cannot merge.
+
+After both technical certification jobs and the independent P5/Journey runs
+have succeeded, `release-admission` waits at most 60 minutes for a new exact
+owner review bound to the current source commit, tree, prepared main commit,
+version and release scope. It polls at approximately 30-second intervals. An
+approval for an older SHA is treated only as missing; a malformed, dismissed,
+rejected or revoked review for the current SHA, API failure, or branch/PR drift
+stops immediately. The required review payload and PR URL are printed by the
+job. The original strict authorization verifier remains the only PASS path.
+
+Before the irreversible merge, the promotion lock performs two additional
+read-only gates. P4 premerge readiness independently authenticates the current
+run/attempt, GitHub Actions App, job/check identities, immutable artifact IDs,
+digests and job time windows for candidate-gate, pr-certification,
+release-admission, P5 and Journey. It also rechecks exact owner authorization
+and current main/candidate. No certificate is created at this stage. Native
+merge readiness then waits for no more than 120 seconds for GitHub to report
+the PR clean and all five required checks successful from first-attempt push
+runs on the exact SHA. A persistent BLOCKED state is a release failure; there
+is no `--admin`, auto-merge or synthetic status fallback. Exact owner approval
+and freshness are checked once more immediately before `gh pr merge`.
+
+The post-merge P4 producer/consumer contract is unchanged in shape, but now
+also requires the originating promotion run to be a first-attempt candidate
+push. The downstream `deploy.yml` workflow dispatch and its merged-main
+identity checks remain the authorized deployment mechanism.
+
 Status: LOCAL IMPLEMENTATION / FULL PREFLIGHT BLOCKED / NOT ACTIVATED.
 Base: the uncommitted P0 package, originally based on
 7516768223602cec697f4fb173382c2b6d17aab4 (GIT 7.1.96).

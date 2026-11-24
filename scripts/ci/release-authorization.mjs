@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { githubRead, readCollection, repositoryName, exactSha, positiveId } from './github-read.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -18,6 +19,8 @@ export const AUTHORIZED_ACTIONS = Object.freeze([
   'notify-ai-studio',
 ]);
 const SHA256 = /^[0-9a-f]{64}$/;
+export const OWNER_APPROVAL_WAIT_MS = 60 * 60 * 1000;
+export const OWNER_APPROVAL_POLL_MS = 30 * 1000;
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 
 export function releaseVersion(root = ROOT) {
@@ -140,10 +143,68 @@ export function checkLiveReleaseAuthorization(expected, {
   });
 }
 
-function runCli() {
+function liveAuthorizationInputs(expected, { read = githubRead, collection = readCollection, stage = 'premerge' } = {}) {
+  const repo = repositoryName(expected.repository);
+  const prNumber = positiveId(expected.prNumber);
+  return {
+    expected: { ...expected, repository: repo, prNumber }, stage,
+    pr: read(`repos/${repo}/pulls/${prNumber}`),
+    reviews: collection(`repos/${repo}/pulls/${prNumber}/reviews`, null, read),
+    candidateRef: stage === 'premerge' ? read(`repos/${repo}/git/ref/heads/candidate`) : null,
+    mainRef: read(`repos/${repo}/git/ref/heads/main`),
+    sourceCommit: read(`repos/${repo}/git/commits/${exactSha(expected.sourceSha)}`),
+  };
+}
+
+export function inspectLiveReleaseAuthorization(expected, options = {}) {
+  const input = liveAuthorizationInputs(expected, options);
+  const owner = ownerLogin(input.expected.repository).toLowerCase();
+  const currentReviews = input.reviews
+    .filter(r => String(r?.user?.login || '').toLowerCase() === owner && r?.commit_id === input.expected.sourceSha)
+    .sort((a, b) => Number(a.id) - Number(b.id));
+
+  // Reuse the strict verifier for every PASS. A historical review on an older
+  // SHA is merely absent for this release; it can never authorize the new SHA.
+  if (!currentReviews.length) {
+    const contextOnly = { ...input, reviews: [{
+      id: 1, node_id: 'PENDING_CONTEXT_ONLY', html_url: `https://github.com/${input.expected.repository}/pull/${input.expected.prNumber}`,
+      user: { login: ownerLogin(input.expected.repository), type: 'User' }, author_association: 'OWNER', state: 'APPROVED',
+      commit_id: input.expected.sourceSha, submitted_at: new Date(0).toISOString(), body: approvalStatement(input.expected),
+    }] };
+    // This proves that PR/ref/tree/main context is still exact before waiting.
+    verifyReleaseAuthorization(contextOnly);
+    return { status: 'WAIT', reason: 'MISSING_CURRENT_OWNER_APPROVAL' };
+  }
+  const latest = currentReviews.at(-1);
+  assert.equal(latest.state, 'APPROVED', 'Current owner review is rejected, dismissed, or not approved');
+  assert.equal(latest.body, approvalStatement(input.expected), 'Current owner approval payload is invalid');
+  return { status: 'PASS', evidence: verifyReleaseAuthorization(input) };
+}
+
+export async function waitForLiveReleaseAuthorization(expected, {
+  read = githubRead, collection = readCollection, pause = sleep, now = Date.now,
+  timeoutMs = OWNER_APPROVAL_WAIT_MS, intervalMs = OWNER_APPROVAL_POLL_MS,
+} = {}) {
+  assert.ok(Number.isFinite(timeoutMs) && timeoutMs > 0 && timeoutMs <= OWNER_APPROVAL_WAIT_MS);
+  assert.ok(Number.isFinite(intervalMs) && intervalMs > 0);
+  const deadline = now() + timeoutMs;
+  for (let iteration = 0; iteration < 121; iteration++) {
+    const result = inspectLiveReleaseAuthorization(expected, { read, collection, stage: 'premerge' });
+    if (result.status === 'PASS') return result.evidence;
+    const remaining = deadline - now();
+    if (remaining <= 0) break;
+    console.log(`WAIT exact owner approval for ${expected.sourceSha}; next check in ${Math.min(intervalMs, remaining)} ms`);
+    await pause(Math.min(intervalMs, remaining));
+  }
+  throw new Error('Timed out waiting for a new exact owner approval');
+}
+
+async function runCli() {
   assert.equal(process.env.GITHUB_ACTIONS, 'true', 'Live owner authorization runs only in GitHub Actions');
   assert.equal(process.env.GITHUB_REPOSITORY, repositoryName(process.env.GITHUB_REPOSITORY));
-  const stage = process.argv.includes('--postmerge') ? 'postmerge' : 'premerge';
+  const mode = process.argv[2];
+  assert.ok(['--premerge', '--postmerge', '--wait-premerge'].includes(mode), 'Unknown release authorization mode');
+  const stage = mode === '--postmerge' ? 'postmerge' : 'premerge';
   const repository = process.env.GITHUB_REPOSITORY;
   const sourceSha = exactSha(process.env.CERTIFIED_SHA);
   const sourceTree = process.env.CERTIFIED_TREE || githubRead(`repos/${repository}/git/commits/${sourceSha}`).tree?.sha;
@@ -157,14 +218,16 @@ function runCli() {
     version: releaseVersion(),
     scope: process.env.RELEASE_SCOPE || RELEASE_SCOPE,
   };
+  console.log(`Owner approval PR: https://github.com/${repository}/pull/${positiveId(expected.prNumber)}`);
   console.log(`Required exact owner review body:\n${approvalStatement(expected)}`);
-  const evidence = checkLiveReleaseAuthorization(expected, { stage });
+  const evidence = mode === '--wait-premerge'
+    ? await waitForLiveReleaseAuthorization(expected)
+    : checkLiveReleaseAuthorization(expected, { stage });
   fs.mkdirSync('qa-results', { recursive: true });
   fs.writeFileSync('qa-results/release-authorization-e10.json', `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(`PASS exact owner release authorization: review ${evidence.approval.reviewId}`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try { runCli(); }
-  catch (error) { console.error(`BLOCKED owner release authorization: ${error.message}`); process.exitCode = 1; }
+  runCli().catch(error => { console.error(`BLOCKED owner release authorization: ${error.message}`); process.exitCode = 1; });
 }

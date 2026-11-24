@@ -9,7 +9,8 @@ import { githubRead, readCollection } from './github-read.mjs';
 import { verifyMainProtection, readLiveProtection, readAdminAttestation, REQUIRED_CHECKS, RULESET_ID, ACTIONS_APP_ID, ATTESTED_RULESET_UPDATED_AT } from './main-protection.mjs';
 import { validateFreshness, checkLiveFreshness } from './promotion-freshness.mjs';
 import { requirePrerequisites, selectIndependentRuns, verifyIndependentJob, waitForIndependent, INDEPENDENT_GATES } from './release-admission.mjs';
-import { validateP1Workflow, jobBlock } from './p1-workflow-contract.mjs';
+import { validateP1Workflow, validateDeployDispatchContract, jobBlock } from './p1-workflow-contract.mjs';
+import './release-orchestration.test.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const repo = 'Daniel22-dev/generator-testu', sha = 'a'.repeat(40), mainSha = 'b'.repeat(40);
 function protection() {
@@ -208,6 +209,9 @@ test('P1 API failure is not treated as pending success', async () => {
 const production = fs.readFileSync(path.join(root, '.github/workflows/safe-promotion.yml'), 'utf8');
 const parallel = production.replace(/^    needs: \[prepare, candidate-gate\]$/m, '    needs: prepare');
 test('P1 production workflow satisfies its guarded topology contract', () => validateP1Workflow(production));
+test('P1 keeps workflow_dispatch only on the authenticated P4 deploy consumer', () => {
+  validateDeployDispatchContract(fs.readFileSync(path.join(root, '.github/workflows/deploy.yml'), 'utf8'));
+});
 test('P1 serial rollback preserves admission and every gate', () => {
   const part = jobBlock(parallel, 'pr-certification');
   const serial = parallel.replace(part, part.replace('    needs: prepare', '    needs: [prepare, candidate-gate]'));
