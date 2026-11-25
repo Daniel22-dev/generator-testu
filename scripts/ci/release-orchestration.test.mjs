@@ -91,6 +91,7 @@ test('invalid current approval, dismissal, branch drift, and API errors fail imm
 
 function nativeFixture() {
   const runs = new Map();
+  const statuses = [];
   const checks = REQUIRED_CHECKS.map((name, index) => {
     const runId = 100 + index;
     runs.set(runId, { id: runId, run_attempt: 1, event: 'push', head_sha: source, head_branch: 'candidate',
@@ -112,7 +113,22 @@ function nativeFixture() {
     if (endpoint.endsWith('/pulls/146')) return structuredClone(refs.pr);
     throw new Error('Unexpected ' + endpoint);
   };
-  return { runs, checks, refs, read, collection: () => structuredClone(checks) };
+  const collection = endpoint => {
+    if (endpoint.endsWith('/check-runs')) return structuredClone(checks);
+    if (endpoint.endsWith('/statuses')) return structuredClone(statuses);
+    throw new Error('Unexpected collection ' + endpoint);
+  };
+  return { runs, checks, statuses, refs, read, collection };
+}
+
+function addCurrentPromotionCheck(f, overrides = {}) {
+  const runId = 104; // release-admission belongs to the current Safe Promotion run
+  const check = { id: 999, name: 'promote-certified-pr', head_sha: source,
+    app: { id: ACTIONS_APP_ID }, status: 'in_progress', conclusion: null,
+    details_url: 'https://github.com/' + repo + '/actions/runs/' + runId + '/job/999', ...overrides };
+  f.runs.get(runId).path = '.github/workflows/safe-promotion.yml';
+  f.checks.push(check);
+  return check;
 }
 
 test('native readiness accepts all five exact-SHA eligible GitHub Actions checks', async () => {
@@ -121,6 +137,50 @@ test('native readiness accepts all five exact-SHA eligible GitHub Actions checks
   const result = await waitForNativeMergeReadiness({ repo, prNumber: 146, sha: source, mainSha: main,
     read: f.read, collection: f.collection, pause: () => { throw new Error('unexpected wait'); } });
   assert.equal(result.status, 'PASS'); assert.equal(result.mergeableState, 'clean');
+});
+
+test('native readiness accepts unstable only for the authentic current in-progress promotion job', async () => {
+  const f = nativeFixture(); f.refs.pr.mergeable_state = 'unstable'; addCurrentPromotionCheck(f);
+  const result = await waitForNativeMergeReadiness({ repo, prNumber: 146, sha: source, mainSha: main,
+    read: f.read, collection: f.collection, pause: () => { throw new Error('unexpected wait'); } });
+  assert.equal(result.status, 'PASS'); assert.equal(result.mergeableState, 'unstable');
+  assert.equal(result.inProgressPromotion.checkId, 999); assert.equal(result.inProgressPromotion.runId, 104);
+});
+
+test('unstable readiness rejects unauthentic promotion, extra failures, failed statuses and identity drift', async () => {
+  const reject = async (mutate, pattern) => {
+    const f = nativeFixture(); f.refs.pr.mergeable_state = 'unstable'; addCurrentPromotionCheck(f); mutate(f);
+    await assert.rejects(waitForNativeMergeReadiness({ repo, prNumber: 146, sha: source, mainSha: main,
+      read: f.read, collection: f.collection, pause: () => { throw new Error('unexpected wait'); } }), pattern);
+  };
+  await reject(f => { f.checks[5].app.id = 999; }, /promotion.*GitHub Actions App/i);
+  await reject(f => { f.checks[5].details_url = 'https://github.com/' + repo + '/actions/runs/103/job/999'; }, /current promotion run/i);
+  await reject(f => { f.checks.push({ id: 1000, name: 'foreign-pending', head_sha: source,
+    app: { id: ACTIONS_APP_ID }, status: 'in_progress', conclusion: null,
+    details_url: 'https://github.com/' + repo + '/actions/runs/104/job/1000' }); }, /only non-success check/i);
+  await reject(f => { f.statuses.push({ id: 1, sha: source, context: 'legacy', state: 'failure' }); }, /commit status/i);
+  await reject(f => { f.refs.candidate.object.sha = 'e'.repeat(40); }, /Candidate moved/);
+  await reject(f => { f.refs.pr.head.sha = 'e'.repeat(40); }, /PR head moved/);
+});
+
+test('native readiness rejects missing or failed mandatory checks and nonmergeable states', async () => {
+  for (const mutate of [
+    f => { f.checks = f.checks.filter(check => check.name !== REQUIRED_CHECKS[0]); },
+    f => { f.checks[0].conclusion = 'failure'; },
+  ]) {
+    const f = nativeFixture(); mutate(f);
+    await assert.rejects(waitForNativeMergeReadiness({ repo, prNumber: 146, sha: source, mainSha: main,
+      read: f.read, collection: endpoint => endpoint.endsWith('/check-runs') ? structuredClone(f.checks) : [],
+      pause: () => { throw new Error('unexpected wait'); } }));
+  }
+  for (const state of ['dirty', 'behind']) {
+    const f = nativeFixture(); f.refs.pr.mergeable_state = state;
+    await assert.rejects(waitForNativeMergeReadiness({ repo, prNumber: 146, sha: source, mainSha: main,
+      read: f.read, collection: f.collection }), /Non-transient native merge state/);
+  }
+  const f = nativeFixture(); f.refs.pr.mergeable = false;
+  await assert.rejects(waitForNativeMergeReadiness({ repo, prNumber: 146, sha: source, mainSha: main,
+    read: f.read, collection: f.collection }), /unmergeable/);
 });
 
 test('native readiness tolerates bounded propagation but never persistent BLOCKED', async () => {

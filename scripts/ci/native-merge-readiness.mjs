@@ -7,6 +7,8 @@ import { ACTIONS_APP_ID, REQUIRED_CHECKS } from './main-protection.mjs';
 
 export const NATIVE_MERGE_WAIT_MS = 120 * 1000;
 const ELIGIBLE_EVENTS = new Set(['push']);
+const PROMOTION_JOB = 'promote-certified-pr';
+const PROMOTION_WORKFLOW = '.github/workflows/safe-promotion.yml';
 
 function runIdFromCheck(check) {
   const match = String(check?.details_url || '').match(/\/actions\/runs\/(\d+)\/job\/\d+$/);
@@ -41,6 +43,38 @@ export function verifyRequiredNativeChecks({ repo, sha, checks, read = githubRea
   return evidence;
 }
 
+function verifyExplainedUnstableState({ repo, sha, checks, evidence, read, collection }) {
+  const nonSuccess = checks.filter(check => check.head_sha === sha &&
+    (check.status !== 'completed' || check.conclusion !== 'success'));
+  assert.equal(nonSuccess.length, 1,
+    'Unstable PR must have promote-certified-pr as its only non-success check');
+  const promotion = nonSuccess[0];
+  assert.equal(promotion.name, PROMOTION_JOB, 'Unexpected non-success check while PR is unstable');
+  assert.equal(promotion.app?.id, ACTIONS_APP_ID, 'Promotion check is not from the GitHub Actions App');
+  assert.equal(promotion.status, 'in_progress', 'Promotion check must be currently in progress');
+  assert.equal(promotion.conclusion, null, 'In-progress promotion check must not have a conclusion');
+  const runId = runIdFromCheck(promotion);
+  const admission = evidence.find(item => item.context === 'release-admission');
+  assert.ok(admission, 'Missing release-admission evidence for current promotion run');
+  assert.equal(Number(runId), admission.runId, 'Promotion check does not belong to the current promotion run');
+  const run = read(`repos/${repo}/actions/runs/${runId}`);
+  assert.equal(run.path, PROMOTION_WORKFLOW, 'Promotion check originates from another workflow');
+  assert.equal(run.event, 'push', 'Promotion run must originate from candidate push');
+  assert.equal(Number(run.run_attempt), 1, 'Promotion rerun cannot authorize merge');
+  assert.equal(run.head_sha, sha, 'Promotion workflow SHA drift');
+  assert.equal(run.head_branch, 'candidate', 'Promotion workflow branch drift');
+  assert.equal(run.repository?.full_name, repo, 'Foreign promotion workflow repository');
+  assert.equal(run.head_repository?.full_name, repo, 'Foreign promotion workflow source');
+  const statuses = collection(`repos/${repo}/commits/${sha}/statuses`, null, read);
+  assert.ok(Array.isArray(statuses), 'Commit statuses collection required');
+  for (const status of statuses) {
+    if (status.sha != null) assert.equal(status.sha, sha, 'Commit status SHA drift');
+    assert.equal(status.state, 'success', `Non-success commit status: ${status.context || status.id || 'unknown'}`);
+  }
+  return { checkId: promotion.id, runId: Number(runId), status: promotion.status,
+    appId: promotion.app.id, workflow: run.path };
+}
+
 export async function waitForNativeMergeReadiness({ repo, prNumber, sha, mainSha, read = githubRead,
   collection = readCollection, pause = sleep, now = Date.now, timeoutMs = NATIVE_MERGE_WAIT_MS, intervalMs = 5000 }) {
   repositoryName(repo); positiveId(prNumber); exactSha(sha); exactSha(mainSha);
@@ -60,6 +94,11 @@ export async function waitForNativeMergeReadiness({ repo, prNumber, sha, mainSha
     if (pr.mergeable === true && pr.mergeable_state === 'clean') {
       return { status: 'PASS', repository: repo, pullRequest: Number(prNumber), sourceCommit: sha,
         preparedMainCommit: mainSha, mergeableState: pr.mergeable_state, checks: evidence };
+    }
+    if (pr.mergeable === true && pr.mergeable_state === 'unstable') {
+      const inProgressPromotion = verifyExplainedUnstableState({ repo, sha, checks, evidence, read, collection });
+      return { status: 'PASS', repository: repo, pullRequest: Number(prNumber), sourceCommit: sha,
+        preparedMainCommit: mainSha, mergeableState: pr.mergeable_state, checks: evidence, inProgressPromotion };
     }
     assert.ok(pr.mergeable === null || pr.mergeable === true, 'GitHub reports the PR as unmergeable');
     assert.ok(['unknown', 'blocked'].includes(pr.mergeable_state), `Non-transient native merge state: ${pr.mergeable_state}`);
