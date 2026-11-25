@@ -70,6 +70,8 @@ function tempRoot(t) {
   }));
   const p5EvidenceRoot = path.join(root, 'premerge-p5');
   fs.mkdirSync(path.join(p5EvidenceRoot, 'dist'), { recursive: true });
+  fs.mkdirSync(path.join(p5EvidenceRoot, 'qa-results'), { recursive: true });
+  fs.writeFileSync(path.join(p5EvidenceRoot, 'qa-results', 'evidence.json'), JSON.stringify({ status: 'passed' }));
   for (const name of REQUIRED_P5_REPORTS) {
     fs.writeFileSync(path.join(p5EvidenceRoot, 'dist', name), JSON.stringify({
       appId: 'generator', appVersion: version, status: 'passed',
@@ -254,6 +256,11 @@ const premergeMutations = [
   ['missing required configuration file', f => { fs.rmSync(path.join(f.root, CONFIG_PATHS[0])); }],
   ['invalid GARP trust input', f => { f.producerEnv.GARP27_EXTERNAL_TRUST_SHA256 = sha256('8'); }],
   ['missing required P5 report', f => { fs.rmSync(path.join(f.p5EvidenceRoot, 'dist', REQUIRED_P5_REPORTS[0])); }],
+  ['missing P5 QA evidence directory', f => { fs.rmSync(path.join(f.p5EvidenceRoot, 'qa-results'), { recursive: true }); }],
+  ['P5 QA evidence directory replaced with a file', f => {
+    const qa = path.join(f.p5EvidenceRoot, 'qa-results');
+    fs.rmSync(qa, { recursive: true }); fs.writeFileSync(qa, 'not a directory');
+  }],
 ];
 for (const [name, mutate] of premergeMutations) test(`P4 premerge readiness rejects ${name}`, t => {
   const f = makePremerge(fixture(t)); mutate(f);

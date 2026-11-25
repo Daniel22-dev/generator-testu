@@ -274,7 +274,13 @@ function collectIndependentCertifications({ root, repo, sourceSha, runId, runAtt
     journeyE2E: certifications['journey-e2e'],
   };
 }
+function requireP5QaDirectory(root) {
+  const qa = path.join(root, 'qa-results');
+  assert.ok(fs.existsSync(qa) && fs.lstatSync(qa).isDirectory(), 'P5 QA evidence directory missing');
+  return qa;
+}
 function validateP5ReportTree(root, version) {
+  requireP5QaDirectory(root);
   const extracted = extractedTreeDigest(root);
   const reports = REQUIRED_P5_REPORTS.map(name => {
     const file = regularFile(path.join(root, 'dist', name));
@@ -610,6 +616,7 @@ export function materializeReusedEvidence({ root = ROOT, reuseDir }) {
   assert.equal(consumed.certifiedSource.tree, consumed.mergedMain.tree, 'Tree equivalence lost before materialization');
   const pkg = readJson(path.join(root, 'package.json'));
   const p5Root = path.join(reuseDir, 'p5');
+  const p5Qa = requireP5QaDirectory(p5Root);
   const extracted = extractedTreeDigest(p5Root);
   assert.equal(extracted.sha256, consumed.reusedP5?.extractedSha256, 'Downloaded P5 evidence changed after validation');
   assert.equal(extracted.fileCount, consumed.reusedP5?.fileCount, 'Downloaded P5 evidence file count changed');
@@ -626,8 +633,6 @@ export function materializeReusedEvidence({ root = ROOT, reuseDir }) {
   fs.mkdirSync(path.join(root, 'qa-results'), { recursive: true });
   fs.copyFileSync(certFile, path.join(root, 'qa-results/p4-promotion-certificate.json'));
   fs.copyFileSync(consumedFile, path.join(root, 'qa-results/p4-consumed-promotion-evidence.json'));
-  const p5Qa = path.join(p5Root, 'qa-results');
-  assert.ok(fs.existsSync(p5Qa) && fs.lstatSync(p5Qa).isDirectory(), 'P5 QA evidence directory missing');
   copyTreeSafe(p5Qa, path.join(root, 'qa-results/premerge-p5'));
   return { status: 'PASS', reports: REQUIRED_P5_REPORTS.length, evidenceRoot: 'qa-results/premerge-p5' };
 }
