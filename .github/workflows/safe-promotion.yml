@@ -3,7 +3,6 @@ name: Safe Promotion - candidate to main
 on:
   push:
     branches: [candidate]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -309,7 +308,7 @@ jobs:
     if: always()
     needs: [prepare, candidate-gate, pr-certification]
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 90
     concurrency:
       group: generator-admission-validation-${{ github.ref }}
       cancel-in-progress: true
@@ -333,6 +332,9 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
+
+      - name: Require authentic first-attempt candidate push
+        run: node scripts/ci/promotion-origin.mjs
 
       - name: Reject failed skipped cancelled or foreign certification results
         env:
@@ -361,7 +363,7 @@ jobs:
           PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
           PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
           RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
-        run: node scripts/ci/release-authorization.mjs --premerge
+        run: node scripts/ci/release-authorization.mjs --wait-premerge
 
       - name: Admit only the still-current PR candidate and main
         id: admitted
@@ -409,6 +411,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Require authentic first-attempt candidate push
+        run: node scripts/ci/promotion-origin.mjs
+
       - name: Recheck native protection inside the promotion lock
         env:
           GH_TOKEN: ${{ github.token }}
@@ -422,6 +427,24 @@ jobs:
 
       - name: Require classroom release readiness
         run: node scripts/check-redteam-release-e10.mjs --require-ready
+
+      - name: Require complete P4 evidence before irreversible merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+          RELEASE_SCOPE: R1-A-C32-D02+R1-E10-GOV
+          GARP27_EXTERNAL_TRUST_SHA256: ca917fc08b10da17e0d6fdcae273177e587758fda5271cf56bfb4f8330eb05b8
+        run: node scripts/ci/p4-promotion-evidence.mjs --premerge
+
+      - name: Wait for native GitHub merge readiness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTIFIED_SHA: ${{ needs.prepare.outputs.certified_sha }}
+          PREPARED_MAIN_SHA: ${{ needs.prepare.outputs.main_sha }}
+          PR_NUMBER: ${{ needs.prepare.outputs.pr_number }}
+        run: node scripts/ci/native-merge-readiness.mjs --wait
 
       - name: Recheck exact owner approval inside the promotion lock
         env:

@@ -22,8 +22,7 @@ export function requirePrerequisites(needs, sha) {
 }
 export function selectIndependentRuns(runs, gate, repo, sha) {
   repositoryName(repo); exactSha(sha); assert.ok(Array.isArray(runs));
-  const relevant = runs.filter(run => run.head_sha === sha && run.head_branch === 'candidate' &&
-    ['push', 'workflow_dispatch'].includes(run.event));
+  const relevant = runs.filter(run => run.head_sha === sha && run.head_branch === 'candidate' && run.event === 'push');
   if (!relevant.length) return { status: 'WAIT', runs: [] };
   for (const run of relevant) {
     positiveId(run.id); positiveId(run.run_attempt);

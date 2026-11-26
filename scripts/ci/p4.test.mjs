@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import {
   ACTIONS_APP_ID, CONFIG_PATHS, GARP27_TRUST_SHA256, PROMOTION_JOB, PROMOTION_WORKFLOW,
   REQUIRED_P5_REPORTS, SCHEMA, createPromotionCertificate, validatePromotionCertificate,
-  materializeReusedEvidence,
+  materializeReusedEvidence, validatePremergeReadiness,
 } from './p4-promotion-evidence.mjs';
 import { buildPlan } from './preflight.mjs';
 import { approvalStatement, RELEASE_SCOPE } from './release-authorization.mjs';
@@ -23,7 +23,7 @@ const sha256 = c => c.repeat(64);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const source = sha('a'), base = sha('b'), merged = sha('c'), tree = sha('d');
 const repo = 'synthetic/fixture';
-const promotionRunId = 1001, promotionAttempt = 2, p5RunId = 2001, journeyRunId = 3001;
+const promotionRunId = 1001, promotionAttempt = 1, p5RunId = 2001, journeyRunId = 3001;
 const prNumber = 77;
 const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
 
@@ -68,7 +68,16 @@ function tempRoot(t) {
       { workflow: 'journey-e2e.yml', job: 'journey-e2e', runId: journeyRunId, attempt: 1, jobId: 31, sha: source },
     ],
   }));
-  return root;
+  const p5EvidenceRoot = path.join(root, 'premerge-p5');
+  fs.mkdirSync(path.join(p5EvidenceRoot, 'dist'), { recursive: true });
+  fs.mkdirSync(path.join(p5EvidenceRoot, 'qa-results'), { recursive: true });
+  fs.writeFileSync(path.join(p5EvidenceRoot, 'qa-results', 'evidence.json'), JSON.stringify({ status: 'passed' }));
+  for (const name of REQUIRED_P5_REPORTS) {
+    fs.writeFileSync(path.join(p5EvidenceRoot, 'dist', name), JSON.stringify({
+      appId: 'generator', appVersion: version, status: 'passed',
+    }));
+  }
+  return { root, p5EvidenceRoot };
 }
 function runObj(id, attempt, workflow, status = 'completed', conclusion = 'success') {
   return { id, run_attempt: attempt, path: workflow, head_sha: source, head_branch: 'candidate', event: 'push',
@@ -87,7 +96,7 @@ function artifact(id, name, runId, digest = `sha256:${sha256(String((id % 9) + 1
     workflow_run: { id: runId } };
 }
 function fixture(t, { candidateSha = source } = {}) {
-  const root = tempRoot(t);
+  const { root, p5EvidenceRoot } = tempRoot(t);
   const currentArtifacts = [
     artifact(101, `generator-candidate-release-${source}-${promotionRunId}-${promotionAttempt}`, promotionRunId),
     artifact(102, `generator-candidate-qa-${source}`, promotionRunId),
@@ -95,6 +104,7 @@ function fixture(t, { candidateSha = source } = {}) {
     artifact(104, `generator-pr-release-${source}-${promotionRunId}-${promotionAttempt}`, promotionRunId),
     artifact(105, `generator-pr-certification-${source}`, promotionRunId),
     artifact(106, `generator-toolchain-${source}-${promotionRunId}-${promotionAttempt}-pr-certification`, promotionRunId),
+    artifact(107, `generator-premerge-admission-${source}-${promotionRunId}-${promotionAttempt}`, promotionRunId),
   ];
   const p5Artifacts = [artifact(201, `p5-r2-${source}`, p5RunId), artifact(202, `generator-toolchain-${source}-${p5RunId}-1-p5-release-gate`, p5RunId)];
   const journeyArtifacts = [artifact(301, `journey-e2e-evidence-${source}`, journeyRunId), artifact(302, `generator-toolchain-${source}-${journeyRunId}-1-journey-e2e`, journeyRunId)];
@@ -108,6 +118,7 @@ function fixture(t, { candidateSha = source } = {}) {
       jobObj(11, promotionRunId, promotionAttempt, 'candidate-gate'),
       jobObj(12, promotionRunId, promotionAttempt, 'pr-certification'),
       jobObj(13, promotionRunId, promotionAttempt, PROMOTION_JOB, 'in_progress', null, producerSteps),
+      jobObj(14, promotionRunId, promotionAttempt, 'release-admission'),
     ],
     [p5RunId]: [jobObj(21, p5RunId, 1, 'p5-release-gate')],
     [journeyRunId]: [jobObj(31, journeyRunId, 1, 'journey-e2e')],
@@ -118,7 +129,7 @@ function fixture(t, { candidateSha = source } = {}) {
     [journeyRunId]: runObj(journeyRunId, 1, '.github/workflows/journey-e2e.yml'),
   };
   const artifacts = { [promotionRunId]: currentArtifacts, [p5RunId]: p5Artifacts, [journeyRunId]: journeyArtifacts };
-  const checks = { 11: checkObj(11, 'candidate-gate'), 12: checkObj(12, 'pr-certification'), 21: checkObj(21, 'p5-release-gate'), 31: checkObj(31, 'journey-e2e') };
+  const checks = { 11: checkObj(11, 'candidate-gate'), 12: checkObj(12, 'pr-certification'), 14: checkObj(14, 'release-admission'), 21: checkObj(21, 'p5-release-gate'), 31: checkObj(31, 'journey-e2e') };
   const pr = { number: prNumber, state: 'closed', merged: true, merge_commit_sha: merged,
     head: { ref: 'candidate', sha: source, repo: { full_name: repo } },
     base: { ref: 'main', sha: base, repo: { full_name: repo } } };
@@ -157,7 +168,9 @@ function fixture(t, { candidateSha = source } = {}) {
   };
   const producerEnv = { GITHUB_REPOSITORY: repo, CERTIFIED_SHA: source, PREPARED_MAIN_SHA: base, MERGED_MAIN_SHA: merged,
     PR_NUMBER: String(prNumber), GITHUB_RUN_ID: String(promotionRunId), GITHUB_RUN_ATTEMPT: String(promotionAttempt),
-    GITHUB_JOB: 'promote', RELEASE_SCOPE, GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
+    GITHUB_JOB: 'promote', GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'push',
+    GITHUB_REF: 'refs/heads/candidate', GITHUB_SHA: source,
+    RELEASE_SCOPE, GARP27_EXTERNAL_TRUST_SHA256: GARP27_TRUST_SHA256 };
   const now = Date.parse('2026-10-06T20:00:00Z');
   const certificate = createPromotionCertificate({ root, env: producerEnv, read, collection, git, now });
   const certArtifact = artifact(401, `generator-p4-promotion-${merged}-${promotionRunId}-${promotionAttempt}`, promotionRunId, `sha256:${sha256('9')}`);
@@ -171,7 +184,7 @@ function fixture(t, { candidateSha = source } = {}) {
     if (key === 'rev-parse HEAD') return merged;
     return git(args);
   };
-  return { root, runs, jobs, artifacts, checks, pr, reviews, ref, read, collection, git, consumerGit, producerEnv, consumerEnv, now, certificate, certArtifact };
+  return { root, p5EvidenceRoot, runs, jobs, artifacts, checks, pr, reviews, ref, read, collection, git, consumerGit, producerEnv, consumerEnv, now, certificate, certArtifact };
 }
 
 test('P4 producer creates exact-tree, exact-run, exact-artifact certificate', t => {
@@ -185,6 +198,89 @@ test('P4 producer creates exact-tree, exact-run, exact-artifact certificate', t 
   assert.equal(c.trust.configDigests.length, CONFIG_PATHS.length);
   assert.equal(c.authorization.status, 'PASS');
   assert.equal(c.authorization.approval.reviewId, 901);
+});
+
+function makePremerge(f) {
+  f.pr.state = 'open';
+  f.pr.merged = false;
+  f.pr.merge_commit_sha = null;
+  f.ref.main.object.sha = base;
+  f.reviews[0].body = approvalStatement({ repository: repo, prNumber, sourceSha: source,
+    sourceTree: tree, preparedMainSha: base, version, scope: RELEASE_SCOPE });
+  return f;
+}
+
+test('P4 premerge readiness authenticates the complete attempt-1 evidence chain', t => {
+  const f = makePremerge(fixture(t));
+  const result = validatePremergeReadiness({ root: f.root, env: f.producerEnv,
+    read: f.read, collection: f.collection, git: f.git, p5EvidenceRoot: f.p5EvidenceRoot });
+  assert.equal(result.status, 'PASS');
+  assert.equal(result.schema, 'git-p4-premerge-readiness-v1');
+  assert.equal(result.producer.runAttempt, 1);
+  assert.equal(result.currentCertifications['release-admission'].checkAppId, ACTIONS_APP_ID);
+  assert.equal(result.independentCertifications.length, 2);
+  assert.equal(result.p5Evidence.requiredReports.length, REQUIRED_P5_REPORTS.length);
+  assert.equal(result.trust.configDigests.length, CONFIG_PATHS.length);
+  assert.equal(result.trust.garp27ExternalTrustSha256, GARP27_TRUST_SHA256);
+});
+
+const premergeMutations = [
+  ['workflow dispatch origin', f => { f.producerEnv.GITHUB_EVENT_NAME = 'workflow_dispatch'; }],
+  ['rerun attempt', f => { f.producerEnv.GITHUB_RUN_ATTEMPT = '2'; }],
+  ['main drift', f => { f.ref.main.object.sha = sha('e'); }],
+  ['missing release admission artifact', f => { f.artifacts[promotionRunId] = f.artifacts[promotionRunId].filter(a => !a.name.startsWith('generator-premerge-admission-')); }],
+  ['foreign release admission app', f => { f.checks[14].app.id = 999; }],
+  ['independent workflow rerun evidence', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8')); evidence.evidence[0].attempt = 2;
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['two P5 certifications without Journey', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8'));
+    evidence.evidence[1] = { ...evidence.evidence[0], runId: journeyRunId, jobId: 31 };
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['two Journey certifications without P5', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8'));
+    evidence.evidence[0] = { ...evidence.evidence[1], runId: p5RunId, jobId: 21 };
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['independent workflow and job role mismatch', f => {
+    const file = path.join(f.root, 'qa-results/independent-admission-p1.json');
+    const evidence = JSON.parse(fs.readFileSync(file, 'utf8'));
+    evidence.evidence[0].workflow = 'journey-e2e.yml';
+    fs.writeFileSync(file, JSON.stringify(evidence));
+  }],
+  ['missing required configuration file', f => { fs.rmSync(path.join(f.root, CONFIG_PATHS[0])); }],
+  ['invalid GARP trust input', f => { f.producerEnv.GARP27_EXTERNAL_TRUST_SHA256 = sha256('8'); }],
+  ['missing required P5 report', f => { fs.rmSync(path.join(f.p5EvidenceRoot, 'dist', REQUIRED_P5_REPORTS[0])); }],
+  ['missing P5 QA evidence directory', f => { fs.rmSync(path.join(f.p5EvidenceRoot, 'qa-results'), { recursive: true }); }],
+  ['P5 QA evidence directory replaced with a file', f => {
+    const qa = path.join(f.p5EvidenceRoot, 'qa-results');
+    fs.rmSync(qa, { recursive: true }); fs.writeFileSync(qa, 'not a directory');
+  }],
+];
+for (const [name, mutate] of premergeMutations) test(`P4 premerge readiness rejects ${name}`, t => {
+  const f = makePremerge(fixture(t)); mutate(f);
+  assert.throws(() => validatePremergeReadiness({ root: f.root, env: f.producerEnv,
+    read: f.read, collection: f.collection, git: f.git, p5EvidenceRoot: f.p5EvidenceRoot }));
+});
+
+test('P4 premerge and producer share independent-role and deterministic-input validation', t => {
+  const duplicate = fixture(t);
+  const admissionFile = path.join(duplicate.root, 'qa-results/independent-admission-p1.json');
+  const admission = JSON.parse(fs.readFileSync(admissionFile, 'utf8'));
+  admission.evidence[1] = { ...admission.evidence[0], runId: journeyRunId, jobId: 31 };
+  fs.writeFileSync(admissionFile, JSON.stringify(admission));
+  assert.throws(() => createPromotionCertificate({ root: duplicate.root, env: duplicate.producerEnv,
+    read: duplicate.read, collection: duplicate.collection, git: duplicate.git, now: duplicate.now }));
+
+  const missingConfig = fixture(t);
+  fs.rmSync(path.join(missingConfig.root, CONFIG_PATHS.at(-1)));
+  assert.throws(() => createPromotionCertificate({ root: missingConfig.root, env: missingConfig.producerEnv,
+    read: missingConfig.read, collection: missingConfig.collection, git: missingConfig.git, now: missingConfig.now }));
 });
 
 
